@@ -3,7 +3,7 @@ use 5.008009;
 use strict;
 use warnings;
 
-our $VERSION = "0.06";
+our $VERSION = "0.08";
 
 use Moose::Role;
 
@@ -11,6 +11,12 @@ has filter => (
     is  => 'ro',
     isa => 'CodeRef|Str',
     predicate => 'has_filter',
+);
+
+has bypass_filter_method_check => (
+    is  => 'ro',
+    isa => 'Bool',
+    default => 0,
 );
 
 1;
@@ -63,6 +69,10 @@ Returns the value of the C<filter> option. This may be a string (method name)
 or coderef or undef.
 
 =item C<has_filter>
+
+Boolean.
+
+=item C<bypass_filter_method_check>
 
 Boolean.
 

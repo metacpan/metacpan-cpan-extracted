@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 239;
+plan tests => 241;
 
 use Math::AnyNum qw(:special rat float complex);
 
@@ -166,6 +166,9 @@ like(pow('-3',          '1/2'), qr/^1\.73205080756887729352744634150587236694\d*
 like(pow('-3',          0.5),   qr/^1\.73205080756887729352744634150587236694\d*i\z/);
 like(pow(rat('-3'),     0.5),   qr/^1\.73205080756887729352744634150587236694\d*i\z/);
 like(pow(complex('-3'), 0.5),   qr/^1\.73205080756887729352744634150587236694\d*i\z/);
+
+like(lnsuperfactorial(10), qr/^64\.065707751895742354200715949449678961\d*\z/);
+like(lnhyperfactorial(10), qr/^102\.08283055193492589328208667231209512\d*\z/);
 
 is(pow('-1/2', '4'),           '1/16');
 is(pow('-1/2', rat('4')),      '1/16');

@@ -13,6 +13,7 @@ t/02_blocking.t
 t/03_non_blocking.t
 t/04_signal.t
 t/06_guard.t
+t/07_guard_blocking.t
 t/Util.pm
 META.yml
 MANIFEST

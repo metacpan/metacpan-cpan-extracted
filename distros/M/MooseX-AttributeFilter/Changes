@@ -1,5 +1,13 @@
 Revision history for Perl extension MooseX-AttributeFilter
 
+0.08
+
+    - bypass_filter_method_check
+
+0.07
+
+    - more tolerant looking for filter method by name
+
 0.06
 
     - fix NAME for MooseX::AttributeFilter::Trait::Attribute::Role docs

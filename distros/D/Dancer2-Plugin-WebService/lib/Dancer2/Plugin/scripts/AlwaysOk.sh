@@ -1,17 +1,17 @@
 #!/bin/sh
 #
 # This script is replaced from the INTERNAL simple authentication
-# I leave it here only as an example.
+# it is hera only as an example.
 #
 # It always authorized user successfully no matter
 # the username the password or group membership.
-# Wait three arguments
+# Expect three arguments
 # 
 #    hex packed username
 #    hex packed password
 #    comma delimitted groups that the user should be member at least to one of them
 # 
-# Printsat standard output the three lines
+# Prints at standard output the three lines
 # 
 #    1         (succesfull login)
 #    ok

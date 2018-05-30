@@ -11,7 +11,6 @@ sub eval_ast {
     # say STDERR "source: [" . $code . "]";
     Perlito5::set_global_phase("UNITCHECK");
     $_->() while $_ = shift @Perlito5::UNITCHECK_BLOCK;
-    # warn "in eval BASE_SCOPE exit: ", Data::Dumper::Dumper($Perlito5::BASE_SCOPE);
     $code = "#line $Perlito5::LINE_NUMBER \"$Perlito5::FILE_NAME\"\n" . $code;
     return eval($code);
 }
@@ -39,7 +38,7 @@ Provides runtime routines for the Perlito-in-Perl5 compiled code
 
 =head1 AUTHORS
 
-The Pugs Team E<lt>perl6-compiler@perl.orgE<gt>.
+The Pugs Team.
 
 =head1 COPYRIGHT
 

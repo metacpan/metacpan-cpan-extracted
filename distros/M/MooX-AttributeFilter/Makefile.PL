@@ -19,7 +19,6 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Class::Method::Modifiers" => 0,
-    "Data::Dumper" => 0,
     "Method::Generate::Accessor" => 0,
     "Scalar::Util" => 0,
     "Sub::Quote" => "1.004005",
@@ -27,15 +26,18 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "List::Util" => "1.29",
+    "Module::Load" => 0,
     "Moo" => 0,
     "Pod::Coverage::TrustPod" => 0,
     "Test2::V0" => "0.000060",
     "Test::Pod" => 0,
     "Test::Pod::Coverage" => 0,
+    "Types::Standard" => 0,
     "strict" => 0,
+    "version" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.001007",
+  "VERSION" => "0.002002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,9 +47,9 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Class::Method::Modifiers" => 0,
-  "Data::Dumper" => 0,
   "List::Util" => "1.29",
   "Method::Generate::Accessor" => 0,
+  "Module::Load" => 0,
   "Moo" => 0,
   "Pod::Coverage::TrustPod" => 0,
   "Scalar::Util" => 0,
@@ -55,8 +57,10 @@ my %FallbackPrereqs = (
   "Test2::V0" => "0.000060",
   "Test::Pod" => 0,
   "Test::Pod::Coverage" => 0,
+  "Types::Standard" => 0,
   "strict" => 0,
   "strictures" => 1,
+  "version" => 0,
   "warnings" => 0
 );
 

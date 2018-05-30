@@ -4,7 +4,7 @@ use warnings;
 no warnings qw(redefine);
 package RT::Extension::ConditionalCustomFields;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =encoding utf8
 
@@ -192,6 +192,36 @@ sub _findGrouping {
     }
     return undef;
 }
+
+my $old_MatchPattern = RT::CustomField->can("MatchPattern");
+*RT::CustomField::MatchPattern = sub {
+    my $self = shift;
+    my $match = $old_MatchPattern->($self);
+    my $conditioned_by = $self->ConditionedBy;
+
+    unless (!$conditioned_by || $match) {
+        my $mason = $HTML::Mason::Commands::m;
+        if ($mason) {
+            my %mason_args = @{$mason->current_args};
+            if ($mason_args{ARGSRef}) {
+                my $condition_cf = RT::CustomField->new($self->CurrentUser);
+                $condition_cf->Load($conditioned_by->{CF});
+                if ($condition_cf->id) {
+                    my $condition_grouping = $condition_cf->_findGrouping($self->ContextObject);
+                    $condition_grouping =~ s/\W//g if $condition_grouping;
+                    my $condition_arg = RT::Interface::Web::GetCustomFieldInputName(Object => $self->ContextObject, CustomField => $condition_cf, Grouping => $condition_grouping );
+
+                    my $condition_val = $mason_args{ARGSRef}->{$condition_arg};
+                    if ($condition_val && !grep {$_ eq $condition_val} @{$conditioned_by->{vals}}) {
+                        $match = 1;
+                    }
+                }
+            }
+        }
+    }
+
+    return $match;
+};
 
 =head1 INITIALDATA
 

@@ -11,8 +11,6 @@ my $day = 24;
 
 #run prior and once per suite
 sub startup : Test(startup => 1) {
-    diag("starting up...");
-
     use_ok('Date::Holidays');
 }
 
@@ -21,10 +19,10 @@ sub test_abstracted_implementation : Test(12) {
         eval { require Date::Holidays::Abstract };
         skip "Date::Holidays::Abstract not installed", 12 if $@;
 
-        use_ok('Date::Holidays::ABSTRACTED');
+        use_ok('Date::Holidays::Abstracted');
 
-        ok(my $abstracted = Date::Holidays::ABSTRACTED->new());
-        isa_ok($abstracted, 'Date::Holidays::ABSTRACTED', 'Testing object');
+        ok(my $abstracted = Date::Holidays::Abstracted->new());
+        isa_ok($abstracted, 'Date::Holidays::Abstracted', 'Testing object');
         can_ok($abstracted, qw(new holidays is_holiday));
 
         ok($abstracted->holidays($year), 'Testing holidays');

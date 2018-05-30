@@ -168,7 +168,7 @@ ok( defined($commit), 'first commit exists' );
 is( $commit->branch, 'master' );
 is( $commit->log,    "import old content" );
 
-TestBot->expect( '#test 03Test U. Ser (03ser) 05master '
+TestBot->expect( 'dummy/#test 03Test U. Ser (03ser) 05master '
         . $commit->id
         . ' 12test/06there 03old import old content * 14http://scm.host.org/there/master/?commit='
         . $commit->id
@@ -183,7 +183,7 @@ push_ok;
 
 $commit = $c->describe_commit;
 
-TestBot->expect( "#test "
+TestBot->expect( "dummy/#test "
     . ${TestBot::COMMIT_USER}
     . ' 12test/06there'
     . ' Pushed 05tag-1, 05tag-2, 6 other tags and 05tag-9' );

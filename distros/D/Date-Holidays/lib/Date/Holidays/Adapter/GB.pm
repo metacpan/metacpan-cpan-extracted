@@ -6,13 +6,13 @@ use vars qw($VERSION);
 
 use base 'Date::Holidays::Adapter';
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 sub holidays {
     my ($self, %params) = @_;
-    
+
     my $sub = $self->{_adaptee}->can('holidays');
-        
+
     if ($sub) {
         return &{$sub}(year => $params{'year'}, regions => $params{'regions'});
     } else {
@@ -22,17 +22,17 @@ sub holidays {
 
 sub is_holiday {
     my ($self, %params) = @_;
-    
+
     my $sub = $self->{_adaptee}->can('is_holiday');
-    
+
     my $holiday;
-    
+
     if ($sub) {
         $holiday = &{$sub}(year => $params{'year'}, month => $params{'month'}, day => $params{'day'}, regions => $params{'regions'});
     } else {
         $holiday = '';
     }
-    
+
     return $holiday;
 }
 
@@ -40,13 +40,15 @@ sub is_holiday {
 
 __END__
 
+=pod
+
 =head1 NAME
 
 Date::Holidays::Adapter::GB - an adapter class for Date::Holidays::GB
 
 =head1 VERSION
 
-This POD describes version 1.06 of Date::Holidays::Adapter::GB
+This POD describes version 1.08 of Date::Holidays::Adapter::GB
 
 =head1 DESCRIPTION
 
@@ -114,7 +116,7 @@ Jonas B. Nielsen, (jonasbn) - C<< <jonasbn@cpan.org> >>
 =head1 LICENSE AND COPYRIGHT
 
 L<Date::Holidays> and related modules are (C) by Jonas B. Nielsen, (jonasbn)
-2004-2017
+2004-2018
 
 Date-Holidays and related modules are released under the Artistic License 2.0
 

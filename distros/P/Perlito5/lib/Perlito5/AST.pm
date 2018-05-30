@@ -48,18 +48,21 @@ sub stmts { $_[0]->{stmts} }
 package Perlito5::AST::Int;
 sub new { my $class = shift; bless {@_}, $class }
 sub int { $_[0]->{int} }
+sub value { $_[0]->{int} }
 
 
 
 package Perlito5::AST::Num;
 sub new { my $class = shift; bless {@_}, $class }
 sub num { $_[0]->{num} }
+sub value { $_[0]->{num} }
 
 
 
 package Perlito5::AST::Buf;
 sub new { my $class = shift; bless {@_}, $class }
 sub buf { $_[0]->{buf} }
+sub value { $_[0]->{buf} }
 
 
 
@@ -98,7 +101,7 @@ sub autoquote {
     # TODO ' sub x () { 123 } $v{main::x} = 12; use Data::Dumper; print Dumper \%v '   # '123'     => 12
     # ok   ' $v{main::x} = 12; use Data::Dumper; print Dumper \%v '                    # 'main::x' => 12
 
-    if ($index->isa('Perlito5::AST::Apply')
+    if ((ref($index) eq 'Perlito5::AST::Apply')
        && $index->{bareword}
        )
     {
@@ -107,7 +110,7 @@ sub autoquote {
             return Perlito5::AST::Buf->new( buf => $full_name );
         }
     }
-    elsif (  $index->isa('Perlito5::AST::Apply')
+    elsif (  (ref($index) eq 'Perlito5::AST::Apply')
           && ($index->code eq 'prefix:<->' || $index->code eq 'prefix:<+>')
           )
     {
@@ -119,7 +122,7 @@ sub autoquote {
                )
             if $arg;
     }
-    elsif (  $index->isa('Perlito5::AST::Apply')
+    elsif (  (ref($index) eq 'Perlito5::AST::Apply')
           && ($index->code eq 'list:<,>')
           )
     {
@@ -173,6 +176,11 @@ sub new {
 sub sigil { $_[0]->{sigil} }
 sub namespace { $_[0]->{namespace} }
 sub name { $_[0]->{name} }
+
+sub clone {
+    my $self = shift;
+    return bless { %$self }, ref($self);
+}
 
 sub plain_name {
     my $self = shift;
@@ -263,6 +271,20 @@ sub PUSH {
     );
 }
 
+sub UNDEF {
+    return Perlito5::AST::Apply->new(
+        'arguments' => [],
+        'code'      => 'undef',
+        'namespace' => '',
+    );
+}
+
+sub value {
+    my $self = shift;
+    my $ref = ref($self);
+    return undef if $ref eq 'Perlito5::AST::Apply' && $self->{code} eq 'undef';
+    die "can't take the Constant value() of Perlito5::AST::Apply '" . $self->{code} . "'";
+}
 
 package Perlito5::AST::If;
 sub new { my $class = shift; bless {@_}, $class }
@@ -322,11 +344,11 @@ sub attributes { $_[0]->{attributes} }
 
 sub is_named_sub {
     my $self = shift;
-    $self->isa('Perlito5::AST::Sub') && $self->{name}
+    (ref($self) eq 'Perlito5::AST::Sub') && $self->{name}
 }
 sub is_anon_sub {
     my $self = shift;
-    $self->isa('Perlito5::AST::Sub') && !$self->{name}
+    (ref($self) eq 'Perlito5::AST::Sub') && !$self->{name}
 }
 
 

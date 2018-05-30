@@ -9,7 +9,7 @@ use Test::More 0.88;
 my $manifest = maniread();
 
 foreach ( sort keys %{ $manifest } ) {
-    m{ \A bin / }smx
+    m{ \A script / }smx
 	and next;
     m{ \A eg / }smx
 	and next;

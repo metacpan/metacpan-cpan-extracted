@@ -9,18 +9,17 @@ use Getopt::Long 'HelpMessage';
 use MARC::Parser::RAW;
 use MARC::Parser::XML;
 use MARC::Schema;
-use DDP;
 
 GetOptions(
     'file|f=s'   => \my $file,
     'type|t=s'   => \( my $type = 'RAW' ),
     'schema|s=s' => \my $schema_file,
-    'help|h'     => sub { HelpMessage(0) },
-) or HelpMessage(1);
+    'help|h'     => sub { HelpMessage() },
+) or HelpMessage();
 
 $file = shift unless defined($file);
 
-usage() unless defined $file and -e $file;
+HelpMessage() unless defined $file and -e $file;
 
 my $schema = MARC::Schema->new({file => $schema_file});
 
@@ -56,18 +55,6 @@ sub print_error {
             print qq{$record_count\t$error->{tag}\t$error->{message}\n};
         }
     }
-}
-
-sub usage {
-    print STDERR <<"EOF";
-usage: $0 [options] file
-
-options:
-    --type,-t         Type of MARC21 serialization (RAW|XML, default: RAW)
-    --schema,-s       Location MARC JSON schema
-    --help            Print this help
-EOF
-    exit(1);
 }
 
 =head1 NAME

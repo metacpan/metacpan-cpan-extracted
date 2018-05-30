@@ -1,0 +1,17 @@
+Build.PL
+CONTRIBUTING.md
+Changes
+INSTALL
+LICENSE
+META.json
+README.md
+cpanfile
+examples/pepe
+examples/simple_cron.pl
+lib/Mojolicious/Plugin/Cron.pm
+minil.toml
+t/basic.t
+t/cron.t
+t/one_crontab.t
+META.yml
+MANIFEST

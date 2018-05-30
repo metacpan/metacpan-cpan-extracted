@@ -1,6 +1,34 @@
 ==================================================
-Changes from 2010-07-08 00:00:00 +0000 to present.
+Changes from 2013-05-28 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 0.56 at 2018-05-27 11:47:05 +0000
+-----------------------------------------
+
+  Change: bc7f7bf9725b4bcdf789b58cb9bcae2a86b0039f
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2018-05-27 12:47:05 +0000
+
+    Release 0.56 
+
+  Change: 4089e20f4c340ad30d51837239a83332e52af7cc
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2018-05-27 12:45:40 +0000
+
+    Merge pull request #13 from karenetheridge/topic/fix_dzil7
+
+    Do not assume that the current directory is already the distribution
+    root 
+
+  Change: 9578a677beb9469241bddf3de383d4c00724844d
+  Author: Karen Etheridge <ether@cpan.org>
+  Date : 2018-05-26 19:15:00 +0000
+
+    Do not assume that the current directory is already the distribution
+    root
+
+    This assumption is no longer true with Dist::Zilla 7.000. 
 
 -----------------------------------------
 version 0.54 at 2015-07-07 18:01:28 +0000
@@ -293,225 +321,6 @@ version 0.30 at 2013-07-17 22:50:24 +0000
 
     Lazy load IPC::Cmd 
 
------------------------------------------
-version 0.28 at 2011-11-17 21:22:40 +0000
------------------------------------------
-
-  Change: de8fcf692ab356de6d8799c9c0165d49c41be967
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2011-11-17 21:22:40 +0000
-
-    Bump the required version of MooseX::Types::URI 
-
------------------------------------------
-version 0.26 at 2011-10-23 18:30:32 +0000
------------------------------------------
-
-  Change: 2d465f4b76f37adf1068f4b84e49446e97db0513
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2011-10-23 19:30:32 +0000
-
-    Fluffed the last release 
-
------------------------------------------
-version 0.24 at 2011-10-23 18:27:49 +0000
------------------------------------------
-
-  Change: 9c1d3c60d8cbc83b8b3f6c4a06b2c6b1a2b42070
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2011-10-23 19:27:49 +0000
-
-    Lower the required version of IPC::Cmd 
-
------------------------------------------
-version 0.22 at 2011-10-07 20:35:38 +0000
------------------------------------------
-
-  Change: 59df70866c19c4262fa8d72befb0061be270d04f
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2011-10-07 21:35:38 +0000
-
-    Bump to version 0.22 
-
-  Change: a6a33014c1a4bea5159fe8a305298512d828b784
-  Author: Kent Fredric <kentfredric@gmail.com>
-  Date : 2011-10-08 04:32:23 +0000
-
-    Warn when a remote is specified, but is not found.
-
-    This scenario can cause some rather nasty problems, and have some
-    hidden side effects, especially if the user has other plugins that
-    are relying on GithubMeta to populate the metadata-stash , but it
-    silently does not.
-
-    Instead of just silently trucking along and failing to populate
-    metadata, it now does:
-
-    [@Filter/GithubMeta] A remote named 'github' was specified, but does
-    not appear to exist.
-
-    [@Filter/GithubMeta] skipping meta.resources.repository creation
-
-    Which will be a bit more helpful if something goes wrong because of
-    this. ( And its incredibly likely that remote names for new clones
-    wont match the remote names used somewhere else )
-
-    Have to add an explict `undef` before `next` too.
-
-    Otherwise, for the last item that fails, "next" jumps past the undef,
-
-    causing the code to try parsing a user and repo out of the whatever
-
-    the result of the last call to `_url_for_remote` returned.
-
-    And this could be either nothing, complete garbage, or the remote
-    name itself, ( the remote name itself appears in the output of `git
-    remote
-
-    show -n foobar` when that remote doesn't even exist:
-
-    > git remote show -n foobar
-
-    * remote foobar
-
-    Fetch URL: foobar
-
-    Push URL: foobar
-
-    HEAD branch: (not queried)
-
-    Local ref configured for 'git push' (status not queried):
-
-    (matching) pushes to (matching)
-
-    This is unessecary effort, and makes further error
-    reporting/diagnostics needlessly noisy. 
-
------------------------------------------
-version 0.20 at 2011-08-13 12:50:03 +0000
------------------------------------------
-
-  Change: 3a080347f8fdb4b57f3dd57f664270aa6e86c997
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2011-08-13 13:50:03 +0000
-
-    Bump to version 0.20, remember to build the release with -Ilib this
-    time 
-
------------------------------------------
-version 0.18 at 2011-08-13 12:45:42 +0000
------------------------------------------
-
-  Change: e131e006db3d902f6caa78a3137e04ca3af6b7f1
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2011-08-13 13:45:42 +0000
-
-    Bumped version to 0.18 
-
-  Change: 8ca18e5a9de4c694b00c534a9b08c60c4440dbf2
-  Author: Olivier MenguÃ© <dolmen@cpan.org>
-  Date : 2011-08-13 20:40:40 +0000
-
-    .gitignore: Dist-Zilla-... 
-
-  Change: f5a1a81428622523623a0aaea782d1a44e468ef9
-  Author: Olivier MenguÃ© <dolmen@cpan.org>
-  Date : 2011-08-13 20:40:39 +0000
-
-    Add ".git" to repo URL 
-
------------------------------------------
-version 0.16 at 2011-07-14 22:13:06 +0000
------------------------------------------
-
-  Change: 2daa340a29e3bf1d281047309d229578076511f2
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2011-07-14 23:13:06 +0000
-
-    Resolve [rt.cpan.org #69412] "Github URLs are now https"
-
-    Reported by Olivier 'dolmen' MenguÃ© 
-
------------------------------------------
-version 0.14 at 2011-06-28 18:12:05 +0000
------------------------------------------
-
-  Change: 22f613bacc1aac2a8a0b6853b9b7f64764ae5b8c
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2011-06-28 19:12:05 +0000
-
-    Skip the basic tests if 'git' is not installed. 
-
------------------------------------------
-version 0.12 at 2011-05-03 11:23:18 +0000
------------------------------------------
-
-  Change: 51b3763c0dff834f10a64a9e38e951e51d2dea1d
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2011-05-03 12:23:18 +0000
-
-    Add POD::Coverage exemption 
-
-  Change: 2041e9982d30681b9b3a2f9bd815e118079d3c9c
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2011-05-03 12:19:09 +0000
-
-    Bumpity version 
-
-  Change: b253fb3122e24a310796c4260397d712fdce1c0f
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2011-05-03 11:47:04 +0000
-
-    Remove trailing whitespace 
-
-  Change: b91e4c56debfddc0fcd89a6bece5b34258d8bc79
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2011-05-03 11:45:26 +0000
-
-    Updated authors and copyright in dist.ini 
-
-  Change: 9d98e255a295e95e0fe171c177756060ffbcf6d6
-  Author: Ricardo Signes <rjbs@cpan.org>
-  Date : 2011-05-03 06:29:27 +0000
-
-    rename to-be-obsoleted [Prereq] 
-
-  Change: 5fa24d00e674e2344e5d58c6280c63a34cc5a56d
-  Author: Ricardo Signes <rjbs@cpan.org>
-  Date : 2011-05-03 06:29:27 +0000
-
-    documentation for the changes 
-
-  Change: 6dfef49bb85848df102485913d888cd2e9c4dff4
-  Author: Ricardo Signes <rjbs@cpan.org>
-  Date : 2011-05-03 06:29:27 +0000
-
-    add a small but non-trivial set of tests 
-
-  Change: bb4c0dcbf6734a150b8a0444a739efd08f109faa
-  Author: Ricardo Signes <rjbs@cpan.org>
-  Date : 2011-05-03 06:28:59 +0000
-
-    rework how we figure out urls; add user/repo args 
-
-  Change: b66a1c9b8416815ccce7ea14b5cfdffac0b2f16c
-  Author: Ricardo Signes <rjbs@cpan.org>
-  Date : 2011-05-03 06:28:47 +0000
-
-    allow checking multiple remotes; use smart urls 
-
-  Change: c5641f0a7a8a7a446b2b97b8de9eec70ed912f5a
-  Author: Ricardo Signes <rjbs@cpan.org>
-  Date : 2011-05-03 06:28:32 +0000
-
-    clean up unneded symbols with namespace::autoclean 
-
-  Change: 165196049f7aff5a953dea0ec6cc74de21b42001
-  Author: Ricardo Signes <rjbs@cpan.org>
-  Date : 2011-05-03 06:27:24 +0000
-
-    keep git status clean with a .gitignore 
-
-================================================
-Plus 5 releases after 2010-07-08 00:00:00 +0000.
-================================================
+=================================================
+Plus 14 releases after 2013-05-28 00:00:00 +0000.
+=================================================

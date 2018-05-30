@@ -1,5 +1,5 @@
 package App::XML::DocBook::Docmake;
-$App::XML::DocBook::Docmake::VERSION = '0.0405';
+$App::XML::DocBook::Docmake::VERSION = '0.0406';
 use strict;
 use warnings;
 
@@ -539,7 +539,7 @@ sub _output_cmd_comp
 }
 
 package App::XML::DocBook::Docmake::CmdComponent;
-$App::XML::DocBook::Docmake::CmdComponent::VERSION = '0.0405';
+$App::XML::DocBook::Docmake::CmdComponent::VERSION = '0.0406';
 use base 'Class::Accessor';
 
 __PACKAGE__->mk_accessors(qw(
@@ -564,7 +564,7 @@ App::XML::DocBook::Docmake - translate DocBook/XML to other formats
 
 =head1 VERSION
 
-version 0.0405
+version 0.0406
 
 =head1 SYNOPSIS
 
@@ -576,7 +576,7 @@ version 0.0405
 
 =head1 VERSION
 
-version 0.0405
+version 0.0406
 
 =head1 FUNCTIONS
 
@@ -652,7 +652,9 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/app-xml-docbook-builder/issues>
+L<http://rt.cpan.org/Public/Dist/Display.html?Name=App-XML-DocBook-Builder>
+or by email to
+L<bug-app-xml-docbook-builder@rt.cpan.org|mailto:bug-app-xml-docbook-builder@rt.cpan.org>.
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

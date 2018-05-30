@@ -1,5 +1,7 @@
 package Catmandu::Fix::Condition::is_valid_isbn;
 
+our $VERSION = '0.10';
+
 use Catmandu::Sane;
 use Moo;
 use Business::ISBN;

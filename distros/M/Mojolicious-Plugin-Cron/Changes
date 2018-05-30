@@ -1,0 +1,48 @@
+Revision history for Perl extension Minilla
+
+0.023 2018-05-29T00:17:22Z
+    - using Mojo::Reactor::Poll in tests
+0.022 2018-05-28T19:15:55Z
+    - new locking scheme, one file per cron line
+0.021 2018-05-28T04:08:37Z
+    - assure tmp dir is empty in tests
+0.020 2018-05-28T03:58:18Z
+    - fix temporary directories
+0.019 2018-05-28T03:30:22Z
+	- cpan release
+0.018 2018-05-28T03:29:22Z
+    - use temporary directory for tests
+0.017 2018-05-27T23:12:25Z
+    - minimal version on cpanfile requirements
+0.016 2018-05-27T17:09:48Z
+    - adds simple example
+0.015 2018-05-27T16:55:07Z
+    - waits for ioloop to start with ->next_tick
+    - added pod info for extended syntax
+0.014 2018-05-27T02:50:53Z
+	- Fix typo
+0.013 2018-05-27T02:41:51Z
+    - First cpan release
+0.011 2018-05-27T01:56:13Z
+    - travis: perl versions 5.22+
+0.010 2018-05-27T00:26:41Z
+	- Added badges for travis & appveyor
+0.009 2018-05-27T00:19:45Z
+    - Added Test2::V0 dependency
+0.008 2018-05-27T00:11:00Z
+    - Fix .travis & .appveyor files location (move to repo root)
+0.007 2018-05-27T00:03:21Z
+    - Adds travis & appveyor tests
+0.006 2018-05-26T23:16:48Z
+    - Pod corrections
+0.005 2018-05-26T23:13:14Z
+	- Prevents tmp directory deletion
+0.004 2018-05-17T01:31:23Z
+    - Get rid of AUTOLOAD cron
+    - New synopsis
+0.003 2018-05-10T14:50:55Z
+    - Separate cron temp directories by mojo mode
+0.002 2018-05-10T02:41:49Z
+    - First tests passing
+0.001 2018-05-10T00:32:30Z
+    - Initial commit

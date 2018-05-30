@@ -16,7 +16,7 @@
         var currentModule = callStack[callStack.length-1];
         var file = resolveModule(id, currentModule ? currentModule.__filename : undefined);
         if (!file) {
-            throw "Can't find module '" + id + "'"
+            throw new Error("Can't find module '" + id + "'")
         }
 
         // already cached

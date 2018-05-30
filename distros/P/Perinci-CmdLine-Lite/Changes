@@ -1,3 +1,10 @@
+1.813   2018-05-29 (PERLANCAR)
+
+	- [Bugfix] To check whether script uses -P, -c, -C we need to get
+	  meta first and this is only possible in script without
+	  subcommand.
+
+
 1.812   2018-05-01 (PERLANCAR)
 
         - [ux] Add shortcut options when there is no conflict: -P for

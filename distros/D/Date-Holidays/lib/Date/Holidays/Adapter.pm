@@ -2,7 +2,7 @@ package Date::Holidays::Adapter;
 
 use strict;
 use warnings;
-use Carp;
+use Carp; # croak
 use TryCatch;
 use Module::Load qw(load);
 use Locale::Country;
@@ -10,13 +10,13 @@ use Scalar::Util qw(blessed);
 
 use vars qw($VERSION);
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 sub new {
     my ($class, %params) = @_;
 
     my $self = bless {
-        _countrycode => lc $params{countrycode},
+        _countrycode => $params{countrycode},
         _adaptee     => undef,
     }, $class || ref $class;
 
@@ -90,12 +90,12 @@ sub is_holiday {
 
     my $r;
     my $adaptee;
-    
+
     if (    $self->{'_adaptee'}->can('new')
         and $self->isa('Date::Holidays::Adapter')) {
 
         $adaptee = $self->{'_adaptee'}->new();
-    
+
     } else {
         $adaptee = $self->{'_adaptee'};
     }
@@ -108,8 +108,8 @@ sub is_holiday {
         if ($adaptee->can($method)) {
 
             $r = $adaptee->$method(
-                $params{'year'}, 
-                $params{'month'}, 
+                $params{'year'},
+                $params{'month'},
                 $params{'day'}
             );
 
@@ -120,8 +120,8 @@ sub is_holiday {
 
             if ($adaptee->can('is_holiday')) {
                 $r = $adaptee->is_holiday(
-                    $params{'year'}, 
-                    $params{'month'}, 
+                    $params{'year'},
+                    $params{'month'},
                     $params{'day'}
                 );
             }
@@ -138,8 +138,8 @@ sub is_holiday {
         if ($sub) {
 
             $r = &{$sub}(
-                $params{'year'}, 
-                $params{'month'}, 
+                $params{'year'},
+                $params{'month'},
                 $params{'day'}
             );
 
@@ -151,13 +151,13 @@ sub is_holiday {
 
         if ($sub) {
             $r = &{$sub}(
-                $params{'year'}, 
-                $params{'month'}, 
+                $params{'year'},
+                $params{'month'},
                 $params{'day'}
             );
 
             return $r;
-        }        
+        }
     }
 
     return $r;
@@ -171,7 +171,7 @@ sub _load {
 
     # Asserting success of load
     if ($@) {
-        die "Unable to load: $module - $!\n";
+        die "Unable to load: $module - $@\n";
     }
 
     # Returning name of loaded module upon success
@@ -182,30 +182,94 @@ sub _fetch {
     my ( $self, $params ) = @_;
 
     # Do we have a country code?
-    if ( !$self->{'_countrycode'} ) {
-        die "No country code specified";
+    if ( not $self->{'_countrycode'} and not $params->{countrycode} ) {
+        croak 'No country code specified';
     }
 
-    # Do we do country code assertion?
-    if ( !$params->{nocheck} ) {
+    my $countrycode = $params->{countrycode} || $self->{'_countrycode'};
 
-        # Is our country code valid?
-        if ( !code2country($self->{'_countrycode'}) ) { # From Locale::Country
-            die "$self->{_countrycode} is not a valid country code";
+    # Do we do country code assertion?
+    if ( !$params->{'nocheck'} ) {
+
+        # Is our country code valid or local?
+        if ( $countrycode !~ m/local/i and !code2country( $countrycode ) ) {  #from Locale::Country
+            die "$countrycode is not a valid country code";
         }
     }
 
-    # Trying to load module for country code
-    my $module = 'Date::Holidays::' . uc $self->{'_countrycode'};
-    $self->_load($module);
+    # Trying to load adapter module for country code
+    my $module;
+
+    try {
+        # We load an adapter implementation
+        if ( code2country( $countrycode ) ) {
+            $module = 'Date::Holidays::' . uc $countrycode;
+        } else {
+            $module = 'Date::Holidays::' . $countrycode;
+        }
+
+        $module = $self->_load($module);
+
+    } catch ($error) {
+        warn "Unable to load module: $module - $error";
+
+        try {
+            #$countrycode = uc $countrycode;
+
+            if ($countrycode =~ m/local/i) {
+                $module = 'Date::Holidays::Local';
+            } else {
+                $module = 'Date::Holidays::' . $countrycode;
+            }
+
+            # We load an adapter implementation
+
+            if ($module = $self->_load($module)) {
+                warn "we got a module and we return\n";
+            }
+
+        } catch ($error) {
+            warn "Unable to load module: $module - $error";
+
+            $module = 'Date::Holidays::Adapter';
+            $module = $self->_load($module);
+        };
+    };
 
     # Returning name of loaded module upon success
     return $module;
 }
 
+# sub _fetch {
+#     my ( $self, $params ) = @_;
+
+#     # Do we have a country code?
+#     if ( !$self->{'_countrycode'} ) {
+#         die "No country code specified";
+#     }
+
+#     # Do we do country code assertion?
+#     if ( !$params->{nocheck} ) {
+
+#         # Is our country code valid?
+#         if ( !code2country($self->{'_countrycode'}) ) { # From Locale::Country
+#             die "$self->{_countrycode} is not a valid country code";
+#         }
+#     }
+
+#     # Trying to load module for country code
+#     my $module = 'Date::Holidays::' . $self->{'_countrycode'};
+#     $self->_load($module);
+
+#     # Returning name of loaded module upon success
+#     return $module;
+# }
+
 1;
 
 __END__
+
+=pod
 
 =head1 NAME
 
@@ -213,7 +277,7 @@ Date::Holidays::Adapter - an adapter class for Date::Holidays::* modules
 
 =head1 VERSION
 
-This POD describes version 1.06 of Date::Holidays::Adapter
+This POD describes version 1.08 of Date::Holidays::Adapter
 
 =head1 SYNOPSIS
 
@@ -384,7 +448,7 @@ Jonas B. Nielsen, (jonasbn) - C<< <jonasbn@cpan.org> >>
 =head1 LICENSE AND COPYRIGHT
 
 L<Date::Holidays> and related modules are (C) by Jonas B. Nielsen, (jonasbn)
-2004-2017
+2004-2018
 
 Date-Holidays and related modules are released under the Artistic License 2.0
 

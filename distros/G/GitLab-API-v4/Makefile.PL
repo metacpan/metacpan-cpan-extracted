@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
     "Exporter" => 0,
     "Getopt::Long" => 0,
     "HTTP::Tiny" => "0.059",
+    "HTTP::Tiny::Multipart" => "0.05",
     "IO::Prompter" => "0.004014",
     "JSON" => "2.59",
     "Log::Any" => "1.703",
@@ -48,7 +49,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => "0.000094",
     "Test::More" => 0
   },
-  "VERSION" => "0.08",
+  "VERSION" => "0.09",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -63,6 +64,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "Getopt::Long" => 0,
   "HTTP::Tiny" => "0.059",
+  "HTTP::Tiny::Multipart" => "0.05",
   "IO::Prompter" => "0.004014",
   "JSON" => "2.59",
   "Log::Any" => "1.703",

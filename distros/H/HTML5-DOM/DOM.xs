@@ -191,6 +191,17 @@ static void html5_dom_wait_for_done(myhtml_tree_node_t *node, bool deep) {
 	#endif
 }
 
+static bool html5_dom_tree_is_done(myhtml_tree_t *tree) {
+	#ifndef MyCORE_BUILD_WITHOUT_THREADS
+		myhtml_t *myhtml = myhtml_tree_get_myhtml(tree);
+		if (myhtml->thread_stream) {
+			mythread_queue_list_t* queue_list = myhtml->thread_stream->context;
+			return mythread_queue_list_see_for_done(myhtml->thread_stream, queue_list);
+		}
+	#endif
+	return true;
+}
+
 static bool html5_dom_is_done(myhtml_tree_node_t *node, bool deep) {
 	#ifndef MyCORE_BUILD_WITHOUT_THREADS
 		if (node->token) {
@@ -1049,6 +1060,10 @@ void html5_dom_parse_options(html5_dom_options_t *opts, html5_dom_options_t *ext
 	opts->encoding_use_meta			= hv_get_int_value(options, "encoding_use_meta", 17, extend ? extend->encoding_use_meta : 1) > 0;
 	opts->encoding_use_bom			= hv_get_int_value(options, "encoding_use_bom", 16, extend ? extend->encoding_use_bom : 1) > 0;
 	opts->encoding_prescan_limit	= hv_get_int_value(options, "encoding_prescan_limit", 22, extend ? extend->encoding_prescan_limit : 1024);
+	
+	#ifdef MyCORE_BUILD_WITHOUT_THREADS
+		opts->threads = 0;
+	#endif
 }
 
 void html5_dom_check_options(CV *cv, html5_dom_options_t *opts) {
@@ -1640,15 +1655,7 @@ OUTPUT:
 int
 parsed(HTML5::DOM::Tree self)
 CODE:
-	RETVAL = true;
-	
-	#ifndef MyCORE_BUILD_WITHOUT_THREADS
-		myhtml_t *myhtml = myhtml_tree_get_myhtml(self->tree);
-		if (myhtml->thread_stream) {
-			mythread_queue_list_t* queue_list = myhtml->thread_stream->context;
-			RETVAL = mythread_queue_list_see_for_done(myhtml->thread_stream, queue_list);
-		}
-	#endif
+	RETVAL = html5_dom_tree_is_done(self->tree);
 OUTPUT:
 	RETVAL
 
@@ -1798,14 +1805,14 @@ CODE:
 MODULE = HTML5::DOM  PACKAGE = HTML5::DOM::Node
 # Tag id
 SV *
-tagId(HTML5::DOM::Node self, int new_tag_id = -1)
+tagId(HTML5::DOM::Node self, SV *new_tag_id = NULL)
 CODE:
-	if (new_tag_id >= 0) {
-		const myhtml_tag_context_t *tag_ctx = myhtml_tag_get_by_id(self->tree->tags, new_tag_id);
+	if (new_tag_id) {
+		const myhtml_tag_context_t *tag_ctx = myhtml_tag_get_by_id(self->tree->tags, SvIV(new_tag_id));
 		if (tag_ctx) {
-			self->tag_id = new_tag_id;
+			self->tag_id = SvIV(new_tag_id);
 		} else {
-			sub_croak(cv, "unknown tag id %d", new_tag_id);
+			sub_croak(cv, "unknown tag id %ld", SvIV(new_tag_id));
 		}
 		
 		RETVAL = SvREFCNT_inc(ST(0));
@@ -1817,13 +1824,13 @@ OUTPUT:
 
 # Namespace id
 SV *
-namespaceId(HTML5::DOM::Node self, int new_ns_id = -1)
+namespaceId(HTML5::DOM::Node self, SV *new_ns_id = NULL)
 CODE:
-	if (new_ns_id >= 0) {
-		if (!myhtml_namespace_name_by_id(new_ns_id, NULL)) {
-			sub_croak(cv, "unknown namespace id %d", new_ns_id);
+	if (new_ns_id) {
+		if (!myhtml_namespace_name_by_id(SvIV(new_ns_id), NULL)) {
+			sub_croak(cv, "unknown namespace id %ld", SvIV(new_ns_id));
 		} else {
-			myhtml_node_namespace_set(self, new_ns_id);
+			myhtml_node_namespace_set(self, SvIV(new_ns_id));
 		}
 		RETVAL = SvREFCNT_inc(ST(0));
 	} else {
@@ -2029,6 +2036,7 @@ CODE:
 			} else {
 				// fragment now is html node, why not?
 				fragment->tag_id = MyHTML_TAG_HTML;
+				myhtml_tree_node_remove(fragment);
 				myhtml_tree_node_add_child(self, fragment);
 			}
 		} else { // same as nodeValue, for user friendly API
@@ -2350,6 +2358,7 @@ CODE:
 			fragment_child = next;
 		}
 	} else {
+		myhtml_tree_node_remove(new_node);
 		myhtml_tree_node_insert_before(reference_node, new_node);
 	}
 	
@@ -2401,6 +2410,7 @@ CODE:
 			fragment_child = next;
 		}
 	} else {
+		myhtml_tree_node_remove(new_node);
 		myhtml_tree_node_insert_after(reference_node, new_node);
 	}
 	
@@ -2437,6 +2447,7 @@ CODE:
 			fragment_child = next;
 		}
 	} else {
+		myhtml_tree_node_remove(child);
 		myhtml_tree_node_add_child(self, child);
 	}
 	
@@ -2478,6 +2489,7 @@ CODE:
 			fragment_child = next;
 		}
 	} else {
+		myhtml_tree_node_remove(child);
 		if (first_node) {
 			myhtml_tree_node_insert_before(first_node, child);
 		} else {
@@ -2533,6 +2545,7 @@ CODE:
 			}
 		}
 	} else {
+		myhtml_tree_node_remove(new_node);
 		myhtml_tree_node_insert_before(old_node, new_node);
 	}
 	
@@ -3144,13 +3157,13 @@ CODE:
 OUTPUT:
 	RETVAL
 
-# Return selector specificity in array [b, a, c]
+# Return selector specificity in array [a, b, c]
 SV *
 specificityArray(HTML5::DOM::CSS::Selector::Entry self)
 CODE:
 	AV *arr = newAV();
-	av_push(arr, newSViv(self->list->specificity.b));
 	av_push(arr, newSViv(self->list->specificity.a));
+	av_push(arr, newSViv(self->list->specificity.b));
 	av_push(arr, newSViv(self->list->specificity.c));
 	RETVAL = newRV_noinc((SV *) arr);
 OUTPUT:

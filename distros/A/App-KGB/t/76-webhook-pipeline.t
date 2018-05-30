@@ -47,7 +47,7 @@ my $webhook_url = sprintf(
     $test_bot->addr,
     $test_bot->port,
     join( '&',
-        'channel=test', 'network=local',
+        'channel=test', 'network=dummy',
         'use_color=0',  'pipeline_only_status=success',
         'pipeline_only_status=failure' )
 );
@@ -86,7 +86,7 @@ is( $resp->code, 202, 'pipeline event response status is 202' )
 
 TestBot->expect(
     join( ' ',
-        '#test Test User',
+        'dummy/#test Test User',
         'pipeline',
         'test-repo',
         '42',
@@ -111,7 +111,7 @@ is( $resp->code, 202, 'pipeline event response status is 202' ) or diag $resp->a
 
 TestBot->expect(
     join( ' ',
-        '#test Test User',
+        'dummy/#test Test User',
         'pipeline',
         'test-rep',
         '43',
@@ -132,7 +132,7 @@ is( $resp->code, 202, 'pipeline event response status is 202' ) or diag $resp->a
 
 TestBot->expect(
     join( ' ',
-        '#test Test User',
+        'dummy/#test Test User',
         'pipeline',
         'test-rep',
         '43',

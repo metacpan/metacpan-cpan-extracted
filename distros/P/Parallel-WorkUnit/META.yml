@@ -20,7 +20,7 @@ name: Parallel-WorkUnit
 provides:
   Parallel::WorkUnit:
     file: lib/Parallel/WorkUnit.pm
-    version: '1.116'
+    version: '1.118'
 recommends:
   AnyEvent: '7.14'
 requires:
@@ -44,5 +44,5 @@ requires:
 resources:
   bugtracker: https://github.com/jmaslak/Parallel-WorkUnit/issues
   repository: git://github.com/jmaslak/Parallel-WorkUnit.git
-version: '1.116'
+version: '1.118'
 x_serialization_backend: 'YAML::Tiny version 1.70'

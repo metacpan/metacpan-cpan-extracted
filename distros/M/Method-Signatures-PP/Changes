@@ -1,5 +1,9 @@
 Revision history for Method-Signatures-PP
 
+0.000004 - 2018-05-25
+  - remove Moo from the test because we don't want it as a dep.
+    I'm an idiot.
+
 0.000003 - 2017-06-21
   - add .pmc generation support to avoid the 5.10 PPR dep in shipped code
   - anchor the regexp before it summons cthulhu (thanks mauke)

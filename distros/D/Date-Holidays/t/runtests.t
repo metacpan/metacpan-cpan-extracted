@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use FindBin qw($Bin);
-use lib "$Bin/../lib", "$Bin/../t";
+use lib "$Bin/../lib", "$Bin/../t", "$Bin/t", "$Bin";
 
 use Test::Class::Date::Holidays::Local;
 use Test::Class::Date::Holidays::Adapter;

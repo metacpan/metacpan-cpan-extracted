@@ -1,0 +1,20 @@
+#!perl
+
++{
+    table_class => 'Artist',
+    attr        => {
+            columns   => [qw/ name fingers /],
+            '+select' => {
+                avg   => [qw/fingers/],
+                -as   => 'a',
+                -over => {
+                    partition_by => 'fingers',
+                    order_by     => 'name',
+                },
+            },
+    },
+    sql => q{ SELECT me.name, me.fingers,
+              AVG(fingers) OVER (PARTITION BY fingers ORDER BY name) AS a
+              FROM artist me
+    },
+};

@@ -16,6 +16,7 @@ do { my $x = {
                                       'Exporter' => '0',
                                       'Getopt::Long' => '0',
                                       'HTTP::Tiny' => '0.059',
+                                      'HTTP::Tiny::Multipart' => '0.05',
                                       'IO::Prompter' => '0.004014',
                                       'JSON' => '2.59',
                                       'Log::Any' => '1.703',

@@ -5,38 +5,41 @@ package MooX::AttributeFilter;
 use v5.10;
 use strictures 1;
 
-our $VERSION = '0.001007';
+our $VERSION = '0.002002';
 
 use Carp;
 use Scalar::Util qw<looks_like_number>;
 use Class::Method::Modifiers qw(install_modifier);
 use Sub::Quote qw<quotify>;
-use Data::Dumper;
 require Method::Generate::Accessor;
 
 my %filterClasses;
 
-install_modifier "Method::Generate::Accessor", 'around',
-  '_generate_core_set', sub {
-    my $orig = shift;
+sub _generate_filter_source {
     my $this = shift;
-    my ( $me, $name, $spec, $value ) = @_;
+    my ( $me, $name, $spec, $source ) = @_;
 
-    my $filterVal = $value;
-
-    #say STDERR "Generating core set for $me,$name,$spec,$value";
-    #say STDERR Dumper( $this->{captures} );
-    if ( $spec->{filter} && $spec->{filter_sub} && !$spec->{".filter_no_core"} )
-    {
-
-        #say STDERR "FILTER IS:", $spec->{filter_sub}, ", value:", $value;
+    if ( $spec->{filter} && $spec->{filter_sub} ) {
         $this->{captures}{ '$filter_for_' . $name } = \$spec->{filter_sub};
-        $filterVal =
-          $this->_generate_call_code( $name, 'filter', "${me}, ${value}",
+        $source =
+          $this->_generate_call_code( $name, 'filter', "${me}, ${source}",
             $spec->{filter_sub} );
     }
 
-    return $orig->( $this, $me, $name, $spec, $filterVal );
+    return $source;
+}
+
+install_modifier "Method::Generate::Accessor", 'around', '_generate_core_set',
+  sub {
+    my $orig = shift;
+    my $this = shift;
+    my ( $me, $name, $spec, $source ) = @_;
+
+    unless ( $spec->{".filter_dont_generate"} ) {
+        $source = _generate_filter_source( $this, $me, $name, $spec, $source );
+    }
+
+    return $orig->( $this, $me, $name, $spec, $source );
   };
 
 install_modifier "Method::Generate::Accessor", 'around', 'is_simple_set', sub {
@@ -46,16 +49,49 @@ install_modifier "Method::Generate::Accessor", 'around', 'is_simple_set', sub {
     return $orig->( $this, @_ ) && !( $spec->{filter} && $spec->{filter_sub} );
 };
 
+install_modifier "Method::Generate::Accessor", 'around',
+  '_generate_use_default', sub {
+    my $orig = shift;
+    my $this = shift;
+    my ( $me, $name, $spec, $test ) = @_;
+
+    # Prevent double generation for lazy attributes with default/builder.
+    $spec->{'.filter_dont_generate'} = 1;
+    return $orig->( $this, @_ );
+  };
+
+install_modifier "Method::Generate::Accessor", 'around',
+  '_generate_get_default', sub {
+    my $orig = shift;
+    my $this = shift;
+    my ( $me, $name, $spec ) = @_;
+
+    my $default = $orig->( $this, $me, $name, $spec );
+
+    return _generate_filter_source( $this, $me, $name, $spec, $default );
+  };
+
+install_modifier "Method::Generate::Accessor", 'around',
+  '_generate_populate_set', sub {
+    my $orig = shift;
+    my $this = shift;
+    my ( $me, $name, $spec, $source, $test, $init_arg ) = @_;
+    local $spec->{".filter_dont_generate"} = 1;
+
+    if ( !$this->has_eager_default( $name, $spec ) ) {
+        $source = _generate_filter_source( $this, $me, $name, $spec, $source );
+    }
+
+    return $orig->( $this, $me, $name, $spec, $source, $test, $init_arg );
+  };
+
 install_modifier "Method::Generate::Accessor", 'around', '_generate_set', sub {
     my $orig = shift;
     my $this = shift;
     my ( $name, $spec ) = @_;
-    local $spec->{".filter_no_core"} = 1;
+    local $spec->{".filter_dont_generate"} = 1;
 
-    #say STDERR "* Generating set: (", join( ",", @_ ), ")";
     my $rc = $orig->( $this, @_ );
-
-    #say STDERR "* Generated set code: ", $rc;
 
     return $rc unless $spec->{filter} && $spec->{filter_sub};
 
@@ -64,10 +100,10 @@ install_modifier "Method::Generate::Accessor", 'around', '_generate_set', sub {
     # Call to the filter was generated already.
     unless ( $this->{captures}{$capName} ) {
 
-    # Work around Method::Generate::Accessor limitation: it predefines source
-    # as being $_[1] only and not acceping any argument to define it externally.
-    # For this purpose the only solution we have is to wrap it into a sub and
-    # pass the filter as sub's argument.
+        # Work around Method::Generate::Accessor limitation: it predefines
+        # source as being $_[1] only and not acceping any argument to define it
+        # externally. For this purpose the only solution we have is to wrap it
+        # into a sub and pass the filter as sub's argument.
 
         my $name_str = quotify $name;
         $rc = "sub { $rc }->( \$_[0], "
@@ -76,8 +112,6 @@ install_modifier "Method::Generate::Accessor", 'around', '_generate_set', sub {
             $spec->{filter_sub} )
           . " )";
     }
-
-    #say STDERR "* Generated final set code: ", $rc;
 
     return $rc;
 };
@@ -90,8 +124,6 @@ install_modifier "Method::Generate::Accessor", 'around', 'generate_method',
 
     if ( $filterClasses{$into} && $spec->{filter} ) {
 
-        #say STDERR "--- Installing filter into ${into}::${name}";
-
         croak "Incompatibe 'is' option '$spec->{is}': can't install filter"
           unless $spec->{is} =~ /^rwp?$/;
 
@@ -102,7 +134,8 @@ install_modifier "Method::Generate::Accessor", 'around', 'generate_method',
         else {
             $filterSub = $spec->{filter};
         }
-        $spec->{filter} = 1;
+
+        #        $spec->{filter} = 1;
 
         croak "Attribute '$name' filter option has invalid value"
           if ref($filterSub) && ref($filterSub) ne 'CODE';
@@ -123,7 +156,28 @@ sub import {
     my ($class) = @_;
     my $target = caller;
 
+    my $trait =
+         Role::Tiny->can('is_role')
+      && Role::Tiny->is_role($target)
+      ? 'MooseX::AttributeFilter::Trait::Attribute::Role'
+      : 'MooseX::AttributeFilter::Trait::Attribute';
+
     $filterClasses{$target} = 1;
+    install_modifier $target, 'around', 'has', sub {
+        my $orig = shift;
+        my ( $attr, %opts ) = @_;
+        return $orig->( $attr, %opts ) unless $opts{filter};
+        $opts{moosify} ||= [];
+        push @{ $opts{moosify} }, sub {
+            my ($spec) = @_;
+            require    # hide from CPANTS
+              MooseX::AttributeFilter;
+            $spec->{traits} ||= [];
+            $spec->{bypass_filter_method_check} = 1;
+            push @{ $spec->{traits} }, $trait;
+        };
+        $orig->( $attr, %opts );
+    };
 }
 
 1;
@@ -140,7 +194,7 @@ MooX::AttributeFilter - Implements 'filter' option for Moo-class attributes
 
 =head1 VERSION
 
-version 0.001007
+version 0.002002
 
 =head1 SYNOPSIS
 
@@ -279,9 +333,11 @@ depending on the current environment. For example:
     }
 }
 
-=head1 CAVEATS
+=head2 Inflation to Moose
 
-* This module doesn't inflate into Moose.
+This module inflates into L<MooseX::AttributeFilter>.
+
+=head1 CAVEATS
 
 * The code relies on low-level functionality of Method::Generate family of
   modules. For this reason it may become incompatible with their future versions 
@@ -294,6 +350,10 @@ core. Since the refusal was backed by strong reasoning while the functionality
 itself is badly wanted there was no other choice but to create the module... So,
 my great thanks to Graham Knopp <haarg@haarg.org> for his advises, sample code,
 and Moo itself, of course!
+
+My special thanks to Princess Kitten <littleprincess@kittymail.com> who
+implemented similar module for Moose framework and made the inflation code
+working.
 
 =head1 AUTHOR
 

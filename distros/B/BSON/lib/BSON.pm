@@ -9,7 +9,7 @@ use base 'Exporter';
 our @EXPORT_OK = qw/encode decode/;
 
 use version;
-our $VERSION = 'v1.6.1';
+our $VERSION = 'v1.6.3';
 
 use Carp;
 use Config;
@@ -660,7 +660,7 @@ BSON - BSON serialization and deserialization
 
 =head1 VERSION
 
-version v1.6.1
+version v1.6.3
 
 =head1 SYNOPSIS
 

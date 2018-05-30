@@ -5,28 +5,11 @@ use Perlito5::Grammar::Precedence;
 use Perlito5::Grammar;
 use strict;
 
-my %Perlito_internal_module = (
-    strict         => 'Perlito5X::strict',
-    warnings       => 'Perlito5X::warnings',
-    feature        => 'Perlito5X::feature',
-    utf8           => 'Perlito5X::utf8',
-    bytes          => 'Perlito5X::bytes',
-    re             => 'Perlito5X::re',
-    encoding       => 'Perlito5X::encoding',
-    Carp           => 'Perlito5X::Carp',
-    Config         => 'Perlito5X::Config',
-    Exporter       => 'Perlito5X::Exporter',
-    'Data::Dumper' => 'Perlito5X::Dumper',
-    UNIVERSAL      => 'Perlito5X::UNIVERSAL',
-    JSON           => 'Perlito5X::JSON',
-    # vars     => 'Perlito5::vars',         # this is "hardcoded" in stmt_use()
-    # constant => 'Perlito5::constant',
+our @Perlito_internal_lib_directory = (
+    'Perlito5X',
+    '',
 );
-
-sub register_internal_module {
-    my ($module, $real_name) = @_;
-    $Perlito_internal_module{$module} = $real_name;
-}
+our %Perlito_internal_module;
 
 token use_decl { 'use' | 'no' };
 
@@ -58,6 +41,10 @@ token term_require {
         }
     |   <Perlito5::Grammar::full_ident>
         {   my $module_name = Perlito5::Match::flat($MATCH->{"Perlito5::Grammar::full_ident"});
+
+            # mark the package as "seen"
+            $Perlito5::PACKAGES->{$module_name} = 1;
+
             my $filename = modulename_to_filename($module_name);
             $MATCH->{capture} = [ 'term', Perlito5::AST::Apply->new(
                                    code      => 'require',
@@ -88,7 +75,7 @@ token stmt_use {
             my $list = Perlito5::Match::flat($MATCH->{"Perlito5::Grammar::Expression::exp_parse"});
             if (ref($list) eq 'Perlito5::AST::Buf') {
                 # use feature 'say';
-                $list = $list->{buf};
+                $list = [ $list->{buf} ];
             }
             elsif ($list) {
                 # evaluate the parameter list in a BEGIN-block context
@@ -112,19 +99,26 @@ token stmt_use {
 
             my $use_decl = Perlito5::Match::flat($MATCH->{use_decl});
 
-            if ($full_ident eq 'strict') {
-                # special case:
-                #   "strict::import()" doesn\'t work
-                #   because the effect of "strict" is localized by the compiler
-                $Perlito5::STRICT = ($use_decl eq 'no' ? 0 : 1);
-            }
-
             if ($use_decl eq 'use' && $full_ident eq 'vars' && $list) {
-                my $code = 'our (' . join(', ', @$list) . ')';
-                my $m = Perlito5::Grammar::Statement::statement_parse( [ split "", $code ], 0);
-                Perlito5::Compiler::error "not a valid variable name: @$list"
-                    if !$m;
-                $MATCH->{capture} = $m->{capture};
+                for my $name (@$list) {
+                    #  $v --> $Pkg::v
+                    $Perlito5::VARS{ substr($name,0,1) . $Perlito5::PKG_NAME . '::' . substr($name,1) } = 1;
+                }
+                # Perlito5::Compiler::error "not a valid variable name: @$list"
+                #    if !$m;
+                $MATCH->{capture} = Perlito5::Grammar::Block::ast_nop();
+            }
+            elsif ($use_decl eq 'use' && $full_ident eq 'subs' && $list) {
+                for my $name (@$list) {
+                    #  v --> &Pkg::v
+                    my $glob = $Perlito5::PKG_NAME . '::' . $name;
+                    if (!exists( $Perlito5::PROTO->{$glob} )) {
+                        $Perlito5::PROTO->{$glob} = undef;
+                    }
+                }
+                # Perlito5::Compiler::error "not a valid subroutine name: @$list"
+                #    if !$m;
+                $MATCH->{capture} = Perlito5::Grammar::Block::ast_nop();
             }
             elsif ($use_decl eq 'use' && $full_ident eq 'constant') {
                 my @ast;
@@ -206,13 +200,16 @@ sub parse_time_eval {
     # load the module source code and create a syntax tree.
     # the module runs in a new scope without access to the current lexical variables
 
-    local $Perlito5::STRICT = 0;
     if ( $Perlito5::EXPAND_USE ) {
         # normal "use" is not disabled, go for it:
         #   - require the module (evaluate the source code)
         #   - run import()
 
-        my $current_module_name = $Perlito5::PKG_NAME;
+        my $caller = [
+            $Perlito5::PKG_NAME,
+            $Perlito5::FILE_NAME,      # current file name being compiled
+            $Perlito5::LINE_NUMBER,    # current line number being compiled
+        ],
 
         # "require" the module
         my $filename = modulename_to_filename($module_name);
@@ -220,7 +217,9 @@ sub parse_time_eval {
         # require $filename;
         #   use the compiler "require" instead of native Perl
         #   because we need to add BEGIN-block instrumentation
+        unshift @Perlito5::CALLER, [ $module_name ];
         Perlito5::Grammar::Use::require($filename);
+        shift @Perlito5::CALLER;
 
         if (!$skip_import) {
             # call import/unimport
@@ -228,7 +227,7 @@ sub parse_time_eval {
                 my $code = $module_name->can('import');
                 if (defined($code)) {
                     # make sure that caller() points to the current module under compilation
-                    unshift @Perlito5::CALLER, [ $current_module_name ];
+                    unshift @Perlito5::CALLER, $caller;
                     eval {
                         # "package $current_module_name;\n"
                         $module_name->import(@$arguments);
@@ -242,7 +241,7 @@ sub parse_time_eval {
                 my $code = $module_name->can('unimport');
                 if (defined($code)) {
                     # make sure that caller() points to the current module under compilation
-                    unshift @Perlito5::CALLER, [ $current_module_name ];
+                    unshift @Perlito5::CALLER, $caller;
                     eval {
                         # "package $current_module_name;\n"
                         $module_name->unimport(@$arguments);
@@ -257,6 +256,7 @@ sub parse_time_eval {
     else {
         # force "use" code to be inlined instead of eval-ed
         bootstrapping_use($ast);
+        emit_time_eval($ast);
     }
 
     return Perlito5::Grammar::Block::ast_nop();
@@ -291,11 +291,23 @@ sub filename_lookup {
         Perlito5::Compiler::error "Compilation failed in require";
     }
 
-    for my $prefix (@INC, '.') {
-        my $realfilename = "$prefix/$filename";
-        if (-f $realfilename) {
-            $INC{$filename} = $realfilename;
+    if (substr($filename, 0, 2) eq './') {
+        if (-f $filename) {
+            $INC{$filename} = $filename;
             return "todo";
+        }
+    }
+    for my $prefix (@INC) {
+        for my $internal (@Perlito_internal_lib_directory) {
+            my $realfilename = join( "/",
+                $prefix,
+                ($internal ? $internal : ()),
+                $filename
+            );
+            if (-f $realfilename) {
+                $INC{$filename} = $realfilename;
+                return "todo";
+            }
         }
     }
     Perlito5::Compiler::error "Can't locate $filename in \@INC ".'(@INC contains '.join(" ",@INC).').';
@@ -327,6 +339,12 @@ sub bootstrapping_use {
     local $/ = undef;
     my $source = <FILE>;
     close FILE;
+
+    local @Perlito5::BASE_SCOPE      = (Perlito5::Grammar::Scope->new_base_scope());
+    local $Perlito5::CLOSURE_SCOPE   = 0;    # variables that are in scope in the current closure being compiled
+    local @Perlito5::SCOPE_STMT      = ();
+    local $^H = 0;
+    local %^H = ();
 
     # compile; push AST into comp_units
     # warn $source;
@@ -361,18 +379,33 @@ sub require {
         return 1;
     }
 
+    # test if there is a name translation registered
+    if (length($filename) > 3 && substr($filename, -3) eq '.pm') {
+        my $module_name = substr($filename, 0, -3);
+        $module_name =~ s{/}{::}g;
+        if (exists $Perlito_internal_module{$module_name}) {
+            my $s = $Perlito_internal_module{$module_name};
+            $s =~ s{::}{/}g;
+            $filename = $s . '.pm';
+        }
+    }
+
     return 
         if filename_lookup($filename) eq "done";
 
     #   use the compiler "do FILE" instead of native Perl
     #   because we need to add BEGIN-block instrumentation
     # my $result = do $filename;
-    my $source = do_file($filename);
+    my $source = slurp_file($filename);
     # print STDERR "require $filename [[ $source ]]\n";
     local $Perlito5::FILE_NAME = $filename;
-    local $Perlito5::STRICT = 0;
     Perlito5::Grammar::Scope::check_variable_declarations();
-    Perlito5::Grammar::Scope::create_new_compile_time_scope();
+
+    local @Perlito5::BASE_SCOPE      = (Perlito5::Grammar::Scope->new_base_scope());
+    local $Perlito5::CLOSURE_SCOPE   = 0;    # variables that are in scope in the current closure being compiled
+    local @Perlito5::SCOPE_STMT      = ();
+    local $^H = 0;
+    local %^H = ();
 
     my $m = Perlito5::Grammar::exp_stmts($source, 0);
     my $ast = Perlito5::AST::Block->new( stmts => Perlito5::Match::flat($m) );
@@ -381,7 +414,7 @@ sub require {
     my $result = Perlito5::Grammar::Block::eval_begin_block($ast);
     # print STDERR "result from require: ", Dumper $result;
 
-    Perlito5::Grammar::Scope::end_compile_time_scope();
+    # Perlito5::Grammar::Scope::end_compile_time_scope();
 
     if ($@) {
         $INC{$filename} = undef;
@@ -395,7 +428,7 @@ sub require {
     }
 }
 
-sub do_file {
+sub slurp_file {
     my $filename = shift;
     eval {
         filename_lookup($filename);
@@ -407,11 +440,54 @@ sub do_file {
         return 'undef';
     };
     my $realfilename = $INC{$filename};
+    slurp_source_file($realfilename);
+}
+
+sub slurp_source_file {
+    my $realfilename = shift;
     open FILE, '<', $realfilename
       or Perlito5::Compiler::error "Cannot read $realfilename: $!\n";
+    binmode FILE;
     local $/ = undef;
     my $source = <FILE>;
     close FILE;
+
+    my $charset = "";
+    eval {
+        # figure out the encoding based on file magic numbers
+        my $c0 = substr($source,0,1);
+        my $c1 = substr($source,1,1);
+        my $c2 = substr($source,2,1);
+        my $c3 = substr($source,3,1);
+        if ($c0 eq "\x{EF}" && $c1 eq "\x{BB}" && $c2 eq "\x{BF}") {
+            #  EF BB BF
+            $charset = 'UTF-8';
+            $source = substr($source, 3);
+        }
+        elsif ($c0 eq "\x{FE}" && $c1 eq "\x{FF}") {
+            #  FE FF
+            $charset = 'UTF-16BE';
+            $source = substr($source, 2);
+        }
+        elsif ($c0 eq "\x{FF}" && $c1 eq "\x{FE}") {
+            #  FF FE
+            $charset = 'UTF-16LE';
+            $source = substr($source, 2);
+        }
+        elsif ($c0 eq "\x{00}" && $c1 ne "\x{00}" && $c2 eq "\x{00}" && $c3 ne "\x{00}") {
+            #  00 XX 00 XX
+            $charset = 'UTF-16BE';
+        }
+        elsif ($c0 ne "\x{00}" && $c1 eq "\x{00}" && $c2 ne "\x{00}" && $c3 eq "\x{00}") {
+            #  XX 00 XX 00
+            $charset = 'UTF-16LE';
+        }
+
+        $source = Encode::decode($charset, $source) if $charset;
+        1;
+    }
+    or warn "Source code charset '$charset' decoding failed: $@";
+
     return $source;
 }
 
@@ -439,7 +515,7 @@ This module parses source code for Perl 5 statements and generates Perlito5 AST.
 =head1 AUTHORS
 
 Flavio Soibelmann Glock <fglock@gmail.com>.
-The Pugs Team E<lt>perl6-compiler@perl.orgE<gt>.
+The Pugs Team.
 
 =head1 COPYRIGHT
 

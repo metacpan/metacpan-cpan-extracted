@@ -14,7 +14,7 @@ use Chart::Plotly::Trace::Sankey::Stream;
 use Chart::Plotly::Trace::Sankey::Textfont;
 use Chart::Plotly::Trace::Sankey::Transform;
 
-our $VERSION = '0.019';    # VERSION
+our $VERSION = '0.020';    # VERSION
 
 # ABSTRACT: Sankey plots for network flow data analysis. The nodes are specified in `nodes` and the links between sources and targets in `links`. The colors are set in `nodes[i].color` and `links[i].color`; otherwise defaults are used.
 
@@ -183,7 +183,7 @@ Chart::Plotly::Trace::Sankey - Sankey plots for network flow data analysis. The 
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

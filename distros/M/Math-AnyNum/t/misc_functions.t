@@ -5,9 +5,10 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 407;
+plan tests => 446;
 
-use Math::AnyNum qw(:misc);
+use Math::AnyNum qw(:misc lngamma ipow10 log);
+use List::Util qw();
 
 my $o = 'Math::AnyNum';
 
@@ -65,6 +66,15 @@ foreach my $i (1 .. 1000) {
     }
 }
 ok($end_inclusive, 'rand is end-inclusive');
+
+is(sum(3, 5, 9, 41), 3 + 5 + 9 + 41);
+is(prod(3, 5, 9, 41), 3 * 5 * 9 * 41);
+
+is(float(3.14159),         '3.14159');
+is(float('777/222'),       '3.5');
+is(float('123+45i'),       '123+45i');
+is(float('3.1+4.2i'),      '3.1+4.2i');
+is(float(sqrt(float(-1))), 'i');
 
 is(sgn(-3), -1);
 is(sgn(0),  0);
@@ -221,18 +231,123 @@ is(join(' ', digits(1234, -92)), '');    # not defined for negative bases
 is(join(' ', digits(1234, 1)),   '');    # not defined for bases <= 1
 is(join(' ', digits(1234, 0)),   '');
 
-is(join(' ', sumdigits(1234, -12)), 'NaN');
-is(join(' ', sumdigits(1234, -75)), 'NaN');
-is(join(' ', sumdigits(1234, 1)),   'NaN');
-is(join(' ', sumdigits(1234, 0)),   'NaN');
+is(sumdigits(1234, -12), 'NaN');
+is(sumdigits(1234, -75), 'NaN');
+is(sumdigits(1234, 1),   'NaN');
+is(sumdigits(1234, 0),   'NaN');
 
-is(join(' ', sumdigits('1234.5678')), 4 + 3 + 2 + 1);    # only the integer part is considered
-is(join(' ', sumdigits('-1234',                          $o->new(9))),             1 + 2 + 6 + 1);
-is(join(' ', sumdigits($o->new('-1234'),                 36)),                     10 + 34);
-is(join(' ', sumdigits('-1234',                          9)),                      1 + 2 + 6 + 1);
-is(join(' ', sumdigits('62748517',                       $o->new('2744'))),        '2392');
-is(join(' ', sumdigits($o->new('62748517'),              $o->new('2744'))),        '2392');
-is(join(' ', sumdigits('996105818874172862495850884533', '81592785159219522212')), '40776745633665741841');
+is(sumdigits('1234.5678'), 4 + 3 + 2 + 1);    # only the integer part is considered
+is(sumdigits('-1234',                          $o->new(9)),             1 + 2 + 6 + 1);
+is(sumdigits($o->new('-1234'),                 36),                     10 + 34);
+is(sumdigits('-1234',                          9),                      1 + 2 + 6 + 1);
+is(sumdigits('62748517',                       $o->new('2744')),        '2392');
+is(sumdigits($o->new('62748517'),              $o->new('2744')),        '2392');
+is(sumdigits('996105818874172862495850884533', '81592785159219522212'), '40776745633665741841');
+
+is(sumdigits('686826004874792510055462773868368874990',                37),          '414');
+is(sumdigits('66584215709534655468641985856223026563233736779476',     38),          '572');
+is(sumdigits('777167811371535604138338540903539713319011224805',       46),          '730');
+is(sumdigits('613136010035433834160054719450842585569017976622615403', 45),          '751');
+is(sumdigits('505738355663143406692565836710328900161705022531597459', 54),          '846');
+is(sumdigits('8704872396456046071051264811294183381856891',            $o->new(42)), '517');
+
+is(List::Util::sum(digits('686826004874792510055462773868368874990',                37)),          '414');
+is(List::Util::sum(digits('66584215709534655468641985856223026563233736779476',     38)),          '572');
+is(List::Util::sum(digits('777167811371535604138338540903539713319011224805',       46)),          '730');
+is(List::Util::sum(digits('613136010035433834160054719450842585569017976622615403', 45)),          '751');
+is(List::Util::sum(digits('505738355663143406692565836710328900161705022531597459', 54)),          '846');
+is(List::Util::sum(digits('8704872396456046071051264811294183381856891',            $o->new(42))), '517');
+
+is(
+    bsearch(
+        100, 120,
+        sub {
+            $_**2 <=> 12769;
+        }
+    ),
+    113
+  );
+
+is(bsearch_le(10**6, sub { exp($_) <=> 1e+9 }), 20);    #=>  20   (exp( 20) <= 1e+9)
+is(bsearch_le(-10**6, 10**6, sub { exp($_) <=> 1e-9 }), -21);    #=> -21   (exp(-21) <= 1e-9)
+
+is(bsearch_ge(10**6, sub { exp($_) <=> 1e+9 }), 21);             #=>  21   (exp( 21) >= 1e+9)
+is(bsearch_ge(-10**6, 10**6, sub { exp($_) <=> 1e-9 }), -20);    #=> -20   (exp(-20) >= 1e-9)
+
+is(
+    bsearch(
+        100, 120,
+        sub {
+            my ($n) = @_;
+            $n * $n <=> 12769;
+        }
+    ),
+    113
+  );
+
+is(
+    bsearch(
+        100,
+        sub {
+            $_ * $_ <=> 49;
+        }
+    ),
+    7
+  );
+
+is(
+    bsearch_le(
+        5,
+        10**6,
+        sub {
+            my ($n) = @_;
+            $n <=> int(exp(12));
+        }
+    ),
+    '162754'
+  );
+
+is(
+    bsearch_ge(
+        5,
+        10**6,
+        sub {
+            my ($n) = @_;
+            $n <=> int(exp(12));
+        }
+    ),
+    '162754'
+  );
+
+sub largest_factorial_lt {
+    my ($n) = @_;
+
+    my $t = $n * log(10);
+    bsearch_le(
+        $n,
+        sub {
+            lngamma($_ + 1) <=> $t;
+        }
+    );
+}
+
+is(largest_factorial_lt(10**6),      '205022');
+is(largest_factorial_lt(ipow10(21)), '51865645374019695121');
+
+sub largest_factorial_gt {
+    my ($n) = @_;
+
+    my $t = $n * log(10);
+    bsearch_ge(
+        $n,
+        sub {
+            lngamma($_ + 1) <=> $t;
+        }
+    );
+}
+
+is(largest_factorial_gt(10**6),      '205023');
+is(largest_factorial_gt(ipow10(21)), '51865645374019695122');
 
 sub factorial_power_1 {
     my ($n, $p) = @_;
@@ -320,8 +435,16 @@ is(as_int('12.5',  rat(16)),     'c');
 is(as_int('-12.5', float(16)),   '-c');
 is(as_int('-12.5', complex(16)), '-c');
 
-is(as_frac('123/567'),          '41/189');
-is(as_frac('42'),               '42/1');
+ok(!defined(as_rat(complex(-1)->sqrt)));
+ok(!defined(as_frac(complex(-1)->sqrt)));
+
+is(as_rat('2/4'), '1/2');
+is(as_rat('42'),  '42');
+is(as_rat(255, 16), "ff");
+
+is(as_frac('123/567'), '41/189');
+is(as_frac('42'),      '42/1');
+
 is(rat_approx(complex('0.75')), '3/4');
 is(rat_approx(float('0.75')),   '3/4');
 
@@ -329,6 +452,9 @@ is(as_frac('123/567',     16),          '29/bd');
 is(as_frac(rat('43/255'), 16),          '2b/ff');
 is(as_frac(rat('43/255'), complex(16)), '2b/ff');
 is(as_frac(rat('0.75'),   rat(2)),      '11/100');
+
+is(as_rat(complex(43), complex(5)), '133');
+is(as_rat(rat('0.75'), rat(2)),     '11/100');
 
 is(as_dec(sqrt(float(2)),   3), '1.41');
 is(as_dec(sqrt(rat(2)),     4), '1.414');

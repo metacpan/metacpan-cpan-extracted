@@ -1,0 +1,32 @@
+bit.c
+bit.h
+Changes
+DS3231.xs
+lib/RPi/RTC/DS3231.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+rtc.h
+t/00-load.t
+t/05-sec.t
+t/10-min.t
+t/15-hour.t
+t/20-clock_hours.t
+t/25-am_pm.t
+t/30-week_day.t
+t/35-month_day.t
+t/40-month.t
+t/45-year.t
+t/50-temp.t
+t/55-hms.t
+t/60-date_time.t
+t/65-dt_hash.t
+t/70-date_time_set.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+test/rtc.pl
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

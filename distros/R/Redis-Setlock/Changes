@@ -1,5 +1,11 @@
 Revision history for Perl extension Redis-Setlock
 
+0.11 2018-05-24T05:04:58Z
+    - Add blocking option to lock_guard (#5)
+
+0.10 2018-05-24T04:23:50Z
+    - Change an algorithm to build key name for $WAIT_QUEUE. (#4)
+
 0.09 2018-05-23T07:33:17Z
     - Add $WAIT_QUEUE package variable. (#3)
       When $WAIT_QUEUE is true, wait for a lock released using BLPOP command instead of polling

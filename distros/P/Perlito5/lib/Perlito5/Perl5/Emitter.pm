@@ -161,12 +161,13 @@ package Perlito5::AST::Var;
 {
     sub emit_perl5 {
         my $self = $_[0];
+        $self = $self->to_begin_scratchpad();
 
         my $str_name = $self->{name};
         my $c = substr($str_name, 0, 1);
 
-        if ($c lt " ") {
-            $str_name = "^" . chr( ord($c) + ord("A") - 1 ) . substr($str_name, 1);
+        if ($c ne "" && $c lt " " && $self->{sigil} ne "::") {
+            return $self->{sigil} . "{^" . chr( ord($c) + ord("A") - 1 ) . substr($str_name, 1) . "}";
         }
 
         # Normalize the sigil
@@ -213,7 +214,7 @@ package Perlito5::AST::Call;
         if  ($meth eq 'postcircumfix:<( )>')  {
             $meth = '';
         }
-        if ( ref($meth) eq 'Perlito5::AST::Var' ) {
+        if ( ref($meth) ) {
             $meth = $meth->emit_perl5();
         }
         if ( $meth ) {
@@ -549,9 +550,12 @@ package Perlito5::AST::Decl;
     sub emit_perl5 {
         my $self = $_[0];
 
+        my $var = $self->{var};
+        return $var->emit_perl5() if ref($var) eq 'Perlito5::AST::Var' && $var->is_begin_scratchpad();
+
         return [ op => 'prefix:<' . $self->{decl} . '>', 
                  ($self->{type} ? $self->{type} : ()),
-                 $self->{var}->emit_perl5()
+                 $var->emit_perl5()
                ];
     }
 }
@@ -597,7 +601,7 @@ This module generates Perl5 code for the Perlito compiler.
 =head1 AUTHORS
 
 Flavio Soibelmann Glock <fglock@gmail.com>.
-The Pugs Team E<lt>perl6-compiler@perl.orgE<gt>.
+The Pugs Team.
 
 =head1 SEE ALSO
 

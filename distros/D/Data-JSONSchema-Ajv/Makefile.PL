@@ -17,14 +17,13 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.020000",
   "NAME" => "Data::JSONSchema::Ajv",
   "PREREQ_PM" => {
-    "Data::GUID" => 0,
-    "Data::Visitor::Callback" => 0,
+    "Capture::Tiny" => "0.48",
+    "Cpanel::JSON::XS" => 0,
     "JavaScript::Duktape::XS" => 0,
-    "Test::JSON::Schema::Acceptance" => 0,
-    "Test::More" => 0,
-    "Types::Serialiser" => 0
+    "Path::Tiny" => "0.104",
+    "Test::More" => 0
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,12 +31,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::GUID" => 0,
-  "Data::Visitor::Callback" => 0,
+  "Capture::Tiny" => "0.48",
+  "Cpanel::JSON::XS" => 0,
   "JavaScript::Duktape::XS" => 0,
-  "Test::JSON::Schema::Acceptance" => 0,
-  "Test::More" => 0,
-  "Types::Serialiser" => 0
+  "Path::Tiny" => "0.104",
+  "Test::More" => 0
 );
 
 

@@ -1,0 +1,80 @@
+{
+   "abstract" : "a Cron-like helper for Mojolicious and Mojolicious::Lite projects",
+   "author" : [
+      "Daniel Mantovani, C<dmanto@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.17",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Cron",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Algorithm::Cron" : "0.10",
+            "Mojolicious" : "7.82",
+            "perl" : "5.020001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000114",
+            "Test::Mock::Time" : "v0.1.7"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::Cron" : {
+         "file" : "lib/Mojolicious/Plugin/Cron.pm",
+         "version" : "0.023"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dmanto/Mojolicious-Plugin-Cron/issues"
+      },
+      "homepage" : "https://github.com/dmanto/Mojolicious-Plugin-Cron",
+      "repository" : {
+         "url" : "git://github.com/dmanto/Mojolicious-Plugin-Cron.git",
+         "web" : "https://github.com/dmanto/Mojolicious-Plugin-Cron"
+      }
+   },
+   "version" : "0.023",
+   "x_contributors" : [
+      "dmanto <dmanto@gmail.com>",
+      "vagrant <vagrant@vagrant.vm>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

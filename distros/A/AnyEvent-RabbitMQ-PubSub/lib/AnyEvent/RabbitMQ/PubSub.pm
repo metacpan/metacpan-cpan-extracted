@@ -7,7 +7,7 @@ use AnyEvent::RabbitMQ;
 use Data::Dumper;
 use Carp qw(longmess);
 
-our $VERSION = "3.2.0";
+our $VERSION = "3.2.1";
 
 sub connect {
     my %connection_opts = @_;
@@ -49,7 +49,7 @@ sub _open_channel_given_condvar {
 
 sub _report_error {
     my ($cv, $why) = @_;
-    if (ref($why)) {
+    if (ref($why) && $why->can('method_frame')) {
         my $method_frame = $why->method_frame;
         $cv->croak(longmess(
             sprintf '%s: %s',

@@ -7,9 +7,11 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.90';
+our $VERSION = '0.95';
 
+use Devel::PPPort 3.42;
 use Dist::Zilla 6.0;
+use Path::Iterator::Rule;
 
 # For the benefit of AutoPrereqs
 use Dist::Zilla::Plugin::Authority;
@@ -36,8 +38,8 @@ use Dist::Zilla::Plugin::Git::Contributors;
 use Dist::Zilla::Plugin::Git::GatherDir;
 use Dist::Zilla::Plugin::Git::Push;
 use Dist::Zilla::Plugin::Git::Tag;
-use Dist::Zilla::Plugin::GitHub::Meta;
-use Dist::Zilla::Plugin::GitHub::Update;
+use Dist::Zilla::Plugin::GitHub::Meta 0.45;
+use Dist::Zilla::Plugin::GitHub::Update 0.45;
 use Dist::Zilla::Plugin::InstallGuide;
 use Dist::Zilla::Plugin::Meta::Contributors;
 use Dist::Zilla::Plugin::MetaConfig;
@@ -65,7 +67,6 @@ use Dist::Zilla::Plugin::Test::Synopsis;
 use Dist::Zilla::Plugin::Test::TidyAll 0.04;
 use Dist::Zilla::Plugin::Test::Version;
 use Dist::Zilla::Plugin::VersionFromMainModule 0.02;
-use Path::Iterator::Rule;
 
 use Moose;
 
@@ -272,8 +273,13 @@ sub configure {
 sub _build_plugins {
     my $self = shift;
 
+    my %make_tool_args;
+    if ( $self->make_tool =~ /MakeMaker/ ) {
+        $make_tool_args{has_xs} = $self->has_xs;
+    }
+
     return [
-        $self->make_tool,
+        [ $self->make_tool => \%make_tool_args ],
         $self->_gather_dir_plugin,
         $self->_basic_plugins,
         $self->_authority_plugin,
@@ -421,8 +427,9 @@ sub _github_plugins {
     return (
         [
             'GitHub::Meta' => {
-                bugs     => $self->use_github_issues,
-                homepage => $self->use_github_homepage,
+                bugs         => $self->use_github_issues,
+                homepage     => $self->use_github_homepage,
+                require_auth => 1,
             },
         ],
         [ 'GitHub::Update' => { metacpan => 1 } ],
@@ -825,7 +832,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 =head1 VERSION
 
-version 0.90
+version 0.95
 
 =head1 SYNOPSIS
 

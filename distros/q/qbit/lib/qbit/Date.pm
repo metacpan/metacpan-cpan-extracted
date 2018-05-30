@@ -6,7 +6,7 @@ qbit::Array - Functions to manipulate dates.
 =cut
 
 package qbit::Date;
-$qbit::Date::VERSION = '2.5';
+$qbit::Date::VERSION = '2.6';
 use strict;
 use warnings;
 use utf8;

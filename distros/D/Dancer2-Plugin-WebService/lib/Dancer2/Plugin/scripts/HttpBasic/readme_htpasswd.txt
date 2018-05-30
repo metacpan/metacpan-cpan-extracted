@@ -18,10 +18,10 @@ Create two different user files, for common users and administrators; also creat
 Assuming george is the user that runs the service
 and the config files are inside the folder /opt/WebService/
 
-	touch               /opt/WebService/htpasswd.{users,admins}
-	chown george:george /opt/WebService/htpasswd.{users,admins}
+	touch               /etc/WebService/htpasswd.{users,admins}
+	chown george:george /etc/WebService/htpasswd.{users,admins}
 
-add user        : htpasswd -b    /opt/WebService/htpasswd.admins root  password
-	          htpasswd -b    /opt/WebService/htpasswd.users  kojak g00dl0rd
-verify password : htpasswd -b -v /opt/WebService/htpasswd.admins root  password
-delete user     : htpasswd -D    /opt/WebService/htpasswd.admins root
+add user        : htpasswd -b    /etc/WebService/htpasswd.admins root  password
+                  htpasswd -b    /etc/WebService/htpasswd.users  kojak g00dl0rd
+verify password : htpasswd -b -v /etc/WebService/htpasswd.admins root  password
+delete user     : htpasswd -D    /etc/WebService/htpasswd.admins root

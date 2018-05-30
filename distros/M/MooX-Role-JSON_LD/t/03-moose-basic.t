@@ -18,14 +18,37 @@ is($obj->bar, 'Bar', 'bar is Bar');
 
 is_deeply($obj->json_ld_data, {
   '@type' => 'Example',
-  '@context' => 'http://schema.org',
+  '@context' => 'http://schema.org/',
   foo => 'Foo',
   bar => 'Bar',
   bax => 'Bar',
   baz => 'Bar Foo',
 }, 'JSON data is correct');
+
 is($obj->json_ld, '{
-   "@context" : "http://schema.org",
+   "@context" : "http://schema.org/",
+   "@type" : "Example",
+   "bar" : "Bar",
+   "bax" : "Bar",
+   "baz" : "Bar Foo",
+   "foo" : "Foo"
+}
+', 'JSON is correct');
+
+$obj = MooseTester->new({ context => 'different' });
+is($obj->context, 'different', 'Correct context');
+
+is_deeply($obj->json_ld_data, {
+  '@type' => 'Example',
+  '@context' => 'different',
+  foo => 'Foo',
+  bar => 'Bar',
+  bax => 'Bar',
+  baz => 'Bar Foo',
+}, 'JSON data is correct');
+
+is($obj->json_ld, '{
+   "@context" : "different",
    "@type" : "Example",
    "bar" : "Bar",
    "bax" : "Bar",

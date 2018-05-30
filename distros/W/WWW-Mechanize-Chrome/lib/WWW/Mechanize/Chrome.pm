@@ -17,7 +17,7 @@ use JSON::PP;
 use MIME::Base64 'decode_base64';
 use Data::Dumper;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 our @CARP_NOT;
 
 =head1 NAME
@@ -66,6 +66,15 @@ on a machine connected to the internet.
 Specify the port of Chrome to connect to
 
   port => 9222
+
+=item B<tab>
+
+Specify which tab to connect to
+
+  tab => 'current'
+
+If you want to connect to a tab by title, you can pass in a regular expression
+matching that title. If you want to create a new tab, pass in a false value.
 
 =item B<log>
 
@@ -335,6 +344,7 @@ sub new($class, %options) {
     $options{start_url} = 'about:blank'
         unless exists $options{start_url};
 
+    $options{ reuse } ||= defined $options{ tab };
     unless ($options{pid} or $options{reuse}) {
 
         unless ( defined $options{ port } ) {
@@ -484,6 +494,10 @@ sub _handleConsoleAPICall( $self, $msg ) {
 
 sub frameId( $self ) {
     $self->{frameId}
+}
+
+sub requestId( $self ) {
+    $self->{requestId}
 }
 
 =head2 C<< $mech->chrome_version >>
@@ -1000,8 +1014,24 @@ sub _fetchFrameId( $self, $ev ) {
         || $ev->{method} eq 'Page.frameScheduledNavigation'
         || $ev->{method} eq 'Network.requestWillBeSent'
     ) {
-        $self->log('debug', sprintf "Found frame id as %s", $ev->{params}->{frameId});
-        return $ev->{params}->{frameId};
+        my $frameId = $ev->{params}->{frameId};
+        $self->log('debug', sprintf "Found frame id as %s", $frameId);
+        return  ($frameId);
+    }
+};
+
+sub _fetchRequestId( $self, $ev ) {
+    if( $ev->{method} eq 'Page.frameStartedLoading'
+        || $ev->{method} eq 'Page.frameScheduledNavigation'
+        || $ev->{method} eq 'Network.requestWillBeSent'
+    ) {
+        my $requestId = $ev->{params}->{requestId};
+        if( $requestId ) {
+            $self->log('debug', sprintf "Found request id as %s", $requestId);
+            return  ($requestId);
+        } else {
+            return
+        };
     }
 };
 
@@ -1012,12 +1042,29 @@ sub _waitForNavigationEnd( $self, %options ) {
     # received all the navigation events.
 
     my $frameId = $options{ frameId } || $self->frameId;
-    $self->log('trace', "Capturing events until 'Page.frameStoppedLoading' for frame $frameId");
+    my $requestId = $options{ requestId } || $self->requestId;
+    my $msg = "Capturing events until 'Page.frameStoppedLoading' for frame $frameId";
+    $msg .= " or 'Network.loadingFailed' for request '$requestId'"
+        if $requestId;
+
+    $self->log('trace', $msg);
     my $events_f = $self->_collectEvents( sub( $ev ) {
         # Let's assume that the first frame id we see is "our" frame
         $frameId ||= $self->_fetchFrameId($ev);
-            $ev->{method} eq 'Page.frameStoppedLoading'
-        and $ev->{params}->{frameId} eq $frameId
+        $requestId ||= $self->_fetchRequestId($ev);
+
+        my $stopped = (    $ev->{method} eq 'Page.frameStoppedLoading'
+                       && $ev->{params}->{frameId} eq $frameId);
+        my $failed  = (   $ev->{method} eq 'Network.loadingFailed'
+                       && $requestId
+                       && $ev->{params}->{requestId} eq $requestId);
+        my $download= (   $ev->{method} eq 'Network.responseReceived'
+                       && $requestId
+                       && $ev->{params}->{requestId} eq $requestId
+                       && exists $ev->{params}->{response}->{headers}->{"Content-Disposition"}
+                       && $ev->{params}->{response}->{headers}->{"Content-Disposition"} =~ m!^attachment\b!
+                       );
+        return $stopped || $failed || $download;
     });
 
     $events_f;
@@ -1025,7 +1072,9 @@ sub _waitForNavigationEnd( $self, %options ) {
 
 sub _mightNavigate( $self, $get_navigation_future, %options ) {
     undef $self->{frameId};
+    undef $self->{requestId};
     my $frameId = $options{ frameId };
+    my $requestId = $options{ requestId };
 
     my $scheduled = $self->driver->one_shot(
         'Page.frameScheduledNavigation',
@@ -1050,6 +1099,7 @@ sub _mightNavigate( $self, $get_navigation_future, %options ) {
                 # download started :-(
                 # Also, we won't know that it finished, or what name the
                 # file got
+                # At least unless we try to parse that from the response body :(
                 $s->log('trace', "Download started, returning synthesized event");
                 $navigated++;
                 $s->{ frameId } = $ev->{params}->{frameId};
@@ -1057,7 +1107,7 @@ sub _mightNavigate( $self, $get_navigation_future, %options ) {
                     # Since Chrome v64,
                     { method => 'MechanizeChrome.download', params => {
                         frameId => $ev->{params}->{frameId},
-                        loaderId => $ev->{params}->{loaderIdId},
+                        loaderId => $ev->{params}->{loaderId},
                         response => {
                             status => 200,
                             statusText => 'faked response',
@@ -1076,7 +1126,9 @@ sub _mightNavigate( $self, $get_navigation_future, %options ) {
                   $navigated++;
 
                   $frameId ||= $s->_fetchFrameId( $ev );
+                  $requestId ||= $s->_fetchRequestId( $ev );
                   $s->{ frameId } = $frameId;
+                  $s->{ requestId } = $requestId;
 
                   $s->_waitForNavigationEnd( %options );
             };
@@ -1091,6 +1143,7 @@ sub _mightNavigate( $self, $get_navigation_future, %options ) {
 
     my @events;
     if( $navigated or $options{ navigates }) {
+        #warn "Now collecting the navigation events from the backlog";
         @events = $does_navigation->get;
         # Handle all the events, by turning them into a ->response again
         my $res = $self->httpMessageFromEvents( $self->frameId, \@events, $target_url );
@@ -1320,6 +1373,7 @@ sub httpMessageFromEvents( $self, $frameId, $events, $url ) {
         if( $_->{method} eq 'Network.requestWillBeSent' and $_->{params}->{frameId} eq $frameId ) {
             $requestId ||= $_->{params}->{requestId};
             $loaderId ||= $_->{params}->{loaderId};
+            $requestId ||= $_->{params}->{requestId};
         };
         $_
     } @$events;

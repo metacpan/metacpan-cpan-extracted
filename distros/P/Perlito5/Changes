@@ -1,22 +1,87 @@
+Dev Version:
 
-- work in progress:
-	pack() unpack() (Java) by Bas Appelo
+- no changes
 
-	module-level compilation for perlito5.pl (Perl5)
+9.024 cpan:Perlito5 2018-05-28
 
-	utf8 support (Java)
+- remove from CPAN tests that depend on specific Perl versions
 
-	BEGIN blocks (parser)
+- Java:
+-- fix syntax error in "or" operation
+-- fix "Inf" in emitter
 
-    tie() and overload
+9.023 cpan:Perlito5 2018-05-24
 
-    XS replacement modules
+- Parser:
+-- some "goto" forms are transformed, so they work in JavaScript and Java
+backends.
+-- fix chomp(), chop()
+-- fix fat-arrow in argument lists
+-- fix indirect object
+-- indented heredoc with <<~"tag"
+-- use $^H and %^H
+-- set Perl version to 5.026
+-- add core modules:
+	Env
+	Benchmark, Memoize
+	DirHandle, File::Spec, File::Basename,
+	Text::Abbrev, Text::ParseWords
+	Time::Local, Time::localtime, Time::gmtime
+	Getopt::Std, Getopt::Long
+	Tie::Hash, Tie::Scalar, Tie::Array, warnings::register,
+	Fcntl, Symbol, Term::ANSIColor,
+	FindBin
+	IO, IO::Handle, IO::Seekable, IO::File,
+	Class::Struct, Perl::OSType
+	integer, if, parent, subs, mro
+-- syntax fixes for hash vs. block, and ${var->{index}}
+-- CORE:: prefix (CORE::print, CORE::tr)
+-- CORE::GLOBAL special namespace
+-- CORE functions can be overridden
+-- stacked operators in "-X" file test
+-- remove "." from @INC
+-- decode source code "magic number" for UTF-8, UTF-16LE, UTF-16BE
+-- "hexfloat" literals
+-- new operators '|.', '|.=', '&.', '&.=', '^.', '^.=', '~.'
+-- "\N{U+263D}", "\N{YIN YANG}" string escape sequence
+
+- JavaScript:
+-- fix some special cases with "$#" sigil
+
+- Java:
+-- javax.script API registers "Perl5" interpreter
+	example at misc/Java/Script.java
+-- "jrunscript" support
+	$ jrunscript -cp .:perlito5.jar -l Perl5
+-- global variable lookup is cached
+-- fix $^O, returns the the operating system name
+-- "require", "require VERSION"
+-- "opendir", "readdir", "closedir", "select", "binmode"
+-- "vec"
+-- "localtime", "gmtime"
+-- tied hash
+-- tied array
+-- overload implemented for about half of the operators
+-- strict refs
+-- srand() returns true, warns on overflow
+-- fix read-only values
+-- "$\", "$;", "$^T"
+-- caller() now works "natively", decoding the Java stack trace
+-- symbol tables like %:: and typeglobs support
+-- file tests: "-e", "-l", "-r", "-w", "-x"
+-- lvalue ternary "?:", "vec", "substr"
+-- regex modifier /xx /r
+-- regex %+ named captures
+-- regex named captures can have underscore in the name
+-- SUPER method call
+-- add core modules:
+	Cwd, Sys::Hostname
 
 9.022 cpan:Perlito5  2017-05-xx
 - Parser:
 -- Implemented compile-time scratchpad, used in BEGIN blocks.
 -- "Use" is no longer an AST node, because all "use" statements
-    are executed at compile-time
+	are executed at compile-time
 - JavaScript:
 -- fix "range" special cases
 -- regex /s /x modifiers

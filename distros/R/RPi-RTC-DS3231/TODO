@@ -1,0 +1,7 @@
+- add system_to_rtc()
+- add rtc_to_system()
+- add set routine for hms() and datetime()
+
+- add constants to RPi::Const, and remove hardcoded info (clock_hours() etc)
+
+

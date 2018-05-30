@@ -1,3 +1,9 @@
+1.117 - May 28, 2018
+Joelle Maslak <jmaslak@antelope.net>
+ * Added new asyncs() method to spawn a number of processes with one
+   call.
+ * Released as DEV (TRIAL) version for CPAN Testers validation
+
 1.116 - Mar 24, 2018
 Joelle Maslak <jmaslak@antelope.net>
  * Released as prod version with 1.115 fixes

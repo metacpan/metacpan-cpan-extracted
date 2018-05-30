@@ -8,7 +8,7 @@
 
 package Data::Table::Text;
 use v5.8.0;
-our $VERSION = '20180510';
+our $VERSION = '20180527';
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -1150,6 +1150,7 @@ sub updateDocumentation(;$)                                                     
   my %exported;                                                                 # Exported methods
   my %userFlags;                                                                # User flags
   my $oneLineDescription = qq(\n);                                              # One line description from =head1 Name
+  my $install = '';                                                             # Additional installation notes
   my @doc;                                                                      # Documentation
   my @private;                                                                  # Documentation of private methods
   my $level = 0; my $off = 0;                                                   # Header levels
@@ -1229,15 +1230,19 @@ END
       push @doc, "\n=head$headLevel $2" if $level;                              # Heading
       push @doc, "\n$4"                 if $level and $4;                       # Text of section
      }
-    elsif ($line =~ /\A#C\s+(\S+)\s+(.+?)\s*\Z/)                                # Collaborators
+    elsif ($line =~ /\A#C(?:ollaborators)?\s+(\S+)\s+(.+?)\s*\Z/)               # Collaborators
      {$collaborators{$1} = $2;
+     }
+    elsif ($line =~ /\A#I(?:nstall(?:ation)?)?\s+(.+)\Z/)                       # Extra install instructions
+     {$install = "\\m$1\\m";
      }
     elsif ($line =~ /\A#/)                                                      # Switch documentation off
      {$level = 0;
      }
-    elsif ($level and $line =~ /\A\s*sub\s*(.*?)?\s*#(\w*)\s+(.+?)\s*\Z/)       # Documentation for a method
-     {my ($sub, $flags, $comment, $example, $produces) =                        # Name from sub, flags, description
-         ($1, $2, $3);
+    elsif ($level and $line =~                                                  # Documentation for a method
+     /\A\s*sub\s*(.*?)?(\s*:lvalue)?\s*#(\w*)\s+(.+?)\s*\Z/)
+     {my ($sub, $lvalue, $flags, $comment, $example, $produces) =               # Name from sub, flags, description
+         ($1, $2, $3, $4);
 
       $flags //= '';                                                            # No flags found
 
@@ -1438,7 +1443,7 @@ Standard L<Module::Build> process for building and installing modules:
   perl Build.PL
   ./Build
   ./Build test
-  ./Build install
+  ./Build install$install
 
 `head1 Author
 

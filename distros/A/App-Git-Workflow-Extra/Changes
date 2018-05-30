@@ -1,5 +1,17 @@
 Revision history for module
 
+0.4   2018-05-27
+        Updating for release of version 0.4
+        Updated date (Ivan Wills)
+        Set the other dependency versions (Ivan Wills)
+        Fixed typo (Ivan Wills)
+        Ignoring lock file (Ivan Wills)
+        Updated so that the latest App::Git::Workflow version (Ivan Wills)
+        Added travisCI config (Ivan Wills)
+        Added auto running tests (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+        Setting default editor vtide configs (Ivan Wills)
+
 0.3   2015-08-25
         Updating for release of version 0.3
         Removed creation of makefile (Ivan Wills)

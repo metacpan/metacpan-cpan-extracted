@@ -1,0 +1,43 @@
+---
+abstract: 'a Cron-like helper for Mojolicious and Mojolicious::Lite projects'
+author:
+  - 'Daniel Mantovani, C<dmanto@cpan.org>'
+build_requires:
+  Test2::V0: '0.000114'
+  Test::Mock::Time: v0.1.7
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.17, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Cron
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Mojolicious::Plugin::Cron:
+    file: lib/Mojolicious/Plugin/Cron.pm
+    version: '0.023'
+requires:
+  Algorithm::Cron: '0.10'
+  Mojolicious: '7.82'
+  perl: '5.020001'
+resources:
+  bugtracker: https://github.com/dmanto/Mojolicious-Plugin-Cron/issues
+  homepage: https://github.com/dmanto/Mojolicious-Plugin-Cron
+  repository: git://github.com/dmanto/Mojolicious-Plugin-Cron.git
+version: '0.023'
+x_contributors:
+  - 'dmanto <dmanto@gmail.com>'
+  - 'vagrant <vagrant@vagrant.vm>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

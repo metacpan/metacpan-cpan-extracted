@@ -173,16 +173,20 @@ package Perlito5::AST::Apply;
             my $args = $self->{arguments};
             if (@$args && !$args->[0]->isa( "Perlito5::AST::Block" )) {
                 # eval-string inside BEGIN block
-                return Perlito5::AST::Apply->new(
-                    %$self,
-                    arguments => [
-                        Perlito5::AST::Apply->new(
-                            code => 'generate_eval_string',
-                            namespace => 'Perlito5::CompileTime::Dumper',
-                            arguments => $args,
-                        ),
-                    ],
-                );
+                ## TODO
+                ## return Perlito5::AST::Apply->new(
+                ##     %$self,
+                ##     arguments => [
+                ##         Perlito5::AST::Apply->new(
+                ##             code => 'generate_eval_string',
+                ##             namespace => 'Perlito5::CompileTime::Dumper',
+                ##             arguments => [
+                ##                 @$args,
+                ##             ],
+                ##         ),
+                ##     ],
+                ## );
+                return $self;
             }
         }
 
@@ -338,6 +342,7 @@ package Perlito5::AST::Sub;
                 );
                 my $id = Perlito5::get_label();
                 $Perlito5::BEGIN_SUBS{$id} = $code;
+                # warn "BEGIN_SUBS: ", Perlito5::Dumper::Dumper( $code );
                 $Perlito5::BEGIN_LEXICALS{$_} = $capture{$_} for keys %capture;
 
                 if (!@stmts) {

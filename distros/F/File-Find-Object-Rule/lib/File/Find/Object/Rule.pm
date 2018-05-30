@@ -1,13 +1,13 @@
 #       $Id: /mirror/lab/perl/File-Find-Rule/lib/File/Find/Rule.pm 2102 2006-06-01T15:39:03.942922Z richardc  $
 
 package File::Find::Object::Rule;
-
+$File::Find::Object::Rule::VERSION = '0.0307';
 use strict;
 use warnings;
 
 use 5.008;
 
-use vars qw/$VERSION $AUTOLOAD/;
+use vars qw/$AUTOLOAD/;
 use File::Spec;
 use Text::Glob 'glob_to_regex';
 use Number::Compare;
@@ -15,8 +15,6 @@ use Carp qw/croak/;
 use File::Find::Object; # we're only wrapping for now
 use File::Basename;
 use Cwd;           # 5.00503s File::Find goes screwy with max_depth == 0
-
-$VERSION = '0.0306';
 
 use Class::XSAccessor
     accessors => {
@@ -46,41 +44,6 @@ sub import {
     }
 }
 
-=encoding utf8
-
-=head1 NAME
-
-File::Find::Object::Rule - Alternative interface to File::Find::Object
-
-=head1 SYNOPSIS
-
-  use File::Find::Object::Rule;
-  # find all the subdirectories of a given directory
-  my @subdirs = File::Find::Object::Rule->directory->in( $directory );
-
-  # find all the .pm files in @INC
-  my @files = File::Find::Object::Rule->file()
-                              ->name( '*.pm' )
-                              ->in( @INC );
-
-  # as above, but without method chaining
-  my $rule =  File::Find::Object::Rule->new;
-  $rule->file;
-  $rule->name( '*.pm' );
-  my @files = $rule->in( @INC );
-
-=head1 DESCRIPTION
-
-File::Find::Object::Rule is a friendlier interface to L<File::Find::Object> .
-It allows you to build rules which specify the desired files and directories.
-
-B<WARNING> : This module is a fork of version 0.30 of L<File::Find::Rule>
-(which has been unmaintained for several years as of February, 2009), and may
-still have some bugs due to its reliance on File::Find'isms. As such it is
-considered Alpha software. Please report any problems with
-L<File::Find::Object::Rule> to its RT CPAN Queue.
-
-=cut
 
 # the procedural shim
 
@@ -116,17 +79,6 @@ sub find {
 }
 
 
-=head1 METHODS
-
-=over
-
-=item C<new>
-
-A constructor.  You need not invoke C<new> manually unless you wish
-to, as each of the rule-making methods will auto-create a suitable
-object if called as class methods.
-
-=cut
 
 sub new {
     # We need this to maintain compatibility with File-Find-Object.
@@ -156,30 +108,6 @@ sub _force_object {
     return $object;
 }
 
-=back
-
-=head2 finder
-
-The L<File::Find::Object> finder instance itself.
-
-=head2 my @rules = @{$ffor->rules()};
-
-The rules to match against. For internal use only.
-
-=head2 Matching Rules
-
-=over
-
-=item C<name( @patterns )>
-
-Specifies names that should match.  May be globs or regular
-expressions.
-
- $set->name( '*.mp3', '*.ogg' ); # mp3s or oggs
- $set->name( qr/\.(mp3|ogg)$/ ); # the same as a regex
- $set->name( 'foo.bar' );        # just things named foo.bar
-
-=cut
 
 sub _flatten {
     my @flat;
@@ -214,39 +142,6 @@ sub name {
     $self;
 }
 
-=item -X tests
-
-Synonyms are provided for each of the -X tests. See L<perlfunc/-X> for
-details.  None of these methods take arguments.
-
-  Test | Method               Test |  Method
- ------|-------------        ------|----------------
-   -r  |  readable             -R  |  r_readable
-   -w  |  writeable            -W  |  r_writeable
-   -w  |  writable             -W  |  r_writable
-   -x  |  executable           -X  |  r_executable
-   -o  |  owned                -O  |  r_owned
-       |                           |
-   -e  |  exists               -f  |  file
-   -z  |  empty                -d  |  directory
-   -s  |  nonempty             -l  |  symlink
-       |                       -p  |  fifo
-   -u  |  setuid               -S  |  socket
-   -g  |  setgid               -b  |  block
-   -k  |  sticky               -c  |  character
-       |                       -t  |  tty
-   -M  |  modified                 |
-   -A  |  accessed             -T  |  ascii
-   -C  |  changed              -B  |  binary
-
-Though some tests are fairly meaningless as binary flags (C<modified>,
-C<accessed>, C<changed>), they have been included for completeness.
-
- # find nonempty files
- $rule->file,
-      ->nonempty;
-
-=cut
 
 use vars qw( %X_tests );
 %X_tests = (
@@ -283,23 +178,6 @@ for my $test (keys %X_tests) {
 }
 
 
-=item stat tests
-
-The following C<stat> based methods are provided: C<dev>, C<ino>,
-C<mode>, C<nlink>, C<uid>, C<gid>, C<rdev>, C<size>, C<atime>,
-C<mtime>, C<ctime>, C<blksize>, and C<blocks>.  See L<perlfunc/stat>
-for details.
-
-Each of these can take a number of targets, which will follow
-L<Number::Compare> semantics.
-
- $rule->size( 7 );         # exactly 7
- $rule->size( ">7Ki" );    # larger than 7 * 1024 * 1024 bytes
- $rule->size( ">=7" )
-      ->size( "<=90" );    # between 7 and 90, inclusive
- $rule->size( 7, 9, 42 );  # 7, 9 or 42
-
-=cut
 
 use vars qw( @stat_tests );
 @stat_tests = qw( dev ino mode nlink uid gid rdev
@@ -326,21 +204,6 @@ use vars qw( @stat_tests );
     }
 }
 
-=item C<any( @rules )>
-
-=item C<or( @rules )>
-
-Allows shortcircuiting boolean evaluation as an alternative to the
-default and-like nature of combined rules.  C<any> and C<or> are
-interchangeable.
-
- # find avis, movs, things over 200M and empty files
- $rule->any( File::Find::Object::Rule->name( '*.avi', '*.mov' ),
-             File::Find::Object::Rule->size( '>200M' ),
-             File::Find::Object::Rule->file->empty,
-           );
-
-=cut
 
 sub any {
     my $self = _force_object shift;
@@ -358,18 +221,6 @@ sub any {
 
 *or = \&any;
 
-=item C<none( @rules )>
-
-=item C<not( @rules )>
-
-Negates a rule.  (The inverse of C<any>.)  C<none> and C<not> are
-interchangeable.
-
-  # files that aren't 8.3 safe
-  $rule->file
-       ->not( $rule->new->name( qr/^[^.]{1,8}(\.[^.]{0,3})?$/ ) );
-
-=cut
 
 sub not {
     my $self = _force_object shift;
@@ -387,11 +238,6 @@ sub not {
 
 *none = \&not;
 
-=item C<prune>
-
-Traverse no further.  This rule always matches.
-
-=cut
 
 sub prune () {
     my $self = _force_object shift;
@@ -406,11 +252,6 @@ sub prune () {
     return $self;
 }
 
-=item C<discard>
-
-Don't keep this file.  This rule always matches.
-
-=cut
 
 sub discard () {
     my $self = _force_object shift;
@@ -423,20 +264,6 @@ sub discard () {
     return $self;
 }
 
-=item C<exec( \&subroutine( $shortname, $path, $fullname ) )>
-
-Allows user-defined rules.  Your subroutine will be invoked with parameters of
-the name, the path you're in, and the full relative filename.
-In addition, C<$_> is set to the current short name, but its use is
-discouraged since as opposed to File::Find::Rule, File::Find::Object::Rule
-does not cd to the containing directory.
-
-Return a true value if your rule matched.
-
- # get things with long names
- $rules->exec( sub { length > 20 } );
-
-=cut
 
 sub exec {
     my $self = _force_object shift;
@@ -452,25 +279,6 @@ sub exec {
     return $self;
 }
 
-=item ->grep( @specifiers );
-
-Opens a file and tests it each line at a time.
-
-For each line it evaluates each of the specifiers, stopping at the
-first successful match.  A specifier may be a regular expression or a
-subroutine.  The subroutine will be invoked with the same parameters
-as an ->exec subroutine.
-
-It is possible to provide a set of negative specifiers by enclosing
-them in anonymous arrays.  Should a negative specifier match the
-iteration is aborted and the clause is failed.  For example:
-
- $rule->grep( qr/^#!.*\bperl/, [ sub { 1 } ] );
-
-Is a passing clause if the first line of a file looks like a perl
-shebang line.
-
-=cut
 
 sub grep {
     my $self = _force_object shift;
@@ -499,32 +307,6 @@ sub grep {
     } );
 }
 
-=item C<maxdepth( $level )>
-
-Descend at most C<$level> (a non-negative integer) levels of directories
-below the starting point.
-
-May be invoked many times per rule, but only the most recent value is
-used.
-
-=item C<mindepth( $level )>
-
-Do not apply any tests at levels less than C<$level> (a non-negative
-integer).
-
-=item C<extras( \%extras )>
-
-Specifies extra values to pass through to C<File::File::find> as part
-of the options hash.
-
-For example this allows you to specify following of symlinks like so:
-
- my $rule = File::Find::Object::Rule->extras({ follow => 1 });
-
-May be invoked many times per rule, but only the most recent value is
-used.
-
-=cut
 
 sub maxdepth {
     my $self = _force_object shift;
@@ -538,11 +320,6 @@ sub mindepth {
     return $self;
 }
 
-=item C<relative>
-
-Trim the leading portion of any path found
-
-=cut
 
 sub relative () {
     my $self = _force_object shift;
@@ -551,16 +328,6 @@ sub relative () {
     return $self;
 }
 
-=item C<not_*>
-
-Negated version of the rule.  An effective shortand related to ! in
-the procedural interface.
-
- $foo->not_name('*.pl');
-
- $foo->not( $foo->new->name('*.pl' ) );
-
-=cut
 
 sub DESTROY {}
 sub AUTOLOAD {
@@ -579,18 +346,6 @@ sub AUTOLOAD {
     &$sub;
 }
 
-=back
-
-=head2 Query Methods
-
-=over
-
-=item C<in( @directories )>
-
-Evaluates the rule, returns a list of paths to matching files and
-directories.
-
-=cut
 
 
 sub _call_find {
@@ -639,18 +394,6 @@ sub in {
     return @results;
 }
 
-=item C<start( @directories )>
-
-Starts a find across the specified directories.  Matching items may
-then be queried using L</match>.  This allows you to use a rule as an
-iterator.
-
- my $rule = File::Find::Object::Rule->file->name("*.jpeg")->start( "/web" );
- while ( my $image = $rule->match ) {
-     ...
- }
-
-=cut
 
 
 sub start {
@@ -712,11 +455,6 @@ sub start {
 }
 
 
-=item C<match>
-
-Returns the next file which matches, false if there are no more.
-
-=cut
 
 sub match {
     my $self = _force_object shift;
@@ -767,6 +505,259 @@ sub match {
 1;
 
 __END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+File::Find::Object::Rule - Alternative interface to File::Find::Object
+
+=head1 VERSION
+
+version 0.0307
+
+=head1 SYNOPSIS
+
+  use File::Find::Object::Rule;
+  # find all the subdirectories of a given directory
+  my @subdirs = File::Find::Object::Rule->directory->in( $directory );
+
+  # find all the .pm files in @INC
+  my @files = File::Find::Object::Rule->file()
+                              ->name( '*.pm' )
+                              ->in( @INC );
+
+  # as above, but without method chaining
+  my $rule =  File::Find::Object::Rule->new;
+  $rule->file;
+  $rule->name( '*.pm' );
+  my @files = $rule->in( @INC );
+
+=head1 DESCRIPTION
+
+File::Find::Object::Rule is a friendlier interface to L<File::Find::Object> .
+It allows you to build rules which specify the desired files and directories.
+
+B<WARNING> : This module is a fork of version 0.30 of L<File::Find::Rule>
+(which has been unmaintained for several years as of February, 2009), and may
+still have some bugs due to its reliance on File::Find'isms. As such it is
+considered Alpha software. Please report any problems with
+L<File::Find::Object::Rule> to its RT CPAN Queue.
+
+=head1 VERSION
+
+version 0.0307
+
+=head1 METHODS
+
+=over
+
+=item C<new>
+
+A constructor.  You need not invoke C<new> manually unless you wish
+to, as each of the rule-making methods will auto-create a suitable
+object if called as class methods.
+
+=back
+
+=head2 finder
+
+The L<File::Find::Object> finder instance itself.
+
+=head2 my @rules = @{$ffor->rules()};
+
+The rules to match against. For internal use only.
+
+=head2 Matching Rules
+
+=over
+
+=item C<name( @patterns )>
+
+Specifies names that should match.  May be globs or regular
+expressions.
+
+ $set->name( '*.mp3', '*.ogg' ); # mp3s or oggs
+ $set->name( qr/\.(mp3|ogg)$/ ); # the same as a regex
+ $set->name( 'foo.bar' );        # just things named foo.bar
+
+=item -X tests
+
+Synonyms are provided for each of the -X tests. See L<perlfunc/-X> for
+details.  None of these methods take arguments.
+
+  Test | Method               Test |  Method
+ ------|-------------        ------|----------------
+   -r  |  readable             -R  |  r_readable
+   -w  |  writeable            -W  |  r_writeable
+   -w  |  writable             -W  |  r_writable
+   -x  |  executable           -X  |  r_executable
+   -o  |  owned                -O  |  r_owned
+       |                           |
+   -e  |  exists               -f  |  file
+   -z  |  empty                -d  |  directory
+   -s  |  nonempty             -l  |  symlink
+       |                       -p  |  fifo
+   -u  |  setuid               -S  |  socket
+   -g  |  setgid               -b  |  block
+   -k  |  sticky               -c  |  character
+       |                       -t  |  tty
+   -M  |  modified                 |
+   -A  |  accessed             -T  |  ascii
+   -C  |  changed              -B  |  binary
+
+Though some tests are fairly meaningless as binary flags (C<modified>,
+C<accessed>, C<changed>), they have been included for completeness.
+
+ # find nonempty files
+ $rule->file,
+      ->nonempty;
+
+=item stat tests
+
+The following C<stat> based methods are provided: C<dev>, C<ino>,
+C<mode>, C<nlink>, C<uid>, C<gid>, C<rdev>, C<size>, C<atime>,
+C<mtime>, C<ctime>, C<blksize>, and C<blocks>.  See L<perlfunc/stat>
+for details.
+
+Each of these can take a number of targets, which will follow
+L<Number::Compare> semantics.
+
+ $rule->size( 7 );         # exactly 7
+ $rule->size( ">7Ki" );    # larger than 7 * 1024 * 1024 bytes
+ $rule->size( ">=7" )
+      ->size( "<=90" );    # between 7 and 90, inclusive
+ $rule->size( 7, 9, 42 );  # 7, 9 or 42
+
+=item C<any( @rules )>
+
+=item C<or( @rules )>
+
+Allows shortcircuiting boolean evaluation as an alternative to the
+default and-like nature of combined rules.  C<any> and C<or> are
+interchangeable.
+
+ # find avis, movs, things over 200M and empty files
+ $rule->any( File::Find::Object::Rule->name( '*.avi', '*.mov' ),
+             File::Find::Object::Rule->size( '>200M' ),
+             File::Find::Object::Rule->file->empty,
+           );
+
+=item C<none( @rules )>
+
+=item C<not( @rules )>
+
+Negates a rule.  (The inverse of C<any>.)  C<none> and C<not> are
+interchangeable.
+
+  # files that aren't 8.3 safe
+  $rule->file
+       ->not( $rule->new->name( qr/^[^.]{1,8}(\.[^.]{0,3})?$/ ) );
+
+=item C<prune>
+
+Traverse no further.  This rule always matches.
+
+=item C<discard>
+
+Don't keep this file.  This rule always matches.
+
+=item C<exec( \&subroutine( $shortname, $path, $fullname ) )>
+
+Allows user-defined rules.  Your subroutine will be invoked with parameters of
+the name, the path you're in, and the full relative filename.
+In addition, C<$_> is set to the current short name, but its use is
+discouraged since as opposed to File::Find::Rule, File::Find::Object::Rule
+does not cd to the containing directory.
+
+Return a true value if your rule matched.
+
+ # get things with long names
+ $rules->exec( sub { length > 20 } );
+
+=item ->grep( @specifiers );
+
+Opens a file and tests it each line at a time.
+
+For each line it evaluates each of the specifiers, stopping at the
+first successful match.  A specifier may be a regular expression or a
+subroutine.  The subroutine will be invoked with the same parameters
+as an ->exec subroutine.
+
+It is possible to provide a set of negative specifiers by enclosing
+them in anonymous arrays.  Should a negative specifier match the
+iteration is aborted and the clause is failed.  For example:
+
+ $rule->grep( qr/^#!.*\bperl/, [ sub { 1 } ] );
+
+Is a passing clause if the first line of a file looks like a perl
+shebang line.
+
+=item C<maxdepth( $level )>
+
+Descend at most C<$level> (a non-negative integer) levels of directories
+below the starting point.
+
+May be invoked many times per rule, but only the most recent value is
+used.
+
+=item C<mindepth( $level )>
+
+Do not apply any tests at levels less than C<$level> (a non-negative
+integer).
+
+=item C<extras( \%extras )>
+
+Specifies extra values to pass through to C<File::File::find> as part
+of the options hash.
+
+For example this allows you to specify following of symlinks like so:
+
+ my $rule = File::Find::Object::Rule->extras({ follow => 1 });
+
+May be invoked many times per rule, but only the most recent value is
+used.
+
+=item C<relative>
+
+Trim the leading portion of any path found
+
+=item C<not_*>
+
+Negated version of the rule.  An effective shortand related to ! in
+the procedural interface.
+
+ $foo->not_name('*.pl');
+
+ $foo->not( $foo->new->name('*.pl' ) );
+
+=back
+
+=head2 Query Methods
+
+=over
+
+=item C<in( @directories )>
+
+Evaluates the rule, returns a list of paths to matching files and
+directories.
+
+=item C<start( @directories )>
+
+Starts a find across the specified directories.  Matching items may
+then be queried using L</match>.  This allows you to use a rule as an
+iterator.
+
+ my $rule = File::Find::Object::Rule->file->name("*.jpeg")->start( "/web" );
+ while ( my $image = $rule->match ) {
+     ...
+ }
+
+=item C<match>
+
+Returns the next file which matches, false if there are no more.
 
 =back
 
@@ -1045,8 +1036,6 @@ The tests don't run successfully when directly inside an old Subversion
 checkout, due to the presence of C<.svn> directories. C<./Build disttest> or
 C<./Build distruntest> run fine.
 
-=cut
-
 =begin Developers
 
 Implementation notes:
@@ -1089,5 +1078,142 @@ and doc that C<_> will only be meaningful after stat and -X tests if
 they're wanted in exec blocks.
 
 =end Developers
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Richard Clamp <richardc@unixbeard.net> with input gained from this
+
+=item *
+
+and Andy Lester andy@petdance.com.
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Richard Clampwith input gained from this.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/file-find-object-rule/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Perldoc
+
+You can find documentation for this module with the perldoc command.
+
+  perldoc File::Find::Object::Rule
+
+=head2 Websites
+
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
+
+=over 4
+
+=item *
+
+MetaCPAN
+
+A modern, open-source CPAN search engine, useful to view POD in HTML format.
+
+L<https://metacpan.org/release/File-Find-Object-Rule>
+
+=item *
+
+Search CPAN
+
+The default CPAN search engine, useful to view POD in HTML format.
+
+L<http://search.cpan.org/dist/File-Find-Object-Rule>
+
+=item *
+
+RT: CPAN's Bug Tracker
+
+The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
+
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-Find-Object-Rule>
+
+=item *
+
+AnnoCPAN
+
+The AnnoCPAN is a website that allows community annotations of Perl module documentation.
+
+L<http://annocpan.org/dist/File-Find-Object-Rule>
+
+=item *
+
+CPAN Ratings
+
+The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
+
+L<http://cpanratings.perl.org/d/File-Find-Object-Rule>
+
+=item *
+
+CPANTS
+
+The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
+
+L<http://cpants.cpanauthors.org/dist/File-Find-Object-Rule>
+
+=item *
+
+CPAN Testers
+
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
+
+L<http://www.cpantesters.org/distro/F/File-Find-Object-Rule>
+
+=item *
+
+CPAN Testers Matrix
+
+The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
+
+L<http://matrix.cpantesters.org/?dist=File-Find-Object-Rule>
+
+=item *
+
+CPAN Testers Dependencies
+
+The CPAN Testers Dependencies is a website that shows a chart of the test results of all dependencies for a distribution.
+
+L<http://deps.cpantesters.org/?module=File::Find::Object::Rule>
+
+=back
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests by email to C<bug-file-find-object-rule at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=File-Find-Object-Rule>. You will be automatically notified of any
+progress on the request by the system.
+
+=head2 Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+L<https://github.com/shlomif/file-find-object-rule>
+
+  git clone http://bitbucket.org/shlomif/perl-file-find-object-rule
 
 =cut

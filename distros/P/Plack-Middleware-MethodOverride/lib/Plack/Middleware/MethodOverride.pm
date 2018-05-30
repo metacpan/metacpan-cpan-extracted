@@ -4,7 +4,7 @@ use warnings;
 use Plack::Request ();
 
 package Plack::Middleware::MethodOverride;
-$Plack::Middleware::MethodOverride::VERSION = '0.15';
+$Plack::Middleware::MethodOverride::VERSION = '0.20';
 # ABSTRACT: Override REST methods to Plack apps via POST
 
 use parent 'Plack::Middleware';
@@ -61,7 +61,7 @@ Plack::Middleware::MethodOverride - Override REST methods to Plack apps via POST
 
 =head1 Version
 
-version 0.15
+version 0.20
 
 =head1 Synopsis
 

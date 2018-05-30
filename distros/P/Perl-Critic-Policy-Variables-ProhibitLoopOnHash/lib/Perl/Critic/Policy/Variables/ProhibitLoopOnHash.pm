@@ -1,7 +1,7 @@
 package Perl::Critic::Policy::Variables::ProhibitLoopOnHash;
 our $AUTHORITY = 'cpan:XSAWYERX';
 # ABSTRACT: Don't write loops on hashes, only on keys and values of hashes
-$Perl::Critic::Policy::Variables::ProhibitLoopOnHash::VERSION = '0.003';
+$Perl::Critic::Policy::Variables::ProhibitLoopOnHash::VERSION = '0.004';
 use strict;
 use warnings;
 use parent 'Perl::Critic::Policy';
@@ -33,6 +33,14 @@ sub violates {
     # * Second, we clear out topical variables ("foreach $foo (...)")
     # * Then we check if it's a postfix without parenthesis
     # * Lastly, we handle the remaining cases
+
+    # Skip if we do not have the right type of PPI::Statement
+    # For example, "$var->{for}" has a PPI::Statement::Expression
+    # when leading for() is a PPI::Statement::Compound and
+    # a postfix for() is a PPI::Statement
+    # This was originally written as: $elem->snext_sibling or return
+    $elem->parent && $elem->parent->isa('PPI::Statement::Expression')
+        and return;
 
     # for my $foo (%hash)
     # we simply skip the "my"
@@ -115,7 +123,7 @@ Perl::Critic::Policy::Variables::ProhibitLoopOnHash - Don't write loops on hashe
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 

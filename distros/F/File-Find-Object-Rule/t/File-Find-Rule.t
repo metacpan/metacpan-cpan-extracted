@@ -23,13 +23,13 @@ my $tree_creator = File::Find::Object::TreeCreate->new();
             {
                 'name' => "File-Find-Rule.t",
                 'contents' => $tree_creator->cat(
-                    "./t/sample-data/to-copy-from/File-Find-Rule.t"
+                    "./t/sample-data/to-copy-from/File-Find-Rule.txt"
                 ),
             },
             {
                 'name' => "findorule.t",
                 'contents' => $tree_creator->cat(
-                    "./t/sample-data/to-copy-from/findorule.t"
+                    "./t/sample-data/to-copy-from/findorule.txt"
                 ),
             },
             {

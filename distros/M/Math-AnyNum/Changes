@@ -1,5 +1,47 @@
 Revision history for Math-AnyNum
 
+0.25    2018-05-25
+
+        [ADDITIONS]
+
+        - sum(a,b,c,...)              sum of a list of numbers.
+        - prod(a,b,c,...)             product of a list of numbers (using binary splitting).
+        - as_rat(n,b)                 rational string-representation of n in base b
+        - bell(n)                     n-th Bell number (OEIS: A000110)
+        - catalan(n)                  n-th Catalan number (OEIS: A000108)
+        - euler(n)                    n-th Euler number (OEIS: A122045).
+        - euler_polynomial(n, x)      Euler polynomial (also available as `euler(n, x)`)
+        - bernoulli_polynomial(n, x)  Bernoulli polynomial (also available as `bernoulli(n, x)`).
+        - geometric_sum(n,r)          geometric sum: r^0 + r^1 + ... + r^n
+        - superfactorial(n)           product of first n factorials
+        - lnsuperfactorial(n)         natural logarithm of superfactorial(n)
+        - hyperfactorial(n)           product of k^k for k=1..n
+        - lnhyperfactorial(n)         natural logarithm of hyperfactorial(n)
+        - bsearch(n,\&f)              binary search from 0 to n (exact match)
+        - bsearch(a,b,\&f)            binary search from a to b (exact match)
+        - bsearch_le(n,\&f)           binary search from 0 to n (less than or equal to)
+        - bsearch_le(a,b,\&f)         binary search from a to b (less than or equal to)
+        - bsearch_ge(n,\&f)           binary search from 0 to n (greater than or equal to)
+        - bsearch_ge(a,b,\&f)         binary search from a to b (greater than or equal to)
+
+        [IMPROVEMENTS]
+
+        - Extended the `gcd()` and `lcm()` functions to accept an arbitrary number of arguments.
+        - Extended the optimizations in `digits(n, b)` and `sumdigits(n, b)` for all values of b <= 62.
+        - Extended the allowed value of `b` in `base(n, b)`, `as_int(n, b)`, `as_frac(n, b)` and `new(n, b`) to be between 2 and 62.
+        - Extended the `float(x)` function to convert `x` to any floating-point number, either real or complex (in this order).
+        - Documentation improvements: added a brief description for each function at the top of the POD file.
+
+        [INCOMPATIBLE CHANGES]
+
+        - Renamed the Euler-Mascheroni constant from `euler` to `EulerGamma`.
+        - Renamed the Catalan constant from `catalan` to `CatalanG`.
+
+        [OTHER]
+
+        - Increased the minimum required version of Perl from 5.14 to 5.16 (for `__SUB__`).
+        - Merged all the `AnyNum/*.pm` files into the main `AnyNum.pm` file.
+
 0.24    2018-05-06
 
         [ADDITIONS]

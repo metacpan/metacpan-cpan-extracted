@@ -469,7 +469,7 @@ package Perlito5::AST::Apply;
                     namespace => '',
                     arguments => [
                        Perlito5::AST::Apply->new(
-                          code => 'do_file',
+                          code => 'slurp_file',
                           namespace => 'Perlito5::Grammar::Use',
                           arguments => $self->{arguments}
                         )
@@ -693,7 +693,7 @@ This module generates XS code for the Perlito compiler.
 =head1 AUTHORS
 
 Flavio Soibelmann Glock <fglock@gmail.com>.
-The Pugs Team E<lt>perl6-compiler@perl.orgE<gt>.
+The Pugs Team.
 
 =head1 SEE ALSO
 

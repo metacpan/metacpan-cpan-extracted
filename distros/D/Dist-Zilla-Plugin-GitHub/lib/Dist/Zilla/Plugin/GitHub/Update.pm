@@ -3,7 +3,7 @@ package Dist::Zilla::Plugin::GitHub::Update;
 use strict;
 use warnings;
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 use JSON::MaybeXS;
 use Moose;
@@ -88,10 +88,9 @@ sub after_release {
     my ($opts)    = @_;
     my $dist_name = $self->zilla->name;
 
-    my ($login, $pass, $otp)  = $self->_get_credentials(0);
-    return if (!$login);
+    return if (!$self->_has_credentials);
 
-    my $repo_name = $self->_get_repo_name($login);
+    my $repo_name = $self->_get_repo_name($self->_credentials->{login});
     if (not $repo_name) {
         $self->log('cannot update GitHub repository info');
         return;
@@ -132,22 +131,9 @@ sub after_release {
         return;
     }
 
-    my $headers;
-
-    if ($pass) {
-        require MIME::Base64;
-        my $basic = MIME::Base64::encode_base64("$login:$pass", '');
-        $headers->{Authorization} = "Basic $basic";
-    }
-
-    if ($self->prompt_2fa) {
-        $headers->{'X-GitHub-OTP'} = $otp;
-        $self->log([ "Using two-factor authentication" ]);
-    }
-
     my $response = HTTP::Tiny->new->request('PATCH', $url, {
         content => encode_json($params),
-        headers => $headers
+        headers => $self->_auth_headers,
     });
 
     my $repo = $self->_check_response($response);
@@ -188,7 +174,7 @@ Dist::Zilla::Plugin::GitHub::Update - Update a GitHub repo's info on release
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 SYNOPSIS
 
@@ -281,6 +267,12 @@ the login, it'll be automatically enabled.
 
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-GitHub>
 (or L<bug-Dist-Zilla-Plugin-GitHub@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-GitHub@rt.cpan.org>).
+
+There is also a mailing list available for users of this distribution, at
+L<http://dzil.org/#mailing-list>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
 =head1 AUTHOR
 

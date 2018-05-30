@@ -11,9 +11,9 @@ get it from ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe
 If you want to do a "drag and drop" install, create the directory
 Games\Sudoku under your site library directory, and put General.pm
 in it. You convert the executable to a .bat file by CD-ing to the
-bin directory of the expanded kit, and running
+script directory of the expanded kit, and running
 
-c:\whatever\bin\> pl2bat sudokug
+c:\whatever\script\> pl2bat sudokug
 
 after which you put the resultant .bat file in a folder that is
 on your PATH.

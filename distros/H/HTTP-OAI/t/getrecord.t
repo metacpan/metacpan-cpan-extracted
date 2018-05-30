@@ -1,4 +1,4 @@
-use Test::More tests => 8;
+use Test::More;
 
 use_ok( 'HTTP::OAI' );
 use_ok( 'HTTP::OAI::Metadata::OAI_DC' );
@@ -62,14 +62,14 @@ $rec->metadata->parse_string($str);
 $r->record($rec);
 
 {
-# hopefully if we can re-parse our own output we're ok, because we can't
-# compare against the ever changing XML output
-my $str = $r->toDOM->toString;
-my $_r = HTTP::OAI::GetRecord->new(handlers=>{
-	metadata=>'HTTP::OAI::Metadata::OAI_DC'
-});
-$_r->parse_string($str);
-is($_r->record->metadata->dc->{creator}->[1], 'Ryne, Robert D.', 'toDOM');
+	# hopefully if we can re-parse our own output we're ok, because we can't
+	# compare against the ever changing XML output
+	my $str = $r->toDOM->toString;
+	my $_r = HTTP::OAI::GetRecord->new(handlers=>{
+		metadata=>'HTTP::OAI::Metadata::OAI_DC'
+	});
+	$_r->parse_string($str);
+	is($_r->record->metadata->dc->{creator}->[1], 'Ryne, Robert D.', 'toDOM');
 }
 
 SKIP: {
@@ -86,6 +86,7 @@ SKIP: {
 	$driver->start_oai_pmh();
 
 	$r->set_handler($w);
+	$r->xslt( "/path/to/OAI.xslt" );
 
 	$r->generate($driver);
 
@@ -93,5 +94,9 @@ SKIP: {
 
 	my $xml = $builder->result;
 
-	ok($xml);
+	ok($xml, 'got XML output');
+
+	like $xml , qr{<\?xml-stylesheet type='text/xsl' href='/path/to/OAI.xslt'\?>} , 'found the stylesheet';
 }
+
+done_testing;

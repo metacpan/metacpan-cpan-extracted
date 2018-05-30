@@ -4,7 +4,7 @@
 #
 
 package Parallel::WorkUnit;
-$Parallel::WorkUnit::VERSION = '1.116';
+$Parallel::WorkUnit::VERSION = '1.118';
 use v5.8;
 
 # ABSTRACT: Provide multi-paradigm forking with ability to pass back data
@@ -245,6 +245,25 @@ sub async {
     }
 }
 
+
+sub asyncs {
+    if ( $#_ < 2 ) { confess 'invalid call'; }
+    my $self     = shift;
+    my $children = shift;
+    my $sub      = shift;
+    if ( scalar(@_) > 1 ) { croak("invalid call"); }
+
+    if ( $children !~ m/^[1-9][0-9]*$/s ) {
+        croak("Number of children must be a numeric value > 0");
+    }
+
+    for ( my $i = 0; $i < $children; $i++ ) {
+        $self->async( sub { return $sub->($i); }, @_ );
+    }
+
+    return $children;
+}
+
 sub _child {
     if ( scalar(@_) != 4 ) { confess 'invalid call'; }
     my ( $self, $sub, $pipe, $pid ) = @_;
@@ -344,7 +363,7 @@ sub _waitone {
     my ($self) = @_;
 
     my $sp = $self->_subprocs();
-    weaken $sp; # To avoid some Windows warnings
+    weaken $sp;    # To avoid some Windows warnings
     if ( !keys(%$sp) ) { return; }
 
     if ($use_thread_queue) {
@@ -738,7 +757,7 @@ Parallel::WorkUnit - Provide multi-paradigm forking with ability to pass back da
 
 =head1 VERSION
 
-version 1.116
+version 1.118
 
 =head1 SYNOPSIS
 
@@ -762,9 +781,18 @@ version 1.116
   #
   # Ordered Responses
   #
-  use AnyEvent;
   my $wu = Parallel::WorkUnit->new();
   $wu->async( sub { ... } );
+
+  @results = $wu->waitall();
+
+
+  #
+  # Spawning off X number of workers
+  # (Ordered Response paradigm shown with 10 children)
+  #
+  my $wu = Parallel::WorkUnit->new();
+  $wu->asyncs( 10, sub { ... } );
 
   @results = $wu->waitall();
 
@@ -879,6 +907,32 @@ Note: on Windows with threaded Perl, if C<AnyEvent> is not installed,
 threads instead of forks are used.  See C<thread> for the caveats
 that apply.  The PID returned is instead a meaningless (outside of
 this module) counter, not associated with any Windows thread identifier.
+
+=head2 asyncs( $children, sub { ... }, \&callback )
+
+  $wu->asyncs( 10, sub { return 1 }, \&callback );
+
+  # To get back results in "ordered" return mode
+  $wu->asyncs( 10, sub { return 1 } );
+  @results = $wu->waitall();
+
+Added in 1.117.
+
+This functions similarly to the C<async()> method, with a couple
+key differences.
+
+First, it takes an additional parameter, C<$children>, that specifies
+the number of child threads to spawn.  Like the C<async()> method,
+the children are spawned immediately, regardless of the value of
+the C<max_children> attribute.
+
+In addition, when the sub/coderef is executed, it is called with a
+single parameter representing the child number in that particular
+instance (between zero to C<$children-1>).
+
+Returns the number of children spawned.
+
+See C<async()> for more details on how this function works.
 
 =head2 waitall()
 

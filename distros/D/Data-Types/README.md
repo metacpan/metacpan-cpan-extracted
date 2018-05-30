@@ -1,4 +1,4 @@
-Data/Types version 0.09
+Data/Types version 0.12
 =======================
 
 This module exports a number of functions that are useful for validating and
@@ -28,7 +28,8 @@ Dependencies
 
 This module requires no modules or libraries not already included with Perl.
 
-COPYRIGHT AND LICENCE
+Copyright and Licence
+---------------------
 
 Copyright (c) 2002-2011, David E. Wheeler. Some Rights Reserved.
 

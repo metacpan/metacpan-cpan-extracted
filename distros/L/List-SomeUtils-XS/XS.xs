@@ -142,28 +142,24 @@ in_pad (pTHX_ SV *code)
     CV *cv = sv_2cv(code, &stash, &gv, 0);
     PADLIST *pad_list = (CvPADLIST(cv));
     PADNAMELIST *pad_namelist = PadlistNAMES(pad_list);
-    PADNAME **pad_names = PadnamelistARRAY(pad_namelist);
     int i;
 
     for (i=PadnamelistMAX(pad_namelist); i>=0; --i) {
-	PADNAME* name_sv = PadnamelistARRAY(pad_namelist)[i];
-	if (name_sv) {
-	    char *name_str = PadnamePV(name_sv);
-	    if (name_str) {
+        PADNAME* name_pn = PadnamelistARRAY(pad_namelist)[i];
+        if (name_pn) {
+            char *name_str = PadnamePV(name_pn);
+            if (name_str) {
 
-		/* perl < 5.6.0 does not yet have our */
-#               ifdef SVpad_OUR
-		if(PadnameIsOUR(name_sv))
-		    continue;
-#               endif
+                if (PadnameIsOUR(name_pn))
+                    continue;
 
-		if (!(PadnameFLAGS(name_sv)) & SVf_OK)
-		    continue;
+                if (strEQ(name_str, "$a") || strEQ(name_str, "$b"))
+                    return 1;
 
-		if (strEQ(name_str, "$a") || strEQ(name_str, "$b"))
-		    return 1;
-	    }
-	}
+                if (!((PadnameFLAGS(name_pn)) & SVf_OK))
+                    continue;
+            }
+        }
     }
     return 0;
 }
@@ -1850,7 +1846,7 @@ mode (...)
         }
 
         hv_iterinit(hv);
-        while (he = hv_iternext(hv)) {
+        while ((he = hv_iternext(hv))) {
             c = SvIV(HeVAL(he));
             if (c > max) {
                 max = c;
@@ -1859,7 +1855,7 @@ mode (...)
 
         i = 0;
         hv_iterinit(hv);
-        while (he = hv_iternext(hv)) {
+        while ((he = hv_iternext(hv))) {
             if (SvIV(HeVAL(he)) == max) {
                 if (GIMME_V == G_SCALAR) {
                     modality++;

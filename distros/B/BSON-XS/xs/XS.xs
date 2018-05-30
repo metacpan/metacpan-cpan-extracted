@@ -139,6 +139,7 @@ static void get_regex_flags(char * flags, SV *sv);
 static int64_t math_bigint_to_int64(SV *sv, const char *key);
 static SV* int64_as_SV(int64_t value);
 static stackette * check_circular_ref(void *ptr, stackette *stack);
+static SV* bson_parent_type(SV *sv);
 
 /* BSON decoding
  *
@@ -623,6 +624,8 @@ iter_src_to_bson(bson_t * bson, SV *sv, HV *opts, stackette *stack, bool subdoc)
   }
 
   while ( call_key_value_iter( iter, kv ) ) {
+    sv_2mortal(kv[0]);
+    sv_2mortal(kv[1]);
     STRLEN len;
     const char *str;
 
@@ -717,8 +720,14 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
   }
   else if (SvROK (sv)) {
     if (sv_isobject (sv)) {
+      const char* obj_type = sv_reftype(SvRV(sv), true);
+      SV* parent = bson_parent_type(SvRV(sv));
+      if ( parent != NULL ) {
+        obj_type = (const char *) SvPV_nolen(parent);
+      }
+
       /* OIDs */
-      if (sv_derived_from (sv, "BSON::OID")) {
+      if (strEQ(obj_type, "BSON::OID")) {
         SV *attr = sv_2mortal(call_perl_reader(sv, "oid"));
         char *bytes = SvPV_nolen(attr);
         bson_oid_t oid;
@@ -727,7 +736,7 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
         bson_append_oid(bson, key, -1, &oid);
 
       }
-      else if (sv_derived_from (sv, "MongoDB::OID")) {
+      else if (strEQ(obj_type, "MongoDB::OID")) {
         SV *attr = sv_2mortal(call_perl_reader(sv, "value"));
         char *str = SvPV_nolen (attr);
         bson_oid_t oid;
@@ -737,21 +746,21 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
 
       }
       /* Tie::IxHash */
-      else if (sv_isa(sv, "Tie::IxHash")) {
+      else if (strEQ(obj_type, "Tie::IxHash")) {
         bson_t child;
 
         bson_append_document_begin(bson, key, -1, &child);
         ixhash_elem_to_bson(&child, sv, opts, stack);
         bson_append_document_end(bson, &child);
       }
-      else if (sv_isa(sv, "BSON::Doc")) {
+      else if (strEQ(obj_type, "BSON::Doc")) {
         bson_t child;
 
         bson_append_document_begin(bson, key, -1, &child);
         iter_elem_to_bson(&child, sv, opts, stack);
         bson_append_document_end(bson, &child);
       }
-      else if (sv_isa(sv, "BSON::Raw")) {
+      else if (strEQ(obj_type, "BSON::Raw")) {
         STRLEN str_len;
         SV *encoded;
         const char *bson_str;
@@ -764,7 +773,7 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
         bson_append_document(bson, key, -1, child);
         bson_destroy(child);
       }
-      else if (sv_isa(sv, "MongoDB::BSON::Raw")) {
+      else if (strEQ(obj_type, "MongoDB::BSON::Raw")) {
         SV *str_sv;
         char *str;
         STRLEN str_len;
@@ -783,7 +792,7 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
         bson_append_document(bson, key, -1, child);
         bson_destroy(child);
       }
-      else if (sv_isa(sv, "BSON::Time")) {
+      else if (strEQ(obj_type, "BSON::Time")) {
         SV *ms = sv_2mortal(call_perl_reader(sv, "value"));
         if ( sv_isa(ms, "Math::BigInt") ) {
           int64_t t = math_bigint_to_int64(ms,key);
@@ -794,13 +803,13 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
         }
       }
       /* Time::Moment */
-      else if (sv_isa(sv, "Time::Moment")) {
+      else if (strEQ(obj_type, "Time::Moment")) {
         SV *sec = sv_2mortal(call_perl_reader(sv, "epoch"));
         SV *ms = sv_2mortal(call_perl_reader(sv, "millisecond"));
         bson_append_date_time(bson, key, -1, (int64_t)SvIV(sec)*1000+SvIV(ms));
       }
       /* DateTime */
-      else if (sv_isa(sv, "DateTime")) {
+      else if (strEQ(obj_type, "DateTime")) {
         SV *sec, *ms, *tz, *tz_name;
         STRLEN len;
         char *str;
@@ -819,7 +828,7 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
         bson_append_date_time(bson, key, -1, (int64_t)SvIV(sec)*1000+SvIV(ms));
       }
       /* DateTime::TIny */
-      else if (sv_isa(sv, "DateTime::Tiny")) {
+      else if (strEQ(obj_type, "DateTime::Tiny")) {
         struct tm t;
         time_t epoch_secs = time(NULL);
         int64_t epoch_ms;
@@ -838,12 +847,12 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
         epoch_ms = (int64_t)epoch_secs*1000;
         bson_append_date_time(bson, key, -1, epoch_ms);
       }
-      else if (sv_isa(sv, "Mango::BSON::Time")) {
+      else if (strEQ(obj_type, "Mango::BSON::Time")) {
         SV *ms = _hv_fetchs_sv((HV *)SvRV(sv), "time");
         bson_append_date_time(bson, key, -1, (int64_t)SvIV(ms));
       }
       /* DBRef */
-      else if (sv_isa(sv, "BSON::DBRef") || sv_isa(sv, "MongoDB::DBRef")) {
+      else if (strEQ(obj_type, "BSON::DBRef") || strEQ(obj_type, "MongoDB::DBRef")) {
         SV *dbref;
         bson_t child;
         dbref = sv_2mortal(call_perl_reader(sv, "_ordered"));
@@ -859,18 +868,18 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
        * similarly have their own type, but now use JSON::PP::Boolean.
        */
       else if (
-          sv_isa(sv, "boolean") ||
-          sv_isa(sv, "BSON::Bool") ||
-          sv_isa(sv, "JSON::XS::Boolean") ||
-          sv_isa(sv, "JSON::PP::Boolean") ||
-          sv_isa(sv, "JSON::Tiny::_Bool") ||
-          sv_isa(sv, "Mojo::JSON::_Bool") ||
-          sv_isa(sv, "Cpanel::JSON::XS::Boolean") ||
-          sv_isa(sv, "Types::Serialiser::Boolean")
+          strEQ(obj_type, "boolean") ||
+          strEQ(obj_type, "BSON::Bool") ||
+          strEQ(obj_type, "JSON::XS::Boolean") ||
+          strEQ(obj_type, "JSON::PP::Boolean") ||
+          strEQ(obj_type, "JSON::Tiny::_Bool") ||
+          strEQ(obj_type, "Mojo::JSON::_Bool") ||
+          strEQ(obj_type, "Cpanel::JSON::XS::Boolean") ||
+          strEQ(obj_type, "Types::Serialiser::Boolean")
         ) {
         bson_append_bool(bson, key, -1, SvIV(SvRV(sv)));
       }
-      else if (sv_isa(sv, "BSON::Code") || sv_isa(sv, "MongoDB::Code")) {
+      else if (strEQ(obj_type, "BSON::Code") || strEQ(obj_type, "MongoDB::Code")) {
         SV *code, *scope;
         char *code_str;
         STRLEN code_len;
@@ -894,7 +903,7 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
         }
 
       }
-      else if (sv_isa(sv, "BSON::Timestamp")) {
+      else if (strEQ(obj_type, "BSON::Timestamp")) {
         SV *sec, *inc;
 
         inc = sv_2mortal(call_perl_reader(sv, "increment"));
@@ -902,7 +911,7 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
 
         bson_append_timestamp(bson, key, -1, SvIV(sec), SvIV(inc));
       }
-      else if (sv_isa(sv, "MongoDB::Timestamp")) {
+      else if (strEQ(obj_type, "MongoDB::Timestamp")) {
         SV *sec, *inc;
 
         inc = sv_2mortal(call_perl_reader(sv, "inc"));
@@ -910,13 +919,13 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
 
         bson_append_timestamp(bson, key, -1, SvIV(sec), SvIV(inc));
       }
-      else if (sv_isa(sv, "BSON::MinKey") || sv_isa(sv, "MongoDB::MinKey")) {
+      else if (strEQ(obj_type, "BSON::MinKey") || strEQ(obj_type, "MongoDB::MinKey")) {
         bson_append_minkey(bson, key, -1);
       }
-      else if (sv_isa(sv, "BSON::MaxKey") || sv_isa(sv, "MongoDB::MaxKey")) {
+      else if (strEQ(obj_type, "BSON::MaxKey") || strEQ(obj_type, "MongoDB::MaxKey")) {
         bson_append_maxkey(bson, key, -1);
       }
-      else if (sv_isa(sv, "MongoDB::BSON::_EncodedDoc")) {
+      else if (strEQ(obj_type, "MongoDB::BSON::_EncodedDoc")) {
         STRLEN str_len;
         SV **svp;
         SV *encoded;
@@ -929,7 +938,7 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
         bson_append_document(bson, key, -1, child);
         bson_destroy(child);
       }
-      else if (sv_isa(sv, "BSON::String")) {
+      else if (strEQ(obj_type, "BSON::String")) {
         SV *str_sv;
         char *str;
         STRLEN str_len;
@@ -937,7 +946,7 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
         str_sv = call_perl_reader(sv,"value");
         append_utf8(bson, key, str_sv);
       }
-      else if (sv_isa(sv, "MongoDB::BSON::String")) {
+      else if (strEQ(obj_type, "MongoDB::BSON::String")) {
         SV *str_sv;
         char *str;
         STRLEN str_len;
@@ -951,7 +960,7 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
 
         append_utf8(bson, key, str_sv);
       }
-      else if (sv_isa(sv, "BSON::Bytes") || sv_isa(sv, "MongoDB::BSON::Binary")) {
+      else if (strEQ(obj_type, "BSON::Bytes") || strEQ(obj_type, "MongoDB::BSON::Binary")) {
         SV *data, *subtype;
 
         subtype = sv_2mortal(call_perl_reader(sv, "subtype"));
@@ -959,7 +968,7 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
 
         append_binary(bson, key, SvIV(subtype), data);
       }
-      else if (sv_isa(sv, "BSON::Binary")) {
+      else if (strEQ(obj_type, "BSON::Binary")) {
         SV *data, *packed, *subtype;
         bson_subtype_t int_subtype;
         char *pat = "C*";
@@ -979,7 +988,7 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
 
         append_binary(bson, key, int_subtype, packed);
       }
-      else if (sv_isa(sv, "Regexp")) {
+      else if (strEQ(obj_type, "Regexp")) {
 #if PERL_REVISION==5 && PERL_VERSION>=12
         REGEXP * re = SvRX(sv);
 #else
@@ -988,7 +997,7 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
 
         append_regex(bson, key, re, sv);
       }
-      else if (sv_isa(sv, "BSON::Regex") || sv_isa(sv, "MongoDB::BSON::Regexp") ) {
+      else if (strEQ(obj_type, "BSON::Regex") || strEQ(obj_type, "MongoDB::BSON::Regexp") ) {
         /* Abstract regexp object */
         SV *pattern, *flags;
         pattern = sv_2mortal(call_perl_reader( sv, "pattern" ));
@@ -997,10 +1006,10 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
         append_decomposed_regex( bson, key, SvPV_nolen( pattern ), SvPV_nolen( flags ) );
       }
       /* 64-bit integers */
-      else if (sv_isa(sv, "Math::BigInt")) {
+      else if (strEQ(obj_type, "Math::BigInt")) {
         bson_append_int64(bson, key, -1, math_bigint_to_int64(sv,key));
       }
-      else if (sv_isa(sv, "BSON::Int64") ) {
+      else if (strEQ(obj_type, "BSON::Int64") ) {
         SV *v = call_perl_reader(sv, "value");
 
         if ( SvROK(v) ) {
@@ -1010,19 +1019,19 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
 
         bson_append_int64(bson, key, -1, (int64_t)SvIV(sv));
       }
-      else if (sv_isa(sv, "Math::Int64")) {
+      else if (strEQ(obj_type, "Math::Int64")) {
         uint64_t v_int;
         SV *v_sv = call_pv_va("Math::Int64::int64_to_native",1,sv);
         Copy(SvPVbyte_nolen(v_sv), &v_int, 1, uint64_t);
         bson_append_int64(bson, key, -1, v_int);
       }
-      else if (sv_isa(sv, "BSON::Int32") ) {
+      else if (strEQ(obj_type, "BSON::Int32") ) {
         bson_append_int32(bson, key, -1, (int32_t)SvIV(sv));
       }
-      else if (sv_isa(sv, "BSON::Double") ) {
+      else if (strEQ(obj_type, "BSON::Double") ) {
         bson_append_double(bson, key, -1, (double)SvNV(sv));
       }
-      else if (sv_isa(sv, "BSON::Decimal128") ) {
+      else if (strEQ(obj_type, "BSON::Decimal128") ) {
         bson_decimal128_t dec;
         SV *dec_sv;
         char *bid_bytes;
@@ -1348,6 +1357,39 @@ check_circular_ref(void *ptr, stackette *stack) {
   return ette;
 }
 
+/**
+ * Given an object SV, finds the first superclass in reverse mro order that
+ * starts with "BSON::" and returns it as a mortal SV.  Otherwise, returns
+ * NULL if no such type is found.
+ */
+static SV*
+bson_parent_type(SV* sv) {
+  SV** handle;
+  AV* mro;
+  int i;
+
+  if (! SvOBJECT(sv)) {
+    return NULL;
+  }
+
+  mro = mro_get_linear_isa(SvSTASH(sv));
+
+  if (av_len(mro) == -1) {
+    return NULL;
+  }
+  /* iterate backwards */
+  for ( i=av_len(mro); i >= 0; i-- ) {
+    handle = av_fetch(mro, i, 0);
+    if (handle != NULL) {
+      char* klass = SvPV_nolen(*handle);
+      if (strnEQ(klass, "BSON::", 6)) {
+        return sv_2mortal(newSVpvn(klass,strlen(klass)));
+      }
+    }
+  }
+  return NULL;
+}
+
 /********************************************************************
  * BSON decoding
  ********************************************************************/
@@ -1398,7 +1440,7 @@ bson_doc_to_hashref(bson_iter_t * iter, HV *opts) {
       && (wrap = _hv_fetchs_sv(opts, "wrap_dbrefs")) && SvTRUE(wrap)
   ) {
     SV *class = sv_2mortal(newSVpvs("BSON::DBRef"));
-    SV *dbref = call_method_va(class, "new", 1, ret );
+    SV *dbref = call_method_va(class, "new", 1, sv_2mortal(ret) );
     return dbref;
   }
 
@@ -1438,6 +1480,7 @@ bson_doc_to_tiedhash(bson_iter_t * iter, HV *opts) {
 
     /* get key and value and store into hash */
     key = sv_2mortal( newSVpvn(name, strlen(name)) );
+    SvUTF8_on(key);
     value = bson_elem_to_sv(iter, name, opts);
     call_method_va(ixhash, "STORE", 2, key, value);
   }
@@ -1712,7 +1755,7 @@ bson_elem_to_sv (const bson_iter_t * iter, const char *key, HV *opts ) {
         croak("error iterating BSON type %d\n", bson_iter_type(iter));
     }
 
-    scope_sv = bson_doc_to_hashref(&child, opts);
+    scope_sv = sv_2mortal(bson_doc_to_hashref(&child, opts));
     value = new_object_from_pairs("BSON::Code", "code", code_sv, "scope", scope_sv, NULL);
 
     break;

@@ -1,4 +1,8 @@
+[![Linux Build Status](https://travis-ci.org/nigelhorne/Geo-Coder-Postcodes.svg?branch=master)](https://travis-ci.org/nigelhorne/Geo-Coder-Postcodes)
+[![Windows Build Status](https://ci.appveyor.com/api/projects/status/x9t8v45f27fuk7mm?svg=true)](https://ci.appveyor.com/project/nigelhorne/geo-coder-postcodes)
+[![Coverage Status](https://coveralls.io/repos/github/nigelhorne/Geo-Coder-Postcodes/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/Geo-Coder-Postcodes?branch=master)
 [![CPAN](https://img.shields.io/cpan/v/Geo-Coder-Postcodes.svg)](http://search.cpan.org/~nhorne/Geo-Coder-Postcodes/)
+[![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/6314705722033970/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/6314705722033970/heads/master/)
 
 # Geo::Coder::Postcodes
 
@@ -6,7 +10,7 @@ Provides a geocoding functionality using https://postcodes.io.
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 
@@ -77,6 +81,6 @@ Lots of thanks to the folks at postcodes.io.
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017 Nigel Horne.
+Copyright 2017-2018 Nigel Horne.
 
 This program is released under the following licence: GPL2

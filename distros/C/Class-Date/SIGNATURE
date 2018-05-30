@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 baa78bd5dc14c91ab53bb8507d3e42fe0767009b CONTRIBUTORS
+SHA1 65e339bb713afbd306d4c836263a9fea3028d214 Changes
+SHA1 7fb470d2eb1d9873620ffc19b853c7eda6f49e00 INSTALL
+SHA1 3cea48a9445c7071ed158759f9f8ad8a953666f5 LICENSE
+SHA1 b16e8c742a737afa5d670b63e53b8fbe6c68743f MANIFEST
+SHA1 6791fd11b6081fe6648bfbcc89e88cfa9416152c META.json
+SHA1 68b5ea0105dbaa60374f8787235d3ce3daeda5f4 META.yml
+SHA1 3231aec77dda7515862e464d03f785b55c969958 Makefile.PL
+SHA1 03ec9cd3b477200d603a8fb7aaa2e331d9136ad4 README.mkdn
+SHA1 75797ea64f4b5cea320cc7d3b93cb54a8ecd34ec cpanfile
+SHA1 24250551300f753a344bd3d38aba5476a3bc97dd doap.xml
+SHA1 1b7d4632976d250956d49d509b30bdd2ac5f48e5 inc/Devel/AssertOS.pm
+SHA1 52dcb8b2b98363d1e1fdebd5e193bc12c57c220a inc/Devel/CheckOS.pm
+SHA1 241bf31f85eb188c91d3b97e3e5209c62c4f7a43 lib/Class/Date.pm
+SHA1 aae497970b984c05e90c1302329573ae59ae58a5 lib/Class/Date/Const.pm
+SHA1 30158d07a3ae199b34a1c4dd0231d0d58588d69c lib/Class/Date/Invalid.pm
+SHA1 f2b8d27792e78399229c5e006498f9580d1a3525 lib/Class/Date/Rel.pm
+SHA1 a956a1d1b8fd1a34b8b91e05eed9e5038a9f8612 t/00-compile.t
+SHA1 d360e9d6be28c72654897045866911191dbdeb17 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 eb05e1a1186d22885ad0d1a1c4ca087b5bb85847 t/00_base.t
+SHA1 71d4a0eb06041ba3ea10101de89c1c74b5b25678 t/05_parsing.t
+SHA1 2d5c3b6c67646439a3d00be2453317f2bd281b28 t/10_fields.t
+SHA1 c8500928554ee619cab4ab8e8128a87e31e46d0f t/20_gmdate.t
+SHA1 9aff6e4ef83fba958c78a3d17d0997d7aa3563a0 t/30_localdate.t
+SHA1 f04bce03139454007e5d74a3a21036156e8626ad t/40_errors.t
+SHA1 101b5b78047b061815643d136bb15fdb3af48aa0 t/50_timezone.t
+SHA1 c3d46608c3a977c64ff2893e9d507601301173d6 t/bug-reports.t
+SHA1 35d858c137ad0997e7d91ab99f757d4da075aa69 t/class-date-invalid.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAlsJl3oACgkQ34Hwf+GwC4w/ewCfdxd11vI+CvHyB/qG3r7Y3Gu9
+3X8AoO3k6WrrR3MRfYjQGKRujDlgaCa/
+=jYfb
+-----END PGP SIGNATURE-----

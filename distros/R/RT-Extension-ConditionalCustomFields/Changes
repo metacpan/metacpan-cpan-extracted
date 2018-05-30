@@ -1,5 +1,8 @@
 Revision history for RT-Extension-ConditionalCustomFields
 
+0.09 2018-05-23
+ - Allow validation (matching pattern) on ConditionedBy CF only when condition is fulfilled
+
 0.08 2018-05-13
  - Fix editing by when condition CF and conditioned_by CF are not in the same CF grouping
 

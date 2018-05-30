@@ -4,8 +4,9 @@ use strict;
 use utf8;
 use Data::Util qw(:check);
 use Moo::Role;
+use Data::UUID;
 
-our $VERSION = "0.0135";
+our $VERSION = "0.0136";
 
 has session_key => (
     is       => "ro",
@@ -35,8 +36,18 @@ has uri_base => (
     required => 1,
     default  => sub { "http://localhost:5000"; }
 );
+has uuid => (
+    is => "lazy",
+    init_arg => undef
+);
 
 requires "to_app";
+
+sub _build_uuid {
+
+    Data::UUID->new();
+
+}
 
 sub _build_error_path {
 
@@ -95,6 +106,37 @@ sub set_auth_sso_error {
     my ($self, $session, $value) = @_;
     _check_plack_session($session);
     $session->set($self->session_key . "_error", $value);
+}
+
+sub generate_csrf_token {
+    $_[0]->uuid()->create_b64();
+}
+
+sub set_csrf_token {
+    my ($self, $session, $value) = @_;
+    _check_plack_session($session);
+    $session->set($self->session_key . "_csrf" , $value);
+}
+
+sub get_csrf_token {
+    my ($self, $session) = @_;
+    _check_plack_session($session);
+    $session->get($self->session_key . "_csrf" );
+}
+
+sub csrf_token_valid {
+    my ($self, $session,$value) = @_;
+    my $stored_token = $self->get_csrf_token($session);
+    defined($value) && defined($stored_token) && $value eq $stored_token;
+}
+
+sub cleanup {
+
+    my ( $self, $session ) = @_;
+
+    $session->remove( $self->session_key() . "_error" );
+    $session->remove( $self->session_key() . "_csrf" );
+
 }
 
 1;
@@ -416,6 +458,30 @@ $hash should be a hash ref, and look like this:
         type => "my-type",
         content => "my-content"
     }
+
+=head2 generate_csrf_token()
+
+Generate unique CSRF token. Store this token in your session, and supply it as parameter
+to the redirect uri.
+
+=head2 set_csrf_token($session,$token)
+
+Save csrf token to the session
+
+The token is saved in key session_key + "_csrf"
+
+=head2 get_csrf_token($session)
+
+Retrieve csrf token from the session
+
+=head2 csrf_token_valid($session,$token)
+
+Compare supplied token with stored token
+
+=head2 cleanup($session)
+
+removes additional session keys like auth_sso_error and auth_sso_csrf
+before redirecting to the authorization path.
 
 =head1 EXAMPLES
 

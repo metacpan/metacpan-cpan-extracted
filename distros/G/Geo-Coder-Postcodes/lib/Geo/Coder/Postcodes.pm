@@ -17,11 +17,11 @@ Geo::Coder::Postcodes - Provides a geocoding functionality using https://postcod
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -71,7 +71,7 @@ sub geocode {
 	my $self = shift;
 
 	scalar(@_) > 0 or
-		Carp::croak("Usage: geocode(location => \$location)");
+		Carp::croak('Usage: geocode(location => $location)');
 
 	my %param;
 	if (@_ % 2 == 0) {
@@ -82,13 +82,13 @@ sub geocode {
 
 	my $location = $param{location};
 	unless(defined($location)) {
-		Carp::croak("Usage: geocode(location => \$location)");
+		Carp::croak('Usage: geocode(location => $location)');
 		return;
 	}
 
 	my $county;
 	if($location =~ /,/) {
-		if($location =~ /^([\w\s]+?),([\w\s]+?),[\w\s]+?$/) {
+		if($location =~ /^([\w\s\-]+?),([\w\s]+?),[\w\s]+?$/i) {
 			# Turn 'Ramsgate, Kent, UK' into 'Ramsgate'
 			$location = $1;
 			$county = $2;
@@ -127,8 +127,16 @@ sub geocode {
 		# TODO: search through all results for the right one, e.g. Leeds in
 		#	Kent or in West Yorkshire?
 		foreach my $result(@results) {
-			if(defined($result->{'county_unitary'})) {
-				if($result->{'county_unitary'} =~ /$county/) {
+			# if(defined($result->{'county_unitary'}) && ($result->{'county_unitary_type'} eq 'County')) {
+			if(my $unitary = $result->{'county_unitary'}) {
+				# $location =~ s/+/ /g;
+				if(($unitary =~ /$county/i) || ($unitary =~ /$location/i)) {
+					return $result;
+				}
+			}
+			if((my $region = $result->{'region'}) && ($county =~ /\s+(\w+)$/)) {
+				if($region =~ /$1/) {
+					# e.g. looked for South Yorkshire, got Yorkshire and the Humber
 					return $result;
 				}
 			}
@@ -173,7 +181,7 @@ sub reverse_geocode {
 	my $self = shift;
 
 	scalar(@_) > 0 or
-		Carp::croak("Usage: reverse_geocode(latlng => \$latlng)");
+		Carp::croak('Usage: reverse_geocode(latlng => $latlng)');
 
 	my %param;
 	if (@_ % 2 == 0) {
@@ -184,7 +192,7 @@ sub reverse_geocode {
 
 	my $latlng = $param{latlng};
 	unless(defined($latlng)) {
-		Carp::croak("Usage: reverse_geocode(latlng => \$latlng)");
+		Carp::croak('Usage: reverse_geocode(latlng => $latlng)');
 		return;
 	}
 
@@ -206,7 +214,7 @@ sub reverse_geocode {
 	my $rc = $json->decode($res->content);
 	my @results = @{$rc->{result}};
 	return $results[0];
-};
+}
 
 =head1 BUGS
 
@@ -230,7 +238,7 @@ L<Geo::Coder::GooglePlaces>, L<HTML::GoogleMaps::V3>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Nigel Horne.
+Copyright 2017-2018 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

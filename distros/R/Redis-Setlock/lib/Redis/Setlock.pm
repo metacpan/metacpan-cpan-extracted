@@ -11,11 +11,11 @@ use Time::HiRes qw/ sleep /;
 use Carp;
 use Guard ();
 
-our $VERSION             = "0.09";
-our $DEFAULT_EXPIRES     = 86400;
-our $RETRY_INTERVAL      = 0.5;
-our $BLOCKING_KEY_PREFIX = "wait:";
-our $WAIT_QUEUE          = 0;
+our $VERSION              = "0.11";
+our $DEFAULT_EXPIRES      = 86400;
+our $RETRY_INTERVAL       = 0.5;
+our $BLOCKING_KEY_POSTFIX = ":wait";
+our $WAIT_QUEUE           = 0;
 
 use constant {
     EXIT_CODE_ERROR => 111,
@@ -34,8 +34,8 @@ END_OF_SCRIPT
 use constant BLOCKING_UNLOCK_LUA_SCRIPT_TMPL => <<'END_OF_SCRIPT'
 if redis.call("get",KEYS[1]) == ARGV[1]
 then
-    redis.call("del",KEYS[1],"%s"..KEYS[1])
-    return redis.call("lpush","%s"..KEYS[1],ARGV[1])
+    redis.call("del",KEYS[1],KEYS[1].."%s")
+    return redis.call("lpush",KEYS[1].."%s",ARGV[1])
 else
     return 0
 end
@@ -43,7 +43,7 @@ END_OF_SCRIPT
     ;
 
 sub BLOCKING_UNLOCK_LUA_SCRIPT {
-    sprintf BLOCKING_UNLOCK_LUA_SCRIPT_TMPL, $BLOCKING_KEY_PREFIX, $BLOCKING_KEY_PREFIX;
+    sprintf BLOCKING_UNLOCK_LUA_SCRIPT_TMPL, $BLOCKING_KEY_POSTFIX, $BLOCKING_KEY_POSTFIX;
 }
 
 sub parse_options {
@@ -80,10 +80,10 @@ sub parse_options {
 
 sub lock_guard {
     my $class = shift;
-    my ($redis, $key, $expires) = @_;
+    my ($redis, $key, $expires, $wait) = @_;
 
     my $opt = {
-        wait    => 0,
+        wait    => $wait,
         expires => defined $expires ? $expires : $DEFAULT_EXPIRES,
     };
     my $token = try_get_lock($redis, $opt, $key)
@@ -177,7 +177,7 @@ sub try_get_lock {
         }
         debugf "unable to lock. waiting for release";
         if ($WAIT_QUEUE) {
-            $redis->blpop("${BLOCKING_KEY_PREFIX}$key", $opt->{expires});
+            $redis->blpop("$key${BLOCKING_KEY_POSTFIX}", $opt->{expires});
         }
         else {
             sleep $RETRY_INTERVAL;
@@ -289,6 +289,22 @@ Redis::Setlock is a like the setlock command using Redis.
 =head1 REQUIREMENTS
 
 Redis Server >= 2.6.12.
+
+=head1 METHODS
+
+=over 4
+
+=item B<new>(%args)
+
+=item B<lock_guard>($redis, $lock_name, $expires, $blocking)
+
+Creates Guard::guard object when the lock got.
+
+The lock is released at the guard is destroyed.
+
+If $blocking is true, lock_guard will be blocked until getting a lock. Otherwise returns immedetly when the lock is held by others .
+
+=back
 
 =head1 LICENSE
 

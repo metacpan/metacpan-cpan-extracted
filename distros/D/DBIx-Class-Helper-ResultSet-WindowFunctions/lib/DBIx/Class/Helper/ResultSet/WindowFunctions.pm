@@ -9,7 +9,7 @@ use warnings;
 
 use parent 'DBIx::Class::ResultSet';
 
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.1.2';
 
 
 sub _resolved_attrs {
@@ -79,7 +79,7 @@ DBIx::Class::Helper::ResultSet::WindowFunctions - Add support for window functio
 
 =head1 VERSION
 
-version v0.1.1
+version v0.1.2
 
 =head1 SYNOPSIS
 

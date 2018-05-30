@@ -43,7 +43,7 @@ my $webhook_url = sprintf(
     $test_bot->addr,
     $test_bot->port,
     join( '&',
-        'channel=test', 'network=local', 'squash_threshold=1',
+        'channel=test', 'network=dummy', 'squash_threshold=1',
         'use_color=0',  'shorten_urls=0' ),
 );
 
@@ -92,7 +92,7 @@ is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
 
 TestBot->expect(
     join( ' ',
-        '#test Test User',
+        'dummy/#test Test User',
         'master checkou test-repo',
         '* pushed 2 commits (first 1 follow)',
         '* http://git/test/compare/before...after' )
@@ -100,7 +100,7 @@ TestBot->expect(
 
 TestBot->expect(
     join( ' ',
-        '#test Test User',
+        'dummy/#test Test User',
         'master b9b5587 test-repo',
         'mod-one file-one rm-one',
         '* Commit three files (add, mod, rm)',
@@ -145,7 +145,7 @@ is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
 
 TestBot->expect(
     join( ' ',
-        '#test Test User',
+        'dummy/#test Test User',
         'master checkou test-repo',
         '* pushed 6 commits (first 1 follow)',
         '* http://git/test/compare/before...after6' )
@@ -153,7 +153,7 @@ TestBot->expect(
 
 TestBot->expect(
     join( ' ',
-        '#test Test User',
+        'dummy/#test Test User',
         'master b9b5587 test-repo',
         'mod-one file-one rm-one',
         '* Commit three files (add, mod, rm)',
@@ -198,7 +198,7 @@ is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
 
 TestBot->expect(
     join( ' ',
-        '#test Test User',
+        'dummy/#test Test User',
         'upstream checkou test-repo',
         '* pushed 6 commits',
         '* http://git/test/compare/before...after6' )
@@ -209,7 +209,7 @@ $webhook_url = sprintf(
     $test_bot->addr,
     $test_bot->port,
     join( '&',
-        'channel=test', 'network=local',
+        'channel=test', 'network=dummy',
         'use_color=0',  'shorten_urls=0',
         'always_squash_outside_dir=dir', ),
 );
@@ -252,7 +252,7 @@ is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
 
 TestBot->expect(
     join( ' ',
-        '#test Test User',
+        'dummy/#test Test User',
         'master test-repo',
         '* 2 commits touching only files outside monitored directories omitted',
     )
@@ -304,7 +304,7 @@ is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
 
 TestBot->expect(
     join( ' ',
-        '#test Test User',
+        'dummy/#test Test User',
         'master b9b5587 test-repo',
         'dir/ mod-one file-one rm-one * Commit three files (add, mod, rm)',
         '* http://git/b9b5587' )
@@ -312,7 +312,7 @@ TestBot->expect(
 
 TestBot->expect(
     join( ' ',
-        '#test Test User',
+        'dummy/#test Test User',
         'master 284ffdd test-repo',
         '(6 files in 2 dirs)',
         '* Commit six files in dir/ (2×(add, mod, rm))',
@@ -322,7 +322,7 @@ TestBot->expect(
 
 TestBot->expect(
     join( ' ',
-        '#test Test User',
+        'dummy/#test Test User',
         'master test-repo',
         '* 1 commit touching only files outside monitored directories omitted',
     )

@@ -1,0 +1,17 @@
+1.002 - May 28, 2018
+Joelle Maslak <jmaslak@antelope.net>
+ * Release changes in 1.001 as production version
+ * From 1.001: Add parallelized grep/map and forlines routines
+ * From 1.001: Code cleanups (manwar)
+
+1.001 - May 28, 2018
+Released as development trial version only
+Joelle Maslak <jmaslak@antelope.net>
+ * Add parallelized grep/map and forlines routines
+Mohammad S Anwar (manwar)
+ * Code cleanups
+
+1.000 - May 28, 2018
+Joelle Maslak <jmaslak@antelope.net>
+ * Initial version
+

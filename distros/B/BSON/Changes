@@ -1,5 +1,20 @@
 Revision history for BSON
 
+v1.6.3    2018-05-25 13:53:32-04:00 America/New_York
+
+    [Bugs]
+
+    - PERL-911 Implement 'bool' overloading for BSON::String to avoid
+      the fallback implementation relying on numification and giving
+      warnings.
+
+v1.6.2    2018-05-24 12:43:06-04:00 America/New_York
+
+    [Bugs]
+
+    - [PERL-641] Fix back-compatible BSON::Timestamp constructor
+      so that MongoDB::Timestamp can be an empty subclass of it.
+
 v1.6.1    2018-05-17 13:41:11-04:00 America/New_York
 
     [Bugs]

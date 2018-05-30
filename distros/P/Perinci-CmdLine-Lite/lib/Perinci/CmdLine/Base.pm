@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Base;
 
-our $DATE = '2018-05-01'; # DATE
-our $VERSION = '1.812'; # VERSION
+our $DATE = '2018-05-29'; # DATE
+our $VERSION = '1.813'; # VERSION
 
 use 5.010001;
 use strict;
@@ -939,7 +939,11 @@ sub _parse_argv2 {
         return [200, "OK (subcommand options parsing skipped)"];
     } else {
         my $scd = $r->{subcommand_data};
-        my $meta = $self->get_meta($r, $scd->{url});
+        if ($r->{meta} && !$self->{subcommands}) {
+            # we have retrieved meta, no need to get it again
+        } else {
+            $self->get_meta($r, $scd->{url});
+        }
 
         # first fill in from subcommand specification
         if ($scd->{args}) {
@@ -965,7 +969,7 @@ sub _parse_argv2 {
                 subcommand_name    => $r->{subcommand_name},
                 config_profile     => $r->{config_profile},
                 common_opts        => $self->common_opts,
-                meta               => $meta,
+                meta               => $r->{meta},
                 meta_is_normalized => 1,
             );
             die $res unless $res->[0] == 200;
@@ -997,8 +1001,8 @@ sub _parse_argv2 {
         }
 
         my $has_cmdline_src;
-        for my $ak (keys %{$meta->{args} // {}}) {
-            my $av = $meta->{args}{$ak};
+        for my $ak (keys %{$r->{meta}{args} // {}}) {
+            my $av = $r->{meta}{args}{$ak};
             if ($av->{cmdline_src}) {
                 $has_cmdline_src = 1;
                 last;
@@ -1009,7 +1013,7 @@ sub _parse_argv2 {
         my $ga_res = Perinci::Sub::GetArgs::Argv::get_args_from_argv(
             argv                => \@ARGV,
             args                => \%args,
-            meta                => $meta,
+            meta                => $r->{meta},
             meta_is_normalized  => 1,
             allow_extra_elems   => $has_cmdline_src ? 1:0,
             per_arg_json        => $self->{per_arg_json},
@@ -1039,7 +1043,7 @@ sub _parse_argv2 {
         return $ga_res unless $ga_res->[0] == 200;
 
         # wrap stream arguments with iterator
-        my $args_p = $meta->{args} // {};
+        my $args_p = $r->{meta}{args} // {};
         for my $arg (keys %{$ga_res->[2]}) {
             next unless $args_p->{$arg};
             next unless $args_p->{$arg}{stream};
@@ -1676,7 +1680,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.812 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2018-05-01.
+This document describes version 1.813 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2018-05-29.
 
 =head1 DESCRIPTION
 

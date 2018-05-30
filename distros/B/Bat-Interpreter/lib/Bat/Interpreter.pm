@@ -10,7 +10,7 @@ use Bat::Interpreter::Delegate::FileStore::LocalFileSystem;
 use Bat::Interpreter::Delegate::Executor::PartialDryRunner;
 use namespace::autoclean;
 
-our $VERSION = '0.008';    # VERSION
+our $VERSION = '0.009';    # VERSION
 
 # ABSTRACT: Pure perl interpreter for a small subset of bat/cmd files
 
@@ -340,7 +340,7 @@ sub _variable_substitution {
     };
 
     #$string =~ s/(?<!%)(?:%([^:%]+?)(:.+?)?%)/$handle_variable_manipulations->($1, $2)/eg;
-    $string =~ s/%([^:%]{2,}?)(:.+?)?%/$handle_variable_manipulations->($1, $2)/eg;
+    $string =~ s/(?<!%)%(?!%)([^:%]{2,}?)(:.+?)?%(?!%)/$handle_variable_manipulations->($1, $2)/eg;
 
     $string =~ s/%%/%/g;
 
@@ -406,7 +406,7 @@ Bat::Interpreter - Pure perl interpreter for a small subset of bat/cmd files
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -449,13 +449,17 @@ This is free software, licensed under:
 
 =head1 CONTRIBUTORS
 
-=for stopwords eva.dominguez pablo.rodriguez
+=for stopwords eva.dominguez Eva Dominguez pablo.rodriguez
 
 =over 4
 
 =item *
 
 eva.dominguez <eva.dominguez@meteologica.com>
+
+=item *
+
+Eva Dominguez <meloncego@gmail.com>
 
 =item *
 

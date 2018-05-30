@@ -64,8 +64,8 @@ if(1){
 # test Translate
 if(1){
     my $ds = $gdal->GetDriver('GTiff')->Create('/vsimem/test.tiff', 10);
-    my $png = $ds->Translate('/vsimem/test.png', -of => 'PNG');
-    ok($png->GetDriver->GetName eq 'PNG', "Translate");
+    my $translated = $ds->Translate('/vsimem/translated.tiff', -of => 'GTiff');
+    ok($translated->GetDriver->GetName eq 'GTiff', "Translate");
 }
 
 done_testing();

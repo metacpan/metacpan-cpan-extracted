@@ -1,7 +1,6 @@
 requires 'perl', '5.008005';
 
 requires 'Cpanel::JSON::XS', '0';
-requires 'DDP', '0';
 requires 'File::Share', '0';
 requires 'File::Slurper', '0';
 requires 'Getopt::Long', '0';

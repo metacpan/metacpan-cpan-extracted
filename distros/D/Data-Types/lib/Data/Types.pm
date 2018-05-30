@@ -4,7 +4,7 @@ use strict;
 require Exporter;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
-$VERSION = '0.09';
+$VERSION = '0.13';
 
 @ISA = qw(Exporter);
 
@@ -281,7 +281,7 @@ integer in $val is C</^[+-]?\d+$/>.
 
   my $bool = is_int(0); # Returns true.
   $bool = is_int(22);   # Returns true.
-  $bool = is_int(-22);  # Returns false.
+  $bool = is_int(-22);  # Returns true.
   $bool = is_int(3.2);  # Returns false.
 
 =head2 to_int
@@ -309,7 +309,7 @@ C</^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/>.
   my $bool = is_decimal(10)    # Returns true.
   $bool = is_decimal(10.8)     # Returns true.
   $bool = is_decimal(-33.48)   # Returns true.
-  $bool = is_decimal((1.23e99) # Returns false.
+  $bool = is_decimal(1.23e99)  # Returns false.
 
 =head2 to_decimal
 
@@ -409,12 +409,12 @@ undef.
 =head1 SUPPORT
 
 This module is stored in an open L<GitHub
-repository|http://github.com/theory/data-types/>. Feel free to fork and
+repository|http://github.com/manwar/data-types/>. Feel free to fork and
 contribute!
 
 Please file bug reports via L<GitHub
-Issues|http://github.com/theory/data-types/issues/> or by sending mail to
-L<bug-Data-Types.cpan.org|mailto:bug-Data-Types.cpan.org>.
+Issues|http://github.com/manwar/data-types/issues/> or by sending mail to
+L<bug-Data-Types@rt.cpan.org|mailto:bug-Data-Types@rt.cpan.org>.
 
 Patches against Class::Meta are welcome. Please send bug reports to
 <bug-data-types@rt.cpan.org>.
@@ -422,6 +422,8 @@ Patches against Class::Meta are welcome. Please send bug reports to
 =head1 AUTHOR
 
 David E. Wheeler <david@justatheory.com>
+
+Currently maintained by Mohammad S Anwar C<< <mohammad.anwar @ yahoo.com> >>
 
 =head1 SEE ALSO
 
@@ -439,7 +441,7 @@ L<Regexp::Common|Regexp::Common> contains many useful common regular expressions
 
 Arthur Bergman's L<types|types> pragma, offers compile-time data types for
 Perl 5.8.0. The data types include int, float, and string. I highly recommend
-using this prgrma for fast, static data types.
+using this pragma for fast, static data types.
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -5,7 +5,7 @@ use warnings;
 use Carp;
 use FFI::Platypus::Buffer;
 
-our $VERSION = 0.05_01;
+our $VERSION = 0.05_03;
 
 sub DESTROY {
     my $self = shift;
@@ -352,7 +352,7 @@ colors [c1...c4].
 
 =head2 SetColorTable
 
- $band->GetColorTable($color_table);
+ $band->SetColorTable($color_table);
 
 =head1 LICENSE
 

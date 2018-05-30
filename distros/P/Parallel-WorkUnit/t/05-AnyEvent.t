@@ -14,7 +14,7 @@ use warnings;
 use autodie;
 
 use Carp;
-use Test::More tests => 53;
+use Test::More tests => 68;
 use Test::Exception;
 use Test2::Tools::Warnings;
 
@@ -59,6 +59,25 @@ SKIP: {
         ok( exists( $RESULTS{$_} ), "Worker First Exec $_ returned properly" );
     }
     is( $wu->count, 0, "no processes running after waitall()" );
+
+    # We're going to spawn 10 children and test the return value, using
+    # asyncs() to spawn them at once.
+    %RESULTS = ();
+    $PROCS   = 10;
+    $wu->asyncs( $PROCS, sub { return $_[0]; }, \&cb );
+    is( $wu->count, 10, "asyncs - 10 workers are executing" );
+
+    $r = $wu->waitone();
+    ok( defined($r), "asyncs - waitone() returned a defined value" );
+    ok( ( $r >= 0 ) && ( $r < $PROCS ), "asyncs - waitone() returned a valid return value" );
+    is( $wu->count, $PROCS - 1, "asyncs - waitone() properly reaped one process" );
+
+    $wu->waitall();
+
+    for ( 0 .. $PROCS - 1 ) {
+        ok( exists( $RESULTS{$_} ), "asyncs - Worker First Exec $_ returned properly" );
+    }
+    is( $wu->count, 0, "asyncs - no processes running after waitall()" );
 
     # We make sure we can call this twice without issues
     # So we're going to zero out the results and re-run the above

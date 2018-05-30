@@ -27,6 +27,7 @@ lib/Catmandu/Fix/orcid_bio.pm
 lib/Catmandu/Fix/orcid_find.pm
 lib/Catmandu/Fix/orcid_profile.pm
 lib/Catmandu/Fix/orcid_works.pm
+lib/Catmandu/Fix/uri_status_code.pm
 lib/Catmandu/Fix/uuid.pm
 lib/Catmandu/Identifier.pm
 lib/Memento/TimeTravel.pm
@@ -50,4 +51,5 @@ t/fix-orcid_bio.t
 t/fix-orcid_find.t
 t/fix-orcid_profile.t
 t/fix-orcid_works.t
+t/fix-uri-status-code.t
 t/fix-uuid.t

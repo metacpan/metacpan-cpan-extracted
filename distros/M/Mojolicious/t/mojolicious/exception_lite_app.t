@@ -20,19 +20,23 @@ app->log->on(message => sub { shift; $log .= join ':', @_ });
 
 helper dead_helper => sub { die "dead helper!\n" };
 
+app->renderer->add_handler(dead => sub { die "dead handler!\n" });
+
 # Custom rendering for missing "txt" template
 hook before_render => sub {
   my ($c, $args) = @_;
   return unless ($args->{template} // '') eq 'not_found';
-  my $exception = $args->{snapshot}{exception};
+  my $stash     = $c->stash;
+  my $exception = $stash->{snapshot}{exception};
   $args->{text} = "Missing template, $exception." if $args->{format} eq 'txt';
 };
 
 # Custom exception rendering for "txt"
 hook before_render => sub {
   my ($c, $args) = @_;
-  @$args{qw(text format)} = ($args->{exception}, 'txt')
-    if ($args->{template} // '') eq 'exception' && $c->accepts('txt');
+  return unless ($args->{template} // '') eq 'exception';
+  return unless $c->accepts('', 'txt');
+  @$args{qw(text format)} = ($c->stash->{exception}, 'txt');
 };
 
 get '/logger' => sub {
@@ -46,6 +50,14 @@ get '/logger' => sub {
 get '/custom_exception' => sub { die Mojo::Base->new };
 
 get '/dead_template';
+
+get '/dead_template_too';
+
+get '/dead_handler' => {handler => 'dead'};
+
+get '/dead_action_epl' => {handler => 'epl'} => sub {
+  die "dead action epl!\n";
+};
 
 get '/dead_included_template';
 
@@ -154,6 +166,21 @@ $t->get_ok('/custom_exception')->status_is(500)->content_like(qr/Mojo::Base/);
 $t->get_ok('/dead_template')->status_is(500)->content_like(qr/dead template!/)
   ->content_like(qr/line 1/);
 like $log, qr/dead template!/, 'right result';
+
+# Dead template with a different handler
+$t->get_ok('/dead_template_too.xml')->status_is(500)
+  ->content_is("<very>bad</very>\n");
+like $log, qr/dead template too!/, 'right result';
+
+# Dead handler
+$t->get_ok('/dead_handler.xml')->status_is(500)
+  ->content_is("<very>bad</very>\n");
+like $log, qr/dead handler!/, 'right result';
+
+# Dead action (with a different handler)
+$t->get_ok('/dead_action_epl.xml')->status_is(500)
+  ->content_is("<very>bad</very>\n");
+like $log, qr/dead action epl!/, 'right result';
 
 # Dead included template
 $t->get_ok('/dead_included_template')->status_is(500)
@@ -277,6 +304,9 @@ Green<%= content %>
 
 @@ dead_template.html.ep
 % die 'dead template!';
+
+@@ dead_template_too.xml.epl
+% die 'dead template too!';
 
 @@ dead_included_template.html.ep
 this

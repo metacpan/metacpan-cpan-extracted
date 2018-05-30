@@ -34,7 +34,7 @@ use Perlito5::Perl6::PrettyPrinter;
 
 # use Perlito5::XS::Emitter;      # experimental
 
-use Perlito5::Java::Emitter;
+use Perlito5::Java;
 use Perlito5::Java::Runtime;
 use Perlito5::Java::Lib;
 
@@ -92,8 +92,12 @@ perlito5 [switches] [programfile]
                     emits or not boilerplate code
     --bootstrapping set this when compiling the compiler,
                     otherwise the new subroutine definitions will overwrite the current compiler
-    --java_eval     enable java eval, using perlito5-lib.jar
-    --nojava_eval   disable java eval, creates a standalone file that doesn't depend on perlito5-lib.jar
+    --java_eval     enable Java eval, using perlito5-lib.jar
+    --nojava_eval   disable Java eval, creates a standalone file that doesn't depend on perlito5-lib.jar
+    -J DEBUG=1      set Java backend options
+                        DEBUG=1     dump the Java source code in eval-string
+    -JS DEBUG=1     set JavaScript backend options
+                        DEBUG=1     dump the JavaScript source code in eval-string
 ";
 my $copyright_message = <<"EOT";
 This is Perlito5 $_V5_COMPILER_VERSION, an implementation of the Perl language.
@@ -139,6 +143,7 @@ sub get_text_from_switch {
 }
 
 my $use_warnings = "";
+my @user_inc;
 push @Use, "no strict";
 
 ARG_LOOP:
@@ -148,9 +153,28 @@ while (@ARGV && substr($ARGV[0], 0, 1) eq '-')
         $verbose = 1;
         shift @ARGV;
     }
+    elsif (substr($ARGV[0], 0, 3) eq '-JS') {
+        $ARGV[0] = '-J' . substr($ARGV[0], 3);  # get_text_from_switch() expects a single letter
+        my $java_opt = get_text_from_switch();
+        my ($key, $value) = split("=", $java_opt, 2);
+        if (!defined $value) {
+            $value = 1;
+        }
+        ${"Perlito5::JavaScript::$key"} = $value;
+        shift @ARGV;
+    }
+    elsif (substr($ARGV[0], 0, 2) eq '-J') {
+        my $java_opt = get_text_from_switch();
+        my ($key, $value) = split("=", $java_opt, 2);
+        if (!defined $value) {
+            $value = 1;
+        }
+        ${"Perlito5::Java::$key"} = $value;
+        shift @ARGV;
+    }
     elsif (substr($ARGV[0], 0, 2) eq '-I') {
         my $lib = get_text_from_switch();
-        unshift @INC, $lib;
+        push @user_inc, $lib;
         shift @ARGV;
     }
     elsif (substr($ARGV[0], 0, 2) eq '-e' || substr($ARGV[0], 0, 2) eq '-E') {
@@ -297,6 +321,8 @@ while (@ARGV && substr($ARGV[0], 0, 1) eq '-')
     }
 }
 
+unshift @INC, @user_inc;
+
 if (!$expand_use) {
     $Perlito5::EMIT_USE = 1;
 }
@@ -304,7 +330,7 @@ if (!$expand_use) {
 if ($backend) {
     local $Perlito5::LINE_NUMBER = 1;
     if (@e_switch) {
-        $source = "@e_switch";
+        $source = join( "\n", @e_switch );
     }
     else {
         $Perlito5::FILE_NAME = $ARGV[0];
@@ -317,11 +343,8 @@ if ($backend) {
             $source = <STDIN>;
         }
         else {
-            open FILE, '<:encoding(UTF-8)', $source_filename
+            $source = Perlito5::Grammar::Use::slurp_source_file($source_filename)
               or die "Cannot read $source_filename: $!\n";
-            local $/ = undef;
-            $source = <FILE>;
-            close FILE;
         }
     }
     $0 = $Perlito5::FILE_NAME;
@@ -355,9 +378,8 @@ if ($backend) {
 
     # TODO - reset information about the current compilation process,
     #        this should happen before the eval-string below is *compiled*.
-    # our $BASE_SCOPE   = Perlito5::Grammar::Scope->new_base_scope();
-    # our $SCOPE        = $BASE_SCOPE;    # information about the current block being compiled
 
+    Perlito5::Java::init();
     Perlito5::Java::Lib::init()
         if $backend eq 'java';
     Perlito5::JavaScript2::Lib::init()
@@ -474,7 +496,8 @@ if ($backend) {
 
                 if (!$bootstrapping) {
                     # emit BEGIN-block side-effects, INIT blocks
-                    $Perlito5::STRICT = 0;
+                    $^H = 0;
+                    %^H = ();
                     my @units;
                     push @units,
                         Perlito5::AST::Block->new(
@@ -598,7 +621,7 @@ if ($backend) {
                     print $@;
                 }
                 elsif ($backend eq '_comp') {
-                    say Perlito5::Dumper::ast_dumper( $Perlito5::SCOPE );
+                    say Perlito5::Dumper::ast_dumper( \@Perlito5::BASE_SCOPE );
                 }
                 else {
                     die "don't know what to do with backend '$backend'";

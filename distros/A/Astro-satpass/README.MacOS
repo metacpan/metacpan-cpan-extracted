@@ -83,4 +83,4 @@ The satpass script's 'help' function doesn't work under MacPerl.
 This is because it tries to parse the POD out of the script, but
 when MacPerl converts the script to an executable, the POD gets
 lost. You can find the docs by hunting up the package at
-http://search.cpan.org/~wyant/
+https://metacpan.org/release/Astro-satpass

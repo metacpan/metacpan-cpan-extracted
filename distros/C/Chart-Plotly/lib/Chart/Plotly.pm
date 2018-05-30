@@ -16,7 +16,7 @@ use Ref::Util;
 use HTML::Show;
 use UUID::Tiny ':std';
 
-our $VERSION = '0.019';    # VERSION
+our $VERSION = '0.020';    # VERSION
 
 # ABSTRACT: Generate html/javascript charts from perl data using javascript library plotly.js
 
@@ -119,7 +119,7 @@ sub show_plot {
 }
 
 sub plotlyjs_version {
-    return '1.37.1';
+    return '1.38.0';
 }
 
 1;
@@ -136,7 +136,7 @@ Chart::Plotly - Generate html/javascript charts from perl data using javascript 
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 
@@ -201,7 +201,7 @@ Example screenshot of plot generated with examples/anscombe.pl:
 Example screenshot of plots generated with examples/traces/*.pl:
 
 =for HTML <p>
-<img src="https://raw.githubusercontent.com/pablrod/p5-Chart-Bokeh/master/examples/montage_all_traces.png" alt="Montage of all examples">
+<img src="https://raw.githubusercontent.com/pablrod/p5-Chart-Plotly/master/examples/montage_all_traces.png" alt="Montage of all examples">
 </p>
 
 =for markdown ![Montage of all examples](https://raw.githubusercontent.com/pablrod/p5-Chart-Plotly/master/examples/montage_all_traces.png)

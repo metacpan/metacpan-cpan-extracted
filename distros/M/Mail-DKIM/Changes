@@ -2,6 +2,11 @@
 This file summarizes what's changed between releases of Mail-DKIM.
 See the ChangeLog file for the details.
 
+Version 0.53
+
+ * Make tests less dependent on local resolver setup
+ * Add thanks to Valimail
+
 Version 0.52
 
  * Internet connection tests were declared in the wrong order

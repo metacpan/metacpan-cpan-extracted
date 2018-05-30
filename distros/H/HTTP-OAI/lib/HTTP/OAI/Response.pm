@@ -6,7 +6,7 @@ require POSIX;
 
 use strict;
 
-our $VERSION = '4.06';
+our $VERSION = '4.07';
 
 # Backwards compatibility, pass any unknown methods to content
 our $AUTOLOAD;
@@ -110,6 +110,13 @@ sub parse_file
 sub generate
 {
 	my( $self, $driver ) = @_;
+
+	if( $self->xslt ) {
+	  $driver->processing_instruction({
+	    'Target' => 'xml-stylesheet',
+	    'Data' => 'type=\'text/xsl\' href=\''. $self->xslt . '\''
+	  });
+	}
 
 	if( !defined $self->version || $self->version eq "2.0" )
 	{

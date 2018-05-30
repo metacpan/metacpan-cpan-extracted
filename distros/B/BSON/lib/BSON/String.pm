@@ -6,7 +6,7 @@ package BSON::String;
 # ABSTRACT: BSON type wrapper for strings
 
 use version;
-our $VERSION = 'v1.6.1';
+our $VERSION = 'v1.6.3';
 
 use Moo;
 
@@ -58,6 +58,7 @@ sub TO_JSON { return "$_[0]->{value}" }
 
 use overload (
     # Unary
+    q{bool} => sub { !! $_[0]->{value} },
     q{""} => sub { $_[0]->{value} },
     q{0+} => sub { 0+ $_[0]->{value} },
     q{~}  => sub { ~( $_[0]->{value} ) },
@@ -93,7 +94,7 @@ BSON::String - BSON type wrapper for strings
 
 =head1 VERSION
 
-version v1.6.1
+version v1.6.3
 
 =head1 SYNOPSIS
 

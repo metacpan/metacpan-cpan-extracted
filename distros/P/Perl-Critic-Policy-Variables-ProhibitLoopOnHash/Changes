@@ -1,3 +1,8 @@
+0.004     2018-05-28 12:19:40+03:00 Asia/Jerusalem
+
+    * Fix handling of $hash{for} and $hashref->{for}.
+      Thanks, Igor Yamolov!
+
 0.003     2018-03-12 18:33:08+01:00 Europe/Amsterdam
 
     * GH #1: Fix example in POD.

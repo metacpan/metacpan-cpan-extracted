@@ -14,7 +14,7 @@ use Test::Deep::JSON;
     use Dist::Zilla::Plugin::GitHub;
     package Dist::Zilla::Plugin::GitHub;
     no warnings 'redefine';
-    sub _get_credentials { 'bob' }
+    sub _build_credentials { return {login => 'bob', pass => q{}, otp => q{}} }
     sub _get_repo_name { 'bob/My-Stuff' }
 }
 
@@ -44,7 +44,7 @@ my @tests = (
         ],
         expected_request => [
             PATCH => 'https://api.github.com/repos/bob/My-Stuff' => {
-                headers => undef,
+                headers => {},
                 content => json({
                     name => 'My-Stuff',
                     description => 'Sample DZ Dist',

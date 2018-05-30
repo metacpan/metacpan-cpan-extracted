@@ -1,7 +1,8 @@
-package Test::Class::Date::Nonpolymorphic;
+package Test::Class::Date::Holidays::Nonpolymorphic;
 
 use strict;
 use warnings;
+
 use base qw(Test::Class);
 use Test::More;
 
@@ -11,17 +12,16 @@ my $year  = 2007;
 
 #run prior and once per suite
 sub startup : Test(startup => 2) {
-    diag "starting up...";
     use_ok('Date::Holidays');
-    use_ok('Date::Holidays::NONPOLYMORPHIC');
+    use_ok('Date::Holidays::Nonpolymorphic');
 }
 
 sub test_nonpolymorphic_interface : Test(13) {
 
     # bare
 
-    ok(my $nonpolymorphic = Date::Holidays::NONPOLYMORPHIC->new());
-    isa_ok($nonpolymorphic, 'Date::Holidays::NONPOLYMORPHIC', 'checking non-polymorphic class object');
+    ok(my $nonpolymorphic = Date::Holidays::Nonpolymorphic->new());
+    isa_ok($nonpolymorphic, 'Date::Holidays::Nonpolymorphic', 'checking non-polymorphic class object');
     can_ok($nonpolymorphic, qw(new nonpolymorphic_holidays is_nonpolymorphic_holiday));
 
     ok($nonpolymorphic->nonpolymorphic_holidays($year));
@@ -29,7 +29,7 @@ sub test_nonpolymorphic_interface : Test(13) {
 
     # wrapper
 
-    ok(my $dh = Date::Holidays->new(nocheck => 1, countrycode => 'nonpolymorphic'));
+    ok(my $dh = Date::Holidays->new(nocheck => 1, countrycode => 'Nonpolymorphic'));
     isa_ok($dh, 'Date::Holidays', 'checking wrapper object');
     can_ok($dh, qw(new holidays is_holiday));
 

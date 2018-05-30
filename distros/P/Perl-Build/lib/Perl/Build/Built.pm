@@ -4,8 +4,8 @@ use strict;
 use warnings;
 use utf8;
 
-use 5.008002;
-our $VERSION = '1.13';
+use 5.008001;
+our $VERSION = '1.23';
 
 use Carp ();
 use File::Spec::Functions qw( catdir catfile );
@@ -24,8 +24,9 @@ sub run_env {
               . ' or ->run_env(\&code)'
               . ' or ->run_env(\%config)' );
     }
-    local $ENV{PATH}    = $self->combined_bin_path;
-    local $ENV{MANPATH} = $self->combined_man_path;
+    local $ENV{PATH} = $self->combined_bin_path;
+    my $combined_man_path = $self->combined_man_path;
+    local $ENV{MANPATH} = $combined_man_path if $combined_man_path;
     delete local $ENV{PERL5LIB};
     return $config->{code}->();
 }

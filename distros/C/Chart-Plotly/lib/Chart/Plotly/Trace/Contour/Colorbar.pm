@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Contour::Colorbar::Tickfont;
 use Chart::Plotly::Trace::Contour::Colorbar::Tickformatstop;
 use Chart::Plotly::Trace::Contour::Colorbar::Titlefont;
 
-our $VERSION = '0.019';    # VERSION
+our $VERSION = '0.020';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace contour.
 
@@ -283,7 +283,7 @@ Chart::Plotly::Trace::Contour::Colorbar - This attribute is one of the possible 
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

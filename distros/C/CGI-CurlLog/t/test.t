@@ -9,14 +9,11 @@ BEGIN {
     $ENV{"REQUEST_URI"} = "/foo.php?a=b&c=d&e=f";
     $ENV{"REMOTE_ADDR"} = "1.2.3.4";
 
-    $CGI::CurlLog::log_file = "curl.log";
-    $CGI::CurlLog::log_output = 0;
     require CGI::CurlLog;
+    CGI::CurlLog->import(file => "curl.log", response => 0);
 }
 
-open my $fh, "<", "curl.log" or die "Can't open curl.log: $!";
-my $content = do {local $/; <$fh>};
-close $fh;
+my $content = `cat curl.log`;
 
 my $test = $content =~ m{^#.* request from 1.2.3.4\n}m &&
            $content =~ m{^curl "http://example.org/foo.php\?a=b&c=d&e=f" -k\n}m;

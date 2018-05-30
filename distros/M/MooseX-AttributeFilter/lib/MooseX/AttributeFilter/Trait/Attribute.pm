@@ -3,7 +3,7 @@ use 5.008009;
 use strict;
 use warnings;
 
-our $VERSION = "0.06";
+our $VERSION = "0.08";
 
 use Moose::Role;
 
@@ -11,6 +11,12 @@ has filter => (
     is  => 'ro',
     isa => 'CodeRef|Str',
     predicate => 'has_filter',
+);
+
+has bypass_filter_method_check => (
+    is  => 'ro',
+    isa => 'Bool',
+    default => 0,
 );
 
 after _process_options => sub {
@@ -21,15 +27,23 @@ after _process_options => sub {
     
     if ($options->{filter} eq '1') {
         $options->{filter} = "_filter_${name}";
-    }    
+    }
 };
 
 before install_accessors => sub {
     my $this = shift;
+    return if $this->bypass_filter_method_check;
     my $filter = $this->filter;
     if (defined $filter and not ref $filter) {
         my $class  = $this->associated_class;
-        my $method = $class->find_method_by_name($filter);
+        my $method = $class->find_method_by_name($filter)
+            || $class->name->can($filter)
+            || eval {
+                no strict 'refs';
+                exists &{ $class->name . "::" . $filter }
+                    ? \&{ $class->name . "::" . $filter }
+                    : undef;
+            };
         
         die sprintf(
             "No filter method '%s' defined for %s attribute '%s'",
@@ -199,6 +213,21 @@ or coderef or undef.
 =item C<has_filter>
 
 Boolean.
+
+=item C<bypass_filter_method_check>
+
+Boolean.
+
+    has attr => (
+        is      => 'rw',
+        filter  => 'my_filter_method',
+        bypass_filter_method_check => 1,
+    );
+
+Can be used to make MooseX::AttributeFilter::Trait::Attribute not throw
+error message in case of C<my_filter_method> method not exists. (Will still
+throw error if is called and cannot find method.) Used for edge cases like
+when filter method will be provided by C<AUTOLOAD> or later added by trait.
 
 =back
 

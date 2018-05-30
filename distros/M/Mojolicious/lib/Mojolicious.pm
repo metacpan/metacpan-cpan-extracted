@@ -65,7 +65,7 @@ has ua       => sub {
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Doughnut';
-our $VERSION  = '7.81';
+our $VERSION  = '7.82';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -126,9 +126,9 @@ sub dispatch {
   my $stash = $c->stash;
   unless ($stash->{'mojo.static'} || $stash->{'mojo.started'}) {
     my $req    = $c->req;
-    my $id     = $req->request_id;
     my $method = $req->method;
     my $path   = $req->url->path->to_abs_string;
+    my $id     = $req->request_id;
     $self->log->debug(qq{$method "$path" ($id)});
     $c->helpers->timing->begin('mojo.timer');
   }
@@ -259,8 +259,9 @@ L<Mojolicious> will emit the following hooks in the listed order.
 =head2 before_server_start
 
 Emitted right before the application server is started, for web servers that
-support it, like L<Mojo::Server::Daemon> and L<Mojo::Server::Prefork>. Note that
-this hook is EXPERIMENTAL and might change without warning!
+support it, which includes all the built-in ones (except for
+L<Mojo::Server::CGI>). Note that this hook is EXPERIMENTAL and might change
+without warning!
 
   $app->hook(before_server_start => sub {
     my ($server, $app) = @_;

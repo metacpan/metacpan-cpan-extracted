@@ -7,9 +7,14 @@ META.yml
 Makefile.PL
 README
 dist.ini
+lib/Perinci/Sub/XCompletion/cryptocurrency.pm
 lib/Perinci/Sub/XCompletion/cryptocurrency_code.pm
 lib/Perinci/Sub/XCompletion/cryptocurrency_code_or_name.pm
+lib/Perinci/Sub/XCompletion/cryptocurrency_safename.pm
+lib/Perinci/Sub/XCompletion/cryptoexchange.pm
+lib/Perinci/Sub/XCompletion/cryptoexchange_code.pm
 lib/Perinci/Sub/XCompletion/cryptoexchange_name.pm
+lib/Perinci/Sub/XCompletion/cryptoexchange_safename.pm
 lib/Perinci/Sub/XCompletionBundle/CryptoCurrency.pm
 t/00-compile.t
 t/author-critic.t

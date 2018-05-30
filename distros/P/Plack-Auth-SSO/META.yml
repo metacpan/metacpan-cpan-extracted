@@ -36,6 +36,7 @@ no_index:
 requires:
   Authen::CAS::Client: '0'
   Clone: '0'
+  Data::UUID: '0'
   Data::Util: '0'
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
@@ -44,13 +45,14 @@ requires:
   Plack: '0'
   Plack::Middleware::Session: '0'
   URI: '0'
+  URI::QueryParam: '0'
   WWW::ORCID: '0.0401'
   perl: v5.10.1
 resources:
   bugtracker: https://github.com/LibreCat/Plack-Auth-SSO/issues
   homepage: https://github.com/LibreCat/Plack-Auth-SSO
   repository: https://github.com/LibreCat/Plack-Auth-SSO.git
-version: '0.0135'
+version: '0.0136'
 x_contributors:
   - 'Nicolas Franck <nicolas.franck@ugent.be>'
   - 'Nicolas Franck <njfranck@auster0.ugent.be>'

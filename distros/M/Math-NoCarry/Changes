@@ -1,5 +1,8 @@
 Revision history for Perl module Math::NoCarry
 
+1.112 2018-05-24T14:14:51Z
+	* Change to Artistic License 2.0
+
 1.111 2016-01-27T20:21:05Z
 	* Freshen distro, remove prereq.t test
 

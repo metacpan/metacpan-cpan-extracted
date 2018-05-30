@@ -1,6 +1,116 @@
 use v5;
 package Perlito5::Macro;
 use strict;
+use Perlito5::Clone;
+
+# provide "goto LABEL" within a statement list
+#
+#  {
+#       123;
+#       my $var;
+#       goto LABEL;
+#       123;
+#     LABEL:
+#       456;
+#  }
+#
+#  a "forward goto" becomes:
+
+#  LABEL:
+#  {
+#       123;
+#       my $var;
+#       do { 456; last LABEL; };
+#       123;
+#       456;
+#  }
+
+# See:
+#   https://jamey.thesharps.us/2016/05/09/how-to-eliminate-goto-statements/
+
+sub rewrite_goto {
+    my ($stmts) = @_;
+    return $stmts if !@Perlito5::GOTO;  # no "goto"
+
+    # ignore "goto &sub" - this is processed elsewhere
+    # ignore "goto $str" - this is not yet implemented - TODO
+    # accept "goto LABEL" (bareword)
+    @Perlito5::GOTO = grep {
+        $_->{arguments}[0]{bareword}
+    } @Perlito5::GOTO;
+    return $stmts if !@Perlito5::GOTO;
+
+    my $change = 0;
+    my $outer_label = Perlito5::get_label();
+    my @unprocessed;
+  GOTO:
+    for my $goto (@Perlito5::GOTO) {
+        my $label = $goto->{arguments}[0]{code};
+        next GOTO unless $label;
+
+        # lookup for labels
+        my @label;
+        for my $id (reverse (0 .. $#$stmts)) {
+            my $ast = $stmts->[$id];
+            if ($ast->{label} && $ast->{label} eq $label) {
+                my @stmt_list = @{$stmts}[ $id .. $#$stmts ];
+                # warn "Block uses goto: ", Perlito5::Dumper::Dumper($goto);
+                # warn "Block goes here: ", Perlito5::Dumper::Dumper(\@stmt_list);
+
+                if ( $id == 0 ) {
+                    # if $id == 0, replace "goto" with "redo"
+                    $goto->{code} = "redo";
+                    $goto->{arguments} =[
+                        Perlito5::AST::Apply->new(
+                            code => $outer_label,
+                            bareword => 1,
+                        )
+                    ];
+                    $change = 1;
+                    next GOTO;
+                }
+
+                # TODO - this doesn't cover all cases
+
+                # do { @stmt; last LABEL };
+                $goto->{code} = "do";
+                $goto->{arguments} = [
+                    Perlito5::AST::Block->new(
+                        stmts => [
+                            @{ Perlito5::Clone::clone(\@stmt_list) },
+                            Perlito5::AST::Apply->new(
+                                code => "last",
+                                arguments => [
+                                    Perlito5::AST::Apply->new(
+                                        code => $outer_label,
+                                        bareword => 1,
+                                    ),
+                                ],
+                            ),
+                        ],
+                    ),
+                ];
+                $change = 1;
+                next GOTO;
+            }
+        }
+        push @unprocessed, $goto;
+    }
+    @Perlito::GOTO = @unprocessed;
+
+    if ($change) {
+        # wrap the statements in a block with the new label
+        return [
+            Perlito5::AST::Block->new(
+                label => $outer_label,
+                stmts => [ @$stmts ],
+            ),
+        ];
+    }
+
+    return $stmts;
+}
+
 
 {
 package Perlito5::AST::Apply;
@@ -11,13 +121,21 @@ my %op = (
     'infix:<-=>'  => 'infix:<->',
     'infix:<*=>'  => 'infix:<*>',
     'infix:</=>'  => 'infix:</>',
+    'infix:<%=>'  => 'infix:<%>',
     'infix:<||=>' => 'infix:<||>',
     'infix:<&&=>' => 'infix:<&&>',
     'infix:<|=>'  => 'infix:<|>',
     'infix:<&=>'  => 'infix:<&>',
+    'infix:<^=>'  => 'infix:<^>',
     'infix:<//=>' => 'infix:<//>',
+    'infix:<**=>' => 'infix:<**>',
     'infix:<.=>'  => 'list:<.>',
     'infix:<x=>'  => 'infix:<x>',
+    'infix:<<<=>' => 'infix:<<<>',
+    'infix:<>>=>' => 'infix:<>>>',
+    'infix:<&.=>' => 'infix:<&.>',
+    'infix:<|.=>' => 'infix:<|.>',
+    'infix:<^.=>' => 'infix:<^.>',
 );
 
 sub op_assign {
@@ -34,6 +152,7 @@ sub op_assign {
                 Perlito5::AST::Apply->new(
                     code      => $op{$code},
                     arguments => $self->{arguments},
+                    ( $self->{_integer} ? ( _integer => 1 ) : () ),
                 ),
             ]
         );
@@ -169,10 +288,12 @@ sub maybe_rewrite_statevars {
 sub myvar_declaration_stmt {
     die 'Can only handle `my` variables'
         if (grep { ($_->{decl} // 'my') ne 'my' } @_);
-    return Perlito5::AST::Apply->new(
-        code      => 'my',
-        arguments => [@_],
-    );
+    return map {
+        Perlito5::AST::Decl->new(
+            decl  => 'my',
+            var   => $_,
+        )
+    } @_;
 }
 
 # rewrite_state_expr($refnode)
@@ -379,7 +500,7 @@ sub while_file {
     return 0
         if ref($self) ne 'Perlito5::AST::While';
     my $cond = $self->{cond};
-    if ($cond->isa('Perlito5::AST::Apply') && ($cond->{code} eq 'readline')) {
+    if ((ref($cond) eq 'Perlito5::AST::Apply') && ($cond->{code} eq 'readline')) {
         # while (<>) ...  is rewritten as  while ( defined($_ = <>) ) { ...
         $self->{cond} = bless({
                 'arguments' => [
@@ -401,47 +522,118 @@ sub while_file {
     return 0;
 }
 
-sub _insert_return_in_block {
-    my ($self, $tag) = @_;
-    my $body = $self->{$tag};
-    if (!$body) {
-        $body = Perlito5::AST::Block->new(
-                    stmts => [
+sub insert_return_in_block {
+    my ($self) = @_;
+    if (@{$self->{stmts}} == 0) {
+        push @{$self->{stmts}},
                         Perlito5::AST::Apply->new(
                             'arguments' => [],
                             'code' => 'return',
                             'namespace' => '',
-                        ),
-                    ],
-                );
-    }
-    elsif (ref($body) ne 'Perlito5::AST::Block') {
-        # TODO
-    }
-    elsif (@{$body->{stmts}} == 0) {
-        push @{$body->{stmts}},
-                        Perlito5::AST::Apply->new(
-                            'arguments' => [],
-                            'code' => 'return',
-                            'namespace' => '',
+                            '_return_from_block' => 1,
                         );
     }
     else {
-        my $last_statement = $body->{stmts}[-1];
-        if ($last_statement->isa('Perlito5::AST::If')) {
-            Perlito5::Macro::insert_return_in_if($last_statement);
-        }
+        my $last_statement = pop(@{$self->{stmts}});
+        push(@{$self->{stmts}}, insert_return( $last_statement ));
     }
-    $self->{$tag} = $body;
+    return $self;
 }
-
 sub insert_return_in_if {
     my $self = $_[0];
-    return 0
-        if ref($self) ne 'Perlito5::AST::If';
-    _insert_return_in_block($self, 'body');
-    _insert_return_in_block($self, 'otherwise');
+    $self->{body}      = insert_return_in_block($self->{body} || Perlito5::AST::Block->new(stmts => []));
+    $self->{otherwise} = insert_return_in_block($self->{otherwise} || Perlito5::AST::Block->new(stmts => []));
+    return $self;
 }
+sub insert_return {
+    my $self = $_[0];
+    if ((ref($self) eq 'Perlito5::AST::If')) {
+        return insert_return_in_if($self);
+    }
+    if ((ref($self) eq 'Perlito5::AST::Block')) {
+        return insert_return_in_block($self);
+    }
+    if ((ref($self) eq 'Perlito5::AST::For')) {
+        return (
+            $self,
+            Perlito5::AST::Apply->new(
+                'arguments' => [ Perlito5::AST::Buf->new( buf => "" ) ],
+                'code' => 'return',
+                'namespace' => '',
+                '_return_from_block' => 1,
+            ),
+        );
+    }
+    if ( (ref($self) eq 'Perlito5::AST::While') ) {
+        if (   $self->{cond}->isa('Perlito5::AST::Int')  && $self->{cond}{int} )
+        {
+            # do not emit "return" after while(1){...} because "unreachable statement"
+            return $self;
+        }
+        else {
+            return (
+                $self,
+                Perlito5::AST::Apply->new(
+                    'arguments' => [ Perlito5::AST::Int->new( int => 0 ) ],
+                    'code' => 'return',
+                    'namespace' => '',
+                    '_return_from_block' => 1,
+                ),
+            );
+        }
+    }
+    if ( (ref($self) eq 'Perlito5::AST::Sub' ) ) {
+        if ( ! $self->{name} )
+        {
+            return Perlito5::AST::Apply->new(
+                    'arguments' => [ $self ],
+                    'code' => 'return',
+                    'namespace' => '',
+                    '_return_from_block' => 1,
+                );
+        }
+        else {
+            return (
+                $self,
+                Perlito5::AST::Apply->new(
+                    'arguments' => [ Perlito5::AST::Int->new( int => 0 ) ],
+                    'code' => 'return',
+                    'namespace' => '',
+                    '_return_from_block' => 1,
+                ),
+            );
+        }
+    }
+    if (   (ref($self) eq 'Perlito5::AST::Int' )
+        || (ref($self) eq 'Perlito5::AST::Num' )
+        || (ref($self) eq 'Perlito5::AST::Buf' )
+        || (ref($self) eq 'Perlito5::AST::Index' )
+        || (ref($self) eq 'Perlito5::AST::Lookup' )
+        || (ref($self) eq 'Perlito5::AST::Call' )
+        || (ref($self) eq 'Perlito5::AST::Var' )
+        || (ref($self) eq 'Perlito5::AST::Decl' )
+    ) {
+        return Perlito5::AST::Apply->new(
+                'arguments' => [ $self ],
+                'code' => 'return',
+                'namespace' => '',
+                '_return_from_block' => 1,
+            );
+    }
+    if ( (ref($self) eq 'Perlito5::AST::Apply' ) ) {
+        if ( $self->code eq 'return' ) {
+            return $self;
+        }
+        return Perlito5::AST::Apply->new(
+                'arguments' => [ $self ],
+                'code' => 'return',
+                'namespace' => '',
+                '_return_from_block' => 1,
+            );
+    }
+    return $self;
+}
+
 
 # sub split_deep_if {
 #     my $stmt = $_[0];
@@ -502,6 +694,30 @@ sub split_code_too_large {
     return @stmts;
 }
 
+
+sub preprocess_regex {
+    my $regex = shift;
+
+    if ((ref($regex) eq 'Perlito5::AST::Apply') && $regex->{code} eq 'circumfix:<( )>') {
+        # $x =~ ( ... )
+        ($regex) = @{ $regex->{arguments} };
+        return preprocess_regex($regex);
+    }
+
+    if ( (ref($regex) eq 'Perlito5::AST::Buf')   # $x =~ '\w'
+      || (ref($regex) eq 'Perlito5::AST::Var')   # $x =~ $regex
+      || ((ref($regex) eq 'Perlito5::AST::Apply') && $regex->{code} eq 'list:<.>')    # $x =~ ($r1 . $r2)
+      )
+    {
+        $regex = Perlito5::AST::Apply->new(
+            code      => 'p5:m',
+            arguments => [ $regex, Perlito5::AST::Buf->new( buf => '' ) ]
+        );
+    }
+
+    return $regex;
+}
+
 1;
 
 =begin
@@ -521,7 +737,7 @@ This module implements some Ast transformations for the Perlito compiler.
 =head1 AUTHORS
 
 Flavio Soibelmann Glock <fglock@gmail.com>.
-The Pugs Team E<lt>perl6-compiler@perl.orgE<gt>.
+The Pugs Team.
 
 =head1 SEE ALSO
 

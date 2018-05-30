@@ -7,7 +7,6 @@ META.yml
 Makefile.PL
 README
 dist.ini
-errors.err
 lib/Parallel/WorkUnit.pm
 t/00-load.t
 t/01-Basic.t

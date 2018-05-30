@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Scattercarpet::Marker::Colorbar;
 use Chart::Plotly::Trace::Scattercarpet::Marker::Gradient;
 use Chart::Plotly::Trace::Scattercarpet::Marker::Line;
 
-our $VERSION = '0.019';    # VERSION
+our $VERSION = '0.020';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scattercarpet.
 
@@ -180,7 +180,7 @@ Chart::Plotly::Trace::Scattercarpet::Marker - This attribute is one of the possi
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

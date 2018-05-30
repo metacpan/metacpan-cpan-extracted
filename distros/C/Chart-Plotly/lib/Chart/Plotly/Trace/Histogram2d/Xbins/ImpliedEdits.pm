@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.019';    # VERSION
+our $VERSION = '0.020';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace histogram2d.
 
@@ -51,7 +51,7 @@ Chart::Plotly::Trace::Histogram2d::Xbins::ImpliedEdits - This attribute is one o
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

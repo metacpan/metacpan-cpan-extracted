@@ -14,11 +14,37 @@ use File::Basename;
 use File::Spec;
 
 my %args = (
-    license              => 'perl',
+    license              => 'perl_5',
     dynamic_config       => 0,
 
     configure_requires => {
-        'Module::Build' => 0.38,
+        'Module::Build' => '0.4005',
+    },
+
+    requires => {
+        'CPAN::Perl::Releases' => '3.58',
+        'CPAN::Perl::Releases::MetaCPAN' => '0.006',
+        'Devel::PatchPerl' => '0.88',
+        'File::Temp' => '0',
+        'File::pushd' => '0',
+        'Getopt::Long' => '0',
+        'HTTP::Tinyish' => '0',
+        'JSON::PP' => '0',
+        'Pod::Usage' => '1.63',
+        'perl' => '5.008001',
+    },
+
+    recommends => {
+    },
+
+    suggests => {
+    },
+
+    build_requires => {
+    },
+
+    test_requires => {
+        'Test::More' => '0.98',
     },
 
     name            => 'Perl-Build',
@@ -26,7 +52,6 @@ my %args = (
     allow_pureperl => 0,
 
     script_files => [glob('script/*'), glob('bin/*')],
-    c_source     => [qw()],
     PL_files => {},
 
     test_files           => ((-d '.git' || $ENV{RELEASE_TESTING}) && -d 'xt') ? 't/ xt/' : 't/',
@@ -50,16 +75,4 @@ my $builder = Module::Build->subclass(
     }
 )->new(%args);
 $builder->create_build_script();
-
-use File::Copy;
-
-print "cp META.json MYMETA.json\n";
-copy("META.json","MYMETA.json") or die "Copy failed(META.json): $!";
-
-if (-f 'META.yml') {
-    print "cp META.yml MYMETA.yml\n";
-    copy("META.yml","MYMETA.yml") or die "Copy failed(META.yml): $!";
-} else {
-    print "There is no META.yml... You may install this module from the repository...\n";
-}
 

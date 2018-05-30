@@ -1,14 +1,13 @@
-package Net::Address::IP::Cipher 0.3;
+package Net::Address::IP::Cipher 0.4;
 
-use 5.006;
+use 5.012;
 use strict;
 use warnings FATAL => 'all';
 
 use Carp;
 
 use Net::IP qw(:PROC);
-use MIME::Base64;
-use Crypt::PBKDF2;
+use Crypt::KeyDerivation qw(pbkdf2);
 use Crypt::Cipher::AES;
 
 =head1 NAME
@@ -18,7 +17,7 @@ address, for pseudo anonymization.
 
 =head1 VERSION
 
-Version 0.3
+Version 0.4
 
 =head1 SYNOPSIS
 
@@ -46,9 +45,8 @@ specification from:
 
 =head1 PREREQUISITES
 
-This module requires Net::IP for v6/v4 handling, MIME::Base64 and 
-Crypt::PBKDF2 for the 128-key derivation from the password, and
-Crypt::Cipher::AES for the IPv6 enc/decryption part.
+This module requires L<Net::IP> for v6/v4 handling and L<CryptX> for
+all crypto stuff (L<Crypt::KeyDerivation>, L<Crypt::Cipher::AES>).
 
 =head1 METHODS
 
@@ -82,23 +80,7 @@ sub new {
     my $key;
 
     if ($params{'password'}) {
-        my $pbkdf2 = Crypt::PBKDF2->new(
-                        hash_class => 'HMACSHA1',
-                        iterations => 50000,
-                        output_len => 16,
-                        salt_len => 16,
-                        encoding => 'crypt',
-                     );
-
-        $key = $pbkdf2->generate($params{'password'}, 'ipcipheripcipher');
-        # we need to extract just the "key" part from PBKDF2 hash
-        my $pbhash = $pbkdf2->encode_string('ipcipheripcipher', $key);
-        my ($ehash) = ($1) if $pbhash =~ /HMACSHA1:50000:.*\$(.*)/;
-        my $ihash = MIME::Base64::decode($ehash);
-        my ($fhash) = ($1) if $ihash =~ /HMACSHA1:50000:.*\$(.*)/;
-        $key = MIME::Base64::decode($fhash);
-
-        # my $dec = unpack("H*", $key);
+        $key = pbkdf2($params{'password'}, 'ipcipheripcipher', 50000, 'SHA1', 16);
     }
     elsif ($params{'barekey'}) {
         $key = pack 'H*', $params{'barekey'};

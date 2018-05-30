@@ -1,3 +1,33 @@
+0.95     2018-05-27
+
+- Require version 0.45 of the GitHub plugins and always authenticate when
+  getting repo metadata.
+
+
+0.94     2018-05-26
+
+- Fix my broken code.
+
+
+0.93     2018-05-26
+
+- Make it possible to only add the compiler warning flags with a minimum Perl
+  version. Some modules I maintain will not compile warning-free on older
+  Perls because of warnings from the Perl core headers.
+
+
+0.92     2018-05-26
+
+- Require Devel::PPPort 3.42. The included in the core with older perl
+  versions leads to warnings when compiling XS code with newer Perls.
+
+
+0.91     2018-05-26
+
+- The generated Makefile.PL for XS modules will add "-Wall" and "-Werror" as
+  a compiler flags when AUTHOR_TESTING is true.
+
+
 0.90     2018-05-13
 
 - Added some hackish plugins to make tests run in parallel by default,

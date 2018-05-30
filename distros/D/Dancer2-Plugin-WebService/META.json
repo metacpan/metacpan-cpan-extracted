@@ -1,10 +1,10 @@
 {
    "abstract" : "Rapid creation of RESTful Web Services with sessions and persistent data",
    "author" : [
-      "George Bouras <george.mpouras@yandex.org>"
+      "George Bouras <george.mpouras@yandex.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -43,11 +43,11 @@
    "provides" : {
       "Dancer2::Plugin::WebService" : {
          "file" : "lib/Dancer2/Plugin/WebService.pm",
-         "version" : "3.014"
+         "version" : "3.101"
       }
    },
    "release_status" : "stable",
-   "version" : "3.014",
-   "x_serialization_backend" : "JSON::XS version 3.03"
+   "version" : "3.101",
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

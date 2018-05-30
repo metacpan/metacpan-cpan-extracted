@@ -1,4 +1,3 @@
-bin/sudokug
 Changes
 eg/README
 eg/simple
@@ -20,6 +19,7 @@ README
 README.MacOS
 README.MSWin32
 README.VMS
+script/sudokug
 t/basic.t
 t/sudoku.t
 xt/author/changes.t

@@ -1,0 +1,19 @@
+#!perl
+
++{
+    table_class => 'Artist',
+    attr        => {
+        columns   => [qw/ name /],
+        '+select' => {
+            rank  => [],
+            -as   => 'ranking',
+            -over => {
+                partition_by => 'fingers',
+            },
+        },
+    },
+    sql => q{ SELECT me.name,
+              RANK() OVER (PARTITION BY fingers) AS ranking
+              FROM artist me
+    },
+  },

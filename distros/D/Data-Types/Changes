@@ -1,51 +1,67 @@
 Revision history for Perl extension Data::Types.
 
+0.13  2018-05-26T09:00:00
+      - Fixed warning "Can't stat bin: No such file or directory". (MANWAR)
+
+0.12  2018-05-25T07:45:00
+      - Added Makefile.PL file as suggested by README. (MANWAR)
+
+0.11  2018-05-24T11:30:00
+      - Updated home page url, pointing to metacpan.org. (MANWAR)
+      - Updated repository details since the move. (MANWAR)
+      - Updated issues url since the move. (MANWAR)
+      - Removed entry MANIFEST from .gitignore. (MANWAR)
+
+0.10  2018-05-24T11:30:00
+      - Fixed broken rt.cpan.org email address.
+      - Fixed invalid documentation examples spotted by fschlich.
+
 0.09  2011-06-20T03:15:50
       - Moved repostitory to [GitHub](https://github.com/theory/data-types/).
       - Switched to a "traditional" `Makefile.PL`.
 
 0.08  2008-05-05T19:01:10
-       - Added Test::Pod to the "recommends" parameter in Build.PL.
-       - Added Module::Build to the "build_requires" parameter in Build.PL.
-       - Updated copyright.
-       - Added a link to the Subversion repository.
-       - Updated the POD test to take advantage of Test::Pod 1.20 or later.
+      - Added Test::Pod to the "recommends" parameter in Build.PL.
+      - Added Module::Build to the "build_requires" parameter in Build.PL.
+      - Updated copyright.
+      - Added a link to the Subversion repository.
+      - Updated the POD test to take advantage of Test::Pod 1.20 or later.
 
 0.07  2008-01-22T18:27:22
-       - Added Module::Build to the "configure_requires" parameter in
-         Build.PL. This should help prevent failures on systems that don't
-         already have Module::Build installed and run Makefile.PL. Reported by
-         Slaven Rezic.
-       - Added Test::Simple to the "build_requires" parameter in Build.PL.
+      - Added Module::Build to the "configure_requires" parameter in
+        Build.PL. This should help prevent failures on systems that don't
+        already have Module::Build installed and run Makefile.PL. Reported by
+        Slaven Rezic.
+      - Added Test::Simple to the "build_requires" parameter in Build.PL.
 
 0.06  2006-05-23T00:45:44
-        - Added POD tests.
-        - Backwards compatibility change: Whole numbers now include 0. This is
-          more inline with accepted mathmatical definitions. See, e.g.,
-          http://en.wikipedia.org/wiki/Whole_number
-          http://mathforum.org/library/drmath/view/57052.html
-        - Added is_count() and to_count() to match whole numbers exclusive of
-          zero. These functions match the previous behavior of is_whole() and
-          to_whole().
-        - Fixed a typo in my email address.
+      - Added POD tests.
+      - Backwards compatibility change: Whole numbers now include 0. This is
+        more inline with accepted mathmatical definitions. See, e.g.,
+        http://en.wikipedia.org/wiki/Whole_number
+        http://mathforum.org/library/drmath/view/57052.html
+      - Added is_count() and to_count() to match whole numbers exclusive of
+        zero. These functions match the previous behavior of is_whole() and
+        to_whole().
+      - Fixed a typo in my email address.
 
-0.05    Tue Aug 26 01:21:03 2003
-        - Switched to Module::Build.
+0.05  Tue Aug 26 01:21:03 2003
+      - Switched to Module::Build.
 
-0.04    Thu Jul 25 05:09:13 2002
-        - Added reference to Arthur Bergman's new "types" pragma for Perl
-          5.8.0. Thought I'd done it in 0.03, but I guess not.
+0.04  Thu Jul 25 05:09:13 2002
+      - Added reference to Arthur Bergman's new "types" pragma for Perl
+        5.8.0. Thought I'd done it in 0.03, but I guess not.
 
 0.03  Mon Jul 22 21:05:26 2002
-        - Fixed to_float() tests so that comparison is more precise. Necessary
-          for compatability with Perl 5.8.0 (and probably better, anyway).
-        - Reorganized structure of distribution to reflect more modern standard
-          for CPAN modules.
+      - Fixed to_float() tests so that comparison is more precise. Necessary
+        for compatability with Perl 5.8.0 (and probably better, anyway).
+      - Reorganized structure of distribution to reflect more modern standard
+        for CPAN modules.
 
 0.02  Thu Jan  3 22:06:42 PST 2002
-        - Added second argument to to_string() that will truncate the string.
-        - Fixed Regular expression in is_int() so that it doesn't match '+' or
-          '-'. Thanks to David Alban for the spot.
+      - Added second argument to to_string() that will truncate the string.
+      - Fixed Regular expression in is_int() so that it doesn't match '+' or
+        '-'. Thanks to David Alban for the spot.
 
 0.01  Wed Jan  2 12:13:19 PST 2002
-        - original version.
+      - original version.

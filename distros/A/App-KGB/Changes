@@ -1,3 +1,21 @@
+1.50 (2018-05-23)
+  [ Martín Ferrari ]
+  * Add merge request title to merge request notifications.
+  * Stop using channel as a unique identifier.
+    This is a big change, as most of the code was assuming a channel name is
+    unique across networks, causing weird issues when adding channels
+    dynamically from a webhook.
+  * Factor out some repetitive code.
+  * The current code was leaving the configuration in a inconsistent state when
+    a channel was dynamically added; now it is done as if it was added to the
+    configuration.
+  * Finally fix the dynamic join problem.
+
+  [ Damyan Ivanov ]
+  * use get_chanid at one more place instead of hand-crafted concatenation
+  * when complaining of a repo without channels, suggest adding them to
+    the request parameters
+
 1.49 (2018-04-29)
   [ Damyan Ivanov ]
   *  add 'always_squash_outside_dir' webhook option (multiple values)

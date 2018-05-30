@@ -1,6 +1,6 @@
 package Math::AnyNum;
 
-use 5.014;
+use 5.016;
 use strict;
 use warnings;
 
@@ -17,7 +17,7 @@ use constant {
               LONG_MIN  => Math::GMPq::_long_min(),
              };
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -75,16 +75,16 @@ use overload
 {
 
     my %const = (    # prototypes are assigned in import()
-                  e       => \&e,
-                  phi     => \&phi,
-                  tau     => \&tau,
-                  pi      => \&pi,
-                  ln2     => \&ln2,
-                  euler   => \&euler,
-                  i       => \&i,
-                  catalan => \&catalan,
-                  Inf     => \&inf,
-                  NaN     => \&nan,
+                  e          => \&e,
+                  phi        => \&phi,
+                  tau        => \&tau,
+                  pi         => \&pi,
+                  ln2        => \&ln2,
+                  i          => \&i,
+                  CatalanG   => \&CatalanG,
+                  EulerGamma => \&EulerGamma,
+                  Inf        => \&inf,
+                  NaN        => \&nan,
                 );
 
     my %trig = (
@@ -171,8 +171,12 @@ use overload
         hypot => \&hypot,
         agm   => \&agm,
 
+        lnbern   => \&lnbern,
         bernreal => \&bernreal,
         harmreal => \&harmreal,
+
+        lnsuperfactorial => \&lnsuperfactorial,
+        lnhyperfactorial => \&lnhyperfactorial,
 
         polygonal_root  => \&polygonal_root,
         polygonal_root2 => \&polygonal_root2,
@@ -184,8 +188,13 @@ use overload
         mfactorial   => \&mfactorial,
         subfactorial => \&subfactorial,
         primorial    => \&primorial,
+        bell         => \&bell,
+        catalan      => \&catalan,
         binomial     => \&binomial,
         multinomial  => \&multinomial,
+
+        superfactorial => \&superfactorial,
+        hyperfactorial => \&hyperfactorial,
 
         rising_factorial  => \&rising_factorial,
         falling_factorial => \&falling_factorial,
@@ -194,12 +203,21 @@ use overload
         fibonacci => \&fibonacci,
 
         faulhaber_sum => \&faulhaber_sum,
+        geometric_sum => \&geometric_sum,
 
         bernfrac => \&bernfrac,
         harmfrac => \&harmfrac,
+        harmonic => \&harmfrac,
 
-        lcm       => \&lcm,
-        gcd       => \&gcd,
+        euler     => \&euler,
+        bernoulli => \&bernfrac,
+
+        euler_polynomial     => \&euler_polynomial,
+        bernoulli_polynomial => \&bernoulli_polynomial,
+
+        lcm => \&lcm,
+        gcd => \&gcd,
+
         valuation => \&valuation,
         kronecker => \&kronecker,
 
@@ -249,6 +267,9 @@ use overload
         rand  => \&rand,
         irand => \&irand,
 
+        sum  => \&sum,
+        prod => \&prod,
+
         seed  => \&seed,
         iseed => \&iseed,
 
@@ -281,10 +302,15 @@ use overload
         digits    => \&digits,
         sumdigits => \&sumdigits,
 
+        bsearch    => \&bsearch,
+        bsearch_le => \&bsearch_le,
+        bsearch_ge => \&bsearch_ge,
+
         as_bin  => \&as_bin,
         as_hex  => \&as_hex,
         as_oct  => \&as_oct,
         as_int  => \&as_int,
+        as_rat  => \&as_rat,
         as_frac => \&as_frac,
         as_dec  => \&as_dec,
 
@@ -719,7 +745,7 @@ sub _any2mpz {
         return;
     }
 
-    (@_) = _any2mpfr($x);
+    @_ = _any2mpfr($x);
     goto &_any2mpz;
 }
 
@@ -738,7 +764,7 @@ sub _any2mpq {
         return;
     }
 
-    (@_) = _any2mpfr($x);
+    @_ = _any2mpfr($x);
     goto &_any2mpq;
 }
 
@@ -856,7 +882,7 @@ sub _star2mpfr {
 
     ref($x) eq 'Math::MPFR' and return $x;
 
-    (@_) = $x;
+    @_ = $x;
     ref($x) eq 'Math::GMPz' && goto &_mpz2mpfr;
     ref($x) eq 'Math::GMPq' && goto &_mpq2mpfr;
     goto &_any2mpfr;
@@ -875,7 +901,7 @@ sub _star2mpz {
 
     ref($x) eq 'Math::GMPz' and return $x;
 
-    (@_) = $x;
+    @_ = $x;
     ref($x) eq 'Math::GMPq' and goto &_mpq2mpz;
     goto &_any2mpz;
 }
@@ -896,13 +922,15 @@ sub _star2mpfr_mpc {
         return $x;
     }
 
-    (@_) = $x;
+    @_ = $x;
     ref($x) eq 'Math::GMPz' && goto &_mpz2mpfr;
     ref($x) eq 'Math::GMPq' && goto &_mpq2mpfr;
     goto &_any2mpfr;    # this should not happen
 }
 
-# Anything to a {GMP*, MPFR or MPC} object
+#
+## Anything to a {GMP*, MPFR or MPC} object
+#
 sub _star2obj {
     my ($x) = @_;
 
@@ -921,9 +949,39 @@ sub _star2obj {
         _reals2mpc($x->reals);
     }
     else {
-        (@_) = "$x";
+        @_ = "$x";
         goto &_str2obj;
     }
+}
+
+#
+## Binary splitting
+#
+sub _binsplit {
+    my ($arr, $func) = @_;
+
+    my $sub = sub {
+        my ($s, $n, $m) = @_;
+
+        $n == $m
+          ? $s->[$n]
+          : $func->(__SUB__->($s, $n, ($n + $m) >> 1), __SUB__->($s, (($n + $m) >> 1) + 1, $m));
+    };
+
+    my $end = $#$arr;
+
+    if ($end <= 1e5) {
+        return $sub->($arr, 0, $end);
+    }
+
+    my @partial;
+
+    while (@$arr) {
+        my @head = splice(@$arr, 0, 1e5);
+        push @partial, $sub->(\@head, 0, $#head);
+    }
+
+    __SUB__->(\@partial, $func);
 }
 
 sub new {
@@ -946,9 +1004,9 @@ sub new {
 
         my $int_base = CORE::int($base);
 
-        if ($int_base < 2 or $int_base > 36) {
+        if ($int_base < 2 or $int_base > 62) {
             require Carp;
-            Carp::croak("base must be between 2 and 36, got $base");
+            Carp::croak("base must be between 2 and 62, got $base");
         }
 
         $num = defined($num) ? "$num" : '0';
@@ -1141,13 +1199,13 @@ sub ln2 {
     bless \$ln2;
 }
 
-sub euler {
+sub EulerGamma {
     my $euler = Math::MPFR::Rmpfr_init2($PREC);
     Math::MPFR::Rmpfr_const_euler($euler, $ROUND);
     bless \$euler;
 }
 
-sub catalan {
+sub CatalanG {
     my $catalan = Math::MPFR::Rmpfr_init2($PREC);
     Math::MPFR::Rmpfr_const_catalan($catalan, $ROUND);
     bless \$catalan;
@@ -1177,51 +1235,337 @@ sub phi {
 }
 
 #
-## OTHER
+## Stringification
 #
 
+sub __stringify__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_GMPz: {
+        push @_, 10;
+        goto &Math::GMPz::Rmpz_get_str;
+    }
+
+  Math_GMPq: {
+        push @_, 10;
+        goto &Math::GMPq::Rmpq_get_str;
+    }
+
+  Math_MPFR: {
+
+        Math::MPFR::Rmpfr_number_p($x)
+          || return (
+                       Math::MPFR::Rmpfr_nan_p($x)   ? 'NaN'
+                     : Math::MPFR::Rmpfr_sgn($x) < 0 ? '-Inf'
+                     :                                 'Inf'
+                    );
+
+        # log(10)/log(2) =~ 3.3219280948873623
+        my $digits = $PREC >> 2;
+        my ($mantissa, $exponent) = Math::MPFR::Rmpfr_deref2($x, 10, $digits, $ROUND);
+
+        my $sgn = '';
+        if (substr($mantissa, 0, 1) eq '-') {
+            $sgn = substr($mantissa, 0, 1, '');
+        }
+
+        $mantissa == 0 and return '0';
+
+        if (CORE::abs($exponent) < CORE::length($mantissa)) {
+
+            if ($exponent > 0) {
+                substr($mantissa, $exponent, 0, '.');
+            }
+            else {
+                substr($mantissa, 0, 0, '0.' . ('0' x CORE::abs($exponent)));
+            }
+
+            $mantissa = reverse($mantissa);
+            $mantissa =~ s/^0+//;
+            $mantissa =~ s/^\.//;
+            $mantissa = reverse($mantissa);
+
+            return ($sgn . $mantissa);
+        }
+
+        substr($mantissa, 1, 0, '.');
+        return ($sgn . $mantissa . 'e' . ($exponent - 1));
+    }
+
+  Math_MPC: {
+        my $fr = Math::MPFR::Rmpfr_init2($PREC);
+
+        Math::MPC::RMPC_RE($fr, $x);
+        my $re = __stringify__($fr);
+
+        Math::MPC::RMPC_IM($fr, $x);
+        my $im = __stringify__($fr);
+
+        if ($im eq '0' or $im eq '-0') {
+            return $re;
+        }
+
+        my $sign = '+';
+
+        if (substr($im, 0, 1) eq '-') {
+            $sign = '-';
+            substr($im, 0, 1, '');
+        }
+
+        $im = '' if $im eq '1';
+        return ($re eq '0' ? $sign eq '+' ? "${im}i" : "$sign${im}i" : "$re$sign${im}i");
+    }
+}
+
 sub stringify {    # used in overloading
-    require Math::AnyNum::stringify;
-    (@_) = (${$_[0]});
+    @_ = (${$_[0]});
     goto &__stringify__;
 }
 
-sub numify {       # used in overloading
-    require Math::AnyNum::numify;
-    (@_) = (${$_[0]});
-    goto &__numify__;
+#
+## Numification (object to a native integer or a double)
+#
+
+sub numify {    # used in overloading
+    my $x = ${$_[0]};
+
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        if (Math::MPFR::Rmpfr_integer_p($x)) {
+            if (Math::MPFR::Rmpfr_fits_slong_p($x, $ROUND)) {
+                return Math::MPFR::Rmpfr_get_si($x, $ROUND);
+            }
+
+            if (Math::MPFR::Rmpfr_fits_ulong_p($x, $ROUND)) {
+                return Math::MPFR::Rmpfr_get_ui($x, $ROUND);
+            }
+        }
+
+        return Math::MPFR::Rmpfr_get_d($x, $ROUND);
+    }
+
+  Math_GMPq: {
+
+        if (Math::GMPq::Rmpq_integer_p($x)) {
+            @_ = ($x = _mpq2mpz($x));
+            goto Math_GMPz;
+        }
+
+        return Math::GMPq::Rmpq_get_d($x);
+    }
+
+  Math_GMPz: {
+
+        if (Math::GMPz::Rmpz_fits_slong_p($x)) {
+            return Math::GMPz::Rmpz_get_si($x);
+        }
+
+        if (Math::GMPz::Rmpz_fits_ulong_p($x)) {
+            return Math::GMPz::Rmpz_get_ui($x);
+        }
+
+        return Math::GMPz::Rmpz_get_d($x);
+    }
+
+  Math_MPC: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPC::RMPC_RE($r, $x);
+        $x = $r;
+        goto Math_MPFR;
+    }
 }
 
-sub boolify {      # used in overloading
-    require Math::AnyNum::boolify;
-    (@_) = (${$_[0]});
-    goto &__boolify__;
+sub boolify {    # used in overloading
+    my $x = ${$_[0]};
+
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        return !Math::MPFR::Rmpfr_zero_p($x);
+    }
+
+  Math_GMPq: {
+        return !!Math::GMPq::Rmpq_sgn($x);
+    }
+
+  Math_GMPz: {
+        return !!Math::GMPz::Rmpz_sgn($x);
+    }
+
+  Math_MPC: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPC::RMPC_RE($r, $x);
+        Math::MPFR::Rmpfr_zero_p($r) || return 1;
+        Math::MPC::RMPC_IM($r, $x);
+        return !Math::MPFR::Rmpfr_zero_p($r);
+    }
 }
 
 #
 ## EQUALITY
 #
 
+sub __eq__ {
+    my ($x, $y) = @_;
+    goto(join('__', ref($x), ref($y) || 'Scalar') =~ tr/:/_/rs);
+
+    #
+    ## MPFR
+    #
+  Math_MPFR__Math_MPFR: {
+        return Math::MPFR::Rmpfr_equal_p($x, $y);
+    }
+
+  Math_MPFR__Math_GMPz: {
+        return (Math::MPFR::Rmpfr_integer_p($x) and Math::MPFR::Rmpfr_cmp_z($x, $y) == 0);
+    }
+
+  Math_MPFR__Math_GMPq: {
+        return (Math::MPFR::Rmpfr_number_p($x) and Math::MPFR::Rmpfr_cmp_q($x, $y) == 0);
+    }
+
+  Math_MPFR__Math_MPC: {
+        $x = _mpfr2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_MPFR__Scalar: {
+        return (
+                Math::MPFR::Rmpfr_integer_p($x)
+                  and (
+                       ($y || return !Math::MPFR::Rmpfr_sgn($x)) < 0
+                       ? Math::MPFR::Rmpfr_cmp_si($x, $y)
+                       : Math::MPFR::Rmpfr_cmp_ui($x, $y)
+                  ) == 0
+               );
+    }
+
+    #
+    ## GMPq
+    #
+  Math_GMPq__Math_GMPq: {
+        return Math::GMPq::Rmpq_equal($x, $y);
+    }
+
+  Math_GMPq__Math_GMPz: {
+        return (Math::GMPq::Rmpq_integer_p($x) and Math::GMPq::Rmpq_cmp_z($x, $y) == 0);
+    }
+
+  Math_GMPq__Math_MPFR: {
+        return (Math::MPFR::Rmpfr_number_p($y) and Math::MPFR::Rmpfr_cmp_q($y, $x) == 0);
+    }
+
+  Math_GMPq__Math_MPC: {
+        $x = _mpq2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_GMPq__Scalar: {
+        return (
+                Math::GMPq::Rmpq_integer_p($x)
+                  and (
+                       ($y || return !Math::GMPq::Rmpq_sgn($x)) < 0
+                       ? Math::GMPq::Rmpq_cmp_si($x, $y, 1)
+                       : Math::GMPq::Rmpq_cmp_ui($x, $y, 1)
+                  ) == 0
+               );
+    }
+
+    #
+    ## GMPz
+    #
+  Math_GMPz__Math_GMPz: {
+        return (Math::GMPz::Rmpz_cmp($x, $y) == 0);
+    }
+
+  Math_GMPz__Math_GMPq: {
+        return (Math::GMPq::Rmpq_integer_p($y) and Math::GMPq::Rmpq_cmp_z($y, $x) == 0);
+    }
+
+  Math_GMPz__Math_MPFR: {
+        return (Math::MPFR::Rmpfr_integer_p($y) and Math::MPFR::Rmpfr_cmp_z($y, $x) == 0);
+    }
+
+  Math_GMPz__Math_MPC: {
+        $x = _mpz2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_GMPz__Scalar: {
+        return (
+                (
+                 ($y || return !Math::GMPz::Rmpz_sgn($x)) < 0
+                 ? Math::GMPz::Rmpz_cmp_si($x, $y)
+                 : Math::GMPz::Rmpz_cmp_ui($x, $y)
+                ) == 0
+               );
+    }
+
+    #
+    ## MPC
+    #
+  Math_MPC__Math_MPC: {
+
+        my $f1 = Math::MPFR::Rmpfr_init2($PREC);
+        my $f2 = Math::MPFR::Rmpfr_init2($PREC);
+
+        Math::MPC::RMPC_RE($f1, $x);
+        Math::MPC::RMPC_RE($f2, $y);
+
+        Math::MPFR::Rmpfr_equal_p($f1, $f2) || return 0;
+
+        Math::MPC::RMPC_IM($f1, $x);
+        Math::MPC::RMPC_IM($f2, $y);
+
+        return Math::MPFR::Rmpfr_equal_p($f1, $f2);
+    }
+
+  Math_MPC__Math_GMPz: {
+        $y = _mpz2mpc($y);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_MPC__Math_GMPq: {
+        $y = _mpq2mpc($y);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_MPC__Math_MPFR: {
+        $y = _mpfr2mpc($y);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_MPC__Scalar: {
+        my $f = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPC::RMPC_IM($f, $x);
+        Math::MPFR::Rmpfr_zero_p($f) || return 0;
+        Math::MPC::RMPC_RE($f, $x);
+        $x = $f;
+        goto Math_MPFR__Scalar;
+    }
+}
+
 sub eq {    # used in overloading
-    require Math::AnyNum::eq;
     my ($x, $y) = @_;
 
     if (ref($y) eq __PACKAGE__) {
-        (@_) = ($$x, $$y);
+        @_ = ($$x, $$y);
         goto &__eq__;
     }
 
     if (!ref($y)) {
         if (CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
-            (@_) = ($$x, $y);
+            @_ = ($$x, $y);
         }
         else {
-            (@_) = ($$x, _str2obj($y));
+            @_ = ($$x, _str2obj($y));
         }
         goto &__eq__;
     }
 
-    (@_) = ($$x, _star2obj($y));
+    @_ = ($$x, _star2obj($y));
     goto &__eq__;
 }
 
@@ -1229,26 +1573,165 @@ sub eq {    # used in overloading
 ## INEQUALITY
 #
 
+sub __ne__ {
+    my ($x, $y) = @_;
+    goto(join('__', ref($x), ref($y) || 'Scalar') =~ tr/:/_/rs);
+
+    #
+    ## MPFR
+    #
+  Math_MPFR__Math_MPFR: {
+        return !Math::MPFR::Rmpfr_equal_p($x, $y);
+    }
+
+  Math_MPFR__Math_GMPz: {
+        return (!Math::MPFR::Rmpfr_integer_p($x) or Math::MPFR::Rmpfr_cmp_z($x, $y) != 0);
+    }
+
+  Math_MPFR__Math_GMPq: {
+        return (!Math::MPFR::Rmpfr_number_p($x) or Math::MPFR::Rmpfr_cmp_q($x, $y) != 0);
+    }
+
+  Math_MPFR__Math_MPC: {
+        $x = _mpfr2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_MPFR__Scalar: {
+        return (
+                !Math::MPFR::Rmpfr_integer_p($x)
+                  or (
+                      ($y || return !!Math::MPFR::Rmpfr_sgn($x)) < 0
+                      ? Math::MPFR::Rmpfr_cmp_si($x, $y)
+                      : Math::MPFR::Rmpfr_cmp_ui($x, $y)
+                  ) != 0
+               );
+    }
+
+    #
+    ## GMPq
+    #
+  Math_GMPq__Math_GMPq: {
+        return !Math::GMPq::Rmpq_equal($x, $y);
+    }
+
+  Math_GMPq__Math_GMPz: {
+        return (!Math::GMPq::Rmpq_integer_p($x) or Math::GMPq::Rmpq_cmp_z($x, $y) != 0);
+    }
+
+  Math_GMPq__Math_MPFR: {
+        return (!Math::MPFR::Rmpfr_number_p($y) or Math::MPFR::Rmpfr_cmp_q($y, $x) != 0);
+    }
+
+  Math_GMPq__Math_MPC: {
+        $x = _mpq2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_GMPq__Scalar: {
+        return (
+                !Math::GMPq::Rmpq_integer_p($x)
+                  or (
+                      ($y || return !!Math::GMPq::Rmpq_sgn($x)) < 0
+                      ? Math::GMPq::Rmpq_cmp_si($x, $y, 1)
+                      : Math::GMPq::Rmpq_cmp_ui($x, $y, 1)
+                  ) != 0
+               );
+    }
+
+    #
+    ## GMPz
+    #
+  Math_GMPz__Math_GMPz: {
+        return (Math::GMPz::Rmpz_cmp($x, $y) != 0);
+    }
+
+  Math_GMPz__Math_GMPq: {
+        return (!Math::GMPq::Rmpq_integer_p($y) or Math::GMPq::Rmpq_cmp_z($y, $x) != 0);
+    }
+
+  Math_GMPz__Math_MPFR: {
+        return (!Math::MPFR::Rmpfr_integer_p($y) or Math::MPFR::Rmpfr_cmp_z($y, $x) != 0);
+    }
+
+  Math_GMPz__Math_MPC: {
+        $x = _mpz2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_GMPz__Scalar: {
+        return (
+                (
+                 ($y || return !!Math::GMPz::Rmpz_sgn($x)) < 0
+                 ? Math::GMPz::Rmpz_cmp_si($x, $y)
+                 : Math::GMPz::Rmpz_cmp_ui($x, $y)
+                ) != 0
+               );
+    }
+
+    #
+    ## MPC
+    #
+  Math_MPC__Math_MPC: {
+
+        my $f1 = Math::MPFR::Rmpfr_init2($PREC);
+        my $f2 = Math::MPFR::Rmpfr_init2($PREC);
+
+        Math::MPC::RMPC_RE($f1, $x);
+        Math::MPC::RMPC_RE($f2, $y);
+
+        Math::MPFR::Rmpfr_equal_p($f1, $f2) || return 1;
+
+        Math::MPC::RMPC_IM($f1, $x);
+        Math::MPC::RMPC_IM($f2, $y);
+
+        return !Math::MPFR::Rmpfr_equal_p($f1, $f2);
+    }
+
+  Math_MPC__Math_GMPz: {
+        $y = _mpz2mpc($y);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_MPC__Math_GMPq: {
+        $y = _mpq2mpc($y);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_MPC__Math_MPFR: {
+        $y = _mpfr2mpc($y);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_MPC__Scalar: {
+        my $f = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPC::RMPC_IM($f, $x);
+        Math::MPFR::Rmpfr_zero_p($f) || return 1;
+        Math::MPC::RMPC_RE($f, $x);
+        $x = $f;
+        goto Math_MPFR__Scalar;
+    }
+}
+
 sub ne {    # used in overloading
-    require Math::AnyNum::ne;
     my ($x, $y) = @_;
 
     if (ref($y) eq __PACKAGE__) {
-        (@_) = ($$x, $$y);
+        @_ = ($$x, $$y);
         goto &__ne__;
     }
 
     if (!ref($y)) {
         if (CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
-            (@_) = ($$x, $y);
+            @_ = ($$x, $y);
         }
         else {
-            (@_) = ($$x, _str2obj($y));
+            @_ = ($$x, _str2obj($y));
         }
         goto &__ne__;
     }
 
-    (@_) = ($$x, _star2obj($y));
+    @_ = ($$x, _star2obj($y));
     goto &__ne__;
 }
 
@@ -1256,34 +1739,190 @@ sub ne {    # used in overloading
 ## COMPARISON
 #
 
+sub __cmp__ {
+    my ($x, $y) = @_;
+    goto(join('__', ref($x), ref($y) || 'Scalar') =~ tr/:/_/rs);
+
+    #
+    ## MPFR
+    #
+  Math_MPFR__Math_MPFR: {
+
+        if (   Math::MPFR::Rmpfr_nan_p($x)
+            or Math::MPFR::Rmpfr_nan_p($y)) {
+            return undef;
+        }
+
+        return Math::MPFR::Rmpfr_cmp($x, $y);
+    }
+
+  Math_MPFR__Math_GMPz: {
+        return (
+                Math::MPFR::Rmpfr_nan_p($x)
+                ? undef
+                : Math::MPFR::Rmpfr_cmp_z($x, $y)
+               );
+    }
+
+  Math_MPFR__Math_GMPq: {
+        return (
+                Math::MPFR::Rmpfr_nan_p($x)
+                ? undef
+                : Math::MPFR::Rmpfr_cmp_q($x, $y)
+               );
+    }
+
+  Math_MPFR__Math_MPC: {
+        $x = _mpfr2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_MPFR__Scalar: {
+        return (
+                  Math::MPFR::Rmpfr_nan_p($x) ? undef
+                : ($y || return Math::MPFR::Rmpfr_sgn($x)) < 0 ? Math::MPFR::Rmpfr_cmp_si($x, $y)
+                :                                                Math::MPFR::Rmpfr_cmp_ui($x, $y)
+               );
+    }
+
+    #
+    ## GMPq
+    #
+  Math_GMPq__Math_GMPq: {
+        return Math::GMPq::Rmpq_cmp($x, $y);
+    }
+
+  Math_GMPq__Math_GMPz: {
+        return Math::GMPq::Rmpq_cmp_z($x, $y);
+    }
+
+  Math_GMPq__Math_MPFR: {
+        return (
+                Math::MPFR::Rmpfr_nan_p($y)
+                ? undef
+                : -Math::MPFR::Rmpfr_cmp_q($y, $x)
+               );
+    }
+
+  Math_GMPq__Math_MPC: {
+        $x = _mpq2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_GMPq__Scalar: {
+        return (
+                ($y || return Math::GMPq::Rmpq_sgn($x)) < 0
+                ? Math::GMPq::Rmpq_cmp_si($x, $y, 1)
+                : Math::GMPq::Rmpq_cmp_ui($x, $y, 1)
+               );
+    }
+
+    #
+    ## GMPz
+    #
+  Math_GMPz__Math_GMPz: {
+        return Math::GMPz::Rmpz_cmp($x, $y);
+    }
+
+  Math_GMPz__Math_GMPq: {
+        return -Math::GMPq::Rmpq_cmp_z($y, $x);
+    }
+
+  Math_GMPz__Math_MPFR: {
+        return (
+                Math::MPFR::Rmpfr_nan_p($y)
+                ? undef
+                : -Math::MPFR::Rmpfr_cmp_z($y, $x)
+               );
+    }
+
+  Math_GMPz__Math_MPC: {
+        $x = _mpz2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_GMPz__Scalar: {
+        return (
+                ($y || return Math::GMPz::Rmpz_sgn($x)) < 0
+                ? Math::GMPz::Rmpz_cmp_si($x, $y)
+                : Math::GMPz::Rmpz_cmp_ui($x, $y)
+               );
+    }
+
+    #
+    ## MPC
+    #
+  Math_MPC__Math_MPC: {
+        my $f = Math::MPFR::Rmpfr_init2($PREC);
+
+        Math::MPC::RMPC_RE($f, $x);
+        Math::MPFR::Rmpfr_nan_p($f) && return undef;
+
+        Math::MPC::RMPC_RE($f, $y);
+        Math::MPFR::Rmpfr_nan_p($f) && return undef;
+
+        Math::MPC::RMPC_IM($f, $x);
+        Math::MPFR::Rmpfr_nan_p($f) && return undef;
+
+        Math::MPC::RMPC_IM($f, $y);
+        Math::MPFR::Rmpfr_nan_p($f) && return undef;
+
+        my $si = Math::MPC::Rmpc_cmp($x, $y);
+        my $re_cmp = Math::MPC::RMPC_INEX_RE($si);
+
+        return (
+                ($re_cmp == 0)
+                ? Math::MPC::RMPC_INEX_IM($si)
+                : $re_cmp
+               );
+    }
+
+  Math_MPC__Math_GMPz: {
+        $y = _mpz2mpc($y);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_MPC__Math_GMPq: {
+        $y = _mpq2mpc($y);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_MPC__Math_MPFR: {
+        $y = _mpfr2mpc($y);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_MPC__Scalar: {
+        $y = _any2mpc(_str2obj($y));
+        goto Math_MPC__Math_MPC;
+    }
+}
+
 sub cmp ($$) {
-    require Math::AnyNum::cmp;
     my ($x, $y) = @_;
 
     if (ref($y) eq __PACKAGE__) {
-        (@_) = ($$x, $$y);
+        @_ = ($$x, $$y);
         goto &__cmp__;
     }
 
     if (!ref($y)) {
         if (CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
-            (@_) = ($$x, $y);
+            @_ = ($$x, $y);
         }
         else {
-            (@_) = ($$x, _str2obj($y));
+            @_ = ($$x, _str2obj($y));
         }
         goto &__cmp__;
     }
 
-    (@_) = ($$x, _star2obj($y));
+    @_ = ($$x, _star2obj($y));
     goto &__cmp__;
 }
 
 # Absolute comparison
 
 sub acmp ($$) {
-    require Math::AnyNum::abs;
-    require Math::AnyNum::cmp;
     my ($x, $y) = @_;
 
     if (!ref($y) and CORE::int($y) eq $y and $y >= 0 and $y < ULONG_MAX) {
@@ -1299,8 +1938,6 @@ sub acmp ($$) {
 # Approximate comparison
 
 sub approx_cmp ($$;$) {
-    require Math::AnyNum::cmp;
-    require Math::AnyNum::round;
     my ($x, $y, $places) = @_;
 
     if (defined($places)) {
@@ -1312,7 +1949,7 @@ sub approx_cmp ($$;$) {
         }
     }
     else {
-        $places = -((CORE::int($PREC) >> 2) - 1);
+        $places = -(($PREC >> 2) - 1);
     }
 
     $x = _star2obj($x);
@@ -1337,7 +1974,6 @@ sub approx_cmp ($$;$) {
 #
 
 sub gt {    # used in overloading
-    require Math::AnyNum::cmp;
     my ($x, $y) = @_;
 
     if (ref($y) eq __PACKAGE__) {
@@ -1359,7 +1995,6 @@ sub gt {    # used in overloading
 #
 
 sub ge {    # used in overloading
-    require Math::AnyNum::cmp;
     my ($x, $y) = @_;
 
     if (ref($y) eq __PACKAGE__) {
@@ -1381,7 +2016,6 @@ sub ge {    # used in overloading
 #
 
 sub lt {    # used in overloading
-    require Math::AnyNum::cmp;
     my ($x, $y) = @_;
 
     if (ref($y) eq __PACKAGE__) {
@@ -1403,7 +2037,6 @@ sub lt {    # used in overloading
 #
 
 sub le {    # used in overloading
-    require Math::AnyNum::cmp;
     my ($x, $y) = @_;
 
     if (ref($y) eq __PACKAGE__) {
@@ -1507,13 +2140,11 @@ sub rat ($) {
 sub float ($) {
     my ($x) = @_;
 
-    bless \(
-              ref($x) eq __PACKAGE__
-            ? ref($$x) eq 'Math::MPFR'
-                  ? (return $x)
-                  : _any2mpfr($$x)
-            : _star2mpfr($x)
-           );
+    ref($x) eq __PACKAGE__
+      && (ref($$x) eq 'Math::MPFR' || ref($$x) eq 'Math::MPC')
+      && return $x;
+
+    bless \_star2mpfr_mpc($x);
 }
 
 #
@@ -1537,31 +2168,133 @@ sub complex ($;$) {
 }
 
 #
-## NEGATION
-#
-
-sub neg {    # used in overloading
-    require Math::AnyNum::neg;
-    my ($x) = @_;
-    bless \__neg__(ref($x) eq __PACKAGE__ ? $$x : _star2obj($x));
-}
-
-#
 ## ABSOLUTE VALUE
 #
 
+sub __abs__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        Math::MPFR::Rmpfr_sgn($x) >= 0 and return $x;
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_abs($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_GMPq: {
+        Math::GMPq::Rmpq_sgn($x) >= 0 and return $x;
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_abs($r, $x);
+        return $r;
+    }
+
+  Math_GMPz: {
+        Math::GMPz::Rmpz_sgn($x) >= 0 and return $x;
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_abs($r, $x);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPC::Rmpc_abs($r, $x, $ROUND);
+        return $r;
+    }
+}
+
 sub abs {    # used in overloading
-    require Math::AnyNum::abs;
     my ($x) = @_;
     bless \__abs__(ref($x) eq __PACKAGE__ ? $$x : _star2obj($x));
 }
 
 #
-## MULTIPLICATIVE INVERSE
+## ADDITIVE INVERSE (-x)
 #
 
+sub __neg__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_neg($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_GMPq: {
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_neg($r, $x);
+        return $r;
+    }
+
+  Math_GMPz: {
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_neg($r, $x);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_neg($r, $x, $ROUND);
+        return $r;
+    }
+}
+
+sub neg {    # used in overloading
+    my ($x) = @_;
+    bless \__neg__(ref($x) eq __PACKAGE__ ? $$x : _star2obj($x));
+}
+
+#
+## MULTIPLICATIVE INVERSE (1/x)
+#
+
+sub __inv__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_ui_div($r, 1, $x, $ROUND);
+        return $r;
+    }
+
+  Math_GMPq: {
+
+        # Check for division by zero
+        Math::GMPq::Rmpq_sgn($x) || do {
+            $x = _mpq2mpfr($x);
+            goto Math_MPFR;
+        };
+
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_inv($r, $x);
+        return $r;
+    }
+
+  Math_GMPz: {
+
+        # Check for division by zero
+        Math::GMPz::Rmpz_sgn($x) || do {
+            $x = _mpz2mpfr($x);
+            goto Math_MPFR;
+        };
+
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set_z($r, $x);
+        Math::GMPq::Rmpq_inv($r, $r);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+        return $r;
+    }
+}
+
 sub inv ($) {
-    require Math::AnyNum::inv;
     my ($x) = @_;
     bless \__inv__(ref($x) eq __PACKAGE__ ? $$x : _star2obj($x));
 }
@@ -1570,8 +2303,37 @@ sub inv ($) {
 ## INCREMENTATION BY ONE
 #
 
+sub __inc__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_add_ui($r, $x, 1, $ROUND);
+        return $r;
+    }
+
+  Math_GMPq: {
+        state $one = Math::GMPz::Rmpz_init_set_ui_nobless(1);
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_add_z($r, $x, $one);
+        return $r;
+    }
+
+  Math_GMPz: {
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_add_ui($r, $x, 1);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_add_ui($r, $x, 1, $ROUND);
+        return $r;
+    }
+}
+
 sub inc ($) {
-    require Math::AnyNum::inc;
     my ($x) = @_;
     bless \__inc__($$x);
 }
@@ -1580,8 +2342,37 @@ sub inc ($) {
 ## DECREMENTATION BY ONE
 #
 
+sub __dec__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_sub_ui($r, $x, 1, $ROUND);
+        return $r;
+    }
+
+  Math_GMPq: {
+        state $mone = Math::GMPz::Rmpz_init_set_si_nobless(-1);
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_add_z($r, $x, $mone);
+        return $r;
+    }
+
+  Math_GMPz: {
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sub_ui($r, $x, 1);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_sub_ui($r, $x, 1, $ROUND);
+        return $r;
+    }
+}
+
 sub dec ($) {
-    require Math::AnyNum::dec;
     my ($x) = @_;
     bless \__dec__($$x);
 }
@@ -1651,8 +2442,157 @@ sub reals ($) {
 ## ADDITION
 #
 
+sub __add__ {
+    my ($x, $y) = @_;
+    goto(join('__', ref($x), ref($y) || 'Scalar') =~ tr/:/_/rs);
+
+    #
+    ## GMPq
+    #
+  Math_GMPq__Math_GMPq: {
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_add($r, $x, $y);
+        return $r;
+    }
+
+  Math_GMPq__Math_GMPz: {
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_add_z($r, $x, $y);
+        return $r;
+    }
+
+  Math_GMPq__Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_add_q($r, $y, $x, $ROUND);
+        return $r;
+    }
+
+  Math_GMPq__Math_MPC: {
+        my $c = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_q($c, $x, $ROUND);
+        Math::MPC::Rmpc_add($c, $c, $y, $ROUND);
+        return $c;
+    }
+
+  Math_GMPq__Scalar: {
+        my $r = Math::GMPq::Rmpq_init();
+        $y < 0
+          ? Math::GMPq::Rmpq_set_si($r, $y, 1)
+          : Math::GMPq::Rmpq_set_ui($r, $y, 1);
+        Math::GMPq::Rmpq_add($r, $r, $x);
+        return $r;
+    }
+
+    #
+    ## GMPz
+    #
+  Math_GMPz__Math_GMPz: {
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_add($r, $x, $y);
+        return $r;
+    }
+
+  Math_GMPz__Scalar: {
+        my $r = Math::GMPz::Rmpz_init();
+        $y < 0
+          ? Math::GMPz::Rmpz_sub_ui($r, $x, -$y)
+          : Math::GMPz::Rmpz_add_ui($r, $x, $y);
+        return $r;
+    }
+
+  Math_GMPz__Math_GMPq: {
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_add_z($r, $y, $x);
+        return $r;
+    }
+
+  Math_GMPz__Math_MPFR: {
+        my $f = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_add_z($f, $y, $x, $ROUND);
+        return $f;
+    }
+
+  Math_GMPz__Math_MPC: {
+        my $c = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_z($c, $x, $ROUND);
+        Math::MPC::Rmpc_add($c, $c, $y, $ROUND);
+        return $c;
+    }
+
+    #
+    ## MPFR
+    #
+  Math_MPFR__Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_add($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPFR__Scalar: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        $y < 0
+          ? Math::MPFR::Rmpfr_sub_ui($r, $x, -$y, $ROUND)
+          : Math::MPFR::Rmpfr_add_ui($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPFR__Math_GMPq: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_add_q($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPFR__Math_GMPz: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_add_z($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPFR__Math_MPC: {
+        my $c = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_add_fr($c, $y, $x, $ROUND);
+        return $c;
+    }
+
+    #
+    ## MPC
+    #
+  Math_MPC__Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_add($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPC__Scalar: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        $y < 0
+          ? Math::MPC::Rmpc_sub_ui($r, $x, -$y, $ROUND)
+          : Math::MPC::Rmpc_add_ui($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPC__Math_MPFR: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_add_fr($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPC__Math_GMPz: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_z($r, $y, $ROUND);
+        Math::MPC::Rmpc_add($r, $r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC__Math_GMPq: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_q($r, $y, $ROUND);
+        Math::MPC::Rmpc_add($r, $r, $x, $ROUND);
+        return $r;
+    }
+}
+
 sub add {    # used in overloading
-    require Math::AnyNum::add;
     my ($x, $y) = @_;
 
     if (ref($y) eq __PACKAGE__) {
@@ -1663,16 +2603,6 @@ sub add {    # used in overloading
 
     if (!ref($y)) {
         if (CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
-
-            if (ref($x) eq 'Math::GMPq') {
-                my $r = Math::GMPq::Rmpq_init();
-                $y < 0
-                  ? Math::GMPq::Rmpq_set_si($r, $y, 1)
-                  : Math::GMPq::Rmpq_set_ui($r, $y, 1);
-                Math::GMPq::Rmpq_add($r, $r, $x);
-                return bless \$r;
-            }
-
             return bless \__add__($x, $y);
         }
 
@@ -1686,8 +2616,173 @@ sub add {    # used in overloading
 ## SUBTRACTION
 #
 
+sub __sub__ {
+    my ($x, $y) = @_;
+    goto(join('__', ref($x), ref($y) || 'Scalar') =~ tr/:/_/rs);
+
+    #
+    ## GMPq
+    #
+  Math_GMPq__Math_GMPq: {
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_sub($r, $x, $y);
+        return $r;
+    }
+
+  Math_GMPq__Math_GMPz: {
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_sub_z($r, $x, $y);
+        return $r;
+    }
+
+  Math_GMPq__Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_sub_q($r, $y, $x, $ROUND);
+        Math::MPFR::Rmpfr_neg($r, $r, $ROUND);
+        return $r;
+    }
+
+  Math_GMPq__Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_q($r, $x, $ROUND);
+        Math::MPC::Rmpc_sub($r, $r, $y, $ROUND);
+        return $r;
+    }
+
+  Math_GMPq__Scalar: {
+        my $r = Math::GMPq::Rmpq_init();
+        $y < 0
+          ? Math::GMPq::Rmpq_set_si($r, $y, 1)
+          : Math::GMPq::Rmpq_set_ui($r, $y, 1);
+        Math::GMPq::Rmpq_sub($r, $x, $r);
+        return $r;
+    }
+
+    #
+    ## GMPz
+    #
+  Math_GMPz__Math_GMPz: {
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sub($r, $x, $y);
+        return $r;
+    }
+
+  Math_GMPz__Scalar: {
+        my $r = Math::GMPz::Rmpz_init();
+        $y < 0
+          ? Math::GMPz::Rmpz_add_ui($r, $x, -$y)
+          : Math::GMPz::Rmpz_sub_ui($r, $x, $y);
+        return $r;
+    }
+
+  Math_GMPz__Math_GMPq: {
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_z_sub($r, $x, $y);
+        return $r;
+    }
+
+  Math_GMPz__Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+
+#<<<
+        state $has_z_sub = (Math::MPFR::MPFR_VERSION_MAJOR() >  3)
+                        || (Math::MPFR::MPFR_VERSION_MAJOR() == 3
+                        &&  Math::MPFR::MPFR_VERSION_MINOR() >= 1);
+#>>>
+
+        $has_z_sub
+          ? Math::MPFR::Rmpfr_z_sub($r, $x, $y, $ROUND)
+          : do {
+            Math::MPFR::Rmpfr_sub_z($r, $y, $x, $ROUND);
+            Math::MPFR::Rmpfr_neg($r, $r, $ROUND);
+          };
+
+        return $r;
+    }
+
+  Math_GMPz__Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_z($r, $x, $ROUND);
+        Math::MPC::Rmpc_sub($r, $r, $y, $ROUND);
+        return $r;
+    }
+
+    #
+    ## MPFR
+    #
+  Math_MPFR__Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_sub($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPFR__Scalar: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        $y < 0
+          ? Math::MPFR::Rmpfr_add_ui($r, $x, -$y, $ROUND)
+          : Math::MPFR::Rmpfr_sub_ui($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPFR__Math_GMPq: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_sub_q($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPFR__Math_GMPz: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_sub_z($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPFR__Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_fr($r, $x, $ROUND);
+        Math::MPC::Rmpc_sub($r, $r, $y, $ROUND);
+        return $r;
+    }
+
+    #
+    ## MPC
+    #
+  Math_MPC__Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_sub($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPC__Scalar: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        $y < 0
+          ? Math::MPC::Rmpc_add_ui($r, $x, -$y, $ROUND)
+          : Math::MPC::Rmpc_sub_ui($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPC__Math_MPFR: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_fr($r, $y, $ROUND);
+        Math::MPC::Rmpc_sub($r, $x, $r, $ROUND);
+        return $r;
+    }
+
+  Math_MPC__Math_GMPz: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_z($r, $y, $ROUND);
+        Math::MPC::Rmpc_sub($r, $x, $r, $ROUND);
+        return $r;
+    }
+
+  Math_MPC__Math_GMPq: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_q($r, $y, $ROUND);
+        Math::MPC::Rmpc_sub($r, $x, $r, $ROUND);
+        return $r;
+    }
+}
+
 sub sub {    # used in overloading
-    require Math::AnyNum::sub;
     my ($x, $y) = @_;
 
     $x =
@@ -1701,16 +2796,6 @@ sub sub {    # used in overloading
 
     if (!ref($y)) {
         if (CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
-
-            if (ref($x) eq 'Math::GMPq') {
-                my $r = Math::GMPq::Rmpq_init();
-                $y < 0
-                  ? Math::GMPq::Rmpq_set_si($r, $y, 1)
-                  : Math::GMPq::Rmpq_set_ui($r, $y, 1);
-                Math::GMPq::Rmpq_sub($r, $x, $r);
-                return bless \$r;
-            }
-
             return bless \__sub__($x, $y);
         }
 
@@ -1724,8 +2809,157 @@ sub sub {    # used in overloading
 ## MULTIPLICATION
 #
 
+sub __mul__ {
+    my ($x, $y) = @_;
+    goto(join('__', ref($x), ref($y) || 'Scalar') =~ tr/:/_/rs);
+
+    #
+    ## GMPq
+    #
+  Math_GMPq__Math_GMPq: {
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_mul($r, $x, $y);
+        return $r;
+    }
+
+  Math_GMPq__Math_GMPz: {
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_mul_z($r, $x, $y);
+        return $r;
+    }
+
+  Math_GMPq__Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_mul_q($r, $y, $x, $ROUND);
+        return $r;
+    }
+
+  Math_GMPq__Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_q($r, $x, $ROUND);
+        Math::MPC::Rmpc_mul($r, $r, $y, $ROUND);
+        return $r;
+    }
+
+  Math_GMPq__Scalar: {
+        my $r = Math::GMPq::Rmpq_init();
+        $y < 0
+          ? Math::GMPq::Rmpq_set_si($r, $y, 1)
+          : Math::GMPq::Rmpq_set_ui($r, $y, 1);
+        Math::GMPq::Rmpq_mul($r, $r, $x);
+        return $r;
+    }
+
+    #
+    ## GMPz
+    #
+  Math_GMPz__Math_GMPz: {
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mul($r, $x, $y);
+        return $r;
+    }
+
+  Math_GMPz__Scalar: {
+        my $r = Math::GMPz::Rmpz_init();
+        $y < 0
+          ? Math::GMPz::Rmpz_mul_si($r, $x, $y)
+          : Math::GMPz::Rmpz_mul_ui($r, $x, $y);
+        return $r;
+    }
+
+  Math_GMPz__Math_GMPq: {
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_mul_z($r, $y, $x);
+        return $r;
+    }
+
+  Math_GMPz__Math_MPFR: {
+        my $f = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_mul_z($f, $y, $x, $ROUND);
+        return $f;
+    }
+
+  Math_GMPz__Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_z($r, $x, $ROUND);
+        Math::MPC::Rmpc_mul($r, $r, $y, $ROUND);
+        return $r;
+    }
+
+    #
+    ## MPFR
+    #
+  Math_MPFR__Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_mul($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPFR__Scalar: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        $y < 0
+          ? Math::MPFR::Rmpfr_mul_si($r, $x, $y, $ROUND)
+          : Math::MPFR::Rmpfr_mul_ui($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPFR__Math_GMPq: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_mul_q($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPFR__Math_GMPz: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_mul_z($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPFR__Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_mul_fr($r, $y, $x, $ROUND);
+        return $r;
+    }
+
+    #
+    ## MPC
+    #
+  Math_MPC__Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_mul($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPC__Scalar: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        $y < 0
+          ? Math::MPC::Rmpc_mul_si($r, $x, $y, $ROUND)
+          : Math::MPC::Rmpc_mul_ui($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPC__Math_MPFR: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_mul_fr($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPC__Math_GMPz: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_z($r, $y, $ROUND);
+        Math::MPC::Rmpc_mul($r, $r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC__Math_GMPq: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_q($r, $y, $ROUND);
+        Math::MPC::Rmpc_mul($r, $r, $x, $ROUND);
+        return $r;
+    }
+}
+
 sub mul {    # used in overloading
-    require Math::AnyNum::mul;
     my ($x, $y) = @_;
 
     if (ref($y) eq __PACKAGE__) {
@@ -1736,16 +2970,6 @@ sub mul {    # used in overloading
 
     if (!ref($y)) {
         if (CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
-
-            if (ref($x) eq 'Math::GMPq') {
-                my $r = Math::GMPq::Rmpq_init();
-                $y < 0
-                  ? Math::GMPq::Rmpq_set_si($r, $y, 1)
-                  : Math::GMPq::Rmpq_set_ui($r, $y, 1);
-                Math::GMPq::Rmpq_mul($r, $r, $x);
-                return bless \$r;
-            }
-
             return bless \__mul__($x, $y);
         }
 
@@ -1759,8 +2983,209 @@ sub mul {    # used in overloading
 ## DIVISION
 #
 
+sub __div__ {
+    my ($x, $y) = @_;
+    goto(join('__', ref($x), ref($y) || 'Scalar') =~ tr/:/_/rs);
+
+    #
+    ## GMPq
+    #
+  Math_GMPq__Math_GMPq: {
+
+        # Check for division by zero
+        Math::GMPq::Rmpq_sgn($y) || do {
+            $x = _mpq2mpfr($x);
+            goto Math_MPFR__Math_GMPq;
+        };
+
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_div($r, $x, $y);
+        return $r;
+    }
+
+  Math_GMPq__Math_GMPz: {
+
+        # Check for division by zero
+        Math::GMPz::Rmpz_sgn($y) || do {
+            $x = _mpq2mpfr($x);
+            goto Math_MPFR__Math_GMPz;
+        };
+
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_div_z($r, $x, $y);
+        return $r;
+    }
+
+  Math_GMPq__Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_q_div($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_GMPq__Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_q($r, $x, $ROUND);
+        Math::MPC::Rmpc_div($r, $r, $y, $ROUND);
+        return $r;
+    }
+
+  Math_GMPq__Scalar: {
+        my $r = Math::GMPq::Rmpq_init();
+        $y < 0
+          ? Math::GMPq::Rmpq_set_si($r, -1, -$y)
+          : Math::GMPq::Rmpq_set_ui($r, 1, $y);
+        Math::GMPq::Rmpq_mul($r, $r, $x);
+        return $r;
+    }
+
+    #
+    ## GMPz
+    #
+  Math_GMPz__Math_GMPz: {
+
+        # Check for division by zero
+        Math::GMPz::Rmpz_sgn($y) || do {
+            $x = _mpz2mpfr($x);
+            goto Math_MPFR__Math_GMPz;
+        };
+
+        # Check for exact divisibility
+        if (Math::GMPz::Rmpz_divisible_p($x, $y)) {
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_divexact($r, $x, $y);
+            return $r;
+        }
+
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set_num($r, $x);
+        Math::GMPq::Rmpq_set_den($r, $y);
+        Math::GMPq::Rmpq_canonicalize($r);
+        return $r;
+    }
+
+  Math_GMPz__Scalar: {
+
+        # Check for exact divisibility
+        if (Math::GMPz::Rmpz_divisible_ui_p($x, CORE::abs($y))) {
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_divexact_ui($r, $x, CORE::abs($y));
+            Math::GMPz::Rmpz_neg($r, $r) if $y < 0;
+            return $r;
+        }
+
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set_ui($r, 1, CORE::abs($y));
+        Math::GMPq::Rmpq_set_num($r, $x);
+        Math::GMPq::Rmpq_neg($r, $r) if $y < 0;
+        Math::GMPq::Rmpq_canonicalize($r);
+        return $r;
+    }
+
+  Math_GMPz__Math_GMPq: {
+
+        # Check for division by zero
+        Math::GMPq::Rmpq_sgn($y) || do {
+            $x = _mpz2mpfr($x);
+            goto Math_MPFR__Math_GMPq;
+        };
+
+        my $q = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_z_div($q, $x, $y);
+        return $q;
+    }
+
+  Math_GMPz__Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_z_div($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_GMPz__Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_z($r, $x, $ROUND);
+        Math::MPC::Rmpc_div($r, $r, $y, $ROUND);
+        return $r;
+    }
+
+    #
+    ## MPFR
+    #
+  Math_MPFR__Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_div($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPFR__Scalar: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        $y < 0
+          ? Math::MPFR::Rmpfr_div_si($r, $x, $y, $ROUND)
+          : Math::MPFR::Rmpfr_div_ui($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPFR__Math_GMPq: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_div_q($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPFR__Math_GMPz: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_div_z($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPFR__Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_fr($r, $x, $ROUND);
+        Math::MPC::Rmpc_div($r, $r, $y, $ROUND);
+        return $r;
+    }
+
+    #
+    ## MPC
+    #
+  Math_MPC__Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_div($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPC__Scalar: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        if ($y < 0) {
+            Math::MPC::Rmpc_div_ui($r, $x, -$y, $ROUND);
+            Math::MPC::Rmpc_neg($r, $r, $ROUND);
+        }
+        else {
+            Math::MPC::Rmpc_div_ui($r, $x, $y, $ROUND);
+        }
+        return $r;
+    }
+
+  Math_MPC__Math_MPFR: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_div_fr($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPC__Math_GMPz: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_z($r, $y, $ROUND);
+        Math::MPC::Rmpc_div($r, $x, $r, $ROUND);
+        return $r;
+    }
+
+  Math_MPC__Math_GMPq: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_q($r, $y, $ROUND);
+        Math::MPC::Rmpc_div($r, $x, $r, $ROUND);
+        return $r;
+    }
+}
+
 sub div {    # used in overloading
-    require Math::AnyNum::div;
     my ($x, $y) = @_;
 
     $x =
@@ -1774,16 +3199,6 @@ sub div {    # used in overloading
 
     if (!ref($y)) {
         if (CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN and CORE::int($y)) {
-
-            if (ref($x) eq 'Math::GMPq') {
-                my $r = Math::GMPq::Rmpq_init();
-                $y < 0
-                  ? Math::GMPq::Rmpq_set_si($r, -1, -$y)
-                  : Math::GMPq::Rmpq_set_ui($r, 1, $y);
-                Math::GMPq::Rmpq_mul($r, $r, $x);
-                return bless \$r;
-            }
-
             return bless \__div__($x, $y);
         }
 
@@ -1804,7 +3219,11 @@ sub iadd ($$) {
         ($x, $y) = ($y, $x);
     }
 
-    $x = _star2mpz($x) // goto &nan;
+    $x = $$x if (ref($x) eq __PACKAGE__);
+
+    if (ref($x) ne 'Math::GMPz') {
+        $x = _star2mpz($x) // goto &nan;
+    }
 
     if (!ref($y) and CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
         my $r = Math::GMPz::Rmpz_init();
@@ -1814,7 +3233,11 @@ sub iadd ($$) {
         return bless \$r;
     }
 
-    $y = _star2mpz($y) // goto &nan;
+    $y = $$y if (ref($y) eq __PACKAGE__);
+
+    if (ref($y) ne 'Math::GMPz') {
+        $y = _star2mpz($y) // goto &nan;
+    }
 
     my $r = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_add($r, $x, $y);
@@ -1828,7 +3251,11 @@ sub iadd ($$) {
 sub isub ($$) {
     my ($x, $y) = @_;
 
-    $x = _star2mpz($x) // goto &nan;
+    $x = $$x if (ref($x) eq __PACKAGE__);
+
+    if (ref($x) ne 'Math::GMPz') {
+        $x = _star2mpz($x) // goto &nan;
+    }
 
     if (!ref($y) and CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
         my $r = Math::GMPz::Rmpz_init();
@@ -1838,7 +3265,11 @@ sub isub ($$) {
         return bless \$r;
     }
 
-    $y = _star2mpz($y) // goto &nan;
+    $y = $$y if (ref($y) eq __PACKAGE__);
+
+    if (ref($y) ne 'Math::GMPz') {
+        $y = _star2mpz($y) // goto &nan;
+    }
 
     my $r = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_sub($r, $x, $y);
@@ -1856,7 +3287,11 @@ sub imul ($$) {
         ($x, $y) = ($y, $x);
     }
 
-    $x = _star2mpz($x) // goto &nan;
+    $x = $$x if (ref($x) eq __PACKAGE__);
+
+    if (ref($x) ne 'Math::GMPz') {
+        $x = _star2mpz($x) // goto &nan;
+    }
 
     if (!ref($y) and CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
         my $r = Math::GMPz::Rmpz_init();
@@ -1865,7 +3300,11 @@ sub imul ($$) {
         return bless \$r;
     }
 
-    $y = _star2mpz($y) // goto &nan;
+    $y = $$y if (ref($y) eq __PACKAGE__);
+
+    if (ref($y) ne 'Math::GMPz') {
+        $y = _star2mpz($y) // goto &nan;
+    }
 
     my $r = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_mul($r, $x, $y);
@@ -1879,7 +3318,11 @@ sub imul ($$) {
 sub idiv ($$) {
     my ($x, $y) = @_;
 
-    $x = _star2mpz($x) // goto &nan;
+    $x = $$x if (ref($x) eq __PACKAGE__);
+
+    if (ref($x) ne 'Math::GMPz') {
+        $x = _star2mpz($x) // goto &nan;
+    }
 
     if (!ref($y) and CORE::int($y) eq $y and CORE::int($y) and $y < ULONG_MAX and $y > LONG_MIN) {
         my $r = Math::GMPz::Rmpz_init();
@@ -1888,7 +3331,11 @@ sub idiv ($$) {
         return bless \$r;
     }
 
-    $y = _star2mpz($y) // goto &nan;
+    $y = $$y if (ref($y) eq __PACKAGE__);
+
+    if (ref($y) ne 'Math::GMPz') {
+        $y = _star2mpz($y) // goto &nan;
+    }
 
     # Detect division by zero
     Math::GMPz::Rmpz_sgn($y) || do {
@@ -1911,11 +3358,191 @@ sub idiv ($$) {
 }
 
 #
-## POWER
+## POWER (x^y)
 #
 
+sub __pow__ {
+    my ($x, $y) = @_;
+    goto(join('__', ref($x), ref($y) || 'Scalar') =~ tr/:/_/rs);
+
+    #
+    ## GMPq
+    #
+  Math_GMPq__Scalar: {
+
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_pow_ui($r, $x, CORE::abs($y));
+
+        if ($y < 0) {
+            Math::GMPq::Rmpq_sgn($r) || goto &_inf;
+            Math::GMPq::Rmpq_inv($r, $r);
+        }
+
+        return $r;
+    }
+
+  Math_GMPq__Math_GMPq: {
+
+        # Integer power
+        if (Math::GMPq::Rmpq_integer_p($y)) {
+            $y = Math::GMPq::Rmpq_get_d($y);
+            goto Math_GMPq__Scalar;
+        }
+
+        # (-x)^(a/b) is a complex number
+        if (Math::GMPq::Rmpq_sgn($x) < 0) {
+            $x = _mpq2mpc($x);
+            $y = _mpq2mpc($y);
+            goto Math_MPC__Math_MPC;
+        }
+
+        $x = _mpq2mpfr($x);
+        $y = _mpq2mpfr($y);
+
+        goto Math_MPFR__Math_MPFR;
+    }
+
+  Math_GMPq__Math_GMPz: {
+        $y = Math::GMPz::Rmpz_get_d($y);
+        goto Math_GMPq__Scalar;
+    }
+
+  Math_GMPq__Math_MPFR: {
+        $x = _mpq2mpfr($x);
+        goto Math_MPFR__Math_MPFR;
+    }
+
+  Math_GMPq__Math_MPC: {
+        $x = _mpq2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
+
+    #
+    ## GMPz
+    #
+
+  Math_GMPz__Scalar: {
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_pow_ui($r, $x, CORE::abs($y));
+
+        if ($y < 0) {
+            Math::GMPz::Rmpz_sgn($r) || goto &_inf;
+
+            my $q = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_set_z($q, $r);
+            Math::GMPq::Rmpq_inv($q, $q);
+            return $q;
+        }
+
+        return $r;
+    }
+
+  Math_GMPz__Math_GMPz: {
+        $y = Math::GMPz::Rmpz_get_d($y);
+        goto Math_GMPz__Scalar;
+    }
+
+  Math_GMPz__Math_GMPq: {
+
+        if (Math::GMPq::Rmpq_integer_p($y)) {
+            $y = Math::GMPq::Rmpq_get_d($y);
+            goto Math_GMPz__Scalar;
+        }
+
+        $x = _mpz2mpfr($x);
+        $y = _mpq2mpfr($y);
+
+        goto Math_MPFR__Math_MPFR;
+    }
+
+  Math_GMPz__Math_MPFR: {
+        $x = _mpz2mpfr($x);
+        goto Math_MPFR__Math_MPFR;
+    }
+
+  Math_GMPz__Math_MPC: {
+        $x = _mpz2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
+
+    #
+    ## MPFR
+    #
+  Math_MPFR__Math_MPFR: {
+
+        if (    Math::MPFR::Rmpfr_sgn($x) < 0
+            and !Math::MPFR::Rmpfr_integer_p($y)
+            and Math::MPFR::Rmpfr_number_p($y)) {
+            $x = _mpfr2mpc($x);
+            goto Math_MPC__Math_MPFR;
+        }
+
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_pow($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPFR__Scalar: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        $y < 0
+          ? Math::MPFR::Rmpfr_pow_si($r, $x, $y, $ROUND)
+          : Math::MPFR::Rmpfr_pow_ui($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPFR__Math_GMPq: {
+        $y = _mpq2mpfr($y);
+        goto Math_MPFR__Math_MPFR;
+    }
+
+  Math_MPFR__Math_GMPz: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_pow_z($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPFR__Math_MPC: {
+        $x = _mpfr2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
+
+    #
+    ## MPC
+    #
+  Math_MPC__Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_pow($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPC__Scalar: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        $y < 0
+          ? Math::MPC::Rmpc_pow_si($r, $x, $y, $ROUND)
+          : Math::MPC::Rmpc_pow_ui($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPC__Math_MPFR: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_pow_fr($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPC__Math_GMPz: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_pow_z($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPC__Math_GMPq: {
+        $y = _mpq2mpc($y);
+        goto Math_MPC__Math_MPC;
+    }
+}
+
 sub pow ($$) {
-    require Math::AnyNum::pow;
     my ($x, $y) = @_;
 
     $x =
@@ -1963,7 +3590,11 @@ sub ipow ($$) {
         return bless \$r;
     }
 
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // (goto &nan);
+    $x = $$x if (ref($x) eq __PACKAGE__);
+
+    if (ref($x) ne 'Math::GMPz') {
+        $x = _star2mpz($x) // goto &nan;
+    }
 
     my $r = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_pow_ui($r, $x, $y < 0 ? -$y : $y);
@@ -1998,10 +3629,9 @@ sub ipow2 ($) {
     }
 
     goto &zero if $n < 0;
-    state $one = Math::GMPz::Rmpz_init_set_ui_nobless(1);
 
     my $r = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_mul_2exp($r, $one, $n);
+    Math::GMPz::Rmpz_setbit($r, $n);
     bless \$r;
 }
 
@@ -2037,8 +3667,6 @@ sub ipow10 ($) {
 #
 
 sub root ($$) {
-    require Math::AnyNum::pow;
-    require Math::AnyNum::inv;
     my ($x, $y) = @_;
 
     $x =
@@ -2058,8 +3686,89 @@ sub root ($$) {
 ## Polygonal root
 #
 
+sub __polygonal_root__ {
+    my ($n, $k, $second) = @_;
+    goto(join('__', ref($n), ref($k)) =~ tr/:/_/rs);
+
+    # polygonal_root(n, k)
+    #   = ((k - 4) ± sqrt(8 * (k - 2) * n + (k - 4)^2)) / (2 * (k - 2))
+
+  Math_MPFR__Math_MPFR: {
+        my $t = Math::MPFR::Rmpfr_init2($PREC);
+        my $u = Math::MPFR::Rmpfr_init2($PREC);
+
+        Math::MPFR::Rmpfr_sub_ui($u, $k, 2, $ROUND);    # u = k-2
+        Math::MPFR::Rmpfr_mul($t, $n, $u, $ROUND);      # t = n*u
+        Math::MPFR::Rmpfr_mul_2ui($t, $t, 3, $ROUND);   # t = t*8
+
+        Math::MPFR::Rmpfr_sub_ui($u, $u, 2, $ROUND);    # u = u-2
+        Math::MPFR::Rmpfr_sqr($u, $u, $ROUND);          # u = u^2
+        Math::MPFR::Rmpfr_add($t, $t, $u, $ROUND);      # t = t+u
+
+        # Return a complex number for `t < 0`
+        if (Math::MPFR::Rmpfr_sgn($t) < 0) {
+            $n = _mpfr2mpc($n);
+            $k = _mpfr2mpc($k);
+            goto Math_MPC__Math_MPC;
+        }
+
+        Math::MPFR::Rmpfr_sqrt($t, $t, $ROUND);         # t = sqrt(t)
+        Math::MPFR::Rmpfr_sub_ui($u, $k, 4, $ROUND);    # u = k-4
+
+        $second
+          ? Math::MPFR::Rmpfr_sub($t, $u, $t, $ROUND)    # t = u-t
+          : Math::MPFR::Rmpfr_add($t, $t, $u, $ROUND);   # t = t+u
+
+        Math::MPFR::Rmpfr_add_ui($u, $u, 2, $ROUND);     # u = u+2
+        Math::MPFR::Rmpfr_mul_2ui($u, $u, 1, $ROUND);    # u = u*2
+
+        Math::MPFR::Rmpfr_zero_p($u) && return $n;       # `u` is zero
+        Math::MPFR::Rmpfr_div($t, $t, $u, $ROUND);       # t = t/u
+        return $t;
+    }
+
+  Math_MPFR__Math_MPC: {
+        $n = _mpfr2mpc($n);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_MPC__Math_MPFR: {
+        $k = _mpfr2mpc($k);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_MPC__Math_MPC: {
+        my $t = Math::MPC::Rmpc_init2($PREC);
+        my $u = Math::MPC::Rmpc_init2($PREC);
+
+        Math::MPC::Rmpc_sub_ui($u, $k, 2, $ROUND);    # u = k-2
+        Math::MPC::Rmpc_mul($t, $n, $u, $ROUND);      # t = n*u
+        Math::MPC::Rmpc_mul_2ui($t, $t, 3, $ROUND);   # t = t*8
+
+        Math::MPC::Rmpc_sub_ui($u, $u, 2, $ROUND);    # u = u-2
+        Math::MPC::Rmpc_sqr($u, $u, $ROUND);          # u = u^2
+        Math::MPC::Rmpc_add($t, $t, $u, $ROUND);      # t = t+u
+
+        Math::MPC::Rmpc_sqrt($t, $t, $ROUND);         # t = sqrt(t)
+        Math::MPC::Rmpc_sub_ui($u, $k, 4, $ROUND);    # u = k-4
+
+        $second
+          ? Math::MPC::Rmpc_sub($t, $u, $t, $ROUND)    # t = u-t
+          : Math::MPC::Rmpc_add($t, $t, $u, $ROUND);   # t = t+u
+
+        Math::MPC::Rmpc_add_ui($u, $u, 2, $ROUND);     # u = u+2
+        Math::MPC::Rmpc_mul_2ui($u, $u, 1, $ROUND);    # u = u*2
+
+        if (Math::MPC::Rmpc_cmp_si($t, 0) == 0) {      # `u` is zero
+            return $n;
+        }
+
+        Math::MPC::Rmpc_div($t, $t, $u, $ROUND);       # t = t/u
+        return $t;
+    }
+}
+
 sub polygonal_root ($$) {
-    require Math::AnyNum::polygonal_root;
     bless \__polygonal_root__(_star2mpfr_mpc($_[0]), _star2mpfr_mpc($_[1]));
 }
 
@@ -2068,7 +3777,6 @@ sub polygonal_root ($$) {
 #
 
 sub polygonal_root2 ($$) {
-    require Math::AnyNum::polygonal_root;
     bless \__polygonal_root__(_star2mpfr_mpc($_[0]), _star2mpfr_mpc($_[1]), 1);
 }
 
@@ -2079,7 +3787,11 @@ sub polygonal_root2 ($$) {
 sub isqrt ($) {
     my ($x) = @_;
 
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // goto &nan;
+    $x = $$x if (ref($x) eq __PACKAGE__);
+
+    if (ref($x) ne 'Math::GMPz') {
+        $x = _star2mpz($x) // goto &nan;
+    }
 
     Math::GMPz::Rmpz_sgn($x) < 0 and goto &nan;
     my $r = Math::GMPz::Rmpz_init();
@@ -2093,7 +3805,13 @@ sub isqrt ($) {
 
 sub icbrt ($) {
     my ($x) = @_;
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // goto &nan;
+
+    $x = $$x if (ref($x) eq __PACKAGE__);
+
+    if (ref($x) ne 'Math::GMPz') {
+        $x = _star2mpz($x) // goto &nan;
+    }
+
     my $r = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_root($r, $x, 3);
     bless \$r;
@@ -2106,7 +3824,11 @@ sub icbrt ($) {
 sub iroot ($$) {
     my ($x, $y) = @_;
 
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // goto &nan;
+    $x = $$x if (ref($x) eq __PACKAGE__);
+
+    if (ref($x) ne 'Math::GMPz') {
+        $x = _star2mpz($x) // goto &nan;
+    }
 
     if (!ref($y) and CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
         ## `y`is native integer
@@ -2162,7 +3884,11 @@ sub iroot ($$) {
 sub isqrtrem ($) {
     my ($x) = @_;
 
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // return (nan(), nan());
+    $x = $$x if (ref($x) eq __PACKAGE__);
+
+    if (ref($x) ne 'Math::GMPz') {
+        $x = _star2mpz($x) // return (nan(), nan());
+    }
 
     Math::GMPz::Rmpz_sgn($x) < 0
       and return (nan(), nan());
@@ -2182,7 +3908,11 @@ sub isqrtrem ($) {
 sub irootrem ($$) {
     my ($x, $y) = @_;
 
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // return (nan(), nan());
+    $x = $$x if (ref($x) eq __PACKAGE__);
+
+    if (ref($x) ne 'Math::GMPz') {
+        $x = _star2mpz($x) // return (nan(), nan());
+    }
 
     if (!ref($y) and CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
         ## `y` is a native integer
@@ -2248,8 +3978,230 @@ sub irootrem ($$) {
 ## MOD
 #
 
+sub __mod__ {
+    my ($x, $y) = @_;
+    goto(join('__', ref($x), ref($y) || 'Scalar') =~ tr/:/_/rs);
+
+    #
+    ## GMPq
+    #
+  Math_GMPq__Math_GMPq: {
+
+        Math::GMPq::Rmpq_sgn($y)
+          || goto &_nan;
+
+        my $quo = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_div($quo, $x, $y);
+
+        # Floor
+        Math::GMPq::Rmpq_integer_p($quo) || do {
+            my $z = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_set_q($z, $quo);
+            Math::GMPz::Rmpz_sub_ui($z, $z, 1) if Math::GMPq::Rmpq_sgn($quo) < 0;
+            Math::GMPq::Rmpq_set_z($quo, $z);
+        };
+
+        Math::GMPq::Rmpq_mul($quo, $quo, $y);
+        Math::GMPq::Rmpq_sub($quo, $x, $quo);
+
+        return $quo;
+    }
+
+  Math_GMPq__Math_GMPz: {
+
+        Math::GMPz::Rmpz_sgn($y)
+          || goto &_nan;
+
+        my $quo = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_div_z($quo, $x, $y);
+
+        # Floor
+        Math::GMPq::Rmpq_integer_p($quo) || do {
+            my $z = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_set_q($z, $quo);
+            Math::GMPz::Rmpz_sub_ui($z, $z, 1) if Math::GMPq::Rmpq_sgn($quo) < 0;
+            Math::GMPq::Rmpq_set_z($quo, $z);
+        };
+
+        Math::GMPq::Rmpq_mul_z($quo, $quo, $y);
+        Math::GMPq::Rmpq_sub($quo, $x, $quo);
+
+        return $quo;
+    }
+
+  Math_GMPq__Math_MPFR: {
+        $x = _mpq2mpfr($x);
+        goto Math_MPFR__Math_MPFR;
+    }
+
+  Math_GMPq__Math_MPC: {
+        $x = _mpq2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
+
+    #
+    ## GMPz
+    #
+  Math_GMPz__Math_GMPz: {
+
+        if (Math::GMPz::Rmpz_fits_ulong_p($y)) {
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_mod_ui($r, $x, Math::GMPz::Rmpz_get_ui($y) || goto &_nan);
+            return $r;
+        }
+
+        my $sgn_y = Math::GMPz::Rmpz_sgn($y) || goto &_nan;
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mod($r, $x, $y);
+
+        if (!Math::GMPz::Rmpz_sgn($r)) {
+            ## ok
+        }
+        elsif ($sgn_y < 0) {
+            Math::GMPz::Rmpz_add($r, $r, $y);
+        }
+
+        return $r;
+    }
+
+  Math_GMPz__Scalar: {
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mod_ui($r, $x, $y);
+        return $r;
+    }
+
+  Math_GMPz__Math_GMPq: {
+        $x = _mpz2mpq($x);
+        goto Math_GMPq__Math_GMPq;
+    }
+
+  Math_GMPz__Math_MPFR: {
+        $x = _mpz2mpfr($x);
+        goto Math_MPFR__Math_MPFR;
+    }
+
+  Math_GMPz__Math_MPC: {
+        $x = _mpz2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
+
+    #
+    ## MPFR
+    #
+  Math_MPFR__Math_MPFR: {
+
+        my $quo = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_div($quo, $x, $y, $ROUND);
+        Math::MPFR::Rmpfr_floor($quo, $quo);
+        Math::MPFR::Rmpfr_mul($quo, $quo, $y, $ROUND);
+        Math::MPFR::Rmpfr_sub($quo, $x, $quo, $ROUND);
+
+        return $quo;
+    }
+
+  Math_MPFR__Scalar: {
+
+        my $quo = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_div_ui($quo, $x, $y, $ROUND);
+        Math::MPFR::Rmpfr_floor($quo, $quo);
+        Math::MPFR::Rmpfr_mul_ui($quo, $quo, $y, $ROUND);
+        Math::MPFR::Rmpfr_sub($quo, $x, $quo, $ROUND);
+
+        return $quo;
+    }
+
+  Math_MPFR__Math_GMPq: {
+
+        my $quo = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_div_q($quo, $x, $y, $ROUND);
+        Math::MPFR::Rmpfr_floor($quo, $quo);
+        Math::MPFR::Rmpfr_mul_q($quo, $quo, $y, $ROUND);
+        Math::MPFR::Rmpfr_sub($quo, $x, $quo, $ROUND);
+
+        return $quo;
+    }
+
+  Math_MPFR__Math_GMPz: {
+
+        my $quo = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_div_z($quo, $x, $y, $ROUND);
+        Math::MPFR::Rmpfr_floor($quo, $quo);
+        Math::MPFR::Rmpfr_mul_z($quo, $quo, $y, $ROUND);
+        Math::MPFR::Rmpfr_sub($quo, $x, $quo, $ROUND);
+
+        return $quo;
+    }
+
+  Math_MPFR__Math_MPC: {
+        $x = _mpfr2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
+
+    #
+    ## MPC
+    #
+  Math_MPC__Math_MPC: {
+
+        my $quo = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_div($quo, $x, $y, $ROUND);
+
+        my $real = Math::MPFR::Rmpfr_init2($PREC);
+        my $imag = Math::MPFR::Rmpfr_init2($PREC);
+
+        Math::MPC::RMPC_RE($real, $quo);
+        Math::MPC::RMPC_IM($imag, $quo);
+
+        Math::MPFR::Rmpfr_floor($real, $real);
+        Math::MPFR::Rmpfr_floor($imag, $imag);
+
+        Math::MPC::Rmpc_set_fr_fr($quo, $real, $imag, $ROUND);
+
+        Math::MPC::Rmpc_mul($quo, $quo, $y, $ROUND);
+        Math::MPC::Rmpc_sub($quo, $x, $quo, $ROUND);
+
+        return $quo;
+    }
+
+  Math_MPC__Scalar: {
+
+        my $quo = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_div_ui($quo, $x, $y, $ROUND);
+
+        my $real = Math::MPFR::Rmpfr_init2($PREC);
+        my $imag = Math::MPFR::Rmpfr_init2($PREC);
+
+        Math::MPC::RMPC_RE($real, $quo);
+        Math::MPC::RMPC_IM($imag, $quo);
+
+        Math::MPFR::Rmpfr_floor($real, $real);
+        Math::MPFR::Rmpfr_floor($imag, $imag);
+
+        Math::MPC::Rmpc_set_fr_fr($quo, $real, $imag, $ROUND);
+
+        Math::MPC::Rmpc_mul_ui($quo, $quo, $y, $ROUND);
+        Math::MPC::Rmpc_sub($quo, $x, $quo, $ROUND);
+
+        return $quo;
+    }
+
+  Math_MPC__Math_MPFR: {
+        $y = _mpfr2mpc($y);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_MPC__Math_GMPz: {
+        $y = _mpz2mpc($y);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_MPC__Math_GMPq: {
+        $y = _mpq2mpc($y);
+        goto Math_MPC__Math_MPC;
+    }
+}
+
 sub mod ($$) {
-    require Math::AnyNum::mod;
     my ($x, $y) = @_;
 
     $x =
@@ -2283,7 +4235,11 @@ sub mod ($$) {
 sub imod ($$) {
     my ($x, $y) = @_;
 
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // (goto &nan);
+    $x = $$x if (ref($x) eq __PACKAGE__);
+
+    if (ref($x) ne 'Math::GMPz') {
+        $x = _star2mpz($x) // goto &nan;
+    }
 
     if (!ref($y) and CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
 
@@ -2305,7 +4261,11 @@ sub imod ($$) {
         return bless \$r;
     }
 
-    $y = (ref($y) eq __PACKAGE__ ? _any2mpz($$y) : _star2mpz($y)) // goto &nan;
+    $y = $$y if (ref($y) eq __PACKAGE__);
+
+    if (ref($y) ne 'Math::GMPz') {
+        $y = _star2mpz($y) // goto &nan;
+    }
 
     my $sign_y = Math::GMPz::Rmpz_sgn($y) || goto &nan;
 
@@ -2327,11 +4287,7 @@ sub imod ($$) {
 #
 
 sub polymod {
-    require Math::AnyNum::mod;
-    require Math::AnyNum::div;
-    require Math::AnyNum::sub;
-
-    my @list = map { _star2obj($_) } @_;
+    my @list = map { ref($_) eq __PACKAGE__ ? $$_ : _star2obj($_) } @_;
 
     my @r;
     my $x = shift(@list);
@@ -2356,8 +4312,17 @@ sub polymod {
 sub divmod ($$) {
     my ($x, $y) = @_;
 
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // return (nan(), nan());
-    $y = (ref($y) eq __PACKAGE__ ? _any2mpz($$y) : _star2mpz($y)) // return (nan(), nan());
+    $x = $$x if (ref($x) eq __PACKAGE__);
+
+    if (ref($x) ne 'Math::GMPz') {
+        $x = _star2mpz($x) // return (nan(), nan());
+    }
+
+    $y = $$y if (ref($y) eq __PACKAGE__);
+
+    if (ref($y) ne 'Math::GMPz') {
+        $y = _star2mpz($y) // return (nan(), nan());
+    }
 
     Math::GMPz::Rmpz_sgn($y)
       || return (nan(), nan());
@@ -2375,7 +4340,6 @@ sub divmod ($$) {
 #
 
 sub is_div ($$) {
-    require Math::AnyNum::eq;
     my ($x, $y) = @_;
 
     if (ref($x) eq __PACKAGE__ and ref($$x) eq 'Math::GMPz') {
@@ -2389,7 +4353,7 @@ sub is_div ($$) {
         }
     }
 
-    (@_) = (${mod($x, $y)}, 0);
+    @_ = (${mod($x, $y)}, 0);
     goto &__eq__;
 }
 
@@ -2397,82 +4361,332 @@ sub is_div ($$) {
 ## SPECIAL
 #
 
+#
+## LOG
+#
+
+sub __log__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+
+        # Complex for x < 0
+        if (Math::MPFR::Rmpfr_sgn($x) < 0) {
+            my $r = _mpfr2mpc($x);
+            Math::MPC::Rmpc_log($r, $r, $ROUND);
+            return $r;
+        }
+
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_log($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_log($r, $x, $ROUND);
+        return $r;
+    }
+
+}
+
+#
+## LOG_2
+#
+
+sub __log2__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+
+        # Complex for x < 0
+        if (Math::MPFR::Rmpfr_sgn($x) < 0) {
+            $x = _mpfr2mpc($x);
+            goto Math_MPC;
+        }
+
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_log2($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r   = Math::MPC::Rmpc_init2($PREC);
+        my $ln2 = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_const_log2($ln2, $ROUND);
+        Math::MPC::Rmpc_log($r, $x, $ROUND);
+        Math::MPC::Rmpc_div_fr($r, $r, $ln2, $ROUND);
+        return $r;
+    }
+}
+
+#
+## LOG_10
+#
+
+sub __log10__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+
+        # Complex for x < 0
+        if (Math::MPFR::Rmpfr_sgn($x) < 0) {
+            $x = _mpfr2mpc($x);
+            goto Math_MPC;
+        }
+
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_log10($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC: {
+        state $MPC_VERSION = Math::MPC::MPC_VERSION();
+
+        my $r = Math::MPC::Rmpc_init2($PREC);
+
+        if ($MPC_VERSION >= 65536) {    # available only in mpc>=1.0.0
+            Math::MPC::Rmpc_log10($r, $x, $ROUND);
+        }
+        else {
+            my $ln10 = Math::MPFR::Rmpfr_init2($PREC);
+            Math::MPFR::Rmpfr_set_ui($ln10, 10, $ROUND);
+            Math::MPFR::Rmpfr_log($ln10, $ln10, $ROUND);
+            Math::MPC::Rmpc_log($r, $x, $ROUND);
+            Math::MPC::Rmpc_div_fr($r, $r, $ln10, $ROUND);
+        }
+
+        return $r;
+    }
+}
+
 sub ln {    # used in overloading
-    require Math::AnyNum::log;
     bless \__log__(_star2mpfr_mpc($_[0]));
 }
 
 sub log2 ($) {
-    require Math::AnyNum::log;
     bless \__log2__(_star2mpfr_mpc($_[0]));
 }
 
 sub log10 ($) {
-    require Math::AnyNum::log;
     bless \__log10__(_star2mpfr_mpc($_[0]));
 }
 
-sub length ($) {
-    my ($z) = _star2mpz($_[0]) // return -1;
-    CORE::length(Math::GMPz::Rmpz_get_str($z, 10)) - (Math::GMPz::Rmpz_sgn($z) < 0 ? 1 : 0);
-}
-
 sub log (_;$) {
-    require Math::AnyNum::log;
     my ($x, $y) = @_;
 
     if (!defined($y)) {
         return bless \__log__(_star2mpfr_mpc($x));
     }
 
-    require Math::AnyNum::div;
     bless \__div__(__log__(_star2mpfr_mpc($x)), __log__(_star2mpfr_mpc($y)));
 }
 
 #
-## ILOG
+## Integer logarithm to a given base
 #
 
+sub __ilog__ {
+    my ($x, $y) = @_;
+
+    # ilog(x, y <= 1) = NaN
+    Math::GMPz::Rmpz_cmp_ui($y, 1) <= 0 and goto &_nan;
+
+    # ilog(x <= 0, y) = NaN
+    Math::GMPz::Rmpz_sgn($x) <= 0 and goto &_nan;
+
+    # Return faster for y <= 62
+    if (Math::GMPz::Rmpz_cmp_ui($y, 62) <= 0) {
+
+        $y = Math::GMPz::Rmpz_get_ui($y);
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $e = (Math::GMPz::Rmpz_sizeinbase($x, $y) || goto &_nan) - 1;
+
+        if ($e > 0) {
+            Math::GMPz::Rmpz_ui_pow_ui($t, $y, $e);
+            Math::GMPz::Rmpz_cmp($t, $x) > 0 and --$e;
+        }
+
+        Math::GMPz::Rmpz_set_ui($t, $e);
+        return $t;
+    }
+
+    my $e = 0;
+    my $t = Math::GMPz::Rmpz_init();
+
+    state $round_z = Math::MPFR::MPFR_RNDZ();
+
+    state $logx = Math::MPFR::Rmpfr_init2_nobless(64);
+    state $logy = Math::MPFR::Rmpfr_init2_nobless(64);
+
+    Math::MPFR::Rmpfr_set_z($logx, $x, $round_z);
+    Math::MPFR::Rmpfr_set_z($logy, $y, $round_z);
+
+    Math::MPFR::Rmpfr_log($logx, $logx, $round_z);
+    Math::MPFR::Rmpfr_log($logy, $logy, $round_z);
+
+    Math::MPFR::Rmpfr_div($logx, $logx, $logy, $round_z);
+
+    if (Math::MPFR::Rmpfr_fits_ulong_p($logx, $round_z)) {
+        $e = Math::MPFR::Rmpfr_get_ui($logx, $round_z) - 1;
+        Math::GMPz::Rmpz_pow_ui($t, $y, $e + 1);
+    }
+    else {
+        Math::GMPz::Rmpz_set($t, $y);
+    }
+
+    for (; Math::GMPz::Rmpz_cmp($t, $x) <= 0 ; Math::GMPz::Rmpz_mul($t, $t, $y)) {
+        ++$e;
+    }
+
+    Math::GMPz::Rmpz_set_ui($t, $e);
+    $t;
+}
+
 sub ilog2 ($) {
-    require Math::AnyNum::ilog;
+    my ($x) = @_;
+
     state $two = Math::GMPz::Rmpz_init_set_ui(2);
-    bless \__ilog__((_star2mpz($_[0]) // goto &nan), $two);
+
+    $x = $$x if (ref($x) eq __PACKAGE__);
+
+    if (ref($x) ne 'Math::GMPz') {
+        $x = _star2mpz($x) // goto &nan;
+    }
+
+    bless \__ilog__($x, $two);
 }
 
 sub ilog10 ($) {
-    require Math::AnyNum::ilog;
+    my ($x) = @_;
+
     state $ten = Math::GMPz::Rmpz_init_set_ui(10);
-    bless \__ilog__((_star2mpz($_[0]) // goto &nan), $ten);
+
+    $x = $$x if (ref($x) eq __PACKAGE__);
+
+    if (ref($x) ne 'Math::GMPz') {
+        $x = _star2mpz($x) // goto &nan;
+    }
+
+    bless \__ilog__($x, $ten);
 }
 
 sub ilog ($;$) {
     my ($x, $y) = @_;
 
     if (!defined($y)) {
-        require Math::AnyNum::log;
         return bless \(_any2mpz(__log__(_star2mpfr_mpc($x))) // goto &nan);
     }
 
-    require Math::AnyNum::ilog;
-    bless \__ilog__((_star2mpz($x) // goto &nan), (_star2mpz($y) // goto &nan));
+    $x = $$x if (ref($x) eq __PACKAGE__);
+
+    if (ref($x) ne 'Math::GMPz') {
+        $x = _star2mpz($x) // goto &nan;
+    }
+
+    $y = $$y if (ref($y) eq __PACKAGE__);
+
+    if (ref($y) ne 'Math::GMPz') {
+        $y = _star2mpz($y) // goto &nan;
+    }
+
+    bless \__ilog__($x, $y);
+}
+
+sub length ($) {
+    my ($x) = @_;
+
+    $x = $$x if (ref($x) eq __PACKAGE__);
+
+    if (ref($x) ne 'Math::GMPz') {
+        $x = _star2mpz($x) // return -1;
+    }
+
+    CORE::length(Math::GMPz::Rmpz_get_str($x, 10) =~ s/^-//r);
 }
 
 #
-## SQRT
+## Square root
 #
 
+sub __sqrt__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+
+        # Complex for x < 0
+        if (Math::MPFR::Rmpfr_sgn($x) < 0) {
+            my $r = _mpfr2mpc($x);
+            Math::MPC::Rmpc_sqrt($r, $r, $ROUND);
+            return $r;
+        }
+
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_sqrt($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_sqrt($r, $x, $ROUND);
+        return $r;
+    }
+}
+
 sub sqrt {    # used in overloading
-    require Math::AnyNum::sqrt;
     bless \__sqrt__(_star2mpfr_mpc($_[0]));
 }
 
+#
+## Cube root
+#
+
+sub __cbrt__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+
+        # Complex for x < 0
+        if (Math::MPFR::Rmpfr_sgn($x) < 0) {
+            $x = _mpfr2mpc($x);
+            goto Math_MPC;
+        }
+
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_cbrt($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC: {
+
+        state $three_inv = do {
+            my $r = Math::MPC::Rmpc_init2_nobless($PREC);
+            Math::MPC::Rmpc_set_ui($r, 3, $ROUND);
+            Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+            $r;
+        };
+
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_pow($r, $x, $three_inv, $ROUND);
+        return $r;
+    }
+}
+
 sub cbrt ($) {
-    require Math::AnyNum::cbrt;
     bless \__cbrt__(_star2mpfr_mpc($_[0]));
 }
 
+#
+## Square (x^2)
+#
+
 sub sqr ($) {
-    require Math::AnyNum::mul;
     my ($x) = @_;
 
     $x =
@@ -2483,8 +4697,40 @@ sub sqr ($) {
     bless \__mul__($x, $x);
 }
 
+#
+## Normalized value: norm(a + b*i) = a^2 + b^2
+#
+
+sub __norm__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPC: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPC::Rmpc_norm($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_sqr($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_GMPz: {
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mul($r, $x, $x);
+        return $r;
+    }
+
+  Math_GMPq: {
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_mul($r, $x, $x);
+        return $r;
+    }
+}
+
 sub norm ($) {
-    require Math::AnyNum::norm;
     my ($x) = @_;
 
     $x =
@@ -2495,13 +4741,32 @@ sub norm ($) {
     bless \__norm__($x);
 }
 
+#
+## Natural exponentiation function (e^x)
+#
+
+sub __exp__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_exp($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_exp($r, $x, $ROUND);
+        return $r;
+    }
+}
+
 sub exp {    # used in overloading
-    require Math::AnyNum::exp;
     bless \__exp__(_star2mpfr_mpc($_[0]));
 }
 
 sub exp2 ($) {
-    require Math::AnyNum::pow;
     my ($x) = @_;
 
     state $base = Math::GMPz::Rmpz_init_set_ui(2);
@@ -2518,7 +4783,6 @@ sub exp2 ($) {
 }
 
 sub exp10 ($) {
-    require Math::AnyNum::pow;
     my ($x) = @_;
 
     state $base = Math::GMPz::Rmpz_init_set_ui(10);
@@ -2534,8 +4798,50 @@ sub exp10 ($) {
     }
 }
 
+#
+## floor(x) function -- round towards -Infinity
+#
+
+sub __floor__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_floor($r, $x);
+        return $r;
+    }
+
+  Math_GMPq: {
+        my $z = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_set_q($z, $x);
+        Math::GMPq::Rmpq_integer_p($x) && return $z;
+        Math::GMPz::Rmpz_sub_ui($z, $z, 1) if Math::GMPq::Rmpq_sgn($x) < 0;
+        return $z;
+    }
+
+  Math_MPC: {
+
+        my $real = Math::MPFR::Rmpfr_init2($PREC);
+        my $imag = Math::MPFR::Rmpfr_init2($PREC);
+
+        Math::MPC::RMPC_RE($real, $x);
+        Math::MPC::RMPC_IM($imag, $x);
+
+        Math::MPFR::Rmpfr_floor($real, $real);
+        Math::MPFR::Rmpfr_floor($imag, $imag);
+
+        if (Math::MPFR::Rmpfr_zero_p($imag)) {
+            return $real;
+        }
+
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_fr_fr($r, $real, $imag, $ROUND);
+        return $r;
+    }
+}
+
 sub floor ($) {
-    require Math::AnyNum::floor;
     my ($x) = @_;
 
     if (ref($x) ne __PACKAGE__) {
@@ -2546,8 +4852,50 @@ sub floor ($) {
     bless \__floor__($$x);
 }
 
+#
+## ceil(x) function -- round towards +Infinity
+#
+
+sub __ceil__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_ceil($r, $x);
+        return $r;
+    }
+
+  Math_GMPq: {
+        my $z = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_set_q($z, $x);
+        Math::GMPq::Rmpq_integer_p($x) && return $z;
+        Math::GMPz::Rmpz_add_ui($z, $z, 1) if Math::GMPq::Rmpq_sgn($x) > 0;
+        return $z;
+    }
+
+  Math_MPC: {
+
+        my $real = Math::MPFR::Rmpfr_init2($PREC);
+        my $imag = Math::MPFR::Rmpfr_init2($PREC);
+
+        Math::MPC::RMPC_RE($real, $x);
+        Math::MPC::RMPC_IM($imag, $x);
+
+        Math::MPFR::Rmpfr_ceil($real, $real);
+        Math::MPFR::Rmpfr_ceil($imag, $imag);
+
+        if (Math::MPFR::Rmpfr_zero_p($imag)) {
+            return $real;
+        }
+
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_fr_fr($r, $real, $imag, $ROUND);
+        return $r;
+    }
+}
+
 sub ceil ($) {
-    require Math::AnyNum::ceil;
     my ($x) = @_;
 
     if (ref($x) ne __PACKAGE__) {
@@ -2562,23 +4910,96 @@ sub ceil ($) {
 ## sin / sinh / asin / asinh
 #
 
+sub __sin__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_sin($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_sin($r, $x, $ROUND);
+        return $r;
+    }
+}
+
 sub sin {    # used in overloading
-    require Math::AnyNum::sin;
     bless \__sin__(_star2mpfr_mpc($_[0]));
 }
 
+sub __sinh__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_sinh($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_sinh($r, $x, $ROUND);
+        return $r;
+    }
+}
+
 sub sinh ($) {
-    require Math::AnyNum::sinh;
     bless \__sinh__(_star2mpfr_mpc($_[0]));
 }
 
+sub __asin__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+
+        # Return a complex number for x < -1 or x > 1
+        if (   Math::MPFR::Rmpfr_cmp_ui($x, 1) > 0
+            or Math::MPFR::Rmpfr_cmp_si($x, -1) < 0) {
+            my $r = _mpfr2mpc($x);
+            Math::MPC::Rmpc_asin($r, $r, $ROUND);
+            return $r;
+        }
+
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_asin($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_asin($r, $x, $ROUND);
+        return $r;
+    }
+}
+
 sub asin ($) {
-    require Math::AnyNum::asin;
     bless \__asin__(_star2mpfr_mpc($_[0]));
 }
 
+sub __asinh__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_asinh($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_asinh($r, $x, $ROUND);
+        return $r;
+    }
+}
+
 sub asinh ($) {
-    require Math::AnyNum::asinh;
     bless \__asinh__(_star2mpfr_mpc($_[0]));
 }
 
@@ -2586,23 +5007,104 @@ sub asinh ($) {
 ## cos / cosh / acos / acosh
 #
 
+sub __cos__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_cos($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_cos($r, $x, $ROUND);
+        return $r;
+    }
+}
+
 sub cos {    # used in overloading
-    require Math::AnyNum::cos;
     bless \__cos__(_star2mpfr_mpc($_[0]));
 }
 
+sub __cosh__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_cosh($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_cosh($r, $x, $ROUND);
+        return $r;
+    }
+}
+
 sub cosh ($) {
-    require Math::AnyNum::cosh;
     bless \__cosh__(_star2mpfr_mpc($_[0]));
 }
 
+sub __acos__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+
+        # Return a complex number for x < -1 or x > 1
+        if (   Math::MPFR::Rmpfr_cmp_ui($x, 1) > 0
+            or Math::MPFR::Rmpfr_cmp_si($x, -1) < 0) {
+            my $r = _mpfr2mpc($x);
+            Math::MPC::Rmpc_acos($r, $r, $ROUND);
+            return $r;
+        }
+
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_acos($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_acos($r, $x, $ROUND);
+        return $r;
+    }
+}
+
 sub acos ($) {
-    require Math::AnyNum::acos;
     bless \__acos__(_star2mpfr_mpc($_[0]));
 }
 
+sub __acosh__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+
+        # Return a complex number for x < 1
+        if (Math::MPFR::Rmpfr_cmp_ui($x, 1) < 0) {
+            my $r = _mpfr2mpc($x);
+            Math::MPC::Rmpc_acosh($r, $r, $ROUND);
+            return $r;
+        }
+
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_acosh($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_acosh($r, $x, $ROUND);
+        return $r;
+    }
+}
+
 sub acosh ($) {
-    require Math::AnyNum::acosh;
     bless \__acosh__(_star2mpfr_mpc($_[0]));
 }
 
@@ -2610,28 +5112,145 @@ sub acosh ($) {
 ## tan / tanh / atan / atanh
 #
 
+sub __tan__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_tan($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_tan($r, $x, $ROUND);
+        return $r;
+    }
+}
+
 sub tan ($) {
-    require Math::AnyNum::tan;
     bless \__tan__(_star2mpfr_mpc($_[0]));
 }
 
+sub __tanh__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_tanh($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_tanh($r, $x, $ROUND);
+        return $r;
+    }
+}
+
 sub tanh ($) {
-    require Math::AnyNum::tanh;
     bless \__tanh__(_star2mpfr_mpc($_[0]));
 }
 
+sub __atan__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_atan($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_atan($r, $x, $ROUND);
+        return $r;
+    }
+}
+
 sub atan ($) {
-    require Math::AnyNum::atan;
     bless \__atan__(_star2mpfr_mpc($_[0]));
 }
 
+sub __atanh__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+
+        # Return a complex number for x < -1 or x > 1
+        if (   Math::MPFR::Rmpfr_cmp_ui($x, +1) > 0
+            or Math::MPFR::Rmpfr_cmp_si($x, -1) < 0) {
+            my $r = _mpfr2mpc($x);
+            Math::MPC::Rmpc_atanh($r, $r, $ROUND);
+            return $r;
+        }
+
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_atanh($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_atanh($r, $x, $ROUND);
+        return $r;
+    }
+}
+
 sub atanh ($) {
-    require Math::AnyNum::atanh;
     bless \__atanh__(_star2mpfr_mpc($_[0]));
 }
 
+sub __atan2__ {
+    my ($x, $y) = @_;
+    goto(join('__', ref($x), ref($y)) =~ tr/:/_/rs);
+
+  Math_MPFR__Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_atan2($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPFR__Math_MPC: {
+        $x = _mpfr2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_MPC__Math_MPFR: {
+        $y = _mpfr2mpc($y);
+        goto Math_MPC__Math_MPC;
+    }
+
+    #
+    ## atan2(x, y) = -i * log((y + x*i) / sqrt(x^2 + y^2))
+    #
+  Math_MPC__Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+
+        Math::MPC::Rmpc_mul_i($r, $x, 1, $ROUND);
+        Math::MPC::Rmpc_add($r, $r, $y, $ROUND);
+
+        my $t1 = Math::MPC::Rmpc_init2($PREC);
+        my $t2 = Math::MPC::Rmpc_init2($PREC);
+
+        Math::MPC::Rmpc_sqr($t1, $x, $ROUND);
+        Math::MPC::Rmpc_sqr($t2, $y, $ROUND);
+        Math::MPC::Rmpc_add($t1, $t1, $t2, $ROUND);
+        Math::MPC::Rmpc_sqrt($t1, $t1, $ROUND);
+
+        Math::MPC::Rmpc_div($r, $r, $t1, $ROUND);
+        Math::MPC::Rmpc_log($r, $r, $ROUND);
+        Math::MPC::Rmpc_mul_i($r, $r, -1, $ROUND);
+
+        return $r;
+    }
+}
+
 sub atan2 ($$) {
-    require Math::AnyNum::atan2;
     bless \__atan2__(_star2mpfr_mpc($_[0]), _star2mpfr_mpc($_[1]));
 }
 
@@ -2639,23 +5258,115 @@ sub atan2 ($$) {
 ## sec / sech / asec / asech
 #
 
+sub __sec__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_sec($r, $x, $ROUND);
+        return $r;
+    }
+
+    # sec(x) = 1/cos(x)
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_cos($r, $x, $ROUND);
+        Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+        return $r;
+    }
+}
+
 sub sec ($) {
-    require Math::AnyNum::sec;
     bless \__sec__(_star2mpfr_mpc($_[0]));
 }
 
+sub __sech__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_sech($r, $x, $ROUND);
+        return $r;
+    }
+
+    # sech(x) = 1/cosh(x)
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_cosh($r, $x, $ROUND);
+        Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+        return $r;
+    }
+}
+
 sub sech ($) {
-    require Math::AnyNum::sech;
     bless \__sech__(_star2mpfr_mpc($_[0]));
 }
 
+sub __asec__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+    # asec(x) = acos(1/x)
+  Math_MPFR: {
+
+        # Return a complex number for x > -1 and x < 1
+        if (    Math::MPFR::Rmpfr_cmp_ui($x, 1) < 0
+            and Math::MPFR::Rmpfr_cmp_si($x, -1) > 0) {
+            $x = _mpfr2mpc($x);
+            goto Math_MPC;
+        }
+
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_ui_div($r, 1, $x, $ROUND);
+        Math::MPFR::Rmpfr_acos($r, $r, $ROUND);
+        return $r;
+    }
+
+    # asec(x) = acos(1/x)
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+        Math::MPC::Rmpc_acos($r, $r, $ROUND);
+        return $r;
+    }
+}
+
 sub asec ($) {
-    require Math::AnyNum::asec;
     bless \__asec__(_star2mpfr_mpc($_[0]));
 }
 
+sub __asech__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+    # asech(x) = acosh(1/x)
+  Math_MPFR: {
+
+        # Return a complex number for x < 0 or x > 1
+        if (   Math::MPFR::Rmpfr_cmp_ui($x, 1) > 0
+            or Math::MPFR::Rmpfr_cmp_ui($x, 0) < 0) {
+            $x = _mpfr2mpc($x);
+            goto Math_MPC;
+        }
+
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_ui_div($r, 1, $x, $ROUND);
+        Math::MPFR::Rmpfr_acosh($r, $r, $ROUND);
+        return $r;
+    }
+
+    # asech(x) = acosh(1/x)
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+        Math::MPC::Rmpc_acosh($r, $r, $ROUND);
+        return $r;
+    }
+}
+
 sub asech ($) {
-    require Math::AnyNum::asech;
     bless \__asech__(_star2mpfr_mpc($_[0]));
 }
 
@@ -2663,23 +5374,107 @@ sub asech ($) {
 ## csc / csch / acsc / acsch
 #
 
+sub __csc__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_csc($r, $x, $ROUND);
+        return $r;
+    }
+
+    # csc(x) = 1/sin(x)
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_sin($r, $x, $ROUND);
+        Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+        return $r;
+    }
+}
+
 sub csc ($) {
-    require Math::AnyNum::csc;
     bless \__csc__(_star2mpfr_mpc($_[0]));
 }
 
+sub __csch__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_csch($r, $x, $ROUND);
+        return $r;
+    }
+
+    # csch(x) = 1/sinh(x)
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_sinh($r, $x, $ROUND);
+        Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+        return $r;
+    }
+}
+
 sub csch ($) {
-    require Math::AnyNum::csch;
     bless \__csch__(_star2mpfr_mpc($_[0]));
 }
 
+sub __acsc__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+    # acsc(x) = asin(1/x)
+  Math_MPFR: {
+
+        # Return a complex number for x > -1 and x < 1
+        if (    Math::MPFR::Rmpfr_cmp_ui($x, 1) < 0
+            and Math::MPFR::Rmpfr_cmp_si($x, -1) > 0) {
+            $x = _mpfr2mpc($x);
+            goto Math_MPC;
+        }
+
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_ui_div($r, 1, $x, $ROUND);
+        Math::MPFR::Rmpfr_asin($r, $r, $ROUND);
+        return $r;
+    }
+
+    # acsc(x) = asin(1/x)
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+        Math::MPC::Rmpc_asin($r, $r, $ROUND);
+        return $r;
+    }
+}
+
 sub acsc ($) {
-    require Math::AnyNum::acsc;
     bless \__acsc__(_star2mpfr_mpc($_[0]));
 }
 
+sub __acsch__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+    # acsch(x) = asinh(1/x)
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_ui_div($r, 1, $x, $ROUND);
+        Math::MPFR::Rmpfr_asinh($r, $r, $ROUND);
+        return $r;
+    }
+
+    # acsch(x) = asinh(1/x)
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+        Math::MPC::Rmpc_asinh($r, $r, $ROUND);
+        return $r;
+    }
+}
+
 sub acsch ($) {
-    require Math::AnyNum::acsch;
     bless \__acsch__(_star2mpfr_mpc($_[0]));
 }
 
@@ -2687,28 +5482,111 @@ sub acsch ($) {
 ## cot / coth / acot / acoth
 #
 
+sub __cot__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_cot($r, $x, $ROUND);
+        return $r;
+    }
+
+    # cot(x) = 1/tan(x)
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_tan($r, $x, $ROUND);
+        Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+        return $r;
+    }
+}
+
 sub cot ($) {
-    require Math::AnyNum::cot;
     bless \__cot__(_star2mpfr_mpc($_[0]));
 }
 
+sub __coth__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_coth($r, $x, $ROUND);
+        return $r;
+    }
+
+    # coth(x) = 1/tanh(x)
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_tanh($r, $x, $ROUND);
+        Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+        return $r;
+    }
+}
+
 sub coth ($) {
-    require Math::AnyNum::coth;
     bless \__coth__(_star2mpfr_mpc($_[0]));
 }
 
+sub __acot__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+    # acot(x) = atan(1/x)
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_ui_div($r, 1, $x, $ROUND);
+        Math::MPFR::Rmpfr_atan($r, $r, $ROUND);
+        return $r;
+    }
+
+    # acot(x) = atan(1/x)
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+        Math::MPC::Rmpc_atan($r, $r, $ROUND);
+        return $r;
+    }
+}
+
 sub acot ($) {
-    require Math::AnyNum::acot;
     bless \__acot__(_star2mpfr_mpc($_[0]));
 }
 
+sub __acoth__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+    # acoth(x) = atanh(1/x)
+  Math_MPFR: {
+
+        # Return a complex number for x > -1 and x < 1
+        if (    Math::MPFR::Rmpfr_cmp_ui($x, 1) < 0
+            and Math::MPFR::Rmpfr_cmp_si($x, -1) > 0) {
+            $x = _mpfr2mpc($x);
+            goto Math_MPC;
+        }
+
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_ui_div($r, 1, $x, $ROUND);
+        Math::MPFR::Rmpfr_atanh($r, $r, $ROUND);
+        return $r;
+    }
+
+    # acoth(x) = atanh(1/x)
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+        Math::MPC::Rmpc_atanh($r, $r, $ROUND);
+        return $r;
+    }
+}
+
 sub acoth ($) {
-    require Math::AnyNum::acoth;
     bless \__acoth__(_star2mpfr_mpc($_[0]));
 }
 
 sub deg2rad ($) {
-    require Math::AnyNum::mul;
     my ($x) = @_;
     my $f = Math::MPFR::Rmpfr_init2($PREC);
     Math::MPFR::Rmpfr_const_pi($f, $ROUND);
@@ -2717,7 +5595,6 @@ sub deg2rad ($) {
 }
 
 sub rad2deg ($) {
-    require Math::AnyNum::mul;
     my ($x) = @_;
     my $f = Math::MPFR::Rmpfr_init2($PREC);
     Math::MPFR::Rmpfr_const_pi($f, $ROUND);
@@ -2795,20 +5672,74 @@ sub zeta ($) {
 }
 
 #
-## eta
+## Dirichlet eta function
 #
 
+# Implemented as:
+#    eta(1) = ln(2)
+#    eta(x) = (1 - 2**(1-x)) * zeta(x)
+
 sub eta ($) {
-    require Math::AnyNum::eta;
-    bless \__eta__(_star2mpfr($_[0]));
+    my $x = _star2mpfr($_[0]);
+
+    my $r        = Math::MPFR::Rmpfr_init2($PREC);
+    my $x_is_int = Math::MPFR::Rmpfr_integer_p($x);
+
+    # Special case for eta(1) = log(2)
+    if ($x_is_int and Math::MPFR::Rmpfr_cmp_ui($x, 1) == 0) {
+        Math::MPFR::Rmpfr_const_log2($r, $ROUND);
+        return bless \$r;
+    }
+
+    my $t = Math::MPFR::Rmpfr_init2($PREC);
+
+    Math::MPFR::Rmpfr_ui_sub($r, 1, $x, $ROUND);
+    Math::MPFR::Rmpfr_ui_pow($r, 2, $r, $ROUND);
+    Math::MPFR::Rmpfr_ui_sub($r, 1, $r, $ROUND);
+
+    if ($x_is_int and Math::MPFR::Rmpfr_fits_ulong_p($x, $ROUND)) {
+        Math::MPFR::Rmpfr_zeta_ui($t, Math::MPFR::Rmpfr_get_ui($x, $ROUND), $ROUND);
+    }
+    else {
+        Math::MPFR::Rmpfr_zeta($t, $x, $ROUND);
+    }
+
+    Math::MPFR::Rmpfr_mul($r, $r, $t, $ROUND);
+    bless \$r;
 }
 
 #
-## beta
+## Beta(x,y) function
 #
+
+# Implemented as:
+#    beta(x,y) = gamma(x)*gamma(y) / gamma(x+y)
+
 sub beta ($$) {
-    require Math::AnyNum::beta;
-    bless \__beta__(_star2mpfr($_[0]), _star2mpfr($_[1]));
+    my $x = _star2mpfr($_[0]);
+    my $y = _star2mpfr($_[1]);
+
+    state $has_beta = (Math::MPFR::MPFR_VERSION_MAJOR() >= 4);
+
+    if ($has_beta) {    # available since mpfr-4.0.0
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_beta($r, $x, $y, $ROUND);
+        return bless \$r;
+    }
+
+    my $t1 = Math::MPFR::Rmpfr_init2($PREC);    # gamma(x+y)
+    my $t2 = Math::MPFR::Rmpfr_init2($PREC);    # gamma(y)
+
+    my $r = Math::MPFR::Rmpfr_init2($PREC);
+
+    Math::MPFR::Rmpfr_add($t1, $x, $y, $ROUND);
+    Math::MPFR::Rmpfr_gamma($t1, $t1, $ROUND);
+    Math::MPFR::Rmpfr_gamma($r,  $x,  $ROUND);
+    Math::MPFR::Rmpfr_gamma($t2, $y,  $ROUND);
+    Math::MPFR::Rmpfr_mul($r, $r, $t2, $ROUND);
+    Math::MPFR::Rmpfr_div($r, $r, $t1, $ROUND);
+
+    bless \$r;
 }
 
 #
@@ -2869,11 +5800,83 @@ sub erfc ($) {
 }
 
 #
-## Lambert W
+## Lambert W function
 #
 
+sub __LambertW__ {
+    my ($x) = @_;
+
+    my $p = Math::MPFR::Rmpfr_init2($PREC);
+    Math::MPFR::Rmpfr_set_str($p, '1e-' . CORE::int($PREC >> 2), 10, $ROUND);
+
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+
+        # Return a complex number for x < -1/e
+        if (Math::MPFR::Rmpfr_cmp_d($x, -1 / CORE::exp(1)) < 0) {
+            $x = _mpfr2mpc($x);
+            goto Math_MPC;
+        }
+
+        Math::MPFR::Rmpfr_set_ui((my $r = Math::MPFR::Rmpfr_init2($PREC)), 1, $ROUND);
+        Math::MPFR::Rmpfr_set_ui((my $y = Math::MPFR::Rmpfr_init2($PREC)), 0, $ROUND);
+
+        my $count = 0;
+        my $tmp   = Math::MPFR::Rmpfr_init2($PREC);
+
+        while (1) {
+            Math::MPFR::Rmpfr_sub($tmp, $r, $y, $ROUND);
+            Math::MPFR::Rmpfr_cmpabs($tmp, $p) <= 0 and last;
+
+            Math::MPFR::Rmpfr_set($y, $r, $ROUND);
+
+            Math::MPFR::Rmpfr_log($tmp, $r, $ROUND);
+            Math::MPFR::Rmpfr_add_ui($tmp, $tmp, 1, $ROUND);
+
+            Math::MPFR::Rmpfr_add($r, $r, $x, $ROUND);
+            Math::MPFR::Rmpfr_div($r, $r, $tmp, $ROUND);
+            last if ++$count > $PREC;
+        }
+
+        Math::MPFR::Rmpfr_log($r, $r, $ROUND);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_sqrt($r, $x, $ROUND);
+        Math::MPC::Rmpc_add_ui($r, $r, 1, $ROUND);
+
+        my $y = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_ui($y, 0, $ROUND);
+
+        my $tmp = Math::MPC::Rmpc_init2($PREC);
+        my $abs = Math::MPFR::Rmpfr_init2($PREC);
+
+        my $count = 0;
+        while (1) {
+            Math::MPC::Rmpc_sub($tmp, $r, $y, $ROUND);
+
+            Math::MPC::Rmpc_abs($abs, $tmp, $ROUND);
+            Math::MPFR::Rmpfr_cmp($abs, $p) <= 0 and last;
+
+            Math::MPC::Rmpc_set($y, $r, $ROUND);
+
+            Math::MPC::Rmpc_log($tmp, $r, $ROUND);
+            Math::MPC::Rmpc_add_ui($tmp, $tmp, 1, $ROUND);
+
+            Math::MPC::Rmpc_add($r, $r, $x, $ROUND);
+            Math::MPC::Rmpc_div($r, $r, $tmp, $ROUND);
+            last if ++$count > $PREC;
+        }
+
+        Math::MPC::Rmpc_log($r, $r, $ROUND);
+        return $r;
+    }
+}
+
 sub LambertW ($) {
-    require Math::AnyNum::LambertW;
     bless \__LambertW__(_star2mpfr_mpc($_[0]));
 }
 
@@ -2881,16 +5884,167 @@ sub LambertW ($) {
 ## lgrt -- logarithmic root
 #
 
+sub __lgrt__ {
+    my ($c) = @_;
+
+    my $p = Math::MPFR::Rmpfr_init2($PREC);
+    Math::MPFR::Rmpfr_set_str($p, '1e-' . CORE::int($PREC >> 2), 10, $ROUND);
+
+    goto(ref($c) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+
+        # Return a complex number for x < e^(-1/e)
+        if (Math::MPFR::Rmpfr_cmp_d($c, CORE::exp(-1 / CORE::exp(1))) < 0) {
+            $c = _mpfr2mpc($c);
+            goto Math_MPC;
+        }
+
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_log($r, $c, $ROUND);
+
+        Math::MPFR::Rmpfr_set_ui((my $x = Math::MPFR::Rmpfr_init2($PREC)), 1, $ROUND);
+        Math::MPFR::Rmpfr_set_ui((my $y = Math::MPFR::Rmpfr_init2($PREC)), 0, $ROUND);
+
+        my $count = 0;
+        my $tmp   = Math::MPFR::Rmpfr_init2($PREC);
+
+        while (1) {
+            Math::MPFR::Rmpfr_sub($tmp, $x, $y, $ROUND);
+            Math::MPFR::Rmpfr_cmpabs($tmp, $p) <= 0 and last;
+
+            Math::MPFR::Rmpfr_set($y, $x, $ROUND);
+
+            Math::MPFR::Rmpfr_log($tmp, $x, $ROUND);
+            Math::MPFR::Rmpfr_add_ui($tmp, $tmp, 1, $ROUND);
+
+            Math::MPFR::Rmpfr_add($x, $x, $r, $ROUND);
+            Math::MPFR::Rmpfr_div($x, $x, $tmp, $ROUND);
+            last if ++$count > $PREC;
+        }
+
+        return $x;
+    }
+
+  Math_MPC: {
+        my $d = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_log($d, $c, $ROUND);
+
+        my $x = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_sqrt($x, $c, $ROUND);
+        Math::MPC::Rmpc_add_ui($x, $x, 1, $ROUND);
+        Math::MPC::Rmpc_log($x, $x, $ROUND);
+
+        my $y = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_ui($y, 0, $ROUND);
+
+        my $tmp = Math::MPC::Rmpc_init2($PREC);
+        my $abs = Math::MPFR::Rmpfr_init2($PREC);
+
+        my $count = 0;
+        while (1) {
+            Math::MPC::Rmpc_sub($tmp, $x, $y, $ROUND);
+
+            Math::MPC::Rmpc_abs($abs, $tmp, $ROUND);
+            Math::MPFR::Rmpfr_cmp($abs, $p) <= 0 and last;
+
+            Math::MPC::Rmpc_set($y, $x, $ROUND);
+
+            Math::MPC::Rmpc_log($tmp, $x, $ROUND);
+            Math::MPC::Rmpc_add_ui($tmp, $tmp, 1, $ROUND);
+
+            Math::MPC::Rmpc_add($x, $x, $d, $ROUND);
+            Math::MPC::Rmpc_div($x, $x, $tmp, $ROUND);
+            last if ++$count > $PREC;
+        }
+
+        return $x;
+    }
+}
+
 sub lgrt ($) {
-    require Math::AnyNum::lgrt;
     bless \__lgrt__(_star2mpfr_mpc($_[0]));
 }
 
 #
-## agm
+## Arithmetic-geometric mean
 #
+
+sub __agm__ {
+    my ($x, $y) = @_;
+    goto(join('__', ref($x), ref($y)) =~ tr/:/_/rs);
+
+  Math_MPFR__Math_MPFR: {
+
+        if (   Math::MPFR::Rmpfr_sgn($x) < 0
+            or Math::MPFR::Rmpfr_sgn($y) < 0) {
+
+            $x = _mpfr2mpc($x);
+            $y = _mpfr2mpc($y);
+
+            goto Math_MPC__Math_MPC;
+        }
+
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_agm($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPC__Math_MPC: {
+
+        # agm(0,  x) = 0
+        Math::MPC::Rmpc_cmp_si_si($x, 0, 0) || return $x;
+
+        # agm(x, 0) = 0
+        Math::MPC::Rmpc_cmp_si_si($y, 0, 0) || return $y;
+
+        my $a0 = Math::MPC::Rmpc_init2($PREC);
+        my $g0 = Math::MPC::Rmpc_init2($PREC);
+
+        my $a1 = Math::MPC::Rmpc_init2($PREC);
+        my $g1 = Math::MPC::Rmpc_init2($PREC);
+
+        my $t = Math::MPC::Rmpc_init2($PREC);
+
+        Math::MPC::Rmpc_set($a0, $x, $ROUND);
+        Math::MPC::Rmpc_set($g0, $y, $ROUND);
+
+        my $count = 0;
+        {
+            Math::MPC::Rmpc_add($a1, $a0, $g0, $ROUND);
+            Math::MPC::Rmpc_div_2ui($a1, $a1, 1, $ROUND);
+
+            Math::MPC::Rmpc_mul($g1, $a0, $g0, $ROUND);
+            Math::MPC::Rmpc_add($t, $a0, $g0, $ROUND);
+            Math::MPC::Rmpc_sqr($t, $t, $ROUND);
+            Math::MPC::Rmpc_cmp_si_si($t, 0, 0) || return $t;
+            Math::MPC::Rmpc_div($g1, $g1, $t, $ROUND);
+            Math::MPC::Rmpc_sqrt($g1, $g1, $ROUND);
+            Math::MPC::Rmpc_add($t, $a0, $g0, $ROUND);
+            Math::MPC::Rmpc_mul($g1, $g1, $t, $ROUND);
+
+            if (Math::MPC::Rmpc_cmp($a0, $a1) and ++$count < $PREC) {
+                Math::MPC::Rmpc_set($a0, $a1, $ROUND);
+                Math::MPC::Rmpc_set($g0, $g1, $ROUND);
+                redo;
+            }
+        }
+
+        return $g0;
+    }
+
+  Math_MPFR__Math_MPC: {
+        $x = _mpfr2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_MPC__Math_MPFR: {
+        $y = _mpfr2mpc($y);
+        goto Math_MPC__Math_MPC;
+    }
+}
+
 sub agm ($$) {
-    require Math::AnyNum::agm;
     bless \__agm__(_star2mpfr_mpc($_[0]), _star2mpfr_mpc($_[1]));
 }
 
@@ -2898,8 +6052,43 @@ sub agm ($$) {
 ## hypot
 #
 
+# hypot(x, y) = sqrt(x^2 + y^2)
+
+sub __hypot__ {
+    my ($x, $y) = @_;
+    goto(join('__', ref($x), ref($y)) =~ tr/:/_/rs);
+
+  Math_MPFR__Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_hypot($r, $x, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPFR__Math_MPC: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPC::Rmpc_abs($r, $y, $ROUND);
+        Math::MPFR::Rmpfr_hypot($r, $r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC__Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPC::Rmpc_abs($r, $x, $ROUND);
+        Math::MPFR::Rmpfr_hypot($r, $r, $y, $ROUND);
+        return $r;
+    }
+
+  Math_MPC__Math_MPC: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPC::Rmpc_abs($r, $x, $ROUND);
+        my $t = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPC::Rmpc_abs($t, $y, $ROUND);
+        Math::MPFR::Rmpfr_hypot($r, $r, $t, $ROUND);
+        return $r;
+    }
+}
+
 sub hypot ($$) {
-    require Math::AnyNum::hypot;
     bless \__hypot__(_star2mpfr_mpc($_[0]), _star2mpfr_mpc($_[1]));
 }
 
@@ -2907,8 +6096,43 @@ sub hypot ($$) {
 ## BesselJ
 #
 
+sub __BesselJ__ {
+    my ($x, $n) = @_;
+    goto(join('__', ref($x), ref($n) || 'Scalar') =~ tr/:/_/rs);
+
+  Math_MPFR__Scalar: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+
+        if ($n == 0) {
+            Math::MPFR::Rmpfr_j0($r, $x, $ROUND);
+        }
+        elsif ($n == 1) {
+            Math::MPFR::Rmpfr_j1($r, $x, $ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_jn($r, $n, $x, $ROUND);
+        }
+
+        return $r;
+    }
+
+  Math_MPFR__Math_GMPz: {
+
+        $n = Math::GMPz::Rmpz_get_d($n);
+
+        # Limit goes to zero when n goes to +/-Infinity
+        if (($n < Math::AnyNum::LONG_MIN or $n > Math::AnyNum::ULONG_MAX)
+            and Math::MPFR::Rmpfr_number_p($x)) {
+            my $r = Math::MPFR::Rmpfr_init2($PREC);
+            Math::MPFR::Rmpfr_set_ui($r, 0, $ROUND);
+            return $r;
+        }
+
+        goto Math_MPFR__Scalar;
+    }
+}
+
 sub BesselJ ($$) {
-    require Math::AnyNum::BesselJ;
     my ($x, $y) = @_;
 
     $x = ref($x) eq __PACKAGE__ ? _any2mpfr($$x) : _star2mpfr($x);
@@ -2924,8 +6148,55 @@ sub BesselJ ($$) {
 ## BesselY
 #
 
+sub __BesselY__ {
+    my ($x, $n) = @_;
+    goto(join('__', ref($x), ref($n) || 'Scalar') =~ tr/:/_/rs);
+
+  Math_MPFR__Scalar: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+
+        if ($n == 0) {
+            Math::MPFR::Rmpfr_y0($r, $x, $ROUND);
+        }
+        elsif ($n == 1) {
+            Math::MPFR::Rmpfr_y1($r, $x, $ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_yn($r, $n, $x, $ROUND);
+        }
+
+        return $r;
+    }
+
+  Math_MPFR__Math_GMPz: {
+
+        $n = Math::GMPz::Rmpz_get_d($n);
+
+        if (   $n < Math::AnyNum::LONG_MIN
+            or $n > Math::AnyNum::ULONG_MAX) {
+
+            my $r = Math::MPFR::Rmpfr_init2($PREC);
+
+            if (Math::MPFR::Rmpfr_sgn($x) < 0 or !Math::MPFR::Rmpfr_number_p($x)) {
+                Math::MPFR::Rmpfr_set_nan($r);
+                return $r;
+            }
+
+            if ($n < 0) {
+                Math::MPFR::Rmpfr_set_inf($r, 1);
+            }
+            else {
+                Math::MPFR::Rmpfr_set_inf($r, -1);
+            }
+
+            return $r;
+        }
+
+        goto Math_MPFR__Scalar;
+    }
+}
+
 sub BesselY ($$) {
-    require Math::AnyNum::BesselY;
     my ($x, $y) = @_;
 
     $x = ref($x) eq __PACKAGE__ ? _any2mpfr($$x) : _star2mpfr($x);
@@ -2941,8 +6212,123 @@ sub BesselY ($$) {
 ## ROUND
 #
 
+sub __round__ {
+    my ($x, $prec) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+
+        my $nth = -CORE::int($prec);
+
+        my $p = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_str($p, '1e' . CORE::abs($nth), 10, $ROUND);
+
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+
+        if ($nth < 0) {
+            Math::MPFR::Rmpfr_div($r, $x, $p, $ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_mul($r, $x, $p, $ROUND);
+        }
+
+        Math::MPFR::Rmpfr_round($r, $r);
+
+        if ($nth < 0) {
+            Math::MPFR::Rmpfr_mul($r, $r, $p, $ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_div($r, $r, $p, $ROUND);
+        }
+
+        return $r;
+    }
+
+  Math_MPC: {
+
+        my $real = Math::MPFR::Rmpfr_init2($PREC);
+        my $imag = Math::MPFR::Rmpfr_init2($PREC);
+
+        Math::MPC::RMPC_RE($real, $x);
+        Math::MPC::RMPC_IM($imag, $x);
+
+        $real = __round__($real, $prec);
+        $imag = __round__($imag, $prec);
+
+        if (Math::MPFR::Rmpfr_zero_p($imag)) {
+            return $real;
+        }
+
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_fr_fr($r, $real, $imag, $ROUND);
+        return $r;
+    }
+
+  Math_GMPq: {
+
+        my $nth = -CORE::int($prec);
+
+        my $n = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set($n, $x);
+
+        my $sgn = Math::GMPq::Rmpq_sgn($n);
+
+        if ($sgn < 0) {
+            Math::GMPq::Rmpq_neg($n, $n);
+        }
+
+        my $p = Math::GMPz::Rmpz_init_set_str('1' . ('0' x CORE::abs($nth)), 10);
+
+        if ($nth < 0) {
+            Math::GMPq::Rmpq_div_z($n, $n, $p);
+        }
+        else {
+            Math::GMPq::Rmpq_mul_z($n, $n, $p);
+        }
+
+        state $half = do {
+            my $q = Math::GMPq::Rmpq_init_nobless();
+            Math::GMPq::Rmpq_set_ui($q, 1, 2);
+            $q;
+        };
+
+        Math::GMPq::Rmpq_add($n, $n, $half);
+
+        my $z = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_set_q($z, $n);
+
+        if (Math::GMPz::Rmpz_odd_p($z) and Math::GMPq::Rmpq_integer_p($n)) {
+            Math::GMPz::Rmpz_sub_ui($z, $z, 1);
+        }
+
+        Math::GMPq::Rmpq_set_z($n, $z);
+
+        if ($nth < 0) {
+            Math::GMPq::Rmpq_mul_z($n, $n, $p);
+        }
+        else {
+            Math::GMPq::Rmpq_div_z($n, $n, $p);
+        }
+
+        if ($sgn < 0) {
+            Math::GMPq::Rmpq_neg($n, $n);
+        }
+
+        if (Math::GMPq::Rmpq_integer_p($n)) {
+            Math::GMPz::Rmpz_set_q($z, $n);
+            return $z;
+        }
+
+        return $n;
+    }
+
+  Math_GMPz: {
+        $x = _mpz2mpq($x);
+        goto Math_GMPq;
+    }
+}
+
 sub round ($;$) {
-    require Math::AnyNum::round;
     my ($x, $y) = @_;
 
     $x = ref($x) eq __PACKAGE__ ? $$x : _star2obj($x);
@@ -2973,6 +6359,43 @@ sub round ($;$) {
 ## RAND / IRAND
 #
 
+sub __irand__ {
+    my ($x, $y, $state) = @_;
+
+    if (defined($y)) {
+        my $cmp = Math::GMPz::Rmpz_cmp($y, $x);
+
+        if ($cmp == 0) {
+            return $x;
+        }
+        elsif ($cmp < 0) {
+            ($x, $y) = ($y, $x);
+        }
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sub($r, $y, $x);
+        Math::GMPz::Rmpz_add_ui($r, $r, 1);
+        Math::GMPz::Rmpz_urandomm($r, $state, $r, 1);
+        Math::GMPz::Rmpz_add($r, $r, $x);
+        return $r;
+    }
+
+    my $sgn = Math::GMPz::Rmpz_sgn($x) || return $x;
+
+    my $r = Math::GMPz::Rmpz_init_set($x);
+
+    if ($sgn < 0) {
+        Math::GMPz::Rmpz_sub_ui($r, $r, 1);
+    }
+    else {
+        Math::GMPz::Rmpz_add_ui($r, $r, 1);
+    }
+
+    Math::GMPz::Rmpz_urandomm($r, $state, $r, 1);
+    Math::GMPz::Rmpz_neg($r, $r) if $sgn < 0;
+    return $r;
+}
+
 {
     my $srand = srand();
 
@@ -2981,7 +6404,6 @@ sub round ($;$) {
         Math::MPFR::Rmpfr_randseed_ui($state, $srand);
 
         sub rand (;$;$) {
-            require Math::AnyNum::mul;
             my ($x, $y) = @_;
 
             if (@_ == 0) {
@@ -2996,9 +6418,6 @@ sub round ($;$) {
                 return bless \__mul__($rand, $x);
             }
 
-            require Math::AnyNum::sub;
-            require Math::AnyNum::add;
-
             $y = ref($y) eq __PACKAGE__ ? $$y : _star2obj($y);
 
             my $rand = Math::MPFR::Rmpfr_init2($PREC);
@@ -3008,12 +6427,18 @@ sub round ($;$) {
         }
 
         sub seed ($) {
-            my $z = _star2mpz($_[0]) // do {
-                require Carp;
-                Carp::croak("seed(): invalid seed value <<$_[0]>> (expected an integer)");
-            };
-            Math::MPFR::Rmpfr_randseed($state, $z);
-            bless \$z;
+            my ($x) = @_;
+
+            $x = $$x if (ref($x) eq __PACKAGE__);
+
+            if (ref($x) ne 'Math::GMPz') {
+                $x = _star2mpz($x) // do {
+                    require Carp;
+                    Carp::croak("seed(): invalid seed value <<$_[0]>> (expected an integer)");
+                };
+            }
+            Math::MPFR::Rmpfr_randseed($state, $x);
+            bless \$x;
         }
     }
 
@@ -3022,26 +6447,41 @@ sub round ($;$) {
         Math::GMPz::zgmp_randseed_ui($state, $srand);
 
         sub irand ($;$) {
-            require Math::AnyNum::irand;
             my ($x, $y) = @_;
 
-            $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // (goto &nan);
+            $x = $$x if (ref($x) eq __PACKAGE__);
+
+            if (ref($x) ne 'Math::GMPz') {
+                $x = _star2mpz($x) // goto &nan;
+            }
 
             if (!defined($y)) {
                 return bless \__irand__($x, undef, $state);
             }
 
-            $y = (ref($y) eq __PACKAGE__ ? _any2mpz($$y) : _star2mpz($y)) // (goto &nan);
+            $y = $$y if (ref($y) eq __PACKAGE__);
+
+            if (ref($y) ne 'Math::GMPz') {
+                $y = _star2mpz($y) // goto &nan;
+            }
+
             bless \__irand__($x, $y, $state);
         }
 
         sub iseed ($) {
-            my $z = _star2mpz($_[0]) // do {
-                require Carp;
-                Carp::croak("iseed(): invalid seed value <<$_[0]>> (expected an integer)");
-            };
-            Math::GMPz::zgmp_randseed($state, $z);
-            bless \$z;
+            my ($x) = @_;
+
+            $x = $$x if (ref($x) eq __PACKAGE__);
+
+            if (ref($x) ne 'Math::GMPz') {
+                $x = _star2mpz($x) // do {
+                    require Carp;
+                    Carp::croak("iseed(): invalid seed value <<$_[0]>> (expected an integer)");
+                };
+            }
+
+            Math::GMPz::zgmp_randseed($state, $x);
+            bless \$x;
         }
     }
 }
@@ -3156,75 +6596,554 @@ sub primorial ($) {
     bless \$r;
 }
 
-#
-## bernfrac
-#
+sub sum {
+    my @terms = map { ref($_) eq __PACKAGE__ ? $$_ : _star2obj($_) } @_;
+    @terms || goto &zero;
+    bless \_binsplit(\@terms, \&__add__);
+}
 
-sub bernfrac ($) {
-    require Math::AnyNum::bernfrac;
-    my ($x) = @_;
+sub prod {
+    my @terms = map { ref($_) eq __PACKAGE__ ? $$_ : _star2obj($_) } @_;
+    @terms || goto &one;
+    bless \_binsplit(\@terms, \&__mul__);
+}
 
-    if (!ref($x) and CORE::int($x) eq $x and $x >= 0 and $x < ULONG_MAX) {
-        ## `x` is a native unsigned integer
+sub _secant_numbers {
+    my ($n) = @_;
+
+    state @cache;
+
+    if ($n <= $#cache) {
+        return @cache;
     }
-    elsif (ref($x) eq __PACKAGE__) {
-        $x = _any2ui($$x) // goto &nan;
+
+    my @S = (Math::GMPz::Rmpz_init_set_ui(1));
+
+    foreach my $k (1 .. $n) {
+        Math::GMPz::Rmpz_mul_ui($S[$k] = Math::GMPz::Rmpz_init(), $S[$k - 1], $k);
+    }
+
+    foreach my $k (1 .. $n) {
+        foreach my $j ($k + 1 .. $n) {
+            Math::GMPz::Rmpz_addmul_ui($S[$j], $S[$j - 1], ($j - $k) * ($j - $k + 2));
+        }
+    }
+
+    push @cache, @S[@cache .. ((@S <= 1000) ? $#S : 1000)];
+
+    return @S;
+}
+
+sub _tangent_numbers {
+    my ($n) = @_;
+
+    state @cache;
+
+    if ($n <= $#cache) {
+        return @cache;
+    }
+
+    my @T = (Math::GMPz::Rmpz_init_set_ui(1));
+
+    foreach my $k (1 .. $n) {
+        Math::GMPz::Rmpz_mul_ui($T[$k] = Math::GMPz::Rmpz_init(), $T[$k - 1], $k);
+    }
+
+    foreach my $k (1 .. $n) {
+        foreach my $j ($k .. $n) {
+            Math::GMPz::Rmpz_mul_ui($T[$j], $T[$j], $j - $k + 2);
+            Math::GMPz::Rmpz_addmul_ui($T[$j], $T[$j - 1], $j - $k);
+        }
+    }
+
+    push @cache, @T[@cache .. ((@T <= 1000) ? $#T : 1000)];
+
+    return @T;
+}
+
+sub bernoulli_polynomial ($$) {
+    my ($n, $x) = @_;
+
+    #
+    ## B_n(x) = Sum_{k=0..n} binomial(n, k) * bernoulli(n-k) * x^k
+    #
+
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
+    }
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
     }
     else {
-        $x = _any2ui(_star2obj($x)) // goto &nan;
+        $n = _any2ui(_star2obj($n)) // goto &nan;
     }
 
-    bless \__bernfrac__($x);
+    $x = ref($x) eq __PACKAGE__ ? $$x : _star2obj($x);
+
+    my @T = _tangent_numbers(($n >> 1) - 1);
+
+    my $u = $n + 1;
+    my $z = Math::GMPz::Rmpz_init();
+    my $q = Math::GMPq::Rmpq_init();
+
+    my @terms;
+
+    foreach my $k (0 .. $n) {
+        --$u & 1 and $u > 1 and next;    # B_n = 0 for odd n > 1
+
+        if ($u == 0) {
+            Math::GMPq::Rmpq_set_ui($q, 1, 1);
+        }
+        elsif ($u == 1) {
+            Math::GMPq::Rmpq_set_si($q, -1, 2);
+        }
+        else {
+            Math::GMPz::Rmpz_mul_ui($z, $T[($u >> 1) - 1], $u);
+            Math::GMPz::Rmpz_neg($z, $z) if ((($u >> 1) - 1) & 1);
+            Math::GMPq::Rmpq_set_z($q, $z);
+
+            # z = (2^n - 1) * 2^n
+            Math::GMPz::Rmpz_set_ui($z, 0);
+            Math::GMPz::Rmpz_setbit($z, $u);
+            Math::GMPz::Rmpz_sub_ui($z, $z, 1);
+            Math::GMPz::Rmpz_mul_2exp($z, $z, $u);
+
+            Math::GMPq::Rmpq_div_z($q, $q, $z);
+        }
+
+        Math::GMPz::Rmpz_bin_uiui($z, $n, $k);
+        Math::GMPq::Rmpq_mul_z($q, $q, $z);
+
+        push @terms, __mul__(__pow__($x, $k), $q);
+    }
+
+    bless \_binsplit(\@terms, \&__add__);
 }
 
 #
-## harmfrac
+## Bernoulli number
+#
+
+# Algorithm due to Kevin J. McGown (December 8, 2005).
+# Described in his paper: "Computing Bernoulli Numbers Quickly".
+
+sub __bernfrac__ {
+    my ($n) = @_;    # $n is an unsigned integer
+
+#<<<
+    # B(n) = (-1)^(n/2 + 1) * zeta(n)*2*n! / (2*pi)^n
+
+    if ($n == 0) {
+        goto &_one;
+    }
+
+    if ($n == 1) {
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set_ui($r, 1, 2);
+        return $r;
+    }
+
+    if (($n & 1) and ($n > 1)) {    # Bn = 0 for odd n>1
+        goto &_zero;
+    }
+
+    state $round = Math::MPFR::MPFR_RNDN();
+    state $tau   = 6.28318530717958647692528676655900576839433879875;
+
+    my $log2B = (CORE::log(4 * $tau * $n) / 2 + $n * (CORE::log($n / $tau) - 1)) / CORE::log(2);
+
+    my $prec = CORE::int($n + $log2B) +
+          ($n <= 90 ? (3, 3, 4, 4, 6, 6, 6, 6, 7, 7, 7, 8, 8, 9, 10, 12, 9, 7, 6, 0, 0, 0,
+                       0, 0, 0, 0, 0, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4)[($n>>1)-1] : 0);
+
+    state $d = Math::GMPz::Rmpz_init_nobless();
+    Math::GMPz::Rmpz_fac_ui($d, $n);                      # d = n!
+
+    my $K = Math::MPFR::Rmpfr_init2($prec);
+    Math::MPFR::Rmpfr_const_pi($K, $round);               # K = pi
+    Math::MPFR::Rmpfr_pow_si($K, $K, -$n, $round);        # K = K^(-n)
+    Math::MPFR::Rmpfr_mul_z($K, $K, $d, $round);          # K = K*d
+    Math::MPFR::Rmpfr_div_2ui($K, $K, $n - 1, $round);    # K = K / 2^(n-1)
+
+    # `d` is the denominator of bernoulli(n)
+    Math::GMPz::Rmpz_set_ui($d, 2);                       # d = 2
+
+    my @primes = (2);
+
+    { # Sieve the primes <= n+1
+      # Sieve of Eratosthenes + Dana Jacobsen's optimizations
+        my $N = $n + 1;
+
+        my @composite;
+        my $bound = CORE::int(CORE::sqrt($N));
+
+        for (my $i = 3 ; $i <= $bound ; $i += 2) {
+            if (!exists($composite[$i])) {
+                for (my $j = $i * $i ; $j <= $N ; $j += 2 * $i) {
+                    undef $composite[$j];
+                }
+            }
+        }
+
+        foreach my $k (1 .. ($N - 1) >> 1) {
+            if (!exists($composite[2 * $k + 1])) {
+
+                push(@primes, 2 * $k + 1);
+
+                if ($n % (2 * $k) == 0) {    # d = d*p   iff (p-1)|n
+                    Math::GMPz::Rmpz_mul_ui($d, $d, 2 * $k + 1);
+                }
+            }
+        }
+    }
+
+    state $N = Math::MPFR::Rmpfr_init2_nobless(64);
+
+    Math::MPFR::Rmpfr_mul_z($K, $K, $d, $round);         # K = K*d
+    Math::MPFR::Rmpfr_set_ui($N, $n - 1, $round);        # N = n-1
+    Math::MPFR::Rmpfr_ui_div($N, 1, $N, $round);         # N = 1/N
+    Math::MPFR::Rmpfr_pow($N, $K, $N, $round);           # N = K^N
+
+    Math::MPFR::Rmpfr_ceil($N, $N);                      # N = ceil(N)
+
+    my $bound = Math::MPFR::Rmpfr_get_ui($N, $round);    # bound = int(N)
+
+    my $z = Math::MPFR::Rmpfr_init2($prec);              # zeta(n)
+    my $u = Math::GMPz::Rmpz_init();                     # p^n
+
+    Math::MPFR::Rmpfr_set_ui($z, 1, $round);             # z = 1
+
+    # `Math::GMPf` would perform slightly faster here.
+    for (my $i = 0 ; $primes[$i] <= $bound ; ++$i) {     # primes <= bound
+        Math::GMPz::Rmpz_ui_pow_ui($u, $primes[$i], $n);    # u = p^n
+        Math::MPFR::Rmpfr_mul_z($z, $z, $u, $round);        # z = z*u
+        Math::GMPz::Rmpz_sub_ui($u, $u, 1);                 # u = u-1
+        Math::MPFR::Rmpfr_div_z($z, $z, $u, $round);        # z = z/u
+    }
+
+    Math::MPFR::Rmpfr_mul($z, $z, $K, $round);              # z = z * K
+    Math::MPFR::Rmpfr_ceil($z, $z);                         # z = ceil(z)
+
+    my $q = Math::GMPq::Rmpq_init();
+
+    Math::GMPq::Rmpq_set_den($q, $d);                       # denominator
+    Math::MPFR::Rmpfr_get_z($d, $z, $round);
+    Math::GMPz::Rmpz_neg($d, $d) if $n % 4 == 0;            # d = -d, iff 4|n
+    Math::GMPq::Rmpq_set_num($q, $d);                       # numerator
+
+#>>>
+    return $q;    # Bn
+}
+
+sub bernfrac ($;$) {
+    my ($n, $x) = @_;
+
+    @_ == 2 && goto &bernoulli_polynomial;
+
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
+    }
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
+    }
+    else {
+        $n = _any2ui(_star2obj($n)) // goto &nan;
+    }
+
+    bless \__bernfrac__($n);
+}
+
+*bernoulli = \&bernfrac;
+
+sub euler_polynomial ($$) {
+    my ($n, $x) = @_;
+
+    #
+    ## E_n(x) = Sum_{k=0..n} binomial(n, n-k) * euler_number(n-k) / 2^(n-k) * (x - 1/2)^k
+    #
+
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
+    }
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
+    }
+    else {
+        $n = _any2ui(_star2obj($n)) // goto &nan;
+    }
+
+    $x = ref($x) eq __PACKAGE__ ? $$x : _star2obj($x);
+
+    my @S = _secant_numbers($n >> 1);
+
+    my $u = $n + 1;
+    my $z = Math::GMPz::Rmpz_init();
+
+    $x = __dec__(__add__($x, $x));    # x = 2*x - 1
+
+    my @terms;
+
+    foreach my $k (0 .. $n) {
+        --$u & 1 and next;            # E_n = 0 for all odd n
+
+        Math::GMPz::Rmpz_bin_uiui($z, $n, $u);
+        Math::GMPz::Rmpz_mul($z, $z, $S[$u >> 1]);
+        Math::GMPz::Rmpz_neg($z, $z) if (($u >> 1) & 1);
+
+        push @terms, __mul__(__pow__($x, $k), $z);
+    }
+
+    Math::GMPz::Rmpz_set_ui($z, 0);
+    Math::GMPz::Rmpz_setbit($z, $n);
+
+    bless \__div__(_binsplit(\@terms, \&__add__), $z);
+}
+
+sub euler ($;$) {
+    my ($n, $x) = @_;
+
+    @_ == 2 && goto &euler_polynomial;
+
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
+    }
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
+    }
+    else {
+        $n = _any2ui(_star2obj($n)) // goto &nan;
+    }
+
+    $n & 1 and goto &zero;    # E_n = 0 for all odd indices
+
+    my $e = Math::GMPz::Rmpz_init_set((_secant_numbers($n >> 1))[$n >> 1]);
+    Math::GMPz::Rmpz_neg($e, $e) if (($n >> 1) & 1);
+    bless \$e;
+}
+
+#
+## The n-th Harmonic number: 1 + 1/2 + ... + 1/n
 #
 
 sub harmfrac ($) {
-    require Math::AnyNum::harmfrac;
-    my ($x) = @_;
+    my ($n) = @_;
 
-    if (!ref($x) and CORE::int($x) eq $x and $x >= 0 and $x < ULONG_MAX) {
-        ## `x` is a native unsigned integer
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
     }
-    elsif (ref($x) eq __PACKAGE__) {
-        $x = _any2ui($$x) // goto &nan;
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
     }
     else {
-        $x = _any2ui(_star2obj($x)) // goto &nan;
+        $n = _any2ui(_star2obj($n)) // goto &nan;
     }
 
-    bless \__harmfrac__($x);
+    $n || goto &zero;
+    $n < 0 && goto &nan;
+
+    # Use binary splitting for large values of n. (by Fredrik Johansson)
+    # https://fredrik-j.blogspot.com/2009/02/how-not-to-compute-harmonic-numbers.html
+    if ($n > 7000) {
+
+        my $num = Math::GMPz::Rmpz_init_set_ui(1);
+        my $den = Math::GMPz::Rmpz_init_set_ui($n + 1);
+
+        my $temp = Math::GMPz::Rmpz_init();
+
+        # Translation of Dana Jacobsen's code from Math::Prime::Util::{PP,GMP}.
+        #   https://metacpan.org/pod/Math::Prime::Util::PP
+        #   https://metacpan.org/pod/Math::Prime::Util::GMP
+        sub {
+            my ($num, $den) = @_;
+            Math::GMPz::Rmpz_sub($temp, $den, $num);
+
+            if (Math::GMPz::Rmpz_cmp_ui($temp, 1) == 0) {
+                Math::GMPz::Rmpz_set($den, $num);
+                Math::GMPz::Rmpz_set_ui($num, 1);
+            }
+            elsif (Math::GMPz::Rmpz_cmp_ui($temp, 2) == 0) {
+                Math::GMPz::Rmpz_set($den, $num);
+                Math::GMPz::Rmpz_mul_2exp($num, $num, 1);
+                Math::GMPz::Rmpz_add_ui($num, $num, 1);
+                Math::GMPz::Rmpz_addmul($den, $den, $den);
+            }
+            else {
+                Math::GMPz::Rmpz_add($temp, $num, $den);
+                Math::GMPz::Rmpz_tdiv_q_2exp($temp, $temp, 1);
+                my $q = Math::GMPz::Rmpz_init_set($temp);
+                my $r = Math::GMPz::Rmpz_init_set($temp);
+                __SUB__->($num, $q);
+                __SUB__->($r,   $den);
+                Math::GMPz::Rmpz_mul($num,  $num, $den);
+                Math::GMPz::Rmpz_mul($temp, $q,   $r);
+                Math::GMPz::Rmpz_add($num, $num, $temp);
+                Math::GMPz::Rmpz_mul($den, $den, $q);
+            }
+          }
+          ->($num, $den);
+
+        my $q = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set_num($q, $num);
+        Math::GMPq::Rmpq_set_den($q, $den);
+        Math::GMPq::Rmpq_canonicalize($q);
+        return bless \$q;
+    }
+
+    my $num = Math::GMPz::Rmpz_init_set_ui(1);
+    my $den = Math::GMPz::Rmpz_init_set_ui(1);
+
+    for (my $k = 2 ; $k <= $n ; ++$k) {
+        Math::GMPz::Rmpz_mul_ui($num, $num, $k);    # num = num * k
+        Math::GMPz::Rmpz_add($num, $num, $den);     # num = num + den
+        Math::GMPz::Rmpz_mul_ui($den, $den, $k);    # den = den * k
+    }
+
+    my $r = Math::GMPq::Rmpq_init();
+    Math::GMPq::Rmpq_set_num($r, $num);
+    Math::GMPq::Rmpq_set_den($r, $den);
+    Math::GMPq::Rmpq_canonicalize($r);
+    bless \$r;
 }
 
+*harmonic = \&harmfrac;
+
 #
-## bernreal
+## Bernoulli number as a floating-point value
 #
 
 sub bernreal ($) {
-    require Math::AnyNum::bernreal;
-    my ($x) = @_;
+    my ($n) = @_;
 
-    if (!ref($x) and CORE::int($x) eq $x and $x >= 0 and $x < ULONG_MAX) {
-        ## `x` is a native unsigned integer
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
     }
-    elsif (ref($x) eq __PACKAGE__) {
-        $x = _any2ui($$x) // goto &nan;
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
     }
     else {
-        $x = _any2ui(_star2obj($x)) // goto &nan;
+        $n = _any2ui(_star2obj($n)) // goto &nan;
     }
 
-    bless \__bernreal__($x);
+    if ($n == 0) {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_ui($r, 1, $ROUND);
+        return bless \$r;
+    }
+
+    if ($n == 1) {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_d($r, 0.5, $ROUND);
+        return bless \$r;
+    }
+
+    if ($n & 1) {    # Bn = 0 for odd n>1
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_ui($r, 0, $ROUND);
+        return bless \$r;
+    }
+
+    my $f = Math::MPFR::Rmpfr_init2($PREC);
+    my $p = Math::MPFR::Rmpfr_init2($PREC);
+
+    Math::MPFR::Rmpfr_zeta_ui($f, $n, $ROUND);    # f = zeta(n)
+    Math::MPFR::Rmpfr_set_ui($p, $n + 1, $ROUND); # p = n+1
+    Math::MPFR::Rmpfr_gamma($p, $p, $ROUND);      # p = gamma(p)
+
+    Math::MPFR::Rmpfr_mul($f, $f, $p, $ROUND);    # f = f * p
+
+    Math::MPFR::Rmpfr_const_pi($p, $ROUND);       # p = PI
+    Math::MPFR::Rmpfr_pow_ui($p, $p, $n, $ROUND); # p = p^n
+
+    Math::MPFR::Rmpfr_div_2ui($f, $f, $n - 1, $ROUND);    # f = f / 2^(n-1)
+
+    Math::MPFR::Rmpfr_div($f, $f, $p, $ROUND);            # f = f/p
+    Math::MPFR::Rmpfr_neg($f, $f, $ROUND) if $n % 4 == 0;
+
+    bless \$f;
+}
+
+# Natural logarithm of the n-th Bernoulli number
+
+sub lnbern ($) {
+    my ($n) = @_;
+
+    $n = _star2mpz($n) // goto &nan;
+
+    # log(|B(n)|) = (1 - n)*log(2) - n*log(π) + log(zeta(n)) + log(n!)
+
+    (Math::GMPz::Rmpz_sgn($n) || goto &zero) < 0 and goto &nan;
+
+    my $L = Math::MPFR::Rmpfr_init2($PREC);
+    Math::MPFR::Rmpfr_const_log2($L, $ROUND);
+
+    if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
+        Math::MPFR::Rmpfr_neg($L, $L, $ROUND);
+        return bless \$L;
+    }
+
+    Math::GMPz::Rmpz_odd_p($n) && goto &ninf;    # log(Bn) = -Inf for odd n>1
+
+    my $pi = Math::MPFR::Rmpfr_init2($PREC);
+    Math::MPFR::Rmpfr_const_pi($pi, $ROUND);     # pi = π
+
+    my $t = Math::MPFR::Rmpfr_init2($PREC);
+    Math::MPFR::Rmpfr_log($t, $pi, $ROUND);      # t = log(π)
+    Math::MPFR::Rmpfr_mul_z($t, $t, $n, $ROUND); # t = n*log(π)
+
+    my $s = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_ui_sub($s, 1, $n);          # s = 1-n
+
+    Math::MPFR::Rmpfr_mul_z($L, $L, $s, $ROUND); # L = (1 - n)*log(2)
+    Math::MPFR::Rmpfr_sub($L, $L, $t, $ROUND);   # L -= n*log(π)
+
+    if (Math::GMPz::Rmpz_fits_ulong_p($n)) {     # n is a native unsigned integer
+        Math::MPFR::Rmpfr_zeta_ui($t, Math::GMPz::Rmpz_get_ui($n), $ROUND);
+    }
+    else {
+        Math::MPFR::Rmpfr_set_z($t, $n, $ROUND);    # t = n
+        Math::MPFR::Rmpfr_zeta($t, $t, $ROUND);     # t = zeta(n)
+    }
+
+    Math::MPFR::Rmpfr_log($t, $t, $ROUND);          # t = log(zeta(n))
+    Math::MPFR::Rmpfr_add($L, $L, $t, $ROUND);      # L += log(zeta(n))
+
+    Math::GMPz::Rmpz_add_ui($s, $n, 1);             # s = n+1
+    Math::MPFR::Rmpfr_set_z($t, $s, $ROUND);        # t = n+1
+    Math::MPFR::Rmpfr_lngamma($t, $t, $ROUND);      # t = log(gamma(n+1)) = log(n!)
+
+    Math::MPFR::Rmpfr_add($L, $L, $t, $ROUND);      # L += log(n!)
+
+    # If 4|n, then B_n is negative; log(-Re(x)) = log(Re(x)) + π*i, for x>0
+    if (Math::GMPz::Rmpz_divisible_2exp_p($n, 2)) {
+        my $c = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_fr_fr($c, $L, $pi, $ROUND);
+        return bless \$c;
+    }
+
+    bless \$L;
 }
 
 #
-## harmreal
+## The n-th Harmonic number as a floating-point value
 #
 
+# harmreal(x) = digamma(x+1) + EulerGamma
+
+sub __harmreal__ {
+    my ($x) = @_;    # $x is a Math::MPFR object
+
+    my $r = Math::MPFR::Rmpfr_init2($PREC);
+    Math::MPFR::Rmpfr_add_ui($r, $x, 1, $ROUND);
+    Math::MPFR::Rmpfr_digamma($r, $r, $ROUND);
+
+    my $t = Math::MPFR::Rmpfr_init2($PREC);
+    Math::MPFR::Rmpfr_const_euler($t, $ROUND);
+    Math::MPFR::Rmpfr_add($r, $r, $t, $ROUND);
+
+    $r;
+}
+
 sub harmreal ($) {
-    require Math::AnyNum::harmreal;
     bless \__harmreal__(_star2mpfr($_[0]) // (goto &nan));
 }
 
@@ -3293,25 +7212,127 @@ sub subfactorial ($;$) {
     bless \$z;
 }
 
+sub superfactorial ($) {
+    my ($n) = @_;
+
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
+    }
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
+    }
+    else {
+        $n = _any2ui(_star2obj($n)) // goto &nan;
+    }
+
+    my @list;
+    foreach my $k (2 .. $n) {
+        my $z = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_ui_pow_ui($z, $k, $n - $k + 1);
+        push @list, $z;
+    }
+
+    bless \_binsplit(\@list, \&__mul__);
+}
+
+sub lnsuperfactorial ($) {
+    my ($n) = @_;
+
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
+    }
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
+    }
+    else {
+        $n = _any2ui(_star2obj($n)) // goto &nan;
+    }
+
+    my $r = Math::MPFR::Rmpfr_init2($PREC);
+    my $t = Math::MPFR::Rmpfr_init2($PREC);
+
+    Math::MPFR::Rmpfr_set_ui($r, 0, $ROUND);
+
+    foreach my $k (2 .. $n) {
+        Math::MPFR::Rmpfr_set_ui($t, $k, $ROUND);
+        Math::MPFR::Rmpfr_log($t, $t, $ROUND);
+        Math::MPFR::Rmpfr_mul_ui($t, $t, $n - $k + 1, $ROUND);
+        Math::MPFR::Rmpfr_add($r, $r, $t, $ROUND);
+    }
+
+    bless \$r;
+}
+
+sub hyperfactorial ($) {
+    my ($n) = @_;
+
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
+    }
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
+    }
+    else {
+        $n = _any2ui(_star2obj($n)) // goto &nan;
+    }
+
+    my @list;
+    foreach my $k (2 .. $n) {
+        my $z = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_ui_pow_ui($z, $k, $k);
+        push @list, $z;
+    }
+
+    bless \_binsplit(\@list, \&__mul__);
+}
+
+sub lnhyperfactorial ($) {
+    my ($n) = @_;
+
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
+    }
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
+    }
+    else {
+        $n = _any2ui(_star2obj($n)) // goto &nan;
+    }
+
+    my $r = Math::MPFR::Rmpfr_init2($PREC);
+    my $t = Math::MPFR::Rmpfr_init2($PREC);
+
+    Math::MPFR::Rmpfr_set_ui($r, 0, $ROUND);
+
+    foreach my $k (2 .. $n) {
+        Math::MPFR::Rmpfr_set_ui($t, $k, $ROUND);
+        Math::MPFR::Rmpfr_log($t, $t, $ROUND);
+        Math::MPFR::Rmpfr_mul_ui($t, $t, $k, $ROUND);
+        Math::MPFR::Rmpfr_add($r, $r, $t, $ROUND);
+    }
+
+    bless \$r;
+}
+
 #
 ## Factorial
 #
 
 sub factorial ($) {
-    my ($x) = @_;
+    my ($n) = @_;
 
-    if (!ref($x) and CORE::int($x) eq $x and $x >= 0 and $x < ULONG_MAX) {
-        ## `x` is a native unsigned integer
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
     }
-    elsif (ref($x) eq __PACKAGE__) {
-        $x = _any2ui($$x) // goto &nan;
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
     }
     else {
-        $x = _any2ui(_star2obj($x)) // goto &nan;
+        $n = _any2ui(_star2obj($n)) // goto &nan;
     }
 
     my $r = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_fac_ui($r, $x);
+    Math::GMPz::Rmpz_fac_ui($r, $n);
     bless \$r;
 }
 
@@ -3320,20 +7341,20 @@ sub factorial ($) {
 #
 
 sub dfactorial ($) {
-    my ($x) = @_;
+    my ($n) = @_;
 
-    if (!ref($x) and CORE::int($x) eq $x and $x >= 0 and $x < ULONG_MAX) {
-        ## `x` is a native unsigned integer
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
     }
-    elsif (ref($x) eq __PACKAGE__) {
-        $x = _any2ui($$x) // goto &nan;
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
     }
     else {
-        $x = _any2ui(_star2obj($x)) // goto &nan;
+        $n = _any2ui(_star2obj($n)) // goto &nan;
     }
 
     my $r = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_2fac_ui($r, $x);
+    Math::GMPz::Rmpz_2fac_ui($r, $n);
     bless \$r;
 }
 
@@ -3376,7 +7397,11 @@ sub mfactorial ($$) {
 sub falling_factorial ($$) {
     my ($x, $y) = @_;
 
-    $x = _star2mpz($x) // goto &nan;
+    $x = $$x if (ref($x) eq __PACKAGE__);
+
+    if (ref($x) ne 'Math::GMPz') {
+        $x = _star2mpz($x) // goto &nan;
+    }
 
     if (ref($y) eq __PACKAGE__) {
         $y = _any2si($$y) // goto &nan;
@@ -3425,7 +7450,11 @@ sub falling_factorial ($$) {
 sub rising_factorial ($$) {
     my ($x, $y) = @_;
 
-    $x = _star2mpz($x) // goto &nan;
+    $x = $$x if (ref($x) eq __PACKAGE__);
+
+    if (ref($x) ne 'Math::GMPz') {
+        $x = _star2mpz($x) // goto &nan;
+    }
 
     if (ref($y) eq __PACKAGE__) {
         $y = _any2si($$y) // goto &nan;
@@ -3473,22 +7502,48 @@ sub rising_factorial ($$) {
 ## Greatest common multiple
 #
 
-sub gcd ($$) {
+sub gcd {
     my ($x, $y) = @_;
+
+    @_ or goto &zero;
+    @_ == 1 and return $x;
+
+    my $r = Math::GMPz::Rmpz_init();
+
+    if (@_ > 2) {
+        my @terms = map { _star2mpz($_) // goto &nan } @_;
+
+        Math::GMPz::Rmpz_set($r, shift(@terms));
+
+        foreach my $z (@terms) {
+            Math::GMPz::Rmpz_gcd($r, $r, $z);
+            Math::GMPz::Rmpz_cmp_ui($r, 1) || last;
+        }
+
+        return bless \$r;
+    }
 
     if (ref($y) and !ref($x)) {
         ($x, $y) = ($y, $x);
     }
 
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // (goto &nan);
+    $x = $$x if (ref($x) eq __PACKAGE__);
 
-    my $r = Math::GMPz::Rmpz_init();
+    if (ref($x) ne 'Math::GMPz') {
+        $x = _star2mpz($x) // goto &nan;
+    }
 
     if (!ref($y) and CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
         Math::GMPz::Rmpz_gcd_ui($r, $x, $y < 0 ? -$y : $y);
     }
     else {
-        $y = (ref($y) eq __PACKAGE__ ? _any2mpz($$y) : _star2mpz($y)) // (goto &nan);
+
+        $y = $$y if (ref($y) eq __PACKAGE__);
+
+        if (ref($y) ne 'Math::GMPz') {
+            $y = _star2mpz($y) // goto &nan;
+        }
+
         Math::GMPz::Rmpz_gcd($r, $x, $y);
     }
 
@@ -3499,14 +7554,33 @@ sub gcd ($$) {
 ## Least common multiple
 #
 
-sub lcm ($$) {
+sub __lcm__ {
+    my ($n, $k) = @_;
+    my $r = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_lcm($r, $n, $k);
+    $r;
+}
+
+sub lcm {
     my ($x, $y) = @_;
+
+    @_ or goto &zero;
+    @_ == 1 and return $x;
+
+    if (@_ > 2) {
+        my @terms = map { _star2mpz($_) // goto &nan } @_;
+        return bless \_binsplit(\@terms, \&__lcm__);
+    }
 
     if (ref($y) and !ref($x)) {
         ($x, $y) = ($y, $x);
     }
 
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // (goto &nan);
+    $x = $$x if (ref($x) eq __PACKAGE__);
+
+    if (ref($x) ne 'Math::GMPz') {
+        $x = _star2mpz($x) // goto &nan;
+    }
 
     my $r = Math::GMPz::Rmpz_init();
 
@@ -3514,7 +7588,13 @@ sub lcm ($$) {
         Math::GMPz::Rmpz_lcm_ui($r, $x, $y < 0 ? -$y : $y);
     }
     else {
-        $y = (ref($y) eq __PACKAGE__ ? _any2mpz($$y) : _star2mpz($y)) // (goto &nan);
+
+        $y = $$y if (ref($y) eq __PACKAGE__);
+
+        if (ref($y) ne 'Math::GMPz') {
+            $y = _star2mpz($y) // goto &nan;
+        }
+
         Math::GMPz::Rmpz_lcm($r, $x, $y);
     }
 
@@ -3522,91 +7602,145 @@ sub lcm ($$) {
 }
 
 #
-## Next prime after `x`.
+## Next prime after `n`.
 #
 
 sub next_prime ($) {
-    my ($x) = @_;
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // goto &nan;
+    my ($n) = @_;
+
+    $n = $$n if (ref($n) eq __PACKAGE__);
+
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // goto &nan;
+    }
+
     my $r = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_nextprime($r, $x);
+    Math::GMPz::Rmpz_nextprime($r, $n);
     bless \$r;
 }
 
 #
-## Is prime?
+## True if `n` is an integer
+#
+
+sub __is_int__ {
+    my ($n) = @_;
+
+    return 1 if (ref($n) eq 'Math::GMPz');
+
+    goto(ref($n) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        goto &Math::MPFR::Rmpfr_integer_p;
+    }
+
+  Math_GMPq: {
+        goto &Math::GMPq::Rmpq_integer_p;
+    }
+
+  Math_MPC: {
+        @_ = _any2mpfr($n);
+        goto &Math::MPFR::Rmpfr_integer_p;
+    }
+}
+
+sub is_int ($) {
+    my ($n) = @_;
+    $n = ref($n) eq __PACKAGE__ ? $$n : _star2obj($n);
+    ref($n) eq 'Math::GMPz' ? 1 : __is_int__($n);
+}
+
+#
+## True if `n` is a rational number
+#
+
+sub is_rat ($) {
+    my ($n) = @_;
+    my $ref = ref(ref($n) eq __PACKAGE__ ? $$n : _star2obj($n));
+    $ref eq 'Math::GMPz' or $ref eq 'Math::GMPq';
+}
+
+#
+## True if `n` is probably a prime number
 #
 
 sub is_prime ($;$) {
-    require Math::AnyNum::is_int;
-    my ($x, $y) = @_;
+    my ($n, $r) = @_;
 
-    $x = ref($x) eq __PACKAGE__ ? $$x : _star2obj($x);
+    $n = ref($n) eq __PACKAGE__ ? $$n : _star2obj($n);
 
-    __is_int__($x) || return 0;
+    if (ref($n) ne 'Math::GMPz') {
+        __is_int__($n) || return 0;
+        $n = _any2mpz($n) // return 0;
+    }
 
-    $y = defined($y) ? (CORE::abs(CORE::int($y)) || 20) : 20;
-    Math::GMPz::Rmpz_probab_prime_p(_any2mpz($x) // (return 0), $y);
+    $r = defined($r) ? (CORE::abs(CORE::int($r)) || 20) : 20;
+    Math::GMPz::Rmpz_probab_prime_p($n, $r);
 }
 
 #
-## Is `x` coprime to `y`?
+## True if `n` is coprime to `k`
 #
 
 sub is_coprime ($$) {
-    require Math::AnyNum::is_int;
-    my ($x, $y) = @_;
+    my ($n, $k) = @_;
 
-    $x = ref($x) eq __PACKAGE__ ? $$x : _star2obj($x);
+    $n = ref($n) eq __PACKAGE__ ? $$n : _star2obj($n);
 
-    __is_int__($x) || return 0;
+    if (ref($n) ne 'Math::GMPz') {
+        __is_int__($n) || return 0;
+        $n = _any2mpz($n) // return 0;
+    }
 
-    $x = _any2mpz($x) // return 0;
-
-    if (!ref($y) and CORE::int($y) eq $y and $y >= 0 and $y < ULONG_MAX) {
+    if (!ref($k) and CORE::int($k) eq $k and $k >= 0 and $k < ULONG_MAX) {
         ## `y` is a native integer
     }
     else {
-        $y = ref($y) eq __PACKAGE__ ? $$y : _star2obj($y);
-        __is_int__($y) || return 0;
-        $y = _any2mpz($y) // return 0;
+        $k = ref($k) eq __PACKAGE__ ? $$k : _star2obj($k);
+
+        if (ref($k) ne 'Math::GMPz') {
+            __is_int__($k) || return 0;
+            $k = _any2mpz($k) // return 0;
+        }
     }
 
-    state $t = Math::GMPz::Rmpz_init_nobless();
+    if (ref($k)) {
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_gcd($t, $n, $k);
+        return (Math::GMPz::Rmpz_cmp_ui($t, 1) == 0);
+    }
 
-    ref($y)
-      ? Math::GMPz::Rmpz_gcd($t, $x, $y)
-      : Math::GMPz::Rmpz_gcd_ui($t, $x, $y);
-
-    Math::GMPz::Rmpz_cmp_ui($t, 1) == 0;
+    Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $n, $k) == 1;
 }
 
 #
-## Returns a true value if all the prime factors of `x` are <= n.
+## True if all the prime factors of `n` are <= k.
 #
 
 sub is_smooth ($$) {
-    require Math::AnyNum::is_int;
-    my ($x, $n) = @_;
+    my ($n, $k) = @_;
 
-    $x = ref($x) eq __PACKAGE__ ? $$x : _star2obj($x);
+    $n = ref($n) eq __PACKAGE__ ? $$n : _star2obj($n);
 
-    __is_int__($x) || return 0;
-
-    if (ref($x) ne 'Math::GMPz') {
-        $x = _any2mpz($x) // return 0;
+    if (ref($n) ne 'Math::GMPz') {
+        __is_int__($n) || return 0;
+        $n = _any2mpz($n) // return 0;
     }
-
-    return 0 if (Math::GMPz::Rmpz_sgn($x) <= 0);
-
-    $n = (ref($n) eq __PACKAGE__ ? _any2mpz($$n) : _star2mpz($n)) // return 0;
 
     return 0 if (Math::GMPz::Rmpz_sgn($n) <= 0);
 
-    my $p = Math::GMPz::Rmpz_init_set_ui(2);
-    my $t = Math::GMPz::Rmpz_init_set($x);
+    $k = $$k if (ref($k) eq __PACKAGE__);
 
-    for (; Math::GMPz::Rmpz_cmp($p, $n) <= 0 ; Math::GMPz::Rmpz_nextprime($p, $p)) {
+    if (ref($k) ne 'Math::GMPz') {
+        $k = _star2mpz($k) // return 0;
+    }
+
+    return 0 if (Math::GMPz::Rmpz_sgn($k) <= 0);
+
+    my $p = Math::GMPz::Rmpz_init_set_ui(2);
+    my $t = Math::GMPz::Rmpz_init_set($n);
+
+    for (; Math::GMPz::Rmpz_cmp($p, $k) <= 0 ; Math::GMPz::Rmpz_nextprime($p, $p)) {
         if (Math::GMPz::Rmpz_divisible_p($t, $p)) {
             Math::GMPz::Rmpz_remove($t, $t, $p);
             Math::GMPz::Rmpz_cmp_ui($t, 1) == 0 and return 1;
@@ -3614,26 +7748,6 @@ sub is_smooth ($$) {
     }
 
     Math::GMPz::Rmpz_cmp_ui($t, 1) == 0;
-}
-
-#
-## Is integer?
-#
-
-sub is_int ($) {
-    require Math::AnyNum::is_int;
-    my ($x) = @_;
-    __is_int__(ref($x) eq __PACKAGE__ ? $$x : _star2obj($x));
-}
-
-#
-## Is rational?
-#
-
-sub is_rat ($) {
-    my ($x) = @_;
-    my $ref = ref(ref($x) eq __PACKAGE__ ? $$x : _star2obj($x));
-    $ref eq 'Math::GMPz' or $ref eq 'Math::GMPq';
 }
 
 #
@@ -3700,15 +7814,45 @@ sub nude ($) {
 ## Sign of a number
 #
 
+sub __sgn__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_MPFR: {
+        goto &Math::MPFR::Rmpfr_sgn;
+    }
+
+  Math_GMPq: {
+        goto &Math::GMPq::Rmpq_sgn;
+    }
+
+  Math_GMPz: {
+        goto &Math::GMPz::Rmpz_sgn;
+    }
+
+    # sgn(x) = x / abs(x)
+  Math_MPC: {
+        my $abs = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPC::Rmpc_abs($abs, $x, $ROUND);
+
+        if (Math::MPFR::Rmpfr_zero_p($abs)) {    # it's zero
+            return 0;
+        }
+
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_div_fr($r, $x, $abs, $ROUND);
+        return $r;
+    }
+}
+
 sub sgn ($) {
-    require Math::AnyNum::sgn;
     my ($x) = @_;
     my $r = __sgn__(ref($x) eq __PACKAGE__ ? $$x : _star2obj($x));
     ref($r) ? (bless \$r) : $r;
 }
 
 #
-## Is a real number?
+## True if `x` is a real number
 #
 
 sub is_real ($) {
@@ -3728,7 +7872,7 @@ sub is_real ($) {
 }
 
 #
-## Is an imaginary number?
+## True if `x` is an imaginary number
 #
 
 sub is_imag ($) {
@@ -3745,7 +7889,7 @@ sub is_imag ($) {
 }
 
 #
-## Is a complex number?
+## True if `x` is a complex number
 #
 
 sub is_complex ($) {
@@ -3762,7 +7906,7 @@ sub is_complex ($) {
 }
 
 #
-## Is positive infinity?
+## True if `x == +Inf`
 #
 
 sub is_inf ($) {
@@ -3782,7 +7926,7 @@ sub is_inf ($) {
 }
 
 #
-## Is negative infinity?
+## True if `x == -Inf`
 #
 
 sub is_ninf ($) {
@@ -3802,7 +7946,7 @@ sub is_ninf ($) {
 }
 
 #
-## Is Not-A-Number?
+## True if `x` is Not-a-Number (NaN)
 #
 
 sub is_nan ($) {
@@ -3826,113 +7970,157 @@ sub is_nan ($) {
 }
 
 #
-## Is an even integer?
+## True if `n` is an even integer
 #
 
 sub is_even ($) {
-    require Math::AnyNum::is_int;
-    my ($x) = @_;
+    my ($n) = @_;
 
-    $x = ref($x) eq __PACKAGE__ ? $$x : _star2obj($x);
+    $n = ref($n) eq __PACKAGE__ ? $$n : _star2obj($n);
 
-    __is_int__($x)
-      && Math::GMPz::Rmpz_even_p(_any2mpz($x) // (return 0));
+    if (ref($n) ne 'Math::GMPz') {
+        __is_int__($n) || return 0;
+        $n = _any2mpz($n) // return 0;
+    }
+
+    Math::GMPz::Rmpz_even_p($n);
 }
 
 #
-## Is an odd integer?
+## True if `n` is an odd integer
 #
 
 sub is_odd ($) {
-    require Math::AnyNum::is_int;
-    my ($x) = @_;
+    my ($n) = @_;
 
-    $x = ref($x) eq __PACKAGE__ ? $$x : _star2obj($x);
+    $n = ref($n) eq __PACKAGE__ ? $$n : _star2obj($n);
 
-    __is_int__($x)
-      && Math::GMPz::Rmpz_odd_p(_any2mpz($x) // (return 0));
+    if (ref($n) ne 'Math::GMPz') {
+        __is_int__($n) || return 0;
+        $n = _any2mpz($n) // return 0;
+    }
+
+    Math::GMPz::Rmpz_odd_p($n);
 }
 
 #
-## Is zero?
+## True if `n == 0`
 #
 
 sub is_zero ($) {
-    require Math::AnyNum::eq;
-    my ($x) = @_;
-    (@_) = ((ref($x) eq __PACKAGE__ ? $$x : _star2obj($x)), 0);
+    my ($n) = @_;
+    @_ = ((ref($n) eq __PACKAGE__ ? $$n : _star2obj($n)), 0);
     goto &__eq__;
 }
 
 #
-## Is one?
+## True if `n == 1`
 #
 
 sub is_one ($) {
-    require Math::AnyNum::eq;
-    my ($x) = @_;
-    (@_) = ((ref($x) eq __PACKAGE__ ? $$x : _star2obj($x)), 1);
+    my ($n) = @_;
+    @_ = ((ref($n) eq __PACKAGE__ ? $$n : _star2obj($n)), 1);
     goto &__eq__;
 }
 
 #
-## Is minus one?
+## True if `n == -1`
 #
 
 sub is_mone ($) {
-    require Math::AnyNum::eq;
-    my ($x) = @_;
-    (@_) = ((ref($x) eq __PACKAGE__ ? $$x : _star2obj($x)), -1);
+    my ($n) = @_;
+    @_ = ((ref($n) eq __PACKAGE__ ? $$n : _star2obj($n)), -1);
     goto &__eq__;
 }
 
 #
-## Is positive?
+## True if `n` is positive
 #
 
 sub is_pos ($) {
-    require Math::AnyNum::cmp;
-    my ($x) = @_;
-    (__cmp__((ref($x) eq __PACKAGE__ ? $$x : _star2obj($x)), 0) // return undef) > 0;
+    my ($n) = @_;
+    (__cmp__((ref($n) eq __PACKAGE__ ? $$n : _star2obj($n)), 0) // return undef) > 0;
 }
 
 #
-## Is negative?
+## True if `n` is negative
 #
 
 sub is_neg ($) {
-    require Math::AnyNum::cmp;
-    my ($x) = @_;
-    (__cmp__((ref($x) eq __PACKAGE__ ? $$x : _star2obj($x)), 0) // return undef) < 0;
+    my ($n) = @_;
+    (__cmp__((ref($n) eq __PACKAGE__ ? $$n : _star2obj($n)), 0) // return undef) < 0;
 }
 
 #
-## Is square?
+## True if `n` is a perfect square
 #
 
 sub is_square ($) {
-    require Math::AnyNum::is_int;
-    my ($x, $y) = @_;
+    my ($n) = @_;
 
-    $x = ref($x) eq __PACKAGE__ ? $$x : _star2obj($x);
+    $n = ref($n) eq __PACKAGE__ ? $$n : _star2obj($n);
 
-    __is_int__($x)
-      && Math::GMPz::Rmpz_perfect_square_p(_any2mpz($x) // (return 0));
+    if (ref($n) ne 'Math::GMPz') {
+        __is_int__($n) || return 0;
+        $n = _any2mpz($n) // return 0;
+    }
+
+    Math::GMPz::Rmpz_perfect_square_p($n);
 }
 
 #
-## Is a polygonal number?
+## True if `n` is a k-gonal number
 #
 
+sub __is_polygonal__ {
+    my ($n, $k, $second) = @_;
+
+    Math::GMPz::Rmpz_sgn($n) || return 1;
+
+    # polygonal_root(n, k)
+    #   = ((k - 4) ± sqrt(8 * (k - 2) * n + (k - 4)^2)) / (2 * (k - 2))
+
+    state $t = Math::GMPz::Rmpz_init_nobless();
+    state $u = Math::GMPz::Rmpz_init_nobless();
+
+    Math::GMPz::Rmpz_sub_ui($u, $k, 2);    # u = k-2
+    Math::GMPz::Rmpz_mul($t, $n, $u);      # t = n*u
+    Math::GMPz::Rmpz_mul_2exp($t, $t, 3);  # t = t*8
+
+    Math::GMPz::Rmpz_sub_ui($u, $u, 2);    # u = u-2
+    Math::GMPz::Rmpz_mul($u, $u, $u);      # u = u^2
+
+    Math::GMPz::Rmpz_add($t, $t, $u);      # t = t+u
+    Math::GMPz::Rmpz_perfect_square_p($t) || return 0;
+    Math::GMPz::Rmpz_sqrt($t, $t);         # t = sqrt(t)
+
+    Math::GMPz::Rmpz_sub_ui($u, $k, 4);    # u = k-4
+
+    $second
+      ? Math::GMPz::Rmpz_sub($t, $u, $t)    # t = u-t
+      : Math::GMPz::Rmpz_add($t, $t, $u);   # t = t+u
+
+    Math::GMPz::Rmpz_add_ui($u, $u, 2);     # u = u+2
+    Math::GMPz::Rmpz_mul_2exp($u, $u, 1);   # u = u*2
+
+    Math::GMPz::Rmpz_divisible_p($t, $u);   # true iff u|t
+}
+
 sub is_polygonal ($$) {
-    require Math::AnyNum::is_int;
-    require Math::AnyNum::is_polygonal;
     my ($n, $k) = @_;
 
     $n = ref($n) eq __PACKAGE__ ? $$n : _star2obj($n);
 
-    $n = (__is_int__($n)         ? _any2mpz($n)  : return 0) // return 0;
-    $k = (ref($k) eq __PACKAGE__ ? _any2mpz($$k) : _star2mpz($k)) // return 0;
+    if (ref($n) ne 'Math::GMPz') {
+        __is_int__($n) || return 0;
+        $n = _any2mpz($n) // return 0;
+    }
+
+    $k = $$k if (ref($k) eq __PACKAGE__);
+
+    if (ref($k) ne 'Math::GMPz') {
+        $k = _star2mpz($k) // return 0;
+    }
 
     __is_polygonal__($n, $k);
 }
@@ -3942,14 +8130,20 @@ sub is_polygonal ($$) {
 #
 
 sub is_polygonal2 ($$) {
-    require Math::AnyNum::is_int;
-    require Math::AnyNum::is_polygonal;
     my ($n, $k) = @_;
 
     $n = ref($n) eq __PACKAGE__ ? $$n : _star2obj($n);
 
-    $n = (__is_int__($n)         ? _any2mpz($n)  : return 0) // return 0;
-    $k = (ref($k) eq __PACKAGE__ ? _any2mpz($$k) : _star2mpz($k)) // return 0;
+    if (ref($n) ne 'Math::GMPz') {
+        __is_int__($n) || return 0;
+        $n = _any2mpz($n) // return 0;
+    }
+
+    $k = $$k if (ref($k) eq __PACKAGE__);
+
+    if (ref($k) ne 'Math::GMPz') {
+        $k = _star2mpz($k) // return 0;
+    }
 
     __is_polygonal__($n, $k, 1);
 }
@@ -3958,12 +8152,56 @@ sub is_polygonal2 ($$) {
 ## Integer polygonal root
 #
 
+sub __ipolygonal_root__ {
+    my ($n, $k, $second) = @_;
+
+    # polygonal_root(n, k)
+    #   = ((k - 4) ± sqrt(8 * (k - 2) * n + (k - 4)^2)) / (2 * (k - 2))
+
+    state $t = Math::GMPz::Rmpz_init_nobless();
+    state $u = Math::GMPz::Rmpz_init_nobless();
+
+    Math::GMPz::Rmpz_sub_ui($u, $k, 2);    # u = k-2
+    Math::GMPz::Rmpz_mul($t, $n, $u);      # t = n*u
+    Math::GMPz::Rmpz_mul_2exp($t, $t, 3);  # t = t*8
+
+    Math::GMPz::Rmpz_sub_ui($u, $u, 2);    # u = u-2
+    Math::GMPz::Rmpz_mul($u, $u, $u);      # u = u^2
+    Math::GMPz::Rmpz_add($t, $t, $u);      # t = t+u
+
+    Math::GMPz::Rmpz_sgn($t) < 0 && goto &_nan;    # `t` is negative
+
+    Math::GMPz::Rmpz_sqrt($t, $t);                 # t = sqrt(t)
+    Math::GMPz::Rmpz_sub_ui($u, $k, 4);            # u = k-4
+
+    $second
+      ? Math::GMPz::Rmpz_sub($t, $u, $t)           # t = u-t
+      : Math::GMPz::Rmpz_add($t, $t, $u);          # t = t+u
+
+    Math::GMPz::Rmpz_add_ui($u, $u, 2);            # u = u+2
+    Math::GMPz::Rmpz_mul_2exp($u, $u, 1);          # u = u*2
+
+    Math::GMPz::Rmpz_sgn($u) || return $n;         # `u` is zero
+
+    my $r = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_div($r, $t, $u);              # r = floor(t/u)
+    return $r;
+}
+
 sub ipolygonal_root ($$) {
-    require Math::AnyNum::ipolygonal_root;
     my ($n, $k) = @_;
 
-    $n = (ref($n) eq __PACKAGE__ ? _any2mpz($$n) : _star2mpz($n)) // goto &nan;
-    $k = (ref($k) eq __PACKAGE__ ? _any2mpz($$k) : _star2mpz($k)) // goto &nan;
+    $n = $$n if (ref($n) eq __PACKAGE__);
+
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // goto &nan;
+    }
+
+    $k = $$k if (ref($k) eq __PACKAGE__);
+
+    if (ref($k) ne 'Math::GMPz') {
+        $k = _star2mpz($k) // goto &nan;
+    }
 
     bless \__ipolygonal_root__($n, $k);
 }
@@ -3973,11 +8211,19 @@ sub ipolygonal_root ($$) {
 #
 
 sub ipolygonal_root2 ($$) {
-    require Math::AnyNum::ipolygonal_root;
     my ($n, $k) = @_;
 
-    $n = (ref($n) eq __PACKAGE__ ? _any2mpz($$n) : _star2mpz($n)) // goto &nan;
-    $k = (ref($k) eq __PACKAGE__ ? _any2mpz($$k) : _star2mpz($k)) // goto &nan;
+    $n = $$n if (ref($n) eq __PACKAGE__);
+
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // goto &nan;
+    }
+
+    $k = $$k if (ref($k) eq __PACKAGE__);
+
+    if (ref($k) ne 'Math::GMPz') {
+        $k = _star2mpz($k) // goto &nan;
+    }
 
     bless \__ipolygonal_root__($n, $k, 1);
 }
@@ -3989,13 +8235,21 @@ sub ipolygonal_root2 ($$) {
 sub polygonal ($$) {
     my ($n, $k) = @_;
 
-    $n = (ref($n) eq __PACKAGE__ ? _any2mpz($$n) : _star2mpz($n)) // goto &nan;
+    $n = $$n if (ref($n) eq __PACKAGE__);
+
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // goto &nan;
+    }
 
     if (!ref($k) and CORE::int($k) eq $k and $k >= 0 and $k < ULONG_MAX) {
         ## `k` is a native unsigned integer
     }
     else {
-        $k = (ref($k) eq __PACKAGE__ ? _any2mpz($$k) : _star2mpz($k)) // goto &nan;
+        $k = $$k if (ref($k) eq __PACKAGE__);
+
+        if (ref($k) ne 'Math::GMPz') {
+            $k = _star2mpz($k) // goto &nan;
+        }
     }
 
     #
@@ -4022,31 +8276,56 @@ sub polygonal ($$) {
 }
 
 #
-## is_power
+## True if n = c^k for some integer c
 #
 
-sub is_power ($;$) {
-    require Math::AnyNum::is_power;
-    require Math::AnyNum::is_int;
-    my ($x, $y) = @_;
+sub __is_power__ {
+    my ($n, $k) = @_;
 
-    $x = ref($x) eq __PACKAGE__ ? $$x : _star2obj($x);
+    # Everything is a first power
+    $k == 1 and return 1;
 
-    __is_int__($x) || return 0;
-    $x = _any2mpz($x) // goto &nan;
+    Math::GMPz::Rmpz_cmp_ui($n, 1) == 0 and return 1;
 
-    if (!defined($y)) {
-        return Math::GMPz::Rmpz_perfect_power_p($x);
+    # Return a true value when $n=-1 and $k is odd
+    $k % 2 and (Math::GMPz::Rmpz_cmp_si($n, -1) == 0) and return 1;
+
+    # Don't accept a non-positive power
+    # Also, when $n is negative and $k is even, return faster
+    if ($k <= 0 or ($k % 2 == 0 and Math::GMPz::Rmpz_sgn($n) < 0)) {
+        return 0;
     }
 
-    if (!ref($y) and CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
+    # Optimization for perfect squares
+    $k == 2 and return Math::GMPz::Rmpz_perfect_square_p($n);
+
+    Math::GMPz::Rmpz_perfect_power_p($n) || return 0;
+    state $t = Math::GMPz::Rmpz_init_nobless();
+    Math::GMPz::Rmpz_root($t, $n, $k);
+}
+
+sub is_power ($;$) {
+    my ($n, $k) = @_;
+
+    $n = ref($n) eq __PACKAGE__ ? $$n : _star2obj($n);
+
+    if (ref($n) ne 'Math::GMPz') {
+        __is_int__($n) || return 0;
+        $n = _any2mpz($n) // goto &nan;
+    }
+
+    if (!defined($k)) {
+        return Math::GMPz::Rmpz_perfect_power_p($n);
+    }
+
+    if (!ref($k) and CORE::int($k) eq $k and $k < ULONG_MAX and $k > LONG_MIN) {
         ## `y` is a native integer
     }
     else {
-        $y = _any2si(ref($y) eq __PACKAGE__ ? $$y : _star2obj($y)) // return 0;
+        $k = _any2si(ref($k) eq __PACKAGE__ ? $$k : _star2obj($k)) // return 0;
     }
 
-    __is_power__($x, $y);
+    __is_power__($n, $k);
 }
 
 #
@@ -4054,35 +8333,60 @@ sub is_power ($;$) {
 #
 
 sub kronecker ($$) {
-    my ($x, $y) = @_;
+    my ($n, $k) = @_;
 
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // goto &nan;
+    $n = $$n if (ref($n) eq __PACKAGE__);
 
-    if (!ref($y) and CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // goto &nan;
+    }
+
+    if (!ref($k) and CORE::int($k) eq $k and $k < ULONG_MAX and $k > LONG_MIN) {
         return (
-                $y < 0
-                ? Math::GMPz::Rmpz_kronecker_si($x, $y)
-                : Math::GMPz::Rmpz_kronecker_ui($x, $y)
+                $k < 0
+                ? Math::GMPz::Rmpz_kronecker_si($n, $k)
+                : Math::GMPz::Rmpz_kronecker_ui($n, $k)
                );
     }
 
-    $y = (ref($y) eq __PACKAGE__ ? _any2mpz($$y) : _star2mpz($y)) // goto &nan;
+    $k = $$k if (ref($k) eq __PACKAGE__);
 
-    Math::GMPz::Rmpz_kronecker($x, $y);
+    if (ref($k) ne 'Math::GMPz') {
+        $k = _star2mpz($k) // goto &nan;
+    }
+
+    Math::GMPz::Rmpz_kronecker($n, $k);
 }
 
 #
 ## valuation
 #
 
-sub valuation ($$) {
-    require Math::AnyNum::valuation;
+sub __valuation__ {    # takes two Math::GMPz objects
     my ($x, $y) = @_;
+    Math::GMPz::Rmpz_sgn($y) || return (0, $x);
+    Math::GMPz::Rmpz_cmpabs_ui($y, 1) || return (0, $x);
+    my $r = Math::GMPz::Rmpz_init();
+    my $v = Math::GMPz::Rmpz_remove($r, $x, $y);
+    ($v, $r);
+}
 
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // goto &nan;
-    $y = (ref($y) eq __PACKAGE__ ? _any2mpz($$y) : _star2mpz($y)) // goto &nan;
+sub valuation ($$) {
+    my ($n, $k) = @_;
 
-    (__valuation__($x, $y))[0];
+    $n = $$n if (ref($n) eq __PACKAGE__);
+
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // goto &nan;
+    }
+
+    $k = $$k if (ref($k) eq __PACKAGE__);
+
+    if (ref($k) ne 'Math::GMPz') {
+        $k = _star2mpz($k) // goto &nan;
+    }
+
+    (__valuation__($n, $k))[0];
 }
 
 #
@@ -4090,13 +8394,21 @@ sub valuation ($$) {
 #
 
 sub remdiv ($$) {
-    require Math::AnyNum::valuation;
-    my ($x, $y) = @_;
+    my ($n, $k) = @_;
 
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // goto &nan;
-    $y = (ref($y) eq __PACKAGE__ ? _any2mpz($$y) : _star2mpz($y)) // goto &nan;
+    $n = $$n if (ref($n) eq __PACKAGE__);
 
-    bless \((__valuation__($x, $y))[1]);
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // goto &nan;
+    }
+
+    $k = $$k if (ref($k) eq __PACKAGE__);
+
+    if (ref($k) ne 'Math::GMPz') {
+        $k = _star2mpz($k) // goto &nan;
+    }
+
+    bless \((__valuation__($n, $k))[1]);
 }
 
 #
@@ -4104,13 +8416,22 @@ sub remdiv ($$) {
 #
 
 sub invmod ($$) {
-    my ($x, $y) = @_;
+    my ($n, $k) = @_;
 
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // goto &nan;
-    $y = (ref($y) eq __PACKAGE__ ? _any2mpz($$y) : _star2mpz($y)) // goto &nan;
+    $n = $$n if (ref($n) eq __PACKAGE__);
+
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // goto &nan;
+    }
+
+    $k = $$k if (ref($k) eq __PACKAGE__);
+
+    if (ref($k) ne 'Math::GMPz') {
+        $k = _star2mpz($k) // goto &nan;
+    }
 
     my $r = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_invert($r, $x, $y) || (goto &nan);
+    Math::GMPz::Rmpz_invert($r, $n, $k) || (goto &nan);
     bless \$r;
 }
 
@@ -4119,23 +8440,50 @@ sub invmod ($$) {
 #
 
 sub powmod ($$$) {
-    my ($x, $y, $z) = @_;
+    my ($n, $k, $z) = @_;
 
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // goto &nan;
-    $y = (ref($y) eq __PACKAGE__ ? _any2mpz($$y) : _star2mpz($y)) // goto &nan;
-    $z = (ref($z) eq __PACKAGE__ ? _any2mpz($$z) : _star2mpz($z)) // goto &nan;
+    $n = $$n if (ref($n) eq __PACKAGE__);
+
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // goto &nan;
+    }
+
+    $k = $$k if (ref($k) eq __PACKAGE__);
+
+    if (ref($k) ne 'Math::GMPz') {
+        $k = _star2mpz($k) // goto &nan;
+    }
+
+    $z = $$z if (ref($z) eq __PACKAGE__);
+
+    if (ref($z) ne 'Math::GMPz') {
+        $z = _star2mpz($z) // goto &nan;
+    }
 
     Math::GMPz::Rmpz_sgn($z) || goto &nan;
 
-    if (Math::GMPz::Rmpz_sgn($y) < 0) {
+    if (Math::GMPz::Rmpz_sgn($k) < 0) {
         my $t = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_gcd($t, $x, $z);
+        Math::GMPz::Rmpz_gcd($t, $n, $z);
         Math::GMPz::Rmpz_cmp_ui($t, 1) == 0 or goto &nan;
     }
 
     my $r = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_powm($r, $x, $y, $z);
+    Math::GMPz::Rmpz_powm($r, $n, $k, $z);
     bless \$r;
+}
+
+#
+## Geometric summation formula
+#
+
+sub geometric_sum ($$) {
+    my ($n, $r) = @_;
+
+    $n = ref($n) eq __PACKAGE__ ? $$n : _star2obj($n);
+    $r = ref($r) eq __PACKAGE__ ? $$r : _star2obj($r);
+
+    bless \__div__(__sub__(__pow__($r, __add__($n, 1)), 1), __sub__($r, 1));
 }
 
 #
@@ -4143,22 +8491,22 @@ sub powmod ($$$) {
 #
 
 sub faulhaber_sum ($$) {
-    require Math::AnyNum::bernfrac;
     my ($n, $p) = @_;
 
-    my $native_n = 0;    # true when `n` is a native integer
+    my $native_n = 0;
 
     if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
-        ## `n` is a native unsigned integer
         $native_n = 1;
     }
     else {
-        $n = (ref($n) eq __PACKAGE__ ? _any2mpz($$n) : _star2mpz($n)) // goto &nan;
+        $n = $$n if (ref($n) eq __PACKAGE__);
 
-        # Try to unbox `n` when it fits inside a native unsigned integer
+        if (ref($n) ne 'Math::GMPz') {
+            $n = _star2mpz($n) // goto &nan;
+        }
+
         if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
-            $native_n = 1;
-            $n        = Math::GMPz::Rmpz_get_ui($n);
+            ($native_n, $n) = (1, Math::GMPz::Rmpz_get_ui($n));
         }
     }
 
@@ -4169,54 +8517,119 @@ sub faulhaber_sum ($$) {
         $p = (ref($p) eq __PACKAGE__ ? _any2ui($$p) : _any2ui(_star2obj($p))) // goto &nan;
     }
 
-    state @cache;    # cache for Bernoulli numbers
+    my @T = _tangent_numbers(($p >> 1) - 1);
 
-    my $t = Math::GMPz::Rmpz_init();
+    my $z = Math::GMPz::Rmpz_init();
     my $u = Math::GMPz::Rmpz_init();
+    my $q = Math::GMPq::Rmpq_init();
 
-    my $numerator   = Math::GMPz::Rmpz_init();
-    my $denominator = Math::GMPz::Rmpz_init_set_ui(1);
+    my $sum = Math::GMPq::Rmpq_init();
+    Math::GMPq::Rmpq_set_ui($sum, 0, 1);
 
-#<<<
-    $native_n
-      ? Math::GMPz::Rmpz_ui_pow_ui($numerator, $n, $p + 1)    # numerator = n^(p + 1)
-      : Math::GMPz::Rmpz_pow_ui(   $numerator, $n, $p + 1);   # ==//==
-#>>>
+    foreach my $j (0 .. $p) {
 
-    foreach my $j (1 .. $p) {
-
-        # When `j` is odd and greater than 1, we can skip it.
         $j % 2 == 0 or $j == 1 or next;
 
-        Math::GMPz::Rmpz_bin_uiui($t, $p + 1, $j);    # t = binomial(p+1, j)
+        Math::GMPz::Rmpz_bin_uiui($z, $p + 1, $j);    # z = binomial(p+1, j)
 
 #<<<
         $native_n
-          ? Math::GMPz::Rmpz_ui_pow_ui($u, $n, $p + 1 - $j)    # u = n^(p + 1 - j)
-          : Math::GMPz::Rmpz_pow_ui(   $u, $n, $p + 1 - $j);   # ==//==
+          ? Math::GMPz::Rmpz_ui_pow_ui($u, $n, $p + 1 - $j)     # u = n^(p+1 - j)
+          : Math::GMPz::Rmpz_pow_ui(   $u, $n, $p + 1 - $j);    # ==//==
 #>>>
 
-        # Compute Bernouli(j)
-        my $bern = ($j <= 100 ? ($cache[$j] //= __bernfrac__($j)) : __bernfrac__($j));
+        Math::GMPz::Rmpz_mul($z, $z, $u);             # z = z * u
 
-#<<<
-        Math::GMPz::Rmpz_mul($t, $t, $u);         # t = t * u
-        Math::GMPq::Rmpq_get_num($u, $bern);      # u = numerator(bern)
-        Math::GMPz::Rmpz_mul($t, $t, $u);         # t = t * u
-        Math::GMPq::Rmpq_get_den($u, $bern);      # u = denominator(bern)
+        if ($j == 0) {
+            Math::GMPq::Rmpq_set_ui($q, 1, 1);
+        }
+        elsif ($j == 1) {
+            Math::GMPq::Rmpq_set_ui($q, 1, 2);
+        }
+        else {
+            Math::GMPz::Rmpz_mul_ui($u, $T[($j >> 1) - 1], $j);
+            Math::GMPz::Rmpz_neg($u, $u) if ((($j >> 1) - 1) & 1);
+            Math::GMPq::Rmpq_set_z($q, $u);
 
-        Math::GMPz::Rmpz_mul(   $numerator,   $numerator,   $u);   # numerator   = numerator   * u
-        Math::GMPz::Rmpz_addmul($numerator,   $denominator, $t);   # numerator  += denominator * t
-        Math::GMPz::Rmpz_mul(   $denominator, $denominator, $u);   # denominator = denominator * u
-#>>>
+            # (2^n - 1) * 2^n
+            Math::GMPz::Rmpz_set_ui($u, 0);
+            Math::GMPz::Rmpz_setbit($u, $j);
+            Math::GMPz::Rmpz_sub_ui($u, $u, 1);
+            Math::GMPz::Rmpz_mul_2exp($u, $u, $j);
+
+            # B_j = q
+            Math::GMPq::Rmpq_div_z($q, $q, $u);
+        }
+
+        Math::GMPq::Rmpq_mul_z($q, $q, $z);
+        Math::GMPq::Rmpq_add($sum, $sum, $q);
     }
 
-#<<<
-    Math::GMPz::Rmpz_mul_ui($denominator, $denominator, $p + 1);        # denominator = denominator * (p+1)
-    Math::GMPz::Rmpz_divexact($numerator, $numerator, $denominator);    # numerator = numerator / denominator
-#>>>
+    Math::GMPq::Rmpq_get_num($z, $sum);
+    Math::GMPz::Rmpz_divexact_ui($z, $z, $p + 1);
 
-    bless \$numerator;
+    bless \$z;
+}
+
+#
+## Catalan numbers
+#
+
+sub catalan ($) {
+    my ($n) = @_;
+
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
+    }
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
+    }
+    else {
+        $n = _any2ui(_star2obj($n)) // goto &nan;
+    }
+
+    my $r = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_bin_uiui($r, $n << 1, $n);
+    Math::GMPz::Rmpz_divexact_ui($r, $r, $n + 1);
+    bless \$r;
+}
+
+#
+## Bell numbers
+#
+
+sub bell ($) {
+    my ($n) = @_;
+
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
+    }
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
+    }
+    else {
+        $n = _any2ui(_star2obj($n)) // goto &nan;
+    }
+
+    my @acc;
+
+    my $t    = Math::GMPz::Rmpz_init();
+    my $bell = Math::GMPz::Rmpz_init_set_ui(1);
+
+    foreach my $k (1 .. $n) {
+
+        Math::GMPz::Rmpz_set($t, $bell);
+
+        foreach my $item (@acc) {
+            Math::GMPz::Rmpz_add($t, $t, $item);
+            Math::GMPz::Rmpz_set($item, $t);
+        }
+
+        unshift @acc, $bell;
+        $bell = Math::GMPz::Rmpz_init_set($acc[-1]);
+    }
+
+    bless \$bell;
 }
 
 #
@@ -4224,40 +8637,44 @@ sub faulhaber_sum ($$) {
 #
 
 sub binomial ($$) {
-    my ($x, $y) = @_;
+    my ($n, $k) = @_;
 
-    # `x` and `y` are native unsigned integers
-    if (    !ref($x)
-        and !ref($y)
-        and CORE::int($x) eq $x
-        and CORE::int($y) eq $y
-        and $x >= 0
-        and $y >= 0
-        and $x < ULONG_MAX
-        and $y < ULONG_MAX) {
+    # `n` and `k` are native unsigned integers
+    if (    !ref($n)
+        and !ref($k)
+        and CORE::int($n) eq $n
+        and CORE::int($k) eq $k
+        and $n >= 0
+        and $k >= 0
+        and $n < ULONG_MAX
+        and $k < ULONG_MAX) {
         my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_bin_uiui($r, $x, $y);
+        Math::GMPz::Rmpz_bin_uiui($r, $n, $k);
         return bless \$r;
     }
 
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // goto &nan;
+    $n = $$n if (ref($n) eq __PACKAGE__);
 
-    if (!ref($y) and CORE::int($y) eq $y and $y > LONG_MIN and $y < ULONG_MAX) {
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // goto &nan;
+    }
+
+    if (!ref($k) and CORE::int($k) eq $k and $k > LONG_MIN and $k < ULONG_MAX) {
         ## `y` is a native integer
     }
     else {
-        $y = _any2si(ref($y) eq __PACKAGE__ ? $$y : _star2obj($y)) // goto &nan;
+        $k = _any2si(ref($k) eq __PACKAGE__ ? $$k : _star2obj($k)) // goto &nan;
     }
 
     my $r = Math::GMPz::Rmpz_init();
 
-    if ($y >= 0 and Math::GMPz::Rmpz_fits_ulong_p($x)) {
-        Math::GMPz::Rmpz_bin_uiui($r, Math::GMPz::Rmpz_get_ui($x), $y);
+    if ($k >= 0 and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+        Math::GMPz::Rmpz_bin_uiui($r, Math::GMPz::Rmpz_get_ui($n), $k);
     }
     else {
-        $y < 0
-          ? Math::GMPz::Rmpz_bin_si($r, $x, $y)
-          : Math::GMPz::Rmpz_bin_ui($r, $x, $y);
+        $k < 0
+          ? Math::GMPz::Rmpz_bin_si($r, $n, $k)
+          : Math::GMPz::Rmpz_bin_ui($r, $n, $k);
     }
 
     bless \$r;
@@ -4309,13 +8726,22 @@ sub multinomial {
 #
 
 sub and {    # used in overloading
-    my ($x, $y) = @_;
+    my ($n, $k) = @_;
 
-    $x = _any2mpz($$x) // (goto &nan);
-    $y = (ref($y) eq __PACKAGE__ ? _any2mpz($$y) : _star2mpz($y)) // (goto &nan);
+    $n = $$n;
+
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _any2mpz($n) // goto &nan;
+    }
+
+    $k = $$k if (ref($k) eq __PACKAGE__);
+
+    if (ref($k) ne 'Math::GMPz') {
+        $k = _star2mpz($k) // goto &nan;
+    }
 
     my $r = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_and($r, $x, $y);
+    Math::GMPz::Rmpz_and($r, $n, $k);
     bless \$r;
 }
 
@@ -4324,13 +8750,22 @@ sub and {    # used in overloading
 #
 
 sub or {    # used in overloading
-    my ($x, $y) = @_;
+    my ($n, $k) = @_;
 
-    $x = _any2mpz($$x) // (goto &nan);
-    $y = (ref($y) eq __PACKAGE__ ? _any2mpz($$y) : _star2mpz($y)) // (goto &nan);
+    $n = $$n;
+
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _any2mpz($n) // goto &nan;
+    }
+
+    $k = $$k if (ref($k) eq __PACKAGE__);
+
+    if (ref($k) ne 'Math::GMPz') {
+        $k = _star2mpz($k) // goto &nan;
+    }
 
     my $r = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_ior($r, $x, $y);
+    Math::GMPz::Rmpz_ior($r, $n, $k);
     bless \$r;
 }
 
@@ -4339,13 +8774,22 @@ sub or {    # used in overloading
 #
 
 sub xor {    # used in overloading
-    my ($x, $y) = @_;
+    my ($n, $k) = @_;
 
-    $x = _any2mpz($$x) // (goto &nan);
-    $y = (ref($y) eq __PACKAGE__ ? _any2mpz($$y) : _star2mpz($y)) // (goto &nan);
+    $n = $$n;
+
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _any2mpz($n) // goto &nan;
+    }
+
+    $k = $$k if (ref($k) eq __PACKAGE__);
+
+    if (ref($k) ne 'Math::GMPz') {
+        $k = _star2mpz($k) // goto &nan;
+    }
 
     my $r = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_xor($r, $x, $y);
+    Math::GMPz::Rmpz_xor($r, $n, $k);
     bless \$r;
 }
 
@@ -4354,50 +8798,64 @@ sub xor {    # used in overloading
 #
 
 sub not {    # used in overloading
-    my ($x) = @_;
-    $x = _any2mpz($$x) // (goto &nan);
+    my ($n) = @_;
+
+    $n = $$n;
+
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _any2mpz($n) // goto &nan;
+    }
+
     my $r = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_com($r, $x);
+    Math::GMPz::Rmpz_com($r, $n);
     bless \$r;
 }
 
 #
-## TEST BIT (true if bit $y is 1, false otherwise)
+## Get k-th bit of integer `n`
 #
 
 sub getbit ($$) {
-    my ($x, $y) = @_;
+    my ($n, $k) = @_;
 
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // return undef;
+    $n = $$n if (ref($n) eq __PACKAGE__);
 
-    if (!ref($y) and CORE::int($y) eq $y and $y >= 0 and $y < ULONG_MAX) {
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // return undef;
+    }
+
+    if (!ref($k) and CORE::int($k) eq $k and $k >= 0 and $k < ULONG_MAX) {
         ## `y` is a native integer
     }
     else {
-        $y = (ref($y) eq __PACKAGE__ ? _any2ui($$y) : _any2ui(_star2obj($y))) // return undef;
+        $k = (ref($k) eq __PACKAGE__ ? _any2ui($$k) : _any2ui(_star2obj($k))) // return undef;
     }
 
-    Math::GMPz::Rmpz_tstbit($x, $y);
+    Math::GMPz::Rmpz_tstbit($n, $k);
 }
 
 #
-## SET BIT (set bit $y to 1)
+## Set k-th bit of integer `n` to 1
 #
 
 sub setbit ($$) {
-    my ($x, $y) = @_;
+    my ($n, $k) = @_;
 
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // goto &nan;
+    $n = $$n if (ref($n) eq __PACKAGE__);
 
-    if (!ref($y) and CORE::int($y) eq $y and $y >= 0 and $y < ULONG_MAX) {
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // goto &nan;
+    }
+
+    if (!ref($k) and CORE::int($k) eq $k and $k >= 0 and $k < ULONG_MAX) {
         ## `y` is a native integer
     }
     else {
-        $y = (ref($y) eq __PACKAGE__ ? _any2ui($$y) : _any2ui(_star2obj($y))) // goto &nan;
+        $k = (ref($k) eq __PACKAGE__ ? _any2ui($$k) : _any2ui(_star2obj($k))) // goto &nan;
     }
 
-    my $r = Math::GMPz::Rmpz_init_set($x);
-    Math::GMPz::Rmpz_setbit($r, $y);
+    my $r = Math::GMPz::Rmpz_init_set($n);
+    Math::GMPz::Rmpz_setbit($r, $k);
     bless \$r;
 }
 
@@ -4406,22 +8864,26 @@ sub setbit ($$) {
 #
 
 sub flipbit ($$) {
-    my ($x, $y) = @_;
+    my ($n, $k) = @_;
 
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // goto &nan;
+    $n = $$n if (ref($n) eq __PACKAGE__);
 
-    if (!ref($y) and CORE::int($y) eq $y and $y >= 0 and $y < ULONG_MAX) {
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // goto &nan;
+    }
+
+    if (!ref($k) and CORE::int($k) eq $k and $k >= 0 and $k < ULONG_MAX) {
         ## `y` is a native integer
     }
     else {
-        $y = (ref($y) eq __PACKAGE__ ? _any2ui($$y) : _any2ui(_star2obj($y))) // goto &nan;
+        $k = (ref($k) eq __PACKAGE__ ? _any2ui($$k) : _any2ui(_star2obj($k))) // goto &nan;
     }
 
-    my $r = Math::GMPz::Rmpz_init_set($x);
+    my $r = Math::GMPz::Rmpz_init_set($n);
 
-    Math::GMPz::Rmpz_tstbit($r, $y)
-      ? Math::GMPz::Rmpz_clrbit($r, $y)
-      : Math::GMPz::Rmpz_setbit($r, $y);
+    Math::GMPz::Rmpz_tstbit($r, $k)
+      ? Math::GMPz::Rmpz_clrbit($r, $k)
+      : Math::GMPz::Rmpz_setbit($r, $k);
 
     bless \$r;
 }
@@ -4431,19 +8893,23 @@ sub flipbit ($$) {
 #
 
 sub clearbit ($$) {
-    my ($x, $y) = @_;
+    my ($n, $k) = @_;
 
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // goto &nan;
+    $n = $$n if (ref($n) eq __PACKAGE__);
 
-    if (!ref($y) and CORE::int($y) eq $y and $y >= 0 and $y < ULONG_MAX) {
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // goto &nan;
+    }
+
+    if (!ref($k) and CORE::int($k) eq $k and $k >= 0 and $k < ULONG_MAX) {
         ## `y` is a native integer
     }
     else {
-        $y = (ref($y) eq __PACKAGE__ ? _any2ui($$y) : _any2ui(_star2obj($y))) // goto &nan;
+        $k = (ref($k) eq __PACKAGE__ ? _any2ui($$k) : _any2ui(_star2obj($k))) // goto &nan;
     }
 
-    my $r = Math::GMPz::Rmpz_init_set($x);
-    Math::GMPz::Rmpz_clrbit($r, $y);
+    my $r = Math::GMPz::Rmpz_init_set($n);
+    Math::GMPz::Rmpz_clrbit($r, $k);
     bless \$r;
 }
 
@@ -4452,22 +8918,26 @@ sub clearbit ($$) {
 #
 
 sub lsft {    # used in overloading
-    my ($x, $y) = @_;
+    my ($n, $k) = @_;
 
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // goto &nan;
+    $n = $$n if (ref($n) eq __PACKAGE__);
 
-    if (!ref($y) and CORE::int($y) eq $y and $y > LONG_MIN and $y < ULONG_MAX) {
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // goto &nan;
+    }
+
+    if (!ref($k) and CORE::int($k) eq $k and $k > LONG_MIN and $k < ULONG_MAX) {
         ## `y` is a native integer
     }
     else {
-        $y = (ref($y) eq __PACKAGE__ ? _any2si($$y) : _any2si(_star2obj($y))) // goto &nan;
+        $k = (ref($k) eq __PACKAGE__ ? _any2si($$k) : _any2si(_star2obj($k))) // goto &nan;
     }
 
     my $r = Math::GMPz::Rmpz_init();
 
-    $y < 0
-      ? Math::GMPz::Rmpz_div_2exp($r, $x, -$y)
-      : Math::GMPz::Rmpz_mul_2exp($r, $x, $y);
+    $k < 0
+      ? Math::GMPz::Rmpz_div_2exp($r, $n, -$k)
+      : Math::GMPz::Rmpz_mul_2exp($r, $n, CORE::int($k));
 
     bless \$r;
 }
@@ -4477,42 +8947,49 @@ sub lsft {    # used in overloading
 #
 
 sub rsft {    # used in overloading
-    my ($x, $y) = @_;
+    my ($n, $k) = @_;
 
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // goto &nan;
+    $n = $$n if (ref($n) eq __PACKAGE__);
 
-    if (!ref($y) and CORE::int($y) eq $y and $y > LONG_MIN and $y < ULONG_MAX) {
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // goto &nan;
+    }
+
+    if (!ref($k) and CORE::int($k) eq $k and $k > LONG_MIN and $k < ULONG_MAX) {
         ## `y` is a native integer
     }
     else {
-        $y = (ref($y) eq __PACKAGE__ ? _any2si($$y) : _any2si(_star2obj($y))) // goto &nan;
+        $k = (ref($k) eq __PACKAGE__ ? _any2si($$k) : _any2si(_star2obj($k))) // goto &nan;
     }
 
     my $r = Math::GMPz::Rmpz_init();
 
-    $y < 0
-      ? Math::GMPz::Rmpz_mul_2exp($r, $x, -$y)
-      : Math::GMPz::Rmpz_div_2exp($r, $x, $y);
+    $k < 0
+      ? Math::GMPz::Rmpz_mul_2exp($r, $n, -$k)
+      : Math::GMPz::Rmpz_div_2exp($r, $n, CORE::int($k));
 
     bless \$r;
 }
 
 #
-## POPCOUNT
+## Population count: number of 1's in the binary representation of `n`
 #
 
 sub popcount ($) {
-    my ($x) = @_;
+    my ($n) = @_;
 
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _any2mpz(_star2obj($x))) // return -1;
+    $n = $$n if (ref($n) eq __PACKAGE__);
 
-    if (Math::GMPz::Rmpz_sgn($x) < 0) {
-        my $t = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_neg($t, $x);
-        $x = $t;
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // return -1;
     }
 
-    Math::GMPz::Rmpz_popcount($x);
+    if (Math::GMPz::Rmpz_sgn($n) < 0) {
+        $n = Math::GMPz::Rmpz_init_set($n);
+        Math::GMPz::Rmpz_neg($n, $n);
+    }
+
+    Math::GMPz::Rmpz_popcount($n);
 }
 
 #
@@ -4520,99 +8997,135 @@ sub popcount ($) {
 #
 
 sub as_bin ($) {
-    Math::GMPz::Rmpz_get_str((_star2mpz($_[0]) // return undef), 2);
+    my ($n) = @_;
+
+    $n = $$n if (ref($n) eq __PACKAGE__);
+
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // return undef;
+    }
+
+    Math::GMPz::Rmpz_get_str($n, 2);
 }
 
 sub as_oct ($) {
-    Math::GMPz::Rmpz_get_str((_star2mpz($_[0]) // return undef), 8);
+    my ($n) = @_;
+
+    $n = $$n if (ref($n) eq __PACKAGE__);
+
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // return undef;
+    }
+
+    Math::GMPz::Rmpz_get_str($n, 8);
 }
 
 sub as_hex ($) {
-    Math::GMPz::Rmpz_get_str((_star2mpz($_[0]) // return undef), 16);
+    my ($n) = @_;
+
+    $n = $$n if (ref($n) eq __PACKAGE__);
+
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // return undef;
+    }
+
+    Math::GMPz::Rmpz_get_str($n, 16);
 }
 
 sub as_int ($;$) {
-    my ($x, $y) = @_;
+    my ($n, $k) = @_;
 
     my $base = 10;
-    if (defined($y)) {
+    if (defined($k)) {
 
-        if (!ref($y) and CORE::int($y) eq $y) {
-            $base = $y;
+        if (!ref($k) and CORE::int($k) eq $k) {
+            $base = $k;
         }
-        elsif (ref($y) eq __PACKAGE__) {
-            $base = _any2ui($$y) // 0;
+        elsif (ref($k) eq __PACKAGE__) {
+            $base = _any2ui($$k) // 0;
         }
         else {
-            $base = _any2ui(_star2mpz($y) // return undef) // 0;
+            $base = _any2ui(_star2obj($k)) // 0;
         }
 
-        if ($base < 2 or $base > 36) {
+        if ($base < 2 or $base > 62) {
             require Carp;
-            Carp::croak("base must be between 2 and 36, got $y");
+            Carp::croak("base must be between 2 and 62, got $k");
         }
     }
 
-    Math::GMPz::Rmpz_get_str((_star2mpz($x) // return undef), $base);
+    $n = $$n if (ref($n) eq __PACKAGE__);
+
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // return undef;
+    }
+
+    Math::GMPz::Rmpz_get_str($n, $base);
+}
+
+sub __as_rat__ {
+    my ($n, $k) = @_;
+
+    $n = ref($n) eq __PACKAGE__ ? $$n : _star2obj($n);
+
+    my $base = 10;
+    if (defined($k)) {
+
+        if (!ref($k) and CORE::int($k) eq $k) {
+            $base = $k;
+        }
+        elsif (ref($k) eq __PACKAGE__) {
+            $base = _any2ui($$k) // 0;
+        }
+        else {
+            $base = _any2ui(_star2obj($k)) // 0;
+        }
+
+        if ($base < 2 or $base > 62) {
+            require Carp;
+            Carp::croak("base must be between 2 and 62, got $k");
+        }
+    }
+
+    my $ref = ref($n);
+    if (   $ref eq 'Math::GMPq'
+        or $ref eq 'Math::GMPz') {
+        return (
+                $ref eq 'Math::GMPq'
+                ? Math::GMPq::Rmpq_get_str($n, $base)
+                : Math::GMPz::Rmpz_get_str($n, $base)
+               );
+    }
+
+    $n = _any2mpq($n) // return undef;
+    Math::GMPq::Rmpq_get_str($n, $base);
+}
+
+sub as_rat ($;$) {
+    my ($n, $k) = @_;
+    __as_rat__($n, $k) // return undef;
 }
 
 sub as_frac ($;$) {
-    my ($x, $y) = @_;
-
-    my $base = 10;
-    if (defined($y)) {
-
-        if (!ref($y) and CORE::int($y) eq $y) {
-            $base = $y;
-        }
-        elsif (ref($y) eq __PACKAGE__) {
-            $base = _any2ui($$y) // 0;
-        }
-        else {
-            $base = _any2ui(_star2mpz($y) // return undef) // 0;
-        }
-
-        if ($base < 2 or $base > 36) {
-            require Carp;
-            Carp::croak("base must be between 2 and 36, got $y");
-        }
-    }
-
-    $x = ref($x) eq __PACKAGE__ ? $$x : _star2obj($x);
-
-    my $ref = ref($x);
-    if (   $ref eq 'Math::GMPq'
-        or $ref eq 'Math::GMPz') {
-        my $frac = (
-                    $ref eq 'Math::GMPq'
-                    ? Math::GMPq::Rmpq_get_str($x, $base)
-                    : Math::GMPz::Rmpz_get_str($x, $base)
-                   );
-        $frac .= '/1' if (index($frac, '/') == -1);
-        return $frac;
-    }
-
-    $x = _any2mpq($x) // return undef;
-
-    my $frac = Math::GMPq::Rmpq_get_str($x, $base);
-    $frac .= '/1' if (index($frac, '/') == -1);
-    $frac;
+    my ($n, $k) = @_;
+    my $rat = __as_rat__($n, $k) // return undef;
+    $rat .= '/1' if (index($rat, '/') == -1);
+    $rat;
 }
 
 sub as_dec ($;$) {
-    my ($x, $y) = @_;
-    require Math::AnyNum::stringify;
+    my ($n, $d) = @_;
 
     my $prec = $PREC;
-    if (defined($y)) {
-        if (!ref($y) and CORE::int($y) eq $y) {
-            $prec = $y;
+    if (defined($d)) {
+        if (!ref($d) and CORE::int($d) eq $d) {
+            $prec = $d;
         }
-        elsif (ref($y) eq __PACKAGE__) {
-            $prec = _any2ui($$y) // 0;
+        elsif (ref($d) eq __PACKAGE__) {
+            $prec = _any2ui($$d) // 0;
         }
         else {
-            $prec = _any2ui(_star2mpz($y) // return undef) // 0;
+            $prec = _any2ui(_star2obj($d)) // 0;
         }
 
         $prec <<= 2;
@@ -4627,11 +9140,10 @@ sub as_dec ($;$) {
     }
 
     local $PREC = $prec;
-    __stringify__(_star2mpfr_mpc($x));
+    __stringify__(_star2mpfr_mpc($n));
 }
 
 sub rat_approx ($) {
-    require Math::AnyNum::stringify;
     my ($x) = @_;
 
     $x = _star2mpfr($x);
@@ -4682,33 +9194,68 @@ sub rat_approx ($) {
     bless \$q;
 }
 
+my %DIGITS_36;
+@DIGITS_36{0 .. 9, 'a' .. 'z'} = (0 .. 35);
+
+my %DIGITS_62;
+@DIGITS_62{0 .. 9, 'A' .. 'Z', 'a' .. 'z'} = (0 .. 61);
+
 sub digits ($;$) {
     my ($n, $k) = @_;
 
-    $n = _star2mpz($n) // return;
+    $n = $$n if (ref($n) eq __PACKAGE__);
+
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // return;
+    }
+
     $k //= 10;
 
     if (!ref($k) and CORE::int($k) eq $k and $k > 1 and $k < ULONG_MAX) {
 
-        # Return faster for k=2..16
-        if ($k <= 16) {
-            my @digits = split(//, scalar reverse(Math::GMPz::Rmpz_get_str($n, $k) =~ s/^-//r));
-            return ($k > 10 ? (map { hex($_) } @digits) : @digits);
+        # Return faster for k=2..62
+        if ($k <= 62) {
+            return map { $k <= 36 ? $DIGITS_36{$_} : $DIGITS_62{$_} }
+              split(//, scalar reverse scalar(Math::GMPz::Rmpz_get_str($n, $k) =~ s/^-//r));
         }
+
+        $n = Math::GMPz::Rmpz_init_set($n);
+
+        my $sgn = Math::GMPz::Rmpz_sgn($n);
+
+        if ($sgn == 0) {
+            goto &zero;
+        }
+        elsif ($sgn < 0) {
+            Math::GMPz::Rmpz_abs($n, $n);
+        }
+
+        my @digits;
+        while (Math::GMPz::Rmpz_sgn($n) > 0) {
+            my $m = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_divmod_ui($n, $m, $n, $k);
+            push @digits, bless \$m;
+        }
+
+        return @digits;
     }
 
-    $k = _star2mpz($k) // return;
+    $k = $$k if (ref($k) eq __PACKAGE__);
+
+    if (ref($k) ne 'Math::GMPz') {
+        $k = _star2mpz($k) // return;
+    }
 
     # Not defined for k <= 1
     if (Math::GMPz::Rmpz_cmp_ui($k, 1) <= 0) {
         return;
     }
 
-    # Return faster for k=2..16
-    if (Math::GMPz::Rmpz_cmp_ui($k, 16) <= 0) {
+    # Return faster for k=2..62
+    if (Math::GMPz::Rmpz_cmp_ui($k, 62) <= 0) {
         $k = Math::GMPz::Rmpz_get_ui($k);
-        my @digits = split(//, scalar reverse(Math::GMPz::Rmpz_get_str($n, $k) =~ s/^-//r));
-        return ($k > 10 ? (map { hex($_) } @digits) : @digits);
+        return map { $k <= 36 ? $DIGITS_36{$_} : $DIGITS_62{$_} }
+          split(//, scalar reverse scalar(Math::GMPz::Rmpz_get_str($n, $k) =~ s/^-//r));
     }
 
     $n = Math::GMPz::Rmpz_init_set($n);
@@ -4716,7 +9263,7 @@ sub digits ($;$) {
     my $sgn = Math::GMPz::Rmpz_sgn($n);
 
     if ($sgn == 0) {
-        return (zero());
+        goto &zero;
     }
     elsif ($sgn < 0) {
         Math::GMPz::Rmpz_abs($n, $n);
@@ -4736,7 +9283,12 @@ sub digits ($;$) {
 sub sumdigits ($;$) {
     my ($n, $k) = @_;
 
-    $n = _star2mpz($n) // goto &nan;
+    $n = $$n if (ref($n) eq __PACKAGE__);
+
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // goto &nan;
+    }
+
     $k //= 10;
 
     if (!ref($k) and CORE::int($k) eq $k and $k > 1 and $k < ULONG_MAX) {
@@ -4752,14 +9304,44 @@ sub sumdigits ($;$) {
             return bless \Math::GMPz::Rmpz_init_set_ui(Math::GMPz::Rmpz_popcount($n));
         }
 
-        # Return faster for k=3..16
-        if ($k <= 16) {
-            my @digits = split(//, Math::GMPz::Rmpz_get_str($n, $k) =~ s/^-//r);
-            return bless \Math::GMPz::Rmpz_init_set_ui(List::Util::sum($k > 10 ? (map { hex($_) } @digits) : @digits));
+        # Return faster for k=3..62
+#<<<
+        if ($k <= 62) {
+            return bless \Math::GMPz::Rmpz_init_set_ui(
+                List::Util::sum(
+                    map { $k <= 36 ? $DIGITS_36{$_} : $DIGITS_62{$_} } split(//, Math::GMPz::Rmpz_get_str($n, $k) =~ s/^-//r)
+                )
+            );
         }
+#>>>
+
+        $n = Math::GMPz::Rmpz_init_set($n);
+
+        my $sgn = Math::GMPz::Rmpz_sgn($n);
+
+        if ($sgn == 0) {
+            goto &zero;
+        }
+        elsif ($sgn < 0) {
+            Math::GMPz::Rmpz_abs($n, $n);
+        }
+
+        my $m   = Math::GMPz::Rmpz_init();
+        my $sum = Math::GMPz::Rmpz_init_set_ui(0);
+
+        while (Math::GMPz::Rmpz_sgn($n) > 0) {
+            Math::GMPz::Rmpz_add_ui($sum, $sum, Math::GMPz::Rmpz_divmod_ui($n, $m, $n, $k));
+        }
+
+        return bless \$sum;
     }
 
-    $k = _star2mpz($k) // goto &nan;
+    $k = $$k if (ref($k) eq __PACKAGE__);
+
+    if (ref($k) ne 'Math::GMPz') {
+        $k = _star2mpz($k) // goto &nan;
+    }
+
     $n = Math::GMPz::Rmpz_init_set($n);
 
     # Not defined for k <= 1
@@ -4770,19 +9352,20 @@ sub sumdigits ($;$) {
     my $sgn = Math::GMPz::Rmpz_sgn($n);
 
     if ($sgn == 0) {
-        return zero();
+        goto &zero;
     }
     elsif ($sgn < 0) {
         Math::GMPz::Rmpz_abs($n, $n);
     }
 
-    # Return faster for k=2..16
-    if (Math::GMPz::Rmpz_cmp_ui($k, 16) <= 0) {
+    # Return faster for k=2..62
+#<<<
+    if (Math::GMPz::Rmpz_cmp_ui($k, 62) <= 0) {
         $k = Math::GMPz::Rmpz_get_ui($k);
         return bless \Math::GMPz::Rmpz_init_set_ui(Math::GMPz::Rmpz_popcount($n)) if $k == 2;
-        my @digits = split(//, Math::GMPz::Rmpz_get_str($n, $k));
-        return bless \Math::GMPz::Rmpz_init_set_ui(List::Util::sum($k > 10 ? (map { hex($_) } @digits) : @digits));
+        return bless \Math::GMPz::Rmpz_init_set_ui(List::Util::sum(map { $k <= 36 ? $DIGITS_36{$_} : $DIGITS_62{$_} } split(//, Math::GMPz::Rmpz_get_str($n, $k))));
     }
+#>>>
 
     my $m   = Math::GMPz::Rmpz_init();
     my $sum = Math::GMPz::Rmpz_init_set_ui(0);
@@ -4793,6 +9376,119 @@ sub sumdigits ($;$) {
     }
 
     bless \$sum;
+}
+
+sub bsearch ($$;$) {
+    my ($left, $right, $block) = @_;
+
+    if (@_ == 3) {
+        $left  = Math::GMPz::Rmpz_init_set(_star2mpz($left) // return undef);
+        $right = Math::GMPz::Rmpz_init_set(_star2mpz($right) // return undef);
+    }
+    else {
+        $block = $right;
+        $right = Math::GMPz::Rmpz_init_set(_star2mpz($left) // return undef);
+        $left  = Math::GMPz::Rmpz_init_set_ui(0);
+    }
+
+    my $middle = Math::GMPz::Rmpz_init();
+
+    while (Math::GMPz::Rmpz_cmp($left, $right) <= 0) {
+
+        Math::GMPz::Rmpz_add($middle, $left, $right);
+        Math::GMPz::Rmpz_div_2exp($middle, $middle, 1);
+
+        local $_ = bless \Math::GMPz::Rmpz_init_set($middle);
+        my $cmp = $block->($_) || return $_;
+
+        if ($cmp > 0) {
+            Math::GMPz::Rmpz_sub_ui($right, $middle, 1);
+        }
+        else {
+            Math::GMPz::Rmpz_add_ui($left, $middle, 1);
+        }
+    }
+
+    return undef;
+}
+
+sub bsearch_ge ($$;$) {
+    my ($left, $right, $block) = @_;
+
+    if (@_ == 3) {
+        $left  = Math::GMPz::Rmpz_init_set(_star2mpz($left) // return undef);
+        $right = Math::GMPz::Rmpz_init_set(_star2mpz($right) // return undef);
+    }
+    else {
+        $block = $right;
+        $right = Math::GMPz::Rmpz_init_set(_star2mpz($left) // return undef);
+        $left  = Math::GMPz::Rmpz_init_set_ui(0);
+    }
+
+    my $middle = Math::GMPz::Rmpz_init();
+
+    while (1) {
+
+        Math::GMPz::Rmpz_add($middle, $left, $right);
+        Math::GMPz::Rmpz_div_2exp($middle, $middle, 1);
+
+        local $_ = bless \Math::GMPz::Rmpz_init_set($middle);
+        my $cmp = $block->($_) || return $_;
+
+        if ($cmp < 0) {
+            Math::GMPz::Rmpz_add_ui($left, $middle, 1);
+
+            if (Math::GMPz::Rmpz_cmp($left, $right) > 0) {
+                Math::GMPz::Rmpz_add_ui($middle, $middle, 1);
+                last;
+            }
+        }
+        else {
+            Math::GMPz::Rmpz_sub_ui($right, $middle, 1);
+            Math::GMPz::Rmpz_cmp($left, $right) > 0 and last;
+        }
+    }
+
+    bless \$middle;
+}
+
+sub bsearch_le ($$;$) {
+    my ($left, $right, $block) = @_;
+
+    if (@_ == 3) {
+        $left  = Math::GMPz::Rmpz_init_set(_star2mpz($left) // return undef);
+        $right = Math::GMPz::Rmpz_init_set(_star2mpz($right) // return undef);
+    }
+    else {
+        $block = $right;
+        $right = Math::GMPz::Rmpz_init_set(_star2mpz($left) // return undef);
+        $left  = Math::GMPz::Rmpz_init_set_ui(0);
+    }
+
+    my $middle = Math::GMPz::Rmpz_init();
+
+    while (1) {
+
+        Math::GMPz::Rmpz_add($middle, $left, $right);
+        Math::GMPz::Rmpz_div_2exp($middle, $middle, 1);
+
+        local $_ = bless \Math::GMPz::Rmpz_init_set($middle);
+        my $cmp = $block->($_) || return $_;
+
+        if ($cmp < 0) {
+            Math::GMPz::Rmpz_add_ui($left, $middle, 1);
+            Math::GMPz::Rmpz_cmp($left, $right) > 0 and last;
+        }
+        else {
+            Math::GMPz::Rmpz_sub_ui($right, $middle, 1);
+            if (Math::GMPz::Rmpz_cmp($left, $right) > 0) {
+                Math::GMPz::Rmpz_sub_ui($middle, $middle, 1);
+                last;
+            }
+        }
+    }
+
+    bless \$middle;
 }
 
 1;    # End of Math::AnyNum

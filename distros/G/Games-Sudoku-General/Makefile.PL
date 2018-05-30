@@ -45,7 +45,7 @@ if ( $opt{n} ) {
 }
 
 if (@exe_files) {
-    @exe_files = map {"bin/$_"} @exe_files;
+    @exe_files = map { "script/$_" } @exe_files;
 }
 
 

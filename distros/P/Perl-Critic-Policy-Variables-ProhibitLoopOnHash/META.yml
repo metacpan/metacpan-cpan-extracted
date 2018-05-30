@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,7 +18,7 @@ name: Perl-Critic-Policy-Variables-ProhibitLoopOnHash
 provides:
   Perl::Critic::Policy::Variables::ProhibitLoopOnHash:
     file: lib/Perl/Critic/Policy/Variables/ProhibitLoopOnHash.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Carp: '0'
   List::Util: '1.33'
@@ -26,6 +26,6 @@ requires:
   parent: '0'
 resources:
   repository: git://github.com/xsawyerx/perl-critic-policy-variables-prohibitlooponhash.git
-version: '0.003'
+version: '0.004'
 x_authority: cpan:XSAWYERX
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_serialization_backend: 'YAML::Tiny version 1.73'

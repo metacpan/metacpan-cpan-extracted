@@ -160,7 +160,7 @@ $commit = $c->describe_commit;
 ok( defined($commit), 'initial import commit' );
 is( $c->describe_commit, undef, 'no more commits' );
 
-TestBot->expect( "#test 03Test U. Ser (03ser) 05master "
+TestBot->expect( "dummy/#test 03Test U. Ser (03ser) 05master "
         . $commit->id
         . " 12test/06there 03old import old content * 14http://scm.host.org/there/master/?commit="
         . $commit->id.'' );
@@ -195,7 +195,7 @@ ok( defined($commit), 'merge commit exists' );
 is( $commit->branch, 'master' );
 is( $commit->log,    "merge '$b1' into master" );
 
-TestBot->expect( '#test 03Test U. Ser (03ser) 05master '
+TestBot->expect( 'dummy/#test 03Test U. Ser (03ser) 05master '
         . $commit->id
         . ' 12test/06there merge \'a-new\' into master * 14http://scm.host.org/there/master/?commit='
         . $commit->id
@@ -206,7 +206,7 @@ ok( defined($commit), 'merge commit exists' );
 is( $commit->branch, 'master' );
 is( $commit->log,    "merge '$b2' into master" );
 
-TestBot->expect( '#test 03Test U. Ser (03ser) 05master '
+TestBot->expect( 'dummy/#test 03Test U. Ser (03ser) 05master '
         . $commit->id
         . ' 12test/06there merge \'new-content\' into master * 14http://scm.host.org/there/master/?commit='
         . $commit->id
@@ -217,7 +217,7 @@ ok( defined($commit), "first $b1 commit exists" );
 is( $commit->branch, $b1 );
 is( $commit->log,    "created new content" );
 
-TestBot->expect( '#test 03Test U. Ser (03ser) 05a-new '
+TestBot->expect( 'dummy/#test 03Test U. Ser (03ser) 05a-new '
         . $commit->id
         . ' 12test/06there 03new created new content * 14http://scm.host.org/there/a-new/?commit='
         . $commit->id
@@ -228,7 +228,7 @@ ok( defined($commit), "second $b1 commit exists" );
 is( $commit->branch, $b1 );
 is( $commit->log,    "updated new content" );
 
-TestBot->expect( '#test 03Test U. Ser (03ser) 05a-new '
+TestBot->expect( 'dummy/#test 03Test U. Ser (03ser) 05a-new '
         . $commit->id
         . ' 12test/06there 10new updated new content * 14http://scm.host.org/there/a-new/?commit='
         . $commit->id
@@ -239,7 +239,7 @@ ok( defined($commit), "first $b2 commit exists" );
 is( $commit->branch, $b2 );
 is( $commit->log,    "created new content" );
 
-TestBot->expect( '#test 03Test U. Ser (03ser) 05new-content '
+TestBot->expect( 'dummy/#test 03Test U. Ser (03ser) 05new-content '
         . $commit->id
         . ' 12test/06there 10new created new content * 14http://scm.host.org/there/new-content/?commit='
         . $commit->id
@@ -250,7 +250,7 @@ ok( defined($commit), "second $b2 commit exists" );
 is( $commit->branch, $b2 );
 is( $commit->log,    "updated new content" );
 
-TestBot->expect( '#test 03Test U. Ser (03ser) 05new-content '
+TestBot->expect( 'dummy/#test 03Test U. Ser (03ser) 05new-content '
         . $commit->id
         . ' 12test/06there 10new updated new content * 14http://scm.host.org/there/new-content/?commit='
         . $commit->id

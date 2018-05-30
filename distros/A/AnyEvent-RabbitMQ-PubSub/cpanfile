@@ -19,5 +19,4 @@ on 'develop' => sub {
     requires 'Test::Spellunker';
     requires 'Version::Next';
     requires 'CPAN::Uploader';
-    requires 'LWP::Protocol::https';
 };

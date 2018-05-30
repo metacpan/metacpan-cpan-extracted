@@ -3,7 +3,7 @@ package Dist::Zilla::Plugin::GitHub::Meta;
 use strict;
 use warnings;
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 use JSON::MaybeXS;
 use Moose;
@@ -34,6 +34,12 @@ has fork => (
     is      => 'ro',
     isa     => 'Bool',
     default => 1
+);
+
+has require_auth => (
+    is      => 'ro',
+    isa     => 'Bool',
+    default => 0
 );
 
 #pod =head1 SYNOPSIS
@@ -124,7 +130,7 @@ sub metadata {
     $self->log("Getting GitHub repository info");
 
     my $url      = $self->api."/repos/$repo_name";
-    my $response = $http->request('GET', $url);
+    my $response = $http->request('GET', $url, $self->require_auth ? {headers => $self->_auth_headers} : ());
 
     my $repo = $self->_check_response($response);
     $offline = 1 if not $repo;
@@ -200,7 +206,7 @@ Dist::Zilla::Plugin::GitHub::Meta - Add a GitHub repo's info to META.{yml,json}
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 SYNOPSIS
 
@@ -314,12 +320,32 @@ If the repository is a GitHub fork of another repository this option will make
 all the information be taken from the original repository instead of the forked
 one, if it's set to true (default).
 
+=item C<require_auth>
+
+If this is true, then the API request will be sent with Authorization
+headers. This is useful if you are behind some sort of proxy that is
+triggering the GitHub rate limiting.
+
+=item C<prompt_2fa>
+
+Prompt for GitHub two-factor authentication code if this option is set to true
+(default is false). If this option is set to false but GitHub requires 2fa for
+the login, it'll be automatically enabled.
+
+This is only relevant if C<require_auth> is true.
+
 =back
 
 =head1 SUPPORT
 
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-GitHub>
 (or L<bug-Dist-Zilla-Plugin-GitHub@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-GitHub@rt.cpan.org>).
+
+There is also a mailing list available for users of this distribution, at
+L<http://dzil.org/#mailing-list>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
 =head1 AUTHOR
 

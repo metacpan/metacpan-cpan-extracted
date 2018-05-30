@@ -1,5 +1,8 @@
 Revision history for Perl extension DBIx-Fixture-Admin
 
+0.16 2018-05-26T04:13:23Z
+    - fix @INC problem
+
 0.15 2016-11-01T02:25:18Z
     - remove name key
 

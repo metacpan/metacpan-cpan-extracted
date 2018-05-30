@@ -56,6 +56,13 @@ my %known_inconsistent = (
 				# Sladen: failed 09-Dec-2017 (Kelso: operational)
     25272 => { sladen => 1 },	# 14-Aug-2017: Sladen tumbling.
     25274 => { sladen => 1 },	# about 28-Aug-2017: Sladen declares failed.
+    25285 => { sladen => 1 },	# 18-May-2018: Sladen failed
+    25287 => { sladen => 1 },	# 10-May-2018: Kelso partly operational
+				# 18-May-2018: Sladen failed
+    25289 => { sladen => 1 },	# 10-May-2018: Kelso partly operational
+				# 18-May-2018: Sladen failed
+    25291 => { sladen => 1 },	# 10-May-2018: Kelso partly operational
+				# 18-May-2018: Sladen failed
     25343 => { sladen => 1 },	# 27-Apr-2018: Kelso partly operational
 #   25431 => { sladen => 1 },	# 21-Jan-2018: Sladen failed.
     25431 => { sladen => 1 },	# Sladen: failed 09-Feb-2018
@@ -133,7 +140,6 @@ foreach (
  24836   Iridium 914    [-]      Tumbling
  24837   Iridium 12     [P]      
  24839   Iridium 10     [+]      
- 24840   Iridium 13     [P]      
  24841   Iridium 16     [-]      Tumbling
  24842   Iridium 911    [-]      Tumbling
  24869   Iridium 15     [+]      
@@ -142,7 +148,6 @@ foreach (
  24872   Iridium 18     [+]      
  24873   Iridium 921    [-]      Tumbling
  24903   Iridium 26     [-]      Tumbling
- 24904   Iridium 25     [P]      
  24905   Iridium 46     [P]      
  24907   Iridium 22     [-]      Tumbling
  24925   Dummy mass 1   [-]      Tumbling
@@ -178,15 +183,14 @@ foreach (
  25276   Iridium 60     [+]      
  25285   Iridium 62     [+]      
  25286   Iridium 63     [-]      Tumbling
- 25287   Iridium 64     [+]      
+ 25287   Iridium 64     [P]      
  25288   Iridium 65     [+]      
- 25289   Iridium 66     [+]      
+ 25289   Iridium 66     [P]      
  25290   Iridium 67     [+]      
- 25291   Iridium 68     [+]      
+ 25291   Iridium 68     [P]      
  25319   Iridium 69     [-]      Tumbling
  25320   Iridium 71     [-]      Tumbling
  25342   Iridium 70     [+]      
- 25343   Iridium 72     [P]      
  25344   Iridium 73     [-]      Tumbling
  25346   Iridium 75     [+]      
  25432   Iridium 76     [P]      
@@ -200,7 +204,7 @@ foreach (
  25577   Iridium 20     [P]      
  25578   Iridium 11     [+]      
  25777   Iridium 14     [+]      
- 25778   Iridium 21     [+]      
+ 25778   Iridium 21     [P]      
  27372   Iridium 91     [+]      
  27373   Iridium 90     [B]      
  27375   Iridium 95     [+]      
@@ -224,7 +228,6 @@ KELSO
  24872   Iridium 18     [-]      Plane 6
  24873   Iridium 921    [-]      Plane 6
  24903   Iridium 26     [-]      Plane 2 - Failed on station?
- 24904   Iridium 25     [-]      Plane 2 - Failed on station?
  24905   Iridium 46     [-]      Plane 2 - Failed on station?
  24907   Iridium 22     [-]      Plane 2 - Failed on station?
  24925   Dummy mass 1   [-]      Dummy
@@ -258,17 +261,16 @@ KELSO
  25274   Iridium 58     [-]      Plane 3
  25275   Iridium 59     [+]      Plane 3
  25276   Iridium 60     [+]      Plane 3
- 25285   Iridium 62     [+]      Plane 1
+ 25285   Iridium 62     [-]      Plane 1
  25286   Iridium 63     [-]      Plane 1 - Failed on station?
- 25287   Iridium 64     [+]      Plane 1
+ 25287   Iridium 64     [-]      Plane 1
  25288   Iridium 65     [+]      Plane 1
- 25289   Iridium 66     [+]      Plane 1
+ 25289   Iridium 66     [-]      Plane 1
  25290   Iridium 67     [+]      Plane 1
- 25291   Iridium 68     [+]      Plane 1
+ 25291   Iridium 68     [-]      Plane 1 - Failed on station?
  25319   Iridium 69     [-]      Plane 2
  25320   Iridium 71     [-]      Plane 2
  25342   Iridium 70     [+]      Plane 1
- 25343   Iridium 72     [-]      Plane 1 - Failed on station?
  25344   Iridium 73     [-]      Plane 1
  25346   Iridium 75     [+]      Plane 1
  25432   Iridium 76     [-]      Plane 2
@@ -311,7 +313,7 @@ SLADEN
  24872   Iridium 18     [?]      SpaceTrack
  24873   Iridium 921    [?]      SpaceTrack
  24903   Iridium 26     [?]      SpaceTrack
- 24904   Iridium 25     [?]      SpaceTrack
+ 24904   Iridium 25     [D]      Decayed 2018-05-14
  24905   Iridium 46     [?]      SpaceTrack
  24906   Iridium 23     [D]      Decayed 2018-03-28
  24907   Iridium 22     [?]      SpaceTrack
@@ -361,7 +363,7 @@ SLADEN
  25319   Iridium 69     [?]      SpaceTrack
  25320   Iridium 71     [?]      SpaceTrack
  25342   Iridium 70     [?]      SpaceTrack
- 25343   Iridium 72     [?]      SpaceTrack
+ 25343   Iridium 72     [D]      Decayed 2018-05-14
  25344   Iridium 73     [?]      SpaceTrack
  25345   Iridium 74     [D]      Decayed 2017-06-11
  25346   Iridium 75     [?]      SpaceTrack

@@ -4,7 +4,7 @@
       "Sawyer X"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -48,7 +48,7 @@
    "provides" : {
       "Perl::Critic::Policy::Variables::ProhibitLoopOnHash" : {
          "file" : "lib/Perl/Critic/Policy/Variables/ProhibitLoopOnHash.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -59,8 +59,8 @@
          "web" : "https://github.com/xsawyerx/perl-critic-policy-variables-prohibitlooponhash"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_authority" : "cpan:XSAWYERX",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

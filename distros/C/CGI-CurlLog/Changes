@@ -1,5 +1,8 @@
 Revision history for CGI::CurlLog
 
+0.03 Wed May 23 16:17:32 CDT 2018
+    - Use options from the use line
+
 0.02 Thu Dec 15 13:07:32 CST 2016
     - Don't buffer before outputting the log
 

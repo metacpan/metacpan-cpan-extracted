@@ -36,6 +36,17 @@ Redis::Setlock is a like the setlock command using Redis.
 
 Redis Server >= 2.6.12.
 
+# METHODS
+
+- **new**(%args)
+- **lock\_guard**($redis, $lock\_name, $expires, $blocking)
+
+    Creates Guard::guard object when the lock got.
+
+    The lock is released at the guard is destroyed.
+
+    If $blocking is true, lock\_guard will be blocked until getting a lock. Otherwise returns immedetly when the lock is held by others .
+
 # LICENSE
 
 Copyright (C) FUJIWARA Shunichiro.

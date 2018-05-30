@@ -54,6 +54,7 @@ xt/group_modify_dropdown.t
 xt/group_modify_list.t
 xt/group_modify_selectbox.t
 xt/initialdata.t
+xt/mandatory_pattern.t
 xt/queue_modify_dropdown.t
 xt/queue_modify_list.t
 xt/queue_modify_selectbox.t

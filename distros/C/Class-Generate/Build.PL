@@ -18,7 +18,7 @@ my %module_build_args = (
     "unknown"
   ],
   "dist_name" => "Class-Generate",
-  "dist_version" => "1.16",
+  "dist_version" => "1.17",
   "license" => "perl",
   "module_name" => "Class::Generate",
   "recursive_test_files" => 1,
@@ -36,6 +36,8 @@ my %module_build_args = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => "0.88",
+    "Text::Soundex" => 0,
+    "Text::Tabs" => 0,
     "constant" => 0,
     "lib" => 0,
     "warnings" => 0
@@ -49,6 +51,8 @@ my %fallback_build_requires = (
   "IPC::Open3" => 0,
   "Module::Build" => "0.28",
   "Test::More" => "0.88",
+  "Text::Soundex" => 0,
+  "Text::Tabs" => 0,
   "constant" => 0,
   "lib" => 0,
   "warnings" => 0

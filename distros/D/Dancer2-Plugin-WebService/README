@@ -4,7 +4,7 @@ NAME
 
 DESCRIPTION
 
-    Rapid creation of RESTful Web Services with sessions and persistent data
+    Rapid creation of RESTful Web Services with login/logout, sessions and persistent data
 
 INSTALLATION
 
@@ -30,7 +30,7 @@ AUTHORS
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017 by George Bouras.
+    This software is copyright (c) 2018 by George Bouras.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

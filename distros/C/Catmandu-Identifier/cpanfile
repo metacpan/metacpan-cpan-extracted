@@ -10,6 +10,9 @@ on 'test', sub {
 
 };
 
+requires 'JSON';
+requires 'Moo';
+requires 'Scalar::Util';
 requires 'Catmandu', '>=0.94';
 requires 'Business::ISSN', '0.91';
 requires 'Business::ISBN', '2.010';

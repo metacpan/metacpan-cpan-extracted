@@ -16,7 +16,9 @@ my %FileFunc = (
         String mode = "";
         String s = "";
         try {
+            PlFileHandle.allOpenFiles.add(fh);
             fh.readlineBuffer = new StringBuilder();
+            fh.flush();
             fh.eof = false;
             if (fh.outputStream != null) {
                 fh.outputStream.close();
@@ -24,15 +26,17 @@ my %FileFunc = (
             if (fh.reader != null) {
                 fh.reader.close();
             }
+            // PlCORE.say("open " + List__.toString());
             if (argCount == 0) {
+                // As a shortcut a one-argument call takes the filename from the
+                // global scalar variable of the same name as the filehandle
                 PlCORE.die("TODO - not implemented: single argument open()");
             }
             else if (argCount == 1) {
 
                 if (List__.aget(0).ref().str_eq(new PlString("SCALAR")).to_boolean()) {
                     PlObject o = List__.aget(0).scalar_deref("main");
-                    InputStream is = new PlStringInputStream(o);
-                    fh.reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+                    fh.reader = new PlStringReader(o);
                     fh.reader.mark(o.toString().length());
                     fh.outputStream = null;
                     return PlCx.INT1;
@@ -44,7 +48,7 @@ my %FileFunc = (
                     mode = mode + s.substring(0, 1);
                     s = s.substring(1);
                 }
-                if (s.length() > 1 && s.substring(0, 2) == ">>") {
+                if (s.length() > 1 && s.substring(0, 2).equals(">>")) {
                     mode = mode + s.substring(0, 2);
                     s = s.substring(2);
                 }
@@ -64,8 +68,7 @@ my %FileFunc = (
                     // TODO - input stream, charset
 
                     PlObject o = List__.aget(1).scalar_deref("main");
-                    InputStream is = new PlStringInputStream(o);
-                    fh.reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+                    fh.reader = new PlStringReader(o);
                     fh.reader.mark(o.toString().length());
                     fh.outputStream = null;
                     return PlCx.INT1;
@@ -73,66 +76,261 @@ my %FileFunc = (
 
                 s = List__.aget(1).toString();
             }
-            path = PlV.path.resolve(s).toRealPath();
-            // PlCORE.say("path " + path.toString());
-            if (mode.equals("<") || mode.equals("")) {
-                // TODO: charset
-                fh.reader = Files.newBufferedReader(path, PlCx.UTF8);
-                fh.outputStream = null;
+
+            String charset = "ISO-8859-1";
+            int pos;
+            pos = mode.indexOf(":raw");
+            if (pos > 0) {
+                charset = "ISO-8859-1";
+                if ((pos + 4) > mode.length()) {
+                    mode = mode.substring(0, pos).trim();
+                }
+                else {
+                    mode = ( mode.substring(0, pos) + mode.substring(pos + 4) ).trim();
+                }
             }
-            else if (mode.equals("<:encoding(UTF-8)")) {
-                fh.reader = Files.newBufferedReader(path, PlCx.UTF8);
+            pos = mode.indexOf(":bytes");
+            if (pos > 0) {
+                charset = "ISO-8859-1";
+                if ((pos + 6) > mode.length()) {
+                    mode = mode.substring(0, pos).trim();
+                }
+                else {
+                    mode = ( mode.substring(0, pos) + mode.substring(pos + 6) ).trim();
+                }
+            }
+            pos = mode.indexOf(":encoding(");
+            if (pos > 0) {
+                // extract the charset specification
+                int last = mode.indexOf(")", pos);
+                if (last > 0) {
+                    charset = mode.substring(pos + 10, last);
+                    if ((last + 1) > mode.length()) {
+                        mode = mode.substring(0, pos).trim();
+                    }
+                    else {
+                        mode = ( mode.substring(0, pos) + mode.substring(last + 1) ).trim();
+                    }
+
+                    if (charset.equals("Latin1")) {
+                        charset = "ISO-8859-1";
+                    }
+                    if (charset.equals("utf8")) {
+                        charset = "UTF-8";
+                    }
+                    if (charset.equals("utf16")) {
+                        charset = "UTF-16";
+                    }
+                }
+            }
+            pos = mode.indexOf(":utf8");
+            if (pos > 0) {
+                charset = "UTF-8";
+                if ((pos + 5) > mode.length()) {
+                    mode = mode.substring(0, pos).trim();
+                }
+                else {
+                    mode = ( mode.substring(0, pos) + mode.substring(pos + 5) ).trim();
+                }
+            }
+            // PlCORE.say("charset [" + charset + "] mode [" + mode + "]");
+
+            path = PlV.path.resolve(s);
+
+            // save the info for binmode()
+            fh.path = path;     // filename
+            fh.mode = mode;     // ">", "+<"
+            fh.charset = charset;   // "UTF-8"
+
+            // PlCORE.say("path " + mode + " " + path.toString());
+            if (mode.equals("<") || mode.equals("")) {
+                fh.reader = Files.newBufferedReader(path, Charset.forName(charset));
                 fh.outputStream = null;
             }
             else if (mode.equals(">")) {
-                // TODO: charset
                 fh.reader = null;
-                fh.outputStream = new PrintStream(Files.newOutputStream(path, StandardOpenOption.CREATE));
+                fh.outputStream = Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
             }
             else if (mode.equals(">>")) {
-                // TODO: charset
                 fh.reader = null;
-                fh.outputStream = new PrintStream(Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.APPEND));
+                fh.outputStream = Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.APPEND, StandardOpenOption.WRITE);
+            }
+            else if (mode.equals("+<")) {
+                // read/write
+                // TODO - share the IO buffer for reads and writes
+                fh.reader = Files.newBufferedReader(path, Charset.forName(charset));
+                PlCORE.die("TODO - not implemented: open() mode '" + mode + "'");
+            }
+            else if (mode.equals("+>")) {
+                // read/write, truncate first
+                // TODO - share the IO buffer for reads and writes
+                fh.reader = Files.newBufferedReader(path, Charset.forName(charset));
+                PlCORE.die("TODO - not implemented: open() mode '" + mode + "'");
+            }
+            else if (mode.equals("<-")) {
+                //   In the two-argument (and one-argument) form, opening "<-" or
+                //   "-" opens STDIN and opening ">-" opens STDOUT.
+                PlCORE.die("TODO - not implemented: open() mode '" + mode + "'");
+            }
+            else if (mode.equals(">-")) {
+                //   In the two-argument (and one-argument) form, opening "<-" or
+                //   "-" opens STDIN and opening ">-" opens STDOUT.
+                PlCORE.die("TODO - not implemented: open() mode '" + mode + "'");
+            }
+            else if (mode.equals("|-")) {
+                //   For three or more arguments if MODE is "|-", the filename is
+                //   interpreted as a command to which output is to be piped, and if
+                //   MODE is "-|", the filename is interpreted as a command that
+                //   pipes output to us.  In the two-argument (and one-argument)
+                //   form, one should replace dash ("-") with the command.  See
+                //   "Using open() for IPC" in perlipc for more examples of this.
+                PlCORE.die("TODO - not implemented: open() mode '" + mode + "'");
+            }
+            else if (mode.equals("-|")) {
+                //   For three or more arguments if MODE is "|-", the filename is
+                //   interpreted as a command to which output is to be piped, and if
+                //   MODE is "-|", the filename is interpreted as a command that
+                //   pipes output to us.  In the two-argument (and one-argument)
+                //   form, one should replace dash ("-") with the command.  See
+                //   "Using open() for IPC" in perlipc for more examples of this.
+                PlCORE.die("TODO - not implemented: open() mode '" + mode + "'");
             }
             else {
                 PlCORE.die("TODO - not implemented: open() mode '" + mode + "'");
             }
+            path = path.toRealPath();
+            // PlCORE.say("path " + mode + " " + path.toString());
+
+            // success
+            return PlCx.INT1;
         }
-        catch(IOException e) {
-            PlV.sset("main::!", new PlString(e.getMessage()));
-            return PlCx.UNDEF;
+        catch(NoSuchFileException e) {
+            PlV.sset("main::!", new PlString("No such file or directory"));
         }
-        return PlCx.INT1;
+        catch(Exception e) {
+            PlV.sset("main::!", new PlStringLazyError(e));
+        }
+        return PlCx.UNDEF;
 EOT
     close => <<'EOT',
         try {
-            fh.readlineBuffer = new StringBuilder();
-            fh.eof = true;
-            if (fh.outputStream != null) {
-                fh.outputStream.close();
+            fh.close();
+
+            // success
+            return PlCx.INT1;
+        }
+        catch(IOException e) {
+            PlV.sset("main::!", new PlStringLazyError(e));
+        }
+        return PlCx.UNDEF;
+EOT
+    # binmode FILEHANDLE, LAYER
+    binmode => <<'EOT',
+        String layer;
+        int arg_count = List__.length_of_array_int();
+        if (arg_count == 0) {
+            // layer = ":raw";
+            fh.binmode = true;
+            return PlCx.INT1;
+        }
+        else {
+            layer = List__.aget(0).toString();
+        }
+        return PlCORE.open(want, fh, new PlArray(
+            new PlString(fh.mode + layer),
+            new PlString(fh.path.toString()) 
+        ));
+EOT
+    opendir => <<'EOT',
+        try {
+            String s = List__.aget(0).toString();
+            Path path = PlV.path.resolve(s).toRealPath();
+
+            fh.directoryStream = Files.newDirectoryStream(path);
+            fh.directoryIterator = fh.directoryStream.iterator();
+
+            // success
+            return PlCx.INT1;
+        }
+        catch(IOException e) {
+            PlV.sset("main::!", new PlStringLazyError(e));
+        }
+        return PlCx.UNDEF;
+EOT
+    readdir => <<'EOT',
+        Iterator<Path> iter = fh.directoryIterator;
+        if (want == PlCx.LIST) {
+            // read all lines
+            PlArray res = new PlArray();
+            while (iter.hasNext()) {
+                res.push_void(new PlString(iter.next().getFileName().toString()));
             }
-            if (fh.reader != null) {
-                fh.reader.close();
+            res.push_void(new PlString("."));
+            res.push_void(new PlString(".."));
+            return res;
+        }
+        if (!iter.hasNext()) {
+            return PlCx.UNDEF;
+        }
+        Path entry = iter.next();
+        return new PlString(entry.getFileName().toString());
+EOT
+    closedir => <<'EOT',
+        try {
+            fh.readlineBuffer = new StringBuilder();
+            fh.flush();
+            fh.eof = true;
+            if (fh.directoryStream != null) {
+                fh.directoryStream.close();
             }
         }
         catch(IOException e) {
-            PlV.sset("main::!", new PlString(e.getMessage()));
+            PlV.sset("main::!", new PlStringLazyError(e));
             return PlCx.UNDEF;
         }
         return PlCx.INT1;
 EOT
-    print => <<'EOT',
-        for (int i = 0; i < List__.to_int(); i++) {
-            fh.outputStream.print(List__.aget(i).toString());
+    syswrite => <<'EOT',
+        int argCount = List__.to_int();
+        if (argCount < 1) {
+            PlCORE.die("Not enough arguments for syswrite");
         }
-        return PlCx.INT1;
+        PlObject st = PlCx.EMPTY;
+        if (argCount == 1) {
+            st = List__.aget(0);
+        }
+        else if (argCount == 2) {
+            // syswrite(FILEHANDLE,SCALAR,LENGTH)
+            st = List__.aget(0).substr(0, List__.aget(1).to_int());
+        }
+        else {
+            // syswrite(FILEHANDLE,SCALAR,LENGTH,OFFSET)
+            st = List__.aget(0).substr(List__.aget(2).to_int(), List__.aget(1).to_int());
+        }
+        int count = 0;
+        try {
+            String s = st.toString();
+
+            if (fh.binmode) {
+                for (int i = 0; i < s.length(); i++) {
+                    fh.outputStream.write(s.charAt(i));
+                    count++;
+                }
+            }
+            else {
+                byte[] bytes = s.getBytes(fh.charset);
+                fh.outputStream.write(bytes);
+                count += bytes.length;
+            }
+            fh.outputStream.flush();
+        }
+        catch(Exception e) {
+            PlV.sset("main::!", new PlStringLazyError(e));
+        }
+        return new PlInt(count);
 EOT
-    say => <<'EOT',
-        for (int i = 0; i < List__.to_int(); i++) {
-            fh.outputStream.print(List__.aget(i).toString());
-        }
-        fh.outputStream.println("");
-        return PlCx.INT1;
+    write => <<'EOT',
+        return PlCORE.die("write() not implemented");
 EOT
     readline => <<'EOT',
         if (want == PlCx.LIST) {
@@ -140,7 +338,7 @@ EOT
             PlArray res = new PlArray();
             PlObject s;
             while (!(s = PlCORE.readline(PlCx.SCALAR, fh, List__)).is_undef()) {
-                res.push(s);
+                res.push_void(s);
             }
             return res;
         }
@@ -161,7 +359,7 @@ EOT
                 else {
                     // read from STDIN
                     fh.is_argv = false;     // clear the magic bit
-                    in  = PlCx.STDIN;
+                    in  = PlV.STDIN;
                 }
                 fh.readlineBuffer   = in.readlineBuffer;
                 fh.eof              = in.eof;
@@ -190,7 +388,7 @@ EOT
                 }
             }
             catch(IOException e) {
-                PlV.sset("main::!", new PlString(e.getMessage()));
+                PlV.sset("main::!", new PlStringLazyError(e));
                 return PlCx.UNDEF;
             }
             if (num_chars > 0) {
@@ -258,7 +456,7 @@ EOT
                 }
             }
             catch(IOException e) {
-                PlV.sset("main::!", new PlString(e.getMessage()));
+                PlV.sset("main::!", new PlStringLazyError(e));
                 return PlCx.UNDEF;
             }
             if (num_chars > 0) {
@@ -302,6 +500,10 @@ EOT
             // See: http://stackoverflow.com/questions/262618/java-bufferedreader-back-to-the-top-of-a-text-file
 
             // position = 0
+            if (fh.reader == null) {
+                PlV.sset("main::!", new PlString("File is not open"));
+                return PlCx.UNDEF;
+            }
             fh.reader.reset();
             fh.readlineBuffer = new StringBuilder();
             fh.eof = false;
@@ -312,7 +514,7 @@ EOT
 
         }
         catch(IOException e) {
-            PlV.sset("main::!", new PlString(e.getMessage()));
+            PlV.sset("main::!", new PlStringLazyError(e));
             return PlCx.UNDEF;
         }
         return PlCx.INT1;
@@ -322,24 +524,79 @@ EOT
 
 
 sub emit_java {
-    return <<'EOT'
+    return <<'EOT',
 
 class PlCORE {
 EOT
     # emit all file-related functions
-    . join("", map {
+    ( map {
           "    public static final PlObject $_(int want, PlFileHandle fh, PlArray List__) {\n"
         .       $FileFunc{$_}
         . "    }\n"
         } sort keys %FileFunc
-    ) . <<'EOT'
-    public static final PlObject say(String s) {
-        // say() shortcut for internal use
-        return PlCORE.say(PlCx.VOID, PlCx.STDOUT, new PlArray(new PlString(s)));
+    ), 
+    <<'EOT',
+
+    public static final PlObject print(int want, PlFileHandle fh, String... args) {
+        try {
+            StringBuilder printBuffer = fh.printBuffer;
+            for (String s : args) {
+                printBuffer.append(s);
+            }
+            if (!PlV.Scalar_OUTPUT_RECORD_SEPARATOR.is_undef()) {
+                printBuffer.append(PlV.Scalar_OUTPUT_RECORD_SEPARATOR.toString());
+            }
+            if (fh.output_autoflush) {
+                // $| autoflush is active
+                fh.flush();
+            }
+            else {
+                int s_length = printBuffer.length();
+                if (s_length > 0) {
+                    char cc = printBuffer.charAt(s_length-1);
+                    if (cc == '\n' || cc == '\r') {
+                        fh.flush();
+                    }
+                    else if (s_length > PlFileHandle.BUFFER_THRESHOLD) {
+                        fh.flush();
+                    }
+                }
+            }
+            return PlCx.INT1;
+        }
+        catch(Exception e) {
+            PlV.sset("main::!", new PlStringLazyError(e));
+            return PlCx.UNDEF;
+        }
     }
+    public static final PlObject say(int want, PlFileHandle fh, String... args) {
+        PlObject sep = PlV.Scalar_OUTPUT_RECORD_SEPARATOR.get();
+        PlV.Scalar_OUTPUT_RECORD_SEPARATOR.set(new PlString("\n"));
+        PlObject ret = PlCORE.print(want, fh, args);
+        PlV.Scalar_OUTPUT_RECORD_SEPARATOR.set(sep);
+        return ret;
+    }
+
+EOT
+    <<'EOT',
+
+    // shortcut functions for internal use: say, warn, die
+    public static final PlObject say(String s) {
+        return PlCORE.say(PlCx.VOID, PlV.STDOUT, s);
+    }
+    public static final PlObject warn(String s) {
+        return PlCORE.warn(PlCx.VOID, new PlArray(new PlString(s)));
+    }
+    public static final PlObject die(String s) {
+        return PlCORE.die(PlCx.VOID, new PlArray(new PlString(s)));
+    }
+    public static final PlObject die(PlObject s) {
+        return PlCORE.die(PlCx.VOID, new PlArray(s));
+    }
+
     public static final PlObject mkdir(int want, PlArray List__) {
         try {
-            Path path = PlV.path.resolve(List__.aget(0).toString()).toRealPath();
+            Path path = PlV.path.resolve(List__.aget(0).toString());
             int mask = List__.aget(1).to_int();
             Set<PosixFilePermission> perms = PerlOp.MaskToPermissions(mask);
             FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
@@ -347,12 +604,16 @@ EOT
             return PlCx.INT1;
         }
         catch(IOException e) {
-            PlV.sset("main::!", new PlString(e.getMessage()));
+            PlV.sset("main::!", new PlStringLazyError(e));
         }
         return PlCx.UNDEF;
     }
     public static final PlObject require(int want, PlObject file, boolean is_bareword) {
-        return PlCORE.die("TODO - not implemented: require(file)");
+        // TODO - require-version
+        if (is_bareword) {
+            file = new PlString("Perlito5::Grammar::Use::modulename_to_filename").apply(PlCx.SCALAR, new PlArray(file));
+        }
+        return new PlString("Perlito5::Grammar::Use::require").apply(want, new PlArray(file));
     }
     public static final PlObject rmdir(int want, PlArray List__) {
         try {
@@ -367,7 +628,7 @@ EOT
             PlV.sset("main::!", new PlString("Directory not empty"));
         }
         catch(IOException e) {
-            PlV.sset("main::!", new PlString(e.getMessage()));
+            PlV.sset("main::!", new PlStringLazyError(e));
         }
         return PlCx.UNDEF;
     }
@@ -385,7 +646,7 @@ EOT
             PlV.sset("main::!", new PlString("Directory not empty"));
         }
         catch(IOException e) {
-            PlV.sset("main::!", new PlString(e.getMessage()));
+            PlV.sset("main::!", new PlStringLazyError(e));
         }
         return PlCx.UNDEF;
     }
@@ -404,51 +665,138 @@ EOT
             PlV.sset("main::!", new PlString("Directory not empty"));
         }
         catch(IOException e) {
-            PlV.sset("main::!", new PlString(e.getMessage()));
+            PlV.sset("main::!", new PlStringLazyError(e));
         }
         return PlCx.UNDEF;
     }
+    public static final PlObject rename(int want, PlArray List__) {
+        try {
+            Files.move(
+                PlV.path.resolve( List__.aget(0).toString() ),
+                PlV.path.resolve( List__.aget(1).toString() ),
+                java.nio.file.StandardCopyOption.REPLACE_EXISTING
+            );
+            return PlCx.INT1;
+        }
+        catch(NoSuchFileException e) {
+            PlV.sset("main::!", new PlString("No such file or directory"));
+        }
+        catch(IOException e) {
+            PlV.sset("main::!", new PlStringLazyError(e));
+        }
+        return PlCx.UNDEF;
+    }
+    public static final PlObject lstat(int want, PlArray List__) {
+        // TODO
+        return PlCORE.stat(want, List__);
+    }
+    public static final PlObject stat(int want, PlArray List__) {
+        // TODO - "_" filehandle
+        PlArray res = new PlArray();
+        PlObject arg = List__.aget(0);
+        try {
+            //     0 dev      device number of filesystem
+            //     1 ino      inode number
+            //     2 mode     file mode  (type and permissions)
+            //     3 nlink    number of (hard) links to the file
+            //     4 uid      numeric user ID of file's owner
+            //     5 gid      numeric group ID of file's owner
+            //     6 rdev     the device identifier (special files only)
+            //     7 size     total size of file, in bytes
+            //     8 atime    last access time in seconds since the epoch
+            //     9 mtime    last modify time in seconds since the epoch
+            //    10 ctime    inode change time in seconds since the epoch (*)
+            //    11 blksize  preferred I/O size in bytes for interacting with the
+            //                file (may vary from file to file)
+            //    12 blocks   actual number of system-specific blocks allocated
+            //                on disk (often, but not always, 512 bytes each)
+            res.aset(7, PerlOp.p5size(arg));
+            res.aset(9, PerlOp.p5mtime(arg));
+            if (want == PlCx.SCALAR) {
+                return PlCx.TRUE;
+            }
+            return res;
+        }
+        catch(Exception e) {
+            PlV.sset("main::!", new PlStringLazyError(e));
+        }
+        if (want == PlCx.SCALAR) {
+            return PlCx.FALSE;
+        }
+        return res;
+    }
+    public static final PlObject select(PlFileHandle fh) {
+        // select FILEHANDLE
+        PlFileHandle fOld = PlV.STDOUT;
+        PlV.STDOUT = fh;
+        return fOld;
+    }
+    public static final PlObject select(int want, PlArray List__) {
+        int arg_count = List__.length_of_array_int();
+        if (arg_count == 0) {
+            // Returns the currently selected filehandle
+            return PlV.STDOUT;
+        }
+        if (arg_count == 4) {
+            if (List__.aget(0).is_undef() && List__.aget(1).is_undef() && List__.aget(2).is_undef()) {
+                // You can effect a sleep of 250 milliseconds this way: select(undef, undef, undef, 0.25);
+                PlCORE.sleep(want, new PlArray(List__.aget(3)));
+                return PlCx.INT0;
+            }
+        }
+        return PlCORE.die("select() not implemented");
+    }
     public static final PlObject exit(int want, PlArray List__) {
         int arg = List__.aget(0).to_int();
+
+        PlV.teardown();
         System.exit(arg);
         return PlCx.UNDEF;
     }
     public static final PlObject warn(int want, PlArray List__) {
-        int arg_count = List__.length_of_array_int();
-        if (arg_count == 0) {
-            List__.push("Warning: something's wrong");
-        }
-        if (arg_count != 1 || !List__.aget(0).is_ref()) {
-            String s = List__.toString();
-            int s_length = s.length();
-            if (s_length > 0 && (s.charAt(s_length-1) == '\n' || s.charAt(s_length-1) == '\r')) {
-                // don't add file+line
+        try {
+            int arg_count = List__.length_of_array_int();
+            if (arg_count == 0) {
+                List__.push_void("Warning: something's wrong");
+            }
+            if (arg_count != 1 || !List__.aget(0).is_ref()) {
+                String s = List__.toString();
+                int s_length = s.length();
+                if (s_length > 0 && (s.charAt(s_length-1) == '\n' || s.charAt(s_length-1) == '\r')) {
+                    // don't add file+line
+                }
+                else {
+                    // TODO - add module name, line number
+                    s = s + " at " + PlV.sget("main::0") + "\n";
+                }
+                List__.set(new PlArray(new PlString(s)));
+            }
+            if (PlV.hash_get("main::SIG").hget("__WARN__").is_coderef()) {
+                // execute $SIG{__WARN__}
+                // localize $SIG{__WARN__} during the call
+                int tmp = PerlOp.local_length();
+                PlObject c = PlV.hash_get("main::SIG").hget("__WARN__");
+                PlV.hash_get("main::SIG").hget_lvalue_local("__WARN__");
+                c.apply(want, List__);
+                PerlOp.cleanup_local(tmp, PlCx.UNDEF);
             }
             else {
-                // TODO - add module name, line number
-                s = s + " at " + PlV.sget("main::0") + "\n";
+                String s = List__.toString();
+                byte[] bytes = s.getBytes(PlV.STDERR.charset);
+                PlV.STDERR.outputStream.write(bytes);
+                PlV.STDERR.outputStream.flush();
             }
-            List__.set(new PlArray(new PlString(s)));
+            return PlCx.INT1;
         }
-        if (PlV.hash_get("main::SIG").hget("__WARN__").is_coderef()) {
-            // execute $SIG{__WARN__}
-            // localize $SIG{__WARN__} during the call
-            int tmp = PerlOp.local_length();
-            PlObject c = PlV.hash_get("main::SIG").hget("__WARN__");
-            PlV.hash_get("main::SIG").hget_lvalue_local("__WARN__");
-            c.apply(want, List__);
-            PerlOp.cleanup_local(tmp, PlCx.UNDEF);
+        catch(Exception e) {
+            PlV.sset("main::!", new PlStringLazyError(e));
+            return PlCx.UNDEF;
         }
-        else {
-            String s = List__.toString();
-            PlCx.STDERR.outputStream.println(s);
-        }
-        return PlCx.INT1;
     }
     public static final PlObject die(int want, PlArray List__) {
         int arg_count = List__.length_of_array_int();
         if (arg_count == 0) {
-            List__.push("Died");
+            List__.push_void("Died");
         }
         if (arg_count != 1 || !List__.aget(0).is_ref()) {
             String s = List__.toString();
@@ -476,13 +824,9 @@ EOT
         PlObject arg = List__.aget(0);
         throw new PlDieException(arg);
     }
-    public static final PlObject die(String s) {
-        // die() shortcut
-        return PlCORE.die(PlCx.VOID, new PlArray(new PlString(s)));
-    }
-    public static final PlString ref(int want, PlArray List__) {
-        return List__.aget(0).ref();
-    }
+    // public static final PlString ref(int want, PlArray List__) {
+    //     return List__.aget(0).ref();
+    // }
     public static final PlObject values(int want, PlObject List__) {
         return want == PlCx.LIST ? List__.values() : List__.values().scalar();
     }
@@ -534,7 +878,7 @@ EOT
 
         return result;
     }
-    public static final PlObject scalar(int want, PlArray List__) {
+    public static final PlScalarImmutable scalar(int want, PlArray List__) {
         if (List__.to_int() == 0) {
             return PlCx.UNDEF;
         }
@@ -558,6 +902,13 @@ EOT
         int limit = plCount.to_int();
         PlArray res = new PlArray();
         if (limit == 0) {
+
+            // TODO - possible optimization for: split("", $str)
+            // if (plReg.is_string() && plReg.toString().length() == 0) {
+            //     // split "", $string, 0
+            //     return new PlArray(plArg.toString().toCharArray());
+            // }
+
             // strip trailing empty strings and undef
             res = (PlArray)PlCORE.split(PlCx.LIST, plReg, plArg, PlCx.MIN1);
             while (res.to_int() > 0) {
@@ -598,7 +949,7 @@ EOT
                 plReg = PlCx.SPLIT_SPACE;
             }
             else {
-                plReg = new PlRegex(regs, Pattern.MULTILINE);
+                plReg = new PlRegex(regs, Pattern.MULTILINE, false);
             }
         }
 
@@ -637,7 +988,7 @@ EOT
             }
             if (matched) {
                 cap = arg.substring(pos, matcher.start());
-                res.push(cap);
+                res.push_void(cap);
                 pos = matcher.end();
                 next = pos;
                 // PlCORE.say("match: match [" + cap + "] next pos " + pos);
@@ -645,10 +996,10 @@ EOT
                 for (int i = 1; i <= matcher.groupCount(); i++) {
                     cap = matcher.group(i);
                     if (cap == null) {
-                        res.push(PlCx.UNDEF);
+                        res.push_void(PlCx.UNDEF);
                     }
                     else {
-                        res.push(cap);
+                        res.push_void(cap);
                     }
                 }
             }
@@ -659,7 +1010,7 @@ EOT
         else {
             cap = arg.substring(pos);
         }
-        res.push(cap);
+        res.push_void(cap);
         return res;
     }
     public static final PlObject splice(int want, PlArray List__, PlObject offset) {
@@ -710,7 +1061,7 @@ EOT
         int diff = last - pos;
         PlArray res = new PlArray();
         for (int i = pos; i < last; i++) {
-            res.push(List__.a.get(i));
+            res.push_void(List__.a.get(i));
         }
         for (int i = pos; i < (size - diff); i++) {
             List__.a.set(i, List__.a.get(i+diff));
@@ -754,7 +1105,7 @@ EOT
         PlArray res = new PlArray();
 
         for (int i = pos; i < last; i++) {
-            res.push(List__.a.get(i));
+            res.push_void(List__.a.get(i));
         }
         for (int i = pos; i < (size - diff); i++) {
             List__.a.set(i, List__.a.get(i+diff));
@@ -773,8 +1124,22 @@ EOT
         return res.aget(-1);
     }
 
-    public static final PlObject hex(int want, PlObject List__) {
+EOT
+    <<'EOT',
+
+    public static final PlInt hex(int want, PlObject List__) {
         String s = List__.toString();
+
+        final int length = s.length();
+        int c;
+
+        for (int i = 0; i < length; i++ ) {
+            c = s.codePointAt(i);
+            if (c > 254) {
+                PlCORE.die("Wide character in hex");
+            }
+        }
+
         if (s.startsWith("0x") || s.startsWith("0X")) {
             s = s.substring(2);
         }
@@ -789,33 +1154,11 @@ EOT
         }
         return new PlInt(0);
     }
-    public static final PlObject oct(int want, PlObject List__) {
+    public static final PlInt oct(int want, PlObject List__) {
         String s = List__.toString();
-        try {
-            if (s.startsWith("0x") || s.startsWith("0X")) {
-                s = s.replace("_","");
-                return new PlInt(Long.parseLong(s.substring(2), 16));
-            } else if (s.startsWith("x") || s.startsWith("X")) {
-                s = s.replace("_","");
-                return new PlInt(Long.parseLong(s.substring(1), 16));
-            } else if (s.startsWith("0b") || s.startsWith("0B")) {
-                s = s.replace("_","");
-                return new PlInt(Long.parseLong(s.substring(2), 2));
-            } else if (s.startsWith("b") || s.startsWith("B")) {
-                s = s.replace("_","");
-                return new PlInt(Long.parseLong(s.substring(1), 2));
-            } else {
-                s = s.replace("_","");
-                return new PlInt(Long.parseLong(s, 8));
-            }
-        } catch (NumberFormatException n) {
-            
-        } catch (Exception e) {
-            // result = e.getMessage();
-        }
-        return new PlInt(0);
+        return new PlInt(PerlOp.oct(s));
     }
-    public static final PlObject sprintf(int want, PlObject List__) {
+    public static final PlString sprintf(int want, PlObject List__) {
         String format = List__.aget(0).toString();
         // "%3s"
         int length = format.length();
@@ -823,18 +1166,34 @@ EOT
         int args_max = List__.to_int();
         int args_index = 0;
         Object args[] = new Object[args_max];
+        String detail = "";
+        int start_detail = -1;
         for ( ; offset < length; ) {
             int c = format.codePointAt(offset);
             switch (c) {
                 case '%':
                     offset++;
                     boolean scanning = true;
+                    start_detail = offset;
                     for ( ; offset < length && scanning ; ) {
                         c = format.codePointAt(offset);
                         switch (c) {
                             case '%':
                                 scanning = false;
                                 offset++;
+                                break;
+                            case 'v':
+                                // TODO - format value like "v1.v2.v3"
+                                // replace "%v" with "%s"
+                                StringBuilder sbv = new StringBuilder();
+                                if (offset > 0) {
+                                    sbv.append(format.substring(0, offset));
+                                }
+                                sbv.append("s");
+                                if (offset + 1 < format.length()) {
+                                    sbv.append(format.substring(offset + 1));
+                                }
+                                format = sbv.toString();
                                 break;
                             case 'c': case 's': case 'd': case 'u': case 'o':
                             case 'x': case 'e': case 'f': case 'g':
@@ -849,10 +1208,35 @@ EOT
                                     case 'd': case 'o': case 'x': case 'X':
                                     case 'u': case 'b': case 'B': case 'p':
                                     case 'c':
-                                        args[args_index] = List__.aget(args_index+1).to_int();
+                                        args[args_index] = List__.aget(args_index+1).to_long();
+
+                                        if (c == 'u') {
+                                            long arg = (long)(args[args_index]);
+                                            arg = arg & 4294967295L; // 0xFFFFFFFF;
+                                            args[args_index] = arg;
+                                            StringBuilder sb = new StringBuilder();
+                                            if (offset > 0) {
+                                                sb.append(format.substring(0, offset));
+                                            }
+                                            sb.append("d");
+                                            if (offset + 1 < format.length()) {
+                                                sb.append(format.substring(offset + 1));
+                                            }
+                                            format = sb.toString();
+                                            //PlCORE.say("format [" + format + "]");
+                                        }
+
                                         break;
                                     case 'f': case 'e': case 'g':
                                     case 'E': case 'G':
+                                        detail = format.substring(start_detail, offset);
+                                        if (detail.equals(".") || detail.equals("+.")) {
+                                            StringBuilder sb = new StringBuilder();
+                                            sb.append(format.substring(0, offset));
+                                            sb.append("0");
+                                            sb.append(format.substring(offset));
+                                            format = sb.toString();
+                                        }
                                         args[args_index] = List__.aget(args_index+1).to_double();
                                         break;
                                     default:
@@ -878,7 +1262,7 @@ EOT
         }
         return new PlString(String.format(format, args));
     }
-    public static final PlObject crypt(int want, PlArray List__) {
+    public static final PlString crypt(int want, PlArray List__) {
         if(List__.to_int() < 2) {
             die("Not enough arguments for crypt");
         }
@@ -894,268 +1278,294 @@ EOT
         
         return new PlString(PlCrypt.crypt(salt, plainText));
     }
-    public static final PlObject join(int want, PlArray List__) {
-        String s = List__.shift().toString();
+    public static final PlString join(int want, String s1, PlObject... args) {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
-        for (int i = 0; i < List__.to_int(); i++) {
-            String item = List__.aget(i).toString();
-            if (first)
-                first = false;
-            else
-                sb.append(s);
-            sb.append(item);
+        for (PlObject s : args) {
+            if (s.is_hash()) {
+                // @x = %x;
+                s = s.to_array();
+            }
+            if (s.is_array()) {
+                // @x = ( @x, @y );
+                for (int i = 0; i < s.to_long(); i++) {
+                    if (first)
+                        first = false;
+                    else
+                        sb.append(s1);
+                    sb.append(s.aget(i).toString());
+                }
+            }
+            else {
+                if (first)
+                    first = false;
+                else
+                    sb.append(s1);
+                sb.append(s.toString());
+            }
         }
         return new PlString(sb.toString());
     }
     public static final PlObject reverse(int want, PlArray List__) {
         if (want == PlCx.LIST) {
-            PlArray ret = new PlArray(List__);
+            PlArray ret = PlArray.construct_list_of_aliases(List__);
             Collections.reverse(ret.a);
             return ret;
         }
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < List__.to_int(); i++) {
-            sb.append( List__.aget(i).toString() );
+        if (List__.to_int() == 0) {
+            sb.append( PlV.Scalar_ARG.get() );
+        }
+        else {
+            for (int i = 0; i < List__.to_int(); i++) {
+                sb.append( List__.aget(i).toString() );
+            }
         }
         return new PlString(sb.reverse().toString());
     }
-    public static final PlObject fc(int want,  PlObject Object__) {
+    public static final PlString fc(int want,  PlObject Object__) {
         return new PlString(Object__.toString().toLowerCase());
     }
     public static final PlObject pack(int want, PlArray List__) {
-        String template = List__.aget(0).toString();
+        String template = List__.shift().toString();
         StringBuilder result = new StringBuilder();
-        int index = 1;
+
+        // Character mode is the default unless the format string starts with "U"
+        boolean characterMode = true;
+        if (template.length() > 0 && template.charAt(0) == 'U') {
+            characterMode = false;
+        }
+
         for(int i = 0; i < template.length(); ++i) {
+            int size;
+            if (template.length() > (i+1) && template.charAt(i+1) == '*') {
+                size = List__.to_int();
+            }
+            else {
+                size = pack_size(template, i);
+            }
+
             switch(template.charAt(i)) {
             case 'a':
             {
-                int size = pack_size(template, i);
-                result.append(pack_a(List__.aget(index).toString(), size));
-                ++index;
+                result.append(pack_a(List__.shift().toString(), size));
                 break;
             }
             case 'A':
             {    
-                int size = pack_size(template, i);
-                result.append(pack_A(List__.aget(index).toString(), size));
-                ++index;
+                result.append(pack_A(List__.shift().toString(), size));
                 break;
             }
             case 'Z':
             {
-                int size = pack_size(template, i);
-                result.append(pack_Z(List__.aget(index).toString(), size));
-                ++index;
+                result.append(pack_Z(List__.shift().toString(), size));
                 break;
             }
             case 'b':
             {
-                int size = pack_size(template, i);
-                result.append(pack_b(List__.aget(index).toString(), size));
-                ++index;
+                result.append(pack_b(List__.shift().toString(), size));
                 break;
             }
             case 'B':
             {
-                int size = pack_size(template, i);
-                result.append(pack_B(List__.aget(index).toString(), size));
-                ++index;
+                result.append(pack_B(List__.shift().toString(), size));
                 break;
             }
             case 'h':
             {
-                int size = pack_size(template, i);
-                result.append(pack_h(List__.aget(index).toString(), size));
-                ++index;
+                result.append(pack_h(List__.shift().toString(), size));
                 break;
             }
             case 'H':
             {
-                int size = pack_size(template, i);
-                result.append(pack_H(List__.aget(index).toString(), size));
-                ++index;
+                result.append(pack_H(List__.shift().toString(), size));
                 break;        
             }
             case 'c':
             {
-                result.append(pack_c(List__.aget(index).toString()));
-                ++index;
+                result.append(pack_c(List__.shift().toString()));
                 break;        
             }
             case 'C':
             {
-                result.append(pack_C(List__.aget(index).toString()));
-                ++index;
+                if (size == 0) {
+                    // C0
+                    characterMode = true;
+                }
+                for (int j = 0; j < size; j++) {
+                    result.append(pack_C(List__.shift().toString()));
+                }
                 break;        
             }
             case 'W':
             {
-                result.append(pack_W(List__.aget(index).toString()));
-                ++index;
+                for (int j = 0; j < size; j++) {
+                    result.appendCodePoint( List__.shift().to_int() );
+                }
+                break;        
+            }
+            case 'U':
+            {
+                if (size == 0) {
+                    // U0
+                    characterMode = false;
+                }
+                if (characterMode) {
+                    // character mode C0
+                    StringBuilder sb = new StringBuilder();
+                    for (int j = 0; j < size; j++) {
+                        sb.appendCodePoint( List__.shift().to_int() );
+                    }
+                    byte[] bytes = sb.toString().getBytes(PlCx.UTF8);
+                    for (byte b : bytes) {
+                        int ub = b < 0 ? 256 + b : b;
+                        result.appendCodePoint(ub);
+                    }
+                }
+                else {
+                    // U0 mode
+                    for (int j = 0; j < size; j++) {
+                        result.appendCodePoint( List__.shift().to_int() );
+                    }
+                }
                 break;        
             }
             case 's':
             {
-                result.append(pack_s(List__.aget(index).toString()));
-                ++index;
+                result.append(pack_s(List__.shift().to_int()));
                 break;        
             }
             case 'S':
             {
-                result.append(pack_S(List__.aget(index).toString()));
-                ++index;
+                result.append(pack_S(List__.shift().to_int()));
                 break;        
             }
             case 'l':
             {
-                result.append(pack_l(List__.aget(index).toString()));
-                ++index;
+                result.append(pack_l(List__.shift().to_int()));
                 break;        
             }
             case 'L':
             {
-                result.append(pack_L(List__.aget(index).toString()));
-                ++index;
+                result.append(pack_L(List__.shift().to_int()));
                 break;        
             }
             case 'q':
             {
-                result.append(pack_q(List__.aget(index).toString()));
-                ++index;
+                result.append(pack_q(List__.shift().to_int()));
                 break;        
             }
             case 'Q':
             {
-                result.append(pack_Q(List__.aget(index).toString()));
-                ++index;
+                result.append(pack_Q(List__.shift().to_int()));
                 break;        
             }
             case 'i':
             {
-                result.append(pack_i(List__.aget(index).toString()));
-                ++index;
+                result.append(pack_i(List__.shift().to_int()));
                 break;        
             }
             case 'I':
             {
-                result.append(pack_I(List__.aget(index).toString()));
-                ++index;
+                result.append(pack_I(List__.shift().to_int()));
                 break;        
             }
             case 'n':
             {
-                result.append(pack_n(List__.aget(index).toString()));
-                ++index;
+                for (int j = 0; j < size; j++) {
+                    result.append(pack_n(List__.shift().to_int()));
+                }
                 break;        
             }
             case 'N':
             {
-                result.append(pack_N(List__.aget(index).toString()));
-                ++index;
+                result.append(pack_N(List__.shift().to_int()));
                 break;        
             }
             case 'v':   
             {
-                result.append(pack_v(List__.aget(index).toString()));
-                ++index;
+                for (int j = 0; j < size; j++) {
+                    result.append(pack_v(List__.shift().to_int()));
+                }
                 break;        
             }
             case 'V':   
             {
-                result.append(pack_V(List__.aget(index).toString()));
-                ++index;
+                result.append(pack_V(List__.shift().to_int()));
                 break;        
             }
             case 'j':   
             {
-                result.append(pack_j(List__.aget(index).toString()));
-                ++index;
+                result.append(pack_j(List__.shift().to_int()));
                 break;        
             }
             case 'J':   
             {
-                result.append(pack_J(List__.aget(index).toString()));
-                ++index;
+                result.append(pack_J(List__.shift().to_int()));
                 break;        
             }
             case 'f':
             {
-                result.append(pack_f(List__.aget(index).to_double()));
-                ++index;
+                result.append(pack_f(List__.shift().to_double()));
                 break;        
             }
             case 'd':
             case 'F':
             {
-                result.append(pack_d(List__.aget(index).to_double()));
-                ++index;
+                result.append(pack_d(List__.shift().to_double()));
                 break;        
             }
             case 'p':
             {
-                int size = pack_size(template, i);
                 for(int k = 0; k < size; ++k) {
-                    if(List__.aget(index + k).is_undef()) {
-                        result.append(pack_q("0"));
+                    PlObject o = List__.shift();
+                    if(o.is_undef()) {
+                        result.append(pack_q(0));
                     
                     } else {
-                        result.append(pack_p(List__.aget(index + k).toString()));
+                        result.append(pack_p(o.toString()));
                     }
                 }
-                index += i;
             }
             case 'u':
             {
-                result.append(pack_u(List__.aget(index).toString()));
-                ++index;
+                result.append(pack_u(List__.shift().toString()));
                 break;
             }
             case 'w':
             {
-                int size = pack_size(template, i);
                 String[] input = new String[size];
                 for(int j = 0; j < size; ++j) {
-                    input[j] = List__.aget(index + j).toString();
+                    input[j] = List__.shift().toString();
                 }
                 result.append(pack_w(input, size));
-                index += size;
                 break;        
             }
             case 'x':
             {
-                int size = pack_size(template, i);
                 result.append(pack_x(size));
-                ++index;                
                 break;        
             }
             case 'X':
             {
-                int size = pack_size(template, i);
                 int length = result.length();
                 result.delete(Math.max(0,length - size), length);
-                ++index;                
                 break;        
             }
             case '@':
             {
-                int size = pack_size(template, i);
                 int length = result.length();
                 if(size > length) {
                     result.append(new char[size - length]);
                 }
-                ++index;                
                 break;        
             }
             case '.':
             {
-               int size = List__.aget(index).to_int();
                 int length = result.length();
                 if(size > length) {
                     result.append(new char[size - length]);
                 }
-                ++index;                
                 break;        
             }
             default:
@@ -1166,42 +1576,150 @@ EOT
     }
     public static final PlObject unpack(int want, PlArray List__) {
         String template = List__.aget(0).toString();
-        StringBuilder result = new StringBuilder();
-        int index = 1;
+        String input = List__.aget(1).toString();
+        PlArray result = new PlArray();
+        int inputIndex = 0;
+
+        // Character mode is the default unless the format string starts with "U"
+        boolean characterMode = true;
+        if (template.length() > 0 && template.charAt(0) == 'U') {
+            characterMode = false;
+        }
+
         for(int i = 0; i < template.length(); ++i) {
+            int size;
+            if (template.length() > (i+1) && template.charAt(i+1) == '*') {
+                size = -1;
+            }
+            else {
+                size = pack_size(template, i);
+            }
+
             switch(template.charAt(i)) {
             case 'a':
             {
-                int size = pack_size(template, i);
-                result.append(unpack_a(List__.aget(index).toString(), size));
-                ++index;
+                // TODO
+                // result.push_void(unpack_a(List__.shift().toString(), size));
                 break;
             }
             case 'A':
             {
-                int size = pack_size(template, i);
-                result.append(unpack_A(List__.aget(index).toString(), size));
-                ++index;
+                // TODO
+                // result.push_void(unpack_A(List__.shift().toString(), size));
                 break;
             }
             case 'Z':
             {
-                int size = pack_size(template, i);
-                result.append(unpack_Z(List__.aget(index).toString(), size));
-                ++index;
+                // TODO
+                // result.push_void(unpack_Z(List__.shift().toString(), size));
                 break;
             }
             case 'b':
             {
-                int size = pack_size(template, i);
-                result.append(unpack_b(List__.aget(index).toString(), size));
-                ++index;
+                // TODO
+                // result.push_void(unpack_b(List__.shift().toString(), size));
                 break;
             }
+
+            case 'C':
+            {
+                if (size == 0) {
+                    // C0
+                    characterMode = true;
+                }
+                if (size < 0) {
+                        while (inputIndex < input.length()) {
+                            result.push_void( new PlInt( input.charAt(inputIndex++) & 0xFF ) );
+                        }
+                }
+                else {
+                    for (int j = 0; j < size; j++) {
+                        if (inputIndex < input.length()) {
+                            result.push_void( new PlInt( input.charAt(inputIndex++) & 0xFF ) );
+                        }
+                    }
+                }
+                break;        
+            }
+            case 'W':
+            {
+                // TODO
+                // for (int j = 0; j < size; j++) {
+                //     result.pushCodePoint( List__.shift().to_int() );
+                // }
+                break;        
+            }
+            case 'U':
+            {
+                if (size == 0) {
+                    // U0
+                    characterMode = false;
+                    break;
+                }
+                if (characterMode) {
+                    // character mode C0
+
+                    if (inputIndex >= input.length()) {
+                        break;
+                    }
+
+                    // decode from UTF-8 ("bytes") to internal representation
+                    String s = input.substring(inputIndex);
+                    char[] chars = s.toCharArray();
+                    byte[] bytes = new byte[chars.length];
+                    for (int j = 0; j < bytes.length; j++){
+                        bytes[j] = (byte)(chars[j]);
+                    }
+                    String internal = new String(bytes, PlCx.UTF8);
+                    int internalIndex = 0;
+ 
+                    // unpack
+                    StringBuilder sb = new StringBuilder();
+                    if (size < 0) {
+                            while (internalIndex < internal.length()) {
+                                int ichar = internal.charAt(internalIndex++);
+                                sb.appendCodePoint(ichar);
+                                result.push_void( new PlInt(ichar) );
+                            }
+                    }
+                    else {
+                        for (int j = 0; j < size; j++) {
+                            if (internalIndex < internal.length()) {
+                                int ichar = internal.charAt(internalIndex++);
+                                sb.appendCodePoint(ichar);
+                                result.push_void( new PlInt(ichar) );
+                            }
+                        }
+                    }
+
+                    // move the input pointer by the number of "bytes" consumed (not chars)
+                    byte[] bytesUsed = sb.toString().getBytes(PlCx.UTF8);
+                    inputIndex += bytesUsed.length;
+
+                    break;        
+                }
+                else {
+                    // U0 mode
+                    if (size < 0) {
+                            while (inputIndex < input.length()) {
+                                result.push_void( new PlInt( input.charAt(inputIndex++) ) );
+                            }
+                    }
+                    else {
+                        for (int j = 0; j < size; j++) {
+                            if (inputIndex < input.length()) {
+                                result.push_void( new PlInt( input.charAt(inputIndex++) ) );
+                            }
+                        }
+                    }
+                    break;        
+                }
+            }
+
             default:
             }
         }
-        return new PlString(result.toString());
+        return result;
     }
     private static final int pack_size(String s, int pos) {
         int howMany = 0;
@@ -1357,72 +1875,53 @@ EOT
             return "";
         }
     }
-    private static String pack_W(String s) {
-        for(int i = 0; i < s.length(); ++i) {
-            if(!java.lang.Character.isDigit(s.charAt(i))) {
-                s = s.substring(0, i);
-                break;
-            }
-        }
-        int value = java.lang.Integer.parseInt(s);
-        StringBuilder sb = new StringBuilder();
-        sb.appendCodePoint(value);
-        return sb.toString();
-    }
-    private static String pack_number_2_string(String s, int size, boolean signed) {
-        for(int i = 0; i < s.length(); ++i) {
-            if(!java.lang.Character.isDigit(s.charAt(i)) && !(s.charAt(i) == '-')) {
-                s = s.substring(0, i);
-                break;
-            }
-        }
-        long value = java.lang.Long.parseLong(s);
+    private static String pack_number_2_string(long value, int size, boolean signed) {
         StringBuilder result = new StringBuilder();
         for(int i = 0; i < size; ++i) {
             result.append((char)((value / (int)Math.pow(2,8*i)) % 256));
         }
         return result.toString();        
     }
-    private static String pack_s(String s) {
+    private static String pack_s(long s) {
         return pack_number_2_string(s, 2, true);
     }
-    private static String pack_S(String s) {
+    private static String pack_S(long s) {
         return pack_number_2_string(s, 2, false);
     }
-    public static final String pack_l(String s) {
+    public static final String pack_l(long s) {
         return pack_number_2_string(s, 4, true);
     }
-    public static final String pack_L(String s) {
+    public static final String pack_L(long s) {
         return pack_number_2_string(s, 4, false);
     }
-    public static final String pack_q(String s) {
+    public static final String pack_q(long s) {
         return pack_number_2_string(s, 8, true);
     }
-    public static final String pack_Q(String s) {
+    public static final String pack_Q(long s) {
         return pack_number_2_string(s, 8, false);
     }
-    public static final String pack_i(String s) {
+    public static final String pack_i(long s) {
         return pack_number_2_string(s, 4, true);
     }
-    public static final String pack_I(String s) {
+    public static final String pack_I(long s) {
         return pack_number_2_string(s, 4, false);
     }
-    public static final String pack_n(String s) {
+    public static final String pack_n(long s) {
         return new StringBuilder(pack_number_2_string(s, 2, false)).reverse().toString();
     }
-    public static final String pack_N(String s) {
+    public static final String pack_N(long s) {
         return new StringBuilder(pack_number_2_string(s, 4, false)).reverse().toString();
     }
-    public static final String pack_v(String s) {
+    public static final String pack_v(long s) {
         return pack_number_2_string(s, 2, false);
     }
-    public static final String pack_V(String s) {
+    public static final String pack_V(long s) {
         return pack_number_2_string(s, 4, false);
     }
-    public static final String pack_j(String s) {
+    public static final String pack_j(long s) {
         return pack_number_2_string(s, 8, true);
     }
-    public static final String pack_J(String s) {
+    public static final String pack_J(long s) {
         return pack_number_2_string(s, 8, false);
     }
     public static final String pack_f(double d) {
@@ -1468,7 +1967,7 @@ EOT
         pack_pointers.append(s);
 
         pack_pointers_size.put(pointer, s.length());
-        return pack_q(new Long(pointer).toString());
+        return pack_q((long)(pointer));
     }
     public static final String pack_u(String s) {
         int index = 0;
@@ -1529,11 +2028,81 @@ EOT
     public static final String pack_x(int size) {
         return new String(new char[size]);
     }
-    public static final PlObject time(int want, PlArray List__) {
+    public static final PlObject times(int want, PlArray List__) {
+        ThreadMXBean bean = ManagementFactory.getThreadMXBean( );
+        long cpu = bean.isCurrentThreadCpuTimeSupported( ) ?
+            bean.getCurrentThreadCpuTime( ) : 0L;
+        long user = bean.isCurrentThreadCpuTimeSupported( ) ?
+            bean.getCurrentThreadUserTime( ) : 0L;
+        long system = cpu - user;
+        return new PlArray(
+            new PlDouble( user / 1000000000.0 ),
+            new PlDouble( system / 1000000000.0 ),
+            new PlDouble( 0.0 ),
+            new PlDouble( 0.0 )
+        );
+    }
+    public static final PlObject localtime(int want, PlArray List__) {
+        PlArray res = new PlArray();
+		ZonedDateTime date;
+        if (List__.to_boolean()) {
+        	long arg = List__.aget(0).to_long();
+            date = Instant.ofEpochSecond(arg).atZone(ZoneId.systemDefault());
+        }
+        else {
+			date = ZonedDateTime.now();
+        }
+        if (want == PlCx.SCALAR) {
+            return new PlString(date.format( DateTimeFormatter.RFC_1123_DATE_TIME ));
+        }
+        //      0    1    2     3     4    5     6     7     8
+        //   ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)
+		res.push_void(date.getSecond());
+		res.push_void(date.getMinute());
+		res.push_void(date.getHour());
+		res.push_void(date.getDayOfMonth());
+		res.push_void(date.getMonth().getValue() - 1);
+		res.push_void(date.getYear() - 1900);
+		res.push_void(date.getDayOfWeek().getValue());
+		res.push_void(date.getDayOfYear() - 1);
+		res.push_void(
+            date.getZone().getRules().isDaylightSavings(date.toInstant()) ? PlCx.INT1 : PlCx.INT0
+        );
+        return res;
+    }
+    public static final PlObject gmtime(int want, PlArray List__) {
+        PlArray res = new PlArray();
+		ZonedDateTime date;
+        if (List__.to_boolean()) {
+        	long arg = List__.aget(0).to_long();
+            date = Instant.ofEpochSecond(arg).atZone(ZoneId.of("UTC"));
+        }
+        else {
+			date = ZonedDateTime.now(ZoneOffset.UTC);
+        }
+        if (want == PlCx.SCALAR) {
+            return new PlString(date.format( DateTimeFormatter.RFC_1123_DATE_TIME ));
+        }
+        //      0    1    2     3     4    5     6     7     8
+        //   ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)
+		res.push_void(date.getSecond());
+		res.push_void(date.getMinute());
+		res.push_void(date.getHour());
+		res.push_void(date.getDayOfMonth());
+		res.push_void(date.getMonth().getValue() - 1);
+		res.push_void(date.getYear() - 1900);
+		res.push_void(date.getDayOfWeek().getValue());
+		res.push_void(date.getDayOfYear() - 1);
+		res.push_void(
+            date.getZone().getRules().isDaylightSavings(date.toInstant()) ? PlCx.INT1 : PlCx.INT0
+        );
+        return res;
+    }
+    public static final PlInt time(int want, PlArray List__) {
         return new PlInt( (long)Math.floor(System.currentTimeMillis() * 0.001 + 0.5));
     }
-    public static final PlObject sleep(int want, PlArray List__) {
-        long s = (new Double(List__.shift().to_double() * 1000)).longValue();
+    public static final PlDouble sleep(int want, PlArray List__) {
+        long s = ((Double)(List__.shift().to_double() * 1000)).longValue();
         try {
             TimeUnit.MILLISECONDS.sleep(s);
         } catch (InterruptedException e) {
@@ -1545,13 +2114,19 @@ EOT
     public static final PlObject system(int want, PlArray List__) {
         // TODO - see perldoc -f system
         try {
-            String[] args = new String[List__.to_int()];
-            int i = 0;
-            for (PlObject s : List__.a) {
-                args[i++] = s.toString();
+            Process p;
+            if (List__.to_int() > 1) {
+                String[] args = new String[List__.to_int()];
+                int i = 0;
+                for (PlObject s : List__.a) {
+                    args[i++] = s.toString();
+                }
+                p = Runtime.getRuntime().exec(args);
             }
-            String s = null;
-            Process p = Runtime.getRuntime().exec(args);
+            else {
+                p = Runtime.getRuntime().exec(List__.aget(0).toString());
+            }
+            // String s = null;
             // BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
             // BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
             // System.out.println("STDOUT\n");
@@ -1562,11 +2137,17 @@ EOT
             // while ((s = stdError.readLine()) != null) {
             //     System.out.println("  " + s);
             // }
-            return PlCx.INT0;
+            int ret = p.waitFor() * 256;
+            PlV.sset("main::?", new PlInt(ret));
+            return new PlInt(ret);
+        } catch (InterruptedException e) {
+            //Handle exception
+            return PlCORE.die("interrupted");
         }
         catch (IOException e) {
             // System.out.println("IOexception: ");
             // e.printStackTrace();
+            PlV.sset("main::!", new PlStringLazyError(e));
             return PlCx.MIN1;
         }
     }
@@ -1586,7 +2167,7 @@ EOT
             // System.out.println("STDOUT\n");
             while ((s = stdInput.readLine()) != null) {
                 // System.out.println("  " + s);
-                res.push(s + "\n");
+                res.push_void(s + "\n");
             }
             // BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
             // System.out.println("STDERR\n");
@@ -1596,14 +2177,126 @@ EOT
             if (want == PlCx.LIST) {
                 return res;
             }
-            res.unshift(PlCx.EMPTY);
-            return join(want, res);
+            return PlCORE.join(want, "", res);
         }
         catch (IOException e) {
             // System.out.println("IOexception: ");
             // e.printStackTrace();
             return PlCx.UNDEF;
         }
+    }
+    public static final PlObject caller(int wantarray, PlArray List__) {
+        PlObject arg = List__.aget(0);
+        boolean argDefined = !arg.is_undef();
+        int item = arg.to_int();
+
+        PlArray callerName = PlV.array_get("Perlito5::CALLER");
+        if (callerName.length_of_array().to_boolean()) {
+            // maybe we are inside an import() subroutine
+
+            PlObject arr = callerName.aget(0);  // XXX this should be "item"
+                                            // XXX FIXME TODO - workaround for "export to level"
+            if (arr.is_arrayref()) {
+                if (wantarray == PlCx.LIST) {
+                    return arr.array_deref_strict();
+                }
+                return arr.aget(0);
+            }
+            // fallback to normal caller()
+        };
+
+        String fullName = "";
+
+        // A StackTraceElement has getClassName(), getFileName(), getLineNumber() and getMethodName().
+        // The last element of the array represents the bottom of the stack,
+        // which is the least recent method invocation in the sequence.
+        callerName = new PlArray();
+        PlArray codeRef = new PlArray();
+        Thread t = Thread.currentThread();
+        StackTraceElement[] stackTraceElements = t.getStackTrace();
+        for (StackTraceElement elem : stackTraceElements) {
+            // PlCORE.say(
+            //     elem.getClassName()  + " \t" +
+            //     elem.getMethodName() + " \t" +
+            //     elem.getFileName()   + " \t" +
+            //     elem.getLineNumber()
+            // );
+            if (elem.getMethodName().equals("apply")) {
+                // stack trace element comes from PlClosure.apply()
+                // TODO - move this inner loop outside, this is very expensive
+                // TODO - this code doesn't account for inner-subs - it might match an outer sub instead
+                // TODO - this code doesn't account for package name changes inside a sub
+                // TODO - this code skips anonymous subroutines
+                // TODO - the "perlSubName" resolution is ambiguous,
+                //        because a sub can be exported to several namespaces:
+                //        Exporter::import and MyClass::import can point to the same Java code
+                // this loop does a symbol table scan - PlV.cvar
+              SCAN_SUBNAME:
+                for (String name : PlStringConstant.constants.keySet()) {
+                    PlObject value = PlV.cget_no_autoload(name);
+                    if (value.is_lvalue()) {
+                        value = value.get();
+                    }
+                    if (value.is_coderef()) {
+                        PlClosure code = (PlClosure)value;
+                        if ( code.javaClassName() != null &&
+                             elem.getClassName().equals(code.javaClassName()) &&
+                             elem.getLineNumber() > code.firstLineNumber() &&
+                             elem.getLineNumber() < code.lastLineNumber() &&
+                             !code.pkg_name.startsWith("Perlito5::")
+                        ) {
+                            // PlCORE.say(
+                            //     elem.getClassName()  + " \t" +
+                            //     elem.getMethodName() + " \t" +
+                            //     elem.getFileName()   + " \t" +
+                            //     elem.getLineNumber()
+                            // );
+                            // PlCORE.say("\tPerl sub &" + perlSubName.toString());
+                            callerName.push_void(new PlString(name));
+                            codeRef.push_void(value);
+                            break SCAN_SUBNAME;
+                        }
+                    }
+                }
+            }
+        }
+
+        PlObject plCoderef = codeRef.aget(item);
+        PlObject plCallerCoderef = codeRef.aget(item + 1);
+        PlObject packageName = PlCx.UNDEF;
+        if (plCallerCoderef.is_coderef()) {
+            packageName = new PlString(((PlClosure)plCallerCoderef).pkg_name);
+        }
+        else if (plCoderef.is_coderef()) {
+            packageName = new PlString("main");
+        }
+
+        if (wantarray != PlCx.LIST) {
+			// caller() in scalar or void context
+            return packageName;
+        }
+
+        PlObject plFullName = callerName.aget(item);    // "subroutine" comes from the current level
+        PlObject lineNumber = PlCx.UNDEF;
+        String fileName = "";
+        if (plCoderef.is_coderef()) {
+            lineNumber = new PlInt(((PlClosure)plCoderef).perlLineNumber());
+            fileName   = ((PlClosure)plCoderef).perlFileName();
+        }
+
+
+        if (!argDefined) {
+			// caller() in list context, without args
+            return new PlArray( packageName, new PlString(fileName), lineNumber );
+        }
+
+		// caller(EXPR) in list context, with args
+        // TODO - add other components
+        //   #  0         1          2      3            4
+        //   ($package, $filename, $line, $subroutine, $hasargs,
+        //   #  5          6          7            8       9         10
+        //   $wantarray, $evaltext, $is_require, $hints, $bitmask, $hinthash)
+        return new PlArray( packageName, new PlString(fileName), lineNumber, plFullName );
     }
 }
 

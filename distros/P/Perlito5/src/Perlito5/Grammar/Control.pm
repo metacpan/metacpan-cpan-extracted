@@ -94,7 +94,7 @@ token when {
 sub is_bareword {
     my $term = shift;
 
-    $term->isa('Perlito5::AST::Apply') and $term->{bareword};
+    (ref($term) eq 'Perlito5::AST::Apply') and $term->{bareword};
 }
 
 token for {
@@ -201,7 +201,7 @@ token while {
                 $cond = Perlito5::AST::Int->new( int => 1 );
             }
             my $stmt = Perlito5::AST::While->new( 
-                    cond  => $cond, 
+                    cond  => Perlito5::FoldConstant::fold_constant($cond), 
                     body  => Perlito5::Match::flat($MATCH->{block}),
                     continue => $MATCH->{opt_continue_block}{capture}
                  );
@@ -222,10 +222,12 @@ token until {
                 $cond = Perlito5::AST::Int->new( int => 1 );
             }
             $MATCH->{capture} = Perlito5::AST::While->new( 
-                    cond  => Perlito5::AST::Apply->new(
-                                'arguments' => [ $cond ],
-                                'code'      => 'prefix:<!>',
-                                'namespace' => '',
+                    cond  => Perlito5::FoldConstant::fold_constant(
+                                Perlito5::AST::Apply->new(
+                                    'arguments' => [ $cond ],
+                                    'code'      => 'prefix:<!>',
+                                    'namespace' => '',
+                                )
                             ),
                     body  => Perlito5::Match::flat($MATCH->{block}),
                     continue => $MATCH->{opt_continue_block}{capture}
@@ -278,7 +280,7 @@ This module generates a syntax tree for the Perlito compiler.
 =head1 AUTHORS
 
 Flavio Soibelmann Glock <fglock@gmail.com>.
-The Pugs Team E<lt>perl6-compiler@perl.orgE<gt>.
+The Pugs Team.
 
 =head1 SEE ALSO
 

@@ -8,9 +8,6 @@ use Env qw($HOLIDAYS_FILE);
 
 #run prior and once per suite
 sub startup : Test(startup => 1) {
-
-    diag("starting up...");
-
     use_ok('Date::Holidays');
 }
 
@@ -18,9 +15,7 @@ sub startup : Test(startup => 1) {
 sub setup : Test(setup => 2) {
     my $self = shift;
 
-    diag("setting up...");
-
-    ok(my $dh = Date::Holidays->new(countrycode => 'local'));
+    ok(my $dh = Date::Holidays->new(countrycode => 'Local'));
 
     isa_ok($dh, 'Date::Holidays');
 
@@ -89,7 +84,7 @@ sub cancelling_christmas_for_all : Test(8) {
         ), 'Initializing Christmas for Denmark');
 
         is($holiday->{'dk'}, 'Juledag', 'Yes it is Christmas in Denmark');
-        
+
         ok($holiday = $self->{dh}->is_holiday(
             year      => 2015,
             month     => 12,
@@ -98,7 +93,7 @@ sub cancelling_christmas_for_all : Test(8) {
         ), 'Initializing Christmas for Norway');
 
         is($holiday->{'no'}, 'juledag', 'Yes it is Christmas in Norway');
-        
+
         ok($holiday = $self->{dh}->is_holiday(
             year      => 2015,
             month     => 12,
@@ -106,7 +101,7 @@ sub cancelling_christmas_for_all : Test(8) {
             countries => ['+local','dk', 'no'],
         ), 'Merging calendars local, dk and no');
 
-        is($holiday->{'dk'}, '', 'Nullified Christmas in Denmark');   
+        is($holiday->{'dk'}, '', 'Nullified Christmas in Denmark');
         is($holiday->{'no'}, '', 'Nullified Christmas in Norway');
         is($holiday->{'local'}, '', 'We have no local holiday (our nullifier)');
     }
@@ -146,7 +141,7 @@ sub cancelling_christmas_next_year : Test(8) {
             day       => 24,
             countries => ['+local','dk'],
         ), 'testing local calendar does not nullify Christmas in DK for 2014');
-        
+
         is($holiday->{'dk'}, 'Juleaftensdag', 'asserting christmas');
         is($holiday->{'local'}, undef, 'asserting local calendar');
     }

@@ -139,16 +139,16 @@ subtest 'Converted to string correctly' => sub {
 
 subtest 'Call instance method' => sub {
         is(Fruits->APPLE->make_sentence, "Apple is red");
-        is(Fruits->ORANGE->make_sentence, "Cherry is red");
+        is(Fruits->ORANGE->make_sentence, "Orange is orange");
         is(Fruits->BANANA->make_sentence('!!!'), "Banana is yellow!!!");
     };
 
 subtest 'Correct values is set' => sub {
         is(Fruits->APPLE->name, 'Apple');
-        is(Fruits->ORANGE->name, 'Cherry');
+        is(Fruits->ORANGE->name, 'Orange');
         is(Fruits->BANANA->name, 'Banana');
         is(Fruits->APPLE->color, 'red');
-        is(Fruits->ORANGE->color, 'red');
+        is(Fruits->ORANGE->color, 'orange');
         is(Fruits->BANANA->color, 'yellow');
         is(Fruits->APPLE->has_seed, 1);
         is(Fruits->ORANGE->has_seed, 1);

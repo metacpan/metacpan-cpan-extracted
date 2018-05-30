@@ -2,11 +2,12 @@ package Geo::GDAL::FFI::Feature;
 use v5.10;
 use strict;
 use warnings;
+use Config;
 use Carp;
 use Encode qw(decode encode);
 use FFI::Platypus::Buffer;
 
-our $VERSION = 0.05_01;
+our $VERSION = 0.05_03;
 
 sub new {
     my ($class, $defn) = @_;
@@ -65,6 +66,9 @@ sub SetField {
     }
     my $d = Geo::GDAL::FFI::OGR_F_GetFieldDefnRef($$self, $i);
     my $t = $Geo::GDAL::FFI::field_types_reverse{Geo::GDAL::FFI::OGR_Fld_GetType($d)};
+    if ($t =~ /^Integer64/ && $Config{use64bitint} ne 'define') {
+        confess "Your Perl does not support 64 bit integers.";
+    }
     Geo::GDAL::FFI::OGR_F_SetFieldInteger($$self, $i, $value) if $t eq 'Integer';
     Geo::GDAL::FFI::OGR_F_SetFieldInteger64($$self, $i, $value) if $t eq 'Integer64';
     Geo::GDAL::FFI::OGR_F_SetFieldDouble($$self, $i, $value) if $t eq 'Real';
@@ -120,6 +124,9 @@ sub GetField {
     return unless $self->IsFieldSetAndNotNull($i);
     my $d = Geo::GDAL::FFI::OGR_F_GetFieldDefnRef($$self, $i);
     my $t = $Geo::GDAL::FFI::field_types_reverse{Geo::GDAL::FFI::OGR_Fld_GetType($d)};
+    if ($t =~ /^Integer64/ && $Config{use64bitint} ne 'define') {
+        confess "Your Perl does not support 64 bit integers.";
+    }
     return Geo::GDAL::FFI::OGR_F_GetFieldAsInteger($$self, $i) if $t eq 'Integer';
     return Geo::GDAL::FFI::OGR_F_GetFieldAsInteger64($$self, $i) if $t eq 'Integer64';
     return Geo::GDAL::FFI::OGR_F_GetFieldAsDouble($$self, $i) if $t eq 'Real';

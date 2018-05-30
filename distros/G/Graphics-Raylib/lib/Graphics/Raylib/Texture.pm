@@ -3,7 +3,7 @@ use warnings;
 package Graphics::Raylib::Texture;
 
 # ABSTRACT: Drawable Texture from Image
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 use List::Util qw(min max);
 use Graphics::Raylib::XS qw(:all);
@@ -23,7 +23,7 @@ Graphics::Raylib::Texture - Drawable Texture from Image
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -155,7 +155,6 @@ sub load_imager {
     $imager->write(data => \$data, type => 'raw');
     return load_bytes($data, 100, 100);#$imager->getwidth, $imager->getheight);
 }
-use Data::HexDump;
 sub load_bytes {
     my $bytes  = shift;
     my $width  = shift // croak "Width must be specified";

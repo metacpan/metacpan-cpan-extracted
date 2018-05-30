@@ -41,7 +41,7 @@ my $ua = LWP::UserAgent->new();
 my $webhook_url = sprintf(
     'http://%s:%d/webhook/?'
         . join( '&',
-        'channel=test', 'network=local', 'use_color=0', 'shorten_urls=0' ),
+        'channel=test', 'network=dummy', 'use_color=0', 'shorten_urls=0' ),
     $test_bot->addr,
     $test_bot->port
 );
@@ -67,7 +67,7 @@ is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
 
 TestBot->expect(
     join( ' ',
-        '#test Test User',
+        'dummy/#test Test User',
         'tags 27d8835 test-repo',
         'v5.6-plus',
     )
@@ -90,7 +90,7 @@ EOT
 
 TestBot->expect(
     join( ' ',
-        '#test Test User',
+        'dummy/#test Test User',
         'signed tags 470fc2f test-repo',
         'v5.8-plus',
         '* Tagging v5.8-plus',
@@ -112,7 +112,7 @@ $resp = webhook_post(
 
 TestBot->expect(
     join( ' ',
-        '#test Test User',
+        'dummy/#test Test User',
         'tags 470fc2f test-repo',
         'v5.8-plus',
         '* tag deleted',

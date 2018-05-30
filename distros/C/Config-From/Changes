@@ -1,5 +1,8 @@
 Revision history for Config-From
 
+0.06    2018-05-28
+        Change the name of a dependency
+
 0.05    2015-07-30
         update dependencies another time
         update pod

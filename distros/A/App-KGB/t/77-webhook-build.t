@@ -43,7 +43,7 @@ my $R = getcwd;
 
 my $ua = LWP::UserAgent->new();
 my $webhook_url =
-    sprintf( 'http://%s:%d/webhook/?channel=test&network=local&use_color=0',
+    sprintf( 'http://%s:%d/webhook/?channel=test&network=dummy&use_color=0',
     $test_bot->addr, $test_bot->port );
 
 sub webhook_post {
@@ -70,7 +70,7 @@ is( $resp->code, 202, 'build event response status is 202' ) or diag $resp->as_s
 
 TestBot->expect(
     join( ' ',
-        '#test Test User',
+        'dummy/#test Test User',
         'builds test-repo',
         '* Build #42 (Marvin) stage: final, status: created',
     )

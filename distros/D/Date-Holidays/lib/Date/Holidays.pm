@@ -5,14 +5,14 @@ use warnings;
 use vars qw($VERSION);
 use Locale::Country qw(all_country_codes code2country);
 use Module::Load qw(load);
-use Carp;
+use Carp; # croak
 use DateTime;
 use TryCatch;
 use Scalar::Util qw(blessed);
 
 use base 'Date::Holidays::Adapter';
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 sub new {
     my ( $class, %params ) = @_;
@@ -25,14 +25,21 @@ sub new {
         ref $class || $class;
 
     if ( $params{'countrycode'} ) {
-        $self->{'_countrycode'} = lc( $params{'countrycode'} );
+        if ( code2country( $params{countrycode} )) {
+            $self->{'_countrycode'} = uc $params{countrycode};
+        } else {
+            $self->{'_countrycode'} = $params{countrycode};
+        }
+
         try {
             $self->{'_inner_class'}
-                = $self->_fetch( { nocheck => $params{'nocheck'}, } );
+                = $self->_fetch( { nocheck     => $params{'nocheck'},
+                                   countrycode => $params{'countrycode'},
+                                 } );
         }
 
     } else {
-        die "No country code specified";
+        croak 'No country code specified';
     }
 
     if (   $self
@@ -52,7 +59,7 @@ sub new {
                 $self = undef;
             }
         } catch ($error) {
-            warn 'Unable to initialize adapter';
+            warn "Unable to initialize adapter: $error";
             $self = undef;
         }
 
@@ -156,7 +163,7 @@ sub _check_countries {
 
             if ( !$dh ) {
                 my $countryname = code2country($country);
-                my $countrycode = uc $country;
+                my $countrycode = $country;
 
                 die 'Unable to initialize Date::Holidays for country: '
                     . "$countrycode - $countryname\n";
@@ -224,35 +231,55 @@ sub _fetch {
     my ( $self, $params ) = @_;
 
     # Do we have a country code?
-    if ( !$self->{'_countrycode'} ) {
-        die "No country code specified";
+    if ( not $self->{'_countrycode'} and not $params->{countrycode} ) {
+        die 'No country code specified';
     }
+
+    my $countrycode = $params->{countrycode} || $self->{'_countrycode'};
 
     # Do we do country code assertion?
     if ( !$params->{'nocheck'} ) {
 
         # Is our country code valid or local?
-        if ( $self->{'_countrycode'} ne 'local' and !code2country( $self->{'_countrycode'} ) ) {  #from Locale::Country
-            die "$self->{_countrycode} is not a valid country code";
+        if ( $countrycode !~ m/local/i and !code2country( $countrycode ) ) {  #from Locale::Country
+            die "$countrycode is not a valid country code";
         }
     }
 
+    # Trying to load adapter module for country code
     my $module;
 
-    # Trying to load adapter module for country code
     try {
         # We load an adapter implementation
-        $module = 'Date::Holidays::Adapter::' . uc $self->{'_countrycode'};
+        if ($countrycode =~ m/local/i) {
+            $module = 'Date::Holidays::Adapter::Local';
+        } elsif (code2country( $countrycode )) {
+            $module = 'Date::Holidays::Adapter::' . uc $countrycode;
+        } else {
+            $module = 'Date::Holidays::Adapter::' . $countrycode;
+        }
 
-        $self->_load($module);
+        $module = $self->_load($module);
 
-    }
-    catch ($error) {
+    } catch ($error) {
+        warn "Unable to load module: $module - $error";
 
-        # Falling over to SUPER adapter class
-        $module = 'Date::Holidays::Adapter';
-        $self->_load($module);
-    }
+        try {
+
+            # We load an adapter implementation
+            $module = 'Date::Holidays::Adapter::' . $countrycode;
+
+            if ($module = $self->_load($module)) {
+                warn "we got a module and we return\n";
+            }
+
+        } catch ($error) {
+            warn "Unable to load module: $module - $error";
+
+            $module = 'Date::Holidays::Adapter';
+            $module = $self->_load($module);
+        };
+    };
 
     # Returning name of loaded module upon success
     return $module;
@@ -269,10 +296,9 @@ __END__
 # Date::Holidays
 
 [![CPAN version](https://badge.fury.io/pl/Date-Holidays.svg)](http://badge.fury.io/pl/Date-Holidays)
-[![Build Status](https://travis-ci.org/jonasbn/perl-date-holidays.svg?branch=master)](https://travis-ci.org/jonasbn/perl-date-holidays)
 ![stability-stable](https://img.shields.io/badge/stability-stable-green.svg)
+[![Build Status](https://travis-ci.org/jonasbn/perl-date-holidays.svg?branch=master)](https://travis-ci.org/jonasbn/perl-date-holidays)
 [![Coverage Status](https://coveralls.io/repos/github/jonasbn/perl-date-holidays/badge.svg?branch=master)](https://coveralls.io/github/jonasbn/perl-date-holidays?branch=master)
-[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.svg)](https://gitter.im/perl-date-holidays)
 [![License: Artistic-2.0](https://img.shields.io/badge/License-Artistic%202.0-0298c3.svg)](https://opensource.org/licenses/Artistic-2.0)
 
 <!-- MarkdownTOC autoanchor=false -->
@@ -736,14 +762,6 @@ Please report any bugs or feature requests using B<Github>.
 
 =back
 
-You are also welcome to contact me with L<Gitter|https://gitter.im/perl-date-holidays>.
-
-=begin markdown
-
-[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.svg)](https://gitter.im/perl-date-holidays)
-
-=end markdown
-
 =head1 TEST COVERAGE
 
 Coverage reports are available via L<Coveralls.io|https://coveralls.io/github/jonasbn/perl-date-holidays?branch=master>
@@ -893,10 +911,10 @@ Jonas B. Nielsen, (jonasbn) - C<< <jonasbn@cpan.org> >>
 =head1 LICENSE AND COPYRIGHT
 
 Date-Holidays and related modules are (C) by Jonas B. Nielsen, (jonasbn)
-2004-2017
+2004-2018
 
 Date-Holidays and related modules are released under the Artistic License 2.0
 
-Image used on L<website|https://jonasbn.github.io/perl-date-holidays/> is under copyright by L<Markus Spiske|https://unsplash.com/@markusspiske?photo=AF_4tBQjdtc>
+Image used on L<website|https://jonasbn.github.io/perl-date-holidays/> is under copyright by L<Tim Mossholder|https://unsplash.com/photos/C8jNJslQM3A>
 
 =cut

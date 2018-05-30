@@ -68,6 +68,7 @@ sub dump_to_ast {
         my $current_package = "main";
         for my $var_id (sort keys %$captures) {
             next if $var_id eq "__PKG__";
+            next if $Perlito5::BEGIN_SCRATCHPAD{$var_id};   # variable captured at BEGIN
             if ($var_id eq '__SUB__') {
                 my $sub_id = $captures->{$var_id};
                 $ast = $Perlito5::BEGIN_SUBS{$sub_id};
@@ -134,7 +135,7 @@ sub dump_to_ast {
             $current_package = $package;
         }
  
-        # say "dump_to_ast: source [[ $source ]]";
+        # warn "dump_to_ast: source: ", Perlito5::Dumper::Dumper( $source );
         return Perlito5::AST::Apply->new(
             code => 'do',
             arguments => [
@@ -163,22 +164,37 @@ sub dump_to_ast {
     }
 
     # TODO find out what kind of reference this is (ARRAY, HASH, ...)
-    # local $@;
-    # eval {
-    #     my @data = @$obj;
-    #     say "is array";
-    #     return 'bless(' . "..." . ", '$ref')";
-    # }
-    # or eval {
-    #     $@ = '';
-    #     my %data = %$obj;
-    #     say "is hash";
-    #     return 'bless(' . "..." . ", '$ref')";
-    # };
-    # $@ = '';
+    local $@ = '';
     
+    my $res = eval {
+        my @out;
+        for my $i ( 0 .. $#$obj ) {
+            my $here = Perlito5::AST::Index::INDEX( $pos, Perlito5::AST::Int->new(int => $i) );
+            push @out, 
+                dump_to_ast($obj->[$i], $seen, $here);
+        }
+        return Perlito5::AST::Apply->new(
+            code => 'bless',
+            arguments => [
+                Perlito5::AST::Apply->new(code => 'circumfix:<[ ]>', arguments => \@out),
+                Perlito5::AST::Buf->new(buf => $ref),
+            ],
+        );
+    };
+    return $res if $res;
+
+    $res = eval {
+        # blessed SCALAR
+        return Perlito5::AST::Apply->new(
+            code => 'bless',
+            arguments => [
+                Perlito5::AST::Apply->new(code => 'prefix:<\\>', arguments => [ dump_to_ast($$obj) ]),
+            ],
+        );
+    };
+    return $res if $res;
+
     # assume it's a blessed HASH
-    
     my @out;
     for my $i ( sort keys %$obj ) {
         my $here = Perlito5::AST::Lookup::LOOKUP( $pos, Perlito5::AST::Buf->new(buf => $i) );

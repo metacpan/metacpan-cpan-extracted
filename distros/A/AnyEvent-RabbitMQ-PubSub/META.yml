@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.0, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   AnyEvent::RabbitMQ::PubSub:
     file: lib/AnyEvent/RabbitMQ/PubSub.pm
-    version: v3.2.0
+    version: v3.2.1
   AnyEvent::RabbitMQ::PubSub::Consumer:
     file: lib/AnyEvent/RabbitMQ/PubSub/Consumer.pm
   AnyEvent::RabbitMQ::PubSub::Publisher:
@@ -38,12 +38,14 @@ requires:
   Promises: '0'
   perl: '5.010'
 resources:
-  bugtracker: https://github.com/tynovsky/AnyEvent-RabbitMQ-PubSub/issues
-  homepage: https://github.com/tynovsky/AnyEvent-RabbitMQ-PubSub
-  repository: git://github.com/tynovsky/AnyEvent-RabbitMQ-PubSub.git
-version: 3.2.0
+  bugtracker: https://github.com/avast/AnyEvent-RabbitMQ-PubSub/issues
+  homepage: https://github.com/avast/AnyEvent-RabbitMQ-PubSub
+  repository: git://github.com/avast/AnyEvent-RabbitMQ-PubSub.git
+version: 3.2.1
 x_authority: cpan:TYNOVSKY
 x_contributors:
   - 'Jan Seidl <seidl@avast.com>'
+  - 'Mohelníková Lucie <mohelnikova@avast.com>'
   - 'tynovsky <tynovsky@seznam.cz>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

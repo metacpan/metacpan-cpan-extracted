@@ -3,26 +3,23 @@ use v5;
 package Perlito5::JavaScript2::Runtime;
 
 sub perl5_to_js {
-    my ($source, $namespace, $want, $scope_js) = @_;
+    my ($source, $namespace, $want, $scalar_hints, $hash_hints, $scope_js) = @_;
 
     # say "source: [" . $source . "]";
 
-    my    $strict_old         = $Perlito5::STRICT;
     local $_;
     local ${^GLOBAL_PHASE};
-    local $Perlito5::BASE_SCOPE = $scope_js->[0];
+    local $^H = $scalar_hints;
+    local %^H = %$hash_hints;
+    local @Perlito5::BASE_SCOPE = ($scope_js->[0]);
     local @Perlito5::SCOPE_STMT;
-    local $Perlito5::CLOSURE_SCOPE = $Perlito5::BASE_SCOPE;
-    local $Perlito5::SCOPE         = $Perlito5::BASE_SCOPE;
-    local $Perlito5::SCOPE_DEPTH = 0;
+    local $Perlito5::CLOSURE_SCOPE = 0;
     local $Perlito5::PKG_NAME = $namespace;
     local @Perlito5::UNITCHECK_BLOCK;
     # warn "in eval enter\n";
-    # warn "External scope ", Data::Dumper::Dumper($scope_js);
-    # warn "BASE_SCOPE ", Data::Dumper::Dumper($Perlito5::BASE_SCOPE);
-    # warn "SCOPE_STMT ", Data::Dumper::Dumper(\@Perlito5::SCOPE_STMT);
-    # warn "SCOPE ", Data::Dumper::Dumper($Perlito5::SCOPE);
-    # warn "SCOPE_DEPTH ", Data::Dumper::Dumper($Perlito5::SCOPE_DEPTH);
+    # warn "External scope ", Perlito5::Dumper::Dumper($scope_js);
+    # warn "BASE_SCOPE ", Perlito5::Dumper::Dumper($Perlito5::BASE_SCOPE);
+    # warn "SCOPE_STMT ", Perlito5::Dumper::Dumper(\@Perlito5::SCOPE_STMT);
 
     my $match = Perlito5::Grammar::exp_stmts( $source, 0 );
 
@@ -42,13 +39,15 @@ sub perl5_to_js {
 
     # say "ast: [" . ast . "]";
     my $js_code = $ast->emit_javascript2(0, $want);
-    # say "js-source: [" . $js_code . "]";
 
     Perlito5::set_global_phase("UNITCHECK");
     $_->() while $_ = shift @Perlito5::UNITCHECK_BLOCK;
 
-    # warn "in eval BASE_SCOPE exit: ", Data::Dumper::Dumper($Perlito5::BASE_SCOPE);
-    $Perlito5::STRICT   = $strict_old;
+    # warn "in eval BASE_SCOPE exit: ", Perlito5::Dumper::Dumper($Perlito5::BASE_SCOPE);
+    if ($Perlito5::JavaScript::DEBUG) {
+        # "-JS DEBUG" switch in the command line
+        print $js_code, "\n\n";
+    }
     return $js_code;
 }
 
@@ -56,11 +55,18 @@ sub eval_ast {
     my ($ast) = @_;
     my $want = 0;
 
+    # use lexicals from BEGIN scratchpad
+    $ast = $ast->emit_begin_scratchpad();
+
     my $js_code = $ast->emit_javascript2(0, $want);
     # say STDERR "js-source: [" . $js_code . "]";
     Perlito5::set_global_phase("UNITCHECK");
     $_->() while $_ = shift @Perlito5::UNITCHECK_BLOCK;
-    # warn "in eval BASE_SCOPE exit: ", Data::Dumper::Dumper($Perlito5::BASE_SCOPE);
+    # warn "in eval BASE_SCOPE exit: ", Perlito5::Dumper::Dumper($Perlito5::BASE_SCOPE);
+    if ($Perlito5::JavaScript::DEBUG) {
+        # "-JS DEBUG" switch in the command line
+        print $js_code, "\n\n";
+    }
     $_ = $js_code;
     return JS::inline('eval("(function(){" + p5pkg.main.v__ + "})()")');
 }
@@ -169,7 +175,7 @@ if (typeof p5pkg !== "object") {
 function p5make_package(pkg_name) {
     if (!p5pkg.hasOwnProperty(pkg_name)) {
         var tmp = function () {};
-        tmp.prototype = p5pkg["CORE::GLOBAL"];
+        tmp.prototype = p5pkg.CORE;
         p5pkg[pkg_name] = new tmp();
         p5pkg[pkg_name]._ref_ = pkg_name;
         p5pkg[pkg_name]._class_ = p5pkg[pkg_name];  // XXX memory leak
@@ -402,15 +408,16 @@ function p5scalar_deref(v, current_pkg_name, autoviv_type) {
         return p5pkg[pkg_name][name];
     }
     if (!v._scalar_) {
-        if (autoviv_type == 'array') {
-            v._scalar_ = new p5ArrayRef([]);
-        }
-        else if (autoviv_type == 'hash') {
-            v._scalar_ = new p5HashRef([]);
-        }
-        else if (autoviv_type == 'scalar') {
-            v._scalar_ = new p5ScalarRef([]);
-        }
+        CORE.die(["not a SCALAR reference"]);
+        // if (autoviv_type == 'array') {
+        //     v._scalar_ = new p5ArrayRef([]);
+        // }
+        // else if (autoviv_type == 'hash') {
+        //     v._scalar_ = new p5HashRef([]);
+        // }
+        // else if (autoviv_type == 'scalar') {
+        //     v._scalar_ = new p5ScalarRef([]);
+        // }
     }
     return v._scalar_;
 }
@@ -512,7 +519,7 @@ p5pkg["main"]['v_"'] = " ";     // $"
 p5pkg["main"]["List_#"] = [];   // @#
 p5scalar_deref_set(String.fromCharCode(15), isNode ? "node.js" : "javascript2");  // $^O
 p5pkg["main"]["List_INC"] = [];
-p5pkg["main"]["Hash_INC"] = {};
+p5pkg["main"]["Hash_INC"] = { "strict.pm" : "strict.pm", "feature.pm" : "feature.pm", "warnings.pm" : "warnings.pm" };
 p5pkg["main"]["List_ARGV"] = [];
 p5pkg["main"]["Hash_ENV"] = {};
 p5pkg["main"]["Hash_SIG"] = {};
@@ -761,6 +768,26 @@ var p5smrt_scalar = function(a1, a2) {
         return p5num(a1) == a2;
     }
     CORE.die("Not implemented: smartmatch operator with argument type '", (typeof a2), "'");
+};
+
+var p5refaddr = function(o) {
+    if (o == null) {
+        return null;
+    }
+    if (typeof o === "object") {
+        if (o instanceof Array) {
+            return null;
+        }
+        if ( o.hasOwnProperty("_ref_") ) {
+            if (!o._id_) { o._id_ = p5id++ }
+            return o._id_;
+        }
+    }
+    if (typeof o === "function") {
+        if (!o._id_) { o._id_ = p5id++ }
+        return o._id_;
+    }
+    return null;
 };
 
 var p5str = function(o) {

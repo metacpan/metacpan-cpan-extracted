@@ -1,161 +1,170 @@
-Revision history for Perl extension Class::Date.
+Revision history for Class::Date
 
-1.1.15 Mon May  5 06:18:37 2014
-    - Don't require Env::C  due to RT #95332
+1.1.16 2018-05-26
+  - Remove the xs part of the distribution, which  was not adding much for
+    the extra pain.
+  - Quiet spurious warning. (GH#9)
+  - Fix typos in documentation. (GH#5)
 
-1.1.14 Sat May  3 11:02:33 2014
-    - Move Date/Const.pm to lib/Calss/Date/
-    - Move Class::Date::Invalid and Class::Date::Rel to their own files in lib/Class/Date/
-    - Require Scalar::Util and remove work-around lack of Scalar::Util
-    - Require Env::C
+  [ STATISTICS ]
+    - code churn: 22 files changed, 181 insertions(+), 510 deletions(-)
 
-1.1.13 Fri May  2 08:32:15 2014
-    - Use Test::More for testing
+1.1.15 2014-05-05T06:18:37Z
+  - Don't require Env::C  due to RT #95332
 
-1.1.12 Wed Apr 30 08:44:29 2014
-    - Fixing MANIFEST.SKIP to include Makefile.PL and exclue MYMETA files.
+1.1.14 2014-05-03T11:02:33Z
+  - Move Date/Const.pm to lib/Calss/Date/
+  - Move Class::Date::Invalid and Class::Date::Rel to their own files in
+    lib/Class/Date/
+  - Require Scalar::Util and remove work-around lack of Scalar::Util
+  - Require Env::C
 
-1.1.11 Wed Apr 30 06:56:24 2014
-    - Convert the pod to UTF8 and add =encoding RT #94657 
-    - Minumum version of perl is not 5.006
-    - Makefile updated
-    - New maintainer: Gabor Szabo
+1.1.13 2014-05-02T08:32:15Z
+  - Use Test::More for testing
 
-1.1.10 Sun Jul 18 13:27:39 CEST 2010
-    - Remove the deprecated UNIVERSAL::import (Vladimir Timofeev)
+1.1.12 2014-04-30T08:44:29Z
+  - Fixing MANIFEST.SKIP to include Makefile.PL and exclue MYMETA files.
 
-1.1.9 Sun May 14 22:52:50 CEST 2006
-    - Added "meridiam" and "ampm" methods by llarian
+1.1.11 2014-04-30T06:56:24Z
+  - Convert the pod to UTF8 and add =encoding RT #94657 
+  - Minumum version of perl is not 5.006
+  - Makefile updated
+  - New maintainer: Gabor Szabo
 
-1.1.8 Sun Nov  6 16:36:54 CET 2005
-    - Added Env::C support for mod_perl environments
-    - Added documentation about thread-safety and mod_perl issues
+1.1.10 2010-07-18T13:27:39Z
+  - Remove the deprecated UNIVERSAL::import (Vladimir Timofeev)
 
-1.1.7 Wed Aug 20 23:16:29 CEST 2003
-    - Bugfix in Date::Parse support
+1.1.9 2006-05-14T22:52:50Z
+  - Added "meridiam" and "ampm" methods by llarian
 
-1.1.6 Sun Mar 16 18:05:23 CET 2003
-    - Introducing the NOTZ_TIMEZONE variable to support local time
-      calculations, where TZ variables are not set.
+1.1.8 2005-11-06T16:36:54Z
+  - Added Env::C support for mod_perl environments
+  - Added documentation about thread-safety and mod_perl issues
 
-1.1.5 Wed Feb  5 23:17:50 CET 2003
-    - Small documentation fix
+1.1.7 2003-08-20T23:16:29Z
+  - Bugfix in Date::Parse support
 
-1.1.4 Wed Feb  5 11:15:20 CET 2003 (test release)
-    - Restored the usage of gmtime and timegm methods, because I cannot
-      solve the timezone issues on win32 platform.
+1.1.6 2003-03-16T18:05:23Z
+  - Introducing the NOTZ_TIMEZONE variable to support local time
+    calculations, where TZ variables are not set.
 
-1.1.3 Fri Jan  3 09:07:01 CET 2003
-    - Fixed a warning in the strftime method
+1.1.5 2003-02-05T23:17:50Z
+  - Small documentation fix
 
-1.1.2 Sat Dec 14 14:46:41 CET 2002
-    - Test and report buggy strftime implementation
-    - Fix for strftime
-    - Hardcoded "Class::Date" class names are removed, to enhance
-      inheritance
+1.1.4 2003-02-05T11:15:20Z (test release)
+  - Restored the usage of gmtime and timegm methods, because I cannot solve
+    the timezone issues on win32 platform.
 
-1.1.1 Wed Aug 28 23:30:43 CEST 2002
-    - errstr method of Class::Date::Invalid is documented
-    - Timezone set fix for perl 5.8.0
-    - Fix for the missing "tzname" declaration on OSX.
-    - NOTE: gmdate and timezone support still does not work on win32!
+1.1.3 2003-01-03T09:07:01Z
+  - Fixed a warning in the strftime method
 
-1.1.0 Mon Jul 15 20:24:04 CEST 2002
-    - Date::Parse support now works well with partly defined dates.
-    - Full timezone support (except on the win32 platform)
+1.1.2 2002-12-14T14:46:41Z
+  - Test and report buggy strftime implementation
+  - Fix for strftime
+  - Hardcoded "Class::Date" class names are removed, to enhance inheritance
 
-1.0.10 Sun Mar 10 21:45:58 CET 2002
-    - Extend the range of operation to 1902-2038 where the underlying
-      system (perl, POSIX functions) support
+1.1.1 2002-08-28T23:30:43Z
+  - errstr method of Class::Date::Invalid is documented
+  - Timezone set fix for perl 5.8.0
+  - Fix for the missing "tzname" declaration on OSX.
+  - NOTE: gmdate and timezone support still does not work on win32!
 
-1.0.9 Mon Feb 25 23:19:49 CET 2002
-    - is_leap_year function added
-    
-1.0.8 Wed Nov  7 12:15:28 CET 2001
-    - fix Time::Local detection in perl 5.005_03
-    - The module is now working without a C compiler
-    - You will get warnings if you request for Date::Parse, but it cannot
-      be found
+1.1.0 2002-07-15T20:24:04Z
+  - Date::Parse support now works well with partly defined dates.
+  - Full timezone support (except on the win32 platform)
 
-1.0.7 Mon Oct 15 00:22:47 CEST 2001
-    - fix for function name clash in bleadperl
-    - Documentation update: Win32 and support chapters added,
-      Development focus rewritten
+1.0.10 2002-03-10T21:45:58Z
+  - Extend the range of operation to 1902-2038 where the underlying system
+    (perl, POSIX functions) support
 
-1.0.6 Thu Oct 11 14:26:27 CEST 2001
-    - Fixed a bug with month_end and newer stable perls (5.6.1)
-    - Fixed a bug with Time::Local in perl 5.7.2
+1.0.9 2002-02-25T23:19:49Z
+  - is_leap_year function added
 
-1.0.5 Tue Jul 17 14:31:00 CEST 2001
-    - Restored and documented the compatibility issues with perl 5.005
+1.0.8 2001-11-07T12:15:28Z
+  - fix Time::Local detection in perl 5.005_03
+  - The module is now working without a C compiler
+  - You will get warnings if you request for Date::Parse, but it cannot be
+    found
 
-1.0.4 Tue Jul 12 11:00:46 CEST 2001
-    - Fix a bug with RANGE_CHECK in addition
+1.0.7 2001-10-15T00:22:47Z
+  - fix for function name clash in bleadperl
+  - Documentation update: Win32 and support chapters added, Development
+    focus rewritten
 
-1.0.3 Tue Jul  3 13:09:04 CEST 2001
-    - "errmsg" method is not works as expected
-    - "errstr" is now an alias to "errmsg"
+1.0.6 2001-10-11T14:26:27Z
+  - Fixed a bug with month_end and newer stable perls (5.6.1)
+  - Fixed a bug with Time::Local in perl 5.7.2
 
-1.0.2 Wed Jun 27 00:08:05 CEST 2001
-    - "set" method is renamed to "clone"
-    - named interface is documented
-    - minor documentation fixes
+1.0.5 2001-07-17T14:31:00Z
+  - Restored and documented the compatibility issues with perl 5.005
 
-1.0.1 Sat Jun 16 16:14:02 CEST 2001
-    - added a "set" method to change parts of the date
-    - fix the "href" method
-    - Added a $RANGE_CHECK variable, to possiby disable dates like 
-      "2001-02-31"
-    - Added error handling
-    - Restored compatibility with perl 5.005
+1.0.4 2001-07-12T11:00:46Z
+  - Fix a bug with RANGE_CHECK in addition
 
-1.0.0 Mon Jun 11 14:58:29 CEST 2001
-    - it is now requires perl 5.6 because of using Time::Local
-    - stable release, basically the same as 0.98
+1.0.3 2001-07-03T13:09:04Z
+  - "errmsg" method is not works as expected
+  - "errstr" is now an alias to "errmsg"
 
-0.98 Tue May 22 16:46:03 CEST 2001
-    - bug in "truncate" method fixed
-    - documentation changes
+1.0.2 2001-06-27T00:08:05Z
+  - "set" method is renamed to "clone"
+  - named interface is documented
+  - minor documentation fixes
 
-0.97 Wed May 16 23:10:17 CEST 2001
-    - Accepts the date in "YYYY-MM-DD HH:MM" format
-    - uses Time::Local instead of strftime("%s"), because the latter
-      is not available in not GNU environment
+1.0.1 2001-06-16T16:14:02Z
+  - added a "set" method to change parts of the date
+  - fix the "href" method
+  - Added a $RANGE_CHECK variable, to possiby disable dates like 
+    "2001-02-31"
+  - Added error handling
+  - Restored compatibility with perl 5.005
 
-0.96 Fri May 11 01:42:36 CEST 2001
-    - Fixed $DST_ADJUST bug when adding months
-    - Added $MONTH_BORDER_ADJUST variable and documentation for it
-    - Added "month_begin", "month_end" and "days_in_month" method
-    - Fixed the "aref" method
-    - Doc. grammar fixes
+1.0.0 2001-06-11T14:58:29Z
+  - it is now requires perl 5.6 because of using Time::Local
+  - stable release, basically the same as 0.98
 
-0.95 Thu May 10 00:11:43 CEST 2001
-    - Fixed comparison problem with undef
-    - date("2001-01-31")+'1M'-'1M' != "2001-01-31" "bug" documented
-    - Fixed the module name in two places (it was Date::Class)
+0.98 2001-05-22T16:46:03Z
+  - bug in "truncate" method fixed
+  - documentation changes
 
-0.94 Thu Apr 26 16:30:39 CEST 2001
-    - $date-'1D' bug fixed
-    - added "now" function
+0.97 2001-05-16T23:10:17Z
+  - Accepts the date in "YYYY-MM-DD HH:MM" format
+  - uses Time::Local instead of strftime("%s"), because the latter is not
+    available in not GNU environment
 
-0.93 Wed Apr 18 12:55:15 CEST 2001
-    - the return value from Date::Parse is fixed
+0.96 2001-05-11T01:42:36Z
+  - Fixed $DST_ADJUST bug when adding months
+  - Added $MONTH_BORDER_ADJUST variable and documentation for it
+  - Added "month_begin", "month_end" and "days_in_month" method
+  - Fixed the "aref" method
+  - Doc. grammar fixes
 
-0.92 Tue Apr 17 17:23:10 CEST 2001
-    - made 'Date::Parse' usage optional
+0.95 2001-05-10T00:11:43Z
+  - Fixed comparison problem with undef
+  - date("2001-01-31")+'1M'-'1M' != "2001-01-31" "bug" documented
+  - Fixed the module name in two places (it was Date::Class)
 
-0.91 Mon Apr  9 13:42:49 CEST 2001
-    - small bugfixes for perl 5.005
-    - date(undef) and Class::Date::Rel(undef) returns undef
-    - array method fix (year + 1900, month + 1)
-    - $DATE_FORMAT is not exportable any more (confusing)
-    - test fixes
+0.94 2001-04-26T16:30:39Z
+  - $date-'1D' bug fixed
+  - added "now" function
 
-0.90 Thu Apr  5 13:18:18 CEST 2001
-    - Complete rewrite based on Matt Sergeant's Time::Object
-    - Can handle GMT and local time also
-    - A severe bug fixed concerning the Daylight Saving Time
-    - Dependency to POSIX.pm has been removed
+0.93 2001-04-18T12:55:15Z
+  - the return value from Date::Parse is fixed
 
-0.5 Initial release
+0.92 2001-04-17T17:23:10Z
+  - made 'Date::Parse' usage optional
 
+0.91 2001-04-09T13:42:49Z
+  - small bugfixes for perl 5.005
+  - date(undef) and Class::Date::Rel(undef) returns undef
+  - array method fix (year + 1900, month + 1)
+  - $DATE_FORMAT is not exportable any more (confusing)
+  - test fixes
+
+0.90 2001-04-05T13:18:18Z
+  - Complete rewrite based on Matt Sergeant's Time::Object
+  - Can handle GMT and local time also
+  - A severe bug fixed concerning the Daylight Saving Time
+  - Dependency to POSIX.pm has been removed
+
+0.5 2001-03-12
+  - Initial release

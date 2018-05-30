@@ -2,10 +2,10 @@ use strict;
 use warnings;
 
 use JavaScript::Duktape::XS;
-use Types::Serialiser;
 
 use Data::JSONSchema::Ajv::src;
-use Data::JSONSchema::Ajv::Types;
+use Data::JSONSchema::Ajv::src::04;
+use Data::JSONSchema::Ajv::src::06;
 
 =head1 NAME
 
@@ -13,7 +13,7 @@ Data::JSONSchema::Ajv - JSON Schema Validator wrapping Ajv
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 
@@ -25,7 +25,9 @@ JSON Schema Validator wrapping Ajv
     use Data::JSONSchema::Ajv;
 
     my $ajv_options = {};
-    my $my_options  = {};
+    my $my_options  = {
+        draft => '04', # Defaults to '07'
+    };
 
     my $ajv     = Data::JSONSchema::Ajv->new($ajv_options, $my_options);
 
@@ -74,7 +76,7 @@ JSON Schema Validator wrapping Ajv
 This module is an offensively light-weight wrapper
 L<Ajv|https://epoberezkin.github.io/ajv/>.
 
-Light-weight in this context just means it's only 50 lines or so of actual Perl.
+Light-weight in this context just means it's not very many lines of actual Perl
 
 =head1 METHODS
 
@@ -82,20 +84,20 @@ Light-weight in this context just means it's only 50 lines or so of actual Perl.
 
   my $ajv = Data::JSONSchema::Ajv->new(
       { v5 => $JSON::PP::true }, # Ajv options. Try: {},
-      {}, # Module options. None at this time
+      {}, # Module options. See `draft`
   );
 
 Instantiates a new L<JavaScript::Duktape::XS> environment and loads C<Ajv> into it.
 Accepts two hashrefs (or undefs). The first is passed straight through to
 C<Ajv>, whose options are documented L<here|https://epoberezkin.github.io/ajv/>.
 
-There are no options at this time to pass this module itself.
-
-You *must* read the section on SCHEMA VERSIONING below.
+The second one allows you to specify a JSON Schema draft version. Allowable
+options are C<04>, C<06>, and C<07>. No support for multiple schemas at this
+time. Default is C<07>.
 
 =head2 make_validator
 
-  my $validator = $ajv->make_validator( $hashref_schema );
+  my $validator = $ajv->make_validator( $hashref_schema OR $json_string );
 
 Compiles your schema using C<Ajv> and return a
 C<Data::JSONSchema::Ajv::Validator> object, documented immediately below.
@@ -120,31 +122,9 @@ L<Data::Dumper> it.
 
 =head1 BOOLEANS AND UNDEFINED/NULL
 
-Perl has no special Boolean types. JSON (and indeed JavaScript) does. On load,
-this module does a bit of magic in the very simple L<Data::JSONSchema::Ajv::Types>
-module, which recognizes and converts common Perl-defined standins for this in to
-L<JavaScript::Duktape::XS::Bool>.
-
-Currently that's a small list consisting of the boolean objects from
-L<Types::Serialiser::BooleanBase>, L<JSON::Boolean>, and L<JSON::PP::Boolean>
-but you can easily overwrite the C<$visitor> object and send me a patch for your
-favourite type.
-
-Calls to C<make_validator> and
-C<validate> will run their input through the visitor object, and convert their
-Booleans. This means you can push data in that you've read with, say,
-L<JSON::XS> without having to think about it.
-
-Also: C<undef> --> will be converted to JS null values -- undefined isn't
-value in JSON.
-
-=head1 SCHEMA VERSIONING
-
-The Ajv docs have the somewhat confusing messages about schema versions, and
-when trying to support the most recent Ajv, I got confusing message about
-Duktape. As a result, we're using Ajv 4.11.8 which supports draft-04 style
-schemas only. This will probably change in the future, but life's too short
-right now and I need something that works. Patches encouraged.
+Perl has no special Boolean types. JSON (and indeed JavaScript) does. If you're
+really brave, you can pass in a C<json> option to replace the underlying
+L<Cpanel::JSON::XS> at instantiation.
 
 =head1 SEE ALSO
 
@@ -178,30 +158,55 @@ This Perl wrapper written by Peter Sergeant.
 package Data::JSONSchema::Ajv {
     use Carp qw/croak/;
     use Storable qw/dclone/;
+    use Cpanel::JSON::XS qw/decode_json/;
 
     sub new {
         my ( $class, $ajv_options, $my_options ) = @_;
 
         $ajv_options = {
-            logger => $Types::Serialiser::false,
+            logger => $Cpanel::JSON::XS::false,
             %{ $ajv_options || {} }
         };
 
         $my_options ||= {};
+        my $draft_version = delete $my_options->{'draft'} // '07';
+        my $json_obj = delete $my_options->{'json'}
+            // Cpanel::JSON::XS->new->ascii->allow_nonref;
         if ( keys %$my_options ) {
             croak( "Unknown options: " . ( join ', ', keys %$my_options ) );
         }
 
         my $js = JavaScript::Duktape::XS->new();
-        $js->eval($Data::JSONSchema::Ajv::Types::src);
         $js->eval($Data::JSONSchema::Ajv::src::src);
+
+        # Setup appropriately for different version of the schema
+        if ( $draft_version eq '04' ) {
+            warn "Over-riding 'schemaId' as you specified draft-04"
+                if exists $ajv_options->{'schemaId'};
+            $ajv_options->{'schemaId'} = 'id';
+            warn "Over-riding 'meta' as you specified draft-04"
+                if exists $ajv_options->{'meta'};
+            $ajv_options->{'meta'}
+                = decode_json($Data::JSONSchema::Ajv::src::04::src);
+        }
+        elsif ( $draft_version eq '06' ) {
+            warn "Over-riding 'meta' as you specified draft-06"
+                if exists $ajv_options->{'meta'};
+            $ajv_options->{'meta'}
+                = $json_obj->decode($Data::JSONSchema::Ajv::src::06::src);
+        }
+        elsif ( $draft_version ne '07' ) {
+            die "Can only accept draft versions: '04', '06', '07'";
+        }
 
         my $self = bless {
             '_context' => $js,
             '_counter' => 0,
+            '_json'    => $json_obj,
         }, $class;
 
         $self->_inject_escaped( ajvOptions => $ajv_options );
+
         $js->eval('var ajv = new Ajv(ajvOptions);');
 
         return $self;
@@ -214,10 +219,16 @@ package Data::JSONSchema::Ajv {
         my $schema_name    = "schemaDef_$counter";
         my $validator_name = "validator_$counter";
 
-        $self->_inject_escaped( $schema_name, $schema );
+        if ( ref $schema ) {
+            $self->_inject_escaped( $schema_name, $schema );
+            $self->{'_context'}
+                ->eval("var $validator_name = ajv.compile($schema_name);");
+        }
+        else {
+            $self->{'_context'}
+                ->eval("var $validator_name = ajv.compile($schema);");
+        }
 
-        $self->{'_context'}
-            ->eval("var $validator_name = ajv.compile($schema_name);");
         return bless [ $self => $validator_name ],
             'Data::JSONSchema::Ajv::Validator';
     }
@@ -230,20 +241,17 @@ package Data::JSONSchema::Ajv {
         my $js = $self->duktape;
 
         # Change various markers to be magic strings
-        $data = dclone( [$data] );
-        $data = $Data::JSONSchema::Ajv::Types::visitor->visit( $data->[0] );
-
-        # Push that input into JS land
-        $js->set( $name, $data );
+        my $data_dump = $self->{'_json'}->encode($data);
 
         # Change them back in JS land if needed
-        $js->eval("$name = data_json_schema_ajv_type_exchange($name);");
+        $js->eval("$name = $data_dump;");
     }
+
 }
-$Data::JSONSchema::Ajv::VERSION = '0.04';;
+$Data::JSONSchema::Ajv::VERSION = '0.05';;
 
 package Data::JSONSchema::Ajv::Validator {
-$Data::JSONSchema::Ajv::Validator::VERSION = '0.04';
+$Data::JSONSchema::Ajv::Validator::VERSION = '0.05';
 use strict;
     use warnings;
 

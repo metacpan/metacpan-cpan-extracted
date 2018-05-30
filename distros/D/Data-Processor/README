@@ -164,20 +164,21 @@ SCHEMA REFERENCE
 
  array
 
-     To have a key point to an array of things, simply use the array key. So:
-    
+    To have a key point to an array of things, simply use the array key.
+    So:
+
      my $schema = {
         houses => {
            array => 1,
         }
      };
-    
-     Would describe a structure like:
-    
+
+    Would describe a structure like:
+
      { houses => [] }
-    
-     And of course you can nest within here so:
-    
+
+    And of course you can nest within here so:
+
      my $schema = {
         houses => {
            array => 1,
@@ -189,9 +190,9 @@ SCHEMA REFERENCE
            },
         },
      };
-    
-     Might describe:
-    
+
+    Might describe:
+
      {
        houses => [
           { name => 'bob',

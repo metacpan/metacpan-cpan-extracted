@@ -1,4 +1,4 @@
-use 5.12.0;
+use 5.012;
 use strict;
 use warnings FATAL => 'all';
 use ExtUtils::MakeMaker;
@@ -19,10 +19,9 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'Net::IP'            => 0,
-        'MIME::Base64'       => 0,
-        'Crypt::PBKDF2'      => 0,
-        'Crypt::Cipher::AES' => 0,
+        'Net::IP'              => 0,
+        'Crypt::KeyDerivation' => 0,
+        'Crypt::Cipher::AES'   => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Net-Address-IP-Cipher-*' },

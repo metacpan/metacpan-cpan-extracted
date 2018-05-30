@@ -15,11 +15,11 @@ Device::Firmata - Perl interface to Firmata for the arduino platform.
 
 =head1 VERSION
 
-Version 0.60
+Version 0.64
 
 =cut
 
-our $VERSION = '0.60';
+our $VERSION = '0.64';
 our $DEBUG = 0;
 
 
@@ -83,7 +83,7 @@ sub listen {
   my $netio = "Device::Firmata::IO::NetIO";
   eval "require $netio";
 
-  return $netio->listen( $ip, $port, $opts ) or die "Could not bind to socket";
+  return $netio->listen( $ip, $port, $opts ) || die "Could not bind to socket";
 }
 
 1;

@@ -1,5 +1,8 @@
 Revision history for Catmandu-Identifier
 
+0.10  2018-05-27 16:28:18 CEST
+    - introduce new fix uri_status_code (@phochste)
+
 0.09  2018-05-16 13:13:59 CEST
     - update dependencies
 

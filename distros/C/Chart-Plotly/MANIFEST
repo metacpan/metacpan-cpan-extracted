@@ -38,6 +38,9 @@ examples/traces/carpet.png
 examples/traces/choropleth.html
 examples/traces/choropleth.pl
 examples/traces/choropleth.png
+examples/traces/cone.html
+examples/traces/cone.pl
+examples/traces/cone.png
 examples/traces/contour.html
 examples/traces/contour.pl
 examples/traces/contour.png
@@ -204,6 +207,17 @@ lib/Chart/Plotly/Trace/Choropleth/Stream.pm
 lib/Chart/Plotly/Trace/Choropleth/Transform.pm
 lib/Chart/Plotly/Trace/Choropleth/Unselected.pm
 lib/Chart/Plotly/Trace/Choropleth/Unselected/Marker.pm
+lib/Chart/Plotly/Trace/Cone.pm
+lib/Chart/Plotly/Trace/Cone/Colorbar.pm
+lib/Chart/Plotly/Trace/Cone/Colorbar/Tickfont.pm
+lib/Chart/Plotly/Trace/Cone/Colorbar/Tickformatstop.pm
+lib/Chart/Plotly/Trace/Cone/Colorbar/Titlefont.pm
+lib/Chart/Plotly/Trace/Cone/Hoverlabel.pm
+lib/Chart/Plotly/Trace/Cone/Hoverlabel/Font.pm
+lib/Chart/Plotly/Trace/Cone/Lighting.pm
+lib/Chart/Plotly/Trace/Cone/Lightposition.pm
+lib/Chart/Plotly/Trace/Cone/Stream.pm
+lib/Chart/Plotly/Trace/Cone/Transform.pm
 lib/Chart/Plotly/Trace/Contour.pm
 lib/Chart/Plotly/Trace/Contour/Colorbar.pm
 lib/Chart/Plotly/Trace/Contour/Colorbar/Tickfont.pm

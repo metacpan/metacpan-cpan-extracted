@@ -5,6 +5,7 @@ use Perlito5::Grammar::Expression;
 use Perlito5::Grammar::Scope;
 use Perlito5::AST::BeginScratchpad;
 use Perlito5::AST::Captures;
+use Perlito5::FoldConstant;
 use strict;
 
 our %Named_block = (
@@ -64,7 +65,7 @@ sub closure_block {
     # before entering the block, so that it can be seen immediately
     Perlito5::Grammar::Scope::check_variable_declarations();
     Perlito5::Grammar::Scope::create_new_compile_time_scope();
-    local $Perlito5::CLOSURE_SCOPE = $Perlito5::SCOPE;  # this is the only diff from plain <block>
+    local $Perlito5::CLOSURE_SCOPE = $#Perlito5::BASE_SCOPE;  # this is the only diff from plain <block>
 
     $m = Perlito5::Grammar::exp_stmts($str, $pos);
     if (!$m) {
@@ -77,6 +78,7 @@ sub closure_block {
     if ( $str->[$pos] ne '}' ) {
         Perlito5::Compiler::error "syntax error";
     }
+
     $m->{to} = $pos + 1;
     $m->{capture} = Perlito5::AST::Block->new( stmts => $capture, sig => undef );
     # end of lexical scope
@@ -98,6 +100,7 @@ sub eval_end_block {
                 'name'       => undef,
                 'namespace'  => $Perlito5::PKG_NAME,
                 'sig'        => undef,
+                'pos'        => Perlito5::Compiler::compiler_pos(),
             )
         ]
     );
@@ -121,7 +124,7 @@ sub eval_begin_block {
                       : ( $_->{_id} => $_ )
                       } @captured;
 
-    # print STDERR "CAPTURES ", Data::Dumper::Dumper(\%capture);
+    # print STDERR "CAPTURES ", Perlito5::Dumper::Dumper(\%capture);
 
     # %capture == (
     #     '100' => ...,
@@ -215,10 +218,6 @@ sub special_named_block {
     $p = $m->{to};
     my $block = Perlito5::Match::flat($m);
  
-    my $compile_block = $Perlito5::SCOPE->{block}[-1];
-    $compile_block->{type} = 'sub';
-    $compile_block->{name} = $block_name;
-  
     if ($block_name eq 'INIT') {
         push @Perlito5::INIT_BLOCK, eval_end_block( $block, 'INIT' );
         $m->{capture} = ast_nop();
@@ -249,6 +248,7 @@ sub special_named_block {
             'name'       => $block_name,
             'namespace'  => $Perlito5::PKG_NAME,
             'sig'        => undef,
+            'pos'        => Perlito5::Compiler::compiler_pos(),
         );
         # add named sub to SCOPE
         my $full_name = $sub->{namespace} . "::" . $sub->{name};
@@ -316,12 +316,6 @@ token named_sub_def {
             #     if exists $Perlito5::PROTO->{$full_name};
 
             $Perlito5::PROTO->{$full_name} = $sig;  # TODO - cleanup - replace $PROTO with prototype()
-
-            if ($MATCH->{_tmp}) {
-                my $block = $Perlito5::SCOPE->{block}[-1];
-                $block->{type} = 'sub';
-                $block->{name} = $full_name;
-            }
         }
         my $sub = Perlito5::AST::Sub->new(
             name       => $name, 
@@ -329,24 +323,40 @@ token named_sub_def {
             sig        => $sig, 
             block      => $MATCH->{_tmp},
             attributes => $attributes,
+            pos        => Perlito5::Compiler::compiler_pos(),
         );
 
-        if ( $Perlito5::EXPAND_USE ) {
-            # normal compiler (not "bootstrapping")
+        if ($name && defined $sig && $sig eq '' && $sub->{block} && @{ $sub->{block}{stmts} } == 1 ) {
+            my $expr = $sub->{block}{stmts}[0];
+            $expr = Perlito5::FoldConstant::fold_constant($expr);
+            my $ref = ref($expr);
+            if (   $ref eq 'Perlito5::AST::Int'
+                || $ref eq 'Perlito5::AST::Num'
+                || $ref eq 'Perlito5::AST::Buf'
+               )
+            {
+                # looks like a constant declaration
+
+                # TODO - "Constant subroutine xx redefined"
+
+                # print STDERR "maybe constant $namespace :: $name ($sig)\n";
+                $Perlito5::CONSTANT{"${namespace}::$name"} = $expr;
+            }
+        }
+
+        if ( $Perlito5::EXPAND_USE && $name ) {
+            # named sub in the normal compiler (not "bootstrapping")
+            my $full_name = "${namespace}::$name";
 
             # evaluate the sub definition in a BEGIN block
-
             my $block = Perlito5::AST::Block->new( stmts => [$sub] );
             Perlito5::Grammar::Block::eval_begin_block($block, 'BEGIN');  
 
-            if ($name) {
-                # add named sub to SCOPE
-                my $full_name = "${namespace}::$name";
-                $Perlito5::GLOBAL->{$full_name} = $sub;
-                # runtime effect of subroutine declaration is "undef"
-                $sub = ast_nop();
-            }
+            # add named sub to SCOPE
+            $Perlito5::GLOBAL->{$full_name} = $sub;
 
+            # runtime effect of subroutine declaration is "undef"
+            $sub = ast_nop();
             $MATCH->{capture} = $sub;
         }
         else {
@@ -423,11 +433,12 @@ token anon_sub_def {
         }
 
         $MATCH->{capture} = Perlito5::AST::Sub->new(
-            name  => undef, 
-            namespace => undef,
-            sig   => $sig, 
-            block => Perlito5::Match::flat($MATCH->{'Perlito5::Grammar::Block::closure_block'}),
+            name       => undef, 
+            namespace  => undef,
+            sig        => $sig, 
+            block      => Perlito5::Match::flat($MATCH->{'Perlito5::Grammar::Block::closure_block'}),
             attributes => $attributes,
+            pos        => Perlito5::Compiler::compiler_pos(),
         ) 
     }
 };
@@ -461,7 +472,7 @@ This module parses source code for Perl 5 statements and generates Perlito5 AST.
 =head1 AUTHORS
 
 Flavio Soibelmann Glock <fglock@gmail.com>.
-The Pugs Team E<lt>perl6-compiler@perl.orgE<gt>.
+The Pugs Team.
 
 =head1 COPYRIGHT
 

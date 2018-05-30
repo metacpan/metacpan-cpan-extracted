@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-Plugin-GitHub
 
+0.45      2018-05-27 03:56:57Z
+
+  - Authentication is optionally available for all requests, via the new
+    'require_auth' option. (Dave Rolsky, #51)
+
 0.44      2017-05-11 09:30:45Z
 
   - fix undef warnings in [GitHub::Update] when any current settings un GitHub

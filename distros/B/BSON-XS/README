@@ -2,7 +2,7 @@ NAME
     BSON::XS - XS implementation of MongoDB's BSON serialization
 
 VERSION
-    version v0.4.0
+    version v0.4.1
 
 DESCRIPTION
     This module contains an XS implementation for BSON encoding and

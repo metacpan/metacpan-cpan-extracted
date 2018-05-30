@@ -92,7 +92,7 @@ content => $tree_creator->cat(
 sub run ($) {
     my $expr = shift;
     my $script = File::Spec->catfile(
-        File::Spec->curdir(), "scripts", "findorule"
+        File::Spec->curdir(), "bin", "findorule"
     );
 
     [ sort split /\n/, `$^X -Mblib $script $expr` ];

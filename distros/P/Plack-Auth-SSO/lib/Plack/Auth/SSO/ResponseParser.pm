@@ -3,7 +3,7 @@ package Plack::Auth::SSO::ResponseParser;
 use strict;
 use Moo::Role;
 
-our $VERSION = "0.0135";
+our $VERSION = "0.0136";
 
 requires "parse";
 

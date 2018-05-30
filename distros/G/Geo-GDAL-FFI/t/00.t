@@ -1,6 +1,7 @@
 use v5.10;
 use strict;
 use warnings;
+use Config;
 use Carp;
 use Encode qw(decode encode);
 use Geo::GDAL::FFI;
@@ -38,20 +39,34 @@ if(1){
 
 # test file finder
 if(1){
-    my $path = $gdal->FindFile('gcs.csv');
-    ok(defined $path, "GDAL support files found.");
-    say STDERR "FYI: GDAL_DATA = ",$gdal->GetConfigOption(GDAL_DATA => '');
+    my $gdal_data_dir = $gdal->GetConfigOption(GDAL_DATA => '');
+    SKIP: {
+        skip "GDAL (Alien::gdal) is not properly installed; GDAL support files are not available.", 3 unless $gdal_data_dir;
 
-    $gdal->PopFinderLocation; #FinderClean;
-    my $path2 = $gdal->FindFile('gcs.csv');
-    ok(not(defined $path2), "GDAL support files not found after popping finder.");
+        my $path = $gdal->FindFile('gcs.csv');
+        ok(defined $path, "GDAL support files found.");
 
-  SKIP: {
-      skip "GDAL support files not found.", 1 if !$path;
-      $path =~ s/[\w.]+$//;
-      $gdal->PushFinderLocation($path);
-      $path = $gdal->FindFile('gcs.csv');
-      ok(defined $path, "GDAL support files found when working path inserted.");
+        say STDERR "FYI: GDAL_DATA = $gdal_data_dir";
+        if (!$path) {
+            # what's wrong with GDAL_DATA??
+            if (opendir(my $dh, $gdal_data_dir)) {
+                my @contents = grep { -f "$gdal_data_dir/$_" } readdir($dh);
+                closedir $dh;
+                @contents = sort @contents;
+                say STDERR "Contents of GDAL_DATA: @contents";
+            } else {
+                say STDERR "Can't opendir $gdal_data_dir: $!";
+            }
+        }
+
+        $gdal->PopFinderLocation; #FinderClean;
+        my $path2 = $gdal->FindFile('gcs.csv');
+        ok(not(defined $path2), "GDAL support files not found after popping finder.");
+
+        $path =~ s/[\w.]+$//;
+        $gdal->PushFinderLocation($path);
+        $path = $gdal->FindFile('gcs.csv');
+        ok(defined $path, "GDAL support files found when working path inserted.");
     }
 }
 
@@ -71,17 +86,17 @@ if(1){
 if(1){
     my $dr = $gdal->GetDriver('NITF');
     my $ds = $dr->Create('/vsimem/test.nitf', 10);
-    
+
     my @d = $ds->GetMetadataDomainList;
     ok(@d > 0, "GetMetadataDomainList"); # DERIVED_SUBDATASETS NITF_METADATA CGM
 
     my %d = $ds->GetMetadata;
     is_deeply([sort keys %d], [sort @d], "GetMetadata");
-    
+
     %d = $ds->GetMetadata('NITF_METADATA');
     @d = keys %d; # NITFFileHeader NITFImageSubheader
     ok(@d == 2, "GetMetadata(\$domain)");
-    
+
     $ds->SetMetadata({x => {a => 'b'}});
     %d = $ds->GetMetadata('x');
     is_deeply(\%d, {a => 'b'}, "SetMetadata");
@@ -114,7 +129,7 @@ if(1){
 if(1){
     my $dr = $gdal->GetDriver('GTiff');
     my $ds = $dr->Create('/vsimem/test.tiff', 10);
-    my $ogc_wkt = 
+    my $ogc_wkt =
         'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS84",6378137,298.257223563,'.
         'AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,'.
         'AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,'.
@@ -126,7 +141,7 @@ if(1){
     $ds->SetGeoTransform($transform);
     my $t = $ds->GetGeoTransform;
     is_deeply($t, $transform, "Set/get geotransform");
-    
+
 }
 
 # test band
@@ -206,16 +221,16 @@ if(1){
     my $f = Geo::GDAL::FFI::FieldDefn->new({Name => 'test', Type => 'Integer'});
     ok($f->GetName eq 'test', "Field definition: get name");
     ok($f->GetType eq 'Integer', "Field definition: get type");
-    
+
     $f->SetName('test2');
     ok($f->GetName eq 'test2', "Field definition: name");
-    
+
     $f->SetType('Real');
     ok($f->GetType eq 'Real', "Field definition: type");
-    
+
     $f->SetSubtype('Float32');
     ok($f->GetSubtype eq 'Float32', "Field definition: subtype");
-    
+
     $f->SetJustify('Left');
     ok($f->GetJustify eq 'Left', "Field definition: Justify");
 
@@ -240,13 +255,13 @@ if(1){
     $f = Geo::GDAL::FFI::GeomFieldDefn->new({Name => 'test', GeometryType => 'Point'});
     ok($f->GetName eq 'test', "Geometry field definition: get name");
     ok($f->GetType eq 'Point', "Geometry field definition: get type");
-    
+
     $f->SetName('test2');
     ok($f->GetName eq 'test2', "Geometry field definition: name");
-    
+
     $f->SetType('LineString');
     ok($f->GetType eq 'LineString', "Geometry field definition: type");
-    
+
     $f->SetIgnored;
     ok($f->IsIgnored, "Geometry field definition: Ignored");
 
@@ -330,7 +345,7 @@ if(1){
     $f->SetGeomField($g);
     my $h = $f->GetGeomField();
     ok($h->AsText eq 'POINT M (1 2 4)', "GetGeometry");
-    
+
     $g = Geo::GDAL::FFI::Geometry->new('LineString');
     $g->SetPoint(0, 5,6,7,8);
     $g->SetPoint(1, [7,8]);
@@ -346,10 +361,10 @@ if(1){
     for my $t (sort {$types->{$a} <=> $types->{$b}} keys %$types) {
         $d->AddFieldDefn(Geo::GDAL::FFI::FieldDefn->new({Name => $t, Type => $t}));
     }
-    
+
     my $f = Geo::GDAL::FFI::Feature->new($d);
     my $n = 'Integer';
-    
+
     my $x = $f->IsFieldSet($n) ? 'set' : 'not set';
     ok($x eq 'not set', "Not set");
     $x = $f->IsFieldNull($n) ? 'null' : 'not null';
@@ -368,20 +383,24 @@ if(1){
     ok($x eq 'not set', "Not set");
     $x = $f->IsFieldNull($n) ? 'null' : 'not null';
     ok($x eq 'not null', "Not null");
-    
+
     # scalar types
     $f->SetField($n, 13);
     $x = $f->GetField($n);
     ok($x == 13, "Set/get Integer field: $x");
 
-    $n = 'Integer64';
-    $f->SetField($n, 0x90000001);
-    $x = $f->GetField($n);
-    ok($x == 0x90000001, "Set/get Integer64 field: $x");
-    
+  SKIP: {
+      skip "64 bit integers not supported in this Perl.",1 unless $Config{use64bitint} eq 'define';
+      $n = 'Integer64';
+      $f->SetField($n, 0x90000001);
+      $x = $f->GetField($n);
+      ok($x == 0x90000001, "Set/get Integer64 field: $x");
+    }
+
     $f->SetField(Real => 1.123);
     $x = $f->GetField('Real');
-    ok($x == 1.123, "Set/get Real field: $x");
+    $x = sprintf("%.3f", $x);
+    ok($x eq '1.123', "Set/get Real field: $x");
 
     my $s = decode utf8 => 'åäö';
     $f->SetField(String => $s);
@@ -389,7 +408,7 @@ if(1){
     ok($x eq $s, "Set/get String field: $x");
 
     # WideString not tested
-    
+
     #$f->SetFieldBinary(Binary}, 1);
 
     my @s = (13, 21, 7, 5);
@@ -397,15 +416,24 @@ if(1){
     my @x = $f->GetField('IntegerList');
     is_deeply(\@x, \@s, "Set/get IntegerList field: @x");
 
-    $n = 'Integer64List';
-    @s = (0x90000001, 21, 7, 5);
-    $f->SetField($n, @s);
-    @x = $f->GetField($n);
-    is_deeply(\@x, \@s, "Set/get Integer64List field: @x");
+  SKIP: {
+      skip "64 bit integers not supported in this Perl.",1 unless $Config{use64bitint} eq 'define';
+      $n = 'Integer64List';
+      @s = (0x90000001, 21, 7, 5);
+      $f->SetField($n, @s);
+      @x = $f->GetField($n);
+      is_deeply(\@x, \@s, "Set/get Integer64List field: @x");
+    }
 
     @s = (3, 21.2, 7.4, 5.5);
     $f->SetField(RealList => @s);
     @x = $f->GetField('RealList');
+    for (@s) {
+        $_ = sprintf("%.3f", $_);
+    }
+    for (@x) {
+        $_ = sprintf("%.3f", $_);
+    }
     is_deeply(\@x, \@s, "Set/get DoubleList field: @x");
 
     @s = ('a', 'gdal', 'perl');
@@ -429,7 +457,7 @@ if(1){
     $f->SetField($n, @s);
     @x = $f->GetField($n);
     is_deeply(\@x, \@s, "Set/get DateTime field: @x");
-        
+
 #    Binary => 8,
 
     @s = (1962, 4, 23);
@@ -442,8 +470,11 @@ if(1){
 if(1){
     my $dr = $gdal->GetDriver('Memory');
     my $ds = $dr->Create({Name => 'test'});
-    my $sr = Geo::GDAL::FFI::SpatialReference->new(EPSG => 3067);
-    my $l = $ds->CreateLayer({Name => 'test', SpatialReference => $sr, GeometryType => 'Point'});
+    my @sr = ();
+    if ($gdal->FindFile('gcs.csv')) {
+        @sr = (SpatialReference => Geo::GDAL::FFI::SpatialReference->new(EPSG => 3067));
+    }
+    my $l = $ds->CreateLayer({Name => 'test', GeometryType => 'Point', @sr});
     $l->CreateField(Geo::GDAL::FFI::FieldDefn->new({Name => 'int', Type => 'Integer'}));
     my $f = Geo::GDAL::FFI::Feature->new($l->GetDefn);
     $f->SetField(int => 5);

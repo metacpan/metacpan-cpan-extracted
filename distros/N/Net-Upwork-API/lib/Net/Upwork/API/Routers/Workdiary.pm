@@ -77,11 +77,10 @@ B<Return value>
 sub get {
     my $self = shift;
     my $company = shift;
-    my $username = shift;
     my $date = shift;
     my %params = @_;
 
-    return $self->client()->get("/team/v1/workdiaries/" . $company . "/" . $username . "/" . $date, %params);
+    return $self->client()->get("/team/v3/workdiaries/companies/" . $company . "/" . $date, %params);
 }
 
 =item get_by_contract
@@ -114,7 +113,7 @@ sub get_by_contract {
     my $date = shift;
     my %params = @_;
 
-    return $self->client()->get("/team/v2/workdiaries/contracts/" . $contract . "/" . $date, %params);
+    return $self->client()->get("/team/v3/workdiaries/contracts/" . $contract . "/" . $date, %params);
 }
 
 =back

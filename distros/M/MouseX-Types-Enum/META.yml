@@ -27,7 +27,7 @@ no_index:
 provides:
   MouseX::Types::Enum:
     file: lib/MouseX/Types/Enum.pm
-    version: '1.03'
+    version: '1.04'
   MouseX::Types::Enum::Base:
     file: lib/MouseX/Types/Enum.pm
 requires:
@@ -37,5 +37,5 @@ resources:
   bugtracker: https://github.com/ikenox/perl-enum/issues
   homepage: https://github.com/ikenox/perl-enum
   repository: git://github.com/ikenox/perl-enum.git
-version: '1.03'
+version: '1.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -26,7 +26,7 @@ no_index:
 provides:
   JavaScript::V8::CommonJS:
     file: lib/JavaScript/V8/CommonJS.pm
-    version: '0.06'
+    version: '0.07'
   JavaScript::V8::CommonJS::Exception:
     file: lib/JavaScript/V8/CommonJS/Exception.pm
 requires:
@@ -41,6 +41,6 @@ resources:
   bugtracker: https://github.com/cafe01/javascript-v8-commonjs/issues
   homepage: https://github.com/cafe01/javascript-v8-commonjs
   repository: git://github.com/cafe01/javascript-v8-commonjs.git
-version: '0.06'
+version: '0.07'
 x_authority: cpan:CAFEGRATZ
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,3 +1,6 @@
+0.0136  2018-05-24 15:01:16 CEST
+  - add parameter "state" to prevent CSRF attacks
+
 0.0135  2018-05-22 14:22:47 CEST
   - read additional information from /person with access_token
 

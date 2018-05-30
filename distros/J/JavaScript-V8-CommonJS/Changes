@@ -1,5 +1,9 @@
 Revision history for Perl extension JavaScript-V8-CommonJS
 
+0.07 2018-05-25T10:58:00Z
+
+    - fixed throw syntax on require.js
+
 0.06 2018-05-18T20:52:49Z
 
     - require() can now load json files

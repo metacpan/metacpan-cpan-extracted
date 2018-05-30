@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.90';
+our $VERSION = '0.95';
 
 use Moose;
 
@@ -37,7 +37,7 @@ Dist::Zilla::Plugin::DROLSKY::WeaverConfig - A plugin that exists solely to hold
 
 =head1 VERSION
 
-version 0.90
+version 0.95
 
 =for Pod::Coverage .*
 

@@ -16,7 +16,7 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Perlish wrapper for Raylib videogame library",
   "AUTHOR" => "Ahmad Fatoum <athreef\@cpan.org>",
   "BUILD_REQUIRES" => {
-    "Alien::raylib" => "0.015"
+    "Alien::raylib" => "0.019"
   },
   "CONFIGURE_REQUIRES" => {
     "Alien::raylib" => 0,
@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Graphics::Raylib",
   "PREREQ_PM" => {
-    "Alien::raylib" => "0.015",
+    "Alien::raylib" => "0.019",
     "Convert::Color" => 0,
     "Import::Into" => 0
   },
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Needs" => 0
   },
-  "VERSION" => "0.018",
+  "VERSION" => "0.019",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,7 +48,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Alien::raylib" => "0.015",
+  "Alien::raylib" => "0.019",
   "Convert::Color" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,

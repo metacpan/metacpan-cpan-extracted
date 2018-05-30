@@ -7,7 +7,6 @@ META.json
 META.yml
 README
 cpanfile
-cpanfile.snapshot
 dist.ini
 examples/app1.pl
 examples/catmandu.yml.example

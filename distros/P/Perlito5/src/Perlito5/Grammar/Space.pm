@@ -43,14 +43,10 @@ sub term_space {
     my $str = $_[0];
     my $pos = $_[1];
     my $p = $pos;
-    while ( $p <= @$str && $space{ $str->[$p] }) {
-        $p = $space{ $str->[$p] }->($str, $p+1)
-    }
-    if ( $str->[$p] eq '_' ) {
-        my $s = join( "", @{$str}[ $p .. $p + 6 ] );
-        return term_end( $str, $p )
-            if $s eq '__END__'
-            || $s . $str->[$p+7] eq '__DATA__';
+    my $sp = $space{ $str->[$p] };
+    while ( $p <= @$str && $sp) {
+        $p = $sp->($str, $p+1);
+        $sp = $space{ $str->[$p] };
     }
     return { str => $str, from => $pos, to => $p, capture => [ 'space',   ' ' ] }
 }
@@ -85,12 +81,25 @@ sub term_end {
         }
     }
     if ($is_data) {
-        $Perlito5::DATA_SECTION{ $Perlito5::PKG_NAME } = { pos => $p, data => join( "", @$str ) };
-        # TODO - leave the DATA filehandle open
-        # open(main::DATA, '<', \$Perlito5::DATA_SECTION{main}{data});
-        # seek(main::DATA, $Perlito5::DATA_SECTION{main}{pos}, 0);
+
+        my $source = join( "", @$str );
+        my $len = length($source);
+        $source =~ s/^.*\n#--START--\n# line 1//s;
+        my $pos = $p - $len + length($source);
+
+        $Perlito5::DATA_SECTION{ $Perlito5::PKG_NAME } = { pos => $pos, data => $source };
+        # leave the DATA filehandle open
+        my $pkg = $Perlito5::PKG_NAME;
+        open *{$pkg . "::DATA"}, '<', \$Perlito5::DATA_SECTION{$pkg}{data};
+        seek(*{$pkg . "::DATA"}, $Perlito5::DATA_SECTION{$pkg}{pos}, 0);
     }
     return { str => $str, from => $_[1], to => scalar(@$str), capture => [ 'space',   ' ' ] }
+}
+
+sub stmt_end {
+    my $ret = term_end(@_);
+    $ret->{capture} = undef;
+    return $ret;
 }
 
 Perlito5::Grammar::Precedence::add_term( '#'        => \&term_space );
@@ -102,19 +111,27 @@ Perlito5::Grammar::Precedence::add_term( chr(32)    => \&term_space );
 Perlito5::Grammar::Precedence::add_term( '__END__'  => \&term_end );
 Perlito5::Grammar::Precedence::add_term( '__DATA__' => \&term_end );
 
+Perlito5::Grammar::Statement::add_statement( '__END__'  => \&stmt_end );
+Perlito5::Grammar::Statement::add_statement( '__DATA__'  => \&stmt_end );
 
 token to_eol {
     [ <!before [ \c10 | \c13 ]> . ]*
 };
 
 token pod_pod_begin {
-    |   [ \c10 | \c13 ] '=cut' <.to_eol>
-    |   . <.to_eol> <.pod_pod_begin>
+    [ <!before [ \c10 | \c13 ] '=cut' > . ]*
+
+    [   [ \c10 | \c13 ] '=cut' <.to_eol>
+    |   ''
+    ]
 };
 
 token pod_begin {
-    |   [ \c10 | \c13 ] '=end' <.to_eol>
-    |   . <.to_eol> <.pod_begin>
+    [ <!before [ \c10 | \c13 ] '=end' > . ]*
+
+    [   [ \c10 | \c13 ] '=end' <.to_eol>
+    |   ''
+    ]
 };
 
 token start_of_line {
@@ -124,6 +141,7 @@ token start_of_line {
            |  'head'     <.pod_pod_begin>
            |  'item'     <.pod_pod_begin>
            |  'over'     <.pod_pod_begin>
+           |  'back'     <.pod_pod_begin>
            |  'begin'    <.pod_begin>
            |  'for'      <.pod_begin>  # TODO - fixme: recognize a single paragraph (double-newline)
            |  'encoding' <.to_eol>
@@ -153,14 +171,10 @@ sub ws {
     my $str = $_[0];
     my $pos = $_[1];
     my $p = $pos;
-    while ( $p <= @$str && $space{ $str->[$p] }) {
-        $p = $space{ $str->[$p] }->($str, $p+1)
-    }
-    if ( $str->[$p] eq '_' ) {
-        my $s = join( "", @{$str}[ $p .. $p + 6 ] );
-        return term_end( $str, $p )
-            if $s eq '__END__'
-            || $s . $str->[$p+7] eq '__DATA__';
+    my $sp = $space{ $str->[$p] };
+    while ( $p <= @$str && $sp) {
+        $p = $sp->($str, $p+1);
+        $sp = $space{ $str->[$p] };
     }
     if ($p == $pos) {
         return;
@@ -172,16 +186,12 @@ sub opt_ws {
     my $str = $_[0];
     my $pos = $_[1];
     my $p = $pos;
+    my $sp = $space{ $str->[$p] };
     # if ($p == 50) { print STDERR "[[ ", join("", @{$str}), "]]\n"; }
     # print STDERR "$pos: $Perlito5::FILE_NAME $Perlito5::LINE_NUMBER\n";
-    while ( $p <= @$str && $space{ $str->[$p] }) {
-        $p = $space{ $str->[$p] }->($str, $p+1)
-    }
-    if ( $str->[$p] eq '_' ) {
-        my $s = join( "", @{$str}[ $p .. $p + 6 ] );
-        return term_end( $_[0], $p )
-            if $s eq '__END__'
-            || $s . $str->[$p+7] eq '__DATA__';
+    while ( $p <= @$str && $sp) {
+        $p = $sp->($str, $p+1);
+        $sp = $space{ $str->[$p] };
     }
     return { str => $_[0], from => $pos, to => $p }
 }

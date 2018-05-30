@@ -1,9 +1,9 @@
-package Dist::Zilla::Plugin::GitHub; # git description: v0.43-3-g82b44d8
+package Dist::Zilla::Plugin::GitHub; # git description: v0.44-11-g3a88cd8
 # ABSTRACT: Plugins to integrate Dist::Zilla with GitHub
 use strict;
 use warnings;
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 use JSON::MaybeXS;
 use Moose;
@@ -35,6 +35,13 @@ has prompt_2fa => (
     default => 0
 );
 
+has _credentials => (
+    is => 'ro',
+    isa => 'HashRef',
+    lazy => 1,
+    builder => '_build_credentials',
+);
+
 #pod =head1 DESCRIPTION
 #pod
 #pod B<Dist::Zilla::Plugin::GitHub> is a set of plugins for L<Dist::Zilla> intended
@@ -58,8 +65,8 @@ has prompt_2fa => (
 #pod
 #pod =cut
 
-sub _get_credentials {
-    my ($self, $nopass) = @_;
+sub _build_credentials {
+    my $self = shift;
 
     my ($login, $pass, $token, $otp);
 
@@ -78,40 +85,63 @@ sub _get_credentials {
             "Err: Missing value 'github.user' in git config";
 
         $self->log($error);
-        return;
+        return [];
     }
 
-    if (!$nopass) {
-        if (%identity) {
-            $token = $identity{token};
-            $pass  = $identity{password};
-        } else {
-            $token = `git config github.token`;    chomp $token;
-            $pass  = `git config github.password`; chomp $pass;
+    if (%identity) {
+        $token = $identity{token};
+        $pass  = $identity{password};
+    } else {
+        $token = `git config github.token`;    chomp $token;
+        $pass  = `git config github.password`; chomp $pass;
 
-            # modern "tokens" can be used as passwords with basic auth, so...
-            # see https://help.github.com/articles/creating-an-access-token-for-command-line-use
-            $pass ||= $token if $token;
-        }
-
-        $self->log("Err: Login with GitHub token is deprecated")
-            if $token && !$pass;
-
-        if (!$pass) {
-            $pass = $self->zilla->chrome->prompt_str(
-                "GitHub password for '$login'", { noecho => 1 },
-            );
-        }
-
-        if ($self->prompt_2fa) {
-            $otp = $self->zilla->chrome->prompt_str(
-                "GitHub two-factor authentication code for '$login'",
-                { noecho => 1 },
-            );
-        }
+        # modern "tokens" can be used as passwords with basic auth, so...
+        # see https://help.github.com/articles/creating-an-access-token-for-command-line-use
+        $pass ||= $token if $token;
     }
 
-    return ($login, $pass, $otp);
+    $self->log("Err: Login with GitHub token is deprecated")
+        if $token && !$pass;
+
+    if (!$pass) {
+        $pass = $self->zilla->chrome->prompt_str(
+            "GitHub password for '$login'", { noecho => 1 },
+        );
+    }
+
+    if ($self->prompt_2fa) {
+        $otp = $self->zilla->chrome->prompt_str(
+            "GitHub two-factor authentication code for '$login'",
+            { noecho => 1 },
+        );
+    }
+
+    return {login => $login, pass => $pass, otp => $otp};
+}
+
+sub _has_credentials {
+    my $self = shift;
+    return keys %{$self->_credentials};
+}
+
+sub _auth_headers {
+    my $self = shift;
+
+    my $credentials = $self->_credentials;
+
+    my %headers;
+    if ($credentials->{pass}) {
+        require MIME::Base64;
+        my $basic = MIME::Base64::encode_base64("$credentials->{login}:$credentials->{pass}", '');
+        $headers{Authorization} = "Basic $basic";
+    }
+
+    if ($self->prompt_2fa) {
+        $headers{'X-GitHub-OTP'} = $credentials->{otp};
+        $self->log([ "Using two-factor authentication" ]);
+    }
+
+    return \%headers;
 }
 
 sub _get_repo_name {
@@ -187,7 +217,7 @@ Dist::Zilla::Plugin::GitHub - Plugins to integrate Dist::Zilla with GitHub
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 DESCRIPTION
 
@@ -215,13 +245,19 @@ bundle|Dist::Zilla::PluginBundle::GitHub>.
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-GitHub>
 (or L<bug-Dist-Zilla-Plugin-GitHub@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-GitHub@rt.cpan.org>).
 
+There is also a mailing list available for users of this distribution, at
+L<http://dzil.org/#mailing-list>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
+
 =head1 AUTHOR
 
 Alessandro Ghedini <alexbio@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alessandro Ghedini Karen Etheridge Mike Friedman Dave Rolsky Jeffrey Ryan Thalhammer Doherty Rafael Kitover Ricardo Signes Vyacheslav Matyukhin Alexandr Ciornii Brian Phillips Chris Weyl Ioan Rogers Jose Luis Perez Diez Mohammad S Anwar
+=for stopwords Alessandro Ghedini Karen Etheridge Dave Rolsky Mike Friedman Jeffrey Ryan Thalhammer Doherty Rafael Kitover Ricardo Signes Vyacheslav Matyukhin Alexandr Ciornii Brian Phillips Chris Weyl Ioan Rogers Jose Luis Perez Diez Mohammad S Anwar
 
 =over 4
 
@@ -235,11 +271,11 @@ Karen Etheridge <ether@cpan.org>
 
 =item *
 
-Mike Friedman <mike.friedman@10gen.com>
+Dave Rolsky <autarch@urth.org>
 
 =item *
 
-Dave Rolsky <autarch@urth.org>
+Mike Friedman <mike.friedman@10gen.com>
 
 =item *
 

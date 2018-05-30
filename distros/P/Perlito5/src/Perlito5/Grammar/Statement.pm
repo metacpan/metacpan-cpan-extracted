@@ -68,9 +68,22 @@ token stmt_format {
 
 token stmt_package {
     'package' <.Perlito5::Grammar::Space::ws> <Perlito5::Grammar::full_ident>
+
+    [
+
+        # package X 1.001 ...
+        <.Perlito5::Grammar::Space::ws>
+        <Perlito5::Grammar::Use::version_string>
+        {   my $version = Perlito5::Match::flat($MATCH->{"Perlito5::Grammar::Use::version_string"});
+            $MATCH->{_version} = $version;
+        }
+        <.Perlito5::Grammar::Space::opt_ws>
+    |
+        <.Perlito5::Grammar::Space::opt_ws>
+    ]
+
     [
         # package X { block }
-        <.Perlito5::Grammar::Space::opt_ws>
         {
             # set the package name before parsing the block
             my $name = Perlito5::Match::flat($MATCH->{"Perlito5::Grammar::full_ident"});
@@ -99,6 +112,20 @@ token stmt_package {
                 }
             }
 
+            if ($MATCH->{_version}) {
+                unshift @statements,
+                    Perlito5::AST::Apply->new(
+                        'arguments' => [
+                            Perlito5::AST::Var->new(
+                                'name' => 'VERSION',
+                                'namespace' => $namespace,
+                                'sigil' => '$',
+                            ),
+                            $MATCH->{_version},
+                        ],
+                        'code' => 'infix:<=>',
+                    );
+            }
             $MATCH->{capture} = 
                 Perlito5::AST::Block->new(
                     stmts => [
@@ -290,7 +317,13 @@ sub statement_parse_inner {
 
     my $res = exp_stmt($str, $pos);
     if ($res) {
-        return $res;
+        # looks like a statement
+        if ( ref($res->{capture}) eq 'Perlito5::AST::Apply' && $res->{capture}{code} eq 'circumfix:<{ }>' ) {
+            # doesn't really look like a statement - maybe it is a { hash } instead of { block }
+        }
+        else {
+            return $res
+        }
     }
     $res = Perlito5::Grammar::Expression::exp_parse($str, $pos);
     if (!$res) {
@@ -300,7 +333,7 @@ sub statement_parse_inner {
 
     # did we just see a label?
     if (  $str->[$res->{to}] eq ':'
-       && $res->{capture}->isa('Perlito5::AST::Apply')
+       && ref($res->{capture}) eq 'Perlito5::AST::Apply'
        && $res->{capture}{bareword}
        )
     {
@@ -371,7 +404,7 @@ This module parses source code for Perl 5 statements and generates Perlito5 AST.
 =head1 AUTHORS
 
 Flavio Soibelmann Glock <fglock@gmail.com>.
-The Pugs Team E<lt>perl6-compiler@perl.orgE<gt>.
+The Pugs Team.
 
 =head1 COPYRIGHT
 

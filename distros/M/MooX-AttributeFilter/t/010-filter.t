@@ -12,6 +12,10 @@ my %testType = (
         my $body    = $testParams->{body} // '';
         my $extends = '';
 
+        if ( ref($body) eq 'CODE' ) {
+            $body = $body->( $testName, $testParams );
+        }
+
         if ( $testParams->{extends} ) {
             my @extList =
               ref( $testParams->{extends} )
@@ -169,22 +173,49 @@ CODE
             body => <<'CODE',
 use MooX::AttributeFilter;
 
-has lz => (
+# To record number of arguments of filter sub
+has args => (
+    is => 'rw',
+);
+
+has lz_default => (
     is      => 'rw',
     lazy    => 1,
     default => 'defVal',
-    filter  => sub {
-        my $this = shift;
-        return "lazy_or_not($_[0])";
-    },
-); 
+    filter  => 'lzFilter',
+);
+
+has lz_builder => (
+    is      => 'rw',
+    lazy    => 1,
+    builder => 'initLzBuilder',
+    filter  => 'lzFilter',
+);
+
+sub lzFilter {
+    my $this = shift;
+    $this->args(scalar @_);
+    return "lazy_or_not($_[0])";
+}
+
+sub initLzBuilder {
+    return "builtVal";
+}
 CODE
             test => sub {
                 my $class = shift;
-                plan 1;
+                plan 5;
 
                 my $o = $class->new;
-                like( $o->lz, "lazy_or_not(defVal)", "lazy init" );
+                like( $o->lz_default, "lazy_or_not(defVal)",
+                    "lazy init with default" );
+                is($o->args, 1, "lazy init filter has 1 arg");
+                $o->lz_default("3.1415926");
+                like( $o->lz_default, "lazy_or_not(3.1415926)",
+                    "lazy attribute set ok" );
+                is($o->args, 2, "lazy argument set filter has 2 args");
+                like( $o->lz_builder, "lazy_or_not(builtVal)",
+                    "lazy init with builder" );
             },
         }
     ],
@@ -421,15 +452,212 @@ has typed => (
 CODE
         },
     ],
+    [
+        DefaultVal => {
+            test => sub {
+                my $class = shift;
+
+                my $o = $class->new;
+                is( $o->defAttr, "filtered(3.1415926)",
+                    "default passed through filter" );
+            },
+            body => <<'CODE',
+use MooX::AttributeFilter;
+
+has defAttr => (
+    is => 'rw',
+    default => 3.1415926,
+    filter => sub {
+        my $this = shift;
+        return "filtered($_[0])";
+    },
+);
+CODE
+        },
+    ],
 );
 
-package main;
+#push @testData, generateCallOrder;
+# Data for order tests
 
+eval { require Types::Standard; };
+my $noTypes = !!$@;
+
+sub _skip_if_noTypes {
+    return $noTypes ? "Types::Standard required for this test" : "";
+}
+
+sub _check_callOrder_second {
+    my ( $class, $testParams, $obj, $word ) = @_;
+
+    my $order = $class->getOrder;
+    is( $class->getOrder->[1], $word, "$word was called second" );
+}
+
+my @mooOpts = (
+    [
+        isa_simple => {
+            body_opt  => 'isa => StrMatch[qr/^filtered\(.*\)$/]',
+            body_head => 'use Types::Standard qw<StrMatch>;',
+            skip      => \&_skip_if_noTypes,
+        },
+    ],
+    [
+        isa_inline => {
+            body_opt => 'isa => sub {push @callOrder, "isa"; return 1;}',
+            check    => sub { _check_callOrder_second( @_, 'isa' ) },
+        },
+    ],
+    [
+        isa_coderef => {
+            body_opt => 'isa => \&isaSub',
+            body     => 'sub isaSub {push @callOrder, "isa"; return 1;}',
+            check    => sub { _check_callOrder_second( @_, 'isa' ) },
+        },
+    ],
+    [
+        types_coerce => {
+            body_opt =>
+q|    isa => (StrMatch[qr/^filtered\(.*\)/])->where(sub{push @callOrder, "coerce"; $_[0]}),
+    coerce => 1|,
+            body_head => 'use Types::Standard qw<StrMatch Str>;',
+            skip      => \&_skip_if_noTypes,
+            check     => sub { _check_callOrder_second( @_, 'coerce' ) },
+        }
+    ],
+    [
+        coerce_inline => {
+            body_opt => 'coerce => sub { push @callOrder, "coerce"; $_[0]}',
+            check    => sub { _check_callOrder_second( @_, 'coerce' ) },
+        },
+    ],
+);
+
+my @filterOpts = (
+    [
+        no_filter => {},
+    ],
+    [
+        filter_bool => {
+            body_opt => 'filter => 1',
+            body =>
+'sub _filter_attr {push @callOrder, "filter";return "filtered($_[1])"}',
+        },
+    ],
+    [
+        filter_inline => {
+            body_opt =>
+'filter => sub {push @callOrder, "filter"; return "filtered($_[1])";}',
+        }
+    ],
+    [
+        filter_named => {
+            body_opt => "filter => 'filterAttr'",
+            body =>
+'sub filterAttr {push @callOrder, "filter"; return "filtered($_[1])";}',
+        },
+    ],
+);
+
+sub _order_test_with_filter {
+    my ( $class, $testParams ) = @_;
+    $class->resetOrder;
+    my $obj;
+    eval { $obj = $class->new( attr => "3.1415926" ); };
+    diag("Error while creating a object:\n", $@) if $@;
+    ok( !$@, "new finishes normally" );
+    is( $obj->attr, "filtered(3.1415926)",
+        "value passed the filter with constructor" );
+    is( $class->getOrder->[0],
+        'filter', "filter was called first with constructor" );
+
+    $class->resetOrder;
+    eval { $obj->attr("12345"); };
+    ok( !$@, "attribute setter finishes normally" );
+    is( $obj->attr, "filtered(12345)", "value passed the filter with setter" );
+    is( $class->getOrder->[0], 'filter',
+        "filter was called first with setter" );
+
+    foreach my $check ( @{ $testParams->{checks} } ) {
+        $check->( @_, $obj );
+    }
+}
+
+sub _order_test_without_filter {
+    my $class = shift;
+
+    my $obj;
+    eval { $obj = $class->new( attr => "3.1415926" ); };
+  SKIP: {
+        skip("Object creation failed, this was probably expected: $@") if $@;
+        is( $obj->attr, "3.1415926", "not filtered" );
+    }
+}
+
+foreach my $mooOpt (@mooOpts) {
+    my ( $mooName, $mooParams ) = @$mooOpt;
+    foreach my $filterOpt (@filterOpts) {
+        my ( $filterName, $filterParams ) = @$filterOpt;
+
+        my $testName = "CallOrder::${mooName}::${filterName}";
+
+        my $testBody = q|
+use MooX::AttributeFilter;
+|
+          . ( $mooParams->{body_head}    || '' ) . "\n"
+          . ( $filterParams->{body_head} || '' ) . q|
+our @callOrder;
+
+has attr => (
+    is => 'rw',
+|
+          . ( $mooParams->{body_opt}    || '' ) . ",\n"
+          . ( $filterParams->{body_opt} || '' ) . q|,
+);
+|
+          . ( $mooParams->{body}    || '' ) . "\n"
+          . ( $filterParams->{body} || '' ) . q|
+          
+sub resetOrder {
+    @callOrder = ();
+}
+
+sub getOrder {
+    return \@callOrder;
+}
+1;|;
+
+        my $skip = ( $mooParams->{skip} && $mooParams->{skip}->() )
+          || ( $filterParams->{skip} && $filterParams->{skip}->() );
+
+        my @subChecks;
+        push @subChecks, $mooParams->{check}    if $mooParams->{check};
+        push @subChecks, $filterParams->{check} if $filterParams->{check};
+
+        my $testEntry = [
+            $testName => {
+                body => $testBody,
+                test => (
+                    defined $filterParams->{body_opt}
+                    ? \&_order_test_with_filter
+                    : \&_order_test_without_filter
+                ),
+                skip   => $skip,
+                checks => \@subChecks,
+            }
+        ];
+
+        push @testData, $testEntry;
+    }
+}
+
+# Run all tests.
 foreach my $type ( keys %testType ) {
     subtest $type => sub {
         my $generator = shift;
         foreach my $test (@testData) {
-            my $skipReason = $test->[1]->{skipFor}{$type} || '';
+            my $skipReason =
+              $test->[1]{skipFor}{$type} || $test->[1]{skip} || '';
             my $testName = $test->[0];
             if ($skipReason) {
                 subtest $testName => sub { skip_all($skipReason); };
@@ -437,7 +665,7 @@ foreach my $type ( keys %testType ) {
             else {
                 my $className = $generator->( $testName, $test->[1] );
                 subtest $testName => $test->[1]->{test},
-                  $className, $skipReason;
+                  $className, $test->[1];
             }
         }
       },

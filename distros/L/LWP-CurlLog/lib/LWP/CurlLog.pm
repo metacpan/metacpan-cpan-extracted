@@ -3,11 +3,35 @@ use strict;
 use warnings;
 use LWP::UserAgent ();
 
-our $VERSION = "0.02";
-our $log_file ||= "~/curl.log";
-our $log_output = defined $log_output ? $log_output : 1;
-our $curl_options = defined $curl_options ? $curl_options : "-k";
-our $logfh = undef;
+our $VERSION = "0.03";
+our %opts = (
+    file => undef,
+    response => 1,
+    options => "-k",
+    timing => 0,
+);
+
+sub import {
+    my ($package, %args) = @_;
+    for my $key (keys %args) {
+        $opts{$key} = $args{$key};
+    }
+
+    if (!$opts{file}) {
+        $opts{fh} = \*STDERR;
+    }
+    else {
+        my $file2 = $opts{file};
+        if ($file2 =~ m{^~/}) {
+            my $home = $ENV{HOME} || (getpwuid($<))[7];
+            $file2 =~ s{^~/}{$home/};
+        }
+        open $opts{fh}, ">>", $file2 or die "Can't open $opts{file}: $!";
+    }
+    select($opts{fh});
+    $| = 1;
+    select(STDOUT);
+}
 
 no strict "refs";
 no warnings "redefine";
@@ -16,7 +40,6 @@ my $orig_sub = \&LWP::UserAgent::send_request;
 *{"LWP::UserAgent::send_request"} = sub {
     my ($self, $request) = @_;
 
-    open_log();
     my $cmd = "curl ";
     my $url = $request->uri();
     if ($url =~ /[=&;?]/) {
@@ -25,8 +48,8 @@ my $orig_sub = \&LWP::UserAgent::send_request;
     else {
         $cmd .= "$url "
     }
-    if ($curl_options) {
-        $cmd .= "$curl_options ";
+    if ($opts{options}) {
+        $cmd .= "$opts{options} ";
     }
     if ($request->method() && ($request->method() ne "GET" || $request->content_length())) {
         $cmd .= "-X " . $request->method() . " ";
@@ -46,40 +69,27 @@ my $orig_sub = \&LWP::UserAgent::send_request;
     }
     $cmd =~ s/\s*$//;
 
-    print $logfh "# " . localtime() . " LWP request\n";
-    print $logfh "$cmd\n";
+    print {$opts{fh}} "# " . localtime() . " LWP request\n";
+    print {$opts{fh}} "$cmd\n";
+    my $time1 = time();
     my $response = $orig_sub->(@_);
+    my $time2 = time();
 
-    if ($log_output) {
-        print $logfh "# " . localtime() . " LWP response\n";
-        print $logfh $response->as_string . "\n";
+    if ($opts{response}) {
+        print {$opts{fh}} "\n# " . localtime() . " LWP response\n";
+        my $response2 = $response->as_string;
+        $response2 =~ s/\s*$//g;
+        print {$opts{fh}} "$response2\n";
     }
+    if ($opts{timing}) {
+        my $diff = $time2 - $time1;
+        print {$opts{fh}} "# ${diff}s\n";
+    }
+
+    print {$opts{fh}} "\n";
 
     return $response;
 };
-
-sub open_log {
-    if ($logfh) {
-        return;
-    }
-    if ($log_file eq "STDOUT") {
-        $logfh = \*STDOUT;
-    }
-    elsif ($log_file eq "STDERR") {
-        $logfh = \*STDERR;
-    }
-    elsif ($log_file =~ m{^~/}) {
-        my $home = (getpwuid($>))[7];
-        $log_file =~ s{^~/}{$home/};
-        open $logfh, ">>", $log_file or die "Can't open $log_file: $!";
-    }
-    else {
-        open $logfh, ">>", $log_file or die "Can't open $log_file: $!";
-    }
-    select($logfh);
-    $| = 1;
-    select(STDOUT);
-}
 
 1;
 
@@ -100,10 +110,21 @@ LWP::CurlLog - Log LWP requests as curl commands
 This module can be used to log LWP requests as curl commands so you
 can redo requests the perl script makes, manually, on the command
 line. Just include a statement "use LWP::CurlLog;" to the top of
-your perl script and then check the log file for curl commands. The
-default log file location is in ~/curl.log, but you can change it
-by setting the $log_file package variable in a begin block before
-including the library.
+your perl script and then check the output for curl commands.
+
+The default location is to STDERR, but you can change it
+by setting the file option on the use line like this:
+
+    use LWP::CurlLog file => "~/curl.log";
+
+The log will include the response in it's output. If that's unwanted,
+do this:
+
+    use LWP::CurlLog response => 0;
+
+You can include timing information like this:
+
+    use LWP::CurlLog timing => 1;
 
 =head1 METACPAN
 

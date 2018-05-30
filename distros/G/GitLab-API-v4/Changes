@@ -1,5 +1,14 @@
 Revision history for Perl extension GitLab::API::v4.
 
+0.09 2018-05-28
+
+- Ensure chmod 600 of ~/.gitlab-api-v4-config is maintained.
+- Enable and fix upload_file_to_project by using HTTP::Tiny::Multipart.
+- Individual methods may now have a custom note added to their POD.
+- Added a self-contained unit test, unit.t, which can be expanded on in the future.
+  This is unlike regression.t which requires that a GitLab installation be available.
+- Added the rest_client_class argument.
+
 0.08 2018-05-14
 
 - Many API endpoints which return lists and did not support parameters now do

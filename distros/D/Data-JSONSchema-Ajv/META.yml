@@ -13,12 +13,11 @@ meta-spec:
   version: '1.4'
 name: Data-JSONSchema-Ajv
 requires:
-  Data::GUID: '0'
-  Data::Visitor::Callback: '0'
+  Capture::Tiny: '0.48'
+  Cpanel::JSON::XS: '0'
   JavaScript::Duktape::XS: '0'
-  Test::JSON::Schema::Acceptance: '0'
+  Path::Tiny: '0.104'
   Test::More: '0'
-  Types::Serialiser: '0'
   perl: v5.20.0
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'YAML::Tiny version 1.73'

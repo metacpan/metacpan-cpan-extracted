@@ -1,5 +1,5 @@
 package Config::From::Backend;
-$Config::From::Backend::VERSION = '0.05';
+$Config::From::Backend::VERSION = '0.06';
 
 use utf8;
 use Moose;

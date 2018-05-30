@@ -1,3 +1,7 @@
+## 1.3.0
+* Stop supporting deprecated Teamrooms API
+* Migrate Workdiaries, Workdays and Snapshots API to v3
+
 ## 1.2.3
 * Time Reports API calls do not work
 

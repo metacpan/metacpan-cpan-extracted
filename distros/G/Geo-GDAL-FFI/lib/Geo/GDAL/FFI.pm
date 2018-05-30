@@ -24,7 +24,7 @@ use Geo::GDAL::FFI::GeomFieldDefn;
 use Geo::GDAL::FFI::Feature;
 use Geo::GDAL::FFI::Geometry;
 
-our $VERSION = 0.05_01;
+our $VERSION = 0.05_03;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(@errors);
 
@@ -1180,7 +1180,11 @@ eval{$ffi->attach('GDALBuildVRT' => [qw/string int uint64* opaque opaque int*/] 
         # this gdal.pc bug was fixed in GDAL 2.3.1
         # we just hope the one configuring GDAL did not change it to something that ends '/data'
         $dir =~ s/\/data$//;
-        CPLSetConfigOption(GDAL_DATA => $dir);
+        if (opendir(my $dh, $dir)) {
+            CPLSetConfigOption(GDAL_DATA => $dir);
+        } else {
+            warn "GDAL data directory ($dir) doesn't exist. Maybe Alien::gdal is not installed?";
+        }
     }
 
     my $self = {};

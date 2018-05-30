@@ -1,5 +1,7 @@
 package Catmandu::Fix::isbn10;
 
+our $VERSION = '0.10';
+
 use Catmandu::Sane;
 use Business::ISBN;
 use Moo;

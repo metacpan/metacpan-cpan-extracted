@@ -1,5 +1,5 @@
 package Config::From::Backend::DBIx;
-$Config::From::Backend::DBIx::VERSION = '0.05';
+$Config::From::Backend::DBIx::VERSION = '0.06';
 
 use utf8;
 use Moose;
@@ -62,7 +62,7 @@ Config::From::Backend::DBIx -  DBIx Backend for Config::From
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

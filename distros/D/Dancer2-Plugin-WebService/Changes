@@ -1,4 +1,19 @@
-3.014  2017-05-05 01:00:00
+3.100  2018-05-20
+
+  - Re-write many parts of the code for perfomance
+
+3.015  2018-05-10
+
+  - Remove several not necessary Moo properties
+  - Find route name from the $plugin->dsl->request->{route}->{spec_route}
+  - Remove method set_data_user
+  - Remove method del_data_user
+  - Rename method RestReply     to reply
+  - Rename method get_data_user to get_data_post
+  - Remove the after hook that clears the posted data
+  - Documentation fixes
+
+3.014  2017-05-05
 
   - New code for retrieving Os info for built-in route info/version
   - Documentation fixes
@@ -7,28 +22,27 @@
   - Authentication 'Always allow login for testing' replaced from the INTERNAL simple
   - Add support for <any> user and <any> password at INTERNAL simple
 
-3.012  2017-04-21 01:00:00
+3.012  2017-04-21
 
   - Re-package it using Dist::Zilla instead of ExtUtils::MakeMaker
     because Somehow CPAN do not show the pod documentation if the
     modules is build with ExtUtils::MakeMaker
-  - Replacing the                %{ $plugin->data_user }{ @keys }
-    using the two times slower   map {$_, $plugin->data_user->{$_}} @keys
+  - Replacing the             %{ $plugin->data_user }{ @keys }
+    using the two slower map{$_, $plugin->data_user->{$_}} @keys
     only for passing the nosense CPAN auto tests ...
 
-3.000  2016-09-01 20:00:00
+3.000  2016-09-01
 
-  - Re-written as a Dancer2 plugin
   - login / logout
   - Plugable authorization scripts
   - Sessions
   - Persistent data
 
-2.000  2016-05-01 20:00:00
+2.000  2016-05-01
 
-  - Rewritten using Dancer2
+  - Re-write it as a Dancer2 plugin
 
-1.000  2012-01-15 20:00:00
+1.000  2012-01-17
 
   - User can register his own code to executed from the server
 

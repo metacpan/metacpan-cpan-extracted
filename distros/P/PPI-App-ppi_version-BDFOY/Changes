@@ -1,7 +1,12 @@
-0.12 - Wed Jun 10 03:19:10 2009
-	* Initial release of my own version of ppi_version. Mostly
-	the same thing, but with output that pleases me.
+Revision history for Perl module PPI::App::ppi_version::BDFOY
 
-0.14 - Tue Dec 17 12:02:52 2013
+0.141 2018-05-23T14:57:36Z
+	* Change to Artistic License 2.0
+	* Several minor meta fixes to the distro
+
+0.14 - 2013-12-17
 	* Handle `our $VERSION`
 
+0.12 - 2009-06-10
+	* Initial release of my own version of ppi_version. Mostly
+	the same thing, but with output that pleases me.

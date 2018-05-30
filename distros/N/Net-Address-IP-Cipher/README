@@ -23,9 +23,8 @@ specification from https://github.com/PowerDNS/ipcipher
 
 PREREQUISITES
 
-This module requires Net::IP for v6/v4 handling, MIME::Base64 and 
-Crypt::PBKDF2 for the 128-key derivation from the password, and
-Crypt::Cipher::AES for the IPv6 enc/decryption part.
+This module requires Net::IP for v6/v4 handling and CryptX for
+all crypto stuff (Crypt::KeyDerivation, Crypt::Cipher::AES).
 
 
 INSTALLATION

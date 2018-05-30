@@ -13,7 +13,7 @@ MooX::Role::JSON_LD - Easily provide JSON-LD mark-up for your objects.
     # define your attributes
     has first_name => ( ... );
     has last_name  => ( ... );
-    has birth date => ( ... );
+    has birth_date => ( ... );
 
     # Add two required methods
     sub json_ld_type { 'Person' };
@@ -73,7 +73,7 @@ you want to use in your JSON-LD, simply add a method called C<json_ld_type>
 which returns the name of your type as a string. This string will be used
 in the C<@type> field of the JSON-LD.
 
-=head3 Defining your fields
+=head2 Defining your fields
 
 You also need to define the fields that are to be included in your JSON-LD.
 To do this, you need to add a method called C<json_ld_fields> which returns
@@ -131,6 +131,12 @@ That configuration will give us the following output:
     "birthDate" : "1974-01-08",
     "name" : "David Bowie",
 
+=head2 Other contexts
+
+By default, this role uses the URL L<http://schema.org>, but you can change
+this. This role adds an attribute (called C<context>) which can be used to
+change the context.
+
 =cut
 
 package MooX::Role::JSON_LD;
@@ -138,16 +144,16 @@ package MooX::Role::JSON_LD;
 use 5.6.0;
 
 use Moo::Role;
-use JSON;
 use Carp;
-use Types::Standard 'InstanceOf';
+use JSON::MaybeXS;
+use Types::Standard qw[ArrayRef HashRef InstanceOf Str];
 
-our $VERSION = '0.0.5';
+our $VERSION = '0.0.11';
 
 requires qw[json_ld_type json_ld_fields];
 
 has json_ld_encoder => (
-  isa => InstanceOf['JSON'],
+  isa => InstanceOf[ qw/ Cpanel::JSON::XS JSON JSON::PP JSON::XS /],
   is  => 'ro',
   lazy => 1,
   builder => '_build_json_ld_encoder',
@@ -157,11 +163,21 @@ sub _build_json_ld_encoder {
   return JSON->new->canonical->utf8->space_after->indent->pretty;
 }
 
+has context => (
+  isa => Str | HashRef | ArrayRef,
+  is  => 'ro',
+  builder => '_build_context',
+);
+
+sub _build_context {
+  return 'http://schema.org/';
+}
+
 sub json_ld_data {
   my $self = shift;
 
   my $data = {
-    '@context' => 'http://schema.org',
+    '@context' => $self->context,
     '@type'    => $self->json_ld_type,
   };
 
@@ -202,6 +218,9 @@ Dave Cross <dave@perlhacks.com>
 =head1 SEE ALSO
 
 perl(1), Moo, Moose, L<https://json-ld.org/>, L<https://schema.org/>
+
+L<MooX::JSON_LD> is included in this distribution and provides an alternative
+interface to the same functionality.
 
 =head1 COPYRIGHT AND LICENSE
 

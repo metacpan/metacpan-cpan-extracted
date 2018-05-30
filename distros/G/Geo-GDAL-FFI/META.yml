@@ -27,5 +27,5 @@ requires:
   PkgConfig: '0'
 resources:
   repository: git://github.com/ajolma/Geo-GDAL-FFI.git
-version: 0.0501
+version: 0.0503
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

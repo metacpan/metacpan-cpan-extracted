@@ -6,7 +6,7 @@ package BSON::Timestamp;
 # ABSTRACT: BSON type wrapper for timestamps
 
 use version;
-our $VERSION = 'v1.6.1';
+our $VERSION = 'v1.6.3';
 
 use Carp ();
 
@@ -32,7 +32,7 @@ use namespace::clean -except => 'meta';
 
 my $max_int32 = 2147483647;
 
-# Support back-compat 'secs' and inc' and legacy constructor shortcut
+# Support back-compat 'sec' and inc' and legacy constructor shortcut
 sub BUILDARGS {
     my ($class) = shift;
 
@@ -46,8 +46,8 @@ sub BUILDARGS {
           unless @_ % 2 == 0;
 
         %args = @_;
-        $args{seconds}   = $args{secs} if exists $args{secs} && !exists $args{seconds};
-        $args{increment} = $args{inc}  if exists $args{inc}  && !exists $args{increment};
+        $args{seconds}   = $args{sec} if exists $args{sec} && !exists $args{seconds};
+        $args{increment} = $args{inc} if exists $args{inc} && !exists $args{increment};
     }
 
     $args{seconds}   = time unless defined $args{seconds};
@@ -120,7 +120,7 @@ BSON::Timestamp - BSON type wrapper for timestamps
 
 =head1 VERSION
 
-version v1.6.1
+version v1.6.3
 
 =head1 SYNOPSIS
 

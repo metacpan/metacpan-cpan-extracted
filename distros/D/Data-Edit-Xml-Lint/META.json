@@ -22,8 +22,8 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Data::Edit::Xml" : "20180420",
-            "Data::Table::Text" : "20180420",
+            "Data::Edit::Xml" : "20180527",
+            "Data::Table::Text" : "20180527",
             "Digest::SHA" : "0",
             "Encode" : "0",
             "Test::More" : "0",
@@ -34,7 +34,7 @@
    "provides" : {
       "Data::Edit::Xml::Lint" : {
          "file" : "lib/Data/Edit/Xml/Lint.pm",
-         "version" : "20180423"
+         "version" : "20180527"
       },
       "Data::Edit::Xml::Lint::Report" : {
          "file" : "lib/Data/Edit/Xml/Lint.pm"
@@ -46,5 +46,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20180423"
+   "version" : "20180527"
 }

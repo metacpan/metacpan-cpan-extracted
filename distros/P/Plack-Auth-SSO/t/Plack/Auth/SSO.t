@@ -1,5 +1,5 @@
 use strict;
-use warnings FATAL => 'all';
+use warnings FATAL => "all";
 use Test::More;
 use Test::Exception;
 use lib "t/lib";
@@ -14,7 +14,7 @@ use HTTP::Request::Common;
 my $pkg;
 
 BEGIN {
-    $pkg = 'Plack::Auth::SSO';
+    $pkg = "Plack::Auth::SSO";
     use_ok $pkg;
 }
 require_ok $pkg;

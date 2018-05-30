@@ -29,7 +29,7 @@ eod
 print $fho "$Config{startperl}\n";
 while (<$fhi>) {print $fho $_}
 
-This needs to be executed from the bin directory of the expanded
-kit. Place the resultant .com file in a directory that is in your
-DCL$PATH. Or, place it with the other Perl scripts, and make sure
-your DCL$PATH includes this directory.
+This needs to be executed from the script directory of the expanded kit.
+Place the resultant .com file in a directory that is in your DCL$PATH.
+Or, place it with the other Perl scripts, and make sure your DCL$PATH
+includes this directory.

@@ -14,7 +14,7 @@ use Chart::Plotly::Trace::Choropleth::Stream;
 use Chart::Plotly::Trace::Choropleth::Transform;
 use Chart::Plotly::Trace::Choropleth::Unselected;
 
-our $VERSION = '0.019';    # VERSION
+our $VERSION = '0.020';    # VERSION
 
 # ABSTRACT: The data that describes the choropleth value-to-color mapping is set in `z`. The geographic locations corresponding to each value in `z` are set in `locations`.
 
@@ -237,7 +237,7 @@ Chart::Plotly::Trace::Choropleth - The data that describes the choropleth value-
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

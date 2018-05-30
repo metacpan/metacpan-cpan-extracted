@@ -1,5 +1,5 @@
 Make sure you have the prerequisite modules installed.
-For example if you have Redhat/Centos 7.x
+e.g for Redhat/Centos 7.x
 
 	yum install perl-devel perl-ExtUtils-ParseXS perl-ExtUtils-Install perl-ExtUtils-MakeMaker perl-ExtUtils-Manifest perl-Test-Harness
 	yum install perl-CPAN perl-CPAN-Meta perl-CPAN-Meta-Requirements perl-CPAN-Meta-YAML perl-CPANPLUS-Dist-Build perl-Parse-CPAN-Meta perl-Test-CPAN-Meta perl-CPAN-Changes perl-CPANPLUS perl-Module-Signature perl-Version-Requirements perl-YAML
@@ -13,49 +13,43 @@ For example if you have Redhat/Centos 7.x
 	cpanm Plack
 	cpanm Plack::Middleware::Deflater
 	cpanm Starman
+	cpanm Template::Toolkit
 	cpanm Dancer2
 	cpanm Dancer2::Plugin::WebService
 
-You should run the service with an unprivilidged user e.g. joe
-Please be careful that non root users can not bind port numbers from 1 to 1024
-Create the user if not exists
+After install Dancer2::Plugin::WebService you should run it as a non privileged user e.g. dancer
+Be careful, non root users can not bind ports up to 1024
+Create the user and ownership
 
-	getent group  joe >/dev/null || groupadd joe
-	getent passwd joe >/dev/null || useradd -g joe --no-log-init -c "Dancer2-Plugin-WebService user" -s /sbin/nologin joe
-	lslogins -o USER,GROUP,UID,SHELL joe
+	getent group  dancer >/dev/null || groupadd dancer
+	getent passwd dancer >/dev/null || useradd -g dancer -l -M -c "Dancer2 WebService" -s $(which nologin) dancer
 
-Create the application e.g TestService inside e.g. the /opt folder
+	mkdir /var/lib/WebService ; chown -R dancer:dancer /var/lib/WebService
+	mkdir /var/log/WebService ; chown -R dancer:dancer /var/log/WebService
 
-	cd /opt
-	dancer2 gen --application TestService
+If there is a firewall open the listening port e.g. at Redhat
 
-Give ownership to joe
+	firewall-cmd --zone=public --permanent --add-port=3000/tcp
+	firewall-cmd --reload
+	firewall-cmd --list-all
 
-	mkdir            /var/log/TestService
-	mkdir            /usr/local/sessions
-	chown -R joe:joe /opt/TestService
-	chown -R joe:joe /var/log/TestService
-	chown -R joe:joe /usr/local/sessions
-	
-	# Redhat        
-	chown -R joe:joe /usr/local/share/perl5/Dancer2/Plugin/scripts
-	chmod u+x        /usr/local/share/perl5/Dancer2/Plugin/scripts/LinuxOS/AuthUser.pl
-	chmod u+x        /usr/local/share/perl5/Dancer2/Plugin/scripts/HttpBasic/users.pl
-	chmod u+x        /usr/local/share/perl5/Dancer2/Plugin/scripts/HttpBasic/admins.pl
-
+	# Redhat
+	find /usr/local/share/perl5/Dancer2/Plugin/scripts      -regex ".*\.\(sh\|pl\)\$" -type f -exec chmod 755 {} \;	
 	# Archlinux
-	chown -R joe:joe /usr/share/perl5/site_perl/Dancer2/Plugin/scripts
-	chmod u+x        /usr/share/perl5/site_perl/Dancer2/Plugin/scripts/LinuxOS/AuthUser.pl
-	chmod u+x        /usr/share/perl5/site_perl/Dancer2/Plugin/scripts/HttpBasic/users.pl
-	chmod u+x        /usr/share/perl5/site_perl/Dancer2/Plugin/scripts/HttpBasic/admins.pl
+	find /usr/share/perl5/site_perl/Dancer2/Plugin/scripts  -regex ".*\.\(sh\|pl\)\$" -type f -exec chmod 755 {} \;
+	
+If you want to use an authentication method that needs sudo, you must add the user running
+the WebService ( dancer ) on a sudoers file e.g.
 
+	vi /etc/sudoers.d/WebService
 
-Use logrotate to housekeeping the log files
-vi /etc/logrotate.d/TestService
+		dancer ALL=NOPASSWD: /usr/local/share/perl5/Dancer2/Plugin/scripts/LinuxOS/AuthUser.pl
 
-	/var/log/TestService/*.log
-	{
-	create 640 joe joe
+Use logrotate for housekeeping the log files
+vi /etc/logrotate.d/WebService
+
+	/var/log/WebService/*.log {
+	create 640 dancer dancer
 	compress
 	missingok
 	notifempty
@@ -64,26 +58,12 @@ vi /etc/logrotate.d/TestService
 	}
 
 
-If an authentication method needs sudo you must add the user running the application at the sudoers file e.g.
-vi /etc/sudoers
+Create a skeleton for your service e.g. at  /opt/TestService/
 
-	joe ALL=NOPASSWD: /usr/local/share/perl5/Dancer2/Plugin/scripts/LinuxOS/AuthUser.pl
+	dancer2 gen --application TestService --directory TestService --path /opt --overwrite
+	chown -R dancer:dancer /opt/TestService
 
-
-If you want your routes ro provide geop ip information install the GeoIP package
-
-At archlinux        pacman -S geoip geoip-database geoip-database-extra
-At debian           apt-get install geoip-bin
-At fedora, redhat   yum install geoip
-At CentOS 5         rpm -Uvh http://mirrors.kernel.org/fedora-epel/5/i386/epel-release-5-4.noarch.rpm
-At CentOS 6         rpm -Uvh http://mirrors.kernel.org/fedora-epel/6/i386/epel-release-6-8.noarch.rpm
-                    yum repolist
-                    yum install geoip
-
-
-
-
-Use compression replies if you have fast CPU and large replies
+Use compressed http if you have fast CPU and large replies
 vi /opt/TestService/bin/app.psgi
 
 	#!/usr/bin/env perl
@@ -93,142 +73,143 @@ vi /opt/TestService/bin/app.psgi
 	use Plack::Builder;
 	builder { enable 'Deflater'; TestService->to_app }
 
-Or if you have slow CPU use uncompressed replies
-vi /opt/TestService/bin/app.psgi
-	
-	#!/usr/bin/env perl
-	use FindBin;
-	use lib "$FindBin::Bin/../lib";
-	use TestService;	
-	TestService->to_app;
-
 
 Configure the production enviroment
 vi /opt/TestService/environments/production.yml
 
 
-show_errors      : 1
+
+
+# logger    : file, console
+# log level : core, debug, info, warning, error
+
 startup_info     : 1
-warnings         : 1 
+show_errors      : 1
+warnings         : 1
 no_server_tokens : 0
-log              : "core"
-logger           : "file"
-engines          :
-  logger         :
-    File         :
-      log_dir    : "/var/log/TestService"
-      file_name  : "activity.log"
+
+logger           : 'console'
+log              : 'file'
+engines:
+  logger:
+    file:
+      log_format : '{"ts":"%{%Y-%m-%d %H:%M:%S}t","host":"%h","level":"%L","message":"%m"}'
+      log_dir    : '/var/log/WebService'
+      file_name  : 'TestService.log'
+    console:
+      log_format : '{"ts":"%{%Y-%m-%d %H:%M:%S}t","host":"%h","level":"%L","message":"%m"}'
 
 
 
 
 
 
-Configure your application settings
+
+
+
+
+Configure your application settings, changing the values to your needs
 vi /opt/TestService/config.yml
 
 
 
-appname                 : TestService
+# enviroment related settings should go to /environments yml files
+
+
 environment             : production
+charset                 : UTF-8
 plugins                 :
   WebService            :
-    Version             : 2.0.1
-    Owner               : Joe Lunchbucket, Joe.Lunchbucket@example.com
-    Session directory   : /usr/local/sessions
+    Owner               : dancer Lunchbucket, dancer.Lunchbucket@example.com
+    Session directory   : /var/lib/WebService
     Session idle timout : 3600
     Default format      : json
-    Command sudo        : /usr/bin/sudo
-    Command rm          : /usr/bin/rm
     Routes              :
-      test_mirror       : public
-      test_get_one_key  : public
-      test_get_data     : public
-      test_new_data     : public
-      test_session      : private
-      
+      secure            : private
+      mirror            : public
+      route1            : public
+      route2            : public
+      route3            : public
+      error             : public
+      get1              : public
+      get2              : public
+
     Allowed hosts:
 
       - 127.*
       - 10.*
+      - 172.??.?.*
       - 192.168.1.23
-      - 172.20.*
-      - 32.??.34.4?
       - 4.?.?.??
       - ????:????:????:6d00:20c:29ff:*:ffa3
       - "*"
 
     User must belong to one or more of the groups:
 
-      - power
-      - storage
-      - network
+      - powerusers
+      - postfix
+      - tape
 
     Authentication methods:
-      simple:
-        Command  : INTERNAL
+
+      - Name     : simple
         Active   : yes
+        Command  : INTERNAL
         Users    :
           <any>  : secret4all
-          user1  : <any>
+          user1  : <any>		
           user2  : pass2
-          user2  : pass2
-      Linux native users:
-        Command  : MODULE_INSTALL_DIR/scripts/LinuxOS/AuthUser.pl
+
+      - Name     : Linux native users
         Active   : yes
+        Command  : MODULE_INSTALL_DIR/scripts/LinuxOS/AuthUser.pl
         Use sudo : yes
-      Basic Apache auth for simple users:
+
+      - Name     : Basic Apache auth for simple users
+        Active   : no
         Command  : MODULE_INSTALL_DIR/scripts/HttpBasic/users.pl
-        Active   : no
         Use sudo : no
-      Basic Apache auth for admins:
+
+      - Name     : Basic Apache auth for admins
+        Active   : no
         Command  : MODULE_INSTALL_DIR/scripts/HttpBasic/admins.pl
-        Active   : no
         Use sudo : no
 
 
-
-Write your real code e.g.
+Write your real code at   /opt/TestService/lib/TestService.pm   e.g.
 vi /opt/TestService/lib/TestService.pm
 
 
+package	TestService;
+use		Dancer2;
+use		Dancer2::Plugin::WebService;
+use		strict;
+use		warnings;
 
+any '/mirror' => sub { reply 'SEND_DATA' };
+get '/route1' => sub { reply };
+any '/route2' => sub { reply 'k1' };
+get '/route3' => sub { reply 'k1'=>'v1', 'k2'=>'v2' };
 
-package TestService;
-use     strict;
-use     warnings;
-use     Dancer2;
-use     Dancer2::Plugin::WebService;
-our     $VERSION = setting('plugins')->{WebService}->{Version};
+get '/error'  => sub { reply 'k1', 'v1', 'error', '37', 'errormessage', 'fever' };
 
-any '/test_mirror'      => sub { RestReply('DATA_USER_SEND') };
-any '/test_get_one_key' => sub { RestReply('k1') };
-any '/test_get_data'    => sub {
-my ($var1, $var2) = get_data_user('k1', 'k2');
-RestReply( Total => ($var1 + $var2), Thought => 'Lets add !' )
-};
+any '/get1'   => sub { my  %all = get_data_post;
+                 reply %all };
 
-any '/test_new_data'    => sub { 
-my %data = 
-set_data_user( new1 => 'N1', new2 => 'N2' );
-set_data_user( new3 => 'N3', new4 => 'N4' );
-del_data_user( 'new1' , 'new4' );
-RestReply('DATA_USER_ALL')
-};
+any '/get2'   => sub { my ($v1, $v2) = get_data_post('k1', 'k2');
+                 reply 'foo'=>$v1 , 'boo'=>$v2
+                 };
 
-setting('plugins')->{'WebService'}->{'Routes'}->{'test_session'} = 'private';
+any '/secure' => sub {
+                 my %send = get_data_post;
+                            set_data_session('s1'=>'L1', 's2'=>'L2', 's3'=>['L3a', 'L3b']);
+                            del_data_session('s2', 's8', 's9');
+                 my %All  = get_data_session();
+                 my @Some = get_data_session('s1', 's7');
 
-any '/test_session' => sub {
-my ($v1, $v2) = get_data_user('k1', 'k2');
-	        set_data_session(s1 =>'L1', s2=>'L2', s3=>['L3a', 'L3b']);
-	        del_data_session('s7', 's8');
-my @Some      = get_data_session('s1', 's2', 's3', 's7');
-my %All       = get_data_session();
-RestReply(k1=>$v1, k2=>$v2, SesData_A => $Some[2], SesData_b=> [ @Some[0..1] ], SesData_all=> { %All } )
-};
-
+                 reply( send=>{%send}, ses_all=>{%All}, s1=>$Some[0], s7=>$Some[1] )
+                 };
 dance;
-
 
 
 
@@ -242,7 +223,7 @@ from port 80 or for adding https protection ( port 443 )
 Add at your nginx.conf something similar to
 
 	...
-	upstream TestService { server 127.0.0.1:65535 fail_timeout=0; keepalive 1024; }
+	upstream TestService { server 127.0.0.1:3000 fail_timeout=0; keepalive 1024; }
 	...
 	server
 	{
@@ -282,23 +263,22 @@ ConditionPathExists=/usr/local/bin/plackup
 
 [Service]
 Type=simple
-User=joe
-Group=joe
-ExecStart=/usr/local/bin/plackup --host 127.0.0.1 --port 65535 --server Starman --workers=10 --env production -a /opt/TestService/bin/app.psgi
-# for Archlinux   ExecStart=/usr/bin/site_perl/plackup --host 127.0.0.1 --port 65535 --server Starman --workers=10 --env production -a /opt/TestService/bin/app.psgi
+User=dancer
+Group=dancer
+ExecStart=/usr/local/bin/plackup --host 127.0.0.1 --port 3000 --server Starman --workers=10 --env production -a /opt/TestService/bin/app.psgi
+# for Archlinux   ExecStart=/usr/bin/site_perl/plackup --host 127.0.0.1 --port 3000 --server Starman --workers=10 --env production -a /opt/TestService/bin/app.psgi
 ExecStop=/bin/kill -s QUIT $MAINPID
 WorkingDirectory=/opt/TestService
 KillMode=mixed
 KillSignal=QUIT
 StandardOutput=journal
-StandardError=inherit 
+StandardError=journal
 NoNewPrivileges=true
 PrivateTmp=true
 LimitNOFILE=infinity
-RestartPreventExitStatus=255
 Restart=on-failure
 RestartSec=60s
-NotifyAccess=all
+
 
 [Install]
 WantedBy=multi-user.target
@@ -309,33 +289,32 @@ WantedBy=multi-user.target
 
 start the service
 
-	systemctl enable testservice.service
-	systemctl cat    testservice
-	systemctl start  testservice
-	systemctl show --property=ActiveState testservice
-	systemctl status testservice
-	journalctl -xeu  testservice | less
+	systemctl enable    testservice.service
+	systemctl cat       testservice
+	systemctl start     testservice
+	systemctl is-active testservice
+	systemctl status    testservice
+	journalctl -xeu     testservice | less
 
-to delete the service
+delete the service
 
-	systemctl stop    testservice
-	systemctl disable testservice.service
+	systemctl stop      testservice
+	systemctl disable   testservice.service
 	rm /usr/lib/systemd/system/testservice.service
 
 start the application manual
 
-	cd /opt/TestService; sudo -u joe plackup --host 127.0.0.1 --port 65535 --server Starman --workers=10 --env production -a /opt/TestService/bin/app.psgi
+	cd /opt/TestService; sudo -u dancer plackup --host 127.0.0.1 --port 3000 --server Starman --workers=10 --env production -a /opt/TestService/bin/app.psgi
 
-or during development. Redhat (up) and Archlinux
+or during development (Redhat)
 
-	cd /opt/TestService; sudo -u joe /usr/local/bin/plackup     --port 65535 -a /opt/TestService/bin/app.psgi --Reload /opt/TestService/lib,/opt/TestService/config.yml,/usr/local/share/perl5/Dancer2/Plugin
-	cd /opt/TestService; sudo -u joe /usr/bin/site_perl/plackup --port 65535 -a /opt/TestService/bin/app.psgi --Reload /opt/TestService/lib,/opt/TestService/config.yml,/usr/share/perl5/site_perl/Dancer2/Plugin
+	sudo -u dancer /usr/local/bin/plackup --port 3000 -a /opt/TestService/bin/app.psgi --Reload /opt/TestService/lib,/opt/TestService/config.yml,/usr/local/share/perl5/Dancer2/Plugin
 	
-or without Plack
+	or without Plack
 
-	sudo -u joe  perl /opt/TestService/bin/app.psgi
+	sudo -u dancer perl /opt/TestService/bin/app.psgi
 
 quick test
 
-	netstat -anp | grep :65535
-	curl -X GET http://localhost:65535/info?to=human
+	ss -tln 'sport = :3000'
+	curl -X GET http://localhost:3000/info?to=human

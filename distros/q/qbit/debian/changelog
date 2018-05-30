@@ -1,3 +1,11 @@
+libqbit-perl (2.6) raring; urgency=low
+
+  * fix
+
+  * minor fix
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 26 May 2018 21:57:02 +0300
+
 libqbit-perl (2.5) raring; urgency=low
 
   * return ($$;%)

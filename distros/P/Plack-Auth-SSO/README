@@ -305,6 +305,30 @@ METHODS
             content => "my-content"
         }
 
+ generate_csrf_token()
+
+    Generate unique CSRF token. Store this token in your session, and
+    supply it as parameter to the redirect uri.
+
+ set_csrf_token($session,$token)
+
+    Save csrf token to the session
+
+    The token is saved in key session_key + "_csrf"
+
+ get_csrf_token($session)
+
+    Retrieve csrf token from the session
+
+ csrf_token_valid($session,$token)
+
+    Compare supplied token with stored token
+
+ cleanup($session)
+
+    removes additional session keys like auth_sso_error and auth_sso_csrf
+    before redirecting to the authorization path.
+
 EXAMPLES
 
     See examples/app1:

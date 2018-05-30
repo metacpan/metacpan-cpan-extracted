@@ -11,6 +11,15 @@ my $modest_source = "third_party/modest/source";
 
 $port = 'windows_nt' if ($^O =~ /MSWin/i);
 
+my $defines = "";
+if ($^O =~ /openbsd/i) {
+	# Simulates mutex using semaphore
+	# Because MyHTML call phtread_mutex_unlock without before call phtread_mutex_lock
+	# And it crashes on OpenBSD
+	warn("Detected OpenBSD - switch from mutex to semaphore\n");
+	$defines = " -DMyCORE_USE_SEMAPHORE_INSTEAD_OF_MUTEX ";
+}
+
 my $sources = [
 	"modest.o", 
 	"DOM.o"
@@ -29,6 +38,7 @@ WriteMakefile(
 	LICENSE			=> 'MIT',
 	LINKTYPE		=> 'dynamic',
 	LIBS			=> ["-lpthread", "-lm"],
+	DEFINE			=> $defines, 
 	CCFLAGS			=> " -std=c99 ". $Config{ccflags},
 	INC				=> "-I$source_dir",
 	OBJECT			=> join(" ", @$sources), 

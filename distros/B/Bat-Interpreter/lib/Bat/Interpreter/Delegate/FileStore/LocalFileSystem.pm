@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 with 'Bat::Interpreter::Role::FileStore';
 
-our $VERSION = '0.008';    # VERSION
+our $VERSION = '0.009';    # VERSION
 
 sub get_contents {
     my $self     = shift();
@@ -31,7 +31,7 @@ Bat::Interpreter::Delegate::FileStore::LocalFileSystem
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

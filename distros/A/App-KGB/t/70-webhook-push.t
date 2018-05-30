@@ -43,7 +43,7 @@ my $webhook_url = sprintf(
     $test_bot->addr,
     $test_bot->port,
     join( '&',
-        'channel=test',   'network=local',
+        'channel=test',   'network=dummy',
         'shorten_urls=0', 'only_branch=master',
         "only_branch=old_branch" )
 );
@@ -56,7 +56,36 @@ sub webhook_post {
     );
 }
 
-my $resp = webhook_post(
+# Verify invalid network is rejected.
+
+my $bad_webhook_url = sprintf(
+    'http://%s:%d/webhook/?%s',
+    $test_bot->addr,
+    $test_bot->port,
+    join( '&', 'channel=test', 'network=invalid' )
+);
+my $content = to_json(
+    {   object_kind   => 'push',
+        ref           => 'refs/heads/old_branch',
+        user_name     => 'Test User',
+        user_username => 'ser',
+        project       => { name => 'test-repo', },
+        before        => '284ffdd4c525547f6ae848d768fff92ff9a89743',
+        after         => '0000000000000000000000000000000000000000',
+        commits       => [ ],
+    }, {utf8=>1});
+
+my $resp = $ua->post(
+    $bad_webhook_url,
+    'Content-Type' => 'text/json',
+    Content        => $content,
+);
+
+is( $resp->code, 400, 'response status is 400' ) or diag $resp->as_string;
+is( $resp->message, '(Bad Request) Unknown network "invalid".',
+    'invalid network detected' ) or diag $resp->as_string;
+
+$resp = webhook_post(
     {   object_kind   => 'push',
         ref           => 'refs/heads/master',
         user_name     => 'Unused Test User',
@@ -88,7 +117,7 @@ is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
 
 TestBot->expect(
     join( ' ',
-        '#test 03Test User',
+        'dummy/#test 03Test User',
         '05master b9b5587 06test-repo',
         '10mod-one 03file-one 04rm-one',
         '* Commit three files (add, mod, rm)',
@@ -97,7 +126,7 @@ TestBot->expect(
 
 TestBot->expect(
     join( ' ',
-        '#test 03Test User',
+        'dummy/#test 03Test User',
         '05master 284ffdd 06test-repo',
         '10(6 files)',
         '* Commit six files (2×(add, mod, rm))',
@@ -120,7 +149,7 @@ is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
 
 TestBot->expect(
     join( ' ',
-        '#test 03Test User',
+        'dummy/#test 03Test User',
         '05old_branch 284ffdd 06test-repo',
         '04.',
         '* branch deleted' )

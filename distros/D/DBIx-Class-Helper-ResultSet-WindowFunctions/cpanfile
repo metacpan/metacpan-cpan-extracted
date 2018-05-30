@@ -3,6 +3,7 @@ requires "parent" => "0";
 requires "perl" => "v5.8.0";
 
 on 'test' => sub {
+  requires "Class::Load" => "0";
   requires "DBD::SQLite" => "0";
   requires "DBIx::Class::Core" => "0";
   requires "DBIx::Class::Schema" => "0";
@@ -12,7 +13,7 @@ on 'test' => sub {
   requires "SQL::Abstract::Test" => "0";
   requires "SQL::Translator" => "0.11018";
   requires "Test::More" => "0";
-  requires "Test::Most" => "0";
+  requires "Test::Roo::DataDriven" => "0";
   requires "base" => "0";
 };
 

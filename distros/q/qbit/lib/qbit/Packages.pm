@@ -6,15 +6,16 @@ qbit::Packages - Functions to manipulate data in packages.
 =cut
 
 package qbit::Packages;
-$qbit::Packages::VERSION = '2.5';
+$qbit::Packages::VERSION = '2.6';
 use strict;
 use warnings;
 use utf8;
 
 use base qw(Exporter);
 
-use Data::Dumper;
-require qbit::StringUtils;
+use qbit::StringUtils qw(fix_utf);
+use qbit::Exceptions;
+use qbit::GetText qw(gettext);
 
 BEGIN {
     our (@EXPORT, @EXPORT_OK);
@@ -154,10 +155,18 @@ B<Return value:> return value of CORE::require if all is Ok or throw Exception i
 sub require_class {
     my ($class) = @_;
 
-    $class = "$class.pm";
-    $class =~ s/::/\//g;
+    my $file_name = "$class.pm";
+    $file_name =~ s/::/\//g;
 
-    return require($class) || die die "Cannot requre file \"$class\": " . qbit::StringUtils::fix_utf($!);
+    my $result;
+    try {
+        $result = require($file_name);
+    }
+    catch {
+        throw $_[0];
+    };
+
+    return $result || throw Exception gettext('Cannot requre class "%s": %s', $class, fix_utf($@ || $!));
 }
 
 1;

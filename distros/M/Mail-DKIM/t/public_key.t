@@ -4,8 +4,14 @@ use strict;
 use warnings;
 use Test::RequiresInternet;
 use Test::More tests => 5;
+use Net::DNS::Resolver;
 
 use Mail::DKIM::Verifier;
+
+my $Resolver = Net::DNS::Resolver->new(
+    nameservers => [ '1.1.1.1', '8.8.8.8' ],
+);
+Mail::DKIM::DNS::resolver( $Resolver );
 $Mail::DKIM::DNS::TIMEOUT = 3;
 
 #

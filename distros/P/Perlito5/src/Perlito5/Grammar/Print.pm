@@ -27,7 +27,6 @@ token the_object {
             }
     |
         <typeglob>
-            <!before '('>
             {
                 $MATCH->{capture} = Perlito5::Match::flat($MATCH->{'typeglob'});
             }
@@ -59,7 +58,14 @@ token the_object {
     }
 };
 
-sub typeglob {
+token typeglob {
+    <typeglob_bareword> <!before '('>
+        {
+            $MATCH->{capture} = Perlito5::Match::flat($MATCH->{'typeglob_bareword'});
+        }
+};
+ 
+sub typeglob_bareword {
     my $str = $_[0];
     my $pos = $_[1];
     my $p = $pos;
@@ -114,9 +120,7 @@ sub typeglob {
     my $full_name = $name;
     $full_name = $namespace . '::' . $name if $namespace;
 
-    # if ( $Perlito5::STRICT && ! $Perlito5::PACKAGES->{ $full_name } ) {
     #     die 'Bareword "' . $full_name . '" not allowed';
-    # }
 
     $m_name->{capture} = Perlito5::AST::Var->new(
                              sigil => '::',
@@ -216,7 +220,7 @@ This module parses source code for Perl 5 statements and generates Perlito5 AST.
 =head1 AUTHORS
 
 Flavio Soibelmann Glock <fglock@gmail.com>.
-The Pugs Team E<lt>perl6-compiler@perl.orgE<gt>.
+The Pugs Team.
 
 =head1 COPYRIGHT
 

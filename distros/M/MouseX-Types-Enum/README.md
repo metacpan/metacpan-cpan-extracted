@@ -10,13 +10,15 @@ In the following example,
 - Three instance variables, `name`, `color`, and `has_seed` are defined.
 - A method `make_sentence($suffix)` is defined.
 
+code:
+
     {
         package Fruits;
 
         use Mouse;
         use MouseX::Types::Enum (
             APPLE  => { name => 'Apple', color => 'red' },
-            ORANGE => { name => 'Cherry', color => 'red' },
+            ORANGE => { name => 'Orange', color => 'orange' },
             BANANA => { name => 'Banana', color => 'yellow', has_seed => 0 }
         );
 
@@ -65,18 +67,13 @@ If you have no need to define instance variables, you can declare enums more sim
 
     Day->Sun == Day->Sun;   # 1
     Day->Sun == Day->Mon;   # ''
-    Day->Sun->to_string;    # 'APPLE'
+    Day->Sun->to_string;    # 'Sun'
     Day->enums;             # { Sun => Day->Sun, Mon => Day->Mon, ... }
 
 # DESCRIPTION
 
-MouseX::Types::Enum provides Java-like enum type declaration.
-
-Enums declared are
-
-- distinguished from each other
-- able to have attributes
-- able to have methods
+MouseX::Types::Enum provides Java-like enum type declaration based on Mouse.
+You can declare enums which have instance variables and methods.
 
 # LICENSE
 

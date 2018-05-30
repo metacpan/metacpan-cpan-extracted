@@ -2,7 +2,7 @@ package CPAN::Perl::Releases::MetaCPAN;
 use strict;
 use warnings;
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 use JSON::PP ();
 use HTTP::Tinyish;
 
@@ -23,38 +23,49 @@ sub get {
     my $self = shift;
     return $self->{_releases} if $self->{cache} and $self->{_releases};
 
+    my @release;
+    my $from = 0;
+    my $total;
     my $uri = "$self->{uri}/_search";
-    # copy from
-    # https://github.com/metacpan/metacpan-web/blob/master/lib/MetaCPAN/Web/Model/API/Release.pm
-    # https://github.com/metacpan/metacpan-api/blob/master/lib/MetaCPAN/Document/Release/Set.pm
-    my $query = {
-        query => {
-            bool => {
-                must => [
-                    { term => { distribution => "perl" } },
-                ],
+    for (1..5) {
+        # https://github.com/metacpan/metacpan-web/blob/master/lib/MetaCPAN/Web/Model/API/Release.pm
+        # https://github.com/metacpan/metacpan-api/blob/master/lib/MetaCPAN/Document/Release/Set.pm
+        my $query = {
+            query => {
+                bool => {
+                    must => [
+                        { term => { distribution => "perl" } },
+                        { term => { authorized => JSON::PP::true } },
+                    ],
+                },
             },
-        },
-        size => 500,
-        sort => [ { date => 'desc' } ],
-        fields => [qw( name date author version status maturity authorized download_url )],
-    };
-    my $res = $self->{http}->post($uri, {
-        content => $self->{json}->encode($query),
-        headers => {
-            'content-type' => 'application/json',
+            size => 1000,
+            from => $from,
+            sort => [ { date => 'desc' } ],
+            fields => [qw( name date author version status maturity download_url )],
+        };
+        my $res = $self->{http}->post($uri, {
+            content => $self->{json}->encode($query),
+            headers => { 'content-type' => 'application/json' },
+        });
+        if (!$res->{success}) {
+            my $message = $res->{status} == 599 ? ", $res->{content}" : "";
+            chomp $message;
+            $message =~ s/\n/ /g;
+            die "$res->{status} $res->{reason}, $uri$message\n";
         }
-    });
-    die "$res->{status} $res->{reason}, $uri\n" unless $res->{success};
-    my $hash = $self->{json}->decode($res->{content});
-    my $releases = [
-        map { $_->{authorized} = 1; $_ }
-        grep { $_->{authorized} }
-        map { $_->{fields} }
-        @{$hash->{hits}{hits}}
-    ];
-    $self->{_releases} = $releases if $self->{cache};
-    $releases;
+        my $hash = $self->{json}->decode($res->{content});
+        $total = $hash->{hits}{total} unless defined $total;
+        push @release, map { $_->{fields} } @{$hash->{hits}{hits}};
+        last if $total <= @release;
+        $from = @release;
+    }
+    if ($total != @release) {
+        die sprintf "metacpan returns %d perl releases, but expected %d\n",
+            (scalar @release), $total;
+    }
+    $self->{_releases} = \@release if $self->{cache};
+    \@release;
 }
 
 sub _self {

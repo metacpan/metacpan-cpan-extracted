@@ -46,110 +46,6 @@ sub new {
     return Net::Upwork::API::init_router($class, $api, ENTRY_POINT);
 }
 
-=item get
-
-    Get snapshot info
-
-B<Parameters>
-
-$company
-
-    Company ID
-
-$username
-
-    User ID
-
-$ts
-
-    Timestamp
-
-B<Return value>
-
-    JSON response as a string
-
-=cut
-
-sub get {
-    my $self = shift;
-    my $company = shift;
-    my $username = shift;
-    my $ts = shift;
-
-    return $self->client()->get("/team/v1/snapshots/" . $company . "/" . $username . "/" . $ts);
-}
-
-=item update
-
-    Update snapshot info
-
-B<Parameters>
-
-$company
-
-    Company ID
-
-$username
-
-    User ID
-
-$ts
-
-    Timestamp
-
-$params
-
-    Hash of parameters
-
-B<Return value>
-
-    JSON response as a string
-
-=cut
-
-sub update {
-    my $self = shift;
-    my $company = shift;
-    my $username = shift;
-    my $ts = shift;
-    my %params = @_;
-
-    return $self->client()->put("/team/v1/snapshots/" . $company . "/" . $username . "/" . $ts, %params);
-}
-
-=item delete
-
-    Delete snapshot info
-
-B<Parameters>
-
-$company
-
-    Company ID
-
-$username
-
-    User ID
-
-$ts
-
-    Timestamp
-
-B<Return value>
-
-    JSON response as a string
-
-=cut
-
-sub delete {
-    my $self = shift;
-    my $company = shift;
-    my $username = shift;
-    my $ts = shift;
-
-    return $self->client()->delete("/team/v1/snapshots/" . $company . "/" . $username . "/" . $ts);
-}
-
 =item get_by_contract
 
     Get snapshot info by specific contract
@@ -175,7 +71,7 @@ sub get_by_contract {
     my $contract = shift;
     my $ts = shift;
 
-    return $self->client()->get("/team/v2/snapshots/contracts/" . $contract . "/" . $ts);
+    return $self->client()->get("/team/v3/snapshots/contracts/" . $contract . "/" . $ts);
 }
 
 =item update_by_contract
@@ -208,7 +104,7 @@ sub update_by_contract {
     my $ts = shift;
     my %params = @_;
 
-    return $self->client()->put("/team/v2/snapshots/contracts/" . $contract . "/" . $ts, %params);
+    return $self->client()->put("/team/v3/snapshots/contracts/" . $contract . "/" . $ts, %params);
 }
 
 =item delete_by_contract

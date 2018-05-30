@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::GithubMeta;
-$Dist::Zilla::Plugin::GithubMeta::VERSION = '0.54';
+$Dist::Zilla::Plugin::GithubMeta::VERSION = '0.56';
 # ABSTRACT: Automatically include GitHub meta information in META.yml
 
 use strict;
@@ -10,6 +10,7 @@ with 'Dist::Zilla::Role::MetaProvider';
 use MooseX::Types::URI qw[Uri];
 use Cwd;
 use Try::Tiny;
+use File::pushd 'pushd';
 
 use namespace::autoclean;
 
@@ -55,6 +56,7 @@ sub _acquire_repo_info {
   require IPC::Cmd;
   return unless IPC::Cmd::can_run('git');
 
+  my $wd = pushd $self->zilla->root;
   {
     my $gitver = `git version`;
     my ($ver) = $gitver =~ m!git version ([0-9.]+(\.msysgit)?[0-9.]+)!;
@@ -190,7 +192,7 @@ Dist::Zilla::Plugin::GithubMeta - Automatically include GitHub meta information 
 
 =head1 VERSION
 
-version 0.54
+version 0.56
 
 =head1 SYNOPSIS
 
@@ -285,7 +287,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Chris Williams, Tatsuhiko Miyagawa and Ricardo SIGNES.
+This software is copyright (c) 2018 by Chris Williams, Tatsuhiko Miyagawa and Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -8,7 +8,7 @@ use Carp;
 
 use base 'Date::Holidays::Adapter';
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 sub holidays {
     croak "holidays is unimplemented for ".__PACKAGE__;
@@ -52,13 +52,15 @@ sub _fetch {
 
 __END__
 
+=pod
+
 =head1 NAME
 
 Date::Holidays::Adapter::JP - an adapter class for Date::Japanese::Holiday
 
 =head1 VERSION
 
-This POD describes version 1.06 of Date::Holidays::Adapter::JP
+This POD describes version 1.08 of Date::Holidays::Adapter::JP
 
 =head1 DESCRIPTION
 
@@ -141,7 +143,7 @@ Jonas B. Nielsen, (jonasbn) - C<< <jonasbn@cpan.org> >>
 =head1 LICENSE AND COPYRIGHT
 
 L<Date::Holidays> and related modules are (C) by Jonas B. Nielsen, (jonasbn)
-2004-2017
+2004-2018
 
 Date-Holidays and related modules are released under the Artistic License 2.0
 

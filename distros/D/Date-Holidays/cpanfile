@@ -11,6 +11,5 @@ requires 'Module::Load', 0;
 on test => sub {
     'Test::Class', 0;
     'Test::More', 0;
-    'Module::Load', 0;
     'FindBin', 0;
 };

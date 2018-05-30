@@ -126,12 +126,10 @@ sub term_special_var {
         my $c0 = $str->[ $pos + $len - 1 ];
         my $c1 = $str->[ $pos + $len ];
         if  ( 
-                ( $c0 eq '$' || $c0 eq '@' || $c0 eq '%' || $c0 eq '*' || $c0 eq '&' )
+                ( $Perlito5::Grammar::is_var_sigil{$c0} )
             &&  
-                ( $c1 eq '$' || $c1 eq '@' || $c1 eq '%' || $c1 eq '*' || $c1 eq '&' 
-                || ( $c1 ge 'a' && $c1 le 'z' )
-                || ( $c1 ge 'A' && $c1 le 'Z' )
-                || ( $c1 ge '0' && $c1 le '9' )
+                ( $Perlito5::Grammar::is_var_sigil{$c1}
+                || $Perlito5::Grammar::is_ident_middle{$c1}
                 )
             ) 
         {
@@ -202,11 +200,19 @@ sub term_sigil {
                 $name = Perlito5::Match::flat($n);
                 $pos  = $n->{to};
             }
-            if ($namespace || $name) {
+            if (
+                ( $namespace || $name )
+                && !(
+                       ( $namespace eq 'CORE' || $namespace eq '' )
+                    && ( $name eq 'sub' )
+                )
+              )
+            {
                 my $spc = Perlito5::Grammar::Space::opt_ws($str, $pos);
+                my $pos = $spc->{to};
                 if ($str->[$pos] eq '{' || $str->[$pos] eq '[' || $str->[$pos] eq '}') {
                     # we are not parsing:  ${subr()}
-                    # we are parsing:  ${var}  ${var{index}}
+                    # we are parsing:  ${var}  ${var{index}}  ${var[index]}
                     # create the 'Var' object
                     $m->{capture} = Perlito5::AST::Var->new(
                         sigil       => $sigil,
@@ -222,6 +228,29 @@ sub term_sigil {
                     if ( $str->[$p] eq '}' ) {
                         $m->{to} = $p + 1;
                         return $m;
+                    }
+                }
+                elsif ($str->[$pos] eq '-' && $str->[$pos + 1] eq '>') {
+                    my $spc = Perlito5::Grammar::Space::opt_ws($str, $pos + 2);
+                    my $pos = $spc->{to};
+                    if ($str->[$pos] eq '{' || $str->[$pos] eq '[') {
+                        # we are parsing:  ${var->{index}}  ${var->[index]}
+                        # create the 'Var' object
+                        $m->{capture} = Perlito5::AST::Var->new(
+                            sigil       => $sigil,
+                            namespace   => ( $namespace || $Perlito5::PKG_NAME ),  # deref variable is always global
+                            name        => $name,
+                        );
+                        $m->{to} = $spc->{to};
+                        # hijack some string interpolation code to parse the subscript
+                        $m = Perlito5::Grammar::String::double_quoted_var_with_subscript($m);
+                        $m->{capture} = [ 'term', $m->{capture} ];
+                        $spc = Perlito5::Grammar::Space::opt_ws($str, $m->{to});
+                        my $p = $spc->{to};
+                        if ( $str->[$p] eq '}' ) {
+                            $m->{to} = $p + 1;
+                            return $m;
+                        }
                     }
                 }
             }
@@ -291,6 +320,7 @@ sub term_sigil {
                         code      => 'prefix:<' . $sigil . '>',
                         namespace => '',
                         arguments => [ $ast->{stmts}[0] ],
+                        _strict_refs => ( $^H & $Perlito5::STRICT_REFS ),
                     ),
                 ];
                 return $m;
@@ -306,7 +336,8 @@ sub term_sigil {
                             namespace => '',
                             arguments => [ $ast ],
                         )
-                    ]
+                    ],
+                    _strict_refs => ( $^H & $Perlito5::STRICT_REFS ),
                 )
             ];
             return $m;
@@ -327,21 +358,24 @@ sub term_sigil {
     }
     if ( $c1 eq '$' ) {
         #  $$ ...
-        my $m2 = Perlito5::Grammar::Space::opt_ws($str, $p + 1);
-        my $p2 = $m2->{to};
-        my $c2 = $str->[$p2];
-        if ($c2 ne ',' && $c2 ne ';') {
-            # not $$; not $$,
-            $m = term_sigil( $str, $p );
-            if ($m) {
-                $m->{capture} = [ 'term',  
-                        Perlito5::AST::Apply->new( 
-                                'arguments' => [ $m->{capture}[1] ],
-                                'code'      => 'prefix:<' . $sigil . '>', 
-                                'namespace' => ''
-                            )
-                    ];
-                return $m;
+        my $m2 = Perlito5::Grammar::Space::ws($str, $p + 1);
+        if (!$m2) {
+            my $p2 = $p + 1;
+            my $c2 = $str->[$p2];
+            if ( $c2 eq '_' || $c2 eq '$' || !exists $special_var{ '$' . $c2 } ) {
+                # not '$$;' not '$$,' not '$$+1'
+                $m = term_sigil( $str, $p );
+                if ($m) {
+                    $m->{capture} = [ 'term',  
+                            Perlito5::AST::Apply->new( 
+                                    arguments  => [ $m->{capture}[1] ],
+                                    code       => 'prefix:<' . $sigil . '>', 
+                                    namespace  => '',
+                                    _strict_refs => ( $^H & $Perlito5::STRICT_REFS ),
+                                )
+                        ];
+                    return $m;
+                }
             }
         }
     }
@@ -405,7 +439,7 @@ This module parses source code for Perl 5 statements and generates Perlito5 AST.
 =head1 AUTHORS
 
 Flavio Soibelmann Glock <fglock@gmail.com>.
-The Pugs Team E<lt>perl6-compiler@perl.orgE<gt>.
+The Pugs Team.
 
 =head1 COPYRIGHT
 

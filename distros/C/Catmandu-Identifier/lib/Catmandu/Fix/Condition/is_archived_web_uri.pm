@@ -1,5 +1,7 @@
 package Catmandu::Fix::Condition::is_archived_web_uri;
 
+our $VERSION = '0.10';
+
 use Catmandu::Sane;
 use Moo;
 use Data::Validate::URI;

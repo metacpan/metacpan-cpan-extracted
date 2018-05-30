@@ -37,6 +37,10 @@ subtest 'require' => sub {
     like dies { $js->eval("require('notStrict')") }, qr/ReferenceError/, 'dont cache bad modules';
 };
 
+subtest 'require unknown' => sub {
+    like dies { $js->eval("require('unknown')") }, qr/Can't find module 'unknown'/, 'unkown module exception';
+};
+
 subtest 'require json' => sub {
     is $js->eval("require('json/file').foo"), 'bar';
 };

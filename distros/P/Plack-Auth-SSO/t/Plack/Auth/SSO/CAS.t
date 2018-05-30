@@ -11,6 +11,9 @@ use HTTP::Cookies;
 use URI::Escape qw(uri_escape);
 use Dancer::Middleware::Rebase;
 use LWP::UserAgent;
+use URI;
+use URI::QueryParam;
+use Data::Util qw(:check);
 
 my $pkg;
 
@@ -60,8 +63,13 @@ EOF
     $cas_app = builder {
 
         mount "/login" => sub{
+            my $env = shift;
+            my $req = Plack::Request->new($env);
+            my $params = $req->query_parameters();
+            my $service = URI->new( $params->get("service") );
+            $service->query_param( ticket => "ticket" );
             [ 302, [
-                Location => "$uri_base/auth/cas?ticket=ticket"
+                Location => $service->as_string()
             ], []];
         };
         mount "/serviceValidate" => sub {
@@ -93,7 +101,8 @@ lives_ok(sub {
     $auth = $pkg->new(
         uri_base => $uri_base,
         cas_url => $cas_uri_base,
-        authorization_path => "/login"
+        authorization_path => "/login",
+        error_path => "/auth/error"
     );
 });
 
@@ -163,17 +172,29 @@ my $cookies = HTTP::Cookies->new();
 
 lives_ok(sub {$test = Plack::Test->create($app);}, "created Plack::Test");
 
-my $res = $test->request( GET "/" );
+my $res = $test->request( GET "$uri_base/" );
 
 is $res->code, 403, "/ should return status 403 when no session";
 
-$res = $test->request( GET "/login" );
+$res = $test->request( GET "$uri_base/login" );
 
 is $res->code, 401, "/login should return status 401 when no auth_sso";
 
-$res = $test->request( GET "/auth/cas" );
+$res = $test->request( GET "$uri_base/auth/cas" );
 
-is $res->header("location"), "$cas_uri_base/login?service=".uri_escape("$uri_base/auth/cas"), "/auth/cas should redirect to $cas_uri_base/login";
+$cookies->extract_cookies($res);
+
+my $state_redirect_uri = URI->new( $res->header("location") );
+
+is $state_redirect_uri->host_port().$state_redirect_uri->path(), "$cas_host:$cas_port/login", "/auth/cas should redirect to $cas_uri_base/login";
+
+my $service_uri = URI->new( $state_redirect_uri->query_param( "service" ) );
+
+is $service_uri->host_port() . $service_uri->path(), "localhost.localhost:80/auth/cas", "service param should contain /auth/cas";
+
+my $service_state = $service_uri->query_param( "state" );
+
+ok is_string($service_state), "state is set in service uri";
 
 $res = $ua->request( GET( "$cas_uri_base/login?service=".uri_escape("$uri_base/auth/cas") ) );
 
@@ -181,11 +202,19 @@ is $res->header("location"), "$uri_base/auth/cas?ticket=ticket", "$cas_uri_base/
 
 $res = $test->request( GET "$uri_base/auth/cas?ticket=ticket" );
 
+is $res->header("location"), "$uri_base/auth/error", "access callback phase without state variable should redirect to /auth/error";
+
+$res = $ua->request( GET( $state_redirect_uri->as_string() ) );
+
+my $req = GET($res->header("location"));
+$cookies->add_cookie_header( $req );
+$res = $test->request( $req );
+
 $cookies->extract_cookies($res);
 
-is $res->header("location"), "$uri_base/login", "/auth/cas should now redirect to /login";
+is $res->header("location"), "$uri_base/login", "/auth/cas with state should now redirect to /login";
 
-my $req = GET "$uri_base/login";
+$req = GET "$uri_base/login";
 $cookies->add_cookie_header( $req );
 
 $res = $test->request( $req );

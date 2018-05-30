@@ -1,5 +1,11 @@
 Revision history for Perl extension Geo::GDAL::FFI
 
+0.05_03 May 16, 2018 (yet another test release)
+     - Set GDAL_DATA only if gdal.pc is found and datadir exists.
+
+0.05_02 May 16, 2018 (yet another test release)
+     - If Perl does not support 64 bit integers, frown upon them as field values
+
 0.05 May 16, 2018
      - Explitly set GDAL_DATA
 

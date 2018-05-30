@@ -7,22 +7,20 @@ use strict;
 use warnings;
 
 use lib qw(../lib);
-use Math::AnyNum qw(:overload);
+use Math::AnyNum qw(:overload approx_cmp);
 
 sub nth_root {
     my ($n, $x) = @_;
 
-    my $eps = 10**-($Math::AnyNum::PREC >> 2);
-
     my $r = 0.0;
     my $m = 1.0;
 
-    while (abs($m - $r) > $eps) {
+    until (approx_cmp($m, $r) == 0) {
         $r = $m;
         $m = (($n - 1) * $r + $x / $r**($n - 1)) / $n;
     }
 
-    $r;
+    return $r;
 }
 
 say nth_root(2,  2);

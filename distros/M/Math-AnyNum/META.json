@@ -32,14 +32,14 @@
             "Math::GMPz" : "0.39",
             "Math::MPC" : "1.07",
             "Math::MPFR" : "3.36",
-            "perl" : "v5.14.0"
+            "perl" : "v5.16.0"
          }
       }
    },
    "provides" : {
       "Math::AnyNum" : {
          "file" : "lib/Math/AnyNum.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       }
    },
    "release_status" : "stable",
@@ -55,6 +55,6 @@
          "url" : "https://github.com/trizen/Math-AnyNum"
       }
    },
-   "version" : "0.24",
+   "version" : "0.25",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

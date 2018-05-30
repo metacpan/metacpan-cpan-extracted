@@ -13,7 +13,7 @@ use WWW::ORCID;
 use JSON;
 use Plack::Auth::SSO::ResponseParser::ORCID;
 
-our $VERSION = "0.0135";
+our $VERSION = "0.0136";
 
 with "Plack::Auth::SSO";
 
@@ -83,7 +83,13 @@ sub _build_scope {
 
 sub redirect_to_login {
 
-    my ( $self, $request ) = @_;
+    my ( $self, $request, $session ) = @_;
+
+    my $state = $self->generate_csrf_token();
+    $self->set_csrf_token(
+        $session,
+        $state
+    );
 
     my $request_uri = $request->request_uri();
     my $idx = index( $request_uri, "?" );
@@ -94,6 +100,7 @@ sub redirect_to_login {
     }
 
     my $redirect_uri = URI->new( $self->uri_for($request_uri) );
+    $redirect_uri->query_form( state => $state );
 
     my $auth_uri = $self->orcid->authorize_url(
         show_login => "true",
@@ -131,16 +138,19 @@ sub to_app {
         }
 
         my $code = $params->get("code");
+        my $state = $params->get("state");
 
         #callback phase
-        if ( is_string($code) ) {
+        if ( is_string($code) && $self->csrf_token_valid($session,$state) ) {
+
+            $self->cleanup( $session );
 
             my $error             = $params->get("error");
             my $error_description = $params->get("error_description");
 
             if ( is_string($error) ) {
 
-                return $self->redirect_to_login( $request ) if $error eq "401";
+                return $self->redirect_to_login( $request, $session ) if $error eq "401";
 
                 $self->set_auth_sso_error( $session, {
                     package    => __PACKAGE__,
@@ -167,7 +177,7 @@ sub to_app {
 
                     my $orcid_res = $json->decode( $body );
 
-                    return $self->redirect_to_login( $request ) if $orcid_res->{error} eq "401";
+                    return $self->redirect_to_login( $request, $session ) if $orcid_res->{error} eq "401";
 
                     $self->set_auth_sso_error( $session, {
                         package    => __PACKAGE__,
@@ -214,10 +224,26 @@ sub to_app {
 
         }
 
+        elsif( is_string($code) ) {
+
+            $self->cleanup( $session );
+
+            $self->set_auth_sso_error( $session,{
+                package    => __PACKAGE__,
+                package_id => $self->id,
+                type => "CSRF_DETECTED",
+                content => "CSRF_DETECTED"
+            });
+            return $self->redirect_to_error();
+
+        }
+
         #request phase
         else {
 
-            $self->redirect_to_login( $request );
+            $self->cleanup( $session );
+
+            $self->redirect_to_login( $request, $session );
 
         }
     };

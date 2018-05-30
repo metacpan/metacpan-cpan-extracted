@@ -1,3 +1,16 @@
+0.014   2018-05-25 (PERLANCAR)
+
+	- Add utility: csv-map.
+
+	- [ux] (for csv-grep, csv-map): Compile --eval code in 'main' package,
+	  turn off strict & warnings.
+
+	- csv-grep & csv-map: also set $main::row and $main::rownum like in
+	  other utilities.
+
+	- [test] Add test for csv-grep (& csv-map).
+
+
 0.013   2017-07-02 (PERLANCAR)
 
         - Add utility: csv-grep.

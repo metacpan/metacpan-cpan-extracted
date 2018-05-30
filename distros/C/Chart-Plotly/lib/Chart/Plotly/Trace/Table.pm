@@ -13,7 +13,7 @@ use Chart::Plotly::Trace::Table::Hoverlabel;
 use Chart::Plotly::Trace::Table::Stream;
 use Chart::Plotly::Trace::Table::Transform;
 
-our $VERSION = '0.019';    # VERSION
+our $VERSION = '0.020';    # VERSION
 
 # ABSTRACT: Table view for detailed data viewing. The data are arranged in a grid of rows and columns. Most styling can be specified for columns, rows or individual cells. Table is using a column-major order, ie. the grid is represented as a vector of column vectors.
 
@@ -177,7 +177,7 @@ Chart::Plotly::Trace::Table - Table view for detailed data viewing. The data are
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

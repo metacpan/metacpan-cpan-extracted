@@ -28,7 +28,7 @@ my $builder = Module::Build->new(
                   },
 
      requires => {
-                  'perl'       => '5.14.0',
+                  'perl'       => '5.16.0',
                   'Carp'       => 0,
                   'List::Util' => 0,
                   'Math::GMPq' => 0.45,

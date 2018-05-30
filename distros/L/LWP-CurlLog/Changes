@@ -1,5 +1,8 @@
 Revision history for LWP::CurlLog
 
+0.03 Wed May 23 17:13:52 CDT 2018
+    - Use options from the use line
+
 0.02 Fri Jul 21 16:16:34 CDT 2017
     - Include dependency of LWP::UserAgent
 

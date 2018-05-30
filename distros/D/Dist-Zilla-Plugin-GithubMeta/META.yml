@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,6 +20,7 @@ name: Dist-Zilla-Plugin-GithubMeta
 requires:
   Dist::Zilla: '4.101582'
   Dist::Zilla::Role::MetaProvider: '4.101582'
+  File::pushd: '0'
   IPC::Cmd: '0'
   Moose: '1.07'
   MooseX::Types::URI: '0.03'
@@ -29,4 +30,6 @@ requires:
 resources:
   homepage: https://github.com/bingos/dist-zilla-plugin-githubmeta
   repository: https://github.com/bingos/dist-zilla-plugin-githubmeta.git
-version: '0.54'
+version: '0.56'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

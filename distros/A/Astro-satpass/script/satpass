@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/env perl
 
 package Astro::satpass;
 
@@ -37,7 +37,7 @@ $clipboard_unavailable = $IO::Clipboard::clipboard_unavailable;
 #	Initialization
 #
 
-our $VERSION = '0.095';
+our $VERSION = '0.096';
 
 use constant LINFMT => <<eod;
 %s %s %8.4f %9.4f %7.1f %-4s %s
@@ -685,7 +685,7 @@ eod
 sub check_version {
     _load_module ('LWP::UserAgent', 'check_version');
     my $lwp = LWP::UserAgent->new ();
-    my $url = 'http://search.cpan.org/dist/Astro-satpass/';
+    my $url = 'http://metacpan.org/release/Astro-satpass/';
     my $rslt = $lwp->get ($url);
     if (!$rslt->is_success) {
 	die <<eod;
@@ -1297,8 +1297,8 @@ BEGIN {
 }
 sub help {
 if ($parm{webcmd}) {
-    CORE::system (join ' ', $parm{webcmd},
-	"http://search.cpan.org/~wyant/Astro-satpass-$VERSION/");
+    CORE::system { $parm{webcmd} } $parm{webcmd},
+	"https://metacpan.org/release/WYANT/Astro-satpass-$VERSION";
     }
   else {
     my $arg = defined $_[0] ? lc $_[0] : '';
@@ -1334,7 +1334,7 @@ Normally, we would display the documentation for the satpass
 script here. But unfortunately this depends on the ability to
 spawn the perldoc command, and we do not have this ability under
 Mac OS 9 and earlier. You can find the same thing online at
-http://search.cpan.org/dist/Astro-satpass/
+http://metacpan.org/release/Astro-satpass/
 
 eod
 }
@@ -4071,7 +4071,7 @@ affect the directory in which you find yourself after exiting satpass.
 
 =item check_version
 
-This command downloads L<http://search.cpan.org/dist/Astro-satpass/>,
+This command downloads L<http://metacpan.org/release/Astro-satpass/>,
 parses out the version, and compares it to the version of this script,
 displaying both versions and the result of the comparison. The intent
 is to provide a mechanism for checking the currency of this script in
@@ -4512,7 +4512,7 @@ the appropriate arguments, as follows:
 The viewer is whatever is the default for your system.
 
 If you set the L<webcmd|/webcmd> parameter properly, this
-command will launch the L<http://search.cpan.org/> page for this
+command will launch the L<http://metacpan.org/> page for this
 package, and any arguments will be ignored.
 
 =for html <a name="list"></a>
@@ -5709,7 +5709,7 @@ The default is 1 (i.e. true).
 This parameter specifies the system command to spawn to display a
 web page. If not the empty string, the L<help|/help> command
 uses it to display the help for this package on
-L<http://search.cpan.org/>. Mac OS X users will find 'open' a useful
+L<http://metacpan.org/>. Mac OS X users will find 'open' a useful
 setting, and Windows users will find 'start' useful.
 
 This functionality was added on speculation, since there is no good

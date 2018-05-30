@@ -51,7 +51,7 @@ my %WriteMakefileArgs = (
     "Time::Moment" => 0,
     "bignum" => 0
   },
-  "VERSION" => "4.3",
+  "VERSION" => "4.4",
   "test" => {
     "TESTS" => "t/*.t"
   }

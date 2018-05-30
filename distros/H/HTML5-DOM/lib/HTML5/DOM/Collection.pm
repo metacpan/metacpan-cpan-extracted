@@ -35,6 +35,25 @@ sub each {
 	return $self;
 }
 
+sub map {
+	my $self = shift;
+	my @result;
+	if (ref($_[0]) eq 'CODE') {
+		my $method = shift;
+		my $index = 0;
+		for my $node (@$self) {
+			push @result, $method->($node, $index, @_);
+			++$index;
+		}
+	} else {
+		my $method = shift;
+		for my $node (@$self) {
+			push @result, $node->$method(@_);
+		}
+	}
+	return HTML5::DOM::Collection->new(\@result);
+}
+
 sub text {
 	my @nodes;
 	for my $node (@{shift()}) {

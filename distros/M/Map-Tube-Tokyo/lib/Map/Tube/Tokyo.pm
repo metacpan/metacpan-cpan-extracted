@@ -1,6 +1,6 @@
 package Map::Tube::Tokyo;
 
-$Map::Tube::Tokyo::VERSION   = '0.43';
+$Map::Tube::Tokyo::VERSION   = '0.44';
 $Map::Tube::Tokyo::AUTHORITY = 'cpan:MANWAR';
 
 =encoding utf8
@@ -11,7 +11,7 @@ Map::Tube::Tokyo - Interface to the Tokyo Subway Map.
 
 =head1 VERSION
 
-Version 0.43
+Version 0.44
 
 =cut
 
@@ -106,7 +106,8 @@ base64 encoded string of the entire map.
 
     my $subway = Map::Tube::Tokyo->new;
     my $map    = $subway->name;
-    open(my $IMAGE, ">$map.png");
+    open(my $IMAGE, ">", "$map.png")
+       or die "ERROR: Can't open [$map.png]: $!";
     binmode($IMAGE);
     print $IMAGE decode_base64($subway->as_image);
     close($IMAGE);

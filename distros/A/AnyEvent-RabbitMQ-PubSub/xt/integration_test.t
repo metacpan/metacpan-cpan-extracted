@@ -13,9 +13,9 @@ use Test::More tests => 1;
 my $rmq_connect_opts = {
     host  => $ENV{RMQ_HOST} // 'localhost',
     port  => 5672,
-    user  => 'guest',
-    pass  => 'guest',
-    vhost => '/',
+    user  => $ENV{RMQ_USER} // 'guest',
+    pass  => $ENV{RMQ_PASS} // 'guest',
+    vhost => $ENV{RMQ_VHOST} // 'test',
 };
 
 my $exchange = {

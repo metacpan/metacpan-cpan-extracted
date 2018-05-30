@@ -14,19 +14,19 @@ use Math::AnyNum qw(
   tau
   ln2
   phi
-  euler
-  catalan
+  EulerGamma
+  CatalanG
   Inf
   NaN
   );
 
-like(e,       qr/^2\.718281828459\d*\z/);
-like(pi,      qr/^3\.141592653589\d*\z/);
-like(tau,     qr/^6\.283185307179\d*\z/);
-like(ln2,     qr/^0\.693147180559\d*\z/);
-like(phi,     qr/^1\.618033988749\d*\z/);
-like(euler,   qr/^0\.577215664901\d*\z/);
-like(catalan, qr/^0\.915965594177\d*\z/);
+like(e,          qr/^2\.718281828459\d*\z/);
+like(pi,         qr/^3\.141592653589\d*\z/);
+like(tau,        qr/^6\.283185307179\d*\z/);
+like(ln2,        qr/^0\.693147180559\d*\z/);
+like(phi,        qr/^1\.618033988749\d*\z/);
+like(EulerGamma, qr/^0\.577215664901\d*\z/);
+like(CatalanG,   qr/^0\.915965594177\d*\z/);
 
 is(i,   'i');
 is(Inf, 'Inf');

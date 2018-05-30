@@ -1,8 +1,6 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-use FindBin;
-use lib "$FindBin::Bin/../lib/";
 use Perl::Build;
 use Getopt::Long;
 use Pod::Usage;
@@ -127,7 +125,7 @@ perl-build - perl binary builder
 =head1 SYNOPSIS 
 
     # perl-build command is FatPacker ready
-    % curl https://raw.github.com/tokuhirom/Perl-Build/master/perl-build | perl - 5.16.2 /opt/perl-5.16/
+    % curl -L https://raw.github.com/tokuhirom/Perl-Build/master/perl-build | perl - 5.16.2 /opt/perl-5.16/
 
     # Or, just install from CPAN
     % cpanm Perl::Build

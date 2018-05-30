@@ -169,7 +169,7 @@ is( $commit->branch, 'master' );
 is( $commit->log,    "import old content" );
 is( $commit->id,     shift @{ $commits{master} } );
 
-TestBot->expect( '#test 03Test U. Ser (03ser) 05master '
+TestBot->expect( 'dummy/#test 03Test U. Ser (03ser) 05master '
         . $commit->id
         . ' 12test/06there 03old import old content * 14http://scm.host.org/there/master/?commit='
         . $commit->id
@@ -191,7 +191,7 @@ ok( !ref($commit), 'squashed commit is a plain string' ) or BAIL_OUT 'will fail 
 
 my $commit_id = shift @{ $commits{master} };
 
-TestBot->expect( "#test "
+TestBot->expect( "dummy/#test "
         . ${TestBot::COMMIT_USER}
         . " 05master $commit_id "
         . "12test/06there 3 commits pushed, "
@@ -212,7 +212,7 @@ ok( defined($commit), 'squashed new branch commit exists' ) or BAIL_OUT "prematu
 ok( !ref($commit), 'squashed commit is a plain string' )
     or BAIL_OUT "will fail with $commit anyway";
 
-TestBot->expect( "#test "
+TestBot->expect( "dummy/#test "
         . ${TestBot::COMMIT_USER}
         . " 05feature "
         . $commit_id

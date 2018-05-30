@@ -12,9 +12,9 @@ my $build = Module::Build->new(
     },
     meta_merge => {
         resources => {
-            homepage   => 'http://search.cpan.org/dist/Data-Types/',
-            bugtracker => 'http://github.com/theory/data-types/issues/',
-            repository => 'http://github.com/theory/data-types/',
+            homepage   => 'https://metacpan.org/pod/Data::Types/',
+            bugtracker => 'http://github.com/manwar/data-types/issues/',
+            repository => 'http://github.com/manwar/data-types/',
         }
     },
 );

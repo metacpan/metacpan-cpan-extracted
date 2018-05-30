@@ -4,7 +4,7 @@ DBIx::Class::Helper::ResultSet::WindowFunctions - Add support for window functio
 
 # VERSION
 
-version v0.1.1
+version v0.1.2
 
 # SYNOPSIS
 

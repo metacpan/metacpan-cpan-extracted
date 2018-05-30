@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.net.URI;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,10 +51,10 @@ class PlJavaCompiler {
 
     static ArrayList<SourceCode> compilationUnits;
     static ExtendedStandardJavaFileManager fileManager;
-    static DynamicClassLoader classLoader;
+    static public DynamicClassLoader classLoader;
     static JavaCompiler javac;
     static Boolean initDone;
-    static int invocationCount = 0;
+    static List<String> optionList;
 
     public static void init() throws Exception
     {
@@ -67,13 +67,43 @@ class PlJavaCompiler {
         // }
 
         javac = ToolProvider.getSystemJavaCompiler();
-        classLoader = new DynamicClassLoader(ClassLoader.getSystemClassLoader());
+        classLoader = new DynamicClassLoader( new PlArray().getClass().getClassLoader() );
+        // classLoader = new DynamicClassLoader(ClassLoader.getSystemClassLoader());
         compilationUnits = new ArrayList<SourceCode>();
+
+        optionList = new ArrayList<String>();
+        // set compiler's classpath to be same as the runtime's
+        StringBuilder cp = new StringBuilder();
+        int cpCount = 0;
+        try {
+            for (URL url : ((URLClassLoader) (Thread.currentThread().getContextClassLoader())).getURLs()) {
+                // System.out.println("url: " + url.getFile());
+                if (cpCount++ != 0) {
+                    cp.append(":");
+                }
+                cp.append(url.getFile());
+            }
+        }
+        catch (Exception e) {
+            // java.base/jdk.internal.loader.ClassLoaders$AppClassLoader cannot be cast to
+            //      java.base/java.net.URLClassLoader
+        }
+        String systemCp = System.getProperty("java.class.path");
+        if (! systemCp.equals("")) {
+            if (cpCount++ != 0) {
+                cp.append(":");
+            }
+            cp.append(systemCp);
+        }
+        optionList.addAll(Arrays.asList("-classpath", cp.toString()));
+        optionList.addAll(Arrays.asList("-source",    "7"));
+        // optionList.addAll(Arrays.asList("-Xlint:deprecation"));
     }
 
     public static PlObject eval_java_string(PlArray List__)
     {
 
+        String className = List__.shift().toString();
         String source    = List__.shift().toString();
         String constants = List__.shift().toString();
 
@@ -89,27 +119,40 @@ class PlJavaCompiler {
             }
 
             // TODO - test local(); initialize local() stack if needed
-            String className = "PlEval" + invocationCount;
-            invocationCount++;
 
-            StringBuffer source5 = new StringBuffer();
-            source5.append("import org.perlito.Perlito5.*;\n");
-            source5.append("import java.util.regex.Pattern;\n");
-            source5.append("public class " + className + " {\n");
+            StringBuilder source5 = new StringBuilder();
             source5.append(constants);
-            source5.append("    public " + className + "() {\n");
-            source5.append("    }\n");
+            source5.append("    @SuppressWarnings(\"unchecked\")");
             source5.append("    public static PlObject runEval(int want, PlArray List__) {\n");
+            source5.append("        int return_context = want;\n");
             source5.append("        try {\n");
             source5.append("        " + source + "\n");
             source5.append("        }\n");
             source5.append("        catch(PlReturnException e) {\n");
             source5.append("            return e.ret;\n");
             source5.append("        }\n");
+            source5.append("        catch(PlNextException e) {\n");
+            source5.append("            throw(e);\n");
+            source5.append("        }\n");
+            source5.append("        catch(PlLastException e) {\n");
+            source5.append("            throw(e);\n");
+            source5.append("        }\n");
+            source5.append("        catch(PlRedoException e) {\n");
+            source5.append("            throw(e);\n");
+            source5.append("        }\n");
+            source5.append("        catch(Exception e) {\n");
+            // source5.append("            e.printStackTrace();\n");
+            source5.append("            String message = e.getMessage();\n");
+            source5.append("            PlV.Scalar_EVAL_ERROR.set(new PlString(\"\" + message));\n");
+            source5.append("            return PerlOp.context(want);\n");
+            source5.append("        }\n");
             source5.append("    }\n");
             source5.append("}\n");
             String cls5 = source5.toString();
-            // System.out.println("\neval_ast:\n" + cls5 + "\n");
+
+            if ( PlV.sget("Perlito5::Java::DEBUG").get().to_boolean() ) {
+                System.out.println("\neval_ast:\n" + cls5 + "\n");
+            }
 
             // TODO - retrieve errors in Java->bytecode
             Class<?> class5 = compileClassInMemory(
@@ -137,7 +180,7 @@ class PlJavaCompiler {
             // e.printStackTrace();
             String message = e.getMessage();
             // System.out.println("Exception in eval_string: " + message);
-            PlV.sset("main::@", new PlString(message));
+            PlV.Scalar_EVAL_ERROR.set(new PlString("" + message));
         }
         return PlCx.UNDEF;
     }
@@ -146,7 +189,8 @@ class PlJavaCompiler {
         String      source, 
         String      namespace, 
         String      wantarray, 
-        int         strict,
+        PlInt       scalar_hints,   // $^H
+        PlHashRef   hash_hints,     // \%^H
         PlObject    scope,          // "my" declarations
         String[]    scalar_name,    // new String[]{"x_100"};   capture name
         PlLvalue[]  scalar_val,     // new PlLvalue[]{x_100};   capture value
@@ -161,21 +205,26 @@ class PlJavaCompiler {
         // System.out.println("eval_string: enter");
         // (new Throwable()).printStackTrace();
 
+        String className;
         String outJava;
         String constants;
+        PlObject tmp_scalar_hints = PlV.sget("main::" + (char)8).get();   // save $^H
+        PlHash   tmp_hash_hints   = new PlHash(PlV.hash_get("main::" + (char)8));  // save %^H
         try {
 
-            // Perlito5::Java::JavaCompiler::perl5_to_java($source, $namespace, $want, $strict, $scope_java)
+            PlV.sset("main::" + (char)8, scalar_hints);                   // $^H
+            PlV.hash_set("main::" + (char)8, hash_hints.hash_deref_strict());    // %^H
+            // Perlito5::Java::JavaCompiler::perl5_to_java($source, $namespace, $want, $scope_java)
             PlObject code[] = org.perlito.Perlito5.LibPerl.apply(
                 "Perlito5::Java::Runtime::perl5_to_java",
                 new PlString(source),
                 new PlString(namespace),
                 new PlString(wantarray),
-                new PlInt(strict),
                 scope
             );
-            outJava = code[0].toString();
-            constants = code[1].toString();
+            className = code[0].toString();
+            outJava   = code[1].toString();
+            constants = code[2].toString();
             // System.out.println("eval_string: from Perlito5::Java::JavaCompiler::perl5_to_java \n[[[ " + outJava + " ]]");
             // System.out.println("eval_string: constants \n[[[ " + constants + " ]]");
         }
@@ -183,13 +232,18 @@ class PlJavaCompiler {
             // e.printStackTrace();
             String message = e.getMessage();
             // System.out.println("Exception in eval_string: " + message);
-            PlV.sset("main::@", new PlString(message));
+            PlV.Scalar_EVAL_ERROR.set(new PlString("" + message));
+            PlV.sset("main::" + (char)8, tmp_scalar_hints);     // restore $^H
+            PlV.hash_set("main::" + (char)8, tmp_hash_hints);   // restore %^H
             return PlCx.UNDEF;
         }
+        PlV.sset("main::" + (char)8, tmp_scalar_hints);     // restore $^H
+        PlV.hash_set("main::" + (char)8, tmp_hash_hints);   // restore %^H
 
         // return eval_java_string(outJava.toString());
 
         if (source.equals("")) {
+            PlV.Scalar_EVAL_ERROR.set(PlCx.EMPTY);
             return PlCx.UNDEF;
         }
 
@@ -201,19 +255,12 @@ class PlJavaCompiler {
             }
 
             // TODO - test local(); initialize local() stack if needed
-            String className = "PlEval" + invocationCount;
-            invocationCount++;
 
-            StringBuffer source5 = new StringBuffer();
-            source5.append("import org.perlito.Perlito5.*;\n");
-            source5.append("import java.util.regex.Pattern;\n");
-            source5.append("public class " + className + " {\n");
-
+            StringBuilder source5 = new StringBuilder();
             source5.append(constants);
-
-            source5.append("    public " + className + "() {\n");
-            source5.append("    }\n");
+            source5.append("    @SuppressWarnings(\"unchecked\")");
             source5.append("    public static PlObject runEval(int want, Object scalar_val, Object array_val, Object hash_val, PlArray List__) {\n");
+            source5.append("        int return_context = want;\n");
             for (int i = 0; i < scalar_name.length; i++) {
             source5.append("        PlLvalue " + scalar_name[i] + " = ((PlLvalue[])(scalar_val))[" + i + "];\n");
             }
@@ -224,30 +271,39 @@ class PlJavaCompiler {
             source5.append("        PlHash " + hash_name[i] + " = ((PlHash[])(hash_val))[" + i + "];\n");
             }
             source5.append("        try {\n");
-            source5.append("            return " + outJava + ";\n");
+            source5.append("            PlObject ret = " + outJava + ";\n");
+            source5.append("            PlV.Scalar_EVAL_ERROR.set(PlCx.EMPTY);\n");
+            source5.append("            return ret;\n");
             source5.append("        }\n");
             source5.append("        catch(PlReturnException e) {\n");
+            source5.append("            PlV.Scalar_EVAL_ERROR.set(PlCx.EMPTY);\n");
             source5.append("            return e.ret;\n");
             source5.append("        }\n");
             source5.append("        catch(PlNextException e) {\n");
+            source5.append("            PlV.Scalar_EVAL_ERROR.set(PlCx.EMPTY);\n");
             source5.append("            throw(e);\n");
             source5.append("        }\n");
             source5.append("        catch(PlLastException e) {\n");
+            source5.append("            PlV.Scalar_EVAL_ERROR.set(PlCx.EMPTY);\n");
             source5.append("            throw(e);\n");
             source5.append("        }\n");
             source5.append("        catch(PlRedoException e) {\n");
+            source5.append("            PlV.Scalar_EVAL_ERROR.set(PlCx.EMPTY);\n");
             source5.append("            throw(e);\n");
             source5.append("        }\n");
             source5.append("        catch(Exception e) {\n");
             // source5.append("            e.printStackTrace();\n");
             source5.append("            String message = e.getMessage();\n");
-            source5.append("            PlV.sset(\"main::@\", new PlString(message));\n");
+            source5.append("            PlV.Scalar_EVAL_ERROR.set(new PlString(\"\" + message));\n");
             source5.append("            return PerlOp.context(want);\n");
             source5.append("        }\n");
             source5.append("    }\n");
             source5.append("}\n");
             String cls5 = source5.toString();
-            // System.out.println("\neval_perl_string:\n" + cls5 + "\n");
+
+            if ( PlV.sget("Perlito5::Java::DEBUG").get().to_boolean() ) {
+                System.out.println("\neval_perl_string:\n" + cls5 + "\n");
+            }
 
             // TODO - retrieve errors in Java->bytecode
             Class<?> class5 = compileClassInMemory(
@@ -275,7 +331,7 @@ class PlJavaCompiler {
             // e.printStackTrace();
             String message = e.getMessage();
             // System.out.println("Exception in eval_string: " + message);
-            PlV.sset("main::@", new PlString(message));
+            PlV.Scalar_EVAL_ERROR.set(new PlString("" + message));
         }
         return PlCx.UNDEF;
     }
@@ -295,11 +351,6 @@ class PlJavaCompiler {
             // reusing the file manager; replace the source code
             compilationUnits.set(0, sourceCodeObj);
         }
-
-        List<String> optionList = new ArrayList<String>();
-        // set compiler's classpath to be same as the runtime's
-        optionList.addAll(Arrays.asList("-classpath", System.getProperty("java.class.path")));
-        optionList.addAll(Arrays.asList("-source",    "7"));
 
         // run the compiler
         JavaCompiler.CompilationTask task = javac.getTask(null, fileManager,

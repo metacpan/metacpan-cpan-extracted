@@ -8,7 +8,9 @@ use Perlito5::Grammar::Statement;
 use Perlito5::Grammar::Control;
 use Perlito5::Grammar::Precedence;
 use Perlito5::Grammar::Expression;
+use Perlito5::Grammar::CORE;
 use Perlito5::Macro;
+use Perlito5::Regex;
 use Perlito5::Runtime;
 use Perlito5::AST::CompileTime;
 use Perlito5::Dumper;
@@ -25,6 +27,13 @@ sub do_not_edit {
 
 sub error {
     die join('', @_) . ' at ' . $Perlito5::FILE_NAME . ' line ' . $Perlito5::LINE_NUMBER . "\n";
+}
+
+sub compiler_pos {
+    return {
+        file => $Perlito5::FILE_NAME,
+        line => $Perlito5::LINE_NUMBER,
+    };
 }
 
 1;

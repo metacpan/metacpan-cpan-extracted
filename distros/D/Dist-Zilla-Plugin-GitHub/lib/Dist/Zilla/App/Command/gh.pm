@@ -4,7 +4,7 @@ package Dist::Zilla::App::Command::gh;
 use strict;
 use warnings;
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 use Dist::Zilla::App -command;
 
@@ -36,7 +36,9 @@ sub execute {
     my $zilla = $self->zilla;
 
     $_->gather_files for
-        @{ $zilla->plugins_with(-FileGatherer) };
+        eval { Dist::Zilla::App->VERSION('7.000') }
+            ? $zilla->plugins_with(-FileGatherer)
+            : @{ $zilla->plugins_with(-FileGatherer) };
 
     if ($arg->[0] eq 'create') {
         require Dist::Zilla::Dist::Minter;
@@ -84,7 +86,7 @@ Dist::Zilla::App::Command::gh - Use the GitHub plugins from the command-line
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 SYNOPSIS
 
@@ -98,6 +100,12 @@ version 0.44
 
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-GitHub>
 (or L<bug-Dist-Zilla-Plugin-GitHub@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-GitHub@rt.cpan.org>).
+
+There is also a mailing list available for users of this distribution, at
+L<http://dzil.org/#mailing-list>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
 =head1 AUTHOR
 

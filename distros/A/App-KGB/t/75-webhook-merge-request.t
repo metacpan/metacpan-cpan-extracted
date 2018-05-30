@@ -47,7 +47,7 @@ my $webhook_url = sprintf(
     $test_bot->addr,
     $test_bot->port,
     join( '&',
-        'channel=test', 'network=local', 'use_color=0', 'shorten_urls=0' )
+        'channel=test', 'network=dummy', 'use_color=0', 'shorten_urls=0' )
 );
 
 sub webhook_post {
@@ -68,6 +68,7 @@ my $resp = webhook_post(
             target_branch => "nevermore",
             action        => 'open',
             url           => 'http://git/merge_requests/42',
+            title         => 'nope nope',
         },
     }
 );
@@ -76,9 +77,10 @@ is( $resp->code, 202, 'commit note event response status is 202' ) or diag $resp
 
 TestBot->expect(
     join( ' ',
-        '#test Test User',
+        'dummy/#test Test User',
         'nevermore test-repo',
-        '* [open] merge request !42',
+        '* [open] merge request !42:',
+        'nope nope',
         '* http://git/merge_requests/42',
     )
 );

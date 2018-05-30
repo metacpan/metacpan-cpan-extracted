@@ -14,7 +14,7 @@ use Chart::Plotly::Trace::Surface::Lightposition;
 use Chart::Plotly::Trace::Surface::Stream;
 use Chart::Plotly::Trace::Surface::Transform;
 
-our $VERSION = '0.019';    # VERSION
+our $VERSION = '0.020';    # VERSION
 
 # ABSTRACT: The data the describes the coordinates of the surface is set in `z`. Data in `z` should be a {2D array}. Coordinates in `x` and `y` can either be 1D {arrays} or {2D arrays} (e.g. to graph parametric surfaces). If not provided in `x` and `y`, the x and y coordinates are assumed to be linear starting at 0 with a unit step. The color scale corresponds to the `z` values by default. For custom color scales, use `surfacecolor` which should be a {2D array}, where its bounds can be controlled using `cmin` and `cmax`.
 
@@ -288,7 +288,7 @@ Chart::Plotly::Trace::Surface - The data the describes the coordinates of the su
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

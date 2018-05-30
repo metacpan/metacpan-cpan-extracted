@@ -1,5 +1,10 @@
 Revision history for Geo-Coder-Postcodes
 
+0.05	Sat 26 May 08:56:29 EDT 2018
+	Find Bolton-upon-Dearne, which is not listed in a county
+	Find Southend-on-Sea
+	Find St Nicholas-at-Wade in Kent
+
 0.04	Sat Oct 21 18:11:19 EDT 2017
 	Find places with spaces in them, such as South Bersted
 

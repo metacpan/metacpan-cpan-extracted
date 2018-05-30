@@ -117,7 +117,7 @@ for my $codec ( sort keys %encoders ) {
 }
 
 for my $codec ( sort keys %decoders ) {
-    subtest "Check '$codec' encoding for leaks" => sub {
+    subtest "Check '$codec' decoding for leaks" => sub {
         # Test for leaks
         for my $key ( sort keys %encoded ) {
             my $case = "$key|$codec";

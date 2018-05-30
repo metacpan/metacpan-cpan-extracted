@@ -3,7 +3,7 @@ use warnings;
 package Graphics::Raylib::Util;
 
 # ABSTRACT: Utility functions for use with Graphics::Raylib::XS
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 use List::Util qw(reduce);
 use Graphics::Raylib::XS qw(:all);
@@ -37,7 +37,7 @@ Graphics::Raylib::Util - Utility functions for use With Graphics::Raylib::XS
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 

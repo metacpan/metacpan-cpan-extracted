@@ -1,10 +1,40 @@
 ==================================================
-Changes from 2017-05-13 00:00:00 +0000 to present.
+Changes from 2017-05-26 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 2.5 at 2018-05-13 08:45:28 +0000
+version 2.6 at 2018-05-26 18:57:02 +0000
 ----------------------------------------
+
+  Change: a0c2d84fc4b79a5c0a081faec3bb9fdd49a31f15
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2018-05-26 21:56:26 +0000
+
+    Merge pull request #26 from Madskill/minor_fix
+
+    Minor fix 
+
+  Change: f1eb3fdea4adfa7444fe4510fde63aab5047b301
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-05-26 21:54:47 +0000
+
+    fix 
+
+  Change: 12c603951d3c2e262de7cb4733f02a13a30d55fc
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-05-26 21:46:00 +0000
+
+    minor fix 
+
+----------------------------------------
+version 2.5 at 2018-05-13 08:46:04 +0000
+----------------------------------------
+
+  Change: 78abccf22ae76bf8fad094205702f7eb639b53a2
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-05-13 11:46:04 +0000
+
+    Version 2.5 
 
   Change: f0b530e4a7bbf7ffc43fc5ac0921a24c32574e82
   Author: Igor <igor-sverdlov@mail.ru>
@@ -27,5 +57,5 @@ version 2.5 at 2018-05-13 08:45:28 +0000
     use sysopen 
 
 =================================================
-Plus 24 releases after 2017-05-13 00:00:00 +0000.
+Plus 24 releases after 2017-05-26 00:00:00 +0000.
 =================================================

@@ -13,7 +13,7 @@ my $year  = 2007;
 sub startup : Test(startup => 2) {
 
     use_ok('Date::Holidays');
-    use_ok('Date::Holidays::POLYMORPHIC');
+    use_ok('Date::Holidays::Polymorphic');
 
     return 1;
 }
@@ -22,8 +22,8 @@ sub test_polymorphic_interface : Test(13) {
 
     # bare
 
-    ok(my $polymorphic = Date::Holidays::POLYMORPHIC->new());
-    isa_ok($polymorphic, 'Date::Holidays::POLYMORPHIC', 'checking OOP class object');
+    ok(my $polymorphic = Date::Holidays::Polymorphic->new());
+    isa_ok($polymorphic, 'Date::Holidays::Polymorphic', 'checking OOP class object');
     can_ok($polymorphic, qw(new holidays is_holiday));
 
     ok($polymorphic->holidays());
@@ -31,7 +31,7 @@ sub test_polymorphic_interface : Test(13) {
 
     # wrapper
 
-    ok(my $dh = Date::Holidays->new(nocheck => 1, countrycode => 'polymorphic'));
+    ok(my $dh = Date::Holidays->new(nocheck => 1, countrycode => 'Polymorphic'));
     isa_ok($dh, 'Date::Holidays', 'checking wrapper object');
     can_ok($dh, qw(new holidays is_holiday));
 
@@ -41,7 +41,7 @@ sub test_polymorphic_interface : Test(13) {
 
     #inner
 
-    isa_ok($dh->{_inner_object}, 'Date::Holidays::Adapter::POLYMORPHIC', 'checking _inner_object');
+    isa_ok($dh->{_inner_object}, 'Date::Holidays::Adapter::Polymorphic', 'checking _inner_object');
     can_ok($dh->{_inner_object}, qw(new holidays is_holiday));
 }
 

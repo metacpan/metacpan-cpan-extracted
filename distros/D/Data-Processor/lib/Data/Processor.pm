@@ -2,7 +2,7 @@ package Data::Processor;
 
 use strict;
 use 5.010_001;
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 use Carp;
 use Data::Processor::Error::Collection;
@@ -420,7 +420,7 @@ Obviously this can be nested all the way down:
 
 =head2 array
 
- To have a key point to an array of things, simply use the array key. So:
+To have a key point to an array of things, simply use the array key. So:
 
  my $schema = {
     houses => {
@@ -428,11 +428,11 @@ Obviously this can be nested all the way down:
     }
  };
 
- Would describe a structure like:
+Would describe a structure like:
 
  { houses => [] }
 
- And of course you can nest within here so:
+And of course you can nest within here so:
 
  my $schema = {
     houses => {
@@ -446,7 +446,7 @@ Obviously this can be nested all the way down:
     },
  };
 
- Might describe:
+Might describe:
 
  {
    houses => [

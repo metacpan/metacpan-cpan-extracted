@@ -1,3 +1,13 @@
+0.109		2018-05-23	T. R. Wyant
+    Update canned status table for decay of
+    - Iridium 25
+    - Iridium 72
+
+    Fix portability issue in eg/sh_script. Thanks to Thomas Klausner for
+    picking up on this.
+    
+    Added -identity as valid option for script/SpaceTrack.
+
 0.108		2018-05-08	T. R. Wyant
     Iridium 13 decayed. Canned status update.
 

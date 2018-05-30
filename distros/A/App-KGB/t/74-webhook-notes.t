@@ -47,7 +47,7 @@ my $webhook_url = sprintf(
     $test_bot->addr,
     $test_bot->port,
     join( '&',
-        'channel=test', 'network=local', 'use_color=0', 'shorten_urls=0' )
+        'channel=test', 'network=dummy', 'use_color=0', 'shorten_urls=0' )
 );
 
 sub webhook_post {
@@ -78,7 +78,7 @@ is( $resp->code, 202, 'commit note event response status is 202' ) or diag $resp
 
 TestBot->expect(
     join( ' ',
-        '#test Test User',
+        'dummy/#test Test User',
         'test-repo',
         '42',
         '* commented commit 4242424',
@@ -104,7 +104,7 @@ is( $resp->code, 202, 'merge request note event response status is 202' ) or dia
 
 TestBot->expect(
     join( ' ',
-        '#test Test User',
+        'dummy/#test Test User',
         'test-repo',
         '42',
         '* commented merge request !4242',
@@ -130,7 +130,7 @@ is( $resp->code, 202, 'issue note event response status is 202' ) or diag $resp-
 
 TestBot->expect(
     join( ' ',
-        '#test Test User',
+        'dummy/#test Test User',
         'test-repo',
         '42',
         '* commented issue #4242',
@@ -156,7 +156,7 @@ is( $resp->code, 202, 'code snippet note event response status is 202' ) or diag
 
 TestBot->expect(
     join( ' ',
-        '#test Test User',
+        'dummy/#test Test User',
         'test-repo',
         '42',
         '* commented snippet #4242',

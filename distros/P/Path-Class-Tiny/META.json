@@ -1,0 +1,70 @@
+{
+   "abstract" : "a Path::Tiny wrapper for Path::Class compatibility",
+   "author" : [
+      "Buddy Burden <barefootcoder@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Path-Class-Tiny",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "Module::Runtime" : "0",
+            "Path::Tiny" : "0.104",
+            "perl" : "v5.10.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Temp" : "0",
+            "Test::Most" : "0.25"
+         }
+      }
+   },
+   "provides" : {
+      "Path::Class::Tiny" : {
+         "file" : "lib/Path/Class/Tiny.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/barefootcoder/path-class-tiny/issues"
+      },
+      "homepage" : "https://github.com/barefootcoder/path-class-tiny",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/barefootcoder/path-class-tiny.git",
+         "web" : "https://github.com/barefootcoder/path-class-tiny"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::XS version 3.03"
+}
+

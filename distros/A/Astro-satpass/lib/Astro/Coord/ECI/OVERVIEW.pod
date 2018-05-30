@@ -84,7 +84,7 @@ perl, please submit a bug report.
 Other examples are available in the F<eg> directory of the distribution. 
 
 Both the module documentation and the F<eg> directory are available
-online at L<http://search.cpan.org/dist/Astro-satpass/>. For the F<eg>
+online at L<https://metacpan.org/release/Astro-satpass>. For the F<eg>
 directory you will need to follow the [F<browse>] link near the top of
 the page.
 

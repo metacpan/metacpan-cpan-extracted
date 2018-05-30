@@ -11,8 +11,6 @@ my $day = 24;
 
 #run prior and once per suite
 sub startup : Test(startup => 1) {
-    diag("starting up...");
-
     use_ok('Date::Holidays');
 }
 
@@ -22,10 +20,10 @@ sub test_supered_implementation : Test(12) {
         eval { require Date::Holidays::Super };
         skip "Date::Holidays::Super not installed", 12 if $@;
 
-        use_ok('Date::Holidays::SUPERED');
+        use_ok('Date::Holidays::Supered');
 
-        ok(my $supered = Date::Holidays::SUPERED->new());
-        isa_ok($supered, 'Date::Holidays::SUPERED');
+        ok(my $supered = Date::Holidays::Supered->new());
+        isa_ok($supered, 'Date::Holidays::Supered');
         can_ok($supered, qw(new holidays is_holiday));
 
         ok($supered->holidays($year), 'Testing holidays');

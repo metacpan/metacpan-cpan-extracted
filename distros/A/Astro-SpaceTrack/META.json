@@ -9,7 +9,7 @@
       "perl_5"
    ],
    "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
       "version" : 2
    },
    "name" : "Astro-SpaceTrack",
@@ -60,7 +60,7 @@
    "provides" : {
       "Astro::SpaceTrack" : {
          "file" : "lib/Astro/SpaceTrack.pm",
-         "version" : "0.108"
+         "version" : "0.109"
       }
    },
    "release_status" : "stable",
@@ -77,6 +77,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-SpaceTrack"
       }
    },
-   "version" : "0.108",
+   "version" : "0.109",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

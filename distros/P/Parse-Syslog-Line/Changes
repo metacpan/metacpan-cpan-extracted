@@ -1,9 +1,73 @@
 ==================================================
-Changes from 2016-05-11 00:00:00 +0000 to present.
+Changes from 2016-05-25 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 4.3 at 2018-05-11 23:44:08 +0000
+version 4.4 at 2018-05-25 01:29:58 +0000
+----------------------------------------
+
+  Change: 67342e8bc50bdbf2811bacf7c1983f09b287dbfc
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-05-24 18:29:27 +0000
+
+    Ignore log files in the repo used for testing 
+
+  Change: 00c03f59e6596375829b1db6ff036af22221075f
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-05-24 18:27:17 +0000
+
+    fixup 
+
+  Change: 33e610806f083ea6c25747e23296c7b1a9eae653
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-05-24 10:39:19 +0000
+
+    Version Bump for the 4.4 Release 
+
+  Change: 979c1d8ad55eb5df058a19e6c8c4b21f7fded203
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-05-24 10:24:59 +0000
+
+    Added a complex k/v log entry to the benchmark suite 
+
+  Change: 69a93d7107568855853f503c3db878893a85d536
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-05-24 10:24:59 +0000
+
+    Improve Key/Value Detection
+
+    Be smarter about handling key/value pairs. This isn't perfect, but it's a
+    lot better than the previous revision. This will strip all "brackets" from
+    the front and end of values and uses a smart regex to figure out the
+    boundaries for the values. This allows for k/v detection on fields like:
+
+    dateStarted=2018-05-24 10:11:23 +00:00 dateStopped=2018-05-24 10:14:23
+    +00:00
+
+    And wind up with:
+
+    {
+
+    ...
+
+    SDATA => {
+
+    ...
+
+    dateStarted => '2018-05-24 10:11:23 +00:00',
+
+    dateStopped => '2018-05-24 10:14:23 +00:00',
+
+    ...
+
+    }
+
+    }
+
+    Unstructured logs are fun! 
+
+----------------------------------------
+version 4.3 at 2018-05-11 23:43:58 +0000
 ----------------------------------------
 
   Change: a2601667283958a3ac28200573c931363afedac8
@@ -359,5 +423,5 @@ version 3.4 at 2016-11-19 20:08:46 +0000
     Dist::Zilla and Pod::Weaver config updates. 
 
 =================================================
-Plus 24 releases after 2016-05-11 00:00:00 +0000.
+Plus 24 releases after 2016-05-25 00:00:00 +0000.
 =================================================

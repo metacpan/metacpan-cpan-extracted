@@ -2,18 +2,35 @@
 abstract: "brian d foy's rip off of Adam's ppi_version"
 author:
   - 'brian d foy <bdfoy@cpan.org>'
-build_requires: {}
+build_requires:
+  Test::More: '1'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: PPI-App-ppi_version-BDFOY
 no_index:
   directory:
     - t
     - inc
+requires:
+  File::Find::Rule: '0'
+  File::Find::Rule::Perl: '0'
+  PPI: '0'
+  PPI::App::ppi_version: '0'
+  PPI::Document: '0'
+  Term::ANSIColor: '0'
+  parent: '0'
+  perl: '5.008'
+  version: '0'
 resources:
-  repository: https://github.com/briandfoy/PPI-App-ppi_version-BDFOY
-version: 0.14
+  bugtracker: https://github.com/briandfoy/ppi-app-ppi_version-bdfoy/issues
+  homepage: https://github.com/briandfoy/ppi-app-ppi_version-bdfoy
+  repository: https://github.com/briandfoy/ppi-app-ppi_version-bdfoy.git
+version: '0.141'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

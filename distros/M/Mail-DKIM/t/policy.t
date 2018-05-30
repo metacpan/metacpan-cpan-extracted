@@ -9,6 +9,12 @@ use Test::More tests => 19;
 use Mail::DKIM::DkPolicy;
 use Mail::DKIM::DkimPolicy;
 use Mail::DKIM::AuthorDomainPolicy;
+use Net::DNS::Resolver;
+
+my $Resolver = Net::DNS::Resolver->new(
+    nameservers => [ '1.1.1.1', '8.8.8.8' ],
+);
+Mail::DKIM::DNS::resolver( $Resolver );
 
 my $policy;
 $policy = Mail::DKIM::DkPolicy->new();
@@ -42,25 +48,35 @@ ok( !$policy->testing, "testing flag has default value" );
 
 ok( $policy->as_string, "as_string() method is implemented" );
 
-$policy = Mail::DKIM::DkPolicy->fetch(
-    Protocol => "dns",
-    Sender   => 'alfred@doesnotexist.test.authmilter.org.invalid',
-);
-ok( $policy, "fetch() returns policy for nonexistent domain" );
-ok( $policy->is_implied_default_policy, "yep, it's the default policy" );
+SKIP:
+{
+    skip "these tests depend on local resolver behaviour and may fail unnecessarily", 5
+      unless ( $ENV{DNS_TESTS_NXDOMAIN} );
 
-$policy = Mail::DKIM::AuthorDomainPolicy->fetch(
-    Protocol => "dns",
-    Domain   => "nonexistent-subdomain.test.authmilter.org.invalid",
-);
-ok( $policy, "fetch() returns policy for nonexistent domain" );
-ok( !$policy->is_implied_default_policy, "shouldn't be the default policy" );
-ok( $policy->policy eq "NXDOMAIN",       "got policy of NXDOMAIN" );
+    # Tests dependent on local DNS behaviour
+
+    $policy = Mail::DKIM::DkPolicy->fetch(
+        Protocol => "dns",
+        Sender   => 'alfred@doesnotexist.test.authmilter.org.invalid',
+    );
+    ok( $policy, "fetch() returns policy for nonexistent domain" );
+    ok( $policy->is_implied_default_policy, "yep, it's the default policy" );
+
+    $policy = Mail::DKIM::AuthorDomainPolicy->fetch(
+        Protocol => "dns",
+        Domain   => "nonexistent-subdomain.test.authmilter.org.invalid",
+    );
+    ok( $policy, "fetch() returns policy for nonexistent domain" );
+    ok( !$policy->is_implied_default_policy, "shouldn't be the default policy" );
+    ok( $policy->policy eq "NXDOMAIN",       "got policy of NXDOMAIN" );
+}
 
 SKIP:
 {
-    skip "these tests fail when run on the other side of my firewall", 1
-      unless ( $ENV{DNS_TESTS} && $ENV{DNS_TESTS} > 1 );
+    skip "test depends on specific DNS setup at test site", 1
+      unless ( $ENV{DNS_TESTS_BLACKHOLE_TIMEOUT} );
+
+    # Tests dependent on local DNS behaviour
 
     $policy = eval {
         Mail::DKIM::AuthorDomainPolicy->fetch(
@@ -77,7 +93,7 @@ SKIP:
 SKIP:
 {
     skip "test depends on specific DNS setup at test site", 1
-      unless ( $ENV{DNS_TESTS} && $ENV{DNS_TESTS} > 1 );
+      unless ( $ENV{DNS_TESTS_BLACKHOLE_SERVFAIL} );
 
     $policy = eval {
         Mail::DKIM::AuthorDomainPolicy->fetch(

@@ -40,7 +40,7 @@ my $R = getcwd;
 my $ua = LWP::UserAgent->new();
 my $webhook_url = sprintf( 'http://%s:%d/webhook/?%s',
     $test_bot->addr, $test_bot->port,
-    join( '&', 'channel=test', 'network=local', 'shorten_urls=0' ) );
+    join( '&', 'channel=test', 'network=dummy', 'shorten_urls=0' ) );
 
 sub webhook_post {
     my $response = $ua->post(
@@ -67,7 +67,7 @@ is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
 
 TestBot->expect(
     join( ' ',
-        '#test 03Test User',
+        'dummy/#test 03Test User',
         '05wiki 06test-repo',
         '10home',
         '* Update home page',

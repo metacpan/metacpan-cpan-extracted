@@ -10,5 +10,6 @@ dist.ini
 lib/MooX/AttributeFilter.pm
 t/010-filter.t
 t/020-errors.t
+t/030-moose-inflate.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t

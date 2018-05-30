@@ -3,16 +3,18 @@ use strict;
 use warnings;
 use utf8;
 
-use 5.008002;
-our $VERSION = '1.13';
+use 5.008001;
+our $VERSION = '1.23';
 
 use Carp ();
 use File::Basename;
 use File::Spec::Functions qw(catfile catdir rel2abs);
 use CPAN::Perl::Releases;
+use CPAN::Perl::Releases::MetaCPAN;
 use File::pushd qw(pushd);
 use File::Temp;
-use HTTP::Tiny;
+use HTTP::Tinyish;
+use JSON::PP qw(decode_json);
 use Devel::PatchPerl 0.88;
 use Perl::Build::Built;
 use Time::Local;
@@ -20,25 +22,18 @@ use Time::Local;
 our $CPAN_MIRROR = $ENV{PERL_BUILD_CPAN_MIRROR} || 'http://www.cpan.org';
 
 sub available_perls {
-    my ( $class, $dist ) = @_;
+    my $class = shift;
 
-    my $url = "http://www.cpan.org/src/5.0/";
-    my $html = http_get( $url );
-
-    unless($html) {
-        die "\nERROR: Unable to retrieve the list of perls.\n\n";
-    }
-
+    my $releases = CPAN::Perl::Releases::MetaCPAN->new->get;
     my @available_versions;
-
-    my %uniq;
-    while ($html =~ m|<a href="perl-([^"]+)\.tar\.gz">(.+?)</a>|g) {
-        my $version = $1;
-        next if $uniq{$version}++;
-        push @available_versions, $version;
+    for my $release (@$releases) {
+        if ($release->{name} =~ /^perl-(5.(\d+).(\d+)(-\w+)?)$/) {
+            my ($version, $major, $minor, $rc) = ($1, $2, $3, $4);
+            my $sort_by = sprintf "%03d%03d%s", $major, $minor, $rc || "ZZZ";
+            push @available_versions, { version => $version, sort_by => $sort_by };
+        }
     }
-
-    return @available_versions;
+    map { $_->{version} } sort { $b->{sort_by} cmp $a->{sort_by} } @available_versions;
 }
 
 # @return extracted source directory
@@ -49,16 +44,17 @@ sub extract_tarball {
     # installed as 'gtar' - RT #61042
     my $tarx =
         ($^O eq 'solaris' ? 'gtar ' : 'tar ') .
-        ( $dist_tarball =~ m/bz2$/ ? 'xjf' : 'xzf' );
+        (  $dist_tarball =~ m/bz2$/ ? 'xjf'
+         : $dist_tarball =~ m/xz$/  ? 'xJf' : 'xzf' );
     my $extract_command = "cd @{[ $destdir ]}; $tarx @{[ File::Spec->rel2abs($dist_tarball) ]}";
     system($extract_command) == 0
         or die "Failed to extract $dist_tarball";
-    $dist_tarball =~ s{(?:.*/)?([^/]+)\.tar\.(?:gz|bz2)$}{$1};
+    $dist_tarball =~ s{(?:.*/)?([^/]+)\.tar\.(?:gz|bz2|xz)$}{$1};
     if ($dist_tarball eq 'blead') {
         opendir my $dh, $destdir or die "Can't open $destdir: $!";
         my $latest = [];
         while(my $dir = readdir $dh) {
-            next unless -d catfile($destdir, $dir) && $dir =~ /perl-[0-9a-f]{7,8}$/;
+            next unless -d catfile($destdir, $dir) && $dir =~ /perl-(?:blead-)?[0-9a-f]{7,8}$/;
             my $mtime = (stat(_))[9];
             $latest = [$dir, $mtime] if !$latest->[1] or $latest->[1] < $mtime;
         }
@@ -83,91 +79,47 @@ sub perl_release {
     my ($class, $version) = @_;
 
     my ($dist_tarball, $dist_tarball_url);
-    for my $func (qw/cpan_perl_releases perl_releases_page search_cpan_org/) {
+    my @err;
+    for my $func (qw/cpan_perl_releases metacpan/) {
         eval {
             ($dist_tarball, $dist_tarball_url) = $class->can("perl_release_by_$func")->($class,$version);
         };
-        warn "WARN: [$func] $@" if $@;
+        push @err, "[$func] $@" if $@;
         last if $dist_tarball && $dist_tarball_url;
     }
-    die "ERROR: Cannot find the tarball for perl-$version\n"
-        if !$dist_tarball and !$dist_tarball_url;
-           
+    if (!$dist_tarball and !$dist_tarball_url) {
+        push @err, "ERROR: Cannot find the tarball for perl-$version\n";
+        die join "", @err;
+    }
+
     return ($dist_tarball, $dist_tarball_url);
 }
 
-sub perl_release_by_cpan_perl_releases {
-    my ($class, $version) = @_;
-    my $tarballs = CPAN::Perl::Releases::perl_tarballs($version);
+sub _perl_release {
+    my ($class, $version, $by) = @_;
+    my $tarballs = $by->($version);
 
-    my $x = $tarballs->{'tar.gz'};
+    my $x = $tarballs->{'tar.gz'} || $tarballs->{'tar.bz2'} || $tarballs->{'tar.xz'};
     die "not found the tarball for perl-$version\n" unless $x;
     my $dist_tarball = (split("/", $x))[-1];
     my $dist_tarball_url = $CPAN_MIRROR . "/authors/id/$x";
     return ($dist_tarball, $dist_tarball_url);
 }
 
-sub perl_release_by_perl_releases_page {
+sub perl_release_by_cpan_perl_releases {
     my ($class, $version) = @_;
-
-    my $url = "http://perl-releases.s3-website-us-east-1.amazonaws.com/";
-    my $http = HTTP::Tiny->new();
-    my $response = $http->get($url);
-    if (!$response->{success}) {
-        die "Cannot get content from $url: $response->{status} $response->{reason}\n";
-    }
-
-    if ( ! exists $response->{headers}{'last-modified'} ) {
-        die "There is not Last-Modified header. ignore this response\n";
-    }
-
-    my $last_modified;
-    # Copy from HTTP::Tiny::_parse_date_time
-    my $MoY = "Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec";
-    if ( $response->{headers}{'last-modified'} =~ 
-             /^[SMTWF][a-z]+, +(\d{1,2}) ($MoY) +(\d\d\d\d) +(\d\d):(\d\d):(\d\d) +GMT$/) {
-        my @tl_parts = ($6, $5, $4, $1, (index($MoY,$2)/4), $3);
-        $last_modified = eval {
-            my $t = @tl_parts ? Time::Local::timegm(@tl_parts) : -1;
-            $t < 0 ? undef : $t;
-        };
-    }
-    if ( ! defined $last_modified || time - $last_modified > 3*86400 ) { #parse error or 3days old
-        die "This page is 3 or more days old. ignore\n";
-    }
-
-    my ($dist_path, $dist_tarball) =
-        $response->{content} =~ m[^\Q${version}\E\t(.+?/(perl-${version}.tar.(gz|bz2)))]m;
-    die "not found the tarball for perl-$version\n"
-        if !$dist_path and !$dist_tarball;
-    my $dist_tarball_url = "$CPAN_MIRROR/authors/id/${dist_path}";
-    return ($dist_tarball, $dist_tarball_url);
-
+    $class->_perl_release($version, \&CPAN::Perl::Releases::perl_tarballs);
 }
 
-sub perl_release_by_search_cpan_org {
+sub perl_release_by_metacpan {
     my ($class, $version) = @_;
-
-    my $html = http_get("http://search.cpan.org/dist/perl-${version}");
-
-    unless ($html) {
-        die "Failed to download perl-${version} tarball\n";
-    }
-
-    my ($dist_path, $dist_tarball) =
-        $html =~ m[<a href="/CPAN/(authors/id/.+/(perl-${version}.tar.(gz|bz2)))">Download</a>];
-    die "not found the tarball for perl-$version\n"
-        if !$dist_path and !$dist_tarball;
-    my $dist_tarball_url = "$CPAN_MIRROR/${dist_path}";
-    return ($dist_tarball, $dist_tarball_url);
-
+    $class->_perl_release($version, \&CPAN::Perl::Releases::MetaCPAN::perl_tarballs);
 }
-
 
 sub http_get {
     my ($url) = @_;
 
-    my $http = HTTP::Tiny->new();
+    my $http = HTTP::Tinyish->new(verify_SSL => 1);
     my $response = $http->get($url);
     if ($response->{success}) {
         return $response->{content};
@@ -179,7 +131,7 @@ sub http_get {
 sub http_mirror {
     my ($url, $path) = @_;
 
-    my $http = HTTP::Tiny->new();
+    my $http = HTTP::Tinyish->new(verify_SSL => 1);
     my $response = $http->mirror($url, $path);
     if ($response->{success}) {
         print "Downloaded $url to $path.\n";
@@ -347,7 +299,11 @@ sub install {
             }
             $class->do_system([@make, $test_target]);
         }
-        $class->do_system('make install');
+	@make = qw(make install);
+	if ($ENV{PERL_BUILD_INSTALL_OPTIONS}) {
+	    push @make, $ENV{PERL_BUILD_INSTALL_OPTIONS};
+	}
+        $class->do_system(\@make);
     }
     return Perl::Build::Built->new({
         installed_path => $dst_path,
@@ -372,7 +328,7 @@ sub symlink_devel_executables {
     my ($class, $bin_dir) = @_;
 
     for my $executable (glob("$bin_dir/*")) {
-        my ($name, $version) = $executable =~ m/bin\/(.+?)(5\.\d.*)?$/;
+        my ($name, $version) = basename( $executable ) =~ m/(.+?)(5\.\d.*)?$/;
         if ($version) {
             my $cmd = "ln -fs $executable $bin_dir/$name";
             $class->info($cmd);
@@ -406,7 +362,7 @@ Perl::Build - perl builder
 =head1 CLI interface without dependencies
 
     # perl-build command is FatPacker ready
-    % curl https://raw.githubusercontent.com/tokuhirom/Perl-Build/master/perl-build | perl - 5.16.2 /opt/perl-5.16/
+    % curl -L https://raw.githubusercontent.com/tokuhirom/Perl-Build/master/perl-build | perl - 5.16.2 /opt/perl-5.16/
 
 =head1 CLI interface
 

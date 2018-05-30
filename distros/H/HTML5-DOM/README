@@ -1461,6 +1461,39 @@ HTML5::DOM::Collection
     Creates new collection from $nodes (reference to array with
     HTML5::DOM::Node).
 
+   each
+     my $collection = $collection->each(sub {
+        my ($node, $index) = @_;
+        print "node[$index] is a '$node'\n";
+     });
+
+    Forach all nodes in collection.
+
+   map
+     my $result = $collection->map(sub {
+        my ($token, $index) = @_;
+        return $node->tag." => $index";
+     });
+
+    Apply callback for each node in collection. Returns new array from
+    results.
+
+     my $result = $collection->map($method, @args);
+
+    Call method for each node in collection. Returns new
+    HTML5::DOM::Collection from results.
+
+    Example:
+
+     # set text 'test!' for all nodes
+     my $result = $collection->map('text', 'test!');
+
+     # get all tag names as array
+     my $result = $collection->map('tag');
+
+     # remove all nodes in collection
+     $collection->map('remove');
+
    add
      my $collection = $collection->add($node);
 
@@ -1729,12 +1762,12 @@ HTML5::DOM::CSS::Selector::Entry
      my $css = HTML5::DOM::CSS->new;
      my $selector = $css->parseSelector('body div.red, body span.blue');
      my $entry = $selector->entry(0);
-     print Dumper($entry->specificity); # {b => 0, a => 1, c => 2}
+     print Dumper($entry->specificity); # {a => 0, b => 1, c => 2}
 
    specificityArray
      my $specificity = $entry->specificityArray;
 
-    Get specificity in array "[b, a, c]" (ordered by weight)
+    Get specificity in array "[a, b, c]" (ordered by weight)
 
      my $css = HTML5::DOM::CSS->new;
      my $selector = $css->parseSelector('body div.red, body span.blue');

@@ -4,7 +4,7 @@ List::SomeUtils::XS - XS implementation for List::SomeUtils
 
 # VERSION
 
-version 0.56
+version 0.57
 
 # DESCRIPTION
 
@@ -65,7 +65,7 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dave Rolsky.
+This software is Copyright (c) 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

@@ -3,7 +3,7 @@ package Dist::Zilla::Plugin::LocalHTML;
 
 # ABSTRACT: create CSS-rich HTML pages from the POD-aware files for local browsing
 
-our $VERSION = 'v0.2.4';
+our $VERSION = 'v0.2.5';
 
 
 use Moose::Autobox;
@@ -162,7 +162,7 @@ Dist::Zilla::Plugin::LocalHTML - create CSS-rich HTML pages from the POD-aware f
 
 =head1 VERSION
 
-version v0.2.4
+version v0.2.5
 
 =head1 SYNOPSIS
 

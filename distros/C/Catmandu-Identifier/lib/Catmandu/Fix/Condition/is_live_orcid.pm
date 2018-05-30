@@ -1,5 +1,7 @@
 package Catmandu::Fix::Condition::is_live_orcid;
 
+our $VERSION = '0.10';
+
 use Catmandu::Sane;
 use Moo;
 use WWW::ORCID;

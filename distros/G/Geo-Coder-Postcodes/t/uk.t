@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 24;
+use Test::Most tests => 33;
 
 BEGIN {
 	use_ok('Geo::Coder::Postcodes');
@@ -10,13 +10,13 @@ BEGIN {
 
 UK: {
 	SKIP: {
-		skip 'Test requires Internet access', 23 unless(-e 't/online.enabled');
+		skip 'Test requires Internet access', 32 unless(-e 't/online.enabled');
 
 		require Test::LWP::UserAgent;
 		Test::LWP::UserAgent->import();
 
 		require Test::Carp;
-		Test::Carp->import();;
+		Test::Carp->import();
 
 		eval {
 			require Test::Number::Delta;
@@ -26,7 +26,7 @@ UK: {
 
 		if($@) {
 			diag('Test::Number::Delta not installed - skipping tests');
-			skip 'Test::Number::Delta not installed', 23;
+			skip 'Test::Number::Delta not installed', 28;
 		}
 
 		my $geocoder = new_ok('Geo::Coder::Postcodes');
@@ -47,6 +47,10 @@ UK: {
 		delta_within($location->{longitude}, 0.87, 1e-2);
 		sleep(1);	# avoid being blacklisted
 
+		# Check we don't get the one in Surrey
+		ok(!defined($geocoder->geocode(location => 'Ashford, Yorkshire, England')));
+		sleep(1);	# avoid being blacklisted
+
 		$location = $geocoder->geocode('Plumstead, London, England');
 		ok(defined($location));
 		ok(ref($location) eq 'HASH');
@@ -61,18 +65,30 @@ UK: {
 		delta_within($location->{longitude}, -0.67, 1e-2);
 		sleep(1);	# avoid being blacklisted
 
-		does_croak_that_matches(sub { 
+		$location = $geocoder->geocode('Bolton-upon-Dearne, South Yorkshire, England');
+		ok(defined($location));
+		ok(ref($location) eq 'HASH');
+		delta_within($location->{latitude}, 53.52, 1e-2);
+		delta_within($location->{longitude}, -1.31, 1e-2);
+
+		$location = $geocoder->geocode('Southend-on-Sea, Essex, England');
+		ok(defined($location));
+		ok(ref($location) eq 'HASH');
+		delta_within($location->{latitude}, 51.54, 1e-2);
+		delta_within($location->{longitude}, 0.71, 1e-2);
+
+		does_croak_that_matches(sub {
 			$location = $geocoder->geocode('Windsor Castle, Windsor, Berkshire, England');
 		}, qr/^Postcodes.io only supports towns/);
 		sleep(1);	# avoid being blacklisted
 
-		does_croak_that_matches(sub { 
-			$location = $geocoder->geocode()
+		does_croak_that_matches(sub {
+			$location = $geocoder->geocode();
 		}, qr/^Usage: /);
 		sleep(1);	# avoid being blacklisted
 
-		does_croak_that_matches(sub { 
-			$location = $geocoder->reverse_geocode()
+		does_croak_that_matches(sub {
+			$location = $geocoder->reverse_geocode();
 		}, qr/^Usage: /);
 		sleep(1);	# avoid being blacklisted
 
@@ -84,7 +100,7 @@ UK: {
 		$ua->map_response('api.postcodes.io', new_ok('HTTP::Response' => [ '500' ]));
 
 		$geocoder->ua($ua);
-		does_croak_that_matches(sub { 
+		does_croak_that_matches(sub {
 			$location = $geocoder->geocode('Sheffield');
 		}, qr/^postcodes.io API returned error: /);
 

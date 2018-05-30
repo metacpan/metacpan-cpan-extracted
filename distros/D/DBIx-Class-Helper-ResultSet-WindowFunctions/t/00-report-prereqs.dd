@@ -34,6 +34,7 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'Class::Load' => '0',
                                    'DBD::SQLite' => '0',
                                    'DBIx::Class::Core' => '0',
                                    'DBIx::Class::Schema' => '0',
@@ -43,7 +44,7 @@ do { my $x = {
                                    'SQL::Abstract::Test' => '0',
                                    'SQL::Translator' => '0.11018',
                                    'Test::More' => '0',
-                                   'Test::Most' => '0',
+                                   'Test::Roo::DataDriven' => '0',
                                    'base' => '0'
                                  }
                  }

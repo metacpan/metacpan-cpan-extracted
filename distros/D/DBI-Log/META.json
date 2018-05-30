@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "DBI-Log",
    "no_index" : {
@@ -53,6 +53,6 @@
          "web" : "https://github.com/zorgnax/dbilog"
       }
    },
-   "version" : "0.07",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

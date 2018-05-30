@@ -11,8 +11,9 @@ use Plack::Session;
 use Plack::Auth::SSO::ResponseParser::CAS;
 use XML::LibXML::XPathContext;
 use XML::LibXML;
+use URI;
 
-our $VERSION = "0.0135";
+our $VERSION = "0.0136";
 
 with "Plack::Auth::SSO";
 
@@ -86,6 +87,7 @@ sub to_app {
 
         #ticket?
         my $ticket = $params->get("ticket");
+        my $state  = $params->get("state");
         my $request_uri = $request->request_uri();
         my $idx = index( $request_uri, "?" );
         if ( $idx >= 0 ) {
@@ -94,10 +96,14 @@ sub to_app {
 
         }
         my $service = $self->uri_for($request_uri);
+        my $service_uri = URI->new( $service );
 
-        if (is_string($ticket)) {
+        if ( is_string($ticket) && $self->csrf_token_valid($session,$state) ) {
 
-            my $r = $cas->service_validate($service, $ticket);
+            $service_uri->query_form( state => $state );
+            my $r = $cas->service_validate($service_uri->as_string(), $ticket);
+
+            $self->cleanup( $session );
 
             if ($r->is_success) {
 
@@ -149,9 +155,32 @@ sub to_app {
             }
 
         }
+        elsif( is_string($ticket) ) {
+
+            $self->cleanup( $session );
+
+            $self->set_auth_sso_error( $session,{
+                package    => __PACKAGE__,
+                package_id => $self->id,
+                type => "CSRF_DETECTED",
+                content => "CSRF_DETECTED"
+            });
+            return $self->redirect_to_error();
+
+        }
+
+        $self->cleanup( $session );
+
+        $state = $self->generate_csrf_token();
+        $self->set_csrf_token(
+            $session,
+            $state
+        );
+
+        $service_uri->query_form( state => $state );
 
         #no ticket or ticket validation failed
-        my $login_url = $cas->login_url($service)->as_string;
+        my $login_url = $cas->login_url( $service_uri->as_string() )->as_string;
 
         [302, [Location => $login_url], []];
 

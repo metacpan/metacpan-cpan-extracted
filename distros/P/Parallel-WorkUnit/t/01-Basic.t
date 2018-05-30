@@ -13,7 +13,7 @@ use warnings;
 use autodie;
 
 use Carp;
-use Test::More tests => 50;
+use Test::More tests => 65;
 use Test::Exception;
 
 # Set Timeout
@@ -49,6 +49,24 @@ for ( 0 .. $PROCS - 1 ) {
     ok( exists( $RESULTS{$_} ), "Worker First Exec $_ returned properly" );
 }
 is( $wu->count, 0, "no processes running after waitall()" );
+
+# Do the above test, with starting all 10 at once.
+%RESULTS = ();
+$PROCS   = 10;
+$wu->asyncs( $PROCS, sub { return $_[0]; }, \&cb );
+is( $wu->count, $PROCS, "asyncs - 10 workers are executing" );
+
+$r = $wu->waitone();
+ok( defined($r), "asyncs - waitone() returned a defined value" );
+ok( ( $r >= 0 ) && ( $r < $PROCS ), "asyncs - waitone() returned a valid return value" );
+is( $wu->count, $PROCS - 1, "asyncs = waitone() properly reaped one process" );
+
+$wu->waitall();
+
+for ( 0 .. $PROCS - 1 ) {
+    ok( exists( $RESULTS{$_} ), "asyncs - Worker First Exec $_ returned properly" );
+}
+is( $wu->count, 0, "asyncs - no processes running after waitall()" );
 
 # We make sure we can call this twice without issues
 # So we're going to zero out the results and re-run the above

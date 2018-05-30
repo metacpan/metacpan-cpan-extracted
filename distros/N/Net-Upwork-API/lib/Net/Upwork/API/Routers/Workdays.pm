@@ -81,7 +81,7 @@ sub get_by_company {
     my $till_date = shift;
     my %params = @_;
 
-    return $self->client()->get("/team/v2/workdays/companies/" . $company . "/" . $from_date . "," . $till_date, %params);
+    return $self->client()->get("/team/v3/workdays/companies/" . $company . "/" . $from_date . "," . $till_date, %params);
 }
 
 =item get_by_contract
@@ -119,7 +119,7 @@ sub get_by_contract {
     my $till_date = shift;
     my %params = @_;
 
-    return $self->client()->get("/team/v2/workdays/contracts/" . $contract . "/" . $from_date . "," . $till_date, %params);
+    return $self->client()->get("/team/v3/workdays/contracts/" . $contract . "/" . $from_date . "," . $till_date, %params);
 }
 
 =back

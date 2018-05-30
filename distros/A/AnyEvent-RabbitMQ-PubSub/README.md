@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/tynovsky/AnyEvent-RabbitMQ-PubSub.svg?branch=master)](https://travis-ci.org/tynovsky/AnyEvent-RabbitMQ-PubSub)
+[![Build Status](https://travis-ci.org/avast/AnyEvent-RabbitMQ-PubSub.svg?branch=master)](https://travis-ci.org/avast/AnyEvent-RabbitMQ-PubSub)
 # NAME
 
 AnyEvent::RabbitMQ::PubSub - Publish and consume RabbitMQ messages.

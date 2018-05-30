@@ -6,7 +6,7 @@ use warnings;
 #require 5.010;
 
 package Mail::DKIM;
-our $VERSION = 0.52;
+our $VERSION = 0.53;
 
 our $SORTTAGS = 0;
 
@@ -99,13 +99,18 @@ https://github.com/fastmail/mail-dkim/issues
 
 =head1 AUTHOR
 
-Jason Long, E<lt>jlong@messiah.eduE<gt>
+Jason Long E<lt>jlong@messiah.eduE<gt>
 
 =head1 CONTRIBUTORS
 
-Marc Bradshaw, E<lt>marc@marcbradshaw.netE<gt>
-Bron Gondwana, E<lt>brong@fastmailteam.comE<gt>
-John Levine, E<lt>john.levine@standcore.comE<gt>
+Marc Bradshaw E<lt>marc@marcbradshaw.netE<gt>,
+Bron Gondwana E<lt>brong@fastmailteam.comE<gt>,
+John Levine E<lt>john.levine@standcore.comE<gt>
+
+=head1 THANKS
+
+Work on ensuring that this module passes the ARC test suite was
+generously sponsored by Valimail (https://www.valimail.com/)
 
 =head1 COPYRIGHT AND LICENSE
 

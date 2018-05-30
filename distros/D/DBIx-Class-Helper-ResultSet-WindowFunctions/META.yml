@@ -3,6 +3,7 @@ abstract: 'Add support for window functions to DBIx::Class'
 author:
   - 'Robert Rothenberg <rrwo@cpan.org>'
 build_requires:
+  Class::Load: '0'
   DBD::SQLite: '0'
   DBIx::Class::Core: '0'
   DBIx::Class::Schema: '0'
@@ -12,7 +13,7 @@ build_requires:
   SQL::Abstract::Test: '0'
   SQL::Translator: '0.11018'
   Test::More: '0'
-  Test::Most: '0'
+  Test::Roo::DataDriven: '0'
   base: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -26,7 +27,7 @@ name: DBIx-Class-Helper-ResultSet-WindowFunctions
 provides:
   DBIx::Class::Helper::ResultSet::WindowFunctions:
     file: lib/DBIx/Class/Helper/ResultSet/WindowFunctions.pm
-    version: v0.1.1
+    version: v0.1.2
 requires:
   DBIx::Class::ResultSet: '0'
   parent: '0'
@@ -34,7 +35,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/DBIx-Class-Helper-ResultSet-WindowFunctions/issues
   repository: git://github.com/robrwo/DBIx-Class-Helper-ResultSet-WindowFunctions.git
-version: v0.1.1
+version: v0.1.2
 x_authority: cpan:RRWO
 x_contributors:
   - 'Peter Rabbitson <ribasushi@leporine.io>'

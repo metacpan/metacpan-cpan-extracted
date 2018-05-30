@@ -1,7 +1,7 @@
 Revision history for Perl extension AnyEvent-RabbitMQ-PubSub
 
-3.2.0 2017-06-22T13:55:18Z
-    - add reject method
+3.2.1 2018-05-24T09:13:46Z
+    - fix calling method_frame on object without this function
 
 3.1.2 2017-03-17T13:06:26Z
     - die on on_inactive error

@@ -76,7 +76,7 @@ parse-syslog-line.pl - Parse a syslog message and display the structured data
 
 =head1 VERSION
 
-version 4.3
+version 4.4
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,43 @@
+NAME
+    Data::Sah::Coerce::perl::str::str_to_cryptocurrency_code - Coerce string
+    containing cryptocurrency code/name/safename to code
+
+VERSION
+    This document describes version 0.001 of
+    Data::Sah::Coerce::perl::str::str_to_cryptocurrency_code (from Perl
+    distribution Data-Sah-Coerce-perl-str-str_to_cryptocurrency_code),
+    released on 2018-05-29.
+
+DESCRIPTION
+    The rule is not enabled by default. You can enable it in a schema using
+    e.g.:
+
+     ["str", "x.perl.coerce_rules"=>["str_to_cryptocurrency_code"]]
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Sah-Coerce-perl-str-str_to_cryptocurr
+    ency_code>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Sah-Coerce-perl-str-str_to_crypt
+    ocurrency_code>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-Coerce-perl-
+    str-str_to_cryptocurrency_code>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

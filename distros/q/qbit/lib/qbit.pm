@@ -74,7 +74,7 @@ Using this pragma is equivalent:
 =cut
 
 package qbit;
-$qbit::VERSION = '2.5';
+$qbit::VERSION = '2.6';
 use strict;
 use warnings FATAL => 'all';
 use utf8;

@@ -15,9 +15,6 @@ sub startup : Test(startup => 1) {
 
 #run after and once per suite
 sub shutdown : Test(shutdown) {
-
-    # body...
-
     return 1;
 }
 

@@ -25,6 +25,8 @@ MODULES
 
       * Catmandu::Fix::orcid_works
 
+      * Catmandu::Fix::uri_status_code
+
       * Catmandu::Fix::Condition::is_valid_isbn
 
       * Catmandu::Fix::Condition::is_valid_issn

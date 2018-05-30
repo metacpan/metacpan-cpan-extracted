@@ -1,12 +1,15 @@
 lib/MooX/Role/JSON_LD.pm
+lib/MooX/JSON_LD.pm
 Makefile.PL
 MANIFEST			This list of files
 README.md
 Changes.md
 t/01-load.t
 t/02-moo-basic.t
+t/02-moo-moox-json_ld.t
 t/03-moose-basic.t
 t/lib/MooseTester.pm
+t/lib/MooTester2.pm
 t/lib/MooTester.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

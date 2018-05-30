@@ -173,7 +173,7 @@ is( $commit->author, 'ser' );
 is( scalar @{ $commit->changes }, 1 );
 is( $commit->changes->[0]->as_string, '(A)a' );
 
-TestBot->expect( '#test 03Test U. Ser (03ser) 05master '
+TestBot->expect( 'dummy/#test 03Test U. Ser (03ser) 05master '
         . $commit->id
         . ' 12test/06there 03a initial import * 14http://scm.host.org/there/master/?commit='
         . $commit->id
@@ -200,7 +200,7 @@ is( scalar @{ $commit->changes }, 2 );
 is( $commit->changes->[0]->as_string, 'a' );
 is( $commit->changes->[1]->as_string, '(A)b' );
 
-TestBot->expect( '#test 03Test U. Ser (03ser) 05master '
+TestBot->expect( 'dummy/#test 03Test U. Ser (03ser) 05master '
         . $commit->id
         . ' 12test/06there 10a 03b some changes * 14http://scm.host.org/there/master/?commit='
         . $commit->id
@@ -249,17 +249,17 @@ is( $commit->log, "tag '1.0-beta' created", "commit 5 log" );
 is( $commit->author, undef, "commit 5 author" );
 is( $commit->changes->[0]->as_string, '(A)1.0-beta', "commit 5 changes" );
 
-TestBot->expect( '#test 03Test U. Ser (03ser) 05master '
+TestBot->expect( 'dummy/#test 03Test U. Ser (03ser) 05master '
         . $c1->id
         . ' 12test/06there 04a a removed * 14http://scm.host.org/there/master/?commit='
         . $c1->id
         . '' );
-TestBot->expect( '#test 03Test U. Ser (03ser) 05other '
+TestBot->expect( 'dummy/#test 03Test U. Ser (03ser) 05other '
         . $c2->id
         . ' 12test/06there 10b 03c a change in the other branch * 14http://scm.host.org/there/other/?commit='
         . $c2->id
         . '' );
-TestBot->expect( '#test 05tags '
+TestBot->expect( 'dummy/#test 05tags '
         . $c2->id
         . ' 12test/06there 031.0-beta tag \'1.0-beta\' created * 14http://scm.host.org/there/tags/?commit='
         . $c2->id
@@ -297,12 +297,12 @@ is( $commit->log,
     'annotated tag log'
 );
 
-TestBot->expect( '#test 03Test U. Ser (03ser) 05other '
+TestBot->expect( 'dummy/#test 03Test U. Ser (03ser) 05other '
         . $c1->id
         . ' 12test/06there 03debian/README add README for release * 14http://scm.host.org/there/other/?commit='
         . $c1->id
         . '' );
-TestBot->expect( '#test 03Test U. Ser (03ser) 05tags '
+TestBot->expect( 'dummy/#test 03Test U. Ser (03ser) 05tags '
         . $c2->id
         . ' 12test/06there 031.0-release Release 1.0 (tagged commit: '
         . $c1->id
@@ -324,7 +324,7 @@ is( $commit->branch, 'hollow', "hollow commit branch is 'hollow'" );
 is( scalar( @{ $commit->changes } ), 0, "no changes in hollow commit" );
 is( $commit->log, "branch created", "hollow commit log is 'branch created'" );
 
-TestBot->expect( '#test 05hollow '
+TestBot->expect( 'dummy/#test 05hollow '
         . $commit->id
         . ' 12test/06there branch created * 14http://scm.host.org/there/hollow/?commit='
         . $commit->id
@@ -346,7 +346,7 @@ is( $commit->author, 'ser' );
 is( scalar( @{ $commit->changes } ), 1 );
 is( $commit->log, "update readme with an über cléver cómmít with cyrillics: привет" );
 
-TestBot->expect( '#test 03Test U. Ser (03ser) 05other '
+TestBot->expect( 'dummy/#test 03Test U. Ser (03ser) 05other '
         . $commit->id
         . ' 12test/06there 03README update readme with an über cléver cómmít with cyrillics: привет * 14http://scm.host.org/there/other/?commit='
         . $commit->id
@@ -366,7 +366,7 @@ ok( defined($commit), 'empty branch creation commit exists' );
 is( $commit->branch, 'allnew', 'empty branch name' );
 is( $commit->log, "created empty branch allnew", 'empty branch log' );
 
-TestBot->expect( '#test 03Test U. Ser (03ser) 05allnew '
+TestBot->expect( 'dummy/#test 03Test U. Ser (03ser) 05allnew '
         . $commit->id
         . ' 12test/06there created empty branch allnew * 14http://scm.host.org/there/allnew/?commit='
         . $commit->id
@@ -392,7 +392,7 @@ ok( defined($commit), 'empty branch merge commit exists' );
 is( $commit->branch, 'master' );
 is( $commit->log, "Merge branch 'allnew'" );
 
-TestBot->expect( '#test 03Test U. Ser (03ser) 05master '
+TestBot->expect( 'dummy/#test 03Test U. Ser (03ser) 05master '
         . $c2->id
         . ' 12test/06there Merge branch \'allnew\' * 14http://scm.host.org/there/master/?commit='
         . $c2->id
@@ -410,7 +410,7 @@ push_ok();
 
 $commit = $c->describe_commit;
 
-TestBot->expect( '#test 03Test U. Ser (03ser) 05other '
+TestBot->expect( 'dummy/#test 03Test U. Ser (03ser) 05other '
         . $commit->id
         . ' 12test/06there 10debian/patches/ 03series 03some.patch A change in two files * 14http://scm.host.org/there/other/?commit='
         . $commit->id

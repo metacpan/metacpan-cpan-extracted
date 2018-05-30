@@ -4,7 +4,7 @@
       "Miroslav Tynovsky <tynovsky@avast.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.10",
+   "generated_by" : "Minilla/v3.1.0",
    "license" : [
       "perl_5"
    ],
@@ -34,7 +34,6 @@
       "develop" : {
          "requires" : {
             "CPAN::Uploader" : "0",
-            "LWP::Protocol::https" : "0",
             "Minilla" : "0",
             "Module::Build::Tiny" : "0",
             "Test::CPAN::Meta" : "0",
@@ -63,7 +62,7 @@
    "provides" : {
       "AnyEvent::RabbitMQ::PubSub" : {
          "file" : "lib/AnyEvent/RabbitMQ/PubSub.pm",
-         "version" : "v3.2.0"
+         "version" : "v3.2.1"
       },
       "AnyEvent::RabbitMQ::PubSub::Consumer" : {
          "file" : "lib/AnyEvent/RabbitMQ/PubSub/Consumer.pm"
@@ -75,19 +74,21 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/tynovsky/AnyEvent-RabbitMQ-PubSub/issues"
+         "web" : "https://github.com/avast/AnyEvent-RabbitMQ-PubSub/issues"
       },
-      "homepage" : "https://github.com/tynovsky/AnyEvent-RabbitMQ-PubSub",
+      "homepage" : "https://github.com/avast/AnyEvent-RabbitMQ-PubSub",
       "repository" : {
-         "url" : "git://github.com/tynovsky/AnyEvent-RabbitMQ-PubSub.git",
-         "web" : "https://github.com/tynovsky/AnyEvent-RabbitMQ-PubSub"
+         "url" : "git://github.com/avast/AnyEvent-RabbitMQ-PubSub.git",
+         "web" : "https://github.com/avast/AnyEvent-RabbitMQ-PubSub"
       }
    },
-   "version" : "3.2.0",
+   "version" : "3.2.1",
    "x_authority" : "cpan:TYNOVSKY",
    "x_contributors" : [
       "Jan Seidl <seidl@avast.com>",
+      "Mohelníková Lucie <mohelnikova@avast.com>",
       "tynovsky <tynovsky@seznam.cz>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 2.94",
+   "x_static_install" : 1
 }

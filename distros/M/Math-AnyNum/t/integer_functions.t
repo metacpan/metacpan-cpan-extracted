@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 404;    # be careful
+plan tests => 428;    # be careful
 
 use Math::AnyNum qw(:ntheory);
 use Math::GMPz::V qw();
@@ -32,9 +32,10 @@ is(fibonacci(12),          '144');
 is(fibonacci(-3),          'NaN');
 is(fibonacci($o->new(12)), '144');
 
-is(join(' ', map { fibonacci($_, 3) } 0 .. 14), '0 0 1 1 2 4 7 13 24 44 81 149 274 504 927');
-is(join(' ', map { fibonacci(Math::AnyNum->new_ui($_), Math::AnyNum->new_ui(4)) } 0 .. 14),
-    '0 0 0 1 1 2 4 8 15 29 56 108 208 401 773');
+#<<<
+is(join(' ', map { fibonacci($_, 3) } 0 .. 14),                                             '0 0 1 1 2 4 7 13 24 44 81 149 274 504 927');
+is(join(' ', map { fibonacci(Math::AnyNum->new_ui($_), Math::AnyNum->new_ui(4)) } 0 .. 14), '0 0 0 1 1 2 4 8 15 29 56 108 208 401 773');
+#>>>
 
 is(binomial(12,           5),           '792');
 is(binomial(0,            0),           '1');
@@ -89,6 +90,21 @@ is(rising_factorial(-123, -13), '-1/3012474223753262018150400000');
 
 is(rising_factorial(12, -13), 'NaN');
 is(falling_factorial(-13, -14), 'NaN');
+
+is(superfactorial(-1), 'NaN');
+is(superfactorial(5),  '34560');
+
+is(hyperfactorial(-1), 'NaN');
+is(hyperfactorial(5),  '86400000');
+
+is(bell(-1),    'NaN');
+is(catalan(-1), 'NaN');
+
+is(join(', ', map { catalan($_) } 0 .. 10), '1, 1, 2, 5, 14, 42, 132, 429, 1430, 4862, 16796');
+is(join(', ', map { bell($_) } 0 .. 10),    '1, 1, 2, 5, 15, 52, 203, 877, 4140, 21147, 115975');
+
+is(bell($o->new(30)),    '846749014511809332450147');
+is(catalan($o->new(45)), '2257117854077248073253720');
 
 #<<<
 is(falling_factorial(123, $o->new(-42)),          '1/4465482258831228787047309106389002878492944333613461706826678255930625748893696000000000000');
@@ -181,6 +197,8 @@ is(ipow10($o->new(3)),      1000);
 is(ipow10($o->new('13/2')), 1000000);
 is(ipow10($o->new('3.7')),  1000);
 
+is(lcm(),   0);
+is(lcm(42), 42);
 is(lcm(13,          14),          182);
 is(lcm(14,          $o->new(13)), 182);
 is(lcm($o->new(14), 13),          182);
@@ -191,6 +209,7 @@ is(lcm(42,          "1210923789812382173912783"), '7265542738874293043476698');
 
 is(lcm(12, -28),          84);
 is(lcm(12, $o->new(-28)), 84);
+is(lcm(4, 9, 13, 11), 5148);
 
 ok(is_coprime(27,          8));
 ok(is_coprime(8,           27));
@@ -204,10 +223,16 @@ ok(!is_coprime($o->new(6), 42));
 ok(!is_coprime($o->new(6), $o->new(42)));
 ok(!is_coprime(6,          $o->new(42)));
 
+is(gcd(),   0);
+is(gcd(42), 42);
 is(gcd(20,          12),          4);
 is(gcd($o->new(20), 12),          4);
 is(gcd(20,          $o->new(12)), 4);
 is(gcd($o->new(12), $o->new(20)), 4);
+
+is(gcd(42,   98,   8),   2);
+is(gcd(5040, 5020, -50), 10);
+is(gcd(5040, 5020, 49, 124), 1);
 
 is(gcd(8993, -207),          23);
 is(gcd(8993, $o->new(-207)), 23);
@@ -485,6 +510,14 @@ is(faulhaber_sum(1234, 13), '1363782530586069716227147685797600627310545');
 is(faulhaber_sum(30,   80), '15824906698911682552620450221533100599157410235977820404994404262610329210567189683421455768203096083923986638110352399');
 is(faulhaber_sum('36893488147419103232', 6), '13290765244262525999877070971093849105865118528347431876799549931828154109852970889789225381341531108777505296823405714971493113182289920');
 #>>>
+
+is(geometric_sum(3, 8), 585);
+is(geometric_sum(8, 3), 9841);
+
+is(geometric_sum(13, '1/2'),  '16383/8192');
+is(geometric_sum(12, '-1/2'), '2731/4096');
+is(geometric_sum(17, '-1/2'), '87381/131072');
+is(geometric_sum(15, '-4/3'), '-607417225/14348907');
 
 ok(is_power('279841'), '23^4');
 ok(is_power(100, 2),  '10^2');

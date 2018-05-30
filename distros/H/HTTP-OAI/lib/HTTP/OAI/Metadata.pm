@@ -4,7 +4,7 @@ package HTTP::OAI::Metadata;
 
 use strict;
 
-our $VERSION = '4.06';
+our $VERSION = '4.07';
 
 sub new
 {

@@ -1,8 +1,706 @@
-DESCRIPTION
+NAME
+    App::CSVUtils - CLI utilities related to CSV
 
+VERSION
+    This document describes version 0.014 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2018-05-25.
+
+DESCRIPTION
     This distribution contains the following CLI utilities:
 
-    # INSERT_EXECS_LIST
+    *   csv-add-field
 
-prepend:SEE ALSO
+    *   csv-avg
+
+    *   csv-concat
+
+    *   csv-convert-to-hash
+
+    *   csv-delete-field
+
+    *   csv-grep
+
+    *   csv-list-field-names
+
+    *   csv-map
+
+    *   csv-munge-field
+
+    *   csv-replace-newline
+
+    *   csv-select-fields
+
+    *   csv-select-row
+
+    *   csv-sort-fields
+
+    *   csv-sum
+
+FUNCTIONS
+  csv_add_field
+    Usage:
+
+     csv_add_field(%args) -> [status, msg, result, meta]
+
+    Add a field to CSV file.
+
+    Your Perl code (-e) will be called for each row (excluding the header
+    row) and should return the value for the new field. $main::row is
+    available and contains the current row, while $main::rownum contains the
+    row number (2 means the first data row).
+
+    Field by default will be added as the last field, unless you specify one
+    of "--after" (to put after a certain field), "--before" (to put before a
+    certain field), or "--at" (to put at specific position, 1 means as the
+    first field).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   after => *str*
+
+        Put the new field after specified field.
+
+    *   at => *int*
+
+        Put the new field at specific position (1 means as first field).
+
+    *   before => *str*
+
+        Put the new field before specified field.
+
+    *   eval* => *str*
+
+        Perl code to do munging.
+
+    *   field* => *str*
+
+        Field name.
+
+    *   filename* => *filename*
+
+        Input CSV file.
+
+    *   header => *bool* (default: 1)
+
+        Whether CSV has a header row.
+
+        When you declare that CSV does not have header row ("--no-header"),
+        the fields will be named "field1", "field2", and so on.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  csv_avg
+    Usage:
+
+     csv_avg(%args) -> [status, msg, result, meta]
+
+    Output a summary row which are arithmetic averages of data rows.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename* => *filename*
+
+        Input CSV file.
+
+    *   header => *bool* (default: 1)
+
+        Whether CSV has a header row.
+
+        When you declare that CSV does not have header row ("--no-header"),
+        the fields will be named "field1", "field2", and so on.
+
+    *   with_data_rows => *bool*
+
+        Whether to also output data rows.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  csv_concat
+    Usage:
+
+     csv_concat(%args) -> [status, msg, result, meta]
+
+    Concatenate several CSV files together, collecting all the fields.
+
+    Example, concatenating this CSV:
+
+     col1,col2
+     1,2
+     3,4
+
+    and:
+
+     col2,col4
+     a,b
+     c,d
+     e,f
+
+    and:
+
+     col3
+     X
+     Y
+
+    will result in:
+
+     col1,col2,col4,col3
+     1,2,
+     3,4,
+     ,a,b
+     ,c,d
+     ,e,f
+     ,,,X
+     ,,,Y
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filenames* => *array[filename]*
+
+        Input CSV files.
+
+    *   header => *bool* (default: 1)
+
+        Whether CSV has a header row.
+
+        When you declare that CSV does not have header row ("--no-header"),
+        the fields will be named "field1", "field2", and so on.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  csv_convert_to_hash
+    Usage:
+
+     csv_convert_to_hash(%args) -> [status, msg, result, meta]
+
+    Return a hash of field names as keys and first row as values.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename* => *filename*
+
+        Input CSV file.
+
+    *   header => *bool* (default: 1)
+
+        Whether CSV has a header row.
+
+        When you declare that CSV does not have header row ("--no-header"),
+        the fields will be named "field1", "field2", and so on.
+
+    *   row_number => *int* (default: 2)
+
+        Row number (e.g. 2 for first data row).
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  csv_delete_field
+    Usage:
+
+     csv_delete_field(%args) -> [status, msg, result, meta]
+
+    Delete one or more fields from CSV file.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   fields* => *array[str]*
+
+        Field names.
+
+    *   filename* => *filename*
+
+        Input CSV file.
+
+    *   header => *bool* (default: 1)
+
+        Whether CSV has a header row.
+
+        When you declare that CSV does not have header row ("--no-header"),
+        the fields will be named "field1", "field2", and so on.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  csv_grep
+    Usage:
+
+     csv_grep(%args) -> [status, msg, result, meta]
+
+    Only output row(s) where Perl expression returns true.
+
+    Examples:
+
+    *   Only show rows where the amount field is divisible by 7:
+
+         csv_grep( filename => "file.csv", eval => "\$_->{amount} % 7 ? 1:0", hash => 1);
+
+    *   Only show rows where the date is a Wednesday:
+
+         csv_grep(
+           filename => "file.csv",
+           eval => "BEGIN { use DateTime::Format::Natural; \$parser = DateTime::Format::Natural->new } \$dt = \$parser->parse_datetime(\$_->{date}); \$dt->day_of_week == 3",
+           hash => 1
+         );
+
+    This is like Perl's "grep" performed over rows of CSV. In $_, your Perl
+    code will find the CSV row as an arrayref (or, if you specify "-H", as a
+    hashref). $main::row is also set to the row, while $main::rownum
+    contains the row number (2 means the first data row). Your code is then
+    free to return true or false based on some criteria. Only rows where
+    Perl expression returns true will be included in the result.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   eval* => *str*
+
+        Perl code.
+
+    *   filename* => *filename*
+
+        Input CSV file.
+
+    *   hash => *bool*
+
+        Provide row in $_ as hashref instead of arrayref.
+
+    *   header => *bool* (default: 1)
+
+        Whether CSV has a header row.
+
+        When you declare that CSV does not have header row ("--no-header"),
+        the fields will be named "field1", "field2", and so on.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  csv_list_field_names
+    Usage:
+
+     csv_list_field_names(%args) -> [status, msg, result, meta]
+
+    List field names of CSV file.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename* => *filename*
+
+        Input CSV file.
+
+    *   header => *bool* (default: 1)
+
+        Whether CSV has a header row.
+
+        When you declare that CSV does not have header row ("--no-header"),
+        the fields will be named "field1", "field2", and so on.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  csv_map
+    Usage:
+
+     csv_map(%args) -> [status, msg, result, meta]
+
+    Return result of Perl code for every row.
+
+    Examples:
+
+    *   Create SQL insert statements (escaping is left as an exercise for
+        users):
+
+         csv_map(
+           filename => "file.csv",
+           eval => "\"INSERT INTO mytable (id,amount) VALUES (\$_->{id}, \$_->{amount});\"",
+           hash => 1
+         );
+
+    This is like Perl's "map" performed over rows of CSV. In $_, your Perl
+    code will find the CSV row as an arrayref (or, if you specify "-H", as a
+    hashref). $main::row is also set to the row, while $main::rownum
+    contains the row number (2 means the first data row). Your code is then
+    free to return a string based on some operation against these data. This
+    utility will then print out the resulting string.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   add_newline => *bool* (default: 1)
+
+        Whether to make sure each string ends with newline.
+
+    *   eval* => *str*
+
+        Perl code.
+
+    *   filename* => *filename*
+
+        Input CSV file.
+
+    *   hash => *bool*
+
+        Provide row in $_ as hashref instead of arrayref.
+
+    *   header => *bool* (default: 1)
+
+        Whether CSV has a header row.
+
+        When you declare that CSV does not have header row ("--no-header"),
+        the fields will be named "field1", "field2", and so on.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  csv_munge_field
+    Usage:
+
+     csv_munge_field(%args) -> [status, msg, result, meta]
+
+    Munge a field in every row of CSV file.
+
+    Perl code (-e) will be called for each row (excluding the header row)
+    and $_ will contain the value of the field, and the Perl code is
+    expected to modify it. $main::row will contain the current row array and
+    $main::rownum contains the row number (2 means the first data row).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   eval* => *str*
+
+        Perl code to do munging.
+
+    *   field* => *str*
+
+        Field name.
+
+    *   filename* => *filename*
+
+        Input CSV file.
+
+    *   header => *bool* (default: 1)
+
+        Whether CSV has a header row.
+
+        When you declare that CSV does not have header row ("--no-header"),
+        the fields will be named "field1", "field2", and so on.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  csv_replace_newline
+    Usage:
+
+     csv_replace_newline(%args) -> [status, msg, result, meta]
+
+    Replace newlines in CSV values.
+
+    Some CSV parsers or applications cannot handle multiline CSV values.
+    This utility can be used to convert the newline to something else. There
+    are a few choices: replace newline with space ("--with-space", the
+    default), remove newline ("--with-nothing"), replace with encoded
+    representation ("--with-backslash-n"), or with characters of your choice
+    ("--with 'blah'").
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename* => *filename*
+
+        Input CSV file.
+
+    *   header => *bool* (default: 1)
+
+        Whether CSV has a header row.
+
+        When you declare that CSV does not have header row ("--no-header"),
+        the fields will be named "field1", "field2", and so on.
+
+    *   with => *str* (default: " ")
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  csv_select_fields
+    Usage:
+
+     csv_select_fields(%args) -> [status, msg, result, meta]
+
+    Only output selected field(s).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   field_pat => *re*
+
+        Field regex pattern to select.
+
+    *   fields => *array[str]*
+
+        Field names.
+
+    *   filename* => *filename*
+
+        Input CSV file.
+
+    *   header => *bool* (default: 1)
+
+        Whether CSV has a header row.
+
+        When you declare that CSV does not have header row ("--no-header"),
+        the fields will be named "field1", "field2", and so on.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  csv_select_row
+    Usage:
+
+     csv_select_row(%args) -> [status, msg, result, meta]
+
+    Only output specified row(s).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename* => *filename*
+
+        Input CSV file.
+
+    *   header => *bool* (default: 1)
+
+        Whether CSV has a header row.
+
+        When you declare that CSV does not have header row ("--no-header"),
+        the fields will be named "field1", "field2", and so on.
+
+    *   row_spec* => *str*
+
+        Row number (e.g. 2 for first data row), range (2-7), or
+        comma-separated list of such (2-7,10,20-23).
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  csv_sort_fields
+    Usage:
+
+     csv_sort_fields(%args) -> [status, msg, result, meta]
+
+    Sort CSV fields.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   ci => *bool*
+
+    *   example => *str*
+
+        A comma-separated list of field names.
+
+    *   filename* => *filename*
+
+        Input CSV file.
+
+    *   header => *bool* (default: 1)
+
+        Whether CSV has a header row.
+
+        When you declare that CSV does not have header row ("--no-header"),
+        the fields will be named "field1", "field2", and so on.
+
+    *   reverse => *bool*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  csv_sum
+    Usage:
+
+     csv_sum(%args) -> [status, msg, result, meta]
+
+    Output a summary row which are arithmetic sums of data rows.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename* => *filename*
+
+        Input CSV file.
+
+    *   header => *bool* (default: 1)
+
+        Whether CSV has a header row.
+
+        When you declare that CSV does not have header row ("--no-header"),
+        the fields will be named "field1", "field2", and so on.
+
+    *   with_data_rows => *bool*
+
+        Whether to also output data rows.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-CSVUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-CSVUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSVUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    csvgrep.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -5,7 +5,7 @@ use Method::Signatures::PP;
 
 package Wat;
 
-use Moo;
+sub new { bless {}, $_[0] }
 
 method foo {
   "FOO from ".ref($self);

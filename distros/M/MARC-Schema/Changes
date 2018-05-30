@@ -1,5 +1,9 @@
 Revision history for MARC-Schema
 
+0.07  2018-05-25 19:35:17 CEST
+  - delete DDP dependency
+  - fix script help message
+
 0.06  2018-05-17 20:12:02 CEST
   - Suporting validation of indicators
   - Pass alternative location schema file

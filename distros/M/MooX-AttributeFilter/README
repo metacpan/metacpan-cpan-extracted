@@ -3,7 +3,7 @@ NAME
     attributes
 
 VERSION
-    version 0.001007
+    version 0.002002
 
 SYNOPSIS
         package My::Class;
@@ -140,9 +140,10 @@ DESCRIPTION
         }
     }
 
-CAVEATS
-    * This module doesn't inflate into Moose.
+  Inflation to Moose
+    This module inflates into MooseX::AttributeFilter.
 
+CAVEATS
     * The code relies on low-level functionality of Method::Generate family
     of modules. For this reason it may become incompatible with their future
     versions if they get drastically changed.
@@ -154,6 +155,10 @@ ACKNOWLEDGEMENTS
     create the module... So, my great thanks to Graham Knopp
     <haarg@haarg.org> for his advises, sample code, and Moo itself, of
     course!
+
+    My special thanks to Princess Kitten <littleprincess@kittymail.com> who
+    implemented similar module for Moose framework and made the inflation
+    code working.
 
 AUTHOR
     Vadim Belman <vrurg@cpan.org>

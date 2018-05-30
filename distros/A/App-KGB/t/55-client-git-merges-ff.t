@@ -160,7 +160,7 @@ $commit = $c->describe_commit;
 ok( defined($commit), 'initial import commit' );
 is( $c->describe_commit, undef, 'no more commits' );
 
-TestBot->expect( '#test 03Test U. Ser (03ser) 05master '
+TestBot->expect( 'dummy/#test 03Test U. Ser (03ser) 05master '
         . $commit->id
         . ' 12test/06there 03old import old content * 14http://scm.host.org/there/master/?commit='
         . $commit->id
@@ -176,7 +176,7 @@ $commit = $c->describe_commit;
 is( $commit->branch, $b1 );
 is( $commit->log, 'branch created' );
 
-TestBot->expect( "#test"
+TestBot->expect( "dummy/#test"
         . " 05develop "
         . $commit->id
         . " 12test/06there "
@@ -200,7 +200,7 @@ $commit = $c->describe_commit;
 is( $commit->branch, 'master' );
 is( $commit->log,    'created new content' );
 
-TestBot->expect( "#test "
+TestBot->expect( "dummy/#test "
         . "03Test U. Ser (03ser)"
         . " 05master "
         . $commit->id
@@ -215,7 +215,7 @@ $commit = $c->describe_commit;
 is( $commit->branch, $b1 );
 is( $commit->log,    'fast forward' );
 
-TestBot->expect( "#test "
+TestBot->expect( "dummy/#test "
         . ${TestBot::COMMIT_USER}
         . " 05develop "
         . $commit->id

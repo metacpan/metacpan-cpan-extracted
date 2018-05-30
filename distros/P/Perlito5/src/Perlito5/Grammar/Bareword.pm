@@ -46,10 +46,6 @@ sub term_bareword {
     }
 
     my $name = Perlito5::Match::flat($m_name);
-    if ($name eq '__PACKAGE__' && $namespace eq '') {
-        $m_name->{capture} = [ 'term', Perlito5::AST::Apply->new( code => $name, namespace => '', arguments => [], bareword => 1 ) ];
-        return $m_name;
-    }
     $p = $m_name->{to};
 
     if ( $str->[$p] eq ':' && $str->[$p+1] eq ':' ) {
@@ -77,29 +73,14 @@ sub term_bareword {
         $p = $m->{to};
     }
 
-    if ( $str->[$p] eq '!' && ( $str->[$p+1] eq '=' || $str->[$p+1] eq '~' ) ) {
-        # != or !~
-        # "X::y != ..."  subroutine call
-        $m_name->{capture} = [ 'term', 
-                    Perlito5::AST::Apply->new(
-                        code      => $name,
-                        namespace => $namespace,
-                        arguments => [],
-                        bareword  => 1
-                    )
-                ];
-        return $m_name;
-    }
-
     # check for indirect-object
     my $invocant;
     my $is_subroutine_name;
     my $effective_name = ( $namespace || $Perlito5::PKG_NAME ) . '::' . $name;
 
-    {
-        # workaround for bootstrapping: $Perlito5::PROTO is not set when executing under the 'C-perl' compiler
+    if ( exists( &{ $effective_name } ) ) {
         my $p = eval { prototype($effective_name) };
-        $Perlito5::PROTO->{$effective_name} = $p if $p;
+        $Perlito5::PROTO->{$effective_name} = $p;
     }
 
     if ( exists( $Perlito5::Grammar::Print::Print{$name} ) ) {
@@ -111,6 +92,10 @@ sub term_bareword {
              )
            )
     {
+        if ( $name eq '__END__' || $name eq '__DATA__' ) {
+            return Perlito5::Grammar::Space::term_end(@_);
+        }
+
         # first term is a subroutine name;
         $is_subroutine_name = 1;
 
@@ -199,31 +184,6 @@ sub term_bareword {
         $m_name->{to} = $p;
         return $m_name;
     }
-    if ( $str->[$p] eq '-' && $str->[$p+1] eq '>' ) {
-        # ->
-        if ( $is_subroutine_name ) {
-            # call()->method call
-            $m_name->{capture} = [ 'term', 
-                                   Perlito5::AST::Apply->new(
-                                       'arguments' => [],
-                                       'code'      => $name,
-                                       'namespace' => $namespace,
-                                   )
-                                 ];
-        }
-        else {
-            # class->method call
-            $m_name->{capture} = [ 'term',
-                                   Perlito5::AST::Var->new(
-                                        'name'      => '',
-                                        'namespace' => $full_name,
-                                        'sigil'     => '::',
-                                   )
-                                 ];
-        }
-        $m_name->{to} = $p;
-        return $m_name;
-    }
 
     # Note: how does this work: (See: perldoc CORE)
     #   $ perl -e ' use strict; sub print { die "here" }; print "123\n"; '
@@ -253,17 +213,24 @@ sub term_bareword {
     #   $ perldoc -u PerlFunc | head -n300 | perl -ne ' push @x, /C<([^>]+)/g; END { eval { $p{$_} = prototype("CORE::$_") } for @x; use Data::Dumper; print Dumper \%p } '
 
 
-    my $sig;
+    my $sig = undef;
+
+    {
+        my $op = $str->[$p] . $str->[$p+1];
+        if ( $op eq '!=' || $op eq '!~' || $op eq '=~' ) {
+            $sig = '';
+        }
+    }
+
     if ( exists $Perlito5::PROTO->{$effective_name} ) {
         # subroutine was predeclared
         $sig = $Perlito5::PROTO->{$effective_name};
+        $namespace ||= $Perlito5::PKG_NAME;
     }
     elsif ( (!$namespace || $namespace eq 'CORE')
           && exists $Perlito5::CORE_PROTO->{"CORE::$name"} 
           )
     {
-        # TODO - CORE::GLOBAL
-
         # subroutine comes from CORE
 
         ## XXX - this breaks perl: "CORE::say is not a keyword"
@@ -271,6 +238,34 @@ sub term_bareword {
 
         $effective_name = "CORE::$name";
         $sig = $Perlito5::CORE_PROTO->{$effective_name};
+
+        # CORE_GLOBAL_OVERRIDABLE
+
+        my $core_global_name = "CORE::GLOBAL::$name";
+        if (  ! $namespace
+           && exists $Perlito5::CORE_GLOBAL_OVERRIDABLE->{$name}
+           && exists &{$core_global_name}
+        ) {
+            $namespace = "CORE::GLOBAL";
+            $effective_name = $core_global_name;
+            if (!exists $Perlito5::PROTO->{$core_global_name}) {
+                $Perlito5::PROTO->{$core_global_name} = prototype(&{$core_global_name});
+            }
+        }
+
+        # CORE_OVERRIDABLE
+
+        my $local_name = $Perlito5::PKG_NAME . "::$name";
+        if (  ! $namespace
+           && exists $Perlito5::CORE_OVERRIDABLE->{$name}
+           && exists &{$local_name}
+        ) {
+            $namespace = $$Perlito5::PKG_NAME;
+            $effective_name = $local_name;
+            if (!exists $Perlito5::PROTO->{$local_name}) {
+                $Perlito5::PROTO->{$local_name} = prototype(&{$local_name});
+            }
+        }
     }
     else {
         # TODO - add error messages if needed
@@ -291,13 +286,62 @@ sub term_bareword {
             $m->{capture} = [ 'term', $m->{capture} ];
             return $m;
         }
-
-        $sig = undef;
     }
+
+    if ( $str->[$p] eq '-' && $str->[$p+1] eq '>' ) {
+        # ->
+        if ( $is_subroutine_name ) {
+            # call()->method call
+            $m_name->{capture} = [ 'term', 
+                                   Perlito5::AST::Apply->new(
+                                       'arguments' => [],
+                                       'code'      => $name,
+                                       'namespace' => $namespace,
+                                   )
+                                 ];
+        }
+        else {
+            # class->method call
+            $m_name->{capture} = [ 'term',
+                                   Perlito5::AST::Var->new(
+                                        'name'      => '',
+                                        'namespace' => $full_name,
+                                        'sigil'     => '::',
+                                   )
+                                 ];
+        }
+        $m_name->{to} = $p;
+        return $m_name;
+    }
+
 
     # TODO - parse the parameter list according to the sig
 
     # say "calling $effective_name ($sig)";
+
+    if (defined $sig && $sig eq '' ) {
+        # looks like a constant declaration
+        # print STDERR "maybe constant $effective_name ($sig)\n";
+        my $expr = $Perlito5::CONSTANT{"${namespace}::$name"};
+        if ($expr) {
+
+            if ( $str->[$p] eq '(' ) {
+                $p++;
+                my $m = Perlito5::Grammar::Space::ws( $str, $p );
+                if ($m) {
+                    $p = $m->{to}
+                }
+                if ( $str->[$p] ne ')' ) {
+                    Perlito5::Compiler::error( "Too many arguments for ${namespace}::$name" );
+                }
+                $p++;
+            }
+
+            $m_name->{capture} = [ 'term', $expr ];
+            $m_name->{to} = $p;
+            return $m_name;
+        }
+    }
 
     my $has_paren = 0;
     if ( defined $sig ) {
@@ -503,6 +547,8 @@ sub term_bareword {
                 # - other variables captured by the current closure need to be added when the closure finishes compiling
 
                 $ast->{_scope} = Perlito5::Grammar::Scope::get_snapshot( $Perlito5::CLOSURE_SCOPE );
+                $ast->{_scalar_hints} = $^H;
+                $ast->{_hash_hints} = { %^H };
             }
             $m->{capture} = [ 'term', $ast ];
             return $m;
@@ -542,6 +588,12 @@ sub term_bareword {
             # stat DIRHANDLE
             # If EXPR is omitted, it stats $_.
 
+            # $m = Perlito5::Grammar::Print::typeglob( $str, $p );
+            # if ($m) {
+            #     $p = $m->{to};
+            #     my $arg = Perlito5::Match::flat($m->{'Perlito5::Grammar::Print::typeglob'});
+            #     # TODO
+            # }
         }
 
     } # / defined $sig
@@ -559,32 +611,6 @@ sub term_bareword {
         $arg = Perlito5::Grammar::Expression::expand_list( $arg );
 
         if ( $namespace eq '' || $namespace eq 'CORE' ) {
-            if  (   $name eq 'local'
-                ||  $name eq 'my'
-                ||  $name eq 'state'
-                ||  $name eq 'our'
-                )
-            {
-                my $declarator = $name;
-                for my $var (@$arg) {
-                    if ( ref($var) eq 'Perlito5::AST::Apply' && $var->{code} eq 'undef' ) {
-                        # "local (undef)" is a no-op
-                    }
-                    else {
-                        my $decl = Perlito5::AST::Decl->new(
-                                decl => $declarator,
-                                type => '',
-                                var  => $var,
-                                attributes => [],
-                            );
-                        $var->{_decl} = $name;
-                        $var->{_id}   = $Perlito5::ID++;
-                        $var->{_namespace} = $Perlito5::PKG_NAME if $declarator eq 'our';
-                        $var->{_namespace} = $Perlito5::PKG_NAME
-                            if $declarator eq 'local' && !$var->{namespace} && !$var->{_namespace};
-                    }
-                }
-            }
             if ( $name eq 'print' || $name eq 'say' ) {
                 if (@$arg == 0) {
                     push @$arg, Perlito5::AST::Var->new(
@@ -623,10 +649,30 @@ sub term_bareword {
     my $m_list = Perlito5::Grammar::Expression::list_parse( $str, $p );
     my $list = $m_list->{capture};
     if ($list ne '*undef*') {
+        my $param_list = Perlito5::Grammar::Expression::expand_list($list);
+        # warn "Bareword ", Perlito5::Dumper::Dumper($param_list);
+
+        if ( $^H & $Perlito5::STRICT_SUBS ) {
+            for my $i (0 .. $#$param_list) {
+                my $arg = $param_list->[$i];
+                if (ref($arg) eq 'Perlito5::AST::Apply' && $arg->{bareword} && $arg->{_not_a_subroutine} ) {
+                    # sub must be predeclared, unless proto is '*'
+                    my $name = $arg->{code};
+                    my $namespace = $arg->{namespace};
+                    if ($sig && (substr($sig, $i, 1) eq '*' || substr($sig, $i, 2) eq ';*')) {
+                        # proto is '*' or ';*'
+                    }
+                    else {
+                        Perlito5::Compiler::error( 'Bareword "' . ( $namespace ? "${namespace}::" : "" ) . $name . '" not allowed while "strict subs" in use' );
+                    }
+                }
+            }
+        }
+
         $m_name->{capture} = [ 'postfix_or_term', 'funcall',
                 $namespace,
                 $name,
-                $list
+                $param_list
             ];
         $m_name->{to} = $m_list->{to};
         return $m_name;
@@ -669,29 +715,55 @@ sub term_bareword {
 
     # it's just a bareword - we will disambiguate later
 
-    # TODO - forbid barewords that are not "GLOB" - "close FILE" is ok
-    #
-    # if ($Perlito5::STRICT) {
-    #     if (
-    #         !(
-    #             exists( $Perlito5::PROTO->{$effective_name} )
-    #             || (
-    #                 ( !$namespace || $namespace eq 'CORE' )
-    #                 && exists $Perlito5::CORE_PROTO->{"CORE::$name"}    # subroutine comes from CORE
-    #             )
-    #         )
-    #       )
-    #     {
-    #         # subroutine was not predeclared
-    #         # print STDERR "effective_name [$effective_name]\n";
-    #         Perlito5::Compiler::error 'Bareword "' . ( $namespace ? "${namespace}::" : "" ) . $name . '" not allowed while "strict subs" in use';
+    if ( $^H & $Perlito5::STRICT_SUBS ) {
+        # Allow:
+        #   - close FILE
+        #   - LABEL: { ... }
+        #   - next LABEL / goto LABEL
+        #   - predeclared named subroutines in $Perlito5::PROTO
+        #   - CORE operators                in $Perlito5::CORE_PROTO
+        #   - subr LABEL                    if prototype(&subr) eq '*'
 
-    #     }
-    # }
+        my $m = Perlito5::Grammar::Space::opt_ws( $str, $p );
+        my $p = $m->{to};
+        if ( $str->[$p] eq ':' ) {
+            # looks like "LABEL:"
+        }
+        elsif (
+            !(
+                exists( $Perlito5::PROTO->{$effective_name} )
+                || (
+                    ( !$namespace || $namespace eq 'CORE' )
+                    && exists $Perlito5::CORE_PROTO->{"CORE::$name"}    # subroutine comes from CORE
+                )
+            )
+          )
+        {
+            # TODO
+
+            # subroutine was not predeclared
+            # print STDERR "effective_name [$effective_name]\n";
+            # Perlito5::Compiler::error( 'HERE2 Bareword "' . ( $namespace ? "${namespace}::" : "" ) . $name . '" not allowed while "strict subs" in use' );
+            # warn( 'HERE2 Bareword "' . ( $namespace ? "${namespace}::" : "" ) . $name . '" not allowed while "strict subs" in use' );
+
+            $m_name->{capture} = [
+                'postfix_or_term',
+                'funcall_no_params',
+                Perlito5::AST::Apply->new(
+                    code      => $name,
+                    namespace => $namespace,
+                    arguments => [],
+                    bareword  => 1,
+                    _not_a_subroutine => 1,
+                )
+            ];
+            return $m_name;
+
+        }
+    }
 
     $m_name->{capture} = [ 'postfix_or_term', 'funcall_no_params',
-            $namespace,
-            $name
+            Perlito5::AST::Apply->new( code => $name, namespace => $namespace, arguments => [], bareword => 1 )
         ];
     return $m_name;
 }
@@ -743,7 +815,7 @@ This module parses source code for Perl 5 statements and generates Perlito5 AST.
 =head1 AUTHORS
 
 Flavio Soibelmann Glock <fglock@gmail.com>.
-The Pugs Team E<lt>perl6-compiler@perl.orgE<gt>.
+The Pugs Team.
 
 =head1 COPYRIGHT
 

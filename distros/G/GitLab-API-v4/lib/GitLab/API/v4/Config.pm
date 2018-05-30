@@ -1,5 +1,5 @@
 package GitLab::API::v4::Config;
-$GitLab::API::v4::Config::VERSION = '0.08';
+$GitLab::API::v4::Config::VERSION = '0.09';
 =encoding utf8
 
 =head1 NAME
@@ -248,7 +248,7 @@ sub configure {
     my $file = path( $self->file() );
     $file->touch();
     $file->chmod( 0600 );
-    $file->spew( $json );
+    $file->append( {truncate=>1}, $json );
 
     $log->infof( 'Configuration for GitLab::API::v4 saved to: %s', $file->absolute() );
 

@@ -1,7 +1,7 @@
 package Perinci::Sub::XCompletionBundle::CryptoCurrency;
 
-our $DATE = '2018-03-08'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-05-29'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: Completion routines related to cryptocurrency
@@ -18,7 +18,7 @@ Perinci::Sub::XCompletionBundle::CryptoCurrency - Completion routines related to
 
 =head1 VERSION
 
-This document describes version 0.003 of Perinci::Sub::XCompletionBundle::CryptoCurrency (from Perl distribution Perinci-Sub-XCompletionBundle-CryptoCurrency), released on 2018-03-08.
+This document describes version 0.004 of Perinci::Sub::XCompletionBundle::CryptoCurrency (from Perl distribution Perinci-Sub-XCompletionBundle-CryptoCurrency), released on 2018-05-29.
 
 =head1 HOMEPAGE
 

@@ -1,6 +1,10 @@
 use strict;
 use Test::More 0.98;
 use Test::Exception;
+
+use FindBin;
+use lib "$FindBin::Bin/../../";
+
 use t::Util;
 
 use DBIx::Fixture::Admin;

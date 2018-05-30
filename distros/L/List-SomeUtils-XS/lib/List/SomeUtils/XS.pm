@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.56';
+our $VERSION = '0.57';
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, $VERSION );
@@ -82,7 +82,7 @@ List::SomeUtils::XS - XS implementation for List::SomeUtils
 
 =head1 VERSION
 
-version 0.56
+version 0.57
 
 =head1 DESCRIPTION
 
@@ -143,7 +143,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dave Rolsky.
+This software is Copyright (c) 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

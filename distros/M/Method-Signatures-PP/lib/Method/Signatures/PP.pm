@@ -6,7 +6,7 @@ use re 'eval';
 use Filter::Util::Call;
 use PPR;
 
-our $VERSION = '0.000003'; # v0.0.3
+our $VERSION = '0.000004'; # v0.0.4
 
 $VERSION = eval $VERSION;
 

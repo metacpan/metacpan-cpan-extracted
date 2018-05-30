@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Lite;
 
-our $DATE = '2018-05-01'; # DATE
-our $VERSION = '1.812'; # VERSION
+our $DATE = '2018-05-29'; # DATE
+our $VERSION = '1.813'; # VERSION
 
 use 5.010001;
 # use strict; # already enabled by Mo
@@ -172,6 +172,13 @@ sub equal2 {
 sub hook_before_parse_argv {
     my ($self, $r) = @_;
 
+    # in this hook, we want to add several shortcut options (e.g. -C for
+    # --no-config, etc) if the function is not using those shortcut options. but
+    # to do this, we need to get meta first and this is only possible when there
+    # is no subcommand
+    return if $r->{subcommands};
+    $self->get_meta($r, $self->{url});
+
     my $copts = $self->common_opts;
 
     # XXX cache
@@ -195,6 +202,10 @@ sub hook_before_parse_argv {
         if (grep { $_ eq '-c' } @$opts) { $meta_uses_opt_c = 1 }
         if (grep { $_ eq '-C' } @$opts) { $meta_uses_opt_C = 1 }
     }
+
+    #say "D:meta_uses_opt_P=<$meta_uses_opt_P>";
+    #say "D:meta_uses_opt_c=<$meta_uses_opt_c>";
+    #say "D:meta_uses_opt_C=<$meta_uses_opt_C>";
 
     # add -P shortcut for --config-profile if no conflict
     if ($copts->{config_profile} && !$meta_uses_opt_P) {
@@ -550,7 +561,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.812 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2018-05-01.
+This document describes version 1.813 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2018-05-29.
 
 =head1 SYNOPSIS
 

@@ -63,38 +63,21 @@ sub import {
 #     or die sprintf "%s: Perl lib version (5.22.0) doesn't match executable '$^X' version (%vd)", $0, $^V;
 
 
-sub FETCH {
-    my($self, $key) = @_;
-
-    # check for cached value (which may be undef so we use exists not defined)
-    return exists $self->{$key} ? $self->{$key} : $self->fetch_string($key);
-}
-
-sub TIEHASH {
-    bless $_[1], $_[0];
-}
-
-sub DESTROY { }
-
-sub AUTOLOAD {
-    require 'Config_heavy.pl';
-    goto \&launcher unless $Config::AUTOLOAD =~ /launcher$/;
-    die "&Config::AUTOLOAD failed on $Config::AUTOLOAD";
-}
-
-# tie returns the object, so the value returned to require will be true.
-tie %Config, 'Config', {
+%Config = (
     archlibexp => '/usr/local/lib/perl5/5.22.0/darwin-2level',
     archname => 'darwin-2level',
     cc => 'cc',
-    d_readlink => 'define',
-    d_symlink => 'define',
+    # d_readlink => 'define',
+    # d_symlink => 'define',
+    d_readdir => '1',
     dlext => 'bundle',
     dlsrc => 'dl_dlopen.xs',
     dont_use_nlink => undef,
     exe_ext => '',
+    extensions => 'List/Util',
     inc_version_list => '5.20.0',
     intsize => '4',
+    ivsize  => '4',
     ldlibpthname => 'DYLD_LIBRARY_PATH',
     libpth => '/usr/local/lib /usr/bin/../lib/clang/4.2/lib /usr/lib /opt/local/lib',
     osname => 'darwin',
@@ -108,4 +91,8 @@ tie %Config, 'Config', {
     useithreads => undef,
     usevendorprefix => undef,
     version => '5.22.0',
-};
+    d_double_has_inf => '1',
+    d_double_has_nan => '1',
+    nvsize => '8',
+);
+

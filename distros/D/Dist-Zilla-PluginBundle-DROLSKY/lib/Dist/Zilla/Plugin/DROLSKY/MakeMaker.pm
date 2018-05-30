@@ -7,13 +7,25 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.90';
+our $VERSION = '0.95';
 
 use File::Which qw( which );
 
 use Moose;
 
-extends 'Dist::Zilla::Plugin::MakeMaker';
+extends 'Dist::Zilla::Plugin::MakeMaker::Awesome';
+
+has has_xs => (
+    is      => 'ro',
+    isa     => 'Bool',
+    default => 0,
+);
+
+has wall_min_perl_version => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => '5.008008',
+);
 
 with 'Dist::Zilla::Plugin::DROLSKY::Role::CoreCounter';
 
@@ -23,11 +35,28 @@ sub default_jobs {
     return shift->_core_count;
 }
 
+override _build_WriteMakefile_dump => sub {
+    my $self = shift;
+
+    my $dump = super();
+    return $dump unless $self->has_xs;
+
+    $dump .= sprintf( <<'EOF', $self->wall_min_perl_version );
+my $gcc_warnings = $ENV{AUTHOR_TESTING} ? q{ -Wall -Werror} : q{};
+$WriteMakefileArgs{DEFINE}
+    = ( $WriteMakefileArgs{DEFINE} || q{} ) . $gcc_warnings
+    if $] >= %s;
+
+EOF
+
+    return $dump;
+};
+
 __PACKAGE__->meta->make_immutable;
 
 1;
 
-# ABSTRACT: Subclasses MakeMaker to always run tests in parallel
+# ABSTRACT: Subclasses MakeMaker::Awesome to always run tests in parallel and add -W flags for XS code
 
 __END__
 
@@ -37,11 +66,11 @@ __END__
 
 =head1 NAME
 
-Dist::Zilla::Plugin::DROLSKY::MakeMaker - Subclasses MakeMaker to always run tests in parallel
+Dist::Zilla::Plugin::DROLSKY::MakeMaker - Subclasses MakeMaker::Awesome to always run tests in parallel and add -W flags for XS code
 
 =head1 VERSION
 
-version 0.90
+version 0.95
 
 =for Pod::Coverage .*
 

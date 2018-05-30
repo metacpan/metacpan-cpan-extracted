@@ -1,7 +1,7 @@
 package App::CSVUtils;
 
-our $DATE = '2017-07-02'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2018-05-25'; # DATE
+our $VERSION = '0.014'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,7 +12,7 @@ our %SPEC;
 sub _compile {
     my $str = shift;
     defined($str) && length($str) or die "Please specify code (-e)\n";
-    $str = "sub { $str }";
+    $str = "package main; no strict; no warnings; sub { $str }";
     my $code = eval $str;
     die "Can't compile code (-e) '$str': $@\n" if $@;
     $code;
@@ -238,6 +238,23 @@ my %arg_with_data_rows = (
     },
 );
 
+my %arg_eval = (
+    eval => {
+        summary => 'Perl code',
+        schema => 'str*',
+        cmdline_aliases => { e=>{} },
+        req => 1,
+    },
+);
+
+my %arg_hash = (
+    hash => {
+        summary => 'Provide row in $_ as hashref instead of arrayref',
+        schema => ['bool*', is=>1],
+        cmdline_aliases => {H=>{}},
+    },
+);
+
 $SPEC{csvutil} = {
     v => 1.1,
     summary => 'Perform action on a CSV file',
@@ -255,6 +272,7 @@ $SPEC{csvutil} = {
                 'avg',
                 'select-row',
                 'grep',
+                'map',
                 'convert-to-hash',
                 'select-fields',
             ]],
@@ -283,6 +301,7 @@ sub csvutil {
     my %args = @_;
     my $action = $args{action};
     my $has_header = $args{header} // 1;
+    my $add_newline = $args{add_newline} // 1;
 
     my $csv = Text::CSV_XS->new({binary => 1});
     open my($fh), "<:encoding(utf8)", $args{filename} or
@@ -366,6 +385,7 @@ sub csvutil {
                 return [400, "BUG: Invalid row_spec code: $@"] if $@;
             }
             if ($action eq 'grep') {
+            } elsif ($action eq 'map') {
             }
         } # if i==1 (header row)
 
@@ -531,9 +551,34 @@ sub csvutil {
                     }
                 }
                 local $_ = $args{hash} ? $rowhash : $row;
+                local $main::row = $row;
+                local $main::rownum = $i;
                 $code->($row);
             }) {
                 $res .= _get_csv_row($csv, $row, $i, $has_header);
+            }
+        } elsif ($action eq 'map') {
+            unless ($code) {
+                $code = _compile($args{eval});
+            }
+            if ($i > 1) {
+                my $rowres = do {
+                    my $rowhash;
+                    if ($args{hash}) {
+                        $rowhash = {};
+                        for (0..$#{$fields}) {
+                            $rowhash->{ $fields->[$_] } = $row->[$_];
+                        }
+                    }
+                    local $_ = $args{hash} ? $rowhash : $row;
+                    local $main::row = $row;
+                    local $main::rownum = $i;
+                    $code->($row);
+                } // '';
+                unless (!$add_newline || $rowres =~ /\R\z/) {
+                    $rowres .= "\n";
+                }
+                $res .= $rowres;
             }
         } elsif ($action eq 'convert-to-hash') {
             if ($i == $args{_row_number}) {
@@ -796,27 +841,35 @@ $SPEC{csv_grep} = {
     summary => 'Only output row(s) where Perl expression returns true',
     description => <<'_',
 
-This is like Perl's grep performed over rows of CSV. In `$_`, your Perl code
+This is like Perl's `grep` performed over rows of CSV. In `$_`, your Perl code
 will find the CSV row as an arrayref (or, if you specify `-H`, as a hashref).
-Your code is then free to return true or false based on some criteria. Only rows
-where Perl expression returns true will be included in the result.
+`$main::row` is also set to the row, while `$main::rownum` contains the row
+number (2 means the first data row). Your code is then free to return true or
+false based on some criteria. Only rows where Perl expression returns true will
+be included in the result.
 
 _
     args => {
         %args_common,
         %arg_filename_0,
-        eval => {
-            summary => 'Perl code',
-            schema => 'str*',
-            cmdline_aliases => { e=>{} },
-            req => 1,
-        },
-        hash => {
-            summary => 'Provide row in $_ as hashref instead of arrayref',
-            schema => ['bool*', is=>1],
-            cmdline_aliases => {H=>{}},
-        },
+        %arg_eval,
+        %arg_hash,
     },
+    examples => [
+        {
+            summary => 'Only show rows where the amount field '.
+                'is divisible by 7',
+            argv => ['-He', '$_->{amount} % 7 ? 1:0', 'file.csv'],
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Only show rows where the date is a Wednesday',
+            argv => ['-He', 'BEGIN { use DateTime::Format::Natural; $parser = DateTime::Format::Natural->new } $dt = $parser->parse_datetime($_->{date}); $dt->day_of_week == 3', 'file.csv'],
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+    ],
     links => [
         {url=>'prog:csvgrep'},
     ],
@@ -825,6 +878,48 @@ sub csv_grep {
     my %args = @_;
 
     csvutil(%args, action=>'grep');
+}
+
+$SPEC{csv_map} = {
+    v => 1.1,
+    summary => 'Return result of Perl code for every row',
+    description => <<'_',
+
+This is like Perl's `map` performed over rows of CSV. In `$_`, your Perl code
+will find the CSV row as an arrayref (or, if you specify `-H`, as a hashref).
+`$main::row` is also set to the row, while `$main::rownum` contains the row
+number (2 means the first data row). Your code is then free to return a string
+based on some operation against these data. This utility will then print out the
+resulting string.
+
+_
+    args => {
+        %args_common,
+        %arg_filename_0,
+        %arg_eval,
+        %arg_hash,
+        add_newline => {
+            summary => 'Whether to make sure each string ends with newline',
+            schema => 'bool*',
+            default => 1,
+        },
+    },
+    examples => [
+        {
+            summary => 'Create SQL insert statements (escaping is left as an exercise for users)',
+            argv => ['-He', '"INSERT INTO mytable (id,amount) VALUES ($_->{id}, $_->{amount});"', 'file.csv'],
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+    ],
+    links => [
+        {url=>'prog:csvgrep'},
+    ],
+};
+sub csv_map {
+    my %args = @_;
+
+    csvutil(%args, action=>'map');
 }
 
 $SPEC{csv_convert_to_hash} = {
@@ -978,7 +1073,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 0.013 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2017-07-02.
+This document describes version 0.014 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2018-05-25.
 
 =head1 DESCRIPTION
 
@@ -999,6 +1094,8 @@ This distribution contains the following CLI utilities:
 =item * L<csv-grep>
 
 =item * L<csv-list-field-names>
+
+=item * L<csv-map>
 
 =item * L<csv-munge-field>
 
@@ -1291,10 +1388,30 @@ Usage:
 
 Only output row(s) where Perl expression returns true.
 
-This is like Perl's grep performed over rows of CSV. In C<$_>, your Perl code
+Examples:
+
+=over
+
+=item * Only show rows where the amount field is divisible by 7:
+
+ csv_grep( filename => "file.csv", eval => "\$_->{amount} % 7 ? 1:0", hash => 1);
+
+=item * Only show rows where the date is a Wednesday:
+
+ csv_grep(
+   filename => "file.csv",
+   eval => "BEGIN { use DateTime::Format::Natural; \$parser = DateTime::Format::Natural->new } \$dt = \$parser->parse_datetime(\$_->{date}); \$dt->day_of_week == 3",
+   hash => 1
+ );
+
+=back
+
+This is like Perl's C<grep> performed over rows of CSV. In C<$_>, your Perl code
 will find the CSV row as an arrayref (or, if you specify C<-H>, as a hashref).
-Your code is then free to return true or false based on some criteria. Only rows
-where Perl expression returns true will be included in the result.
+C<$main::row> is also set to the row, while C<$main::rownum> contains the row
+number (2 means the first data row). Your code is then free to return true or
+false based on some criteria. Only rows where Perl expression returns true will
+be included in the result.
 
 This function is not exported.
 
@@ -1352,6 +1469,78 @@ Arguments ('*' denotes required arguments):
 =item * B<filename>* => I<filename>
 
 Input CSV file.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether CSV has a header row.
+
+When you declare that CSV does not have header row (C<--no-header>), the fields
+will be named C<field1>, C<field2>, and so on.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+=head2 csv_map
+
+Usage:
+
+ csv_map(%args) -> [status, msg, result, meta]
+
+Return result of Perl code for every row.
+
+Examples:
+
+=over
+
+=item * Create SQL insert statements (escaping is left as an exercise for users):
+
+ csv_map(
+   filename => "file.csv",
+   eval => "\"INSERT INTO mytable (id,amount) VALUES (\$_->{id}, \$_->{amount});\"",
+   hash => 1
+ );
+
+=back
+
+This is like Perl's C<map> performed over rows of CSV. In C<$_>, your Perl code
+will find the CSV row as an arrayref (or, if you specify C<-H>, as a hashref).
+C<$main::row> is also set to the row, while C<$main::rownum> contains the row
+number (2 means the first data row). Your code is then free to return a string
+based on some operation against these data. This utility will then print out the
+resulting string.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<add_newline> => I<bool> (default: 1)
+
+Whether to make sure each string ends with newline.
+
+=item * B<eval>* => I<str>
+
+Perl code.
+
+=item * B<filename>* => I<filename>
+
+Input CSV file.
+
+=item * B<hash> => I<bool>
+
+Provide row in $_ as hashref instead of arrayref.
 
 =item * B<header> => I<bool> (default: 1)
 
@@ -1681,7 +1870,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -3,7 +3,7 @@ package Dist::Zilla::Plugin::GitHub::Create;
 use strict;
 use warnings;
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 use JSON::MaybeXS;
 use Moose;
@@ -111,8 +111,6 @@ sub after_mint {
         $repo_name = $self->zilla->name;
     }
 
-    my ($login, $pass, $otp)  = $self->_get_credentials(0);
-
     my $http = HTTP::Tiny->new;
 
     $self->log([ "Creating new GitHub repository '%s'", $repo_name ]);
@@ -139,23 +137,11 @@ sub after_mint {
     $url .= $self->org ? '/orgs/' . $self->org . '/' : '/user/';
     $url .= 'repos';
 
-    if ($pass) {
-        require MIME::Base64;
-
-        my $basic = MIME::Base64::encode_base64("$login:$pass", '');
-        $headers->{authorization} = "Basic $basic";
-    }
-
-    if ($self->prompt_2fa) {
-        $headers->{'X-GitHub-OTP'} = $otp;
-        $self->log([ "Using two-factor authentication" ]);
-    }
-
     $content = encode_json($params);
 
     my $response = $http->request('POST', $url, {
         content => $content,
-        headers => $headers
+        headers => $self->_auth_headers,
     });
 
     my $repo = $self->_check_response($response);
@@ -220,7 +206,7 @@ Dist::Zilla::Plugin::GitHub::Create - Create a new GitHub repo on dzil new
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 SYNOPSIS
 
@@ -350,6 +336,12 @@ look at L<Dist::Zilla::Plugin::Git::PushInitial>.
 
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-GitHub>
 (or L<bug-Dist-Zilla-Plugin-GitHub@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-GitHub@rt.cpan.org>).
+
+There is also a mailing list available for users of this distribution, at
+L<http://dzil.org/#mailing-list>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
 =head1 AUTHOR
 

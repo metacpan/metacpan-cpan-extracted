@@ -13,6 +13,12 @@ is_deeply(trdate(norm => db_time => [2013, 12, 31, 23, 59, 59]), '2013-12-31 23:
 is_deeply(trdate(db_time => norm => '2013-12-31 23:59:59'), [2013, 12, 31, 23, 59, 59],
     'Check trdate db_time => norm ');
 
+is_deeply(
+    trdate(db_time => norm => '2013-12-31'),
+    [2013, 12, 31, 0, 0, 0],
+    'Check trdate db_time (without time) => norm'
+);
+
 is(trdate(norm => sec => trdate(sec => norm => 1375808504)), 1375808504, 'Check trdate sec => norm => sec');
 
 is(trdate(norm => days_in_month => [2012, 02, 15]), 29, 'Check trdate norm => days_in_month');
@@ -30,9 +36,3 @@ is(compare_dates('1900-01-01', '1984-07-04', iformat1 => 'db', iformat2 => 'db')
 is(compare_dates('2010-01-01', '2010-01-01', iformat1 => 'db', iformat2 => 'db'), 0, 'compare_dates()',);
 
 is(compare_dates('1999-01-01', '1998-01-01', iformat1 => 'db', iformat2 => 'db'), 1, 'compare_dates()',);
-
-is_deeply(
-    trdate(db_time => norm => '2013-12-31'),
-    [2013, 12, 31, 0, 0, 0],
-    'Check trdate db_time (without time) => norm'
-);

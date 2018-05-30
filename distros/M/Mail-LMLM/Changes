@@ -1,62 +1,66 @@
-0.6804    ( 2015-04-27 )
+0.6805    2018-05-23
+
+    - Convert to Dist-Zilla .
+
+0.6804    2015-04-27
 
     - Update old URLs and E-mails to up-to-date ones.
 
-0.6803    ( Fri 31 Jan 12:48:22 IST 2014 )
+0.6803   2014-01-31
 
     - Minimal version of perl is 5.008.
     - Add t/style-trailing-space.t and remove trailing space.
     - Add "use warnings;" everywhere.
     - Add the LICENSE file (CPANTS).
 
-0.6802    ( 2012-03-09 )
+0.6802    2012-03-09
     - Convert t/use.t to Test::More and use_ok().
         - it previously used Test.pm and plain ok()s after use statements.
         - Test.pm is no longer recommended.
     - Enhance the Build.PL with keywords, resources, requires and build_requires.
 
-0.6801    ( Fri Feb 26 13:20:42 IST 2010 )
+0.6801    Unknown
     - Correct the Google groups' mailing list homepage.
 
-0.6800    ( Tue Feb 23 22:56:49 IST 2010 )
+0.6800    Unknown
     - Fix the Google Groups behaviour. (It was completely broken beforehand).
         - We need some t/*.t tests.
 
-0.6700    ( Tue Feb 23 22:34:27 IST 2010 )
+0.6700    Unknown
     - Fix the building of the rpm using rpmbuild -tb Mail-LMLM-0.6600.tar.gz
 
-0.6600:   ( Tue Feb 23 22:24:23 IST 2010 )
+0.6600   2010-02-23
     - Add support for Google Groups mailing lists (under the "google" type).
 
-0.6500:   ( Thu Jul 23 18:04:02 IDT 2009 )
+0.6500   2009-07-23
     - Added the -owner address to mailman.
 
-0.6400:   ( Wed Mar  7 21:13:01 IST 2007 )
+0.6400   2007-03-07
     - Kwalitee improvements:
         - Added pod.t and pod-coverage.t files.
         - Added full POD coverage.
         - Added a Build.PL file.
         - Changed the COPYRIGHT POD section to LICENSE
 
-0.6300:   ( Tue Apr 25 09:49:24 IDT 2006 )
+0.6300   2006-04-25
     - Added id="" attributes to the sections.
 
-0.6.2:
+0.6.2    Unknown
     - RPM .spec fixes for new versions of Mandriva.
     - Fixed the prepare_package.sh script.
 
-0.6.1:
+0.6.1    Unknown
     Processed the prolog and epilog parameters in Mail::LMLM.
 
-0.6.0:
+0.6.0    Unknown
     Upgraded the minor version number to a stable version.
 
-0.5.16:
+0.5.16    Unknown
     Added MANIFEST to itself.
 
     Added the RPM Spec file.
 
-0.5.15:
+0.5.15    Unknown
     Added a t/use.t test and made sure the objects were moved to blib
     during the installation.
 

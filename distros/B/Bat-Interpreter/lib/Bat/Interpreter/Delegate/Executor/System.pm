@@ -7,7 +7,7 @@ use namespace::autoclean;
 
 with 'Bat::Interpreter::Role::Executor';
 
-our $VERSION = '0.008';    # VERSION
+our $VERSION = '0.009';    # VERSION
 
 sub execute_command {
     my $self    = shift();
@@ -37,7 +37,7 @@ Bat::Interpreter::Delegate::Executor::System
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

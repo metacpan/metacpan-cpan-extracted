@@ -4,11 +4,11 @@ author:
   - 'Ivan Wills <ivan.wills@gmail.com>'
 build_requires:
   Test::More: '0.88'
-  Test::Warnings: '0'
+  Test::Warnings: '0.026'
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,16 +17,17 @@ name: App-Git-Workflow-Extra
 provides:
   App::Git::Workflow::Extra:
     file: lib/App/Git/Workflow/Extra.pm
-    version: '0.3'
+    version: '0.4'
 requires:
-  App::Git::Workflow: '0.8'
-  App::Git::Workflow::Command::BranchConflicts: '0'
-  App::Git::Workflow::Command::Cat: '0'
-  App::Git::Workflow::Command::SinceRelease: '0'
-  App::Git::Workflow::Command::Take: '0'
+  App::Git::Workflow: v1.0.6
+  App::Git::Workflow::Command::BranchConflicts: '0.6'
+  App::Git::Workflow::Command::Cat: '0.2'
+  App::Git::Workflow::Command::SinceRelease: '0.4'
+  App::Git::Workflow::Command::Take: '0.5'
   perl: '5.006'
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Git-Workflow-Extra
   license: http://dev.perl.org/licenses/
   repository: git://github.com/ivanwills/App-Git-Workflow-Extra.git
-version: '0.3'
+version: '0.4'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

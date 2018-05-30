@@ -1,5 +1,9 @@
 Revision history for CPAN-Perl-Releases-MetaCPAN
 
+0.006  2018-05-26 20:19:38 JST
+    - Retrieve releases until num of releases == total
+    - Dump content if HTTP::Tinyish->get returns status 599
+
 0.005  2018-04-15 08:28:02 JST
     - verify_SSL => 1
 

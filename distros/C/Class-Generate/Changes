@@ -1,5 +1,13 @@
 Revision history for Perl extension Class::Generate.
 
+1.17    2018-05-24
+        - Fix github link.
+            - https://rt.cpan.org/Ticket/Display.html?id=125392
+            - Thanks to SREZIC for the report.
+        - Add test_requires on Text::Soundex.
+            - https://rt.cpan.org/Ticket/Display.html?id=125393
+            - Thanks to SREZIC for the report.
+
 1.16    2018-05-22
         - Convert to dzil .
 

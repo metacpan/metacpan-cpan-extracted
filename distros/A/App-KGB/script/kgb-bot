@@ -286,35 +286,36 @@ sub read_conf ($) {
 
     $conf->{broadcast_channels} = [];
 
-    $_->{channels} //= [] for values %{ $conf->{repositories} };
+    $_->{chanids} //= [] for values %{ $conf->{repositories} };
 
+    my %chanidx;
     foreach ( @{ $conf->{channels} } ) {
         $_->{repositories} //= [];
         die "Missing channel name at channel\n" unless ( $_->{name} );
         die "Invalid network at channel " . $_->{name} . "\n"
             unless ( $_->{network} and $conf->{networks}{ $_->{network} } );
         push @{ $conf->{networks}{ $_->{network} }{channels} }, $_->{name};
-        die "Invalid repos key at channel " . $_->{name} . "\n"
+        my $chanid = KGB->get_chanid( $_->{network}, $_->{name} );
+        die "Invalid repos key at channel $chanid\n"
             unless $_->{broadcast}
             or ( ref $_->{repos} and ref $_->{repos} eq "ARRAY" );
         if ( $_->{broadcast} ) {
-            push @{ $conf->{broadcast_channels} }, $_->{name};
-            KGB->out("Repository list ignored for broadcast channel $_->{name}\n")
+            push @{ $conf->{broadcast_channels} }, $chanid;
+            KGB->out("Repository list ignored for broadcast channel $chanid\n")
                 if @{ $_->{repositories} };
         }
         else {
-            KGB->out("Channel " . $_->{name} . " doesn't listen on any repository\n")
+            KGB->out("Channel $chanid doesn't listen on any repository\n")
                 unless @{ $_->{repos} };
             foreach my $repo ( @{ $_->{repos} } ) {
-                die "Invalid repository $repo at channel " . $_->{name} . "\n"
+                die "Invalid repository $repo at channel $chanid\n"
                     unless ( $conf->{repositories}{$repo} );
-                push @{ $conf->{repositories}{$repo}{channels} }, $_->{name};
+                push @{ $conf->{repositories}{$repo}{chanids} }, $chanid;
             }
         }
+        $_->{chanid} = $chanid;
+        $chanidx{$chanid} = $_;
     }
-    my %chanidx
-        = map ( { $conf->{channels}[$_]{name} => $conf->{channels}[$_] }
-        0 .. $#{ $conf->{channels} } );
     $conf->{chanidx} = \%chanidx;
 
     $conf->{colors}             ||= {};
@@ -431,6 +432,22 @@ sub get_run_seconds {
 sub reset_stats {
     %stats = ();
     $run_time_since = time;
+}
+
+sub get_chanid ($$) {
+    my $self = shift;
+    my $net = shift // "";
+    my $chan = shift // "";
+    return "$net/$chan";
+}
+
+sub get_net_chan ($) {
+    my $self = shift;
+    my $chanid = shift;
+    die "Invalid chanid $chanid"
+        unless exists $KGB::config->{chanidx}{$chanid};
+    return ($KGB::config->{chanidx}{$chanid}{network},
+        $KGB::config->{chanidx}{$chanid}{name});
 }
 
 1;
@@ -587,12 +604,12 @@ sub do_commit_msg {
 
     my $repo = $KGB::config->{repositories}{$repo_id};
 
-    my @channels = @{ $repo->{channels} };
-    push @channels, @{ $KGB::config->{broadcast_channels} }
+    my @chanids = @{ $repo->{chanids} };
+    push @chanids, @{ $KGB::config->{broadcast_channels} }
         unless $repo->{private};
 
     throw Error::Simple("Repository $repo_id has no associated channels.\n")
-        unless (@channels);
+        unless (@chanids);
 
     my $path_string;
     my %dirs;
@@ -659,40 +676,23 @@ sub do_commit_msg {
     $string[0] .= ' ' . colorize( separator => '*' ) . ' ' . $web_string
         if defined($web_string);
 
-    my @tmp;
-    # Standard says 512 (minus \r\n), anyway that's further trimmed when
-    # resending to clients because of prefix.
-    # Let's trim on 400, to be safe
-    my $MAGIC_MAX_LINE
-        = ( 400 - length("PRIVMSG ") - max( map( length, @channels ) ) );
+    @string = trim_lines(\@chanids, $repo_id, @string);
 
-    while ( $_ = shift @string ) {
-        if ( length($_) > $MAGIC_MAX_LINE ) {
-            push @tmp, substr( $_, 0, $MAGIC_MAX_LINE );
-            unshift @string,
-                colorize( repository => $repo_id )
-                . substr( $_, $MAGIC_MAX_LINE );
-        }
-        else {
-            push @tmp, $_;
-        }
-    }
-    @string = @tmp;
-
-    foreach my $chan ( @channels ) {
+    foreach my $chanid ( @chanids ) {
         if ($KGB::simulate) {
             my $fh = IO::File->new(">> $KGB::simulate")
                 or die "Error opening $KGB::simulate for writing: $!\n";
             $fh->autoflush(1);
             $fh->binmode(':utf8');
             for (@string) {
-                $fh->print("$chan $_\n");
+                $fh->print("$chanid $_\n");
             }
             $fh->close;
         }
         else {
+            my ( $net, $chan ) = KGB->get_net_chan($chanid);
             $kernel->yield(
-                irc_notify => $chan => \@string,
+                irc_notify => $net, $chan, \@string,
                 $use_notices ? 'notice' : 'privmsg'
             );
         }
@@ -888,6 +888,7 @@ use POE;
 use POE::Component::IRC::Common qw( parse_user matches_mask );
 use POE::Component::IRC::Constants qw( MSG_PRI MSG_TEXT PRI_HIGH );
 use Schedule::RateLimiter;
+use Storable qw(dclone);
 
 our %current = ();
 our $irc_object;
@@ -921,6 +922,7 @@ sub _irc_reconnect {
     my ( $kernel, $session ) = @_[ KERNEL, SESSION ];
     my ( @to_start, @to_stop, @to_restart );
 
+    KGB->debug("_irc_reconnect called, re-sync network configuration.");
     foreach my $net ( keys %current ) {
         next unless ( defined( $current{$net} ) );
         my ( $new, $old )
@@ -954,7 +956,7 @@ sub _irc_reconnect {
                     $kernel->post( "irc_$net" => part => $chan );
                 }
             }
-            $current{$net} = $new;
+            $current{$net} = dclone($new);
         }
     }
     foreach ( keys %{ $KGB::config->{networks} } ) {
@@ -964,7 +966,7 @@ sub _irc_reconnect {
     }
     foreach my $net (@to_start) {
         my $opts = $KGB::config->{networks}{$net};
-        $current{$net} = $opts;
+        $current{$net} = dclone($opts);
 
         my $irc = POE::Component::IRC::State->spawn(
             Alias      => "irc_$net",
@@ -1078,19 +1080,34 @@ sub get_net {
     return $net;
 }
 
+sub add_channel ($$$) {
+    my ( $kernel, $network, $channel ) = @_;
+    my $chanid = KGB->get_chanid($network, $channel);
+
+    die "Unknown network \"$network\"."
+        unless (exists $KGB::config->{networks}{$network});
+    return if (exists $KGB::config->{chanidx}{$chanid});
+
+    push @{ $KGB::config->{networks}{$network}{channels} }, $channel;
+    $KGB::config->{chanidx}{$chanid} = {
+        name => $channel,
+        network => $network,
+    };
+    # Mark as pending.
+    $KGB::joining_channels{$chanid} = { pending_messages => [] };
+    $kernel->yield("_irc_reconnect") unless $KGB::simulate;
+}
+
 sub irc_chan_sync {
-    my ( $kernel, $chan ) = @_[KERNEL, ARG0];
+    my ( $kernel, $sender, $chan ) = @_[KERNEL, SENDER, ARG0];
+    my $net = get_net($sender);
+    my $chanid = KGB->get_chanid($net, $chan);
 
-    if ( my $jc = delete $KGB::joining_channels{$chan} ) {
-        KGB->out("Sending messages waiting for $chan");
-        $KGB::config->{chanidx}{$chan} = {
-            name => $chan,
-            network => $jc->{network},
-        };
-
+    if ( my $jc = delete $KGB::joining_channels{$chanid} ) {
+        KGB->out("Sending messages waiting for $chanid");
         for my $stash ( @{ $jc->{pending_messages} } ) {
             $kernel->yield(
-                irc_notify => $chan,
+                irc_notify => $net, $chan,
                 $stash->{message}, $stash->{method}
             );
         }
@@ -1134,17 +1151,17 @@ sub get_polygen_joke {
 }
 
 sub get_smart_answer {
-    my $chan = shift;
+    my $chanid = shift;
 
     # Channel config
-    if ( $KGB::config->{chanidx}{$chan}{smart_answers_polygen} ) {
+    if ( $KGB::config->{chanidx}{$chanid}{smart_answers_polygen} ) {
         my $polygen_joke = get_polygen_joke;
 
         return $polygen_joke if $polygen_joke;
     }
 
     my $smart_answers
-        = $chan ? $KGB::config->{chanidx}{$chan}{smart_answers} : undef;
+        = $chanid ? $KGB::config->{chanidx}{$chanid}{smart_answers} : undef;
     return $smart_answers->[ ( int( rand( scalar(@$smart_answers) ) ) ) ]
         if $smart_answers;
 
@@ -1178,7 +1195,8 @@ sub got_a_message {
         $kernel->yield( irc_command => $1 => $who => $chan => $net );
     }
     else {
-        my $msg = get_smart_answer($chan);
+        my $chanid = KGB->get_chanid($net, $chan);
+        my $msg = get_smart_answer($chanid);
         return undef unless ($msg);
         my $nick = parse_user($who);
         reply( $kernel, $net, $chan, $nick, $msg );
@@ -1229,8 +1247,8 @@ sub irc_new_hash {
 }
 
 sub irc_notify {
-    my ( $kernel, $heap, $chan, $str, $method )
-        = @_[ KERNEL, HEAP, ARG0, ARG1, ARG2 ];
+    my ( $kernel, $heap, $net, $chan, $str, $method )
+        = @_[ KERNEL, HEAP, ARG0, ARG1, ARG2, ARG3 ];
 
     $method ||= 'privmsg';
 
@@ -1252,10 +1270,10 @@ sub irc_notify {
 
     KGB->count('notifications');
 
-    my $alias = "irc_" . $KGB::config->{chanidx}{$chan}{network};
+    my $alias = "irc_$net";
     $kernel->post( $alias => $method => $chan => $_ ) foreach (@$str);
     if ( $KGB::debug ) {
-        KGB->out("$alias/$chan > $_\n") foreach (@$str);
+        KGB->out("$net/$chan > $_\n") foreach (@$str);
     }
 }
 
@@ -1445,11 +1463,11 @@ sub do_json_relay_message {
     defined $repo_id or die "Missing repo_id argument\n";
     exists $KGB::config->{repositories}{$repo_id} or die "Invalid repository '$repo_id'\n";
     my $repo = $KGB::config->{repositories}{$repo_id};
-    my @channels = @{ $repo->{channels} };
-    push @channels, @{ $KGB::config->{broadcast_channels} }
-            unless $repo->{private};
+    my @chanids = @{ $repo->{chanids} };
+    push @chanids, @{ $KGB::config->{broadcast_channels} }
+        unless $repo->{private};
 
-    die("Repository $repo_id has no associated channels.\n") unless @channels;
+    die("Repository $repo_id has no associated channels.\n") unless @chanids;
 
     my @messages;
 
@@ -1483,19 +1501,20 @@ sub do_json_relay_message {
         < ( $KGB::IRC::irc_object->send_queue + scalar(@messages) );
 
     foreach my $msg (@messages) {
-        foreach my $chan ( @channels ) {
+        foreach my $chanid ( @chanids ) {
             for my $line ( split( /\n/, $msg ) ) {
                 if ($KGB::simulate) {
                     my $fh = IO::File->new(">> $KGB::simulate")
                         or die "Error opening $KGB::simulate for writing: $!\n";
                     $fh->autoflush(1);
                     $fh->binmode(':utf8');
-                    $fh->print("$chan $line\n");
+                    $fh->print("$chanid $line\n");
                     $fh->close;
                 }
                 else {
+                    my ( $net, $chan ) = KGB->get_net_chan($chanid);
                     $kernel->yield(
-                        irc_notify => $chan => [$line],
+                        irc_notify => $net, $chan, [$line],
                         $opts->{use_irc_notices} ? 'notice' : 'privmsg'
                     );
                 }
@@ -1521,6 +1540,20 @@ use POE;
 sub colorize { KGB::SOAP::colorize( @_ ) };
 sub colorize_change { KGB::SOAP::colorize_change( @_ ) };
 
+sub webhook_error(\@$;$$) {
+    my $env = shift;
+    my $message = shift;
+    my $code = shift // HTTP::Status::HTTP_BAD_REQUEST;
+    my $content = shift // $message;
+
+    KGB->debug("Webhook error: $message");
+    my $response = $env->[ARG1];
+    $response->code($code);
+    $response->message($message);
+    $response->content($content);
+    return $env->[KERNEL]->post( $env->[SENDER], DONE => $response);
+}
+
 =head2 webhook_request I<request> I<response> I<dirmatch>
 
 Handler for webhook HTTP request.
@@ -1539,12 +1572,11 @@ my @array_webhook_params =
 my %array_webhook_params = map( ( $_ => 1 ), @array_webhook_params );
 
 sub webhook_request {
-    my ( $request, $response, $dirmatch ) = @_[ ARG0 .. ARG2 ];
+    my ( $kernel, $request, $response, $dirmatch ) = @_[ KERNEL, ARG0 .. ARG2 ];
 
     unless ( $KGB::config->{webhook}{enabled} ) {
-        $response->code(HTTP::Status::HTTP_PRECONDITION_FAILED);
-        $response->content('WebHook support not enabled');
-        return $_[KERNEL]->post( $_[SENDER], DONE => $response );
+        return webhook_error(@_, 'WebHook support not enabled',
+            HTTP::Status::HTTP_PRECONDITION_FAILED);
     }
 
     my $client_ip = Net::IP->new($response->connection->remote_ip);
@@ -1562,20 +1594,14 @@ sub webhook_request {
     }
 
     unless ($allowed) {
-        KGB->debug( "Client $client_ip is not whitelisted ("
-                . join( ', ', map( $_->short, @{ $allowed_nets // [] } ) )
-                . ")" );
-        $response->code(HTTP::Status::HTTP_FORBIDDEN);
-        $response->content('Your IP is not allowed to send webhook requests');
-        return $_[KERNEL]->post( $_[SENDER], DONE => $response );
+        return webhook_error(@_, "Client IP $client_ip is not whitelisted",
+            HTTP::Status::HTTP_FORBIDDEN);
     }
 
     KGB->debug( "got a webhook request from " . $client_ip->ip );
 
     unless( $request->method eq 'POST' ) {
-        $response->code(HTTP::Status::HTTP_BAD_REQUEST);
-        $response->message('Request method must be "POST"');
-        return $_[KERNEL]->post( $_[SENDER], DONE => $response );
+        return webhook_error(@_, 'Request method must be "POST"');
     }
 
     KGB->debug('DEBUG: method check passed');
@@ -1587,11 +1613,7 @@ sub webhook_request {
     };
 
     unless ($ok) {
-        my $err = $@;
-        $response->code(HTTP::Status::HTTP_BAD_REQUEST);
-        $response->message('Error decoding JSON body');
-        $response->content($err);
-        return $_[KERNEL]->post( $_[SENDER], DONE => $response );
+        return webhook_error(@_, 'Error decoding JSON body', undef, $@);
     }
 
     KGB->debug('Body decoded');
@@ -1608,9 +1630,7 @@ sub webhook_request {
         and length $json->{object_kind}
         )
     {
-        $response->code(HTTP::Status::HTTP_BAD_REQUEST);
-        $response->message('Empty on invalid JSON body');
-        return $_[KERNEL]->post( $_[SENDER], DONE => $response );
+        return webhook_error(@_, 'Empty on invalid JSON body');
     }
 
     my $module = $json->{project}{name};
@@ -1641,9 +1661,8 @@ sub webhook_request {
         $hook_handler = 'gitlab_webhook_build';
     }
     else {
-        $response->code(HTTP::Status::HTTP_BAD_REQUEST);
-        $response->content("Unsupported object_kind: $json->{object_kind}");
-        return $_[KERNEL]->post( $_[SENDER], DONE => $response );
+        return webhook_error(@_,
+            "Unsupported object_kind: $json->{object_kind}");
     }
 
     KGB->debug('Body check passed');
@@ -1653,6 +1672,7 @@ sub webhook_request {
     $param->{always_squash_branch} = [qw( upstream upstream/master )];
     $param->{shorten_urls}         = 1;
     $param->{use_irc_notices}      = 1;
+    $param->{network}              = 'oftc';
     my $uri = URI->new( $request->url );
     my @query = $request->uri->query_form;
     while ( my( $key, $value ) = splice( @query, 0, 2 ) ) {
@@ -1664,25 +1684,41 @@ sub webhook_request {
         }
     }
 
-    my @channels = @{ $param->{channel} };
-    s/^(?!#)/#/ for @channels;
-    push @channels, @{ $KGB::config->{broadcast_channels} }
-        unless $param->{private};
-
-    unless (@channels) {
-        KGB->debug("Repository $module has no associated channels.");
-        $response->code(HTTP::Status::HTTP_BAD_REQUEST);
-        $response->content("Repository $module has no assosiated channels.");
-        return $_[KERNEL]->post( $_[SENDER], DONE => $response );
+    my $network = delete $param->{network};
+    unless (exists $KGB::config->{networks}{$network}) {
+        return webhook_error(@_, "Unknown network \"$network\".");
     }
 
-    $param->{channel} = \@channels;
+    my @channels = @{ delete $param->{channel} };
+    s/^(?!#)/#/ for @channels;
 
-    $_[KERNEL]->yield( $hook_handler => $json, $param );
+    my @chanids;
+    for my $channel (@channels) {
+        my $chanid = KGB->get_chanid($network, $channel);
+
+        if ( not exists $KGB::config->{chanidx}{$chanid} and
+            not exists $KGB::joining_channels{$chanid} )
+        {
+            # An unknown channel. needs a JOIN
+            KGB->out("Joining $chanid dynamically due to webhook request...");
+            KGB::IRC::add_channel($kernel, $network, $channel);
+        }
+        push @chanids, $chanid;
+    }
+
+    push @chanids, @{ $KGB::config->{broadcast_channels} }
+        unless $param->{private};
+
+    unless ( @chanids ) {
+        return webhook_error(@_,
+            "Repository $module has no associated channels and none given as parameters.");
+    }
+
+    $kernel->yield( $hook_handler => \@chanids, $json, $param );
 
     $response->code(HTTP::Status::HTTP_ACCEPTED);
     $response->message('Notification received');
-    return $_[KERNEL]->post( $_[SENDER], DONE => $response );
+    return $kernel->post( $_[SENDER], DONE => $response );
 }
 
 sub monkey_shorten_git_hashes {
@@ -1739,72 +1775,62 @@ sub shorten_url {
     return $short_url;
 }
 
-sub to_irc {
-    my ( $p ) = @_;
-
+sub trim_lines(\@$@) {
+    my ( $chanids, $repoid, @strings ) = @_;
     # Standard says 512 (minus \r\n), anyway that's further trimmed when
     # resending to clients because of prefix.
     # Let's trim on 400, to be safe
     my $MAGIC_MAX_LINE = ( 400 - length("PRIVMSG ")
-            - max( map( length, @{ $p->{opts}{channel} } ) ) );
+        - max( map( length($KGB::config->{chanidx}{$_}{name}), @$chanids ) ) );
 
     my @tmp;
-    while ( $_ = shift @{ $p->{strings} } ) {
+    while ( $_ = shift @strings ) {
         if ( length($_) > $MAGIC_MAX_LINE ) {
             push @tmp, substr( $_, 0, $MAGIC_MAX_LINE );
-            unshift @{ $p->{strings} },
-                colorize( repository => $p->{repository} )
+            unshift @strings,
+                colorize( repository => $repoid )
                 . substr( $_, $MAGIC_MAX_LINE );
         }
         else {
             push @tmp, $_;
         }
     }
-    @{ $p->{strings} } = @tmp;
+    return @tmp;
+}
 
-    foreach my $chan ( @{ $p->{opts}{channel} } ) {
-        if ($KGB::simulate) {
+sub webhook_to_irc {
+    my ( $p ) = @_;
+
+    my @chanids = @{ $p->{chanids} };
+    my @strings = trim_lines(@chanids, $p->{repository}, @{ $p->{strings} });
+
+    foreach my $chanid (@chanids) {
+        if ( $KGB::simulate ) {
             my $fh = IO::File->new(">> $KGB::simulate")
                 or die "Error opening $KGB::simulate for writing: $!\n";
             $fh->autoflush(1);
             $fh->binmode(':utf8');
-            for (@{ $p->{strings} } ) {
-                $fh->print("$chan $_\n");
+            for (@strings) {
+                $fh->print("$chanid $_\n");
             }
             $fh->close;
         }
         else {
-            if ( $KGB::config->{chanidx}{$chan}
-                and not exists $KGB::joining_channels{$chan} )
+            my ( $net, $chan ) = KGB->get_net_chan($chanid);
+            my $method = $p->{opts}{use_irc_notices} ? 'notice' : 'privmsg';
+            if ( not exists $KGB::joining_channels{$chanid} )
             {
                 $p->{kernel}->yield(
-                    irc_notify => $chan => $p->{strings},
-                    $p->{opts}{use_irc_notices} ? 'notice' : 'privmsg'
+                    irc_notify => $net, $chan, \@strings, $method
                 );
             }
             else {
-                my $net = $p->{opts}{network} // 'oftc';
-
-                my $stash = {
-                    message => $p->{strings},
-                    method  => $p->{opts}{use_irc_notices} ? 'notice' : 'privmsg'
-                };
-
-                if ( my $jc = $KGB::joining_channels{$chan} ) {
-                    # joining already initiated
-                    KGB->out(
-                        "Delaying a message to $chan for after it is joined"
-                    );
-
-                    push @{ $jc->{pending_messages} }, $stash;
-                }
-                else {
-                    # an unknown channel. needs a JOIN
-                    KGB->out("Joining $chan on $net");
-                    $KGB::joining_channels{$chan} =
-                        { network => $net, pending_messages => [$stash] };
-                    $p->{kernel}->post( "irc_$net" => join => $chan );
-                }
+                KGB->out(
+                    "Delaying a message to $chanid for after it is joined."
+                );
+                my $stash = { message => \@strings, method  => $method };
+                push (@{ $KGB::joining_channels{$chanid}{pending_messages} },
+                    $stash);
             }
         }
     }
@@ -1869,7 +1895,7 @@ B<Default>: 20
 =cut
 
 sub gitlab_webhook_push {
-    my ( $kernel, $body, $opts ) = @_[ KERNEL, ARG0, ARG1 ];
+    my ( $kernel, $chanids, $body, $opts ) = @_[ KERNEL, ARG0 .. ARG2 ];
 
     my $module = $body->{project}{name};
 
@@ -1902,8 +1928,9 @@ sub gitlab_webhook_push {
         push @info, colorize( deletion => '.' );
         push @info, colorize( separator => '*' ), 'branch deleted';
 
-        to_irc(
+        webhook_to_irc(
             {   kernel     => $kernel,
+                chanids    => $chanids,
                 strings    => [ join( ' ', @info ) ],
                 repository => $body->{project}{namespace},
                 opts       => $opts,
@@ -1967,8 +1994,9 @@ sub gitlab_webhook_push {
             )
             );
 
-        to_irc(
+        webhook_to_irc(
             {   kernel     => $kernel,
+                chanids    => $chanids,
                 strings    => [ join( ' ', @info ) ],
                 repository => $body->{project}{namespace},
                 opts       => $opts,
@@ -2085,8 +2113,9 @@ sub gitlab_webhook_push {
         $string[0] .= ' ' . colorize( separator => '*' ) . ' ' . $web_string
             if defined($web_string);
 
-        to_irc(
+        webhook_to_irc(
             {   kernel     => $kernel,
+                chanids    => $chanids,
                 strings    => \@string,
                 repository => $body->{project}{namespace},
                 opts       => $opts,
@@ -2107,8 +2136,9 @@ sub gitlab_webhook_push {
             '%d commit%s touching only files outside monitored directories omitted',
             $number_of_hidden_commits,
             ( $number_of_hidden_commits > 1 ) ? 's' : '' );
-        to_irc(
+        webhook_to_irc(
             {   kernel     => $kernel,
+                chanids    => $chanids,
                 strings    => [ join( ' ', @info ) ],
                 repository => $body->{project}{namespace},
                 opts       => $opts,
@@ -2118,7 +2148,7 @@ sub gitlab_webhook_push {
 }
 
 sub gitlab_webhook_wiki_page {
-    my ( $kernel, $body, $opts ) = @_[ KERNEL, ARG0, ARG1 ];
+    my ( $kernel, $chanids, $body, $opts ) = @_[ KERNEL, ARG0 .. ARG2 ];
 
     my $module = $body->{project}{name};
 
@@ -2175,8 +2205,9 @@ sub gitlab_webhook_wiki_page {
     $string[0] .= ' ' . colorize( separator => '*' ) . ' ' . $web_string
         if defined($web_string);
 
-    to_irc(
+    webhook_to_irc(
         {   kernel     => $kernel,
+            chanids    => $chanids,
             strings    => \@string,
             repository => $body->{project}{namespace},
             opts       => $opts,
@@ -2185,7 +2216,7 @@ sub gitlab_webhook_wiki_page {
 }
 
 sub gitlab_webhook_tag_push {
-    my ( $kernel, $body, $opts ) = @_[ KERNEL, ARG0, ARG1 ];
+    my ( $kernel, $chanids, $body, $opts ) = @_[ KERNEL, ARG0 .. ARG2 ];
 
     my $module = $body->{project}{name};
 
@@ -2257,8 +2288,9 @@ sub gitlab_webhook_tag_push {
     $string[0] .= ' ' . colorize( separator => '*' ) . ' ' . $web_string
         if defined($web_string);
 
-    to_irc(
+    webhook_to_irc(
         {   kernel     => $kernel,
+            chanids    => $chanids,
             strings    => \@string,
             repository => $body->{project}{namespace},
             opts       => $opts,
@@ -2267,7 +2299,7 @@ sub gitlab_webhook_tag_push {
 }
 
 sub gitlab_webhook_issue {
-    my ( $kernel, $body, $opts ) = @_[ KERNEL, ARG0, ARG1 ];
+    my ( $kernel, $chanids, $body, $opts ) = @_[ KERNEL, ARG0 .. ARG2 ];
 
     my $module = $body->{project}{name};
 
@@ -2322,8 +2354,9 @@ sub gitlab_webhook_issue {
     $string[0] .= ' ' . colorize( separator => '*' ) . ' ' . $web_string
         if defined($web_string);
 
-    to_irc(
+    webhook_to_irc(
         {   kernel     => $kernel,
+            chanids    => $chanids,
             strings    => \@string,
             repository => $body->{project}{namespace},
             opts       => $opts,
@@ -2339,7 +2372,7 @@ my %note_descr = (
 );
 
 sub gitlab_webhook_note {
-    my ( $kernel, $body, $opts ) = @_[ KERNEL, ARG0, ARG1 ];
+    my ( $kernel, $chanids, $body, $opts ) = @_[ KERNEL, ARG0 .. ARG2 ];
 
     my $module = $body->{project}{name};
 
@@ -2387,8 +2420,9 @@ sub gitlab_webhook_note {
     $string[0] .= ' ' . colorize( separator => '*' ) . ' ' . $web_string
         if defined($web_string);
 
-    to_irc(
+    webhook_to_irc(
         {   kernel     => $kernel,
+            chanids    => $chanids,
             strings    => \@string,
             repository => $body->{project}{namespace},
             opts       => $opts,
@@ -2397,7 +2431,7 @@ sub gitlab_webhook_note {
 }
 
 sub gitlab_webhook_merge_request {
-    my ( $kernel, $body, $opts ) = @_[ KERNEL, ARG0, ARG1 ];
+    my ( $kernel, $chanids, $body, $opts ) = @_[ KERNEL, ARG0 .. ARG2 ];
 
     my $module = $body->{project}{name};
 
@@ -2412,6 +2446,9 @@ sub gitlab_webhook_merge_request {
 
     my $log = sprintf( '[%s] merge request !%s',
         $action, $body->{object_attributes}{iid} );
+    if ( $body->{object_attributes}{title} ) {
+        $log .= ': ' . $body->{object_attributes}{title};
+    }
 
     my @info;
 
@@ -2429,8 +2466,9 @@ sub gitlab_webhook_merge_request {
     $string[0] .= ' ' . colorize( separator => '*' ) . ' ' . $web_string
         if defined($web_string);
 
-    to_irc(
+    webhook_to_irc(
         {   kernel     => $kernel,
+            chanids    => $chanids,
             strings    => \@string,
             repository => $body->{project}{namespace},
             opts       => $opts,
@@ -2471,7 +2509,7 @@ sub human_duration {
 }
 
 sub gitlab_webhook_pipeline {
-    my ( $kernel, $body, $opts ) = @_[ KERNEL, ARG0, ARG1 ];
+    my ( $kernel, $chanids, $body, $opts ) = @_[ KERNEL, ARG0 .. ARG2 ];
 
     my $module = $body->{project}{name};
 
@@ -2515,8 +2553,9 @@ sub gitlab_webhook_pipeline {
 
     my @string = join( ' ', @info );
 
-    to_irc(
+    webhook_to_irc(
         {   kernel     => $kernel,
+            chanids    => $chanids,
             strings    => \@string,
             repository => $body->{project}{namespace},
             opts       => $opts,
@@ -2525,7 +2564,7 @@ sub gitlab_webhook_pipeline {
 }
 
 sub gitlab_webhook_build {
-    my ( $kernel, $body, $opts ) = @_[ KERNEL, ARG0, ARG1 ];
+    my ( $kernel, $chanids, $body, $opts ) = @_[ KERNEL, ARG0 .. ARG2 ];
 
     my $module = $body->{project_name};
 
@@ -2554,8 +2593,9 @@ sub gitlab_webhook_build {
 
     my @string = join( ' ', @info );
 
-    to_irc(
+    webhook_to_irc(
         {   kernel     => $kernel,
+            chanids    => $chanids,
             strings    => \@string,
             repository => $body->{project}{namespace},
             opts       => $opts,

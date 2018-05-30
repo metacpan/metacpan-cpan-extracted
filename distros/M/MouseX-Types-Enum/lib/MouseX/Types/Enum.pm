@@ -7,7 +7,7 @@ use warnings FATAL => 'all';
 use Carp;
 use Mouse::Meta::Class;
 
-our $VERSION = "1.03";
+our $VERSION = "1.04";
 
 sub import {
     my ($class, @enums) = @_;
@@ -130,13 +130,16 @@ A method C<< make_sentence($suffix) >> is defined.
 
 =back
 
+code:
+
+
     {
         package Fruits;
 
         use Mouse;
         use MouseX::Types::Enum (
             APPLE  => { name => 'Apple', color => 'red' },
-            ORANGE => { name => 'Cherry', color => 'red' },
+            ORANGE => { name => 'Orange', color => 'orange' },
             BANANA => { name => 'Banana', color => 'yellow', has_seed => 0 }
         );
 
@@ -185,31 +188,14 @@ If you have no need to define instance variables, you can declare enums more sim
 
     Day->Sun == Day->Sun;   # 1
     Day->Sun == Day->Mon;   # ''
-    Day->Sun->to_string;    # 'APPLE'
+    Day->Sun->to_string;    # 'Sun'
     Day->enums;             # { Sun => Day->Sun, Mon => Day->Mon, ... }
 
 
 =head1 DESCRIPTION
 
-MouseX::Types::Enum provides Java-like enum type declaration.
-
-Enums declared are
-
-=over 4
-
-=item *
-
-distinguished from each other
-
-=item *
-
-able to have attributes
-
-=item *
-
-able to have methods
-
-=back
+MouseX::Types::Enum provides Java-like enum type declaration based on Mouse.
+You can declare enums which have instance variables and methods.
 
 =head1 LICENSE
 

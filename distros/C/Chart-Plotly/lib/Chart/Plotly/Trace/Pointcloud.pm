@@ -11,7 +11,7 @@ use Chart::Plotly::Trace::Pointcloud::Marker;
 use Chart::Plotly::Trace::Pointcloud::Stream;
 use Chart::Plotly::Trace::Pointcloud::Transform;
 
-our $VERSION = '0.019';    # VERSION
+our $VERSION = '0.020';    # VERSION
 
 # ABSTRACT: The data visualized as a point cloud set in `x` and `y` using the WebGl plotting engine.
 
@@ -237,7 +237,7 @@ Chart::Plotly::Trace::Pointcloud - The data visualized as a point cloud set in `
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

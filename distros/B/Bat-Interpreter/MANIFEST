@@ -40,6 +40,8 @@ t/10-call_command.t
 t/10-call_command_subcall.cmd
 t/11-for_loop.cmd
 t/11-for_loop.t
+t/12-env_variables.cmd
+t/12-env_variables.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/author-synopsis.t

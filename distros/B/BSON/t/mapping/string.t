@@ -24,6 +24,7 @@ is( BSON::String->new, '', "empty constructor is ''" );
 
 # test overloading
 is( bson_string('héllo wörld'), 'héllo wörld', "string overload" );
+ok( bson_string('héllo wörld'), "bool overload" );
 
 # string -> string
 $hash = decode( encode( { A => 'héllo wörld' } ) );

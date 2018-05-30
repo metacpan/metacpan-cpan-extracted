@@ -38,7 +38,7 @@ Games if it does not already exist, then open it. Create
 folder Sudoku in Games (if it does not already exist) and
 open it. Drop General.pm in the Sudoku folder.
 
-6) Open the bin folder in the expanded kit, and drop file
+6) Open the script folder in the expanded kit, and drop file
 sudokug on the droplet.
 
 7) Open file sudokug with MacPerl and save it as an executable.
@@ -57,4 +57,4 @@ The sudokug script's 'help' function doesn't work under MacPerl.
 This is because it tries to parse the POD out of the script, but
 when MacPerl converts the script to an executable, the POD gets
 lost. You can find the docs by hunting up the package at
-http://search.cpan.org/
+https://metacpan.org/release/Games-Sudoku-General

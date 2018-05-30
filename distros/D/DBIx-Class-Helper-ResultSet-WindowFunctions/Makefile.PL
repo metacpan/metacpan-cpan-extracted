@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     "parent" => 0
   },
   "TEST_REQUIRES" => {
+    "Class::Load" => 0,
     "DBD::SQLite" => 0,
     "DBIx::Class::Core" => 0,
     "DBIx::Class::Schema" => 0,
@@ -30,10 +31,10 @@ my %WriteMakefileArgs = (
     "SQL::Abstract::Test" => 0,
     "SQL::Translator" => "0.11018",
     "Test::More" => 0,
-    "Test::Most" => 0,
+    "Test::Roo::DataDriven" => 0,
     "base" => 0
   },
-  "VERSION" => "v0.1.1",
+  "VERSION" => "v0.1.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,6 +42,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Class::Load" => 0,
   "DBD::SQLite" => 0,
   "DBIx::Class::Core" => 0,
   "DBIx::Class::ResultSet" => 0,
@@ -51,7 +53,7 @@ my %FallbackPrereqs = (
   "SQL::Abstract::Test" => 0,
   "SQL::Translator" => "0.11018",
   "Test::More" => 0,
-  "Test::Most" => 0,
+  "Test::Roo::DataDriven" => 0,
   "base" => 0,
   "parent" => 0
 );

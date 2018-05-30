@@ -1,7 +1,7 @@
 package Catmandu::Identifier;
 
 use strict;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 1;
 __END__
@@ -45,6 +45,8 @@ Catmandu::Identifier - Namespace fixing around identifiers (for normalization, v
 =item * L<Catmandu::Fix::orcid_profile>
 
 =item * L<Catmandu::Fix::orcid_works>
+
+=item * L<Catmandu::Fix::uri_status_code>
 
 =item * L<Catmandu::Fix::Condition::is_valid_isbn>
 

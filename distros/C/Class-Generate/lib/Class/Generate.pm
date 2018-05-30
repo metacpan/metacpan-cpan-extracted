@@ -1,5 +1,5 @@
 package Class::Generate;
-$Class::Generate::VERSION = '1.16';
+$Class::Generate::VERSION = '1.17';
 use 5.010;
 use strict;
 use Carp;
@@ -544,7 +544,7 @@ $invalid_spec_message = sub {
 };
 
 package Class::Generate::Class_Holder;	# This package encapsulates functions
-$Class::Generate::Class_Holder::VERSION = '1.16';
+$Class::Generate::Class_Holder::VERSION = '1.17';
 use strict;				# related to storing and retrieving
 					# information on classes.  It lets classes
 					# saved in files be reused transparently.
@@ -764,7 +764,7 @@ sub comma_prefixed_list_of_values($@) {
 }
 
 package Class::Generate::Member_Names;	# This package encapsulates functions
-$Class::Generate::Member_Names::VERSION = '1.16';
+$Class::Generate::Member_Names::VERSION = '1.17';
 use strict;				# to handle name substitution in
 					# user-defined code.
 
@@ -976,7 +976,7 @@ sub class_of($$;$) {	# element of C; if not, search parents recursively.
 }
 
 package Class::Generate::Code_Checker;		# This package encapsulates
-$Class::Generate::Code_Checker::VERSION = '1.16';
+$Class::Generate::Code_Checker::VERSION = '1.17';
 use strict;					# checking for warnings and
 use Carp;					# errors in user-defined code.
 
@@ -1086,7 +1086,7 @@ sub fragment_as_sub($$\@;\@) {
 }
 
 package Class::Generate::Array;		# Given a string or an ARRAY, return an
-$Class::Generate::Array::VERSION = '1.16';
+$Class::Generate::Array::VERSION = '1.17';
 use strict;				# object that is either the ARRAY or
 use Carp;				# the string made into an ARRAY by
 					# splitting the string on white space.
@@ -1112,7 +1112,7 @@ sub values {
 }
 
 package Class::Generate::Hash;		# Given a string or a HASH and a key
-$Class::Generate::Hash::VERSION = '1.16';
+$Class::Generate::Hash::VERSION = '1.17';
 use strict;				# name, return an object that is either
 use Carp;				# the HASH or a HASH of the form
 					# (key => string). Also, if the object
@@ -1133,7 +1133,7 @@ sub new {				# is a HASH, it *must* contain the key.
 }
 
 package Class::Generate::Support;	# Miscellaneous support routines.
-$Class::Generate::Support::VERSION = '1.16';
+$Class::Generate::Support::VERSION = '1.17';
 no strict;				# Definitely NOT strict!
 					# Return the superclass of $class that
 sub class_containing_method {		# contains the method that the form
@@ -1180,7 +1180,7 @@ sub my_decl_form {		# Given a non-empty set of variable names,
 }
 
 package Class::Generate::Member;	# A virtual class describing class
-$Class::Generate::Member::VERSION = '1.16';
+$Class::Generate::Member::VERSION = '1.17';
 use strict;				# members.
 
 sub new {
@@ -1393,7 +1393,7 @@ sub default_assignment_form {	# Return a form that assigns a default value
 }
 
 package Class::Generate::Scalar_Member;		# A Member subclass for
-$Class::Generate::Scalar_Member::VERSION = '1.16';
+$Class::Generate::Scalar_Member::VERSION = '1.17';
 use strict;					# scalar class members.
 use vars qw(@ISA);				# accessor accepts 0 or 1 parameters.
 @ISA = qw(Class::Generate::Member);
@@ -1482,7 +1482,7 @@ sub equals {
 }
 
 package Class::Generate::List_Member;		# A Member subclass for list
-$Class::Generate::List_Member::VERSION = '1.16';
+$Class::Generate::List_Member::VERSION = '1.17';
 use strict;					# (array and hash) members.
 use vars qw(@ISA);				# accessor accepts 0-2 parameters.
 @ISA = qw(Class::Generate::Member);
@@ -1566,7 +1566,7 @@ sub can_be_invalid {		# A value for a list member can
 }				# type of list can be given.
 
 package Class::Generate::Array_Member;		# A List subclass for array
-$Class::Generate::Array_Member::VERSION = '1.16';
+$Class::Generate::Array_Member::VERSION = '1.17';
 use strict;					# members.  Provides the
 use vars qw(@ISA);				# of accessing array members.
 @ISA = qw(Class::Generate::List_Member);
@@ -1672,7 +1672,7 @@ sub equals {
 }
 
 package Class::Generate::Hash_Member;		# A List subclass for Hash
-$Class::Generate::Hash_Member::VERSION = '1.16';
+$Class::Generate::Hash_Member::VERSION = '1.17';
 use strict;					# members.  Provides the n_keys
 use vars qw(@ISA);				# specifics of accessing
 @ISA = qw(Class::Generate::List_Member);	# hash members.
@@ -1778,7 +1778,7 @@ sub equals {
 }
 
 package Class::Generate::Constructor;	# The constructor is treated as a
-$Class::Generate::Constructor::VERSION = '1.16';
+$Class::Generate::Constructor::VERSION = '1.17';
 use strict;				# special type of member.  It includes
 use vars qw(@ISA);			# constraints on required members.
 @ISA = qw(Class::Generate::Member);
@@ -1887,7 +1887,7 @@ sub form {
 }
 
 package Class::Generate::Method;	# A user-defined method,
-$Class::Generate::Method::VERSION = '1.16';
+$Class::Generate::Method::VERSION = '1.17';
 					# with a name and body.
 sub new {
     my $class = shift;
@@ -1922,7 +1922,7 @@ sub form {
 }
 
 package Class::Generate::Class_Method;	# A user-defined class method,
-$Class::Generate::Class_Method::VERSION = '1.16';
+$Class::Generate::Class_Method::VERSION = '1.17';
 use strict;				# which may specify objects
 use vars qw(@ISA);			# of the class used within its
 @ISA = qw(Class::Generate::Method);	# body.
@@ -1945,7 +1945,7 @@ sub form {
 }
 
 package Class::Generate::Class;			# A virtual class describing
-$Class::Generate::Class::VERSION = '1.16';
+$Class::Generate::Class::VERSION = '1.17';
 use strict;					# a user-specified class.
 
 sub new {
@@ -2386,7 +2386,7 @@ sub needs_constructor {
 }
 
 package Class::Generate::Array_Class;		# A subclass of Class defining
-$Class::Generate::Array_Class::VERSION = '1.16';
+$Class::Generate::Array_Class::VERSION = '1.17';
 use strict;					# array-based classes.
 use vars qw(@ISA);
 @ISA = qw(Class::Generate::Class);
@@ -2472,7 +2472,7 @@ sub protected_members_info_index {
 }
 
 package Class::Generate::Hash_Class;		# A subclass of Class defining
-$Class::Generate::Hash_Class::VERSION = '1.16';
+$Class::Generate::Hash_Class::VERSION = '1.17';
 use vars qw(@ISA);				# hash-based classes.
 @ISA = qw(Class::Generate::Class);
 
@@ -2519,7 +2519,7 @@ sub protected_members_info_index {
 }
 
 package Class::Generate::Param_Style;		# A virtual class encompassing
-$Class::Generate::Param_Style::VERSION = '1.16';
+$Class::Generate::Param_Style::VERSION = '1.17';
 use strict;					# parameter-passing styles for
 
 sub new {
@@ -2555,7 +2555,7 @@ sub my_decl_form {
 }
 
 package Class::Generate::Key_Value;		# The key/value parameter-
-$Class::Generate::Key_Value::VERSION = '1.16';
+$Class::Generate::Key_Value::VERSION = '1.17';
 use strict;					# passing style.  It adds
 use vars qw(@ISA);				# the name of the variable
 @ISA = qw(Class::Generate::Param_Style);	# that holds the parameters.
@@ -2627,7 +2627,7 @@ sub params_check_form {
 }
 
 package Class::Generate::Positional;		# The positional parameter-
-$Class::Generate::Positional::VERSION = '1.16';
+$Class::Generate::Positional::VERSION = '1.17';
 use strict;					# passing style.  It adds
 use vars qw(@ISA);				# an ordering of parameters.
 @ISA = qw(Class::Generate::Param_Style);
@@ -2670,7 +2670,7 @@ sub params_check_form {
 }
 
 package Class::Generate::Mix;			# The mix parameter-passing
-$Class::Generate::Mix::VERSION = '1.16';
+$Class::Generate::Mix::VERSION = '1.17';
 use strict;					# style.  It combines key/value
 use vars qw(@ISA);				# and positional.
 @ISA = qw(Class::Generate::Param_Style);
@@ -2758,7 +2758,7 @@ sub kv_params_form {
 }
 
 package Class::Generate::Own;			# The "own" parameter-passing
-$Class::Generate::Own::VERSION = '1.16';
+$Class::Generate::Own::VERSION = '1.17';
 use strict;					# style.
 use vars qw(@ISA);
 @ISA = qw(Class::Generate::Param_Style);
@@ -2803,7 +2803,7 @@ Class::Generate - Generate Perl class hierarchies
 
 =head1 VERSION
 
-version 1.16
+version 1.17
 
 =head1 SYNOPSIS
 
@@ -2878,7 +2878,7 @@ I also wanted it to get out of my way when I asked.
 
 =head1 VERSION
 
-version 1.16
+version 1.17
 
 =head1 THE CLASS FUNCTION
 
@@ -4876,7 +4876,7 @@ the same terms as the Perl 5 programming language system itself.
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/class-generate/issues>
+L<https://github.com/shlomif/perl-Class-Generate/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -4985,7 +4985,7 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/class-generate>
+L<https://github.com/shlomif/perl-Class-Generate>
 
   git clone https://github.com/shlomif/perl-Class-Generate
 

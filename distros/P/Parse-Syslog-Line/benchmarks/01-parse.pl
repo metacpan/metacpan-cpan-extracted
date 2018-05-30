@@ -20,6 +20,7 @@ const my @msgs => (
     q|2015 Nov 13 13:40:01 ether rsyslogd-2177: imuxsock begins to drop messages from pid 17840 due to rate-limit|,
     q|2015 Nov 13 13:40:01 ether application: JSON log is: {"src_ip":"1.2.3.4","src_port":35235}|,
     q|2015 Nov 13 13:40:01 ether application: this is words with some splunk k/v at the end: k1=v1, k2=v2, k3=v3|,
+    q|May 24 09:14:21 deprecation GoogleSoftwareUpdateAgent[22548]: 2018-05-24 09:14:21.050 GoogleSoftwareUpdateAgent[22548/0x70000b057000] [lvl=2] -[KSAgentApp(PrivateMethods) setUpLoggerOutputForVerboseMode:] Agent default/global settings: <KSAgentSettings:0x1003390a0 bundleID=com.google.Keystone.Agent lastCheck=2018-05-24 00:07:32 +0000 lastServerCheck=2018-05-24 00:07:31 +0000 lastCheckStart=2018-05-24 16:14:19 +0000 checkInterval=18000.000000 uiDisplayInterval=604800.000000 sleepInterval=1800.000000 jitterInterval=900 maxRunInterval=0.000000 isConsoleUser=1 ticketStorePath=/Users/brad/Library/Google/GoogleSoftwareUpdate/TicketStore/Keystone.ticketstore runMode=3 daemonUpdateEngineBrokerServiceName=com.google.Keystone.Daemon.UpdateEngine daemonAdministrationServiceName=com.google.Keystone.Daemon.Administration alwaysPromptForUpdates=0 lastUIDisplayed=(null) alwaysShowStatusItem=0 updateCheckTag=(null) printResults=NO userInitiated=NO>|,
 );
 
 my $last = '';

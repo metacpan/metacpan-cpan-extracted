@@ -8,6 +8,8 @@ build_requires:
   IPC::Open3: '0'
   Module::Build: '0.28'
   Test::More: '0.88'
+  Text::Soundex: '0'
+  Text::Tabs: '0'
   constant: '0'
   lib: '0'
   warnings: '0'
@@ -23,73 +25,73 @@ name: Class-Generate
 provides:
   Class::Generate:
     file: lib/Class/Generate.pm
-    version: '1.16'
+    version: '1.17'
   Class::Generate::Array:
     file: lib/Class/Generate.pm
-    version: '1.16'
+    version: '1.17'
   Class::Generate::Array_Class:
     file: lib/Class/Generate.pm
-    version: '1.16'
+    version: '1.17'
   Class::Generate::Array_Member:
     file: lib/Class/Generate.pm
-    version: '1.16'
+    version: '1.17'
   Class::Generate::Class:
     file: lib/Class/Generate.pm
-    version: '1.16'
+    version: '1.17'
   Class::Generate::Class_Holder:
     file: lib/Class/Generate.pm
-    version: '1.16'
+    version: '1.17'
   Class::Generate::Class_Method:
     file: lib/Class/Generate.pm
-    version: '1.16'
+    version: '1.17'
   Class::Generate::Code_Checker:
     file: lib/Class/Generate.pm
-    version: '1.16'
+    version: '1.17'
   Class::Generate::Constructor:
     file: lib/Class/Generate.pm
-    version: '1.16'
+    version: '1.17'
   Class::Generate::Hash:
     file: lib/Class/Generate.pm
-    version: '1.16'
+    version: '1.17'
   Class::Generate::Hash_Class:
     file: lib/Class/Generate.pm
-    version: '1.16'
+    version: '1.17'
   Class::Generate::Hash_Member:
     file: lib/Class/Generate.pm
-    version: '1.16'
+    version: '1.17'
   Class::Generate::Key_Value:
     file: lib/Class/Generate.pm
-    version: '1.16'
+    version: '1.17'
   Class::Generate::List_Member:
     file: lib/Class/Generate.pm
-    version: '1.16'
+    version: '1.17'
   Class::Generate::Member:
     file: lib/Class/Generate.pm
-    version: '1.16'
+    version: '1.17'
   Class::Generate::Member_Names:
     file: lib/Class/Generate.pm
-    version: '1.16'
+    version: '1.17'
   Class::Generate::Method:
     file: lib/Class/Generate.pm
-    version: '1.16'
+    version: '1.17'
   Class::Generate::Mix:
     file: lib/Class/Generate.pm
-    version: '1.16'
+    version: '1.17'
   Class::Generate::Own:
     file: lib/Class/Generate.pm
-    version: '1.16'
+    version: '1.17'
   Class::Generate::Param_Style:
     file: lib/Class/Generate.pm
-    version: '1.16'
+    version: '1.17'
   Class::Generate::Positional:
     file: lib/Class/Generate.pm
-    version: '1.16'
+    version: '1.17'
   Class::Generate::Scalar_Member:
     file: lib/Class/Generate.pm
-    version: '1.16'
+    version: '1.17'
   Class::Generate::Support:
     file: lib/Class/Generate.pm
-    version: '1.16'
+    version: '1.17'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -99,10 +101,10 @@ requires:
   vars: '0'
   warnings::register: '0'
 resources:
-  bugtracker: https://github.com/shlomif/class-generate/issues
+  bugtracker: https://github.com/shlomif/perl-Class-Generate/issues
   homepage: http://metacpan.org/release/Class-Generate
   repository: https://github.com/shlomif/perl-Class-Generate
-version: '1.16'
+version: '1.17'
 x_Dist_Zilla:
   perl:
     version: '5.026002'
@@ -356,6 +358,14 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Filter/UploadToCPAN'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: TestRequires
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode

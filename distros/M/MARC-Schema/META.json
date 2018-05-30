@@ -4,7 +4,7 @@
       "Johann Rolschewski"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -32,7 +32,7 @@
       "develop" : {
          "requires" : {
             "Code::TidyAll" : "0",
-            "Dist::Milla" : "v1.0.18",
+            "Dist::Milla" : "v1.0.17",
             "Perl::Tidy" : "0",
             "Test::Code::TidyAll" : "0.20",
             "Test::Perl::Critic" : "0",
@@ -43,7 +43,6 @@
       "runtime" : {
          "requires" : {
             "Cpanel::JSON::XS" : "0",
-            "DDP" : "0",
             "File::Share" : "0",
             "File::Slurper" : "0",
             "Getopt::Long" : "0",
@@ -73,11 +72,11 @@
          "web" : "https://github.com/jorol/MARC-Schema"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_contributors" : [
       "Johann Rolschewski <jorol@cpan.org>",
       "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.00"
 }
 

@@ -39,7 +39,7 @@ my $R = getcwd;
 
 my $ua = LWP::UserAgent->new();
 my $webhook_url =
-    sprintf( 'http://%s:%d/webhook/?channel=test&network=local&use_color=0',
+    sprintf( 'http://%s:%d/webhook/?channel=test&network=dummy&use_color=0',
     $test_bot->addr, $test_bot->port );
 
 sub webhook_post {
@@ -80,7 +80,7 @@ is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
 
 TestBot->expect(
     join( ' ',
-        '#test Test Author (via Test User)',
+        'dummy/#test Test Author (via Test User)',
         'master b9b5587 test-repo',
         'mod-one file-one rm-one',
         '* Commit three files (add, mod, rm)',

@@ -65,6 +65,13 @@ token term_qr_quote {
         }
 };
 
+our $unicode_table;     # unicore/UnicodeData.txt
+sub get_unicode_table {
+    $unicode_table = Perlito5::Grammar::Use::slurp_file("unicore/UnicodeData.txt")
+        if !$unicode_table;
+    return $unicode_table;
+}
+
 my %pair = (
     '{' => '}',
     '(' => ')',
@@ -217,10 +224,8 @@ sub s_quote_parse {
     }
     else {
         # $part2 is string
-        if (exists($pair{$delimiter})) {
-            $interpolate = 2;
-            $delimiter eq chr(39) && ($interpolate = 3);
-        }
+        $interpolate = 1;
+        $delimiter eq chr(39) && ($interpolate = 3);
         my $m = string_interpolation_parse( [ $open_delimiter, @replace, $closing_delimiter ], 1, $open_delimiter, $closing_delimiter, $interpolate);
         if (!$m) {;
             Perlito5::Compiler::error('syntax error')
@@ -505,7 +510,11 @@ sub string_interpolation_parse {
         my $c2 = $str->[$p+1];
         my $m;
         my $more = '';
-        if ($balanced && $c eq '\\' && ($c2 eq $open_delimiter || $c2 eq $delimiter)) {
+        if ($c eq '\\' && $c2 eq $delimiter) {
+            $p++;
+            $c = $c2;
+        }
+        elsif ($balanced && $c eq '\\' && ($c2 eq $open_delimiter || $c2 eq $delimiter)) {
             $p++;
             $c = $c2;
         }
@@ -651,14 +660,18 @@ sub string_interpolation_parse {
     if (!@args) {
         $ast = Perlito5::AST::Buf->new( buf => '' )
     }
-    elsif (@args == 1) {
+    elsif (@args == 1 && ref($args[0]) eq 'Perlito5::AST::Buf') {
         $ast = $args[0];
     }
     else {
+        unshift @args, Perlito5::AST::Buf->new( buf => '' )
+            if @args == 1;
+
         $ast = Perlito5::AST::Apply->new(
             namespace => '',
             code => 'list:<.>',
             arguments => \@args,
+            Perlito5::overloading_flag(),
         )
     }
     
@@ -681,11 +694,17 @@ sub here_doc_wanted {
 
     my $delimiter;
     my $type = 'double_quote';
+    my $indented = 0;
     my $p = $pos;
     if ( $str->[$p] eq '<' && $str->[$p + 1] eq '<' ) {
         # <<
         $p += 2;
         my $quote = $str->[$p];
+        if ( $quote eq "~" ) {
+            $indented = 1;
+            $p++;
+            $quote = $str->[$p];
+        }
         if ( $quote eq "'" || $quote eq '"' ) {
             $p += 1;
             my $m = string_interpolation_parse($_[0], $p, $quote, $quote, 0);
@@ -738,6 +757,7 @@ sub here_doc_wanted {
         $type,
         $placeholder->{arguments}[0]{arguments},
         $delimiter,
+        $indented,
     ];
 
     return {
@@ -774,12 +794,55 @@ sub here_doc {
     my $type      = $here->[0];
     my $result    = $here->[1];
     my $delimiter = $here->[2];
+    my $indented  = $here->[3];     # TODO indented heredoc
     # say "got a newline and we are looking for a $type that ends with ", $delimiter;
-    if ($type eq 'single_quote') {
-        while ( $p < @$str ) {
-            if ( join('', @{$str}[ $p .. $p + length($delimiter) - 1]) eq $delimiter ) {
+    while ( $p < @$str ) {
+        my $spaces = '';
+        my $p0 = $p;
+        if ($indented) {
+            while ( $p < @$str ) {
+                last if $str->[$p] ne ' ' && $str->[$p] ne "\t";
+                $p++;
+            }
+            $spaces = join('', @{$str}[ $p0 .. $p - 1 ] );
+        }
+        if ( join('', @{$str}[ $p .. $p + length($delimiter) - 1]) eq $delimiter ) {
+            my $c = $str->[ $p + length($delimiter) ];
+            if ($c eq '' || $c eq " " || $c eq "\t" || $c eq chr(10) || $c eq chr(13) ) {
                 # this will put the text in the right place in the AST
-                push @$result, Perlito5::AST::Buf->new(buf => join('', @{$str}[ $pos .. $p - 1]));
+
+                # unindent the heredoc by $spaces
+                my @here_string = split( "\n", join('', @{$str}[ $pos .. $p - 1]), -1 );
+                if (length($spaces)) {
+                    my $l = length($spaces);
+                    for my $i (0 .. $#here_string) {
+                        if ( substr($here_string[$i], 0, $l) eq $spaces ) {
+                            $here_string[$i] = substr( $here_string[$i], $l );
+                        }
+                        else {
+                            Perlito5::Compiler::error "Indentation on line $i of here-doc doesn't match delimiter";
+                        }
+                    }
+                }
+
+                if ($type eq 'single_quote') {
+                    # single_quote
+                    # TODO - single quote escapes like \' and \\
+                    push @$result, Perlito5::AST::Buf->new(buf => join("\n", @here_string));
+                }
+                else {
+                    # double_quote
+                    my $m;
+                    my $str = [ split "", join("\n", @here_string, $delimiter . "\n") ];
+                    $m = string_interpolation_parse($str, 0, '', "\n" . $delimiter . "\n", 1);
+                    if ( $m ) {
+                        push @$result, Perlito5::Match::flat($m);
+                    }
+                    else {
+                        Perlito5::Compiler::error 'Can\'t find string terminator "' . $delimiter . '" anywhere before EOF';
+                    }
+                }
+
                 $p += length($delimiter);
                 # say "$p ", scalar(@$str);
                 my $m = newline( $str, $p );
@@ -791,44 +854,19 @@ sub here_doc {
                     }
                 }
             }
-            # ... next line
-            while (  $p < @$str
-                  && ( $str->[$p] ne chr(10) && $str->[$p] ne chr(13) )
-                  )
-            {
-                $p++
-            }
-            while (  $p < @$str
-                  && ( $str->[$p] eq chr(10) || $str->[$p] eq chr(13) )
-                  )
-            {
-                $p++
-            }
         }
-    }
-    else {
-        # double_quote
-        my $m;
-        if ( join('', @{$str}[ $p .. $p + length($delimiter) - 1]) eq $delimiter ) {
-            $p += length($delimiter);
-            $m = newline( $str, $p );
-            if ( $p >= @$str || $m ) {
-                push @$result, Perlito5::AST::Buf->new( buf => '' );
-                $p = $m->{to} if $m;
-                return {
-                    'str' => $str, 'from' => $pos, 'to' => $p
-                };
-            }
+        # ... next line
+        while (  $p < @$str
+              && ( $str->[$p] ne chr(10) && $str->[$p] ne chr(13) )
+              )
+        {
+            $p++
         }
-
-        # TODO - compare to newline() instead of "\n"
-
-        $m = string_interpolation_parse($str, $pos, '', "\n" . $delimiter . "\n", 1);
-        if ( $m ) {
-            push @$result, Perlito5::Match::flat($m);
-            push @$result, Perlito5::AST::Buf->new( buf => "\n" );
-            $m->{to} = $m->{to} - 1;
-            return $m;
+        while (  $p < @$str
+              && ( $str->[$p] eq chr(10) || $str->[$p] eq chr(13) )
+              )
+        {
+            $p++
         }
     }
     Perlito5::Compiler::error 'Can\'t find string terminator "' . $delimiter . '" anywhere before EOF';
@@ -910,9 +948,40 @@ sub double_quoted_unescape {
         };
     }
     elsif ( $c2 eq 'N' ) {
-        #  \N{name}    named Unicode character
-        #  \N{U+263D}  Unicode character     (example: FIRST QUARTER MOON)
-        Perlito5::Compiler::error "TODO - \\N{charname} not implemented; requires 'use charnames'";
+        if ($str->[$pos+2] eq '{') {
+            if ($str->[$pos+3] eq 'U' && $str->[$pos+4] eq '+') {
+                #  \N{U+263D}  Unicode character
+                my $p = $pos+5;
+                $p++
+                    while $p < @$str && $str->[$p] ne '}';
+                my $hex_code = join("", @{$str}[ $pos+5 .. $p - 1 ]);
+                $hex_code = "0" unless $hex_code;
+                my $tmp = oct( "0x" . $hex_code );
+                $m = {
+                    str => $str,
+                    from => $pos,
+                    to => $p + 1,
+                    capture => Perlito5::AST::Buf->new( buf => chr($tmp) ),
+                };
+            }
+            else {
+                #  \N{name}    named Unicode character
+                my $p = $pos+3;
+                $p++
+                    while $p < @$str && $str->[$p] ne '}';
+                my $name = join("", @{$str}[ $pos+3 .. $p - 1 ]);
+                my ($hex_code) = get_unicode_table() =~ /\n([0-9A-Z]+);$name;/;
+                Perlito5::Compiler::error "Unknown charname '$name'"
+                    if !$hex_code;
+                my $tmp = oct( "0x" . $hex_code );
+                $m = {
+                    str => $str,
+                    from => $pos,
+                    to => $p + 1,
+                    capture => Perlito5::AST::Buf->new( buf => chr($tmp) ),
+                };
+            }
+        }
     }
     else {
         $m = {

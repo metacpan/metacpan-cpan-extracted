@@ -1,3 +1,9 @@
+0.004   2018-05-29 (PERLANCAR)
+
+	- Add completions: cryptocurrency, cryptocurrency_safename,
+	  cryptoexchange, cryptoexchange_code, cryptoexchange_safename.
+
+
 0.003   2018-03-08 (PERLANCAR)
 
 	- Rename module:

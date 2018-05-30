@@ -1,4 +1,5 @@
 requires "Code::TidyAll::Config::INI::Reader" => "0.44";
+requires "Devel::PPPort" => "3.42";
 requires "Dist::Zilla" => "6.0";
 requires "Dist::Zilla::Plugin::Authority" => "0";
 requires "Dist::Zilla::Plugin::AutoPrereqs" => "0";
@@ -19,10 +20,10 @@ requires "Dist::Zilla::Plugin::Git::Contributors" => "0";
 requires "Dist::Zilla::Plugin::Git::GatherDir" => "0";
 requires "Dist::Zilla::Plugin::Git::Push" => "0";
 requires "Dist::Zilla::Plugin::Git::Tag" => "0";
-requires "Dist::Zilla::Plugin::GitHub::Meta" => "0";
-requires "Dist::Zilla::Plugin::GitHub::Update" => "0";
+requires "Dist::Zilla::Plugin::GitHub::Meta" => "0.45";
+requires "Dist::Zilla::Plugin::GitHub::Update" => "0.45";
 requires "Dist::Zilla::Plugin::InstallGuide" => "0";
-requires "Dist::Zilla::Plugin::MakeMaker" => "0";
+requires "Dist::Zilla::Plugin::MakeMaker::Awesome" => "0";
 requires "Dist::Zilla::Plugin::Meta::Contributors" => "0";
 requires "Dist::Zilla::Plugin::MetaConfig" => "0";
 requires "Dist::Zilla::Plugin::MetaJSON" => "0";
@@ -103,7 +104,7 @@ on 'test' => sub {
 
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
-  requires "File::ShareDir::Install" => "0.06";
+  requires "File::ShareDir::Install" => "0.03";
 };
 
 on 'develop' => sub {

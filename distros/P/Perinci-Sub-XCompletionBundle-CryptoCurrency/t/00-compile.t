@@ -6,12 +6,17 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'Perinci/Sub/XCompletion/cryptocurrency.pm',
     'Perinci/Sub/XCompletion/cryptocurrency_code.pm',
     'Perinci/Sub/XCompletion/cryptocurrency_code_or_name.pm',
+    'Perinci/Sub/XCompletion/cryptocurrency_safename.pm',
+    'Perinci/Sub/XCompletion/cryptoexchange.pm',
+    'Perinci/Sub/XCompletion/cryptoexchange_code.pm',
     'Perinci/Sub/XCompletion/cryptoexchange_name.pm',
+    'Perinci/Sub/XCompletion/cryptoexchange_safename.pm',
     'Perinci/Sub/XCompletionBundle/CryptoCurrency.pm'
 );
 

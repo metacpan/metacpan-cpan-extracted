@@ -1,3 +1,6 @@
+0.020		2018-05-28	T. R. Wyant
+    Remove references to search.cpan.org. Sigh.
+
 0.019		2018-02-27	T. R. Wyant
     Further deprecate third value for 'set brick'. It now warns on the
     first use. This was the puzzle size, which can be derived from the

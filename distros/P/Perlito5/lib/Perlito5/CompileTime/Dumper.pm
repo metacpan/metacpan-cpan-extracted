@@ -3,32 +3,37 @@ package Perlito5::CompileTime::Dumper;
 use Perlito5::DumpToAST;
 use strict;
 
-sub generate_eval_string {
-    my ($source) = @_;
-    # print STDERR "[[[ $source ]]]\n";
-    my $m = Perlito5::Grammar::exp_stmts($source, 0);
-    my $block = Perlito5::AST::Block->new( stmts => Perlito5::Match::flat($m) );
-
-    ## TODO: enable emit_compile_time()
-    ##
-    ##  $ node perlito5.js -I src5/lib  t5/op/pow.t
-    ##  [[[ { package main;
-    ##  {
-    ##      chdir 't' if -d 't';
-    ##      @INC = '../lib';
-    ##      require './test.pl';
-    ##  } }; 1 ]]]
-    ##  Error in BEGIN block: TypeError: Cannot call method 'p5aget' of undefined
-    ##
-    # my @data = $block->emit_compile_time;
-
-    my @data = $block->emit_perl5;
-    my $out = [];
-    Perlito5::Perl5::PrettyPrinter::pretty_print( \@data, 0, $out );
-    my $source_new = join( '', @$out ), ";1\n";
-    # print STDERR "[[[ $source_new ]]]\n";
-    return $source_new;
-}
+# TODO
+# sub generate_eval_string {
+#     my ($source, $strict) = @_;
+#     my $source_new = "";
+#     $@ = "";
+#     eval {
+#         # print STDERR "[[[ $source ]]]\n";
+#         my $m = Perlito5::Grammar::exp_stmts($source, 0);
+#         my $block = Perlito5::AST::Block->new( stmts => Perlito5::Match::flat($m) );
+# 
+#         ## TODO: enable emit_compile_time()
+#         ##
+#         ##  $ node perlito5.js -I src5/lib  t5/op/pow.t
+#         ##  [[[ { package main;
+#         ##  {
+#         ##      chdir 't' if -d 't';
+#         ##      @INC = '../lib';
+#         ##      require './test.pl';
+#         ##  } }; 1 ]]]
+#         ##  Error in BEGIN block: TypeError: Cannot call method 'p5aget' of undefined
+#         ##
+#         # my @data = $block->emit_compile_time;
+# 
+#         my @data = $block->emit_perl5;
+#         my $out = [];
+#         Perlito5::Perl5::PrettyPrinter::pretty_print( \@data, 0, $out );
+#         $source_new = join( '', @$out ), ";1\n";
+#         # print STDERR "[[[ $source_new ]]]\n";
+#     };
+#     return $source_new;
+# }
 
 sub _dump_AST_from_scope {
     my ($name, $item, $vars, $dumper_seen,) = @_;
@@ -162,7 +167,7 @@ sub _dump_AST_from_scope {
 #         variables are shared or not.
 #         Closures can have un-shared variables if the closure is created
 #         in a loop inside BEGIN
-#       - shared lexicals can be obtained from the data in $Perlito5::SCOPE
+#       - shared lexicals can be obtained from the data in @Perlito5::BASE_SCOPE
 
 #   - this Perl warning should probably be fatal in Perlito5:
 #       Variable "$z" will not stay shared
@@ -226,9 +231,33 @@ sub emit_globals_after_BEGIN {
     delete $scope->{'@main::_'};
     local $_;   # not sure about keeping $_
 
-    for my $v ( '$main::0', '$main::a', '$main::b', '$main::_' ) {
-        # inject special variables like $0 (script name) in the scope, if it is not there already
-        my ($sigil, $namespace, $name) = $v =~ /^([$@%])(\w+)::(.*)$/;
+    my @dump_these = (
+        '$main::0',
+        '$main::a',
+        '$main::b',
+        '$main::_',
+        '%main::INC',
+        '@Perlito5::END_BLOCK',         # __END__ blocks
+        '@Perlito5::INIT_BLOCK',        # __INIT__ blocks
+        '%Perlito5::DATA_SECTION',      # __DATA__ contents
+        '%Perlito5::BEGIN_SCRATCHPAD',  # BEGIN captures
+    );
+    for my $pkg (keys %{$Perlito5::PACKAGES}) {;
+        push @dump_these, '@' . $pkg . "::ISA";     # dump @ISA
+    }
+  DUMP:
+    for my $v ( @dump_these ) {
+        # inject global variable in the scope, if it is not there already
+        no strict 'refs';
+        my ($sigil, $namespace, $name) = $v =~ /^([\$\@%])(\w+)::(.*)$/;
+
+        if ($sigil eq '@' && @{ $namespace . "::" . $name } == 0) {
+            next DUMP;
+        }
+        if ($sigil eq '%' && keys %{ $namespace . "::" . $name } == 0) {
+            next DUMP;
+        }
+
         $scope->{$v} //= {
             'ast' => Perlito5::AST::Var->new(
                 'name'      => $name,
@@ -236,57 +265,23 @@ sub emit_globals_after_BEGIN {
                 '_decl'     => 'global',
                 'namespace' => $namespace,
             ),
+            value => (
+                  $sigil eq '$' ? \${ $namespace . "::" . $name }
+                : $sigil eq '@' ? \@{ $namespace . "::" . $name }
+                : $sigil eq '%' ? \%{ $namespace . "::" . $name }
+                : undef
+            ),
         };
     }
 
-    # dump @ISA
-    for my $pkg (keys %{$Perlito5::PACKAGES}) {;
-        no strict 'refs';
-        if (@{ $pkg . "::ISA" }) {
-            $scope->{ '@' . $pkg . "::ISA" } //= {
-                'ast' => Perlito5::AST::Var->new(
-                    'name'      => "ISA",
-                    'sigil'     => '@',
-                    '_decl'     => 'global',
-                    'namespace' => $pkg,
-                ),
-                value => \@{ $pkg . "::ISA" },
-            };
-        }
-    }
+    # # TODO - look for imported subroutines
+    # for my $glob (%{ $pkg . "::" }) {
+    #     my $name = *{$glob}{NAME};
+    #     if (defined &{ $pkg . '::' . $name }) {
+    #         warn "sub $pkg :: " . $name . "\n";
+    #     }
+    # }
 
-    # dump __END__ blocks
-    $scope->{'@Perlito5::END_BLOCK'} //= {
-        'ast' => Perlito5::AST::Var->new(
-            'namespace' => 'Perlito5',
-            'name'      => 'END_BLOCK',
-            'sigil'     => '@',
-            '_decl'     => 'global',
-        ),
-        value => \@Perlito5::END_BLOCK,
-    };
-
-    # dump __INIT__ blocks
-    $scope->{'@Perlito5::INIT_BLOCK'} //= {
-        'ast' => Perlito5::AST::Var->new(
-            'namespace' => 'Perlito5',
-            'name'      => 'INIT_BLOCK',
-            'sigil'     => '@',
-            '_decl'     => 'global',
-        ),
-        value => \@Perlito5::INIT_BLOCK,
-    };
-
-    # dump __DATA__ contents
-    $scope->{'%Perlito5::DATA_SECTION'} //= {
-        'ast' => Perlito5::AST::Var->new(
-            'namespace' => 'Perlito5',
-            'name'      => 'DATA_SECTION',
-            'sigil'     => '%',
-            '_decl'     => 'global',
-        ),
-        value => \%Perlito5::DATA_SECTION,
-    };
 
     for my $id (keys %Perlito5::BEGIN_SCRATCHPAD) {
         # BEGIN side-effects

@@ -55,7 +55,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "v1.6.1",
+  "VERSION" => "v1.6.3",
   "test" => {
     "TESTS" => "t/*.t t/common/*.t t/corpus/*.t t/legacy/*.t t/mapping/*.t"
   }

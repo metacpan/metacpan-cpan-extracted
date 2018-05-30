@@ -1,4 +1,10 @@
 
+7.82  2018-05-27
+  - Removed experimental status from new_tag and selector methods in Mojo::DOM.
+  - Improved Mojo::Server::PSGI with support for the before_server_start hook.
+  - Fixed a bug where render_maybe in Mojolicious::Controller could not render
+    multiple alternatives properly because arguments were not localized.
+
 7.81  2018-05-21
   - Added request_id attribute to Mojo::Message::Request.
   - Improved all built in templates to contain a comment with their request id.

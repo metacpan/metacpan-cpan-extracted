@@ -42,7 +42,10 @@
             "Catmandu" : "0.94",
             "Data::UUID" : "0",
             "Data::Validate::URI" : "0",
+            "JSON" : "0",
             "LWP::Simple" : "0",
+            "Moo" : "0",
+            "Scalar::Util" : "0",
             "WWW::ORCID" : "0.0401",
             "perl" : "v5.10.1"
          }
@@ -70,10 +73,11 @@
          "web" : "https://github.com/LibreCat/Catmandu-Identifier"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_contributors" : [
       "brian d foy <brian.d.foy@gmail.com>",
       "Ere Maijala <ere.maijala@helsinki.fi>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>",
       "Vitali Peil <vitali.peil@uni-bielefeld.de>"
    ],

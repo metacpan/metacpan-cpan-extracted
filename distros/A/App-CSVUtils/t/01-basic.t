@@ -11,17 +11,21 @@ use File::Temp qw(tempdir);
 use File::Slurper qw(write_text);
 
 my $dir = tempdir(CLEANUP => 1);
+write_text("$dir/empty.csv", '');
 write_text("$dir/1.csv", "f1,f2,f3\n1,2,3\n4,5,6\n7,8,9\n");
 write_text("$dir/2.csv", "f1\n1\n2\n3\n");
 write_text("$dir/3.csv", qq(f1,f2\n1,"row\n1"\n2,"row\n2"\n));
 write_text("$dir/4.csv", qq(f1,F3,f2\n1,2,3\n4,5,6\n));
 write_text("$dir/5.csv", qq(f1\n1\n2\n3\n4\n5\n6\n));
 write_text("$dir/no-rows.csv", qq(f1,f2,f3\n));
+write_text("$dir/no-header-1.csv", "1,2,3\n4,5,6\n7,8,9\n");
+
+# XXX test with opt: --no-header
 
 subtest csv_add_field => sub {
     my $res;
 
-    dies_ok { App::CSVUtils::csv_add_field(filename=>"$dir/1.csv", field=>"f4", eval=>"blah") }
+    dies_ok { App::CSVUtils::csv_add_field(filename=>"$dir/1.csv", field=>"f4", eval=>"blah +") }
         "error in eval code -> dies";
 
     $res = App::CSVUtils::csv_add_field(filename=>"$dir/1.csv", field=>"f3", eval=>"1");
@@ -73,7 +77,7 @@ subtest csv_list_field_names => sub {
 subtest csv_munge_field => sub {
     my $res;
 
-    dies_ok { App::CSVUtils::csv_munge_field(filename=>"$dir/1.csv", field=>"f1", eval=>"blah") }
+    dies_ok { App::CSVUtils::csv_munge_field(filename=>"$dir/1.csv", field=>"f1", eval=>"blah +") }
         "error in code -> dies";
 
     dies_ok { App::CSVUtils::csv_munge_field(filename=>"$dir/1.csv", field=>"f4", eval=>'1') }
@@ -178,6 +182,47 @@ subtest csv_select_fields => sub {
     $res = App::CSVUtils::csv_select_fields(filename=>"$dir/1.csv", fields=>["f3", "f1"]);
     is_deeply($res, [200,"OK","f3,f1\n3,1\n6,4\n9,7\n",{'cmdline.skip_format'=>1}], "result")
         or diag explain $res;
+};
+
+subtest csv_grep => sub {
+    my $res;
+
+    $res = App::CSVUtils::csv_grep(filename=>"$dir/1.csv", eval=>'$_->[0] >= 4');
+    is_deeply($res, [200,"OK","f1,f2,f3\n4,5,6\n7,8,9\n",{'cmdline.skip_format'=>1}], "result")
+        or diag explain $res;
+    subtest "opt: --hash" => sub {
+        $res = App::CSVUtils::csv_grep(filename=>"$dir/1.csv", hash=>1, eval=>'$_->{f1} >= 4');
+        is_deeply($res, [200,"OK","f1,f2,f3\n4,5,6\n7,8,9\n",{'cmdline.skip_format'=>1}], "result")
+            or diag explain $res;
+    };
+    subtest "opt: --no-header" => sub {
+        $res = App::CSVUtils::csv_grep(filename=>"$dir/no-header-1.csv", header=>0, eval=>'$_->[0] >= 4');
+        is_deeply($res, [200,"OK","4,5,6\n7,8,9\n",{'cmdline.skip_format'=>1}], "result")
+            or diag explain $res;
+    };
+    subtest "opt: --hash, --no-header" => sub {
+        $res = App::CSVUtils::csv_grep(filename=>"$dir/no-header-1.csv", hash=>1, header=>0, eval=>'$_->{field1} >= 4');
+        is_deeply($res, [200,"OK","4,5,6\n7,8,9\n",{'cmdline.skip_format'=>1}], "result")
+            or diag explain $res;
+    };
+};
+
+subtest csv_map => sub {
+    my $res;
+
+    $res = App::CSVUtils::csv_map(filename=>"$dir/1.csv", eval=>'"$_->[0].$_->[1].$_->[2]"');
+    is_deeply($res, [200,"OK","1.2.3\n4.5.6\n7.8.9\n",{'cmdline.skip_format'=>1}], "result")
+        or diag explain $res;
+    subtest "opt: --hash" => sub {
+        $res = App::CSVUtils::csv_map(hash=>1, filename=>"$dir/1.csv", eval=>'"$_->{f1}.$_->{f2}.$_->{f3}"');
+        is_deeply($res, [200,"OK","1.2.3\n4.5.6\n7.8.9\n",{'cmdline.skip_format'=>1}], "result")
+            or diag explain $res;
+    };
+    subtest "opt: --no-add-newline" => sub {
+        $res = App::CSVUtils::csv_map(add_newline=>0, hash=>1, filename=>"$dir/1.csv", eval=>'"$_->{f1}.$_->{f2}.$_->{f3}"');
+        is_deeply($res, [200,"OK","1.2.34.5.67.8.9",{'cmdline.skip_format'=>1}], "result")
+            or diag explain $res;
+    };
 };
 
 done_testing;

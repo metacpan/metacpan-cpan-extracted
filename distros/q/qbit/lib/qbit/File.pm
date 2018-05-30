@@ -6,7 +6,7 @@ qbit::File - Functions to manipulate files.
 =cut
 
 package qbit::File;
-$qbit::File::VERSION = '2.5';
+$qbit::File::VERSION = '2.6';
 use strict;
 use warnings;
 use utf8;
@@ -25,9 +25,9 @@ BEGIN {
 
 use Fcntl qw(O_RDONLY O_WRONLY O_CREAT O_APPEND);
 
-use qbit::StringUtils;
+use qbit::StringUtils qw(fix_utf);
 use qbit::Exceptions;
-use qbit::GetText;
+use qbit::GetText qw(gettext);
 
 =head1 Functions
 
@@ -64,7 +64,7 @@ sub readfile($;%) {
 
     my $fh = local *FH;
     unless (sysopen($fh, $filename, O_RDONLY)) {
-        throw Exception gettext('Cannot open file "%s": %s', $filename, qbit::StringUtils::fix_utf($!));
+        throw Exception gettext('Cannot open file "%s": %s', $filename, fix_utf($!));
     }
 
     $opts{'binary'} ? binmode $fh : binmode $fh, ':utf8';
@@ -76,7 +76,7 @@ sub readfile($;%) {
         my $read_cnt = sysread($fh, $content, $size_left, length $content);
 
         unless (defined $read_cnt) {
-            throw Exception gettext('Cannot read file "%s": %s', $filename, qbit::StringUtils::fix_utf($!));
+            throw Exception gettext('Cannot read file "%s": %s', $filename, fix_utf($!));
         }
 
         last if $read_cnt == 0;
@@ -129,7 +129,7 @@ sub writefile($$;%) {
     $mode |= O_APPEND if $opts{'append'};
 
     unless (sysopen($fh, $filename, $mode)) {
-        throw Exception gettext('Cannot open file "%s" for write: %s', $filename, qbit::StringUtils::fix_utf($!));
+        throw Exception gettext('Cannot open file "%s" for write: %s', $filename, fix_utf($!));
     }
 
     $opts{'binary'} ? binmode $fh : binmode $fh, ':utf8';

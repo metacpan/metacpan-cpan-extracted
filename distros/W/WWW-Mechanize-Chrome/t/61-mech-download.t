@@ -28,7 +28,9 @@ if (my $err = t::helper::default_unavailable) {
     plan tests => 5*@instances;
 };
 
-my $d = tempdir;
+my $d = tempdir( CLEANUP => 1 );
+-d $d or diag "Temp directory '$d' doesn't exist?!: $!";
+
 sub new_mech {
     WWW::Mechanize::Chrome->new(
         autodie => 1,
@@ -53,15 +55,17 @@ t::helper::run_across_instances(\@instances, $instance_port, \&new_mech, 5, sub 
         if( $version =~ /\b(\d+)\b/ and $1 < 62 ) {
             skip "Chrome before v62 doesn't know about downloads...", 4;
 
-        } elsif( $version =~ /\b(\d+)\.\d+\.(\d+)\b/ and ($1 >= 63 and $2 >= 3239)) {
+        } elsif( $version =~ /\b(\d+)\.\d+\.(\d+)\b/ and ($1 == 63 and $2 >= 3239)) {
             skip "Chrome before v63 build 3292 doesn't know about downloads anymore", 4;
+        # No, but Chrome 63 doesn't send proper events for downloaded files
+        # we could try with networkIdle ...
 
-        } elsif( $version =~ /\b(\d+)\b/ and $1 >= 64 ) {
-            skip "Chrome after v63 doesn't tell us about downloads...", 4;
+        } elsif( $version =~ /\b(\d+)\b/ and $1 >= 64 and $1 <= 65 ) {
+            skip "Chrome between v64 and v65 doesn't tell us about downloads...", 4;
+            # Actually, they are missing any kind of sensible events to tell us
+            # anything about the quality of the response
 
         } else {
-
-            $mech->get($server->url);
 
             my ($site,$estatus) = ($server->download('mytest.txt'),200);
             my $res = $mech->get($site);
@@ -69,7 +73,7 @@ t::helper::run_across_instances(\@instances, $instance_port, \&new_mech, 5, sub 
             ok $mech->success, "The download (always) succeeds";
             like $res->header('Content-Disposition'), qr/attachment;/, "We got a download response";
 
-            $mech->sleep(2); # well, should be faster, but...
+            $mech->sleep(1); # well, should be faster, but...
             ok -f "$d/mytest.txt", "File 'mytest.txt' was downloaded OK";
         };
     }

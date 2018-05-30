@@ -22,7 +22,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Data::Table::Text" : "20180510",
+            "Data::Table::Text" : "20180527",
             "Storable" : "0",
             "Test2::API" : "0",
             "Test::More" : "0",
@@ -34,7 +34,7 @@
    "provides" : {
       "Data::Edit::Xml" : {
          "file" : "lib/Data/Edit/Xml.pm",
-         "version" : "20180520"
+         "version" : "20180527"
       }
    },
    "release_status" : "stable",
@@ -43,5 +43,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20180520"
+   "version" : "20180527"
 }

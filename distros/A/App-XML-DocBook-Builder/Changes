@@ -1,3 +1,6 @@
+0.0406  2018-05-29
+        - Fix the link to the bugtracker in the META.yml .
+
 0.0405  2018-05-22
         - Convert to dzil.
 
