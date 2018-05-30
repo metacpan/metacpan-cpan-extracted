@@ -85,6 +85,17 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
         }
       }
       
+      {
+        int32_t arg_index;
+        for (arg_index = 0 ; arg_index < sub->op_args->length; arg_index++) {
+          SPVM_OP* op_arg = SPVM_LIST_fetch(sub->op_args, arg_index);
+          SPVM_TYPE* arg_type = SPVM_OP_get_type(compiler, op_arg);
+          if (SPVM_TYPE_is_object(compiler, arg_type)) {
+            SPVM_LIST_push(sub->object_arg_ids, (void*)(intptr_t)arg_index);
+          }
+        }
+      }
+      
       if (package->is_interface && (sub->op_block || sub->is_native)) {
         SPVM_yyerror_format(compiler, "Subroutine in interface package can't have implementation\n", op_sub->file, op_sub->line);
       }
@@ -212,7 +223,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                     for (i = 0; i < length; i++) {
                       SPVM_OP* op_case = SPVM_LIST_fetch(op_cases, i);
                       SPVM_OP* op_constant = op_case->first;
-                      int32_t value = op_constant->uv.constant->value.int_value;
+                      int32_t value = op_constant->uv.constant->value.ival;
                       
                       if (value < min) {
                         min = value;
@@ -780,11 +791,11 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   
                   // Can receive only numeric type
                   if (!SPVM_TYPE_is_string(compiler, first_type)) {
-                    SPVM_yyerror_format(compiler, "eq left type must be String at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "eq left type must be string at %s line %d\n", op_cur->file, op_cur->line);
                     return;
                   }
                   if (!SPVM_TYPE_is_string(compiler, last_type)) {
-                    SPVM_yyerror_format(compiler, "eq right type must be String at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "eq right type must be string at %s line %d\n", op_cur->file, op_cur->line);
                     return;
                   }
                   
@@ -806,11 +817,11 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   
                   // Can receive only numeric type
                   if (!SPVM_TYPE_is_string(compiler, first_type)) {
-                    SPVM_yyerror_format(compiler, "ne left type must be String at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "ne left type must be string at %s line %d\n", op_cur->file, op_cur->line);
                     return;
                   }
                   if (!SPVM_TYPE_is_string(compiler, last_type)) {
-                    SPVM_yyerror_format(compiler, "ne right type must be String at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "ne right type must be string at %s line %d\n", op_cur->file, op_cur->line);
                     return;
                   }
                   
@@ -832,11 +843,11 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   
                   // Can receive only numeric type
                   if (!SPVM_TYPE_is_string(compiler, first_type)) {
-                    SPVM_yyerror_format(compiler, "gt left type must be String at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "gt left type must be string at %s line %d\n", op_cur->file, op_cur->line);
                     return;
                   }
                   if (!SPVM_TYPE_is_string(compiler, last_type)) {
-                    SPVM_yyerror_format(compiler, "gt right type must be String at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "gt right type must be string at %s line %d\n", op_cur->file, op_cur->line);
                     return;
                   }
                   
@@ -858,11 +869,11 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   
                   // Can receive only numeric type
                   if (!SPVM_TYPE_is_string(compiler, first_type)) {
-                    SPVM_yyerror_format(compiler, "ge left type must be String at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "ge left type must be string at %s line %d\n", op_cur->file, op_cur->line);
                     return;
                   }
                   if (!SPVM_TYPE_is_string(compiler, last_type)) {
-                    SPVM_yyerror_format(compiler, "ge right type must be String at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "ge right type must be string at %s line %d\n", op_cur->file, op_cur->line);
                     return;
                   }
                   
@@ -884,11 +895,11 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   
                   // Can receive only numeric type
                   if (!SPVM_TYPE_is_string(compiler, first_type)) {
-                    SPVM_yyerror_format(compiler, "lt left type must be String at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "lt left type must be string at %s line %d\n", op_cur->file, op_cur->line);
                     return;
                   }
                   if (!SPVM_TYPE_is_string(compiler, last_type)) {
-                    SPVM_yyerror_format(compiler, "lt right type must be String at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "lt right type must be string at %s line %d\n", op_cur->file, op_cur->line);
                     return;
                   }
                   
@@ -910,11 +921,11 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   
                   // Can receive only numeric type
                   if (!SPVM_TYPE_is_string(compiler, first_type)) {
-                    SPVM_yyerror_format(compiler, "le left type must be String at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "le left type must be string at %s line %d\n", op_cur->file, op_cur->line);
                     return;
                   }
                   if (!SPVM_TYPE_is_string(compiler, last_type)) {
-                    SPVM_yyerror_format(compiler, "le right type must be String at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "le right type must be string at %s line %d\n", op_cur->file, op_cur->line);
                     return;
                   }
                   
@@ -1462,15 +1473,15 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
                   SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
                   
-                  // Left type must be String
+                  // Left type must be string
                   if (!SPVM_TYPE_is_string(compiler, first_type)) {
-                    SPVM_yyerror_format(compiler, ". operator left value must be String at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, ". operator left value must be string at %s line %d\n", op_cur->file, op_cur->line);
                     return;
                   }
                   
                   // First value must be numeric or byte array
                   if (!SPVM_TYPE_is_string(compiler, last_type)) {
-                    SPVM_yyerror_format(compiler, ". operator right value must be String at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, ". operator right value must be string at %s line %d\n", op_cur->file, op_cur->line);
                     return;
                   }
                   
@@ -1478,8 +1489,8 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                 }
                 case SPVM_OP_C_ID_CROAK: {
                   SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
-                  if (first_type->dimension == 0 && first_type->basic_type->id != SPVM_BASIC_TYPE_C_ID_STRING) {
-                    SPVM_yyerror_format(compiler, "croak argument must be String at %s line %d\n", op_cur->file, op_cur->line);
+                  if (first_type->dimension == 1 && first_type->basic_type->id != SPVM_BASIC_TYPE_C_ID_BYTE) {
+                    SPVM_yyerror_format(compiler, "croak argument must be string at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
@@ -1742,12 +1753,12 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   if (SPVM_TYPE_is_numeric(compiler, term_type) && SPVM_TYPE_is_numeric(compiler, type_type)) {
                     can_convert = 1;
                   }
-                  else if (SPVM_TYPE_is_numeric(compiler, term_type) && type_type->dimension == 0 && type_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_STRING) {
+                  else if (SPVM_TYPE_is_numeric(compiler, term_type) && (type_type->dimension == 1 && type_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE)) {
                     can_convert = 1;
                   }
                   else if (SPVM_TYPE_is_object(compiler, term_type) && SPVM_TYPE_is_object(compiler, type_type)) {
                     if (SPVM_TYPE_is_array_numeric(compiler, term_type) && !SPVM_TYPE_is_array_numeric(compiler, type_type)) {
-                      if (type_type->dimension == 1 && type_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_STRING) {
+                      if (type_type->dimension == 2 && type_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
                         can_convert = 1;
                       }
                       else {
@@ -2034,7 +2045,7 @@ _Bool SPVM_OP_CHECKER_can_assign(SPVM_COMPILER* compiler, int32_t assign_to_basi
     // To dimension is less than or equal to from dimension
     else if (assign_to_type_dimension <= assign_from_type_dimension) {
       
-      // To basic type is any Object
+      // To basic type is any object
       if (assign_to_basic_type_id == SPVM_BASIC_TYPE_C_ID_ANY_OBJECT) {
         can_assign = 1;
       }
@@ -2111,10 +2122,10 @@ SPVM_OP* SPVM_OP_CHECKER_check_and_convert_type(SPVM_COMPILER* compiler, SPVM_OP
             || (constant->type->dimension == 0 && constant->type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG))
           {
             if ((constant->type->dimension == 0 && constant->type->basic_type->id == SPVM_BASIC_TYPE_C_ID_INT)) {
-              constant_value = constant->value.int_value;
+              constant_value = constant->value.ival;
             }
             else if ((constant->type->dimension == 0 && constant->type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG)) {
-              constant_value = constant->value.long_value;
+              constant_value = constant->value.lval;
             }
             
             if ((assign_to_type->dimension == 0 && assign_to_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE)) {
@@ -2170,15 +2181,19 @@ SPVM_OP* SPVM_OP_CHECKER_check_and_convert_type(SPVM_COMPILER* compiler, SPVM_OP
       }
     }
     else {
-      if ((assign_to_type->dimension && assign_to_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_STRING) && SPVM_TYPE_is_numeric(compiler, assign_from_type)) {
-        // Convert numeric type to String
+      if ((assign_to_type->dimension == 1 && assign_to_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) && SPVM_TYPE_is_numeric(compiler, assign_from_type)) {
+        // Convert numeric type to string
       }
-      // Object type check
+      // object type check
       else {
         _Bool can_assign = SPVM_OP_CHECKER_can_assign(
           compiler, assign_to_type->basic_type->id, assign_to_type->dimension, assign_from_type->basic_type->id,  assign_from_type->dimension);
         if (!can_assign) {
           SPVM_yyerror_format(compiler, "Imcompatible object convertion at %s line %d\n", op_assign_from->file, op_assign_from->line);
+        }
+        // Const check
+        if (!assign_to_type->is_const && assign_from_type->is_const) {
+          SPVM_yyerror_format(compiler, "Can't assign const type to no const type at %s line %d\n", op_assign_from->file, op_assign_from->line);
         }
       }
     }
@@ -2206,7 +2221,6 @@ void SPVM_OP_CHECKER_check_types(SPVM_COMPILER* compiler) {
       // Default core type is ok
       if (type->basic_type->id == SPVM_BASIC_TYPE_C_ID_VOID
         || (type->basic_type->id >= SPVM_BASIC_TYPE_C_ID_BYTE && type->basic_type->id <= SPVM_BASIC_TYPE_C_ID_DOUBLE)
-        || type->basic_type->id == SPVM_BASIC_TYPE_C_ID_STRING
         || type->basic_type->id == SPVM_BASIC_TYPE_C_ID_ANY_OBJECT)
       {
         // Nothing

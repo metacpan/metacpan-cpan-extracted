@@ -62,6 +62,8 @@ has ua_handler_module => (
 
 The port to use if no port is specified (probably will always be 80)
 
+=back
+
 =cut
 
 has default_port => (is => 'ro', isa => 'Int', default => 80);

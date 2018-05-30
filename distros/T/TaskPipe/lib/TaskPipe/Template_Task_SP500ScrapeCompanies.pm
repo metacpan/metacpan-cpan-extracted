@@ -37,7 +37,7 @@ has ws => (is => 'ro', isa => 'Web::Scraper', default => sub {
         process_first 'table.wikitable', 'table' => scraper {
             process 'tr + tr', 'tr[]' => scraper {
                 process_first 'td:nth-child(1) a', 'ticker' => 'TEXT';
-                process_first 'td:nth-child(1) a', 'url' => '@href';
+                process_first 'td:nth-child(1) a', 'url' => ['@href',sub{ $_[0]->as_string }];
                 process_first 'td:nth-child(2) a', 'name' => 'TEXT';
                 process_first 'td:nth-child(4)', 'sector' => 'TEXT';
                 process_first 'td:nth-child(5)', 'industry' => 'TEXT';

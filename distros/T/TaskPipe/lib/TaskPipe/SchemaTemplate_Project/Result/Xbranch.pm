@@ -33,7 +33,9 @@ __PACKAGE__->add_columns(
   "last_plan_index",
   { data_type => "bigint", is_nullable => 1 },
   "last_input_index",
-  { data_type => "bigint", is_nullable => 1 }
+  { data_type => "bigint", is_nullable => 1 },
+  "last_result",
+  { data_type => "text", is_nullable => 1 }
 );
 
 

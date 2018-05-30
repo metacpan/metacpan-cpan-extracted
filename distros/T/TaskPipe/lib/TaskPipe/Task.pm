@@ -1,6 +1,6 @@
 package TaskPipe::Task;
 
-our $VERSION = 0.03;
+our $VERSION = 0.05;
 
 use Moose;
 use Module::Runtime qw(require_module);
@@ -16,6 +16,7 @@ use TaskPipe::InterpParam;
 use TaskPipe::LoggerManager;
 use JSON;
 use TaskPipe::ThreadManager;
+use TaskPipe::Iterator_Array;
 use TaskPipe::RunInfo;
 use Try::Tiny;
 use Clone 'clone';
@@ -47,19 +48,13 @@ has param_md5 => (is => 'rw', isa => 'Str');
 has param_history => (is => 'rw', isa => 'ArrayRef', default => sub{[]});
 
 
-has tags => (is => 'rw', isa => 'HashRef', default => sub{{}});
 has xbranch_ids => (is => 'rw', isa => 'ArrayRef', default => sub{[]});
-
 
 has pinterp => (is => 'rw', isa => 'HashRef', default => sub{{}});
 has pinterp_dd => (is => 'rw', isa => 'Str');
 has pinterp_md5 => (is => 'rw', isa => 'Str');
 
 has results_iterator => (is => 'rw', isa => 'TaskPipe::Iterator');
-
-has working_result_group_rs => (is => 'rw', isa=> 'Maybe[DBIx::Class::ResultSet]');
-has cached_result_group_rs => (is => 'rw', isa => 'Maybe[DBIx::Class::ResultSet]');
-has cached_pinterp => (is => 'rw', isa => 'Maybe[DBIx::Class::Core]');
 
 has thread_manager => (is => 'rw', isa => 'TaskPipe::ThreadManager', lazy => 1, default => sub{
     TaskPipe::ThreadManager->new(
@@ -114,8 +109,6 @@ sub test{
 
     foreach my $test_pinterp ( @{$self->test_data} ){
 
-        #confess "Need test_pinterp" unless $test_pinterp;
-
         $self->pinterp( $test_pinterp );
         my $results = $self->action;
 
@@ -126,8 +119,8 @@ sub test{
         $output.= "Test Pinterp: ".Dumper( $test_pinterp )."\n\n";
 
         if ( ref $results eq 'TaskPipe::Iterator' ){
-            $output.="Task returned an iterator. Showing first 3 results\n\n";
-            for my $i (1..3){
+            $output.="Task returned an iterator. Showing first 10 results\n\n";
+            for my $i (1..10){
                 my $result = $results->next->();
                 $output .= "RESULT $i:\n";
                 $output .= Dumper( $result )."\n\n";
@@ -323,40 +316,30 @@ sub execute_as_task{
 
     $self->pinterp( $interp->interp );
 
+    my $results;
+    my $from_cache = 0;
+    my $should_cache = $self->settings->cache_results;
 
-    $self->get_cached_pinterp;
-    
-    if ( $self->cached_pinterp ){
-        $logger->info( "Found cached pinterp");
-
-        $self->get_cached_result_groups( $self->cached_pinterp->id );
-
-    } else {
-        
-        $self->cached_result_group_rs( undef );
-        $self->working_result_group_rs( undef );
-        $self->cache_pinterp;
-
+    if ( $should_cache ){
+        $results = $self->get_cached_results;
+        $from_cache = 1 if $results;
     }
 
-    if ( $self->cached_result_group_rs && $self->cached_result_group_rs->count ){
+    $results = $results || $self->action;
+    my $is_array = ref $results eq ref [];
 
-        $logger->info("Found existing results for this job - piping ".$self->input_dd." ".$self->plan_dd);
-
-    } else {
-
-        $logger->info("Pinterp not cached - actioning");
-        my $results = $self->action;
-
-        if ( ref $results eq ref [] ){
-            $self->cache_results( $results );
-            $self->get_cached_result_groups;
-        } elsif ( ref($results) eq 'TaskPipe::Iterator' ){
-            $self->results_iterator( $results );
-        } else {
-            confess "Expected an arrayref, or a TaskPipe::Iterator. Instead action returned [$results]";
-        }
+    if ( $should_cache && $is_array && ! $from_cache ){
+        $self->cache_results( $results );
     }
+
+    if ( $is_array ){
+        $self->results_iterator( TaskPipe::Iterator_Array->new( array => $results ) );
+    } elsif ( ref($results) eq 'TaskPipe::Iterator' ){
+        $self->results_iterator( $results );
+    } else {
+        confess "Expected an arrayref, or a TaskPipe::Iterator. Instead action returned [$results]";
+    }
+
 
     my $to_pipe = $self->get_plan_to_pipe;
     
@@ -368,6 +351,64 @@ sub execute_as_task{
         $self->mark_seen;
     }
 
+}
+
+
+sub get_cached_results{
+    my ($self) = @_;
+
+    my $serialized = $self->serialize( $self->pinterp );
+    $self->pinterp_dd( $serialized );
+    $self->pinterp_md5( md5_base64( $serialized ) );
+
+    my $cached = $self->sm->table('pinterp')->search({
+        task_name => $self->name,
+        pinterp_md5 => $self->pinterp_md5
+    })->first;
+    
+    my $results;
+    if ( $cached ){
+        
+        my $results_rs = $self->sm->table('result')->search({
+            pinterp_id => $cached->id
+        });
+
+        if ( $results_rs ){
+            $results = [];
+            while( my $serialized = $results_rs->next ){
+                push @$results, +$self->deserialize( $serialized );
+            }
+        }
+    }
+
+    return $results;
+}
+
+           
+
+sub cache_results{
+    my ($self,$results) = @_;
+
+    my $serialized = $self->serialize( $self->pinterp );
+    $self->pinterp_dd( $serialized );
+    $self->pinterp_md5( md5_base64( $serialized ) );
+
+
+    my $guard = $self->sm->schema->txn_scope_guard;    
+    my $pinterp = $self->sm->table('pinterp')->create({
+        task_name => $self->name,
+        pinterp_md5 => $self->pinterp_md5,
+        pinterp_dd => $self->pinterp_dd
+    });    
+
+    foreach my $result (@$results){
+        
+        $self->sm->table('result')->create({
+            pinterp_id => $pinterp->id,
+            result => +$self->serialize( $result )
+        });
+    }
+    $guard->commit;
 }
 
 
@@ -414,40 +455,11 @@ sub execute_as_manager{
         ||  $self->settings->plan_mode eq 'branch' && ! @{$self->plan}
     );
 
-    $self->init_run;
     $self->thread_manager->init;
     $self->pipe_through;
-    $self->end_run;
     $self->thread_manager->finalize;
 }
 
-
-
-sub init_run{
-    my ($self) = @_;
-
-
-    my $dt = DateTime->now;
-    my $run = $self->sm->table('run')->create({
-        started => $dt->ymd." ".$dt->hms
-    });
-
-    $self->run_info->run_id( $run->id );
-}
-
-    
-
-
-sub end_run{
-    my ($self) = @_;
-
-    my $dt = DateTime->now;
-    $self->sm->table('run')->find({
-        id => $self->run_info->run_id
-    })->update({
-        completed => $dt->ymd." ".$dt->hms
-    });
-}
 
 
 
@@ -478,6 +490,7 @@ sub get_cached_pinterp{
     $logger->debug( "pinterp is cached");
     $self->cached_pinterp( $cached );
 }
+
 
 
 
@@ -529,81 +542,31 @@ sub cache_pinterp{
 sub serialize{
     my ($self,$ref) = @_;
 
-    my $serialized = $self->json_encoder->encode( $ref );
+    my $serialized;
+    try {
+        $serialized = $self->json_encoder->encode( $ref );
+    } catch {
+        confess "Serialize error: $_\nref was ".Dumper( $ref );
+    };
+
     return $serialized;
 }
 
 
+sub deserialize{
+    my ($self,$json) = @_;
 
-sub get_cached_result_groups{
-    my ($self) = @_;
-
-    my $group_rs = $self->sm->table('result_group')->search({
-        pinterp_id => $self->cached_pinterp->id
-    });
-
-    $self->cached_result_group_rs( $group_rs );
-
-}
-
-
-sub cache_results{
-    my ($self, $results) = @_; #results is an arrayref
-
-    confess "Sets of results should be an arrayref. This one isnt: $results" unless ref $results eq ref [];
-
-    #my $id;
-    foreach my $result (@$results){
-        $self->cache_result( $result );
+    my $ref;
+    try {
+        $ref = $self->json_encoder->decode( $json );
+    } catch {
+        confess "Error deserialising json string '$json': $_";
     }
 
-
-    $self->cached_pinterp->update({
-        status => 'fully-cached'
-    });
-
+    return $ref;
 }
 
 
-
-sub cache_result{
-    my ($self, $result) = @_;
-
-    confess "Individual results should be hashrefs. This one isn't: $result" unless ref $result eq ref {};
-
-    my $guard = $self->sm->schema->txn_scope_guard;
-    my $group = $self->sm->table('result_group')->create({
-        pinterp_id => +$self->cached_pinterp->id
-    });
-
-    foreach my $res_name (keys %$result){
-        
-        $self->sm->table('result')->create({
-            group_id => $group->id,
-            res_name => $res_name,
-            res_value => $result->{$res_name}
-        });
-    }
-    $guard->commit;
-}
-
-
-
-sub de_cache_results{ # no longer needed for 'seen' jobs
-    my ($self) = @_;
-
-    $self->cached_result_group_rs->reset;
-
-    while( my $group = $self->cached_result_group_rs->next ){
-
-        $self->sm->table('result')->search({
-            group_id => $group->id
-        })->delete_all;
-
-    }
-
-    $self->cached_result_group_rs->delete_all;
-}
 
 
     
@@ -629,7 +592,7 @@ sub next_result_as_manager{
 
     my %input = %{$self->input};
     $self->input({});
-    return %input?\%input:undef;
+    return +%input?\%input:undef;
 }
 
 
@@ -637,38 +600,7 @@ sub next_result_as_manager{
 sub next_result_as_task{
     my ($self) = @_;
 
-    my $result;
-    if ( defined $self->results_iterator ){
-
-        $result = $self->results_iterator->next->();
-
-        if ( $result ){
-            $self->cache_result( $result );
-        } else {
-            $self->cached_pinterp->update({
-                status => 'fully-cached'
-            });
-        }
-
-    } else {
-
-        my $group = $self->working_result_group_rs->next;
-
-        if ( $group ){
-
-            my @results = $self->sm->table('result')->search({
-                group_id => $group->id
-            });
-
-            $result = {};
-            foreach my $res (@results){
-                $result->{$res->res_name} = $res->res_value;
-            }
-        }
-
-    }
-
-    return $result;
+    return +$self->results_iterator->next->();
 }
 
 
@@ -676,29 +608,15 @@ sub next_result_as_task{
 sub count_results{
     my ($self) = @_;
 
-    if ($self->results_iterator){
-        return +$self->results_iterator->count->();
-    } else {
-        return +$self->cached_result_group_rs->count;
-    }
+    return +$self->results_iterator->count->();
 }
 
 
 
 sub reset_results_iterator{
-    my ($self,$index) = @_;
+    my ($self,$index,$last) = @_;
 
-    if ( defined $self->results_iterator ){
-        $self->results_iterator->reset->($index);
-    } else {
-        my $crs = $self->cached_result_group_rs;
-        if ( $index ){
-            my $max = $crs->count - 1;
-            $self->working_result_group_rs( $crs->slice( $index, $max ) );
-        } else {
-            $self->working_result_group_rs( $crs );
-        }
-    }
+    $self->results_iterator->reset->($index,$last);
 }
 
 
@@ -736,39 +654,40 @@ sub pipe_through{
 sub pipe_to{
     my ($self,$plan) = @_;
 
+    my $logger = Log::Log4perl->get_logger;
+
     my $tm = $self->thread_manager;
     $tm->forks(0);
     
     my $ni = $self->count_results;
     
-#    my ($i0, $p0 ) = $self->get_xbranch_resume_indices;
-    my $i0 = 0;
-    my $p0 = 0;
+    my ($i0, $p0, $last_result ) = $self->get_resume_info;
 
     for my $pi ($p0..$#$plan){
 
-        $self->reset_results_iterator( $i0 );
+        $self->reset_results_iterator( $i0, $last_result );
         $i0 = 0; # make sure to start inputs from scratch on the next plan iteration
+        $last_result = undef;
         my $ii = 0;
 
-        while( my $input_item = $self->next_result ){
+        my $input_item;
+        my $gid;
+
+        while(1){
+            $input_item = $self->next_result;
+            last unless $input_item;
+
             $ii++;
             my $count = $pi * $ni + $ii;
             my $last_rec_cond = $pi == $#$plan && $ii == $ni ? 1 : 0;
 
             $tm->execute( sub{
                     $self->execute_child_task( $plan->[$pi], $input_item );
+                    $self->record_resume_info( $ii,$pi,$input_item );
                 },
                 $count,
                 $last_rec_cond
             );
-
-            $self->sm->table('xbranch')->find({
-                id => $self->xbranch_ids->[0]
-            })->update({
-                last_plan_index => $pi,
-                last_input_index => $ii
-            });
         }
     }
 
@@ -776,7 +695,26 @@ sub pipe_to{
 }
 
 
-sub get_xbranch_resume_indices{
+
+sub record_resume_info{
+    my ($self,$input_index,$plan_index,$last_result) = @_;
+
+    my $xbranch = $self->sm->table('xbranch')->find({
+        id => $self->xbranch_ids->[0]
+    });
+
+    if ($xbranch){
+        $xbranch->update({
+            last_plan_index => $plan_index,
+            last_input_index => $input_index,
+            last_result => +$self->serialize($last_result)
+        });
+    }
+}
+
+
+
+sub get_resume_info{
     my ($self) = @_;
 
     my $xbranch = $self->sm->table('xbranch')->find({
@@ -785,13 +723,17 @@ sub get_xbranch_resume_indices{
 
     my $plan_index = 0;
     my $input_index = 0;
+    my $last_result;
 
     if ( $xbranch ){
         $plan_index = $xbranch->last_plan_index || 0;
         $input_index = $xbranch->last_input_index || 0;
+        $last_result = $xbranch->last_result || undef;
     }
 
-    return ($input_index,$plan_index);
+    $last_result = $self->deserialize( $last_result ) if $last_result;
+
+    return ($input_index,$plan_index,$last_result);
 }
 
 
@@ -827,25 +769,11 @@ sub execute_child_task{
 
 sub mark_seen{
     my ($self) = @_;
-
-    my $logger = Log::Log4perl->get_logger;
     
-    $self->set_xbranch_status( 'seen' );
+    my $xbranch = $self->sm->table('xbranch')->search({
+        id => $self->xbranch_ids->[0]
+    })->delete_all;
 
-    if ( ! $self->settings->persist_xbranch_record ){
-        $self->sm->table('xbranch')->search({    #delete cached xbranches with
-            parent_id => $self->xbranch_ids->[0]             # this parent
-        })->delete_all;
-    }
-    
-    if ( $self->settings->persist_result_cache ){
-        $logger->trace("Persisting result cache");
-    }
-
-    if ( ! $self->settings->persist_result_cache ){
-        $self->de_cache_results;
-        $self->cached_pinterp->delete;
-    }
 }
 
 
@@ -892,7 +820,6 @@ sub task_from_plan{
     my $task = $mod_name->new(
         sm => $self->sm,
         gm => $self->gm,
-        settings => $self->settings,
         thread_manager => $self->thread_manager,
         plan => $plan
     );
@@ -905,12 +832,15 @@ sub task_from_plan{
 sub set_xbranch_status{
     my ($self,$status) = @_;
 
-    $self->sm->table('xbranch')->find({
+    my $xbranch = $self->sm->table('xbranch')->find({
         id => $self->xbranch_ids->[0]
-    })->update({
-        status => $status
     });
 
+    if ( $xbranch ){
+        $xbranch->update({
+            status => $status
+        });
+    }
 }
 
 
@@ -921,7 +851,6 @@ sub handle_error{
     my $guard = $self->sm->schema->txn_scope_guard;
 
     my $error = $self->sm->table('error')->create({
-        run_id => $self->run_info->run_id,
         history_index => scalar( @{$self->input_history} ),
         tag => $self->param->{_tag},
         task_name => $self->name,

@@ -2,10 +2,9 @@ package Surveyor::App;
 use strict;
 use warnings;
 
-use subs qw();
-use vars qw($VERSION);
+our $VERSION = '0.121';
 
-$VERSION = '0.12';
+=encoding utf8
 
 =head1 NAME
 
@@ -121,7 +120,6 @@ Extract all of the subroutines starting with C<bench_> in C<PACKAGE>.
 If you don't define a package, it uses the package this subroutine
 was compiled in (so that's probably useless).
 
-
 =cut
 
 sub get_all_bench_ {
@@ -157,9 +155,9 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2013, brian d foy, All Rights Reserved.
+Copyright © 2013-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+You may redistribute this under the terms of the Artistic License 2.0.
 
 =cut
 

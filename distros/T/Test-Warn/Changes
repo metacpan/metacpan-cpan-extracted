@@ -1,5 +1,10 @@
 Revision history for Perl extension Test::Warn.
 
+0.33  2018-05-29
+        - Patch from Era Eriksson to clean up some manpage language
+          Bug-Debian: #322351
+          https://rt.cpan.org/Ticket/Display.html?id=49519
+
 0.32  2016-12-23
         - updating github information
         - updating changes

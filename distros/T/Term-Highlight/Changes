@@ -84,3 +84,7 @@ Revision history for Perl module Term::Highlight and script hl.
 2018/04/01 - Version 2.0.2 - better treatment of the trailing highlight options
                 not followed by a pattern.
 
+2018/05/20 - Version 2.0.3 - added new global option '-f' to build the file list
+                from the trailing arguments automatically when option '-' is not
+                specified, fixed handling of option '0'.
+

@@ -49,7 +49,7 @@
             "Test::Roo::Role" : "0",
             "curry" : "0",
             "namespace::autoclean" : "0",
-            "perl" : "v5.10.1"
+            "perl" : "v5.8.0"
          }
       },
       "test" : {
@@ -58,7 +58,6 @@
          },
          "requires" : {
             "Class::Inspector" : "0",
-            "File::Basename" : "0",
             "File::Spec" : "0",
             "JSON::PP" : "2.00",
             "Module::Metadata" : "0",
@@ -67,18 +66,14 @@
             "Test::Most" : "0",
             "Test::Roo" : "0",
             "Time::Piece" : "1.16",
-            "Time::Seconds" : "0",
-            "feature" : "0",
-            "lib" : "0",
-            "strict" : "0",
-            "warnings" : "0"
+            "Time::Seconds" : "0"
          }
       }
    },
    "provides" : {
       "Test::Roo::DataDriven" : {
          "file" : "lib/Test/Roo/DataDriven.pm",
-         "version" : "v0.3.1"
+         "version" : "v0.4.0"
       }
    },
    "release_status" : "stable",
@@ -92,7 +87,7 @@
          "web" : "https://github.com/robrwo/Test-Roo-DataDriven"
       }
    },
-   "version" : "v0.3.1",
+   "version" : "v0.4.0",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Aaron Crane <arc@cpan.org>",

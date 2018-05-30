@@ -1,4 +1,5 @@
 use utf8;
+use ExtUtils::testlib;
 use Test2::V0;
 use URI::Encode::XS qw(uri_encode_utf8 uri_decode_utf8);
 use URI::Fast qw(uri);

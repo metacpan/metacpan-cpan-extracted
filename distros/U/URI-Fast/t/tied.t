@@ -4,6 +4,7 @@ require Tie::Scalar;
 1;
 
 package main;
+use ExtUtils::testlib;
 use Test2::V0;
 use URI::Fast qw(uri uri_split);
 

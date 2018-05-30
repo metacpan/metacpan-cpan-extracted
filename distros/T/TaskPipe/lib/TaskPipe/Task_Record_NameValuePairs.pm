@@ -39,9 +39,9 @@ sub action{
 
     }
 
-    my $rec_hash = { $record->get_columns };
-
-    return [ $rec_hash ];
+    
+    return [{ $record->get_columns }] if $record;
+    return [];
 }
 
 

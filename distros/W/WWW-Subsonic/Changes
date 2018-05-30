@@ -1,9 +1,42 @@
 ==================================================
-Changes from 2016-05-18 00:00:00 +0000 to present.
+Changes from 2016-05-25 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.006 at 2018-05-18 22:58:33 +0000
+version 0.007 at 2018-05-25 17:41:49 +0000
+------------------------------------------
+
+  Change: 0a188dca505394acd3624fbfa3265dd9e3c162a1
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-05-24 08:24:04 +0000
+
+    Remove explicit MinimumPerl setting
+
+    Use the autodetection for the minimum Perl version. This module uses two
+    features of Perl 5.22:
+
+    * The "double diamond" <<>> operator for safely reading from files or
+
+    STDIN
+
+    * The regex '/n' modifier, to disable capture groups via parentheses 
+
+  Change: 904b639bbd70b8162e679c722a87fa68060b64c3
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-05-24 08:23:04 +0000
+
+    Revert "Remove 5.22+ requirement Double Diamond"
+
+    This reverts commit 1cf1f8d0aec69c9c878f19f40ec20cef8ad86ce4. 
+
+  Change: f284570b17b6cc17cea9975efc74faa1a2cc0603
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-05-18 15:59:06 +0000
+
+    Version 0.006 Docs 
+
+------------------------------------------
+version 0.006 at 2018-05-18 22:57:23 +0000
 ------------------------------------------
 
   Change: 1cf1f8d0aec69c9c878f19f40ec20cef8ad86ce4

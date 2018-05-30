@@ -9,7 +9,7 @@ our @ISA = qw( Exporter );
 
 our @EXPORT = qw( LoadArgs LoadPatterns ClearPatterns GetPatterns Process );
 
-our $VERSION = "2.0.2";
+our $VERSION = "2.0.3";
 
 
 sub new
@@ -52,7 +52,7 @@ sub LoadArgs
     my ( $self, $args ) = @_;
     my ( $ignorecase, $fgcolor, $bold, $bgcolor );
     my $lastPatternOmitted = 0;
-    while ( my $arg = shift @$args )
+    while ( defined ( my $arg = shift @$args ) )
     {
         SWITCH_ARGS:
         {

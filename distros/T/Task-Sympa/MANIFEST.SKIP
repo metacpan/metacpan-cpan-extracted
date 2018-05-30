@@ -1,0 +1,15 @@
+~$
+^blib
+^_build
+^Build$
+^cover_db
+^.git
+^Makefile(\.old)?$
+^MANIFEST\.
+^MYMETA\.
+^nytprof
+^pm_to_blib$
+^run-postinst
+\.swp
+^Task-Sympa-*
+^.travis.yml$

@@ -4,8 +4,23 @@ author:
   - 'Christopher White <cxwembedded@gmail.com>'
 build_requires:
   App::FatPacker: '0'
+  Capture::Tiny: '0'
+  Carp: '0'
+  Config: '0'
+  Cwd: '0'
+  Exporter: '0'
+  File::Spec: '0'
+  Getopt::Long: '2.5'
   IPC::Run3: '0'
+  Import::Into: '0'
+  List::Util: '1.33'
+  Pod::Usage: '0'
   Test::More: '0'
+  Text::Diff: '0'
+  Text::ParseWords: '0'
+  constant: '0'
+  parent: '0'
+  rlib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -23,5 +38,5 @@ requires:
   Getopt::Long: '2.5'
   Pod::Usage: '0'
   perl: '5.010'
-version: v0.4.0
+version: '0.500003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

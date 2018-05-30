@@ -11,12 +11,10 @@ __PACKAGE__->table("result");
 __PACKAGE__->add_columns(
   "id",
   { data_type => "bigint", is_auto_increment => 1, is_nullable => 0 },
-  "group_id",
+  "pinterp_id",
   { data_type => "bigint", is_nullable => 1 },
-  "res_name",
-  { data_type => "varchar", is_nullable => 1, size => 255 },
-  "res_value",
-  { data_type => "text", is_nullable => 1 },
+  "result",
+  { data_type => "text", is_nullable => 1 }
 );
 
 __PACKAGE__->set_primary_key("id");

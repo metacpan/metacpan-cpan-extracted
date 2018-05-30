@@ -1,113 +1,17 @@
 ==================================================
-Changes from 2008-01-12 00:00:00 +0000 to present.
+Changes from 2013-05-30 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 1.12 at 2013-01-10 14:55:52 +0000
+version 1.14 at 2018-05-29 08:22:21 +0000
 -----------------------------------------
 
-  Change: 34a8e3a668f6c4ba1f5725971598fc8cd4eaef1b
+  Change: 7ba57fa9ee6d411fc7cd1336a985e57565d082c9
   Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-01-10 14:55:52 +0000
+  Date : 2018-05-29 09:22:21 +0000
 
-    Bump version to 1.12 
+    Added accessor for 'context' and update documentation 
 
-  Change: 37b60d1ae2460076f82f07300b2c1f0d78412200
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-01-10 14:55:28 +0000
-
-    Implement a timeout option 
-
-  Change: 4a636064c8cceeddc33fac4095ff546d5e62e3a1
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-01-10 13:19:52 +0000
-
-    Update distribution to Dist::Zilla 
-
------------------------------------------
-version 1.10 at 2011-06-29 09:39:16 +0000
------------------------------------------
-
-  Change: da4c89e75890aea9213ad2cf890fce310290d7fc
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2011-06-29 10:39:16 +0000
-
-    Explicitly shutdown socket in/out on destruction under Cygwin/MSWin32 
-
------------------------------------------
-version 1.08 at 2010-04-28 14:30:50 +0000
------------------------------------------
-
-  Change: e01e068cabdaa0afc907422655732ec0a49831ae
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2010-04-28 15:30:50 +0000
-
-    Mod changes 
-
-  Change: 89cf253e9a3ab2175184e5d242b12c3f3eb3e3f5
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2010-04-28 15:29:55 +0000
-
-    Bump version 
-
------------------------------------------
-version 1.06 at 2009-10-26 23:23:08 +0000
------------------------------------------
-
-  Change: adcbdc62c056aa5849a78fcb5fd8c34ddca58600
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2009-10-26 23:23:08 +0000
-
-    Amended tests and bumped required POE version 
-
-  Change: 61bce98e0e218b96faa360e6bef98a9ae3f34033
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2009-06-17 23:43:35 +0000
-
-    Updated MANIFEST 
-
------------------------------------------
-version 1.04 at 2009-06-17 22:41:06 +0000
------------------------------------------
-
-  Change: 7c94933cad841febeadbd78860a93dddc45b0477
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2009-06-17 23:41:06 +0000
-
-    Added accessor for alias 
-
------------------------------------------
-version 1.02 at 2009-04-07 20:06:59 +0000
------------------------------------------
-
-  Change: f95144656b122e51b1a5e315886a7e87e0c7c691
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2009-04-07 21:06:59 +0000
-
-    Make auto_set_repository() only run at author-time 
-
-  Change: 20e5748aee88d043b72227046d78ab6891759710
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2009-04-07 21:06:40 +0000
-
-    Make auto_set_repository() only run at author-time 
-
------------------------------------------
-version 1.00 at 2009-04-06 21:54:24 +0000
------------------------------------------
-
-  Change: fd17e74af7af11027eba7fa28ac08cbad7fa90bc
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2009-04-06 22:54:24 +0000
-
-    Bump to a 'stable' version. Add auto_set_repository to Makefile.PL 
-
-  Change: a069cbd3fc6d67413a592512a74c1653e8e8df82
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2009-03-12 11:52:11 +0000
-
-    Initial commit 
-
-================
-End of releases.
-================
+================================================
+Plus 7 releases after 2013-05-30 00:00:00 +0000.
+================================================

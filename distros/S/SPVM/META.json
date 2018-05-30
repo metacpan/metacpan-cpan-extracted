@@ -1,5 +1,5 @@
 {
-   "abstract" : "Fast Calculation and Easy C/C++ Binding with perlish syntax and static typing",
+   "abstract" : "Fast array and numeric operation, and provide easy way to C/C++ Binding",
    "author" : [
       "A. U. Thor <kimoto@sakura.ne.jp>"
    ],
@@ -35,5 +35,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.0336"
+   "version" : "0.0341"
 }

@@ -2,10 +2,8 @@ package Surveyor::Benchmark::HTMLEntities;
 use strict;
 use warnings;
 
-use subs qw();
-use vars qw($VERSION $HTML);
-
-$VERSION = '1.02';
+our $VERSION = '1.021';
+our $HTML;
 
 use HTML::Entities;
 use HTML::Escape;
@@ -80,7 +78,7 @@ sub set_up {
 	printf qq(> (%d)\n< (%d)\n& (%d)\n' (%d)\n" (%d)\n),
 		@counts{ qw(> < & ' ") };
 	}
-	
+
 =item tear_down
 
 =cut
@@ -127,7 +125,7 @@ sub bench_html_entities {
 
 This source is in Github:
 
-	http://github.com/briandfoy/surveyor-benchmark-htmlentities
+	https://github.com/briandfoy/surveyor-benchmark-htmlentities
 
 =head1 AUTHOR
 
@@ -135,9 +133,9 @@ brian d foy, C<< <bdfoy@gmail.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2013, brian d foy, All Rights Reserved.
+Copyright © 2013-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+You may redistribute this under the terms of Artistic License 2.0.
 
 =cut
 

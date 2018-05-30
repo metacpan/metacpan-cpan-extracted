@@ -61,6 +61,13 @@ sub after_request{
     $self->handle_failed_request($resp) unless $resp && $resp->status_line =~ /^200/;
 }
 
+sub refresh{
+    my $self = shift;
+
+    $self->ua_handler->ua( $self->ua_handler->build_ua );
+    $self->change_ip;
+}
+
 
 =head1 NAME
 

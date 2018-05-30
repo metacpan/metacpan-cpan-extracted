@@ -1,3 +1,13 @@
+0.004 2018-05-28
+
+  * move LGPL_2 license in Software::LicenseMoreUtils
+
+0.003 2018-05-26
+
+  * add MPL_1_1 and MPL_2_0 summaries (Debian #865472)
+  * add CC0_1_0 summary (Debian #887926)
+  * fix examples in pod doc
+
 0.002 2018-05-21
 
   * fix tests for non-Debian distributions. Tx Slaven (gh #1)

@@ -4,9 +4,9 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -21,27 +21,37 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : 0
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
          "requires" : {
-            "Benchmark" : 0,
-            "Test::More" : "0.94"
+            "Benchmark" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.95"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/surveyor-app/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/surveyor-app",
       "repository" : {
-         "url" : "https://github.com/briandfoy/surveyor-app"
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/surveyor-app.git",
+         "web" : "https://github.com/briandfoy/surveyor-app"
       }
    },
-   "version" : "0.12"
+   "version" : "0.121",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

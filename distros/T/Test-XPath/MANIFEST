@@ -1,9 +1,8 @@
 Build.PL
+Makefile.PL
 Changes
 lib/Test/XPath.pm
-MANIFEST			This list of files
-META.json
-META.yml
+MANIFEST
 README
 t/atom.xml
 t/blocks.t
@@ -17,3 +16,5 @@ t/subclass.t
 t/xhtml.t
 t/xmlns.t
 t/xpath.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

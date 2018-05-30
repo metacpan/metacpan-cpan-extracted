@@ -3,7 +3,7 @@ package Task::Sympa;
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.03';
 
 1;
 
@@ -11,13 +11,15 @@ __END__
 
 =pod
 
+=head1 Deprecated
+
+a cpanfile will be provided with the next versions of the sympa project
+and this module is probably doomed to backpan in the next year. please
+follow the sympa-users mailing list.
+
 =head1 NAME
 
 Task::Sympa - Sympa dependencies
-
-=head1 VERSION
-
-version 1.01
 
 =head1 SYNOPSIS
 
@@ -28,6 +30,7 @@ or run.
 
 Installing this module will install all the modules needed for running Sympa
 mailing-list manager, ie:
+
 
 =over
 
@@ -85,9 +88,19 @@ mailing-list manager, ie:
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over
+
+=item
 
 Guillaume Rousse <guillomovitch@cpan.org>
+
+=item
+
+Marc Chantreux <marc.chantreux@renater.fr>
+
+=back
 
 =head1 LICENSE
 

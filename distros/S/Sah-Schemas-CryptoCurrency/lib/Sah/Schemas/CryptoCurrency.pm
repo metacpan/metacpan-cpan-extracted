@@ -1,7 +1,7 @@
 package Sah::Schemas::CryptoCurrency;
 
-our $DATE = '2018-04-06'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-05-29'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 1;
 # ABSTRACT: Various Sah cryptocurrency schemas
@@ -18,7 +18,37 @@ Sah::Schemas::CryptoCurrency - Various Sah cryptocurrency schemas
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::Schemas::CryptoCurrency (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-04-06.
+This document describes version 0.006 of Sah::Schemas::CryptoCurrency (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-05-29.
+
+=head1 SAH SCHEMAS
+
+=over
+
+=item * L<cryptocurrency|Sah::Schema::cryptocurrency>
+
+Cryptocurrency code, name, or safename.
+
+Cryptocurrency code or name or safename that is listed in
+L<CryptoCurrency::Catalog>, e.g. BTC, "Bitcoin Cash", ethereum-classic.
+
+Code/name/safename must be listed.
+
+Will be normalized to code in uppercase.
+
+
+=item * L<cryptoexchange|Sah::Schema::cryptoexchange>
+
+Cryptoexchange code, name, or safename.
+
+Cryptoexchange code or name or safename that is listed in
+L<CryptoExchange::Catalog>, e.g. GDAX, "BX Thailand", bx-thailand.
+
+Code/name/safename must be listed.
+
+Will be normalized to safename in lowercase.
+
+
+=back
 
 =head1 HOMEPAGE
 

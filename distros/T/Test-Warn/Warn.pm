@@ -31,9 +31,9 @@ Test::Warn - Perl extension to test methods for warnings
 
 A good style of Perl programming calls for a lot of diverse regression tests.
 
-This module provides a few convenience methods for testing warning based code.
+This module provides a few convenience methods for testing warning based-code.
 
-If you are not already familiar with the Test::More manpage 
+If you are not already familiar with the L<Test::More> manpage,
 now would be the time to go take a look.
 
 =head2 FUNCTIONS
@@ -49,7 +49,7 @@ then the tests succeeds if the BLOCK doesn't give any warning.
 Another way to say that there are no warnings in the block
 is C<warnings_are {foo()} [], "no warnings">.
 
-If you want to test for a warning given by Carp,
+If you want to test for a warning given by Carp
 you have to write something like:
 C<warning_is {carp "msg"} {carped =E<gt> 'msg'}, "Test for a carped warning">.
 The test will fail if a "normal" warning is found instead of a "carped" one.
@@ -97,10 +97,10 @@ The REGEXP is matched against the whole warning line,
 which in general has the form "WARNING at __FILE__ line __LINE__".
 So you can check for a warning in the file Foo.pm on line 5 with
 C<warning_like {bar()} qr/at Foo.pm line 5/, "Testname">.
-I don't know whether it makes sense to do such a test :-(
-However, you should be prepared as a matching with 'at', 'file', '\d'
+Perhaps it is not sensible to perform such a test;
+however, you should be aware that matching on a sweeping regular expression
 or similar will always pass. 
-Think to the qr/^foo/ if you want to test for warning "foo something" in file foo.pl.
+Consider qr/^foo/ if you want to test for warning "foo something" in file foo.pl.
 
 You can also write the regexp in a string as "/.../"
 instead of using the qr/.../ syntax.
@@ -108,7 +108,7 @@ Note that the slashes are important in the string,
 as strings without slashes are reserved for warning categories
 (to match warning categories as can be seen in the perllexwarn man page).
 
-Similar to C<warning_is>,
+As with C<warning_is>,
 you can test for warnings via C<carp> with:
 C<warning_like {bar()} {carped => qr/bar called too early/i};>
 
@@ -128,10 +128,10 @@ Also see L</BUGS AND LIMITATIONS>.
 
 
 Thanks to the grouping in a tree,
-it's simple possible to test for an 'io' warning,
-instead for testing for a 'closed|exec|layer|newline|pipe|unopened' warning.
+it's possible to test simply for an 'io' warning,
+instead of testing for a 'closed|exec|layer|newline|pipe|unopened' warning.
 
-Note, that warnings occurring at compile time,
+Note that compile-time warnings
 can only be caught in an eval block. So
 
   warning_like {eval q/"$x"; $x;/} 
@@ -141,9 +141,8 @@ can only be caught in an eval block. So
 will work,
 while it wouldn't work without the eval.
 
-Note, that it isn't possible yet,
-to test for own categories,
-created with warnings::register.
+Note also that it isn't yet possible
+to test for categories you created yourself with C<warnings::register>.
 
 =item warnings_like BLOCK ARRAYREF, TEST_NAME
 
@@ -163,7 +162,7 @@ and for warning categories, too:
                  {carped => qr/bar warning/i},
                  'io'
                 ],
-                "I hope, you'll never have to write a test for so many warnings :-)";
+                "I hope you'll never have to write a test for so many warnings :-)";
 
 =item warnings_exist BLOCK STRING|ARRAYREF, TEST_NAME
 
@@ -195,19 +194,19 @@ If you want to add a warning to a category, send a pull request. Modifications
 should be done to %warnings_in_category. You should look into perl source to check
 how warning is looking exactly.
 
-Please note that warnings with newlines inside are making a lot of trouble.
-The only sensible way to handle them is to use are the C<warning_like> or
-C<warnings_like> methods. Background for these problems is that there is no
-really secure way to distinguish between warnings with newlines and a tracing
+Please note that warnings with newlines inside are very awkward.
+The only sensible way to handle them is to use the C<warning_like> or
+C<warnings_like> methods. The background is that there is no
+really safe way to distinguish between warnings with newlines and a
 stacktrace.
 
-If a method has it's own warn handler,
+If a method has its own warn handler,
 overwriting C<$SIG{__WARN__}>,
 my test warning methods won't get these warnings.
 
-The C<warning_like BLOCK CATEGORY, TEST_NAME> method isn't extremely tested.
-Please use this calling style with higher attention and
-tell me if you find a bug.
+The C<warning_like BLOCK CATEGORY, TEST_NAME> method isn't fully tested.
+Please take note if you use this this calling style,
+and report any bugs you find.
 
 =head1 TODO
 
@@ -220,7 +219,7 @@ Please feel free to suggest improvements.
 
 =head1 SEE ALSO
 
-Have a look to the similar modules: L<Test::Exception>, L<Test::Trap>.
+Have a look to the similar L<Test::Exception> module. L<Test::Trap>
 
 =head1 THANKS
 
@@ -252,7 +251,7 @@ use warnings;
 #use Array::Compare;
 use Sub::Uplevel 0.12;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 require Exporter;
 

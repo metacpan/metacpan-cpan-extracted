@@ -1,6 +1,6 @@
 package Twitter::API::Trait::Migration;
 # ABSTRACT: Migration support Net::Twitter/::Lite users
-$Twitter::API::Trait::Migration::VERSION = '1.0001';
+$Twitter::API::Trait::Migration::VERSION = '1.0002';
 use 5.14.1;
 use Carp;
 use Moo::Role;
@@ -117,7 +117,7 @@ Twitter::API::Trait::Migration - Migration support Net::Twitter/::Lite users
 
 =head1 VERSION
 
-version 1.0001
+version 1.0002
 
 =head1 DESCRIPTION
 

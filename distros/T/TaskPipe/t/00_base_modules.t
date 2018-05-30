@@ -20,8 +20,6 @@ my @base_modules = qw(
     Template_Plan_SP500
     UserAgentManager
     TorManager
-    DaemonManager
-
     PortManager
     Template_Task_SP500ScrapeCompanies
     Template_Config_System

@@ -2,9 +2,32 @@ NAME
     Sah::Schemas::CryptoCurrency - Various Sah cryptocurrency schemas
 
 VERSION
-    This document describes version 0.005 of Sah::Schemas::CryptoCurrency
+    This document describes version 0.006 of Sah::Schemas::CryptoCurrency
     (from Perl distribution Sah-Schemas-CryptoCurrency), released on
-    2018-04-06.
+    2018-05-29.
+
+SAH SCHEMAS
+    *   cryptocurrency
+
+        Cryptocurrency code, name, or safename.
+
+        Cryptocurrency code or name or safename that is listed in
+        CryptoCurrency::Catalog, e.g. BTC, "Bitcoin Cash", ethereum-classic.
+
+        Code/name/safename must be listed.
+
+        Will be normalized to code in uppercase.
+
+    *   cryptoexchange
+
+        Cryptoexchange code, name, or safename.
+
+        Cryptoexchange code or name or safename that is listed in
+        CryptoExchange::Catalog, e.g. GDAX, "BX Thailand", bx-thailand.
+
+        Code/name/safename must be listed.
+
+        Will be normalized to safename in lowercase.
 
 HOMEPAGE
     Please visit the project's homepage at

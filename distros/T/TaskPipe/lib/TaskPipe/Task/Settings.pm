@@ -58,26 +58,14 @@ The tasks C<Record> and C<Scrape_SomethingElse> execute in parallel. See the gen
 
 has plan_mode => (is => 'ro', isa => 'Str', default => 'branch');
 
-=item persist_xbranch_record
 
-Once an xbranch has been 'seen' - ie all the sub-xbranches have been executed, taskpipe can clear all records of those sub-xbranches in order to keep the database trim. The upside to persisting the xbranch cache is that any (sub) xbranch can be targetted in a rerun so that only that xbranch gets executed without executing the whole plan. The downside is a substantially larger database. 
+=item cache_results
 
-Persisting the xbranch cache may be a good idea during development when errors are expected frequently, but is probably less desirable in production with less frequent errors and a much larger amount of data.
-
-=cut
-
-has persist_xbranch_record => (is => 'ro', isa => 'Bool', default => 0);
-
-
-=item persist_result_cache
-
-Once an xbranch has been 'seen' without errors, taskpipe can clear all cached results associated with the xtasks that appear on the xbranch, in order to keep the database trim. The upside to persisting the result cache is that if the plan is changed, taskpipe will only execute any new or changed xtasks without needing to execute unchanged ones (since the unchanged xtasks are cached). The downside is considerable database overhead.
-
-Like persisting the xbranch record, persisting the result cache may be a good idea during development when errors and changes are expected frequently, but is probably less desirable in production with a much larger amount of data.
+Cache xtask results. This prevents the same xtask (ie the same task with the same C<pinterp> being executed again (the results will just be piped to the next task without the task being executed).
 
 =cut
 
-has persist_result_cache => (is => 'ro', isa => 'Bool', default => 0);
+has cache_results => (is => 'ro', isa => 'Bool', default => 0);
 
 
 =item threads

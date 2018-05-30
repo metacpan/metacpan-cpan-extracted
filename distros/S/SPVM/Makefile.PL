@@ -48,10 +48,8 @@ WriteMakefile(
 sub MY::postamble {
   
   my @module_names = qw(
-    SPVM::Std::IO
-    SPVM::Std::Time
-    SPVM::Std::Math
-    SPVM::Std::TypeUtil
+    SPVM::Math
+    SPVM::TypeUtil
   );
   
   my $make_rule = '';

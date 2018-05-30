@@ -28,7 +28,16 @@ sub action{
 
     my $record = $self->record_row( $self->pinterp->{'values'} );
 
+    return [] unless $record;
+
     my $rec_hash = { $record->get_columns };
+
+    delete $rec_hash->{modified_dt};
+    delete $rec_hash->{created_dt};
+#    my $mdt = $rec_hash->{modified_dt};
+#    $rec_hash->{modified_dt} = $mdt->ymd.' '.$mdt->hms if $mdt;
+#    my $cdt = $rec_hash->{created_dt};
+#    $rec_hash->{created_dt} = $cdt->ymd.' '.$cdt->hms if $cdt;
 
     return [ $rec_hash ];
 
@@ -38,7 +47,6 @@ sub action{
 sub record_row{
 
     my ($self,$row) = @_;
-
 
     my $record;
     my $mode = $self->param->{mode};
@@ -52,11 +60,12 @@ sub record_row{
             modified_dt => $self->dt
         });
 
-    } elsif ( $mode && $mode eq 'find' ){
+    } elsif ( $mode && $mode =~ /(find|new)/ ){
 
-        $record = $table->find( $row );
+        my $found = $table->find( $row );
+        $record = $found if $found and $mode eq 'find';
 
-        if ( ! $record ){
+        if ( ! $found ){
 
             try {
 
@@ -70,7 +79,7 @@ sub record_row{
 
                 $record = $table->find({
                     %$row
-                });
+                }) if $mode eq 'find';
 
             }
 
@@ -104,6 +113,7 @@ sub record_row{
         });
     
     }
+
 
     return $record;
 

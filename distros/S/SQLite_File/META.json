@@ -4,7 +4,7 @@
       "Mark A. Jensen"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -43,7 +43,7 @@
    "provides" : {
       "SQLite_File" : {
          "file" : "lib/SQLite_File.pm",
-         "version" : "0.1004"
+         "version" : "0.1005"
       }
    },
    "release_status" : "stable",
@@ -58,6 +58,6 @@
          "url" : "http://github.com/majensen/sqlite_file.git"
       }
    },
-   "version" : "0.1004",
+   "version" : "0.1005",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

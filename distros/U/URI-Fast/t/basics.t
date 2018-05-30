@@ -1,4 +1,5 @@
 use utf8;
+use ExtUtils::testlib;
 use Test2::V0;
 use Test::LeakTrace qw(no_leaks_ok);
 use URI::Encode::XS qw(uri_encode_utf8 uri_decode_utf8);
@@ -288,6 +289,15 @@ subtest 'memory leaks' => sub{
     my $str = "$uri";
 
   }, 'combined';
+};
+
+subtest 'clearers' => sub{
+  ok my $uri = uri($uris[3]), 'ctor';
+  foreach (qw(scheme path query frag usr pwd host port auth)) {
+    my $method = 'clear_' . $_;
+    $uri->$method;
+    is $uri->$_, '', $method;
+  }
 };
 
 subtest 'overruns' => sub{

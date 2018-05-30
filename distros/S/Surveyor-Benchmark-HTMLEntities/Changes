@@ -1,7 +1,12 @@
-1.01 - Mon Feb 11 13:40:29 2013
+Revision history for Perl module Surveyor::Benchmark::HTMLEntities
+
+1.021 2018-05-24T14:46:30Z
+	* Change to the Artistic License 2.0
+
+1.01 - 2013-02-11
 	* First upload of a module to compare HTML entity encoding
 	speeds. It compares HTML::Escape and HTML::Entities.
 
-1.02 - Fri Jan  3 12:24:41 2014
+1.02 - 2014-01-03
 	* Get rid of MYMETA
 

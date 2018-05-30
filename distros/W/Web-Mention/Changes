@@ -1,5 +1,17 @@
 Revision history for Web::Mention
 
+0.5 2018-05-28T22:33:03Z
+
+    - Adding the from_html batch-creation class method.
+
+    - Significant improvements to the content method.
+
+    - Improvements to serialization, and adding tests and documentation for it.
+    
+    - Miscellaneous bugfixes and documentation improvements.
+
+    - Adding Travis config.
+
 0.4 2018-05-10T04:34:13Z
 
     - Adding support for webmention sending. (Passes all create / update / delete tests on http://webmention.rocks, as of May 9, 2018.)

@@ -1,4 +1,14 @@
-# Changes for Tie::BoundedInteger
-1.01 - Tue Aug 27 13:50:49 2013
+Revision history for Perl module Tie::BoundedInteger
+
+1.005 2018-05-17T14:28:54Z
+	* Clarify that it's the Artistic License 2.0.
+
+1.004 2015-11-18T04:32:58Z
+	* Adjust MANIFEST
+
+1.02 - 2014-01-03
+	* Remove MYMETA
+
+1.01 - 2013-08-27
 	* Example module for Mastering Perl, first CPAN release
 

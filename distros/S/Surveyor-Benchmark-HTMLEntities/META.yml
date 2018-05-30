@@ -3,24 +3,30 @@ abstract: 'Benchmark HTML entity escaping'
 author:
   - 'brian d foy <bdfoy@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  Test::More: '0.94'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Surveyor-Benchmark-HTMLEntities
 no_index:
   directory:
     - t
     - inc
 requires:
-  HTML::Entities: 0
-  HTML::Escape: 0
-  Mojo::UserAgent: 0
-  Surveyor::App: 0
-  Test::More: 0
-version: 1.02
+  HTML::Entities: '0'
+  HTML::Escape: '0'
+  Mojo::UserAgent: '0'
+  Surveyor::App: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/briandfoy/surveyor-benchmark-htmlentities/issues
+  homepage: https://github.com/briandfoy/surveyor-benchmark-htmlentities
+  repository: https://github.com/briandfoy/surveyor-benchmark-htmlentities.git
+version: '1.021'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

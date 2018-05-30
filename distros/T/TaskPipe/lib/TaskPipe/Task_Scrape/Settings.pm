@@ -28,6 +28,17 @@ Exit with an error if set to 1 and no referer is provided (alongside url)
 has require_referer => (is => 'ro', isa => 'Bool', default => 1);
 
 
+
+=item require_url
+
+Exit with an error if set to 1 and no url is provided. If set to zero and no url is provided, the task will return an empty list
+
+=cut
+
+has require_url => (is => 'ro', isa => 'Bool', default => 1);
+
+
+
 =item ua_mgr_module
 
 The UserAgentManager module to use
@@ -40,6 +51,8 @@ has ua_mgr_module => (is => 'ro', isa => 'Str', default => 'TaskPipe::UserAgentM
 =item ua_handler_module
 
 The UserAgentHandler module to use
+
+=back
 
 =cut
 

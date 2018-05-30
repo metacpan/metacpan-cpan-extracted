@@ -2,7 +2,8 @@
 
 use Test::More tests => 1;
 
-BEGIN {
-	use_ok( 'Spork::Shlomify' );
+BEGIN
+{
+    use_ok('Spork::Shlomify');
 }
 

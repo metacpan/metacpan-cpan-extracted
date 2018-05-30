@@ -6,7 +6,7 @@ WriteMakefile(
     ABSTRACT_FROM=> 'lib/SMS/Send/NANP/TextPower.pm',
     PREREQ_PM    => {
                      'Test::Simple'                  => 0.44,
-                     'SMS::Send::Driver::WebService' => 0,
+                     'SMS::Send::Driver::WebService' => 0.05,
                      'XML::Simple'                   => 0,
                     },
 );

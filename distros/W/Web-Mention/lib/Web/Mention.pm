@@ -6,6 +6,7 @@ use MooseX::Types::URI qw(Uri);
 use LWP;
 use HTTP::Link;
 use DateTime;
+use String::Truncate qw(elide);
 use Try::Tiny;
 use Types::Standard qw(Enum);
 use MooseX::Enumeration;
@@ -13,12 +14,12 @@ use Scalar::Util;
 use Carp qw(carp croak);
 use Mojo::DOM58;
 use URI::Escape;
-use Carp qw(croak);
+use Encode qw(decode_utf8);
 
 use Web::Microformats2::Parser;
 use Web::Mention::Author;
 
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 has 'source' => (
     isa => Uri,
@@ -43,6 +44,7 @@ has 'source_mf2_document' => (
     isa => 'Maybe[Web::Microformats2::Document]',
     is => 'rw',
     lazy_build => 1,
+    clearer => '_clear_mf2',
 );
 
 has 'target' => (
@@ -85,6 +87,7 @@ has 'author' => (
     isa => 'Maybe[Web::Mention::Author]',
     is => 'ro',
     lazy_build => 1,
+    clearer => '_clear_author',
 );
 
 has 'type' => (
@@ -99,6 +102,7 @@ has 'content' => (
     isa => 'Maybe[Str]',
     is => 'ro',
     lazy_build => 1,
+    clearer => '_clear_content',
 );
 
 has 'response' => (
@@ -110,6 +114,18 @@ class_has 'ua' => (
     isa => 'LWP::UserAgent',
     is => 'rw',
     default => sub { LWP::UserAgent->new },
+);
+
+class_has 'max_content_length' => (
+    isa => 'Num',
+    is => 'rw',
+    default => 280,
+);
+
+class_has 'content_truncation_marker' => (
+    isa => 'Str',
+    is => 'rw',
+    default => '...',
 );
 
 sub _build_is_verified {
@@ -132,7 +148,6 @@ sub BUILD {
 	die "Inavlid webmention; source and target have the same URL "
 	    . "($source)\n";
     }
-
 }
 
 sub new_from_request {
@@ -164,6 +179,30 @@ sub new_from_request {
     return $class->new( %new_args );
 }
 
+sub new_from_html {
+    my $class = shift;
+
+    my %args = @_;
+    my $source = $args{ source };
+    my $html = $args{ html };
+
+    unless ($source) {
+        croak "You must define a source URL when calling new_from_html.";
+    }
+
+    my @webmentions;
+
+    my $dom = Mojo::DOM58->new( $html );
+    my $nodes_ref = $dom->find( 'a[href]' );
+    for my $node ( @$nodes_ref ) {
+        push @webmentions,
+            $class->new( source => $source, target => $node->attr( 'href' ) );
+    }
+
+    return @webmentions;
+}
+
+
 sub verify {
     my $self = shift;
 
@@ -180,6 +219,9 @@ sub verify {
     ) {
         $self->time_verified( DateTime->now );
         $self->source_html( $response->decoded_content );
+        $self->_clear_mf2;
+        $self->_clear_content;
+        $self->_clear_author;
         return 1;
     }
     else {
@@ -270,19 +312,65 @@ sub _build_type {
 sub _build_content {
     my $self = shift;
 
-    # XXX This is inflexible and not on-spec
-    #     Current behavior: Get an explicit content property,
-    #     or return the HTML document's title, if there is one.
+    # If the source page has MF2 data *and* an h-entry,
+    # then we apply the algorithm outlined at:
+    # https://indieweb.org/comments#How_to_display
+    #
+    # Otherwise, we can't extract any semantic information about it,
+    # so we'll just offer the page's title, if there is one.
 
-    my $item = $self->source_mf2_document->get_first( 'h-entry' );
+    my $item;
+    if ( $self->source_mf2_document ) {
+        $item = $self->source_mf2_document->get_first( 'h-entry' );
+    }
 
-    if ( $item && $item->get_property( 'content' ) ) {
-        return $item->get_property( 'content' )->{value};
+    unless ( $item ) {
+        my $title = Mojo::DOM58->new( $self->source_html )->at('title');
+        if ($title) {
+            return $title->text;
+        }
+        else {
+            return undef;
+        }
     }
-    else {
-        my ( $title ) = $self->source_html =~ /<\s*\btitle\b.*?>\s*(.*?)\s*</;
-        return $title;
+
+    my $raw_content;
+    if ( $item->get_property( 'content' ) ) {
+        $raw_content = $item->get_property( 'content' )->{ value };
     }
+    if ( defined $raw_content ) {
+        if ( length $raw_content <= $self->max_content_length ) {
+            return $raw_content;
+        }
+    }
+
+    if ( my $summary = $item->get_property( 'summary' ) ) {
+        return $self->_truncate_content( $summary );
+    }
+
+    if ( defined $raw_content ) {
+        return $self->_truncate_content( $raw_content );
+    }
+
+    if ( my $name = $item->get_property( 'name' ) ) {
+        return $self->_truncate_content( $name );
+    }
+
+    return $self->_truncate_content( $item->value );
+}
+
+sub _truncate_content {
+    my $self = shift;
+    my ( $content ) = @_;
+
+    return elide(
+        $content,
+        $self->max_content_length,
+        {
+            at_space => 1,
+            marker => $self->content_truncation_marker,
+        },
+    );
 }
 
 sub _build_original_source {
@@ -361,16 +449,19 @@ sub TO_JSON {
     };
 
     if ( $self->is_tested ) {
-	$return_ref->{ is_verified } = $self->is_verified;
-	$return_ref->{ type } = $self->type;
-	$return_ref->{ time_verified} = $self->time_verified->epoch;
-	if ( $self->source_mf2_document ) {
-	    $return_ref->{ mf2_document_json } =
-		$self->source_mf2_document->as_json;
-	}
-	else {
-	    $return_ref->{ mf2_document_json } = undef;
-	}
+    	$return_ref->{ is_tested } = $self->is_tested;
+    	$return_ref->{ is_verified } = $self->is_verified;
+	    $return_ref->{ type } = $self->type;
+    	$return_ref->{ time_verified } = $self->time_verified->epoch;
+    	$return_ref->{ content } = $self->content;
+    	$return_ref->{ source_html } = $self->source_html;
+	    if ( $self->source_mf2_document ) {
+    	    $return_ref->{ mf2_document_json } =
+	    	decode_utf8($self->source_mf2_document->as_json);
+    	}
+    	else {
+	        $return_ref->{ mf2_document_json } = undef;
+    	}
     }
 
     return $return_ref;
@@ -383,9 +474,10 @@ sub FROM_JSON {
     my ( $data_ref ) = @_;
 
     foreach ( qw( time_received time_verified ) ) {
-	if ( defined $data_ref->{ $_ } ) {
-	    $data_ref->{ $_ } = DateTime->from_epoch( epoch => $data_ref->{ $_ } );
-	}
+    	if ( defined $data_ref->{ $_ } ) {
+    	    $data_ref->{ $_ } =
+    	        DateTime->from_epoch( epoch => $data_ref->{ $_ } );
+    	}
     }
 
     my $webmention = $class->new( $data_ref );
@@ -425,17 +517,18 @@ Web::Mention - Implementation of the IndieWeb Webmention protocol
  };
 
  if ( $wm && $wm->is_verified ) {
+     my $source = $wm->original_source;
+     my $target = $wm->target;
      my $author = $wm->author;
+
      my $name;
      if ( $author ) {
          $name = $author->name;
      }
      else {
-         $name = 'somebody';
+         $name = $wm->source->host;
      }
 
-     my $source = $wm->original_source;
-     my $target = $wm->target;
 
      if ( $wm->is_like ) {
          say "Hooray, $name likes $target!";
@@ -460,7 +553,7 @@ Web::Mention - Implementation of the IndieWeb Webmention protocol
 
  $wm = Web::Mention->new(
     source => $url_of_the_thing_that_got_mentioned,
-    target => $url_of_the_thing_that_did_the_mentioning
+    target => $url_of_the_thing_that_did_the_mentioning,
  );
 
  my $success = $wm->send;
@@ -470,7 +563,18 @@ Web::Mention - Implementation of the IndieWeb Webmention protocol
  else {
      say "The webmention wasn't sent successfully.";
      say "Here's the response we got back..."
-     say $wm->response;
+     say $wm->response->as_string;
+ }
+
+ # Batch-sending a bunch of webmentions based on some published HTML
+
+ my @wms = Web::Mention->new_from_html(
+    source => $url_of_a_web_page_i_just_published,
+    html   => $relevant_html_content_of_that_web_page,
+ )
+
+ for my $wm ( @wms ) {
+    my $success = $wm->send;
  }
 
 =head1 DESCRIPTION
@@ -490,7 +594,8 @@ the author of source document, if possible.
 
 =head3 new
 
- $wm = Web::Mention->new( source => $source_url, target => $target_url );
+ $wm = Web::Mention->new( source => $source_url, target => $target_url
+ );
 
 Basic constructor. The B<source> and B<target> URLs are both required
 arguments. Either one can either be a L<URI> object, or a valid URL
@@ -502,6 +607,21 @@ describes the location of the document that got mentioned. The two
 arguments cannot refer to the same URL (disregarding the C<#fragment>
 part of either, if present).
 
+=head3 new_from_html
+
+ @wms = Web::Mention->new_from_html( source => $source_url, html =>
+ $html );
+
+Convenience batch-construtor that returns a (possibly empty) I<list> of
+Web::Mention objects based on the single source URL (or I<URI> object)
+that you pass in, as well as a string containing HTML from which we can
+extract zero or more target URLs. These extracted URLs include the
+C<href> attribute value of every E<lt>aE<gt> tag in the provided HTML.
+
+Note that (as with all this class's constructors) this method won't
+proceed to actually send the generated webmentions; that step remains
+yours to take. (See L<"send">.)
+
 =head3 new_from_request
 
  $wm = Web::Mention->new_from_request( $request_object );
@@ -510,12 +630,45 @@ Convenience constructor that looks into the given web-request object for
 B<source> and B<target> parameters, and attempts to build a new
 Web::Mention object out of them.
 
-The object must provide a C<param( $param_name )> method that returns the
-value of the named HTTP parameter. So it could be a L<Catalyst::Request>
-object or a L<Mojo::Message::Request> object, for example.
+The object must provide a C<param( $param_name )> method that returns
+the value of the named HTTP parameter. So it could be a
+L<Catalyst::Request> object or a L<Mojo::Message::Request> object, for
+example.
 
 Throws an exception if the given argument doesn't meet this requirement,
 or if it does but does not define both required HTTP parameters.
+
+=head3 FROM_JSON
+
+ $wm = Web::Mention->FROM_JSON( JSON::decode_json(
+ $serialized_webmention ) );
+
+Converts an unblessed hash reference resulting from an earlier
+serialization (via L<JSON>) into a fully fledged Web::Mention object.
+See L<"SERIALIZATION">.
+
+The all-caps spelling comes from a perhaps-misguided attempt to pair
+well with the TO_JSON method that L<JSON> requires. As such, this method
+may end up deprecated in favor of a less convoluted approach in future
+releases of this module.
+
+=head3 content_truncation_marker
+
+ Web::Mention->content_truncation_marker( $new_truncation_marker )
+
+The text that the content method will append to text that it has
+truncated, if it did truncate it. (See L<"content">.)
+
+Defaults to C<...>.
+
+=head3 max_content_length
+
+ Web::Mention->max_content_length( $new_max_length )
+
+Gets or sets the maximum length, in characters, of the content displayed
+by that object method prior to truncation. (See L<"content">.)
+
+Defaults to 280.
 
 =head2 Object Methods
 
@@ -531,12 +684,20 @@ this returns undef.
 
  $content = $wm->content;
 
-The content of this webmention, if its source document exists and
-defines its content using Microformats2. If not, then it returns the content
-of the source document's E<lt>titleE<gt> element, if it has one.
+Returns a string representing this object's best determination of the
+I<display-ready> representation of this webmention's content, based on a
+number of factors.
 
-B<CAUTION:> Spec-compliant implementation of this method is incomplete,
-and its API may change in near-future updates to this module.
+If the source document uses Microformats2 metadata and contains an
+C<h-entry> MF2 item, then returned content may come from a variety of
+its constituent properties, according to L<the IndieWeb comment-display
+algorithm|https://indieweb.org/comments#How_to_display>.
+
+If not, then it returns the content of the source document's
+E<lt>titleE<gt> element, with any further HTML stripped away.
+
+In any case, the string will get truncated if it's too long. See
+L<"max_content_length"> and L<"content_truncation_marker">.
 
 =head3 endpoint
 
@@ -548,6 +709,13 @@ target. On success, returns a L<URI> object. On failure, returns undef.
 (If the endpoint is set to localhost or a loopback IP, will return undef
 and also emit a warning, because that's terribly rude behavior on the
 target's part.)
+
+=head3 is_tested
+
+ $bool = $wm->is_tested;
+
+Returns 1 if this object's C<verify()> method has been called at least
+once, regardless of the results of that call. Returns 0 otherwise.
 
 =head3 is_verified
 
@@ -613,15 +781,29 @@ fetched successfully, returns undef.
 
  $mf2_doc = $wm->source_mf2_document;
 
-The L<Web::Microformats2::Document> object that resulted from parsing the
-source document for Microformats2 metadata. If no such result, returns
-undef.
+The L<Web::Microformats2::Document> object that resulted from parsing
+the source document for Microformats2 metadata. If no such result,
+returns undef.
 
 =head3 target
 
  $target_url = $wm->target;
 
 Returns the webmention's target URL, as a L<URI> object.
+
+=head3 time_received
+
+ $dt = $wm->time_received;
+
+A L<DateTime> object corresponding to this object's creation time.
+
+=head3 time_verified
+
+ $dt = $wm->time_verified;
+
+If this webmention has been verified, then this will return a
+L<DateTime> object corresponding to the time of verification.
+(Otherwise, returns undef.)
 
 =head3 type
 
@@ -653,19 +835,35 @@ quotation
 
 =back
 
+=head1 SERIALIZATION
+
+To serialize a Web::Mention object into JSON, enable <the JSON module's
+"convert_blessed" fetaure|JSON/"convert_blessed">, and then use one of
+that module's JSON-encoding functions on this object. This will result
+in a JSON string containing all the pertinent information about the
+webmention, including its verification status, any content and metadata
+fetched from the target, and so on.
+
+To unserialize a Web::Mention object serialized in this way, first
+decode it into an unblessed hash reference via L<JSON>, and then pass
+that as the single argument to L<the FROM_JSON class
+method|"FROM_JSON">.
+
 =head1 NOTES AND BUGS
 
 This software is B<alpha>; its author is still determining how it wants
 to work, and its interface might change dramatically.
 
-Implementation of the content-fetching method is incomplete.
+This library does not, at this time, support L<the proposed "Vouch"
+anti-spam extension for Webmention|https://indieweb.org/Vouch>.
 
 =head1 SUPPORT
 
 To file issues or submit pull requests, please see L<this module's
 repository on GitHub|https://github.com/jmacdotorg/webmention-perl>.
 
-The author also welcomes any direct questions about this module via email.
+The author also welcomes any direct questions about this module via
+email.
 
 =head1 AUTHOR
 
@@ -688,3 +886,46 @@ This software is Copyright (c) 2018 by Jason McIntosh.
 This is free software, licensed under:
 
   The MIT (X11) License
+
+=head1 A PERSONAL REQUEST
+
+My ability to share and maintain free, open-source software like this
+depends upon my living in a society that allows me the free time and
+personal liberty to create work benefiting people other than just myself
+or my immediate family. I recognize that I got a head start on this due
+to an accident of birth, and I strive to convert some of my unclaimed
+time and attention into work that, I hope, gives back to society in some
+small way.
+
+Worryingly, I find myself today living in a country experiencing a
+profound and unwelcome political upheaval, with its already flawed
+democracy under grave threat from powerful authoritarian elements. These
+powers wish to undermine this society, remolding it according to their
+deeply cynical and strictly zero-sum philosophies, where nobody can gain
+without someone else losing.
+
+Free and open-source software has no place in such a world. As such,
+these autocrats' further ascension would have a deleterious effect on my
+ability to continue working for the public good.
+
+Therefore, if you would like to financially support my work, I would ask
+you to consider a donation to one of the following causes. It would mean
+a lot to me if you did. (You can tell me about it if you'd like to, but
+you don't have to.)
+
+=over
+
+=item *
+
+L<The American Civil Liberties Union|http://aclu.org>
+
+=item *
+
+L<The Democratic National Committee|http://democrats.org>
+
+=item *
+
+L<Earthjustice|https://earthjustice.org>
+
+=back
+

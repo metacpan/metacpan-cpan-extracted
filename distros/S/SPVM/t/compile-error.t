@@ -12,7 +12,7 @@ use Test::More 'no_plan';
 my $file = 't/' . basename $0;
 
 use FindBin;
-use lib "$FindBin::Bin/default/lib";
+use lib "$FindBin::Bin/lib";
 
 my $ok;
 
@@ -53,6 +53,15 @@ sub init_spvm {
 {
   BEGIN { init_spvm() }
   use SPVM 'TestCase::CompileError::AssignIncompatibleType::DifferentObject';
+  BEGIN {
+    my $success = SPVM::Build->new->compile_spvm();
+    ok($success == 0);
+  }
+}
+
+{
+  BEGIN { init_spvm() }
+  use SPVM 'TestCase::CompileError::AssignIncompatibleType::ConstToNoConst';
   BEGIN {
     my $success = SPVM::Build->new->compile_spvm();
     ok($success == 0);

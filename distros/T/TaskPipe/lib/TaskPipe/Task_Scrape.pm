@@ -76,7 +76,11 @@ sub action{
 
     my $logger = Log::Log4perl->get_logger;  
 
-    $self->_verbose_fail("url required but none provided") unless $self->pinterp->{url};
+    if ( ! $self->pinterp->{url} ){
+        $self->_verbose_fail("url required but none provided") if $self->scrape_settings->require_url;
+        return [];
+    }
+
     $self->url( $self->pinterp->{url} );
     $logger->info("Getting ".$self->pinterp->{url});
 
@@ -86,7 +90,7 @@ sub action{
 
     } else {
 
-        $self->_request_page_content;
+        $self->request_page_content;
 
     }
 
@@ -96,7 +100,7 @@ sub action{
     while( $self->url && $self->retry_condition( $scraped ) && $tries < $self->scrape_settings->max_retries ){
 
         $self->ua_mgr->refresh;
-        $self->_request_page_content;
+        $self->request_page_content;
         $scraped = $self->scrape;
         $tries++;
 
@@ -118,11 +122,11 @@ sub fail_condition{
     my ($self,$scraped) = @_;
 
     my $fail = 1;
-    $fail = 0 if $scraped && @$scraped;
+    $fail = 0 if $scraped; # && @$scraped;
     return $fail;
 }
 
-sub _request_page_content{
+sub request_page_content{
     my ($self) = @_;
 
     my $logger = Log::Log4perl->get_logger;
@@ -142,9 +146,12 @@ sub _request_page_content{
     my $content;
     my $resp = $self->ua_mgr->request( 'get', $self->url );
 
-    if ( ! $resp->is_success ){
+    if ( ! $resp || ! $resp->is_success ){
 
-        $logger->warn("Request to ".$self->url." failed. Response was: ".$resp->status_line);
+        my $message = "Request to ".$self->url." failed. ";
+        $message.="No response was returned" unless $resp;
+        $message.="Response was: ".$resp->status_line if $resp;
+        $logger->warn( $message );
 
     } else {
 

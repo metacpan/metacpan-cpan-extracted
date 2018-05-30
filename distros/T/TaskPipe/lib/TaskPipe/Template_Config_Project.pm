@@ -15,8 +15,12 @@ has option_specs => (is => 'ro', isa => 'ArrayRef', default => sub{[
     },
     'TaskPipe::Task::Settings',
     'TaskPipe::Task::TestSettings',
-    'TaskPipe::SchemaManager::Settings_Project',
-    'TaskPipe::LoggerManager::Settings',
+    'TaskPipe::SchemaManager::Settings_Project', {
+        module => 'TaskPipe::LoggerManager::Settings',
+        exclude => [
+            'log_screen_colors'
+        ]
+    },
     'TaskPipe::UserAgentManager::Settings', {
         module => 'TaskPipe::UserAgentManager::UserAgentHandler::Settings',
         exclude => [

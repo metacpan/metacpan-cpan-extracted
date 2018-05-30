@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010001;
+use 5.008000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Test-Roo-DataDriven",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.010001",
+  "MIN_PERL_VERSION" => "5.008000",
   "NAME" => "Test::Roo::DataDriven",
   "PREREQ_PM" => {
     "Class::Unload" => 0,
@@ -26,7 +26,6 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Class::Inspector" => 0,
-    "File::Basename" => 0,
     "File::Spec" => 0,
     "JSON::PP" => "2.00",
     "Module::Metadata" => 0,
@@ -35,13 +34,9 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "Test::Roo" => 0,
     "Time::Piece" => "1.16",
-    "Time::Seconds" => 0,
-    "feature" => 0,
-    "lib" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "Time::Seconds" => 0
   },
-  "VERSION" => "v0.3.1",
+  "VERSION" => "v0.4.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,7 +46,6 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Class::Inspector" => 0,
   "Class::Unload" => 0,
-  "File::Basename" => 0,
   "File::Spec" => 0,
   "JSON::PP" => "2.00",
   "Module::Metadata" => 0,
@@ -64,11 +58,7 @@ my %FallbackPrereqs = (
   "Time::Piece" => "1.16",
   "Time::Seconds" => 0,
   "curry" => 0,
-  "feature" => 0,
-  "lib" => 0,
-  "namespace::autoclean" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "namespace::autoclean" => 0
 );
 
 

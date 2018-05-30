@@ -6,15 +6,25 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 17 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'Sah/Schema/cryptocurrency.pm',
     'Sah/Schema/cryptocurrency/code.pm',
     'Sah/Schema/cryptocurrency/code_or_name.pm',
+    'Sah/Schema/cryptocurrency/safename.pm',
+    'Sah/Schema/cryptoexchange.pm',
+    'Sah/Schema/cryptoexchange/code.pm',
     'Sah/Schema/cryptoexchange/name.pm',
+    'Sah/Schema/cryptoexchange/safename.pm',
+    'Sah/SchemaR/cryptocurrency.pm',
     'Sah/SchemaR/cryptocurrency/code.pm',
     'Sah/SchemaR/cryptocurrency/code_or_name.pm',
+    'Sah/SchemaR/cryptocurrency/safename.pm',
+    'Sah/SchemaR/cryptoexchange.pm',
+    'Sah/SchemaR/cryptoexchange/code.pm',
     'Sah/SchemaR/cryptoexchange/name.pm',
+    'Sah/SchemaR/cryptoexchange/safename.pm',
     'Sah/Schemas/CryptoCurrency.pm'
 );
 

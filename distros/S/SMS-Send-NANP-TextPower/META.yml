@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               SMS-Send-NANP-TextPower
-version:            0.03
+version:            0.06
 abstract:           SMS::Send driver for TextPower WebService
 author:
     - Michael R. Davis (mdavis@stopllc.com)
@@ -11,7 +11,7 @@ configure_requires:
 build_requires:
     ExtUtils::MakeMaker:  0
 requires:
-    SMS::Send::Driver::WebService:  0
+    SMS::Send::Driver::WebService:  0.05
     Test::Simple:         0.44
     XML::Simple:          0
 no_index:

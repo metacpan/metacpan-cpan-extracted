@@ -1,10 +1,18 @@
 package Sah::Schema::cryptocurrency::code;
 
-our $DATE = '2018-04-06'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-05-29'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 our $schema = [str => {
     summary => 'Cryptocurrency code',
+    description => <<'_',
+
+Cryptocurrency code that is listed in <pm:CryptoCurrency::Catalog>, e.g. BTC,
+ltc, ETH.
+
+Code will be converted to uppercase.
+
+_
     'x.completion' => 'cryptocurrency_code',
     'x.perl.coerce_rules' => ['str_toupper'],
 }, {}];
@@ -24,7 +32,14 @@ Sah::Schema::cryptocurrency::code - Cryptocurrency code
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::Schema::cryptocurrency::code (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-04-06.
+This document describes version 0.006 of Sah::Schema::cryptocurrency::code (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-05-29.
+
+=head1 DESCRIPTION
+
+Cryptocurrency code that is listed in L<CryptoCurrency::Catalog>, e.g. BTC,
+ltc, ETH.
+
+Code will be converted to uppercase.
 
 =head1 HOMEPAGE
 

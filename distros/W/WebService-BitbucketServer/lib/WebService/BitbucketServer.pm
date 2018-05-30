@@ -5,7 +5,7 @@ package WebService::BitbucketServer;
 use warnings;
 use strict;
 
-our $VERSION = '0.603'; # VERSION
+our $VERSION = '0.604'; # VERSION
 
 use HTTP::AnyUA::Util qw(www_form_urlencode);
 use HTTP::AnyUA;
@@ -217,6 +217,13 @@ sub write_api_packages {
         $self->_debug_log('Fetched WADL', $resp->{url});
 
         my $wadl = WebService::BitbucketServer::WADL::parse_wadl($resp->{content});
+
+        my $api_info = api_info($wadl);
+        if (!$api_info) {
+            warn "Missing API info: $resp->{url}\n";
+            return;
+        }
+
         my ($package_code, $package) = WebService::BitbucketServer::WADL::generate_package($wadl, %$args, base => __PACKAGE__);
 
         require File::Path;
@@ -234,12 +241,6 @@ sub write_api_packages {
         close($fh);
 
         my $submap = WebService::BitbucketServer::WADL::generate_submap($wadl, %$args);
-
-        my $api_info = api_info($wadl);
-        if (!$api_info) {
-            warn "Missing API info: $resp->{url}\n";
-            return;
-        }
 
         my $filename = "submap_$api_info->{id}.pl";
 
@@ -304,7 +305,7 @@ WebService::BitbucketServer - Bindings for Bitbucket Server REST APIs
 
 =head1 VERSION
 
-version 0.603
+version 0.604
 
 =head1 SYNOPSIS
 
@@ -517,7 +518,7 @@ Camspi <amarus18@hotmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Charles McGarvey.
+This software is copyright (c) 2018 by Charles McGarvey.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

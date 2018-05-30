@@ -1,5 +1,8 @@
 Revision history for Spork-Shlomify
 
+0.0204  2018-05-25
+          - Convert to Dist Zilla.
+
 0.0203  2015-12-06
           - Remove occurences of an old E-mail address.
 

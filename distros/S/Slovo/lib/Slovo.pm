@@ -1,14 +1,20 @@
 package Slovo;
+# we want to use many recent native features in modern perl after 5.010. here
+# are some of them which we switch on on the next few lines:
+# * unicode strings: see /perldoc/feature#The-unicode_strings-feature
+# * my/state/our sub foo syntax: see /perldoc/feature#The-lexical_subs-feature 
+# * signatures /perldoc/feature#The-signatures-feature
+no warnings "experimental::lexical_subs";
+use 5.020; #unicode,lexical subs
+use Mojo::Base 'Mojolicious', -signatures;
 
-use Mojo::Base 'Mojolicious';
-use experimental 'signatures';
 use Mojo::Util 'class_to_path';
 use Mojo::File 'path';
 use Slovo::Controller;
 use Slovo::Validator;
 
 our $AUTHORITY = 'cpan:BEROV';
-our $VERSION   = '2018.05.19';
+our $VERSION   = '2018.05.24';
 our $CODENAME  = 'U+2C0C GLAGOLITIC CAPITAL LETTER DJERVI (Ⰼ)';
 my $CLASS = __PACKAGE__;
 
@@ -241,10 +247,8 @@ html in the browser.
 Consider addding also ContentTools as the default WYSIWIG html editor
   (https://github.com/GetmeUK/ContentTools)
 
-Consider (preferred) using Mithril as frontend framework for building UI
-together with Pure CSS for styling.
+Consider (preferred) using Mithril as frontend framework for building UI.
   (https://github.com/MithrilJS/mithril.js)
-  (https://github.com/pure-css/pure)
 
 Consider using L<DataTables|https://datatables.net/> jQuery plugin for the
 administrative panel.

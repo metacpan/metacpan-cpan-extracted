@@ -297,7 +297,7 @@ sub execute{
 
         my ($ident,$status) = $self->request_process;
 
-        if ( $ident eq 'parent' && $status eq 'unavailable' ){
+        while ( $ident eq 'parent' && $status eq 'unavailable' ) {
 
             $logger->trace("count: $count got unavailable status");
 
@@ -306,12 +306,14 @@ sub execute{
                 $logger->trace("count: $count Waiting for an available thread");
                 my $pid = $self->wait_child;
                 $logger->trace("count: $count A process finished (pid $pid). Continuing");
+                ($ident,$status) = $self->request_process;
 
             } else {
 
                 $logger->trace("Parent executing task directly");
                 #$code->($thread_id);
                 $code->();
+                last;
 
             }
 

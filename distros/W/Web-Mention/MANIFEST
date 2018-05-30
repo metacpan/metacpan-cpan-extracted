@@ -18,10 +18,16 @@ t/authorship_test_cases/h-feed_with_p-author_h-card.html
 t/authorship_test_cases/h-feed_with_u-author.html
 t/content.t
 t/sending.t
+t/serialization.t
 t/sources/content_property.html
 t/sources/escaped.html
+t/sources/explicit_name.html
 t/sources/invalid.html
+t/sources/long_content_and_long_summary.html
+t/sources/long_content_and_short_summary.html
+t/sources/no_properties.html
 t/sources/valid.html
+t/sources/very_long_content_property.html
 t/webmention.t
 META.yml
 MANIFEST

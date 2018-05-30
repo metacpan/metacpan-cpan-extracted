@@ -87,7 +87,8 @@ sub connect_socket{
             port => $self->port,
             control_port => $self->control_port,
             password => $self->password,
-            status => 'connecting'
+            status => 'connecting',
+            temp_dir => $self->data_dir
         });
     }
 
@@ -133,6 +134,7 @@ sub start_tor{
     confess "Command '$hashed_password_cmd' did not seem to produce a tor password" unless $hashed_password;
 
     my $data_dir = Path::Tiny->tempdir( CLEANUP => 0 );
+    #my $data_dir = Path::Tiny->tempdir;
     $self->data_dir( $data_dir );
 
     my $cmd = join(' ',$self->settings->exec_name,

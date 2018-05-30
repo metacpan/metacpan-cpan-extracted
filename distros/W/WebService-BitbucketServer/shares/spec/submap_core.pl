@@ -162,6 +162,8 @@ use strict;
     'api/1.0/projects/{projectKey}/repos/{repositorySlug}/tags GET' => 'get_tags',
     'api/1.0/projects/{projectKey}/repos/{repositorySlug}/tags POST' => 'create_tag',
     'api/1.0/projects/{projectKey}/repos/{repositorySlug}/tags/{name:.*} GET' => 'get_tag',
+    'api/1.0/projects/{projectKey}/repos/{repositorySlug}/watch DELETE' => 'unwatch_repository',
+    'api/1.0/projects/{projectKey}/repos/{repositorySlug}/watch POST' => 'watch_repository',
     'api/1.0/projects/{projectKey}/repos/{repositorySlug}/webhooks GET' => 'find_webhooks',
     'api/1.0/projects/{projectKey}/repos/{repositorySlug}/webhooks POST' => 'create_webhook',
     'api/1.0/projects/{projectKey}/repos/{repositorySlug}/webhooks/test POST' => 'test_webhook',

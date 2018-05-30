@@ -1,4 +1,5 @@
 use utf8;
+use ExtUtils::testlib;
 use Test2::V0;
 use URI::Fast qw(uri);
 

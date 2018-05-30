@@ -4,7 +4,7 @@ package WebService::BitbucketServer::Spec;
 use warnings;
 use strict;
 
-our $VERSION = '0.603'; # VERSION
+our $VERSION = '0.604'; # VERSION
 
 use Exporter qw(import);
 use namespace::clean -except => [qw(import)];
@@ -96,7 +96,7 @@ sub api_info {
 
     my $namespace = ref($endpoint) eq 'HASH' ? _endpoint_namespace($endpoint) : $endpoint;
 
-    return $API{$namespace};
+    return $API{$namespace || ''};
 }
 
 sub _endpoint_namespace {
@@ -191,7 +191,7 @@ WebService::BitbucketServer::Spec - Databases for mapping Bitbucket Server REST 
 
 =head1 VERSION
 
-version 0.603
+version 0.604
 
 =head1 FUNCTIONS
 
@@ -236,7 +236,7 @@ Charles McGarvey <chazmcgarvey@brokenzipper.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Charles McGarvey.
+This software is copyright (c) 2018 by Charles McGarvey.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

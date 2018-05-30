@@ -1,5 +1,8 @@
 Revision history for Twitter::API
 
+1.0002  2018-05-25 18:07:26 PDT
+  - fixed authentication error in RetryOnError (thanks Rob Hoelz)
+
 1.0001  2018-03-30 20:19:15 PDT
   - added RateLimiting trait (thanks Rob Hoelz)
   - removed the alpha designation - it's production ready

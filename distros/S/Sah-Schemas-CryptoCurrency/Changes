@@ -1,3 +1,11 @@
+0.006   2018-05-29 (PERLANCAR)
+
+	- Add schemas: cryptocurrency, cryptocurrency::safename,
+	  cryptoexchange, cryptoexchange::code, cryptoexchange::safename.
+
+        - [test] Add tests.
+
+
 0.005   2018-04-06 (PERLANCAR)
 
 	- [ux] cryptocurrency::code: Convert to uppercase.

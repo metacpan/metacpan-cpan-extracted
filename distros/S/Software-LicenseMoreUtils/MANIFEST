@@ -8,8 +8,8 @@ Makefile.PL
 README
 README.md
 dist.ini
-lib/Software/License/LGPL_2.pm
 lib/Software/LicenseMoreUtils.pm
+lib/Software/LicenseMoreUtils/LGPL_2.pm
 lib/Software/LicenseMoreUtils/LicenseWithSummary.pm
 lib/Software/LicenseMoreUtils/debian-summaries.yml
 t/license-summary.t

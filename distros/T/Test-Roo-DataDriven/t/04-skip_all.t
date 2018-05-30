@@ -21,7 +21,7 @@ Example::Class->run_data_tests(
     recurse => 1,
     filter  => sub {
         my ($case, $file) = @_;
-        $case->{data_file} //= $file;
+        $case->{data_file} ||= $file;
         $case;
     },
 );

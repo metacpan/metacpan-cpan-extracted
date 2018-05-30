@@ -18,6 +18,7 @@ struct SPVM_sub {
   SPVM_OP* op_package;
   SPVM_OP* op_constant;
   SPVM_LIST* op_args;
+  SPVM_LIST* object_arg_ids;
   SPVM_LIST* op_mys;
   const char* abs_name;
   const char* file_name;
@@ -28,14 +29,11 @@ struct SPVM_sub {
   int32_t id;
   int32_t eval_stack_max_length;
   int32_t mortal_stack_max;
-  int32_t object_mys_length;
   int8_t call_type_id;
   _Bool is_native;
   _Bool is_enum;
   _Bool is_destructor;
-  _Bool is_jit;
-  _Bool disable_jit;
-  _Bool have_jit_desc;
+  _Bool is_jit_compiled;
 };
 
 SPVM_SUB* SPVM_SUB_new(SPVM_COMPILER* compiler);

@@ -1,8 +1,5 @@
 package Test::POE::Client::TCP;
-{
-  $Test::POE::Client::TCP::VERSION = '1.12';
-}
-
+$Test::POE::Client::TCP::VERSION = '1.14';
 #ABSTRACT: A POE Component providing TCP client services for test cases
 
 use strict;
@@ -48,6 +45,12 @@ sub spawn {
 
 sub session_id {
   shift->{session_id};
+}
+
+sub context {
+  my $self = shift;
+  return $self->{context} if defined $self->{context};
+  return;
 }
 
 sub shutdown {
@@ -451,13 +454,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Test::POE::Client::TCP - A POE Component providing TCP client services for test cases
 
 =head1 VERSION
 
-version 1.12
+version 1.14
 
 =head1 SYNOPSIS
 
@@ -610,6 +615,7 @@ Takes a number of optional arguments:
   'autoconnect', set to a true value to make the poco connect immediately;
   'prefix', specify an event prefix other than the default of 'testc';
   'timeout', specify number of seconds to wait for socket timeouts;
+  'context', anything that can fit into a scalar, such as a ref, etc.
 
 The semantics for C<filter>, C<inputfilter> and C<outputfilter> are the same as for L<POE::Component::Server::TCP> in that one
 may provide either a C<SCALAR>, C<ARRAYREF> or an C<OBJECT>.
@@ -679,6 +685,10 @@ You can use this method to call methods on the wheel object to switch filters, e
 =item C<alias>
 
 Returns the currently configured alias.
+
+=item C<context>
+
+Returns whatever was provided as C<context> when the component was spawned. If nothing was provided then it returns nothing.
 
 =back
 
@@ -782,7 +792,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Chris Williams, Rocco Caputo, Ann Barcomb and Jos Boumans.
+This software is copyright (c) 2018 by Chris Williams, Rocco Caputo, Ann Barcomb and Jos Boumans.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

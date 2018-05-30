@@ -1,5 +1,8 @@
 Revision history for XML-Grammar-Fortune-Synd
 
+0.0212  2018-05-23
+        - Convert to dzil .
+
 0.0211  2014-02-01
         - Add separate "LICENSE" file (CPANTS).
         - Minimum version of perl in META.yml/etc. (CPANTS).

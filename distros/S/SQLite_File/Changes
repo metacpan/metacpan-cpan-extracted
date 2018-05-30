@@ -1,4 +1,7 @@
 Revision history for Perl module SQLite_File
+0.1005 2018-05-28
+    - Create index for hash type per RT#122742
+      (thanks again Pseudonym Man)
 0.1003 2017-08-10
     - Fix perl version in Build.PL
 0.1002 2017-08-12

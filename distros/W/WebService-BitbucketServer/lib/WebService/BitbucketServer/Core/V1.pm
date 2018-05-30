@@ -6,7 +6,7 @@ package WebService::BitbucketServer::Core::V1;
 use warnings;
 use strict;
 
-our $VERSION = '0.603'; # VERSION
+our $VERSION = '0.604'; # VERSION
 
 use Moo;
 use namespace::clean;
@@ -38,42 +38,6 @@ sub _get_path_parameter {
 }
 
 
-sub get_dashboard_pull_request_suggestions {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/dashboard/pull-request-suggestions', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
-}
-
-
-sub get_dashboard_pull_requests {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/dashboard/pull-requests', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
-}
-
-
-sub get_inbox_pull_requests {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/inbox/pull-requests', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
-}
-
-
-sub get_inbox_pull_request_count {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/inbox/pull-requests/count', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
-}
-
-
 sub get_cluster_information {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
@@ -83,12 +47,12 @@ sub get_cluster_information {
 }
 
 
-sub delete_group {
+sub get_groups {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/admin/groups', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
+    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -101,12 +65,12 @@ sub create_group {
 }
 
 
-sub get_groups {
+sub delete_group {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/admin/groups', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
+    $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -227,21 +191,21 @@ sub set_sender_address {
 }
 
 
-sub get_groups_with_any_permission {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/admin/permissions/groups', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
-}
-
-
 sub set_permission_for_groups {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/admin/permissions/groups', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
     $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
+}
+
+
+sub get_groups_with_any_permission {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/admin/permissions/groups', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -263,12 +227,12 @@ sub get_groups_without_any_permission {
 }
 
 
-sub revoke_permissions_for_user {
+sub set_permission_for_users {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/admin/permissions/users', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
+    $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -281,12 +245,12 @@ sub get_users_with_any_permission {
 }
 
 
-sub set_permission_for_users {
+sub revoke_permissions_for_user {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/admin/permissions/users', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
+    $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -299,6 +263,15 @@ sub get_users_without_any_permission {
 }
 
 
+sub set_merge_config {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/admin/pull-requests/{scmId}', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'POST', url => $url, $data ? (data => $data) : ());
+}
+
+
 sub get_merge_config {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
@@ -308,12 +281,21 @@ sub get_merge_config {
 }
 
 
-sub set_merge_config {
+sub get_users {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/admin/pull-requests/{scmId}', $args);
+    my $url  = _get_url('api/1.0/admin/users', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'POST', url => $url, $data ? (data => $data) : ());
+    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
+}
+
+
+sub update_user_details {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/admin/users', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -332,24 +314,6 @@ sub delete_user {
     my $url  = _get_url('api/1.0/admin/users', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
     $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
-}
-
-
-sub update_user_details {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/admin/users', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
-}
-
-
-sub get_users {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/admin/users', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -434,6 +398,24 @@ sub get_application_properties {
 }
 
 
+sub get_dashboard_pull_request_suggestions {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/dashboard/pull-request-suggestions', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
+}
+
+
+sub get_dashboard_pull_requests {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/dashboard/pull-requests', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
+}
+
+
 sub get_group_names {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
@@ -447,6 +429,24 @@ sub get_avatar {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/hooks/{hookKey}/avatar', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
+}
+
+
+sub get_inbox_pull_requests {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/inbox/pull-requests', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
+}
+
+
+sub get_inbox_pull_request_count {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/inbox/pull-requests/count', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
     $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
 }
@@ -524,6 +524,15 @@ sub create_project {
 }
 
 
+sub get_project {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/projects/{projectKey}', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
+}
+
+
 sub delete_project {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
@@ -542,10 +551,10 @@ sub update_project {
 }
 
 
-sub get_project {
+sub get_project_avatar {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}', $args);
+    my $url  = _get_url('api/1.0/projects/{projectKey}/avatar.png', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
     $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
 }
@@ -560,12 +569,12 @@ sub upload_project_avatar {
 }
 
 
-sub get_project_avatar {
+sub set_project_permission_for_groups {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/avatar.png', $args);
+    my $url  = _get_url('api/1.0/projects/{projectKey}/permissions/groups', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
+    $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -575,15 +584,6 @@ sub get_groups_with_any_project_permission {
     my $url  = _get_url('api/1.0/projects/{projectKey}/permissions/groups', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
     $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
-}
-
-
-sub set_project_permission_for_groups {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/permissions/groups', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -605,12 +605,12 @@ sub get_groups_without_any_project_permission {
 }
 
 
-sub revoke_project_permissions_for_user {
+sub set_project_permission_for_users {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/projects/{projectKey}/permissions/users', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
+    $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -623,12 +623,12 @@ sub get_users_with_any_project_permission {
 }
 
 
-sub set_project_permission_for_users {
+sub revoke_project_permissions_for_user {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/projects/{projectKey}/permissions/users', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
+    $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -636,15 +636,6 @@ sub get_users_without_project_permission {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/projects/{projectKey}/permissions/users/none', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
-}
-
-
-sub has_all_user_project_permission {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/permissions/{permission}/all', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
     $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
 }
@@ -659,10 +650,10 @@ sub modify_all_user_project_permission {
 }
 
 
-sub get_repositories {
+sub has_all_user_project_permission {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/repos', $args);
+    my $url  = _get_url('api/1.0/projects/{projectKey}/permissions/{permission}/all', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
     $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
 }
@@ -677,21 +668,12 @@ sub create_repository {
 }
 
 
-sub delete_repository {
+sub get_repositories {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}', $args);
+    my $url  = _get_url('api/1.0/projects/{projectKey}/repos', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
-}
-
-
-sub fork_repository {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'POST', url => $url, $data ? (data => $data) : ());
+    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -713,19 +695,28 @@ sub update_repository {
 }
 
 
+sub delete_repository {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
+}
+
+
+sub fork_repository {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'POST', url => $url, $data ? (data => $data) : ());
+}
+
+
 sub get_archive {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/archive', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
-}
-
-
-sub get_branches {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/branches', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
     $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
 }
@@ -740,12 +731,12 @@ sub create_branch {
 }
 
 
-sub set_default_branch {
+sub get_branches {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/branches/default', $args);
+    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/branches', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
+    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -758,10 +749,10 @@ sub get_default_branch {
 }
 
 
-sub edit_file {
+sub set_default_branch {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/browse/{path:.*}', $args);
+    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/branches/default', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
     $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
 }
@@ -773,6 +764,15 @@ sub get_file {
     my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/browse/{path:.*}', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
     $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
+}
+
+
+sub edit_file {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/browse/{path:.*}', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -812,15 +812,6 @@ sub get_commit_changes {
 }
 
 
-sub create_commit_comment {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/commits/{commitId}/comments', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'POST', url => $url, $data ? (data => $data) : ());
-}
-
-
 sub get_commit_comments {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
@@ -830,21 +821,12 @@ sub get_commit_comments {
 }
 
 
-sub update_commit_comment {
+sub create_commit_comment {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/commits/{commitId}/comments/{commentId}', $args);
+    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/commits/{commitId}/comments', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
-}
-
-
-sub delete_commit_comment {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/commits/{commitId}/comments/{commentId}', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
+    $self->context->call(method => 'POST', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -857,6 +839,24 @@ sub get_commit_comment {
 }
 
 
+sub delete_commit_comment {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/commits/{commitId}/comments/{commentId}', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
+}
+
+
+sub update_commit_comment {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/commits/{commitId}/comments/{commentId}', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
+}
+
+
 sub stream_commit_diff {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
@@ -866,21 +866,21 @@ sub stream_commit_diff {
 }
 
 
-sub unwatch_commit {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/commits/{commitId}/watch', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
-}
-
-
 sub watch_commit {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/commits/{commitId}/watch', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
     $self->context->call(method => 'POST', url => $url, $data ? (data => $data) : ());
+}
+
+
+sub unwatch_commit {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/commits/{commitId}/watch', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -956,21 +956,21 @@ sub get_repository_participants {
 }
 
 
-sub set_repository_permission_for_group {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/permissions/groups', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
-}
-
-
 sub get_groups_with_any_repository_permission {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/permissions/groups', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
     $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
+}
+
+
+sub set_repository_permission_for_group {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/permissions/groups', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -992,12 +992,12 @@ sub get_groups_without_any_repository_permission {
 }
 
 
-sub revoke_repository_permissions_for_user {
+sub get_users_with_any_repository_permission {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/permissions/users', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
+    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -1010,12 +1010,12 @@ sub set_repository_permission_for_user {
 }
 
 
-sub get_users_with_any_repository_permission {
+sub revoke_repository_permissions_for_user {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/permissions/users', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
+    $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -1028,21 +1028,21 @@ sub get_users_without_repository_permission {
 }
 
 
-sub get_pull_requests {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
-}
-
-
 sub create_pull_request {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
     $self->context->call(method => 'POST', url => $url, $data ? (data => $data) : ());
+}
+
+
+sub get_pull_requests {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -1082,15 +1082,6 @@ sub get_pull_request_activities {
 }
 
 
-sub withdraw_pull_request_approval {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/approve', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
-}
-
-
 sub approve_pull_request {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
@@ -1100,10 +1091,28 @@ sub approve_pull_request {
 }
 
 
+sub withdraw_pull_request_approval {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/approve', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
+}
+
+
 sub stream_pull_request_changes {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/changes', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
+}
+
+
+sub get_pull_request_comments {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/comments', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
     $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
 }
@@ -1118,21 +1127,12 @@ sub create_pull_request_comment {
 }
 
 
-sub get_pull_request_comments {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/comments', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
-}
-
-
-sub update_pull_request_comment {
+sub get_pull_request_comment {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/comments/{commentId}', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
+    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -1145,12 +1145,12 @@ sub delete_pull_request_comment {
 }
 
 
-sub get_pull_request_comment {
+sub update_pull_request_comment {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/comments/{commentId}', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
+    $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -1181,21 +1181,21 @@ sub stream_pull_request_diff {
 }
 
 
-sub can_merge_pull_request {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/merge', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
-}
-
-
 sub merge_pull_request {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/merge', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
     $self->context->call(method => 'POST', url => $url, $data ? (data => $data) : ());
+}
+
+
+sub can_merge_pull_request {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/merge', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -1262,21 +1262,21 @@ sub count_pull_request_tasks {
 }
 
 
-sub unwatch_pull_request {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/watch', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
-}
-
-
 sub watch_pull_request {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/watch', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
     $self->context->call(method => 'POST', url => $url, $data ? (data => $data) : ());
+}
+
+
+sub unwatch_pull_request {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/watch', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -1316,21 +1316,21 @@ sub get_repository_hooks {
 }
 
 
-sub delete_repository_hook {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/settings/hooks/{hookKey}', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
-}
-
-
 sub get_repository_hook {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/settings/hooks/{hookKey}', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
     $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
+}
+
+
+sub delete_repository_hook {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/settings/hooks/{hookKey}', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -1352,15 +1352,6 @@ sub disable_repository_hook {
 }
 
 
-sub set_repository_hook_settings {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/settings/hooks/{hookKey}/settings', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
-}
-
-
 sub get_repository_hook_settings {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
@@ -1370,12 +1361,12 @@ sub get_repository_hook_settings {
 }
 
 
-sub get_repository_pull_request_settings {
+sub set_repository_hook_settings {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/settings/pull-requests', $args);
+    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/settings/hooks/{hookKey}/settings', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
+    $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -1388,12 +1379,12 @@ sub update_repository_pull_request_settings {
 }
 
 
-sub create_tag {
+sub get_repository_pull_request_settings {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/tags', $args);
+    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/settings/pull-requests', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'POST', url => $url, $data ? (data => $data) : ());
+    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -1406,12 +1397,39 @@ sub get_tags {
 }
 
 
+sub create_tag {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/tags', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'POST', url => $url, $data ? (data => $data) : ());
+}
+
+
 sub get_tag {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/tags/{name:.*}', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
     $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
+}
+
+
+sub watch_repository {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/watch', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'POST', url => $url, $data ? (data => $data) : ());
+}
+
+
+sub unwatch_repository {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/projects/{projectKey}/repos/{repositorySlug}/watch', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -1532,15 +1550,6 @@ sub disable_repository_hook_for_project {
 }
 
 
-sub set_repository_hook_settings_for_project {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/settings/hooks/{hookKey}/settings', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
-}
-
-
 sub get_repository_hook_settings_for_project {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
@@ -1550,12 +1559,12 @@ sub get_repository_hook_settings_for_project {
 }
 
 
-sub get_project_pull_request_settings {
+sub set_repository_hook_settings_for_project {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/projects/{projectKey}/settings/pull-requests/{scmId}', $args);
+    my $url  = _get_url('api/1.0/projects/{projectKey}/settings/hooks/{hookKey}/settings', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
+    $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -1565,6 +1574,15 @@ sub update_project_pull_request_settings {
     my $url  = _get_url('api/1.0/projects/{projectKey}/settings/pull-requests/{scmId}', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
     $self->context->call(method => 'POST', url => $url, $data ? (data => $data) : ());
+}
+
+
+sub get_project_pull_request_settings {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/projects/{projectKey}/settings/pull-requests/{scmId}', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -1586,12 +1604,12 @@ sub create_task {
 }
 
 
-sub update_task {
+sub get_task {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/tasks/{taskId}', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
+    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -1604,19 +1622,10 @@ sub delete_task {
 }
 
 
-sub get_task {
+sub update_task {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/tasks/{taskId}', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
-}
-
-
-sub update_current_user {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/users', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
     $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
 }
@@ -1628,6 +1637,15 @@ sub find_users {
     my $url  = _get_url('api/1.0/users', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
     $self->context->call(method => 'GET', url => $url, $data ? (data => $data) : ());
+}
+
+
+sub update_current_user {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/users', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'PUT', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -1649,21 +1667,21 @@ sub get_user {
 }
 
 
-sub upload_user_avatar {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('api/1.0/users/{userSlug}/avatar.png', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'POST', url => $url, $data ? (data => $data) : ());
-}
-
-
 sub delete_user_avatar {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('api/1.0/users/{userSlug}/avatar.png', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
     $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
+}
+
+
+sub upload_user_avatar {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('api/1.0/users/{userSlug}/avatar.png', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'POST', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -1699,7 +1717,7 @@ WebService::BitbucketServer::Core::V1 - Bindings for a Bitbucket Server REST API
 
 =head1 VERSION
 
-version 0.603
+version 0.604
 
 =head1 SYNOPSIS
 
@@ -1712,7 +1730,7 @@ version 0.603
 
 =head1 DESCRIPTION
 
-This is a Bitbucket Server REST API for L<Core::V1|https://developer.atlassian.com/static/rest/bitbucket-server/5.5.0/bitbucket-rest.html>.
+This is a Bitbucket Server REST API for L<Core::V1|https://developer.atlassian.com/static/rest/bitbucket-server/5.10.0/bitbucket-rest.html>.
 
 Original API documentation created by and copyright Atlassian.
 
@@ -1731,138 +1749,6 @@ Get the instance of L<WebService::BitbucketServer> passed to L</new>.
 Create a new API.
 
 Normally you would use C<<< $webservice_bitbucketserver_obj->core >>> instead.
-
-=head2 get_dashboard_pull_request_suggestions
-
-Retrieves a page of suggestions for pull requests that the currently authenticated user may wish to
-raise. Such suggestions are based on ref changes occurring and so contain the ref change that
-prompted the suggestion plus the time the change event occurred. Changes will be returned in
-descending order based on the time the change that prompted the suggestion occurred.
-
-Note that although the response is a page object, the interface does not support paging, however
-a limit can be applied to the size of the returned page.
-
-    GET api/1.0/dashboard/pull-request-suggestions
-
-Parameters:
-
-=over 4
-
-=item * C<<< changesSince >>> - string, default: 172800
-
-restrict pull request suggestions to be based on events that occurred since some time
-in the past. This is expressed in seconds since "now". So to return suggestions
-based only on activity within the past 48 hours, pass a value of 172800.
-
-=item * C<<< limit >>> - int, default: 3
-
-restricts the result set to return at most this many suggestions.
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - page, type: application/json
-
-A page of pull requests that match the search criteria.
-
-=item * C<<< 400 >>> - errors, type: application/json
-
-The request was malformed.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The current user is not authenticated
-
-=back
-
-=head2 get_dashboard_pull_requests
-
-Retrieve a page of pull requests where the current authenticated user is involved as either a reviewer, author
-or a participant. The request may be filtered by pull request state, role or participant status.
-
-    GET api/1.0/dashboard/pull-requests
-
-Parameters:
-
-=over 4
-
-=item * C<<< state >>> - string, default: none
-
-(optional, defaults to returning pull requests in any state). If a state is supplied only pull
-requests in the specified state will be returned. Either B<<< OPEN >>>,
-B<<< DECLINED >>> or B<<< MERGED >>>.
-Omit this parameter to return pull request in any state.
-
-=item * C<<< role >>> - string, default: none
-
-(optional, defaults to returning pull requests for any role). If a role is supplied only pull
-requests where the authenticated user is a participant in the given role will be returned.
-Either B<<< REVIEWER >>>, B<<< AUTHOR >>> or B<<< PARTICIPANT >>>.
-
-=item * C<<< participantStatus >>> - string, default: none
-
-(optional, defaults to returning pull requests with any participant status). A comma
-separated list of participant status. That is, one or more of
-B<<< UNAPPROVED >>>, B<<< NEEDS_WORK >>>, or B<<< APPROVED >>>.
-
-=item * C<<< order >>> - string, default: none
-
-(optional, defaults to B<<< NEWEST >>>) the order to return pull requests in, either
-B<<< OLDEST >>> (as in: "oldest first"), B<<< NEWEST >>>,
-B<<< PARTICIPANT_STATUS >>>, or B<<< CLOSED_DATE >>>. Where
-B<<< CLOSED_DATE >>> is specified and the result set includes pull requests that are not in
-the closed state, these pull requests will appear first in the result set, followed by most recently
-closed pull requests.
-
-=item * C<<< closedSince >>> - string, default: none
-
-(optional, defaults to returning pull requests regardless of closed since date). Permits
-returning only pull requests with a closed timestamp set more recently that
-(now - closedSince). Units are in seconds. So for example if closed since 86400 is set only
-pull requests closed in the previous 24 hours will be returned.
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - page, type: application/json
-
-A page of pull requests that match the search criteria.
-
-=item * C<<< 400 >>> - errors, type: application/json
-
-The request was malformed.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The current user is not authenticated
-
-=back
-
-=head2 get_inbox_pull_requests
-
-    GET api/1.0/inbox/pull-requests
-
-Parameters:
-
-=over 4
-
-=item * C<<< start >>> - int, default: none
-
-=item * C<<< limit >>> - int, default: 25
-
-=item * C<<< role >>> - string, default: reviewer
-
-=back
-
-=head2 get_inbox_pull_request_count
-
-    GET api/1.0/inbox/pull-requests/count
 
 =head2 get_cluster_information
 
@@ -1884,6 +1770,78 @@ Information about the cluster
 
 The currently authenticated user has insufficient permissions to
 retrieve the cluster information.
+
+=back
+
+=head2 get_groups
+
+Retrieve a page of groups.
+
+The authenticated user must have B<<< LICENSED_USER >>> permission or higher to call this resource.
+
+    GET api/1.0/admin/groups
+
+Parameters:
+
+=over 4
+
+=item * C<<< filter >>> - string, default: none
+
+if specified only group names containing the supplied string will be returned
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - page, type: application/json
+
+A page of groups.
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user is not a licensed user.
+
+=back
+
+=head2 create_group
+
+Create a new group.
+
+The authenticated user must have B<<< ADMIN >>> permission or higher to call this resource.
+
+    POST api/1.0/admin/groups
+
+Parameters:
+
+=over 4
+
+=item * C<<< name >>> - string, default: none
+
+Name of the group.
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - restDetailedGroup, type: application/json
+
+The newly created group.
+
+=item * C<<< 400 >>> - errors, type: application/json
+
+The request was malformed.
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user is not an administrator.
+
+=item * C<<< 409 >>> - errors, type: application/json
+
+A group with this name already exists.
 
 =back
 
@@ -1938,78 +1896,6 @@ The specified group does not exist.
 
 The action was disallowed as it would lower the authenticated user's permission
 level.
-
-=back
-
-=head2 create_group
-
-Create a new group.
-
-The authenticated user must have B<<< ADMIN >>> permission or higher to call this resource.
-
-    POST api/1.0/admin/groups
-
-Parameters:
-
-=over 4
-
-=item * C<<< name >>> - string, default: none
-
-Name of the group.
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - restDetailedGroup, type: application/json
-
-The newly created group.
-
-=item * C<<< 400 >>> - errors, type: application/json
-
-The request was malformed.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user is not an administrator.
-
-=item * C<<< 409 >>> - errors, type: application/json
-
-A group with this name already exists.
-
-=back
-
-=head2 get_groups
-
-Retrieve a page of groups.
-
-The authenticated user must have B<<< LICENSED_USER >>> permission or higher to call this resource.
-
-    GET api/1.0/admin/groups
-
-Parameters:
-
-=over 4
-
-=item * C<<< filter >>> - string, default: none
-
-if specified only group names containing the supplied string will be returned
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - page, type: application/json
-
-A page of groups.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user is not a licensed user.
 
 =back
 
@@ -2421,38 +2307,6 @@ server email address.
 
 =back
 
-=head2 get_groups_with_any_permission
-
-Retrieve a page of groups that have been granted at least one global permission.
-
-The authenticated user must have B<<< ADMIN >>> permission or higher to call this resource.
-
-    GET api/1.0/admin/permissions/groups
-
-Parameters:
-
-=over 4
-
-=item * C<<< filter >>> - string, default: none
-
-if specified only group names containing the supplied string will be returned
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - page, type: application/json
-
-A page of groups and their highest global permissions.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user is not an administrator.
-
-=back
-
 =head2 set_permission_for_groups
 
 Promote or demote a user's global permission level. Available global permissions are:
@@ -2551,6 +2405,38 @@ level than the group they are attempting to modify.
 
 =back
 
+=head2 get_groups_with_any_permission
+
+Retrieve a page of groups that have been granted at least one global permission.
+
+The authenticated user must have B<<< ADMIN >>> permission or higher to call this resource.
+
+    GET api/1.0/admin/permissions/groups
+
+Parameters:
+
+=over 4
+
+=item * C<<< filter >>> - string, default: none
+
+if specified only group names containing the supplied string will be returned
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - page, type: application/json
+
+A page of groups and their highest global permissions.
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user is not an administrator.
+
+=back
+
 =head2 revoke_permissions_for_group
 
 Revoke all global permissions for a group.
@@ -2634,95 +2520,6 @@ Responses:
 =item * C<<< 200 >>> - page, type: application/json
 
 A page of groups that have not been granted any global permissions.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user is not an administrator.
-
-=back
-
-=head2 revoke_permissions_for_user
-
-Revoke all global permissions for a user.
-
-The authenticated user must have:
-
-=over 4
-
-=item *
-
-B<<< ADMIN >>> permission or higher; and
-
-=item *
-
-greater or equal permissions than the current permission level of the user (a user may not demote the
-permission level of a user with higher permissions than them)
-
-=back
-
-to call this resource. In addition, a user may not demote their own permission level.
-
-    DELETE api/1.0/admin/permissions/users
-
-Parameters:
-
-=over 4
-
-=item * C<<< name >>> - string, default: none
-
-the name of the user
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user is not an administrator.
-
-=item * C<<< 204 >>> - data, type: unknown
-
-All global permissions were revoked from the user.
-
-=item * C<<< 404 >>> - errors, type: application/json
-
-The specified user does not exist.
-
-=item * C<<< 409 >>> - errors, type: application/json
-
-The action was disallowed as it would reduce the currently authenticated user's
-permission level or the currently authenticated user has a lower permission
-level than the user they are attempting to modify.
-
-=back
-
-=head2 get_users_with_any_permission
-
-Retrieve a page of users that have been granted at least one global permission.
-
-The authenticated user must have B<<< ADMIN >>> permission or higher to call this resource.
-
-    GET api/1.0/admin/permissions/users
-
-Parameters:
-
-=over 4
-
-=item * C<<< filter >>> - string, default: none
-
-if specified only user names containing the supplied string will be returned
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - page, type: application/json
-
-A page of users and their highest global permissions.
 
 =item * C<<< 401 >>> - errors, type: application/json
 
@@ -2827,6 +2624,95 @@ level than the user they are attempting to modify.
 
 =back
 
+=head2 get_users_with_any_permission
+
+Retrieve a page of users that have been granted at least one global permission.
+
+The authenticated user must have B<<< ADMIN >>> permission or higher to call this resource.
+
+    GET api/1.0/admin/permissions/users
+
+Parameters:
+
+=over 4
+
+=item * C<<< filter >>> - string, default: none
+
+if specified only user names containing the supplied string will be returned
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - page, type: application/json
+
+A page of users and their highest global permissions.
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user is not an administrator.
+
+=back
+
+=head2 revoke_permissions_for_user
+
+Revoke all global permissions for a user.
+
+The authenticated user must have:
+
+=over 4
+
+=item *
+
+B<<< ADMIN >>> permission or higher; and
+
+=item *
+
+greater or equal permissions than the current permission level of the user (a user may not demote the
+permission level of a user with higher permissions than them)
+
+=back
+
+to call this resource. In addition, a user may not demote their own permission level.
+
+    DELETE api/1.0/admin/permissions/users
+
+Parameters:
+
+=over 4
+
+=item * C<<< name >>> - string, default: none
+
+the name of the user
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user is not an administrator.
+
+=item * C<<< 204 >>> - data, type: unknown
+
+All global permissions were revoked from the user.
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+The specified user does not exist.
+
+=item * C<<< 409 >>> - errors, type: application/json
+
+The action was disallowed as it would reduce the currently authenticated user's
+permission level or the currently authenticated user has a lower permission
+level than the user they are attempting to modify.
+
+=back
+
 =head2 get_users_without_any_permission
 
 Retrieve a page of users that have no granted global permissions.
@@ -2856,43 +2742,6 @@ A page of users that have not been granted any global permissions.
 =item * C<<< 401 >>> - errors, type: application/json
 
 The currently authenticated user is not an administrator.
-
-=back
-
-=head2 get_merge_config
-
-Retrieve the merge strategies available for this instance.
-
-The user must be authenticated to call this resource.
-
-    GET api/1.0/admin/pull-requests/{scmId}
-
-Parameters:
-
-=over 4
-
-=item * C<<< scmId >>> - string, default: none
-
-the id of the scm to get strategies for
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - page, type: application/json
-
-The merge configuration of this instance.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user has insufficient permissions to see the
-request repository.
-
-=item * C<<< 404 >>> - errors, type: application/json
-
-The request repository does not exist.
 
 =back
 
@@ -2946,6 +2795,107 @@ specified repository.
 =item * C<<< 404 >>> - errors, type: application/json
 
 The specified repository does not exist.
+
+=back
+
+=head2 get_merge_config
+
+Retrieve the merge strategies available for this instance.
+
+The user must be authenticated to call this resource.
+
+    GET api/1.0/admin/pull-requests/{scmId}
+
+Parameters:
+
+=over 4
+
+=item * C<<< scmId >>> - string, default: none
+
+the id of the scm to get strategies for
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - page, type: application/json
+
+The merge configuration of this instance.
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user has insufficient permissions to see the
+request repository.
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+The request repository does not exist.
+
+=back
+
+=head2 get_users
+
+Retrieve a page of users.
+
+The authenticated user must have the B<<< LICENSED_USER >>> permission to call this resource.
+
+    GET api/1.0/admin/users
+
+Parameters:
+
+=over 4
+
+=item * C<<< filter >>> - string, default: none
+
+if specified only users with usernames, display name or email addresses containing the supplied
+string will be returned
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - page, type: application/json
+
+A page of users.
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user is not a licensed user.
+
+=back
+
+=head2 update_user_details
+
+Update a user's details.
+
+The authenticated user must have the B<<< ADMIN >>> permission to call this resource.
+
+    PUT api/1.0/admin/users
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - detailedUser, type: application/json
+
+The updated user.
+
+=item * C<<< 400 >>> - errors, type: application/json
+
+The request was malformed.
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The authenticated user does not have the B<<< ADMIN >>> permission or
+has a lower permission level than the user being deleted.
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+The specified user does not exist.
 
 =back
 
@@ -3070,70 +3020,6 @@ The specified user does not exist.
 =item * C<<< 409 >>> - errors, type: application/json
 
 The action was disallowed as a user can not delete themselves.
-
-=back
-
-=head2 update_user_details
-
-Update a user's details.
-
-The authenticated user must have the B<<< ADMIN >>> permission to call this resource.
-
-    PUT api/1.0/admin/users
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - detailedUser, type: application/json
-
-The updated user.
-
-=item * C<<< 400 >>> - errors, type: application/json
-
-The request was malformed.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The authenticated user does not have the B<<< ADMIN >>> permission or
-has a lower permission level than the user being deleted.
-
-=item * C<<< 404 >>> - errors, type: application/json
-
-The specified user does not exist.
-
-=back
-
-=head2 get_users
-
-Retrieve a page of users.
-
-The authenticated user must have the B<<< LICENSED_USER >>> permission to call this resource.
-
-    GET api/1.0/admin/users
-
-Parameters:
-
-=over 4
-
-=item * C<<< filter >>> - string, default: none
-
-if specified only users with usernames, display name or email addresses containing the supplied
-string will be returned
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - page, type: application/json
-
-A page of users.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user is not a licensed user.
 
 =back
 
@@ -3439,6 +3325,118 @@ The application properties.
 
 =back
 
+=head2 get_dashboard_pull_request_suggestions
+
+Retrieves a page of suggestions for pull requests that the currently authenticated user may wish to
+raise. Such suggestions are based on ref changes occurring and so contain the ref change that
+prompted the suggestion plus the time the change event occurred. Changes will be returned in
+descending order based on the time the change that prompted the suggestion occurred.
+
+Note that although the response is a page object, the interface does not support paging, however
+a limit can be applied to the size of the returned page.
+
+    GET api/1.0/dashboard/pull-request-suggestions
+
+Parameters:
+
+=over 4
+
+=item * C<<< changesSince >>> - string, default: 172800
+
+restrict pull request suggestions to be based on events that occurred since some time
+in the past. This is expressed in seconds since "now". So to return suggestions
+based only on activity within the past 48 hours, pass a value of 172800.
+
+=item * C<<< limit >>> - int, default: 3
+
+restricts the result set to return at most this many suggestions.
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - page, type: application/json
+
+A page of pull requests that match the search criteria.
+
+=item * C<<< 400 >>> - errors, type: application/json
+
+The request was malformed.
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The current user is not authenticated
+
+=back
+
+=head2 get_dashboard_pull_requests
+
+Retrieve a page of pull requests where the current authenticated user is involved as either a reviewer, author
+or a participant. The request may be filtered by pull request state, role or participant status.
+
+    GET api/1.0/dashboard/pull-requests
+
+Parameters:
+
+=over 4
+
+=item * C<<< state >>> - string, default: none
+
+(optional, defaults to returning pull requests in any state). If a state is supplied only pull
+requests in the specified state will be returned. Either B<<< OPEN >>>,
+B<<< DECLINED >>> or B<<< MERGED >>>.
+Omit this parameter to return pull request in any state.
+
+=item * C<<< role >>> - string, default: none
+
+(optional, defaults to returning pull requests for any role). If a role is supplied only pull
+requests where the authenticated user is a participant in the given role will be returned.
+Either B<<< REVIEWER >>>, B<<< AUTHOR >>> or B<<< PARTICIPANT >>>.
+
+=item * C<<< participantStatus >>> - string, default: none
+
+(optional, defaults to returning pull requests with any participant status). A comma
+separated list of participant status. That is, one or more of
+B<<< UNAPPROVED >>>, B<<< NEEDS_WORK >>>, or B<<< APPROVED >>>.
+
+=item * C<<< order >>> - string, default: none
+
+(optional, defaults to B<<< NEWEST >>>) the order to return pull requests in, either
+B<<< OLDEST >>> (as in: "oldest first"), B<<< NEWEST >>>,
+B<<< PARTICIPANT_STATUS >>>, or B<<< CLOSED_DATE >>>. Where
+B<<< CLOSED_DATE >>> is specified and the result set includes pull requests that are not in
+the closed state, these pull requests will appear first in the result set, followed by most recently
+closed pull requests.
+
+=item * C<<< closedSince >>> - string, default: none
+
+(optional, defaults to returning pull requests regardless of closed since date). Permits
+returning only pull requests with a closed timestamp set more recently that
+(now - closedSince). Units are in seconds. So for example if closed since 86400 is set only
+pull requests closed in the previous 24 hours will be returned.
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - page, type: application/json
+
+A page of pull requests that match the search criteria.
+
+=item * C<<< 400 >>> - errors, type: application/json
+
+The request was malformed.
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The current user is not authenticated
+
+=back
+
 =head2 get_group_names
 
 Retrieve a page of group names.
@@ -3510,6 +3508,26 @@ project.
 The specified project does not exist.
 
 =back
+
+=head2 get_inbox_pull_requests
+
+    GET api/1.0/inbox/pull-requests
+
+Parameters:
+
+=over 4
+
+=item * C<<< start >>> - int, default: none
+
+=item * C<<< limit >>> - int, default: 25
+
+=item * C<<< role >>> - string, default: reviewer
+
+=back
+
+=head2 get_inbox_pull_request_count
+
+    GET api/1.0/inbox/pull-requests/count
 
 =head2 get_level
 
@@ -3804,6 +3822,34 @@ The project key or name is already in use.
 
 =back
 
+=head2 get_project
+
+Retrieve the project matching the supplied B<<< projectKey >>>.
+
+The authenticated user must have B<<< PROJECT_VIEW >>> permission for the specified project to call this
+resource.
+
+    GET api/1.0/projects/{projectKey}
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - project, type: application/json
+
+The project matching the supplied B<<< projectKey >>>.
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user has insufficient permissions to view the
+project.
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+The specified project does not exist.
+
+=back
+
 =head2 delete_project
 
 Delete the project matching the supplied B<<< projectKey >>>.
@@ -3844,8 +3890,7 @@ Update the project matching the B<<< projectKey >>> supplied in the resource pat
 To include a custom avatar for the updated project, the project definition should contain an additional attribute
 with the key C<<< avatar >>> and the value a data URI containing Base64-encoded image data. The URI should be
 in the following format:
-C<<<
-data:(content type, e.g. image/png);base64,(data)
+C<<<data:(content type, e.g. image/png);base64,(data)
  >>>
 If the data is not Base64-encoded, or if a character set is defined in the URI, or the URI is otherwise invalid,
 I<<< project creation will fail >>>.
@@ -3870,76 +3915,6 @@ The updated project. The project's key B<<< was >>> updated.
 =item * C<<< 400 >>> - errors, type: application/json
 
 The project was not updated due to a validation error.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user has insufficient permissions to update the
-project.
-
-=item * C<<< 404 >>> - errors, type: application/json
-
-The specified project does not exist.
-
-=back
-
-=head2 get_project
-
-Retrieve the project matching the supplied B<<< projectKey >>>.
-
-The authenticated user must have B<<< PROJECT_VIEW >>> permission for the specified project to call this
-resource.
-
-    GET api/1.0/projects/{projectKey}
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - project, type: application/json
-
-The project matching the supplied B<<< projectKey >>>.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user has insufficient permissions to view the
-project.
-
-=item * C<<< 404 >>> - errors, type: application/json
-
-The specified project does not exist.
-
-=back
-
-=head2 upload_project_avatar
-
-Update the avatar for the project matching the supplied B<<< projectKey >>>.
-
-This resource accepts POST multipart form data, containing a single image in a form-field named 'avatar'.
-
-There are configurable server limits on both the dimensions (1024x1024 pixels by default) and uploaded file size
-(1MB by default). Several different image formats are supported, but B<<< PNG >>> and
-B<<< JPEG >>> are preferred due to the file size limit.
-
-This resource has Cross-Site Request Forgery (XSRF) protection. To allow the request to
-pass the XSRF check the caller needs to send an C<<< X-Atlassian-Token >>> HTTP header with the
-value C<<< no-check >>>.
-
-An example L<<< curl|http://curl.haxx.se/ >>> request to upload an image name 'avatar.png' would be:
-
-    curl -X POST -u username:password -H "X-Atlassian-Token: no-check" http://example.com/rest/api/1.0/projects/STASH/avatar.png -F avatar=@avatar.png
-
-The authenticated user must have B<<< PROJECT_ADMIN >>> permission for the specified project to call this
-resource.
-
-    POST api/1.0/projects/{projectKey}/avatar.png
-
-Responses:
-
-=over 4
-
-=item * C<<< 201 >>> - data, type: unknown
-
-The avatar was uploaded successfully.
 
 =item * C<<< 401 >>> - errors, type: application/json
 
@@ -3991,39 +3966,43 @@ The specified project does not exist.
 
 =back
 
-=head2 get_groups_with_any_project_permission
+=head2 upload_project_avatar
 
-Retrieve a page of groups that have been granted at least one permission for the specified project.
+Update the avatar for the project matching the supplied B<<< projectKey >>>.
 
-The authenticated user must have B<<< PROJECT_ADMIN >>> permission for the specified project or a higher
-global permission to call this resource.
+This resource accepts POST multipart form data, containing a single image in a form-field named 'avatar'.
 
-    GET api/1.0/projects/{projectKey}/permissions/groups
+There are configurable server limits on both the dimensions (1024x1024 pixels by default) and uploaded file size
+(1MB by default). Several different image formats are supported, but B<<< PNG >>> and
+B<<< JPEG >>> are preferred due to the file size limit.
 
-Parameters:
+This resource has Cross-Site Request Forgery (XSRF) protection. To allow the request to
+pass the XSRF check the caller needs to send an C<<< X-Atlassian-Token >>> HTTP header with the
+value C<<< no-check >>>.
 
-=over 4
+An example L<<< curl|http://curl.haxx.se/ >>> request to upload an image name 'avatar.png' would be:
 
-=item * C<<< filter >>> - string, default: none
+    curl -X POST -u username:password -H "X-Atlassian-Token: no-check" http://example.com/rest/api/1.0/projects/STASH/avatar.png -F avatar=@avatar.png
 
-if specified only group names containing the supplied string will be returned
+The authenticated user must have B<<< PROJECT_ADMIN >>> permission for the specified project to call this
+resource.
 
-=back
+    POST api/1.0/projects/{projectKey}/avatar.png
 
 Responses:
 
 =over 4
 
-=item * C<<< 200 >>> - page, type: application/json
+=item * C<<< 201 >>> - data, type: unknown
 
-A page of groups and their highest permissions for the specified project.
+The avatar was uploaded successfully.
 
-=item * C<<< 401 >>> - data, type: unknown
+=item * C<<< 401 >>> - errors, type: application/json
 
-The currently authenticated user is not a project administrator for the
-specified project.
+The currently authenticated user has insufficient permissions to update the
+project.
 
-=item * C<<< 404 >>> - data, type: unknown
+=item * C<<< 404 >>> - errors, type: application/json
 
 The specified project does not exist.
 
@@ -4097,6 +4076,44 @@ permission level.
 =item * C<<< 404 >>> - data, type: unknown
 
 The specified project or group does not exist.
+
+=back
+
+=head2 get_groups_with_any_project_permission
+
+Retrieve a page of groups that have been granted at least one permission for the specified project.
+
+The authenticated user must have B<<< PROJECT_ADMIN >>> permission for the specified project or a higher
+global permission to call this resource.
+
+    GET api/1.0/projects/{projectKey}/permissions/groups
+
+Parameters:
+
+=over 4
+
+=item * C<<< filter >>> - string, default: none
+
+if specified only group names containing the supplied string will be returned
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - page, type: application/json
+
+A page of groups and their highest permissions for the specified project.
+
+=item * C<<< 401 >>> - data, type: unknown
+
+The currently authenticated user is not a project administrator for the
+specified project.
+
+=item * C<<< 404 >>> - data, type: unknown
+
+The specified project does not exist.
 
 =back
 
@@ -4184,89 +4201,6 @@ The specified project does not exist.
 
 =back
 
-=head2 revoke_project_permissions_for_user
-
-Revoke all permissions for the specified project for a user.
-
-The authenticated user must have B<<< PROJECT_ADMIN >>> permission for the specified project or a higher
-global permission to call this resource.
-
-In addition, a user may not revoke their own project permissions if they do not have a higher global permission.
-
-    DELETE api/1.0/projects/{projectKey}/permissions/users
-
-Parameters:
-
-=over 4
-
-=item * C<<< name >>> - string, default: none
-
-the name of the user
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 401 >>> - data, type: unknown
-
-The currently authenticated user is not an administrator of the specified
-project.
-
-=item * C<<< 204 >>> - data, type: unknown
-
-All project permissions were revoked from the user for the specified project.
-
-=item * C<<< 404 >>> - data, type: unknown
-
-The specified project or group does not exist.
-
-=item * C<<< 409 >>> - data, type: unknown
-
-The action was disallowed as it would reduce the currently authenticated user's
-permission level.
-
-=back
-
-=head2 get_users_with_any_project_permission
-
-Retrieve a page of users that have been granted at least one permission for the specified project.
-
-The authenticated user must have B<<< PROJECT_ADMIN >>> permission for the specified project or a higher
-global permission to call this resource.
-
-    GET api/1.0/projects/{projectKey}/permissions/users
-
-Parameters:
-
-=over 4
-
-=item * C<<< filter >>> - string, default: none
-
-if specified only group names containing the supplied string will be returned
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - page, type: application/json
-
-A page of users and their highest permissions for the specified project.
-
-=item * C<<< 401 >>> - data, type: unknown
-
-The currently authenticated user is not a project administrator for the
-specified project.
-
-=item * C<<< 404 >>> - data, type: unknown
-
-The specified project does not exist.
-
-=back
-
 =head2 set_project_permission_for_users
 
 Promote or demote a user's permission level for the specified project.
@@ -4337,6 +4271,89 @@ The specified project or user does not exist.
 
 =back
 
+=head2 get_users_with_any_project_permission
+
+Retrieve a page of users that have been granted at least one permission for the specified project.
+
+The authenticated user must have B<<< PROJECT_ADMIN >>> permission for the specified project or a higher
+global permission to call this resource.
+
+    GET api/1.0/projects/{projectKey}/permissions/users
+
+Parameters:
+
+=over 4
+
+=item * C<<< filter >>> - string, default: none
+
+if specified only group names containing the supplied string will be returned
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - page, type: application/json
+
+A page of users and their highest permissions for the specified project.
+
+=item * C<<< 401 >>> - data, type: unknown
+
+The currently authenticated user is not a project administrator for the
+specified project.
+
+=item * C<<< 404 >>> - data, type: unknown
+
+The specified project does not exist.
+
+=back
+
+=head2 revoke_project_permissions_for_user
+
+Revoke all permissions for the specified project for a user.
+
+The authenticated user must have B<<< PROJECT_ADMIN >>> permission for the specified project or a higher
+global permission to call this resource.
+
+In addition, a user may not revoke their own project permissions if they do not have a higher global permission.
+
+    DELETE api/1.0/projects/{projectKey}/permissions/users
+
+Parameters:
+
+=over 4
+
+=item * C<<< name >>> - string, default: none
+
+the name of the user
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 401 >>> - data, type: unknown
+
+The currently authenticated user is not an administrator of the specified
+project.
+
+=item * C<<< 204 >>> - data, type: unknown
+
+All project permissions were revoked from the user for the specified project.
+
+=item * C<<< 404 >>> - data, type: unknown
+
+The specified project or group does not exist.
+
+=item * C<<< 409 >>> - data, type: unknown
+
+The action was disallowed as it would reduce the currently authenticated user's
+permission level.
+
+=back
+
 =head2 get_users_without_project_permission
 
 Retrieve a page of I<<< licensed >>> users that have no granted permissions for the specified project.
@@ -4369,66 +4386,6 @@ project.
 
 The currently authenticated user is not a project administrator for the
 specified project.
-
-=item * C<<< 404 >>> - data, type: unknown
-
-The specified project does not exist.
-
-=back
-
-=head2 has_all_user_project_permission
-
-Check whether the specified permission is the default permission (granted to all users) for a project.
-
-The authenticated user must have B<<< PROJECT_ADMIN >>> permission for the specified project or a higher
-global permission to call this resource.
-
-    GET api/1.0/projects/{projectKey}/permissions/{permission}/all
-
-Parameters:
-
-=over 4
-
-=item * C<<< permission >>> - string, default: none
-
-the permission to grant
-Available project permissions are:
-
-=over 4
-
-=item *
-
-PROJECT_READ
-
-=item *
-
-PROJECT_WRITE
-
-=item *
-
-PROJECT_ADMIN
-
-=back
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - permitted, type: application/json
-
-A simple entity indicating whether the specified permission is the default
-permission for this project.
-
-=item * C<<< 400 >>> - data, type: unknown
-
-The request was malformed or the specified permission does not exist.
-
-=item * C<<< 401 >>> - data, type: unknown
-
-The currently authenticated user is not an administrator of the specified
-project.
 
 =item * C<<< 404 >>> - data, type: unknown
 
@@ -4499,22 +4456,39 @@ The specified project does not exist.
 
 =back
 
-=head2 get_repositories
+=head2 has_all_user_project_permission
 
-Retrieve repositories from the project corresponding to the supplied B<<< projectKey >>>.
+Check whether the specified permission is the default permission (granted to all users) for a project.
 
-The authenticated user must have B<<< REPO_READ >>> permission for the specified project to call this
-resource.
+The authenticated user must have B<<< PROJECT_ADMIN >>> permission for the specified project or a higher
+global permission to call this resource.
 
-    GET api/1.0/projects/{projectKey}/repos
+    GET api/1.0/projects/{projectKey}/permissions/{permission}/all
 
 Parameters:
 
 =over 4
 
-=item * C<<< projectKey >>> - string, default: none
+=item * C<<< permission >>> - string, default: none
 
-the parent project key
+the permission to grant
+Available project permissions are:
+
+=over 4
+
+=item *
+
+PROJECT_READ
+
+=item *
+
+PROJECT_WRITE
+
+=item *
+
+PROJECT_ADMIN
+
+=back
 
 =back
 
@@ -4522,16 +4496,21 @@ Responses:
 
 =over 4
 
-=item * C<<< 200 >>> - page, type: application/json
+=item * C<<< 200 >>> - permitted, type: application/json
 
-The repositories matching the supplied B<<< projectKey >>>.
+A simple entity indicating whether the specified permission is the default
+permission for this project.
 
-=item * C<<< 401 >>> - errors, type: application/json
+=item * C<<< 400 >>> - data, type: unknown
 
-The currently authenticated user has insufficient permissions to see the
-specified project.
+The request was malformed or the specified permission does not exist.
 
-=item * C<<< 404 >>> - errors, type: application/json
+=item * C<<< 401 >>> - data, type: unknown
+
+The currently authenticated user is not an administrator of the specified
+project.
+
+=item * C<<< 404 >>> - data, type: unknown
 
 The specified project does not exist.
 
@@ -4577,6 +4556,150 @@ repository.
 =item * C<<< 409 >>> - errors, type: application/json
 
 A repository with same name already exists.
+
+=back
+
+=head2 get_repositories
+
+Retrieve repositories from the project corresponding to the supplied B<<< projectKey >>>.
+
+The authenticated user must have B<<< REPO_READ >>> permission for the specified project to call this
+resource.
+
+    GET api/1.0/projects/{projectKey}/repos
+
+Parameters:
+
+=over 4
+
+=item * C<<< projectKey >>> - string, default: none
+
+the parent project key
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - page, type: application/json
+
+The repositories matching the supplied B<<< projectKey >>>.
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user has insufficient permissions to see the
+specified project.
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+The specified project does not exist.
+
+=back
+
+=head2 get_repository
+
+Retrieve the repository matching the supplied B<<< projectKey >>> and B<<< repositorySlug >>>.
+
+The authenticated user must have B<<< REPO_READ >>> permission for the specified repository to call this
+resource.
+
+    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}
+
+Parameters:
+
+=over 4
+
+=item * C<<< projectKey >>> - string, default: none
+
+the parent project key
+
+=item * C<<< projectKey >>> - string, default: none
+
+the parent project key
+
+=item * C<<< repositorySlug >>> - string, default: none
+
+the repository slug
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - repository, type: application/json
+
+The repository which matches the supplied B<<< projectKey >>> and
+B<<< repositorySlug >>>.
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user has insufficient permissions to see the
+specified repository.
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+The specified repository does not exist.
+
+=back
+
+=head2 update_repository
+
+Update the repository matching the B<<< repositorySlug >>> supplied in the resource path.
+
+The repository's slug is derived from its name. If the name changes the slug may also change.
+
+This API can be used to move the repository to a different project by setting the new project in the request,
+example: C<<< {"project":{"key":"NEW_KEY" >>>}} .
+
+The authenticated user must have B<<< REPO_ADMIN >>> permission for the specified repository to call this
+resource.
+
+    PUT api/1.0/projects/{projectKey}/repos/{repositorySlug}
+
+Parameters:
+
+=over 4
+
+=item * C<<< projectKey >>> - string, default: none
+
+the parent project key
+
+=item * C<<< projectKey >>> - string, default: none
+
+the parent project key
+
+=item * C<<< repositorySlug >>> - string, default: none
+
+the repository slug
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 201 >>> - repository, type: application/json
+
+The updated repository.
+
+=item * C<<< 400 >>> - errors, type: application/json
+
+The repository was not updated due to a validation error.
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user has insufficient permissions to update a
+repository
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+The specified repository does not exist.
+
+=item * C<<< 409 >>> - errors, type: application/json
+
+A repository with same name as the target already exists
 
 =back
 
@@ -4714,112 +4837,6 @@ the target project does not exist.
 
 =back
 
-=head2 get_repository
-
-Retrieve the repository matching the supplied B<<< projectKey >>> and B<<< repositorySlug >>>.
-
-The authenticated user must have B<<< REPO_READ >>> permission for the specified repository to call this
-resource.
-
-    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}
-
-Parameters:
-
-=over 4
-
-=item * C<<< projectKey >>> - string, default: none
-
-the parent project key
-
-=item * C<<< projectKey >>> - string, default: none
-
-the parent project key
-
-=item * C<<< repositorySlug >>> - string, default: none
-
-the repository slug
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - repository, type: application/json
-
-The repository which matches the supplied B<<< projectKey >>> and
-B<<< repositorySlug >>>.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user has insufficient permissions to see the
-specified repository.
-
-=item * C<<< 404 >>> - errors, type: application/json
-
-The specified repository does not exist.
-
-=back
-
-=head2 update_repository
-
-Update the repository matching the B<<< repositorySlug >>> supplied in the resource path.
-
-The repository's slug is derived from its name. If the name changes the slug may also change.
-
-This API can be used to move the repository to a different project by setting the new project in the request,
-example: C<<< {"project":{"key":"NEW_KEY" >>>}} .
-
-The authenticated user must have B<<< REPO_ADMIN >>> permission for the specified repository to call this
-resource.
-
-    PUT api/1.0/projects/{projectKey}/repos/{repositorySlug}
-
-Parameters:
-
-=over 4
-
-=item * C<<< projectKey >>> - string, default: none
-
-the parent project key
-
-=item * C<<< projectKey >>> - string, default: none
-
-the parent project key
-
-=item * C<<< repositorySlug >>> - string, default: none
-
-the repository slug
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 201 >>> - repository, type: application/json
-
-The updated repository.
-
-=item * C<<< 400 >>> - errors, type: application/json
-
-The repository was not updated due to a validation error.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user has insufficient permissions to update a
-repository
-
-=item * C<<< 404 >>> - errors, type: application/json
-
-The specified repository does not exist.
-
-=item * C<<< 409 >>> - errors, type: application/json
-
-A repository with same name as the target already exists
-
-=back
-
 =head2 get_archive
 
 Streams an archive of the repository's contents at the requested commit. If no C<<< at= >>> commit is
@@ -4944,6 +4961,34 @@ The repository does not exist or does not contain the C<<< at >>> commit.
 
 =back
 
+=head2 create_branch
+
+Creates a branch using the information provided in the request
+
+The authenticated user must have B<<< REPO_WRITE >>> permission for the context repository to call
+this resource.
+
+    POST api/1.0/projects/{projectKey}/repos/{repositorySlug}/branches
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - branch, type: application/json
+
+The created branch
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user has insufficient permissions to write to the
+repository.
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+The specified repository does not exist.
+
+=back
+
 =head2 get_branches
 
 Retrieve the branches matching the supplied B<<< filterText >>> param.
@@ -4994,31 +5039,36 @@ The specified repository does not exist.
 
 =back
 
-=head2 create_branch
+=head2 get_default_branch
 
-Creates a branch using the information provided in the request
+Get the default branch of the repository.
 
-The authenticated user must have B<<< REPO_WRITE >>> permission for the context repository to call
-this resource.
+The authenticated user must have B<<< REPO_READ >>> permission for the specified repository to call this
+resource.
 
-    POST api/1.0/projects/{projectKey}/repos/{repositorySlug}/branches
+    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}/branches/default
 
 Responses:
 
 =over 4
 
-=item * C<<< 200 >>> - branch, type: application/json
+=item * C<<< 200 >>> - page, type: application/json
 
-The created branch
+The configured default branch for the repository.
 
 =item * C<<< 401 >>> - errors, type: application/json
 
-The currently authenticated user has insufficient permissions to write to the
+The currently authenticated user has insufficient permissions to read the
 repository.
+
+=item * C<<< 204 >>> - data, type: unknown
+
+The repository is empty, and has no default branch.
 
 =item * C<<< 404 >>> - errors, type: application/json
 
-The specified repository does not exist.
+The specified repository does not exist, or its configured default branch
+does not exist.
 
 =back
 
@@ -5050,14 +5100,40 @@ The specified repository does not exist.
 
 =back
 
-=head2 get_default_branch
+=head2 get_file
 
-Get the default branch of the repository.
+Retrieve a page of content for a file path at a specified revision.
 
 The authenticated user must have B<<< REPO_READ >>> permission for the specified repository to call this
 resource.
 
-    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}/branches/default
+    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}/browse/{path:.*}
+
+Parameters:
+
+=over 4
+
+=item * C<<< path >>> - string, default: none
+
+the path of the file that is to be modified or created
+
+=item * C<<< at >>> - string, default: none
+
+the commit ID or ref to retrieve the content for.
+
+=item * C<<< type >>> - boolean, default: false
+
+if true only the type will be returned for the file path instead of the contents.
+
+=item * C<<< blame >>> - string, default: none
+
+if present the blame will be returned for the file as well.
+
+=item * C<<< noContent >>> - string, default: none
+
+if present and used with blame only the blame is retrieved instead of the contents.
+
+=back
 
 Responses:
 
@@ -5065,17 +5141,20 @@ Responses:
 
 =item * C<<< 200 >>> - page, type: application/json
 
-The branches matching the supplied B<<< filterText >>>.
+A page of contents from a file.
+
+=item * C<<< 400 >>> - errors, type: application/json
+
+The path or until parameters were not supplied.
 
 =item * C<<< 401 >>> - errors, type: application/json
 
-The currently authenticated user has insufficient permissions to read the
-repository.
+The currently authenticated user has insufficient permissions
+to view the repository.
 
 =item * C<<< 404 >>> - errors, type: application/json
 
-The specified repository does not exist or the repository has no default
-branch configured.
+The repository does not exist.
 
 =back
 
@@ -5125,7 +5204,7 @@ Parameters:
 
 =item * C<<< path >>> - string, default: none
 
-the file path to retrieve content from
+the path of the file that is to be modified or created
 
 =back
 
@@ -5154,64 +5233,6 @@ The repository does not exist.
 
 The file already exists when trying to create a file, or the given content does
 not modify the file, or the file has changed since the given sourceCommitId
-
-=back
-
-=head2 get_file
-
-Retrieve a page of content for a file path at a specified revision.
-
-The authenticated user must have B<<< REPO_READ >>> permission for the specified repository to call this
-resource.
-
-    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}/browse/{path:.*}
-
-Parameters:
-
-=over 4
-
-=item * C<<< path >>> - string, default: none
-
-the file path to retrieve content from
-
-=item * C<<< at >>> - string, default: none
-
-the commit ID or ref to retrieve the content for.
-
-=item * C<<< type >>> - boolean, default: false
-
-if true only the type will be returned for the file path instead of the contents.
-
-=item * C<<< blame >>> - string, default: none
-
-if present the blame will be returned for the file as well.
-
-=item * C<<< noContent >>> - string, default: none
-
-if present and used with blame only the blame is retrieved instead of the contents.
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - page, type: application/json
-
-A page of contents from a file.
-
-=item * C<<< 400 >>> - errors, type: application/json
-
-The path or until parameters were not supplied.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user has insufficient permissions
-to view the repository.
-
-=item * C<<< 404 >>> - errors, type: application/json
-
-The repository does not exist.
 
 =back
 
@@ -5292,9 +5313,9 @@ C<<< true >>> to ignore missing commits, C<<< false >>> otherwise
 
 =item * C<<< merges >>> - string, default: none
 
-if present, controls how merge commits should be filtered. Can be either C<<< exclude >>>, to
-exclude merge commits, C<<< include >>>, to include both merge commits and non-merge commits or
-C<<< only >>>, to only return merge commits.
+if present, controls how merge commits should be filtered. Can be either C<<< exclude >>>,
+to exclude merge commits, C<<< include >>>, to include both merge commits and non-merge
+commits or C<<< only >>>, to only return merge commits.
 
 =item * C<<< path >>> - string, default: none
 
@@ -5441,6 +5462,61 @@ The repository or the since or until parameters supplied does not exist.
 
 =back
 
+=head2 get_commit_comments
+
+Retrieves the commit discussion comments that match the specified search criteria.
+
+It is possible to retrieve commit discussion comments that are anchored to a range of commits by providing the
+C<<< sinceId >>> that the comments anchored from.
+
+The authenticated user must have B<<< REPO_READ >>> permission for the repository that the commit
+is in to call this resource.
+
+    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}/commits/{commitId}/comments
+
+Parameters:
+
+=over 4
+
+=item * C<<< commitId >>> - string, default: none
+
+the I<<< full ID >>> of the commit within the repository
+
+=item * C<<< path >>> - string, default: none
+
+the path to the file on which comments were made
+
+=item * C<<< since >>> - string, default: none
+
+For a merge commit, a parent can be provided to specify which diff the comments are on. For
+a commit range, a C<<< sinceId >>> can be provided to specify where the comments are anchored
+from.
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - page, type: application/json
+
+A page of comments that match the search criteria
+
+=item * C<<< 400 >>> - errors, type: application/json
+
+The request was malformed.
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user has insufficient permissions to view the comment
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+Unable to find the supplied project, repository, or commit. The
+missing entity will be specified in the error details.
+
+=back
+
 =head2 create_commit_comment
 
 Add a new comment.
@@ -5545,7 +5621,7 @@ Parameters:
 
 =item * C<<< commitId >>> - string, default: none
 
-the commit to which the comments must be anchored
+the I<<< full ID >>> of the commit within the repository
 
 =item * C<<< since >>> - string, default: none
 
@@ -5579,17 +5655,14 @@ The missing entity will be specified in the error details.
 
 =back
 
-=head2 get_commit_comments
+=head2 get_commit_comment
 
-Retrieves the commit discussion comments that match the specified search criteria.
-
-It is possible to retrieve commit discussion comments that are anchored to a range of commits by providing the
-C<<< sinceId >>> that the comments anchored from.
+Retrieves a commit discussion comment.
 
 The authenticated user must have B<<< REPO_READ >>> permission for the repository that the commit
 is in to call this resource.
 
-    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}/commits/{commitId}/comments
+    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}/commits/{commitId}/comments/{commentId}
 
 Parameters:
 
@@ -5597,64 +5670,7 @@ Parameters:
 
 =item * C<<< commitId >>> - string, default: none
 
-the commit to which the comments must be anchored
-
-=item * C<<< path >>> - string, default: none
-
-the path to the file on which comments were made
-
-=item * C<<< since >>> - string, default: none
-
-For a merge commit, a parent can be provided to specify which diff the comments are on. For
-a commit range, a C<<< sinceId >>> can be provided to specify where the comments are anchored
-from.
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - page, type: application/json
-
-A page of comments that match the search criteria
-
-=item * C<<< 400 >>> - errors, type: application/json
-
-The request was malformed.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user has insufficient permissions to view the comment
-
-=item * C<<< 404 >>> - errors, type: application/json
-
-Unable to find the supplied project, repository, or commit. The
-missing entity will be specified in the error details.
-
-=back
-
-=head2 update_commit_comment
-
-Update the text of a comment. Only the user who created a comment may update it.
-
-B<<< Note: >>> the supplied supplied JSON object must contain a C<<< version >>> that must match
-the server's version of the comment or the update will fail. To determine the current version of the comment,
-the comment should be fetched from the server prior to the update. Look for the 'version' attribute in the
-returned JSON structure.
-
-The authenticated user must have B<<< REPO_READ >>> permission for the repository that the commit
-is in to call this resource.
-
-    PUT api/1.0/projects/{projectKey}/repos/{repositorySlug}/commits/{commitId}/comments/{commentId}
-
-Parameters:
-
-=over 4
-
-=item * C<<< commitId >>> - string, default: none
-
-the commit to which the comments must be anchored
+the I<<< full ID >>> of the commit within the repository
 
 =item * C<<< commentId >>> - long, default: none
 
@@ -5670,27 +5686,18 @@ Responses:
 
 =over 4
 
-=item * C<<< 201 >>> - comment, type: application/json
+=item * C<<< 200 >>> - comment, type: application/json
 
-The newly updated comment.
-
-=item * C<<< 400 >>> - errors, type: application/json
-
-The comment was not updated due to a validation error.
+The requested comment.
 
 =item * C<<< 401 >>> - errors, type: application/json
 
-The currently authenticated user has insufficient permissions to view the
-commit, update the comment or watch the commit.
+The currently authenticated user has insufficient permissions to view the comment
 
 =item * C<<< 404 >>> - errors, type: application/json
 
 Unable to find the supplied project, repository, commit or comment. The
 missing entity will be specified in the error details.
-
-=item * C<<< 409 >>> - errors, type: application/json
-
-The comment version supplied does not match the current version.
 
 =back
 
@@ -5711,7 +5718,7 @@ Parameters:
 
 =item * C<<< commitId >>> - string, default: none
 
-the commit to which the comments must be anchored
+the I<<< full ID >>> of the commit within the repository
 
 =item * C<<< commentId >>> - long, default: none
 
@@ -5754,14 +5761,19 @@ current version.
 
 =back
 
-=head2 get_commit_comment
+=head2 update_commit_comment
 
-Retrieves a commit discussion comment.
+Update the text of a comment. Only the user who created a comment may update it.
+
+B<<< Note: >>> the supplied supplied JSON object must contain a C<<< version >>> that must match
+the server's version of the comment or the update will fail. To determine the current version of the comment,
+the comment should be fetched from the server prior to the update. Look for the 'version' attribute in the
+returned JSON structure.
 
 The authenticated user must have B<<< REPO_READ >>> permission for the repository that the commit
 is in to call this resource.
 
-    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}/commits/{commitId}/comments/{commentId}
+    PUT api/1.0/projects/{projectKey}/repos/{repositorySlug}/commits/{commitId}/comments/{commentId}
 
 Parameters:
 
@@ -5769,7 +5781,7 @@ Parameters:
 
 =item * C<<< commitId >>> - string, default: none
 
-the commit to which the comments must be anchored
+the I<<< full ID >>> of the commit within the repository
 
 =item * C<<< commentId >>> - long, default: none
 
@@ -5785,18 +5797,27 @@ Responses:
 
 =over 4
 
-=item * C<<< 200 >>> - comment, type: application/json
+=item * C<<< 201 >>> - comment, type: application/json
 
-The requested comment.
+The newly updated comment.
+
+=item * C<<< 400 >>> - errors, type: application/json
+
+The comment was not updated due to a validation error.
 
 =item * C<<< 401 >>> - errors, type: application/json
 
-The currently authenticated user has insufficient permissions to view the comment
+The currently authenticated user has insufficient permissions to view the
+commit, update the comment or watch the commit.
 
 =item * C<<< 404 >>> - errors, type: application/json
 
 Unable to find the supplied project, repository, commit or comment. The
 missing entity will be specified in the error details.
+
+=item * C<<< 409 >>> - errors, type: application/json
+
+The comment version supplied does not match the current version.
 
 =back
 
@@ -5878,47 +5899,9 @@ The repository does not exist.
 
 =back
 
-=head2 unwatch_commit
-
-Removes the authenticated user as a watcher for the specified commit.
-
-The authenticated user must have B<<< REPO_READ >>> permission for the repository containing the commit
-to call this resource.
-
-    DELETE api/1.0/projects/{projectKey}/repos/{repositorySlug}/commits/{commitId}/watch
-
-Parameters:
-
-=over 4
-
-=item * C<<< commitId >>> - string, default: none
-
-the I<<< full ID >>> of the commit within the repository
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user has insufficient permissions to view the pull
-request.
-
-=item * C<<< 204 >>> - data, type: unknown
-
-The user is no longer watching the commit.
-
-=item * C<<< 404 >>> - errors, type: application/json
-
-The specified project, repository or commit does not exist.
-
-=back
-
 =head2 watch_commit
 
-Adds the authenticated user as a watcher for the specified commit.
+Add the authenticated user as a watcher for the specified commit.
 
 The authenticated user must have B<<< REPO_READ >>> permission for the repository containing the commit
 to call this resource.
@@ -5947,6 +5930,44 @@ request.
 =item * C<<< 204 >>> - data, type: unknown
 
 The user is now watching the commit.
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+The specified project, repository or commit does not exist.
+
+=back
+
+=head2 unwatch_commit
+
+Remove the authenticated user as a watcher for the specified commit.
+
+The authenticated user must have B<<< REPO_READ >>> permission for the repository containing the commit
+to call this resource.
+
+    DELETE api/1.0/projects/{projectKey}/repos/{repositorySlug}/commits/{commitId}/watch
+
+Parameters:
+
+=over 4
+
+=item * C<<< commitId >>> - string, default: none
+
+the I<<< full ID >>> of the commit within the repository
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user has insufficient permissions to view the pull
+request.
+
+=item * C<<< 204 >>> - data, type: unknown
+
+The user is no longer watching the commit.
 
 =item * C<<< 404 >>> - errors, type: application/json
 
@@ -6354,6 +6375,44 @@ The specified repository does not exist.
 
 =back
 
+=head2 get_groups_with_any_repository_permission
+
+Retrieve a page of groups that have been granted at least one permission for the specified repository.
+
+The authenticated user must have B<<< REPO_ADMIN >>> permission for the specified repository or a higher
+project or global permission to call this resource.
+
+    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}/permissions/groups
+
+Parameters:
+
+=over 4
+
+=item * C<<< filter >>> - string, default: none
+
+if specified only group names containing the supplied string will be returned
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - page, type: application/json
+
+A page of groups and their highest permissions for the specified repository.
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user is not a repository administrator for the
+specified repository.
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+The specified repository does not exist.
+
+=back
+
 =head2 set_repository_permission_for_group
 
 Promote or demote a group's permission level for the specified repository. Available repository permissions are:
@@ -6422,44 +6481,6 @@ permission level.
 =item * C<<< 404 >>> - errors, type: application/json
 
 The specified repository or group does not exist.
-
-=back
-
-=head2 get_groups_with_any_repository_permission
-
-Retrieve a page of groups that have been granted at least one permission for the specified repository.
-
-The authenticated user must have B<<< REPO_ADMIN >>> permission for the specified repository or a higher
-project or global permission to call this resource.
-
-    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}/permissions/groups
-
-Parameters:
-
-=over 4
-
-=item * C<<< filter >>> - string, default: none
-
-if specified only group names containing the supplied string will be returned
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - page, type: application/json
-
-A page of groups and their highest permissions for the specified repository.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user is not a repository administrator for the
-specified repository.
-
-=item * C<<< 404 >>> - errors, type: application/json
-
-The specified repository does not exist.
 
 =back
 
@@ -6547,25 +6568,22 @@ The specified repository does not exist.
 
 =back
 
-=head2 revoke_repository_permissions_for_user
+=head2 get_users_with_any_repository_permission
 
-Revoke all permissions for the specified repository for a user.
+Retrieve a page of users that have been granted at least one permission for the specified repository.
 
 The authenticated user must have B<<< REPO_ADMIN >>> permission for the specified repository or a higher
 project or global permission to call this resource.
 
-In addition, a user may not revoke their own repository permissions if they do not have a higher
-project or global permission.
-
-    DELETE api/1.0/projects/{projectKey}/repos/{repositorySlug}/permissions/users
+    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}/permissions/users
 
 Parameters:
 
 =over 4
 
-=item * C<<< name >>> - string, default: none
+=item * C<<< filter >>> - string, default: none
 
-the name of the user
+if specified only group names containing the supplied string will be returned
 
 =back
 
@@ -6573,23 +6591,18 @@ Responses:
 
 =over 4
 
+=item * C<<< 200 >>> - page, type: application/json
+
+A page of users and their highest permissions for the specified repository.
+
 =item * C<<< 401 >>> - errors, type: application/json
 
-The currently authenticated user is not an administrator of the specified
-repository.
-
-=item * C<<< 204 >>> - data, type: unknown
-
-All repository permissions were revoked from the user for the specified repository.
+The currently authenticated user is not a repository administrator for the
+specified repository.
 
 =item * C<<< 404 >>> - errors, type: application/json
 
-The specified repository or group does not exist.
-
-=item * C<<< 409 >>> - errors, type: application/json
-
-The action was disallowed as it would reduce the currently authenticated user's
-permission level.
+The specified repository does not exist.
 
 =back
 
@@ -6664,22 +6677,25 @@ The specified repository or user does not exist.
 
 =back
 
-=head2 get_users_with_any_repository_permission
+=head2 revoke_repository_permissions_for_user
 
-Retrieve a page of users that have been granted at least one permission for the specified repository.
+Revoke all permissions for the specified repository for a user.
 
 The authenticated user must have B<<< REPO_ADMIN >>> permission for the specified repository or a higher
 project or global permission to call this resource.
 
-    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}/permissions/users
+In addition, a user may not revoke their own repository permissions if they do not have a higher
+project or global permission.
+
+    DELETE api/1.0/projects/{projectKey}/repos/{repositorySlug}/permissions/users
 
 Parameters:
 
 =over 4
 
-=item * C<<< filter >>> - string, default: none
+=item * C<<< name >>> - string, default: none
 
-if specified only group names containing the supplied string will be returned
+the name of the user
 
 =back
 
@@ -6687,18 +6703,23 @@ Responses:
 
 =over 4
 
-=item * C<<< 200 >>> - page, type: application/json
-
-A page of users and their highest permissions for the specified repository.
-
 =item * C<<< 401 >>> - errors, type: application/json
 
-The currently authenticated user is not a repository administrator for the
-specified repository.
+The currently authenticated user is not an administrator of the specified
+repository.
+
+=item * C<<< 204 >>> - data, type: unknown
+
+All repository permissions were revoked from the user for the specified repository.
 
 =item * C<<< 404 >>> - errors, type: application/json
 
-The specified repository does not exist.
+The specified repository or group does not exist.
+
+=item * C<<< 409 >>> - errors, type: application/json
+
+The action was disallowed as it would reduce the currently authenticated user's
+permission level.
 
 =back
 
@@ -6738,6 +6759,64 @@ specified repository.
 =item * C<<< 404 >>> - errors, type: application/json
 
 The specified repository does not exist.
+
+=back
+
+=head2 create_pull_request
+
+Create a new pull request between two branches. The branches may be in the same repository, or different ones.
+When using different repositories, they must still be in the same hierarchy.
+
+The authenticated user must have B<<< REPO_READ >>> permission for the "from" and "to"repositories to
+call this resource.
+
+    POST api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests
+
+Responses:
+
+=over 4
+
+=item * C<<< 201 >>> - pullRequest, type: application/json
+
+The newly created pull request.
+
+=item * C<<< 400 >>> - errors, type: application/json
+
+The pull request entity supplied in the request was malformed.
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user has insufficient permissions to create a pull
+request between the two specified repositories.
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+One of the specified repositories or branches does not exist.
+
+=item * C<<< 409 >>> - errors, type: application/json
+
+One of the following error cases occurred (check the error message for more details):
+
+=over 4
+
+=item *
+
+There was a problem resolving one or more reviewers.
+
+=item *
+
+The specified branches were the same.
+
+=item *
+
+The I<<< to >>> branch is already up-to-date with all the commits on the
+I<<< from >>> branch.
+
+=item *
+
+A pull request between the two branches already exists.
+
+=back
 
 =back
 
@@ -6829,64 +6908,6 @@ specified pull request.
 =item * C<<< 404 >>> - errors, type: application/json
 
 The specified repository or pull request does not exist.
-
-=back
-
-=head2 create_pull_request
-
-Create a new pull request between two branches. The branches may be in the same repository, or different ones.
-When using different repositories, they must still be in the same hierarchy.
-
-The authenticated user must have B<<< REPO_READ >>> permission for the "from" and "to"repositories to
-call this resource.
-
-    POST api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests
-
-Responses:
-
-=over 4
-
-=item * C<<< 201 >>> - pullRequest, type: application/json
-
-The newly created pull request.
-
-=item * C<<< 400 >>> - errors, type: application/json
-
-The pull request entity supplied in the request was malformed.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user has insufficient permissions to create a pull
-request between the two specified repositories.
-
-=item * C<<< 404 >>> - errors, type: application/json
-
-One of the specified repositories or branches does not exist.
-
-=item * C<<< 409 >>> - errors, type: application/json
-
-One of the following error cases occurred (check the error message for more details):
-
-=over 4
-
-=item *
-
-There was a problem resolving one or more reviewers.
-
-=item *
-
-The specified branches were the same.
-
-=item *
-
-The I<<< to >>> branch is already up-to-date with all the commits on the
-I<<< from >>> branch.
-
-=item *
-
-A pull request between the two branches already exists.
-
-=back
 
 =back
 
@@ -7154,50 +7175,6 @@ The specified repository or pull request does not exist.
 
 =back
 
-=head2 withdraw_pull_request_approval
-
-Remove approval from a pull request as the current user. This does not remove the user as a participant.
-
-The authenticated user must have B<<< REPO_READ >>> permission for the repository that this pull request
-targets to call this resource.
-
-B<<< Deprecated since 4.2 >>>. Use
-/rest/api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/participants/{userSlug} instead
-
-    DELETE api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/approve
-
-Parameters:
-
-=over 4
-
-=item * C<<< pullRequestId >>> - long, default: none
-
-the id of the pull request within the repository
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 201 >>> - participant, type: application/json
-
-Details of the updated participant
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user has insufficient permissions to view the pull request.
-
-=item * C<<< 404 >>> - errors, type: application/json
-
-The specified repository or pull request does not exist or the current user is not a participant on the pull request.
-
-=item * C<<< 409 >>> - errors, type: application/json
-
-The pull request is not open.
-
-=back
-
 =head2 approve_pull_request
 
 Approve a pull request as the current user. Implicitly adds the user as a participant if they are not already.
@@ -7235,6 +7212,50 @@ The currently authenticated user has insufficient permissions to view the pull r
 =item * C<<< 404 >>> - errors, type: application/json
 
 The specified repository or pull request does not exist.
+
+=item * C<<< 409 >>> - errors, type: application/json
+
+The pull request is not open.
+
+=back
+
+=head2 withdraw_pull_request_approval
+
+Remove approval from a pull request as the current user. This does not remove the user as a participant.
+
+The authenticated user must have B<<< REPO_READ >>> permission for the repository that this pull request
+targets to call this resource.
+
+B<<< Deprecated since 4.2 >>>. Use
+/rest/api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/participants/{userSlug} instead
+
+    DELETE api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/approve
+
+Parameters:
+
+=over 4
+
+=item * C<<< pullRequestId >>> - long, default: none
+
+the id of the pull request within the repository
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 201 >>> - participant, type: application/json
+
+Details of the updated participant
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user has insufficient permissions to view the pull request.
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+The specified repository or pull request does not exist or the current user is not a participant on the pull request.
 
 =item * C<<< 409 >>> - errors, type: application/json
 
@@ -7298,6 +7319,66 @@ Responses:
 
 A page of unreviewed Changes for the current user from the supplied pull
 request, including the unreviewedCommits in the properties map.
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user has insufficient permissions
+to view the repository or pull request.
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+The repository or pull request does not exist.
+
+=back
+
+=head2 get_pull_request_comments
+
+Gets comments for the specified PullRequest.
+
+The authenticated user must have B<<< REPO_READ >>> permission for the repository that this pull request
+targets to call this resource.
+
+    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/comments
+
+Parameters:
+
+=over 4
+
+=item * C<<< anchorState >>> - string, default: ACTIVE
+
+C<<< ACTIVE >>> to stream the active comments;
+C<<< ORPHANED >>> to stream the orphaned comments;
+C<<< ALL >>> to stream both the active and the orphaned comments;
+
+=item * C<<< diffType >>> - string, default: none
+
+C<<< EFFECTIVE >>> to stream the comments related to the effective diff of the pull request;
+C<<< RANGE >>> to stream comments related to a commit range between two arbitrary commits
+(requires C<<< fromHash >>> and C<<< toHash >>>);
+C<<< COMMIT >>> to stream comments related to a commit between two arbitrary commits (requires
+C<<< fromHash >>> and C<<< toHash >>>)
+
+=item * C<<< fromHash >>> - string, default: none
+
+the from commit hash to stream comments for a C<<< RANGE >>> or C<<< COMMIT >>> arbitrary change scope
+
+=item * C<<< path >>> - string, default: none
+
+the path to stream comments for a given path
+
+=item * C<<< toHash >>> - string, default: none
+
+the to commit hash to stream comments for a C<<< RANGE >>> or C<<< COMMIT >>> arbitrary change scope
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - page, type: application/json
+
+A page of Comments from the supplied pull request.
 
 =item * C<<< 401 >>> - errors, type: application/json
 
@@ -7431,79 +7512,14 @@ Unable to find the supplied project, repository, pull request or parent comment
 
 =back
 
-=head2 get_pull_request_comments
+=head2 get_pull_request_comment
 
-Gets comments for the specified PullRequest.
-
-The authenticated user must have B<<< REPO_READ >>> permission for the repository that this pull request
-targets to call this resource.
-
-    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/comments
-
-Parameters:
-
-=over 4
-
-=item * C<<< anchorState >>> - string, default: ACTIVE
-
-C<<< ACTIVE >>> to stream the active comments;
-C<<< ORPHANED >>> to stream the orphaned comments;
-C<<< ALL >>> to stream both the active and the orphaned comments;
-
-=item * C<<< diffType >>> - string, default: none
-
-C<<< EFFECTIVE >>> to stream the comments related to the effective diff of the pull request;
-C<<< RANGE >>> to stream comments related to a commit range between two arbitrary commits
-(requires C<<< fromHash >>> and C<<< toHash >>>);
-C<<< COMMIT >>> to stream comments related to a commit between two arbitrary commits (requires
-C<<< fromHash >>> and C<<< toHash >>>)
-
-=item * C<<< fromHash >>> - string, default: none
-
-the from commit hash to stream comments for a C<<< RANGE >>> or C<<< COMMIT >>> arbitrary change scope
-
-=item * C<<< path >>> - string, default: none
-
-the path to stream comments for a given path
-
-=item * C<<< toHash >>> - string, default: none
-
-the to commit hash to stream comments for a C<<< RANGE >>> or C<<< COMMIT >>> arbitrary change scope
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - page, type: application/json
-
-A page of Comments from the supplied pull request.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user has insufficient permissions
-to view the repository or pull request.
-
-=item * C<<< 404 >>> - errors, type: application/json
-
-The repository or pull request does not exist.
-
-=back
-
-=head2 update_pull_request_comment
-
-Update the text of a comment. Only the user who created a comment may update it.
-
-B<<< Note: >>> the supplied supplied JSON object must contain a C<<< version >>> that must match the
-server's version of the comment or the update will fail. To determine the current version of
-the comment, the comment should be fetched from the server prior to the update. Look for the
-'version' attribute in the returned JSON structure.
+Retrieves a pull request comment.
 
 The authenticated user must have B<<< REPO_READ >>> permission for the repository that this pull request
 targets to call this resource.
 
-    PUT api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/comments/{commentId}
+    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/comments/{commentId}
 
 Parameters:
 
@@ -7519,26 +7535,17 @@ Responses:
 
 =over 4
 
-=item * C<<< 201 >>> - comment, type: application/json
+=item * C<<< 200 >>> - comment, type: application/json
 
-The newly updated comment.
-
-=item * C<<< 400 >>> - errors, type: application/json
-
-The comment was not updated due to a validation error.
+The requested comment.
 
 =item * C<<< 401 >>> - errors, type: application/json
 
-The currently authenticated user has insufficient permissions to view the pull
-request, update a comment or watch the pull request.
+The currently authenticated user has insufficient permissions to view the comment
 
 =item * C<<< 404 >>> - errors, type: application/json
 
 Unable to find the supplied project, repository, pull request or comment
-
-=item * C<<< 409 >>> - errors, type: application/json
-
-The comment version supplied does not match the current version.
 
 =back
 
@@ -7591,14 +7598,19 @@ The comment has replies or the version supplied does not match the current versi
 
 =back
 
-=head2 get_pull_request_comment
+=head2 update_pull_request_comment
 
-Retrieves a pull request comment.
+Update the text of a comment. Only the user who created a comment may update it.
+
+B<<< Note: >>> the supplied supplied JSON object must contain a C<<< version >>> that must match the
+server's version of the comment or the update will fail. To determine the current version of
+the comment, the comment should be fetched from the server prior to the update. Look for the
+'version' attribute in the returned JSON structure.
 
 The authenticated user must have B<<< REPO_READ >>> permission for the repository that this pull request
 targets to call this resource.
 
-    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/comments/{commentId}
+    PUT api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/comments/{commentId}
 
 Parameters:
 
@@ -7614,17 +7626,26 @@ Responses:
 
 =over 4
 
-=item * C<<< 200 >>> - comment, type: application/json
+=item * C<<< 201 >>> - comment, type: application/json
 
-The requested comment.
+The newly updated comment.
+
+=item * C<<< 400 >>> - errors, type: application/json
+
+The comment was not updated due to a validation error.
 
 =item * C<<< 401 >>> - errors, type: application/json
 
-The currently authenticated user has insufficient permissions to view the comment
+The currently authenticated user has insufficient permissions to view the pull
+request, update a comment or watch the pull request.
 
 =item * C<<< 404 >>> - errors, type: application/json
 
 Unable to find the supplied project, repository, pull request or comment
+
+=item * C<<< 409 >>> - errors, type: application/json
+
+The comment version supplied does not match the current version.
 
 =back
 
@@ -7795,62 +7816,6 @@ The repository or pull request does not exist.
 
 =back
 
-=head2 can_merge_pull_request
-
-Test whether a pull request can be merged.
-
-A pull request may not be merged if:
-
-=over 4
-
-=item *
-
-there are conflicts that need to be manually resolved before merging; and/or
-
-=item *
-
-one or more merge checks have vetoed the merge.
-
-=back
-
-The authenticated user must have B<<< REPO_READ >>> permission for the repository that this pull request
-targets to call this resource.
-
-    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/merge
-
-Parameters:
-
-=over 4
-
-=item * C<<< pullRequestId >>> - long, default: none
-
-the ID of the pull request within the repository
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - pullRequest, type: application/json
-
-The mergeability status of the pull request.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user has insufficient permissions to view the
-specified pull request.
-
-=item * C<<< 404 >>> - errors, type: application/json
-
-The specified repository or pull request does not exist.
-
-=item * C<<< 409 >>> - errors, type: application/json
-
-The specified pull request is not open.
-
-=back
-
 =head2 merge_pull_request
 
 Merge the specified pull request.
@@ -7866,7 +7831,7 @@ Parameters:
 
 =item * C<<< pullRequestId >>> - long, default: none
 
-the ID of the pull request within the repository
+the id of the pull request within the repository
 
 =item * C<<< version >>> - int, default: -1
 
@@ -7917,6 +7882,62 @@ The specified version is out of date.
 The specified pull request is not open.
 
 =back
+
+=back
+
+=head2 can_merge_pull_request
+
+Test whether a pull request can be merged.
+
+A pull request may not be merged if:
+
+=over 4
+
+=item *
+
+there are conflicts that need to be manually resolved before merging; and/or
+
+=item *
+
+one or more merge checks have vetoed the merge.
+
+=back
+
+The authenticated user must have B<<< REPO_READ >>> permission for the repository that this pull request
+targets to call this resource.
+
+    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/merge
+
+Parameters:
+
+=over 4
+
+=item * C<<< pullRequestId >>> - long, default: none
+
+the id of the pull request within the repository
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - pullRequest, type: application/json
+
+The mergeability status of the pull request.
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user has insufficient permissions to view the
+specified pull request.
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+The specified repository or pull request does not exist.
+
+=item * C<<< 409 >>> - errors, type: application/json
+
+The specified pull request is not open.
 
 =back
 
@@ -8236,62 +8257,14 @@ If the pull request does not exist
 
 =back
 
-=head2 unwatch_pull_request
-
-Make the authenticated user stop watching the specified pull request.
-
-The authenticated user must have B<<< REPO_READ >>> permission for the repository that this pull request
-targets to call this resource.
-
-    DELETE api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/watch
-
-Parameters:
-
-=over 4
-
-=item * C<<< pullRequestId >>> - long, default: none
-
-the id of the pull request within the repository
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user has insufficient permissions to view the pull
-request.
-
-=item * C<<< 204 >>> - data, type: unknown
-
-The user is no longer watching the pull request.
-
-=item * C<<< 404 >>> - errors, type: application/json
-
-The specified repository or pull request does not exist.
-
-=back
-
 =head2 watch_pull_request
 
-Make the authenticated user watch the specified pull request.
+Add the authenticated user as a watcher for the specified pull request.
 
 The authenticated user must have B<<< REPO_READ >>> permission for the repository that this pull request
 targets to call this resource.
 
     POST api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/watch
-
-Parameters:
-
-=over 4
-
-=item * C<<< pullRequestId >>> - long, default: none
-
-the id of the pull request within the repository
-
-=back
 
 Responses:
 
@@ -8305,6 +8278,34 @@ request.
 =item * C<<< 204 >>> - data, type: unknown
 
 The user is now watching the pull request.
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+The specified repository or pull request does not exist.
+
+=back
+
+=head2 unwatch_pull_request
+
+Remove the authenticated user as a watcher for the specified pull request.
+
+The authenticated user must have B<<< REPO_READ >>> permission for the repository that this pull request
+targets to call this resource.
+
+    DELETE api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/watch
+
+Responses:
+
+=over 4
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user has insufficient permissions to view the pull
+request.
+
+=item * C<<< 204 >>> - data, type: unknown
+
+The user is no longer watching the pull request.
 
 =item * C<<< 404 >>> - errors, type: application/json
 
@@ -8342,14 +8343,14 @@ is streamed without markup
 =item * C<<< hardwrap >>> - boolean, default: none
 
 (Optional) Whether the markup implementation should convert newlines to breaks.
-If not specified, {@link MarkupService} will user the value of the
-C<<< markup.render.hardwrap >>> which is C<<< true >>> by default
+If not specified, {@link MarkupService} will use the value of the
+C<<< markup.render.hardwrap >>> property, which is C<<< true >>> by default
 
 =item * C<<< htmlEscape >>> - boolean, default: none
 
 (Optional) true if HTML should be escaped in the input markup, false otherwise.
-If not specified, {@link MarkupService} will user the value of the
-C<<< markup.render.html.escape >>> which is C<<< true >>> by default
+If not specified, {@link MarkupService} will use the value of the
+C<<< markup.render.html.escape >>> property, which is C<<< true >>> by default
 
 =back
 
@@ -8473,43 +8474,6 @@ The specified repository does not exist.
 
 =back
 
-=head2 delete_repository_hook
-
-Delete repository hook configuration for the supplied B<<< hookKey >>> and B<<< repositorySlug >>>
-
-The authenticated user must have B<<< REPO_ADMIN >>> permission for the specified repository to call this
-resource.
-
-    DELETE api/1.0/projects/{projectKey}/repos/{repositorySlug}/settings/hooks/{hookKey}
-
-Parameters:
-
-=over 4
-
-=item * C<<< hookKey >>> - string, default: none
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user has insufficient permissions
-to delete the hook.
-
-=item * C<<< 204 >>> - data, type: unknown
-
-The hook configuration matching the supplied B<<< hookKey >>> and
-B<<< repositorySlug >>> was deleted
-
-=item * C<<< 404 >>> - errors, type: application/json
-
-The specified repository or hook does not exist.
-
-=back
-
 =head2 get_repository_hook
 
 Retrieve a repository hook for this repository.
@@ -8545,6 +8509,43 @@ to retrieve the hook.
 
 The specified repository hook does not exist for the given repository, or the
 repository does not exist.
+
+=back
+
+=head2 delete_repository_hook
+
+Delete repository hook configuration for the supplied B<<< hookKey >>> and B<<< repositorySlug >>>
+
+The authenticated user must have B<<< REPO_ADMIN >>> permission for the specified repository to call this
+resource.
+
+    DELETE api/1.0/projects/{projectKey}/repos/{repositorySlug}/settings/hooks/{hookKey}
+
+Parameters:
+
+=over 4
+
+=item * C<<< hookKey >>> - string, default: none
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user has insufficient permissions
+to delete the hook.
+
+=item * C<<< 204 >>> - data, type: unknown
+
+The hook configuration matching the supplied B<<< hookKey >>> and
+B<<< repositorySlug >>> was deleted
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+The specified repository or hook does not exist.
 
 =back
 
@@ -8631,6 +8632,42 @@ The specified repository or hook does not exist.
 
 =back
 
+=head2 get_repository_hook_settings
+
+Retrieve the settings for a repository hook for this repository.
+
+The authenticated user must have B<<< REPO_READ >>> permission for the specified repository to call this
+resource.
+
+    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}/settings/hooks/{hookKey}/settings
+
+Parameters:
+
+=over 4
+
+=item * C<<< hookKey >>> - string, default: none
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - data, type: application/json
+
+The settings for the hook.
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user has insufficient permissions
+to retrieve the hook settings.
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+The specified repository or hook does not exist.
+
+=back
+
 =head2 set_repository_hook_settings
 
 Modify the settings for a repository hook for this repository.
@@ -8673,108 +8710,6 @@ to modify the hook settings.
 =item * C<<< 404 >>> - errors, type: application/json
 
 The specified repository or hook does not exist.
-
-=back
-
-=head2 get_repository_hook_settings
-
-Retrieve the settings for a repository hook for this repository.
-
-The authenticated user must have B<<< REPO_READ >>> permission for the specified repository to call this
-resource.
-
-    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}/settings/hooks/{hookKey}/settings
-
-Parameters:
-
-=over 4
-
-=item * C<<< hookKey >>> - string, default: none
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - data, type: application/json
-
-The settings for the hook.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user has insufficient permissions
-to retrieve the hook settings.
-
-=item * C<<< 404 >>> - errors, type: application/json
-
-The specified repository or hook does not exist.
-
-=back
-
-=head2 get_repository_pull_request_settings
-
-Retrieve the pull request settings for the context repository.
-
-The authenticated user must have B<<< REPO_READ >>> permission for the context repository to call this
-resource.
-
-This resource will call all RestFragments that are registered with the key
-B<<< bitbucket.repository.settings.pullRequests >>>. If any fragment fails validations by returning a
-non-empty Map of errors, then no fragments will execute.
-
-The property keys for the settings that are bundled with the application are
-
-=over 4
-
-=item *
-
-mergeConfig - the merge strategy configuration for pull requests
-
-=item *
-
-requiredApprovers - (Deprecated, please use com.atlassian.bitbucket.server.bundled-hooks.requiredApproversMergeHook instead) the number of approvals required on a pull request for it to be mergeable, or 0 if the merge check is disabled
-
-=item *
-
-com.atlassian.bitbucket.server.bundled-hooks.requiredApproversMergeHook - the merge check configuration for required approvers
-
-=item *
-
-requiredAllApprovers - whether or not all approvers must approve a pull request for it to be mergeable
-
-=item *
-
-requiredAllTasksComplete - whether or not all tasks on a pull request need to be completed for it to be mergeable
-
-=item *
-
-requiredSuccessfulBuilds - (Deprecated, please use com.atlassian.bitbucket.server.bitbucket-build.requiredBuildsMergeCheck instead) the number of successful builds on a pull request for it to be mergeable, or 0 if the merge check is disabled
-
-=item *
-
-com.atlassian.bitbucket.server.bitbucket-build.requiredBuildsMergeCheck - the merge check configuration for required builds
-
-=back
-
-    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}/settings/pull-requests
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - data, type: application/json
-
-The repository pull request settings for the context repository.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user has insufficient permissions to see the
-specified repository.
-
-=item * C<<< 404 >>> - errors, type: application/json
-
-The specified repository does not exist.
 
 =back
 
@@ -8877,27 +8812,65 @@ The specified repository does not exist.
 
 =back
 
-=head2 create_tag
+=head2 get_repository_pull_request_settings
 
-Creates a tag using the information provided in the request
+Retrieve the pull request settings for the context repository.
 
-The authenticated user must have B<<< REPO_WRITE >>> permission for the context repository to call this
+The authenticated user must have B<<< REPO_READ >>> permission for the context repository to call this
 resource.
 
-    POST api/1.0/projects/{projectKey}/repos/{repositorySlug}/tags
+This resource will call all RestFragments that are registered with the key
+B<<< bitbucket.repository.settings.pullRequests >>>. If any fragment fails validations by returning a
+non-empty Map of errors, then no fragments will execute.
+
+The property keys for the settings that are bundled with the application are
+
+=over 4
+
+=item *
+
+mergeConfig - the merge strategy configuration for pull requests
+
+=item *
+
+requiredApprovers - (Deprecated, please use com.atlassian.bitbucket.server.bundled-hooks.requiredApproversMergeHook instead) the number of approvals required on a pull request for it to be mergeable, or 0 if the merge check is disabled
+
+=item *
+
+com.atlassian.bitbucket.server.bundled-hooks.requiredApproversMergeHook - the merge check configuration for required approvers
+
+=item *
+
+requiredAllApprovers - whether or not all approvers must approve a pull request for it to be mergeable
+
+=item *
+
+requiredAllTasksComplete - whether or not all tasks on a pull request need to be completed for it to be mergeable
+
+=item *
+
+requiredSuccessfulBuilds - (Deprecated, please use com.atlassian.bitbucket.server.bitbucket-build.requiredBuildsMergeCheck instead) the number of successful builds on a pull request for it to be mergeable, or 0 if the merge check is disabled
+
+=item *
+
+com.atlassian.bitbucket.server.bitbucket-build.requiredBuildsMergeCheck - the merge check configuration for required builds
+
+=back
+
+    GET api/1.0/projects/{projectKey}/repos/{repositorySlug}/settings/pull-requests
 
 Responses:
 
 =over 4
 
-=item * C<<< 200 >>> - tag, type: application/json
+=item * C<<< 200 >>> - data, type: application/json
 
-The created tag
+The repository pull request settings for the context repository.
 
 =item * C<<< 401 >>> - errors, type: application/json
 
-The currently authenticated user has insufficient permissions to write to the
-repository.
+The currently authenticated user has insufficient permissions to see the
+specified repository.
 
 =item * C<<< 404 >>> - errors, type: application/json
 
@@ -8947,6 +8920,34 @@ The specified repository does not exist.
 
 =back
 
+=head2 create_tag
+
+Creates a tag using the information provided in the request
+
+The authenticated user must have B<<< REPO_WRITE >>> permission for the context repository to call this
+resource.
+
+    POST api/1.0/projects/{projectKey}/repos/{repositorySlug}/tags
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - tag, type: application/json
+
+The created tag
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user has insufficient permissions to write to the
+repository.
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+The specified repository does not exist.
+
+=back
+
 =head2 get_tag
 
 Retrieve a tag in the specified repository.
@@ -8982,6 +8983,60 @@ repository.
 =item * C<<< 404 >>> - errors, type: application/json
 
 The specified tag does not exist.
+
+=back
+
+=head2 watch_repository
+
+Add the authenticated user as a watcher for the specified repository.
+
+The authenticated user must have B<<< REPO_READ >>> permission for the repository to call this resource.
+
+    POST api/1.0/projects/{projectKey}/repos/{repositorySlug}/watch
+
+Responses:
+
+=over 4
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user has insufficient permissions to view the
+repository.
+
+=item * C<<< 204 >>> - data, type: unknown
+
+The user is now watching the repository.
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+The specified repository does not exist.
+
+=back
+
+=head2 unwatch_repository
+
+Remove the authenticated user as a watcher for the specified repository.
+
+The authenticated user must have B<<< REPO_READ >>> permission for the repository to call this resource.
+
+    DELETE api/1.0/projects/{projectKey}/repos/{repositorySlug}/watch
+
+Responses:
+
+=over 4
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user has insufficient permissions to view the
+repository.
+
+=item * C<<< 204 >>> - data, type: unknown
+
+The user is no longer watching the repository.
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+The specified repository does not exist.
 
 =back
 
@@ -9496,6 +9551,42 @@ The specified project or hook does not exist.
 
 =back
 
+=head2 get_repository_hook_settings_for_project
+
+Retrieve the settings for a repository hook for this project.
+
+The authenticated user must have B<<< PROJECT_READ >>> permission for the specified project to call this
+resource.
+
+    GET api/1.0/projects/{projectKey}/settings/hooks/{hookKey}/settings
+
+Parameters:
+
+=over 4
+
+=item * C<<< hookKey >>> - string, default: none
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - data, type: application/json
+
+The settings for the hook.
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user has insufficient permissions
+to retrieve the hook settings.
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+The specified project or hook does not exist.
+
+=back
+
 =head2 set_repository_hook_settings_for_project
 
 Modify the settings for a repository hook for this project.
@@ -9538,80 +9629,6 @@ to modify the hook settings.
 =item * C<<< 404 >>> - errors, type: application/json
 
 The specified project or hook does not exist.
-
-=back
-
-=head2 get_repository_hook_settings_for_project
-
-Retrieve the settings for a repository hook for this project.
-
-The authenticated user must have B<<< PROJECT_READ >>> permission for the specified project to call this
-resource.
-
-    GET api/1.0/projects/{projectKey}/settings/hooks/{hookKey}/settings
-
-Parameters:
-
-=over 4
-
-=item * C<<< hookKey >>> - string, default: none
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - data, type: application/json
-
-The settings for the hook.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user has insufficient permissions
-to retrieve the hook settings.
-
-=item * C<<< 404 >>> - errors, type: application/json
-
-The specified project or hook does not exist.
-
-=back
-
-=head2 get_project_pull_request_settings
-
-Retrieve the merge strategy configuration for this project and SCM.
-
-The authenticated user must have B<<< PROJECT_READ >>> permission for the context repository to call this
-resource.
-
-    GET api/1.0/projects/{projectKey}/settings/pull-requests/{scmId}
-
-Parameters:
-
-=over 4
-
-=item * C<<< scmId >>> - string, default: none
-
-the SCM to get strategies for
-
-=back
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - page, type: application/json
-
-The merge configuration of the request project.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user has insufficient permissions to see the
-request repository.
-
-=item * C<<< 404 >>> - errors, type: application/json
-
-The request repository does not exist.
 
 =back
 
@@ -9666,6 +9683,44 @@ specified repository.
 =item * C<<< 404 >>> - errors, type: application/json
 
 The specified repository does not exist.
+
+=back
+
+=head2 get_project_pull_request_settings
+
+Retrieve the merge strategy configuration for this project and SCM.
+
+The authenticated user must have B<<< PROJECT_READ >>> permission for the context repository to call this
+resource.
+
+    GET api/1.0/projects/{projectKey}/settings/pull-requests/{scmId}
+
+Parameters:
+
+=over 4
+
+=item * C<<< scmId >>> - string, default: none
+
+the SCM to get strategies for
+
+=back
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - page, type: application/json
+
+The merge configuration of the request project.
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user has insufficient permissions to see the
+request repository.
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+The request repository does not exist.
 
 =back
 
@@ -9756,18 +9811,11 @@ If the anchor of the task (such as a pull request comment) does not exist or is 
 
 =back
 
-=head2 update_task
+=head2 get_task
 
-Update a existing task.
+Retrieve a existing task.
 
-As of Stash 3.3, only the state and text of a task can be updated.
-
-Updating the state of a task is allowed for any user having I<<< READ >>> access to the repository.
-However only the task's creator, the context's author or an admin of the context's repository can update the
-task's text. (For a pull request task, those are the task's creator, the pull request's author or an admin on the
-repository containing the pull request). Additionally the task's text cannot be updated if it has been resolved.
-
-    PUT api/1.0/tasks/{taskId}
+    GET api/1.0/tasks/{taskId}
 
 Parameters:
 
@@ -9785,19 +9833,11 @@ Responses:
 
 =item * C<<< 200 >>> - task, type: application/json
 
-A copy of the task if it was successfully updated.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-If the current user does not have the permission to update the task
+A copy of the task.
 
 =item * C<<< 404 >>> - errors, type: application/json
 
 If the task does not exist
-
-=item * C<<< 409 >>> - errors, type: application/json
-
-If the task to update is in the resolved state
 
 =back
 
@@ -9843,11 +9883,18 @@ If the task to delete is in the resolved state
 
 =back
 
-=head2 get_task
+=head2 update_task
 
-Retrieve a existing task.
+Update a existing task.
 
-    GET api/1.0/tasks/{taskId}
+As of Stash 3.3, only the state and text of a task can be updated.
+
+Updating the state of a task is allowed for any user having I<<< READ >>> access to the repository.
+However only the task's creator, the context's author or an admin of the context's repository can update the
+task's text. (For a pull request task, those are the task's creator, the pull request's author or an admin on the
+repository containing the pull request). Additionally the task's text cannot be updated if it has been resolved.
+
+    PUT api/1.0/tasks/{taskId}
 
 Parameters:
 
@@ -9865,36 +9912,19 @@ Responses:
 
 =item * C<<< 200 >>> - task, type: application/json
 
-A copy of the task.
+A copy of the task if it was successfully updated.
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+If the current user does not have the permission to update the task
 
 =item * C<<< 404 >>> - errors, type: application/json
 
 If the task does not exist
 
-=back
+=item * C<<< 409 >>> - errors, type: application/json
 
-=head2 update_current_user
-
-Update the currently authenticated user's details. The update will always be applied to the currently
-authenticated user.
-
-    PUT api/1.0/users
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - detailedUser, type: application/json
-
-The updated user.
-
-=item * C<<< 400 >>> - errors, type: application/json
-
-The request was malformed.
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-Authentication failed or was not attempted.
+If the task to update is in the resolved state
 
 =back
 
@@ -10039,6 +10069,31 @@ Authentication failed or was not attempted.
 
 =back
 
+=head2 update_current_user
+
+Update the currently authenticated user's details. The update will always be applied to the currently
+authenticated user.
+
+    PUT api/1.0/users
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - detailedUser, type: application/json
+
+The updated user.
+
+=item * C<<< 400 >>> - errors, type: application/json
+
+The request was malformed.
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+Authentication failed or was not attempted.
+
+=back
+
 =head2 update_current_user_password
 
 Update the currently authenticated user's password.
@@ -10088,6 +10143,34 @@ The specified user does not exist.
 
 =back
 
+=head2 delete_user_avatar
+
+Delete the avatar associated to a user.
+
+Users are always allowed to delete their own avatar. To delete someone else's avatar the authenticated user must
+have global B<<< ADMIN >>> permission, or global B<<< SYS_ADMIN >>> permission to update a
+B<<< SYS_ADMIN >>> user's avatar.
+
+    DELETE api/1.0/users/{userSlug}/avatar.png
+
+Responses:
+
+=over 4
+
+=item * C<<< 200 >>> - href, type: application/json
+
+The new avatar URL if the local avatar was successfully deleted or did not exist
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The authenticated user has insufficient permissions to delete the specified avatar.
+
+=item * C<<< 404 >>> - errors, type: application/json
+
+The specified user does not exist.
+
+=back
+
 =head2 upload_user_avatar
 
 Update the avatar for the user with the supplied B<<< slug >>>.
@@ -10124,34 +10207,6 @@ The avatar was uploaded successfully.
 
 The currently authenticated user has insufficient permissions to update the
 avatar.
-
-=item * C<<< 404 >>> - errors, type: application/json
-
-The specified user does not exist.
-
-=back
-
-=head2 delete_user_avatar
-
-Delete the avatar associated to a user.
-
-Users are always allowed to delete their own avatar. To delete someone else's avatar the authenticated user must
-have global B<<< ADMIN >>> permission, or global B<<< SYS_ADMIN >>> permission to update a
-B<<< SYS_ADMIN >>> user's avatar.
-
-    DELETE api/1.0/users/{userSlug}/avatar.png
-
-Responses:
-
-=over 4
-
-=item * C<<< 200 >>> - href, type: application/json
-
-The new avatar URL if the local avatar was successfully deleted or did not exist
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The authenticated user has insufficient permissions to delete the specified avatar.
 
 =item * C<<< 404 >>> - errors, type: application/json
 
@@ -10224,7 +10279,7 @@ Charles McGarvey <chazmcgarvey@brokenzipper.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Charles McGarvey.
+This software is copyright (c) 2018 by Charles McGarvey.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

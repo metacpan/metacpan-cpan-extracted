@@ -1,6 +1,6 @@
 package Twitter::API::Trait::RetryOnError;
 # ABSTRACT: Automatically retry API calls on error
-$Twitter::API::Trait::RetryOnError::VERSION = '1.0001';
+$Twitter::API::Trait::RetryOnError::VERSION = '1.0002';
 use Moo::Role;
 use Time::HiRes;
 use namespace::clean;
@@ -92,7 +92,7 @@ around send_request => sub {
         # If this is an OAuth request, we need a new Authorization header
         # (the nonce may be invalid, now).
         if ( $is_oauth ) {
-            $msg->header(authorization => $self->add_authorization($c));
+            $self->add_authorization($c);
         }
     }
 
@@ -113,7 +113,7 @@ Twitter::API::Trait::RetryOnError - Automatically retry API calls on error
 
 =head1 VERSION
 
-version 1.0001
+version 1.0002
 
 =head1 SYNOPSIS
 

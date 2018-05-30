@@ -4,10 +4,9 @@ use strict;
 use warnings;
 no warnings;
 
-use subs qw();
-use vars qw($VERSION);
+our $VERSION = '0.121';
 
-$VERSION = '0.12';
+=encoding utf8
 
 =head1 NAME
 
@@ -29,7 +28,7 @@ Use with C<survey> from L<Surveyor::App>:
 
 sub set_up {
 	my( $self, @args ) = @_;
-	
+
 	my $glob = $args[0];
 	@L::files = glob $glob;
 	print "Testing with " . @L::files . " files\n";
@@ -52,7 +51,7 @@ sub set_up {
 		schwartz_orig_assign => eval "sub { my \@r = $transform, glob \$glob }",
 		schwartz_mod         => eval "sub { my \@r = $transform, \@L::files }",
 	};
-	
+
 	foreach my $key ( keys %$code ) {
 		no strict 'refs';
 		*{"bench_$key"} = $code->{$key};
@@ -93,9 +92,9 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2013, brian d foy, All Rights Reserved.
+Copyright © 2013-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+You may redistribute this under the terms as Artistic License 2.0.
 
 =cut
 

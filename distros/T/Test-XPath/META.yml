@@ -1,34 +1,27 @@
 ---
 abstract: 'Test XML and HTML content and structure with XPath expressions'
 author:
-  - 'David E. Wheeler <david@kineticode.com>'
+  - 'David E. Wheeler <dwheeler@cpan.org>'
 build_requires:
-  Module::Build: 0.30
-  Test::More: 0.70
+  Test::More: '0.70'
 configure_requires:
-  Module::Build: 0.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Test-XPath
-provides:
-  Test::XPath:
-    file: lib/Test/XPath.pm
-    version: 0.16
-recommends:
-  HTML::Selector::XPath: 0.06
-  Test::Pod: 1.41
-  Test::Pod::Coverage: 1.06
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Test::Builder: 0.70
-  XML::LibXML: 1.70
-  perl: 5.006002
+  Test::Builder: '0.70'
+  XML::LibXML: '1.70'
+  perl: '5.006'
 resources:
-  bugtracker: http://github.com/theory/test-xpath/issues/
-  homepage: http://search.cpan.org/dist/Test-XPath/
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/theory/test-xpath/tree/
-version: 0.16
+  repository: https://github.com/manwar/Test-XPath.git
+version: '0.19'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

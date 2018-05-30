@@ -1,5 +1,12 @@
 package TaskPipe;
 
+use strict;
+use warnings;
+
+our $VERSION = 0.05;
+
+1;
+
 =head1 NAME
 
 TaskPipe - A task management framework for building web scrapers and crawlers
@@ -25,5 +32,3 @@ Copyright (c) Tom Gracey 2018
 TaskPipe is free software, licensed under
 
     The GNU Public License Version 3
-
-1;

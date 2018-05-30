@@ -3,63 +3,52 @@
    "author" : [
       "Jeff Ober <sysread@fastmail.fm>"
    ],
-   "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "URI-Fast",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.63_03"
+         }
+      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "develop" : {
-         "requires" : {
-            "Test::Pod" : "1.41"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
             "Exporter" : "0",
-            "Inline" : "0.80",
-            "Inline::C" : "0.78",
             "parent" : "0",
             "perl" : "5.010"
          }
       },
       "test" : {
-         "recommends" : {
-            "CPAN::Meta" : "2.120900"
-         },
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "File::Spec" : "0",
+            "ExtUtils::testlib" : "0",
             "Test2" : "1.302125",
             "Test2::Suite" : "0.000100",
             "Test2::V0" : "0",
             "Test::LeakTrace" : "0.16",
-            "Test::More" : "0",
             "Test::Pod" : "1.41",
             "URI::Encode::XS" : "0.11",
             "URI::Split" : "0"
          }
-      }
-   },
-   "provides" : {
-      "URI::Fast" : {
-         "file" : "lib/URI/Fast.pm",
-         "version" : "0.23"
-      },
-      "URI::Fast::IRI" : {
-         "file" : "lib/URI/Fast.pm",
-         "version" : "0.23"
       }
    },
    "release_status" : "stable",
@@ -74,7 +63,6 @@
          "web" : "https://github.com/sysread/URI-Fast"
       }
    },
-   "version" : "0.23",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "version" : "0.27",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }
-

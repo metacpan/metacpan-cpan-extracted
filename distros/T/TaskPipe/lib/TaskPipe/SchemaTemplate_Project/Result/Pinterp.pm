@@ -16,9 +16,7 @@ __PACKAGE__->add_columns(
   "pinterp_md5",
   { data_type => "varchar", is_nullable => 1, size => 255 },
   "pinterp_dd",
-  { data_type => "text", is_nullable => 1 },
-  "status",
-  { data_type => "varchar", is_nullable => 1, size => 255 },
+  { data_type => "text", is_nullable => 1 }
 );
 
 __PACKAGE__->set_primary_key("id");

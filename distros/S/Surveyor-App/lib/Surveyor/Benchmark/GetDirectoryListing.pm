@@ -2,10 +2,9 @@ package Surveyor::Benchmark::GetDirectoryListing;
 use strict;
 use warnings;
 
-use subs qw();
-use vars qw($VERSION);
+our $VERSION = '0.121';
 
-$VERSION = '0.12';
+=encoding utf8
 
 =head1 NAME
 
@@ -55,7 +54,7 @@ sub tear_down { 1 }
 =cut
 
 sub bench_opendir {
-	opendir my( $dh ), "."; 
+	opendir my( $dh ), ".";
 	my @f = readdir( $dh );
 	}
 
@@ -91,8 +90,8 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2013, brian d foy, All Rights Reserved.
+Copyright © 2013-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+You may redistribute this under the terms of the Artistic License 2.0.
 
 =cut

@@ -1,10 +1,11 @@
 package SMS::Send::NANP::TextPower;
 use strict;
 use warnings;
-use base qw{SMS::Send::Driver::WebService};
+use SMS::Send::Driver::WebService 0.06; #uat function, keep_alive=0
+use parent qw{SMS::Send::Driver::WebService};
 use XML::Simple qw{XMLin};
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
@@ -82,9 +83,9 @@ sub send_sms {
              );
   push @form, Queue => 'y' if $self->queue;
   my $url           = $self->url;
-  my $response      = $self->ua->post($url, \@form);
-  die(sprintf("HTTP Error: %s", $response->status_line)) unless $response->is_success;
-  my $content       = $response->decoded_content;
+  my $response      = $self->uat->post_form($url, \@form); #isa HASH from HTTP::Tiny
+  die(sprintf("HTTP Error: %s %s", $response->{'status'}, $response->{'reason'})) unless $response->{'success'};
+  my $content       = $response->{'content'};
   my $data          = XMLin($content);
   $self->{"__data"} = $data;
   my $status        = $data->{"MessageStatus"}->{"SendResult"}->{"Status"} || '';
@@ -147,13 +148,14 @@ sub _queue_default {""};
 
 Sets and returns the url for the web service.
 
-Default: http://www.textpower.com/TPIServices/Sender.aspx
+Default: https://secure.textpower.com/TPIServices/Sender.aspx
+Old Default: http://www.textpower.com/TPIServices/Sender.aspx
 
 =cut
 
 #see SMS::Send::Driver::WebService->url
 
-sub _url_default {'http://www.textpower.com/TPIServices/Sender.aspx'};
+sub _url_default {'https://secure.textpower.com/TPIServices/Sender.aspx'};
 
 =head1 BUGS
 

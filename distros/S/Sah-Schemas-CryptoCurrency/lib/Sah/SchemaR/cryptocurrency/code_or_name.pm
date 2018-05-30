@@ -1,9 +1,9 @@
 package Sah::SchemaR::cryptocurrency::code_or_name;
 
-our $DATE = '2018-04-06'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-05-29'; # DATE
+our $VERSION = '0.006'; # VERSION
 
-our $rschema = ["str",[{summary=>"Cryptocurrency code or name","x.completion"=>"cryptocurrency_code_or_name"}],["str"]];
+our $rschema = ["str",[{description=>"\nCryptocurrency code or name that is listed in <pm:CryptoCurrency::Catalog>, e.g.\nBTC, \"Bitcoin Cash\", eth.\n\n",summary=>"Cryptocurrency code or name","x.completion"=>"cryptocurrency_code_or_name"}],["str"]];
 
 1;
 # ABSTRACT: Cryptocurrency code or name
@@ -20,7 +20,7 @@ Sah::SchemaR::cryptocurrency::code_or_name - Cryptocurrency code or name
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::SchemaR::cryptocurrency::code_or_name (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-04-06.
+This document describes version 0.006 of Sah::SchemaR::cryptocurrency::code_or_name (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-05-29.
 
 =head1 DESCRIPTION
 

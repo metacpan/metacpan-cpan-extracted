@@ -8,10 +8,6 @@
 struct SPVM_basic_type;
 typedef struct SPVM_basic_type SPVM_BASIC_TYPE;
 
-// spvm_call_stack_info.h
-struct SPVM_call_stack_info;
-typedef struct SPVM_call_stack_info SPVM_CALL_STACK_INFO;
-
 // spvm_opcode_array.h
 struct SPVM_opcode_array;
 typedef struct SPVM_opcode_array SPVM_OPCODE_ARRAY;
@@ -45,8 +41,8 @@ struct SPVM_sub_check_info;
 typedef struct SPVM_sub_check_info SPVM_SUB_CHECK_INFO;
 
 // spvm_object.h
-struct SPVM_object;
-typedef struct SPVM_object SPVM_OBJECT;
+struct SPVM_VALUE_object;
+typedef struct SPVM_VALUE_object SPVM_OBJECT;
 
 // spvm_block.h
 struct SPVM_block;
@@ -55,10 +51,6 @@ typedef struct SPVM_block SPVM_BLOCK;
 // spvm_use.h
 struct SPVM_use;
 typedef struct SPVM_use SPVM_USE;
-
-// spvm_value.h
-union SPVM_value;
-typedef union SPVM_value SPVM_VALUE;
 
 // spvm_runtime.h
 struct SPVM_runtime;

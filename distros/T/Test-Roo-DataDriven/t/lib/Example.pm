@@ -1,7 +1,5 @@
 package Example;
 
-use feature qw/ state /;
-
 use Test::Roo::Role;
 
 use Class::Inspector;
@@ -38,20 +36,20 @@ test 'epoch' => sub {
     ok $self->epoch < time(), 'evaluated time';
 };
 
+my $Counter = 0;
+
+my $Package;
+
 test 'sandbox' => sub {
     my ($self) = @_;
 
-    state $counter = 0;
-
-    state $package;
-
-    note 'index = ' . ($self->index // 'undef');
+    note 'index = ' . (defined $self->index ? $self->index : 'undef');
 
     unless ( $self->index && $self->index > 1 ) {
-        $package = "Test::Roo::DataDriven::Sandbox" . $counter++;
+        $Package = "Test::Roo::DataDriven::Sandbox" . $Counter++;
     }
 
-    ok !Class::Inspector->loaded($package), "$package namespace clean";
+    ok !Class::Inspector->loaded($Package), "$Package namespace clean";
 
 };
 

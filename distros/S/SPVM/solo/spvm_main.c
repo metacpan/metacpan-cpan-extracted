@@ -17,11 +17,9 @@
 #include "spvm_runtime_api.h"
 #include "spvm_opcode_builder.h"
 #include "spvm_jitcode_builder.h"
+#include "spvm_core_func.h"
 
-#include "lib_native/SPVM/Std/IO.native/IO.c"
-#include "lib_native/SPVM/Std/Time.native/Time.c"
-
-#include <spvm_api.h>
+#include <spvm_native.h>
 
 int main(int argc, char *argv[])
 {
@@ -42,9 +40,9 @@ int main(int argc, char *argv[])
   // compiler->debug = 1;
   
   // Create use op for entry point package
-  SPVM_OP* op_name_start = SPVM_OP_new_op_name(compiler, start_package_name, "Std", 0);
+  SPVM_OP* op_name_start = SPVM_OP_new_op_name(compiler, start_package_name, start_package_name, 0);
   SPVM_OP* op_type_start = SPVM_OP_build_basic_type(compiler, op_name_start);
-  SPVM_OP* op_use_start = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_USE, "Std", 0);
+  SPVM_OP* op_use_start = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_USE, start_package_name, 0);
   SPVM_OP_build_use(compiler, op_use_start, op_type_start);
   SPVM_LIST_push(compiler->op_use_stack, op_use_start);
   
@@ -74,33 +72,9 @@ int main(int argc, char *argv[])
     SPVM_DUMPER_dump_all(compiler);
 #endif
   
-  // Bind native subroutine
-  {
-    int32_t i;
-    for (i = 0; i < compiler->op_subs->length; i++) {
-      SPVM_OP* op_sub = SPVM_LIST_fetch(compiler->op_subs, i);
-      SPVM_SUB* sub = op_sub->uv.sub;
-      
-      if (sub->is_native) {
-        // Sub abs name
-        const char* sub_abs_name = sub->abs_name;
-        
-        if (strcmp(sub_abs_name, "Std::IO::print") == 0) {
-          sub->native_address = SPVM__Std__IO__print;
-        }
-        else if (strcmp(sub_abs_name, "Std::IO::warn") == 0) {
-          sub->native_address = SPVM__Std__IO__warn;
-        }
-        else if (strcmp(sub_abs_name, "Std::Time::time") == 0) {
-          sub->native_address = SPVM__Std__Time__time;
-        }
-      }
-    }
-  }
-  
   // Create run-time
   SPVM_RUNTIME* runtime = SPVM_COMPILER_new_runtime(compiler);
-  SPVM_API* api = runtime->api;
+  SPVM_ENV* env = runtime->env;
 
   // Entry point subroutine address
   SPVM_OP* op_sub_start;
@@ -120,21 +94,21 @@ int main(int argc, char *argv[])
     exit(EXIT_FAILURE);
   }
 
-  SPVM_API_VALUE args[1];
-  args[0].int_value = 2;
+  SPVM_VALUE args[1];
+  args[0].ival = 2;
   
   // Run
-  int32_t return_value = api->call_int_sub(api, sub_id, args);
+  int32_t return_value = env->call_int_sub(env, sub_id, args);
   
   if (runtime->exception) {
-    SPVM_RUNTIME_API_print(api, runtime->exception);
+    SPVM_RUNTIME_API_print(env, runtime->exception);
     printf("\n");
   }
   else {
     printf("TEST return_value: %" PRId32 "\n", return_value);
   }
   
-  SPVM_RUNTIME_API_free_runtime(api, runtime);
+  SPVM_RUNTIME_API_free_runtime(env, runtime);
   
   return 0;
 }

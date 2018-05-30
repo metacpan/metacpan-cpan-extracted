@@ -8,6 +8,7 @@ use TaskPipe::JobManager::Settings;
 use Log::Log4perl;
 use DateTime;
 use Try::Tiny;
+use File::Path 'rmtree';
 
 #has job_id => (is => 'rw', isa => 'Int');
 
@@ -123,6 +124,9 @@ sub stop_spawned {
     while( my $spawned = $spawned_rs->next ){
 
         kill 'KILL', $spawned->pid;
+        if ( $spawned->temp_dir ){
+            rmtree( $spawned->temp_dir );
+        }
         $spawned->delete;
 
     }

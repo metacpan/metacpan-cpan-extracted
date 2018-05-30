@@ -1,4 +1,4 @@
 name = "Web-Mention"
-# badges = ["travis"]
+badges = ["travis"]
 module_maker="ModuleBuildTiny"
 

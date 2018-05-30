@@ -1,0 +1,5 @@
+package CORE {
+  native sub print : void ($value : string);
+  native sub warn : void ($value : string);
+  native sub time : long ();
+}

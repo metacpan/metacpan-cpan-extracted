@@ -56,6 +56,8 @@ A list of test data should be supplied within the task module itself by providin
 
 There are 3 words that are important when discussing the data going into a task. Those words are:
 
+=over
+
 =item 1. input(s)
 
 The inputs are the raw data which the task is provided with. When running a plan, this is the data which is provided by the previous task. To give an example, let's say a previous task provides our task C<Scrape_Example> with this set of data:
@@ -110,6 +112,8 @@ In fact C<inputs> and C<pinterp> can be really very different, because we can sp
 These parameters are telling TaskPipe to take the url from the output named C<url> of the I<previous> task, but take the C<Referer> from the output named C<url> of the task previous to the previous task (2 tasks ago). 
 
 Specifying the C<url> and C<Referer> header like this is a common situation, because this mirrors how web pages progress when a human is clicking around in a web browser: the C<Referer> is always the previous url to the one you are visiting.
+
+=back
 
 =head2 Including test data in your Task module
 
@@ -185,6 +189,8 @@ has name => (is => 'rw', isa => 'Str');
 =item test
 
 The name or index of the test to run. (Specify test_pinterp as a 'HashRef[HashRef]' to use names, or 'ArrayRef[HashRef]' to use indices.
+
+=back
 
 =cut
 

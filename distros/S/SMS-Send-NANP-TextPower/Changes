@@ -1,5 +1,14 @@
 Revision history for Perl module SMS::Send::NANP::TextPower
 
+0.06 2017-10-18
+  - Updated requirement for SMS::Send::Driver::WebService => 0.06 to remove keep_alive
+
+0.05 2017-10-17
+  - Updated HTTP user agent to HTTP::Tiny
+
+0.04 2017-05-08
+  - Default URL is HTTPS instead of HTTP
+
 0.03 2015-12-02
   - Moved SMS::Send::TextPower to SMS::Send::NANP::TextPower to be compliant with the SMS::Send Local/International phone number business rules.
 

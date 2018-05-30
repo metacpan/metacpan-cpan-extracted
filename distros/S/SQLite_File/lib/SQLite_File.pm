@@ -155,7 +155,7 @@ package SQLite_File;
 use base qw/Tie::Hash Tie::Array Exporter/;
 use strict;
 use warnings;
-our $VERSION = '0.1004';
+our $VERSION = '0.1005';
 
 use vars qw( $AUTOLOAD ) ;
 
@@ -351,7 +351,8 @@ END
 	    last;
 	};
 	$_ eq 'HASH' && do {
-	    $self->dbh->do("CREATE TABLE IF NOT EXISTS hash ".$hash_tbl->());
+	  $self->dbh->do("CREATE TABLE IF NOT EXISTS hash ".$hash_tbl->());
+	  $self->dbh->do($create_idx);
 	    last;
 	};
 	$_ eq 'RECNO' && do {

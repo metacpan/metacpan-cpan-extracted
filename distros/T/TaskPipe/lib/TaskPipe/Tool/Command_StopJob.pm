@@ -64,6 +64,8 @@ Using C<stop job> rather than manually killing processes is recommended where po
 
 The ID of the job you want to stop. To find the C<job_id>, use C<show jobs>.
 
+=back
+
 =cut
 
 has job_id => (is => 'ro', isa => 'Str');

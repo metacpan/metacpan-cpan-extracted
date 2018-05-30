@@ -1,24 +1,12 @@
 package XML::Grammar::Fortune::Synd;
-
+$XML::Grammar::Fortune::Synd::VERSION = '0.0212';
 use warnings;
 use strict;
 
 use 5.008;
 
-=head1 NAME
 
-XML::Grammar::Fortune::Synd - Provides syndication for a set of
-XML-Grammar-Fortune files.
-
-=head1 VERSION
-
-Version 0.0211
-
-=cut
-
-our $VERSION = '0.0211';
-
-use base 'Class::Accessor';
+use parent 'Class::Accessor';
 
 use YAML::XS (qw( DumpFile LoadFile ));
 use Heap::Elem::Ref (qw(RefElem));
@@ -39,20 +27,6 @@ __PACKAGE__->mk_accessors(qw(
         _file_processors
     ));
 
-=head1 SYNOPSIS
-
-    use XML::Grammar::Fortune::Synd;
-
-    my $syndicator = XML::Grammar::Fortune::Synd->new();
-    ...
-
-=head1 FUNCTIONS
-
-=head2 my $syndicator = $class->new(\%args)
-
-Returns the new Syndicator.
-
-=cut
 
 sub new
 {
@@ -68,37 +42,6 @@ sub new
     return $self;
 }
 
-=head2 $syndicator->calc_feeds(\%args)
-
-C<\%args> should be:
-
-    {
-        yaml_persistence_file => "/path/to/yaml-persistence.yaml",
-        yaml_persistence_file_out => "/path/to/yaml-persistence.yaml",
-        xml_dirs => "/path/to/the/directory-containing-xmls",
-        feed_params =>
-        {
-            title => "My feed title",
-            link => "http://mysite.tld/",
-            tagline => "Feed tagline",
-            author => "john.doe@hello.tld (John Doe)"
-            atom_self_link => "http://mysite.tld/my-feed.atom",
-            rss_self_link => "http://mysite.tld/my-feed.rss",
-        }
-    }
-
-Returns:
-
-    {
-        recent-ids => \@list_of_recent_ids,
-        feeds =>
-        {
-            Atom => $atom_XML_Feed_obj,
-            rss20 => $rss_XML_Feed_obj,
-        },
-    }
-
-=cut
 
 sub calc_feeds
 {
@@ -351,6 +294,71 @@ sub calc_feeds
 }
 
 
+
+1; # End of XML::Grammar::Fortune::Synd
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+XML::Grammar::Fortune::Synd - Provides syndication for a set of
+XML-Grammar-Fortune files.
+
+=head1 VERSION
+
+version 0.0212
+
+=head1 SYNOPSIS
+
+    use XML::Grammar::Fortune::Synd;
+
+    my $syndicator = XML::Grammar::Fortune::Synd->new();
+    ...
+
+=head1 VERSION
+
+version 0.0212
+
+=head1 FUNCTIONS
+
+=head2 my $syndicator = $class->new(\%args)
+
+Returns the new Syndicator.
+
+=head2 $syndicator->calc_feeds(\%args)
+
+C<\%args> should be:
+
+    {
+        yaml_persistence_file => "/path/to/yaml-persistence.yaml",
+        yaml_persistence_file_out => "/path/to/yaml-persistence.yaml",
+        xml_dirs => "/path/to/the/directory-containing-xmls",
+        feed_params =>
+        {
+            title => "My feed title",
+            link => "http://mysite.tld/",
+            tagline => "Feed tagline",
+            author => "john.doe@hello.tld (John Doe)"
+            atom_self_link => "http://mysite.tld/my-feed.atom",
+            rss_self_link => "http://mysite.tld/my-feed.rss",
+        }
+    }
+
+Returns:
+
+    {
+        recent-ids => \@list_of_recent_ids,
+        feeds =>
+        {
+            Atom => $atom_XML_Feed_obj,
+            rss20 => $rss_XML_Feed_obj,
+        },
+    }
+
 =head1 AUTHOR
 
 Shlomi Fish, C<< <shlomif at cpan.org> >>
@@ -361,15 +369,11 @@ Please report any bugs or feature requests to C<bug-xml-grammar-fortune-synd at 
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=XML-Grammar-Fortune-Synd>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-
-
-
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc XML::Grammar::Fortune::Synd
-
 
 You can also look for information at:
 
@@ -393,9 +397,7 @@ L<http://search.cpan.org/dist/XML-Grammar-Fortune-Synd>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 COPYRIGHT & LICENSE
 
@@ -405,6 +407,132 @@ This program is released under the following license: MIT/X11 License
 
 http://www.opensource.org/licenses/mit-license.php
 
-=cut
+=head1 AUTHOR
 
-1; # End of XML::Grammar::Fortune::Synd
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/xml-grammar-fortune-synd/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Perldoc
+
+You can find documentation for this module with the perldoc command.
+
+  perldoc XML::Grammar::Fortune::Synd
+
+=head2 Websites
+
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
+
+=over 4
+
+=item *
+
+MetaCPAN
+
+A modern, open-source CPAN search engine, useful to view POD in HTML format.
+
+L<https://metacpan.org/release/XML-Grammar-Fortune-Synd>
+
+=item *
+
+Search CPAN
+
+The default CPAN search engine, useful to view POD in HTML format.
+
+L<http://search.cpan.org/dist/XML-Grammar-Fortune-Synd>
+
+=item *
+
+RT: CPAN's Bug Tracker
+
+The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
+
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=XML-Grammar-Fortune-Synd>
+
+=item *
+
+AnnoCPAN
+
+The AnnoCPAN is a website that allows community annotations of Perl module documentation.
+
+L<http://annocpan.org/dist/XML-Grammar-Fortune-Synd>
+
+=item *
+
+CPAN Ratings
+
+The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
+
+L<http://cpanratings.perl.org/d/XML-Grammar-Fortune-Synd>
+
+=item *
+
+CPANTS
+
+The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
+
+L<http://cpants.cpanauthors.org/dist/XML-Grammar-Fortune-Synd>
+
+=item *
+
+CPAN Testers
+
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
+
+L<http://www.cpantesters.org/distro/X/XML-Grammar-Fortune-Synd>
+
+=item *
+
+CPAN Testers Matrix
+
+The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
+
+L<http://matrix.cpantesters.org/?dist=XML-Grammar-Fortune-Synd>
+
+=item *
+
+CPAN Testers Dependencies
+
+The CPAN Testers Dependencies is a website that shows a chart of the test results of all dependencies for a distribution.
+
+L<http://deps.cpantesters.org/?module=XML::Grammar::Fortune::Synd>
+
+=back
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests by email to C<bug-xml-grammar-fortune-synd at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=XML-Grammar-Fortune-Synd>. You will be automatically notified of any
+progress on the request by the system.
+
+=head2 Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+L<https://github.com/shlomif/xml-grammar-fortune-synd>
+
+  git clone https://bitbucket.org/shlomif/fortune-xml
+
+=cut

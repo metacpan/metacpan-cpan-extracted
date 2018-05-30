@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Software::LicenseMoreUtils;
-$Software::LicenseMoreUtils::VERSION = '0.002';
+$Software::LicenseMoreUtils::VERSION = '0.004';
 use strict;
 use warnings;
 use 5.10.1;
@@ -31,13 +31,14 @@ my %more_short_names = (
     'Artistic-2'   => 'Software::License::Artistic_2_0',
     'BSD-3-clause' => 'Software::License::BSD',
     'Expat'        => 'Software::License::MIT',
-    'LGPL-2  '     => 'Software::License::LGPL_2',
-    'LGPL-2+'      => 'Software::License::LGPL_2',
-    'LGPL-2.1+'    => 'Software::License::LGPL_2_1',
+    'LGPL-2'       => 'Software::LicenseMoreUtils::LGPL_2',
+    'LGPL_2'       => 'Software::LicenseMoreUtils::LGPL_2',
+    'LGPL-2.1'     => 'Software::License::LGPL_2_1',
     'GPL-1+'       => 'Software::License::GPL_1',
     'GPL-2+'       => 'Software::License::GPL_2',
     'GPL-3+'       => 'Software::License::GPL_3',
-    'LGPL-2+'      => 'Software::License::LGPL_2',
+    'LGPL-2+'      => 'Software::LicenseMoreUtils::LGPL_2',
+    'LGPL_2+'      => 'Software::LicenseMoreUtils::LGPL_2',
     'LGPL-2.1+'    => 'Software::License::LGPL_2_1',
     'LGPL-3+'      => 'Software::License::LGPL_3_0',
     'LGPL-3.0+'    => 'Software::License::LGPL_3_0',
@@ -102,7 +103,7 @@ Software::LicenseMoreUtils - More utilities and a summary for Software::License
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -164,18 +165,18 @@ summaries.
 
 =head2 new_license_with_summary
 
- my $license_object = Software::LicenseUtils->new_license_with_summary({
+ my $license_object = Software::LicenseMoreUtils->new_license_with_summary({
       short_name => 'GPL-1',
       holder => 'X. Ample'
  }) ;
 
-Returns a new L<Software::LicenseUtils::LicenseWithSummary> object
+Returns a new L<Software::LicenseMoreUtils::LicenseWithSummary> object
 which is a L<Software::License> wrapped with a summary. This method
 accepts the same parameters as L<new_from_short_name>.
 
 =head2 new_from_short_name
 
- my $license_object = Software::LicenseUtils->new_from_short_name({
+ my $license_object = Software::LicenseMoreUtils->new_from_short_name({
       short_name => 'GPL-1',
       holder => 'X. Ample'
  }) ;

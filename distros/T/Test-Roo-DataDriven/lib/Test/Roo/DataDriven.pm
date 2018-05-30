@@ -5,7 +5,7 @@ package Test::Roo::DataDriven;
 # RECOMMEND PREREQ: App::Prove
 # RECOMMEND PREREQ: Ref::Util::XS
 
-use v5.10.1;
+use v5.8;
 
 use Test::Roo::Role;
 
@@ -19,18 +19,18 @@ use namespace::autoclean;
 
 requires 'run_tests';
 
-our $VERSION = 'v0.3.1';
+our $VERSION = 'v0.4.0';
 
 
 sub _build_data_files {
     my ( $class, $args ) = @_;
 
-    my $match = $args->{match} // qr/\.dat$/;
+    my $match = $args->{match} || qr/\.dat$/;
 
     my @paths;
     my @files;
 
-    my $argv = $args->{argv} // 1;
+    my $argv = defined $args->{argv} ? $args->{argv} : 1;
     if ( $argv && @ARGV ) {
         @paths = map { path($_) } @ARGV;
     }
@@ -80,8 +80,8 @@ sub run_data_tests {
       ? %{ $args[0] }
       : @args;
 
-    my $filter = $args{filter} // sub { $_[0] };
-    my $parser = $args{parser} // $class->curry::parse_data_file;
+    my $filter = $args{filter} || sub { $_[0] };
+    my $parser = $args{parser} || $class->curry::parse_data_file;
 
     foreach my $file ( @{ $class->_build_data_files( \%args ) } ) {
 
@@ -98,7 +98,7 @@ sub run_data_tests {
 
                 my $desc = sprintf(
                     '%s (%u of %u)',
-                    $case->{description} // $file->basename,    #
+                    $case->{description} || $file->basename,    #
                     ++$i,                                       #
                     scalar(@cases)                              #
                 );
@@ -110,7 +110,7 @@ sub run_data_tests {
         }
         elsif ( is_hashref($data) ) {
 
-            my $desc = $data->{description} // $file->basename;
+            my $desc = $data->{description} || $file->basename;
 
             $class->run_tests( $desc, $filter->( $data, $file ) );
         }
@@ -126,15 +126,16 @@ sub run_data_tests {
 }
 
 
+my $Counter = 0;
+
 sub parse_data_file {
     my ( $class, $file ) = @_;
 
     my $path = $file->absolute;
 
-    state $eval = sub { eval $_[0] };    ## no critic (ProhibitStringyEval)
-    state $counter = 0;
+    my $eval = sub { eval $_[0] };    ## no critic (ProhibitStringyEval)
 
-    my $package = __PACKAGE__ . "::Sandbox" . $counter++;
+    my $package = __PACKAGE__ . "::Sandbox" . $Counter++;
 
     my $data = $eval->("package ${package}; do q{${path}} or die \$!;");
 
@@ -162,7 +163,7 @@ Test::Roo::DataDriven - simple data-driven tests with Test::Roo
 
 =head1 VERSION
 
-version v0.3.1
+version v0.4.0
 
 =head1 SYNOPSIS
 
@@ -391,13 +392,6 @@ unloaded.
 =head1 KNOWN ISSUES
 
 See also L</BUGS> below.
-
-=head2 Support for older Perl versions
-
-This module requires Perl v5.10.1 or newer.
-
-Pull requests to support older versions of Perl are welcome. See
-L</SOURCE>.
 
 =head2 Skipping test cases
 

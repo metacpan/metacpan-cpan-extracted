@@ -3,7 +3,7 @@
 use Term::Highlight ();
 
 ( $PROGNAME = $0 ) =~ s/.*\///;
-$VERSION = "2.0.2";
+$VERSION = "2.0.3";
 $TAGTYPE = "term";
 $RC_FILE = "$ENV{ HOME }/.hlrc";
 $SNIPPET_PTN = qr/^\s*snippet\s+(\S+)\s+(.*)/;
@@ -17,8 +17,8 @@ sub PrintUsage
 print << "EOHELP"
 $PROGNAME, version $VERSION. See man $PROGNAME for details.
 
-Usage: $PROGNAME [global-options] [[--] highlight-options [patterns] ...]
-          [- file1 [file2] ...]
+Usage: $PROGNAME [global-options] [--] [highlight-options [patterns] ...]
+          [-] [files]
 
 Global options affect the behaviour of the program globally:
     -s <snippet> loads a snippet with specified name from file ~/.hlrc or
@@ -28,6 +28,8 @@ Global options affect the behaviour of the program globally:
     -g (-grep) prints only lines that match specified patterns.
     -r greps recursively, implies '-g'.
        If the file list is empty then grep starts in the current directory.
+    -f (-flist) builds the file list from the trailing arguments automatically
+       when option '-' is not specified.
     -l prints the list of files where matches were found, implies '-g'.
     -c <pre[.post]> where 'pre' and 'post' are numbers, prints context lines
        around matches, if 'post' is not set then it is supposed to be equal to
@@ -168,12 +170,16 @@ sub Flush
 push @Hl_args, split '\s+', $ENV{ HL_INITSTRING } if exists
                                                         $ENV{ HL_INITSTRING };
 my $Hl_args = 0;
+my $FilelistIdx = 0;
 
 $TAGTYPE = "none" unless -t STDOUT;
 
-while ( my $arg = shift )
+while ( defined ( my $arg = shift ) )
 {
-    last if $arg eq '-';
+    if ( $arg eq "-" )
+    {
+        $BuildFilelist = 0; last;
+    }
     SWITCH_ARGS :
     {
         last SWITCH_ARGS if $Hl_args;
@@ -189,19 +195,23 @@ while ( my $arg = shift )
         {
             $LineNumbers = 1; last SWITCH_ARGS;
         }
-        if ( $arg eq "-g" || $arg eq "-grep" || $arg eq "--grep" )
+        if ( $arg eq "-g" || $arg eq "-grep" )
         {
             $Grep = 1; last SWITCH_ARGS;
         }
-        if ( $arg eq "-u" || $arg eq "-utf8" || $arg eq "--utf8" )
+        if ( $arg eq "-u" || $arg eq "-utf8" )
         {
             $UTF8Support = 1; last SWITCH_ARGS;
         }
-        if ( $arg eq "-b" || $arg eq "-bin" || $arg eq "--binary" )
+        if ( $arg eq "-f" || $arg eq "-flist" )
+        {
+            $BuildFilelist = 1; last SWITCH_ARGS;
+        }
+        if ( $arg eq "-b" || $arg eq "-bin" )
         {
             $BinarySupport = 1; last SWITCH_ARGS;
         }
-        if ( $arg eq "-t" || $arg eq "-term" || $arg eq "--terminal" )
+        if ( $arg eq "-t" || $arg eq "-term" )
         {
             $TAGTYPE = "term"; last SWITCH_ARGS;
         }
@@ -235,13 +245,18 @@ while ( my $arg = shift )
         {
             PrintUsage; exit 0;
         }
-        if ( $arg eq "-d" || $arg eq "-debug" || $arg eq "--debug" )
+        if ( $arg eq "-d" || $arg eq "-debug" )
         {
             $TAGTYPE = "debug-term"; last SWITCH_ARGS;
         }
         $Hl_args = 1;
     }
-    push @Hl_args, $arg if $Hl_args == 1;
+    if ( $Hl_args == 1 )
+    {
+        push @Hl_args, $arg;
+        $FilelistIdx = substr( $arg, 0, 1 ) eq '-' ? 0 : $FilelistIdx - 1
+                                                            if $BuildFilelist;
+    }
     $Hl_args = 1 if $Hl_args == 2;
 }
 
@@ -256,12 +271,26 @@ if ( $UTF8Support )
     Encode->import( qw( decode_utf8 ) );
     @Hl_args = map { decode_utf8( $_, 1 ) } @Hl_args;
 }
+
+my @Files = @ARGV;
+
+if ( $BuildFilelist && $FilelistIdx < 0 )
+{
+    my $idx = $FilelistIdx;
+    $FilelistIdx = 0;
+    for ( my $i = 0; $i > $idx; --$i )
+    {
+        last unless -e $Hl_args[ $i - 1 ];
+        --$FilelistIdx;
+    }
+    @Files = splice @Hl_args, $FilelistIdx if $FilelistIdx;
+}
+
+my $ManyFiles = @Files > 1;
+
 $hl->LoadArgs( \@Hl_args );
 my $Patterns = $hl->GetPatterns();
 my $AlwaysMatches = @$Patterns && ! defined $$Patterns[ 0 ][ 0 ];
-
-my @Files = @ARGV;
-my $ManyFiles = @Files > 1;
 
 my $hl_loc = undef;
 
@@ -339,7 +368,7 @@ sub ProcessCtx
 }
 
 
-#process STDIN or file list line by line
+#process file list or STDIN line by line
 if ( $GrepRecursively )
 {
     my $count = 0;
@@ -547,7 +576,7 @@ hl - terminal patterns highlighter
 
 =head1 SYNOPSIS
 
-hl [global-options] [[--] highlight-options [patterns] ...] [- file1 [file2] ...]
+hl [global-options] [--] [highlight-options [patterns] ...] [-] [files]
 
 =head1 DESCRIPTION
 
@@ -582,6 +611,11 @@ prints only lines that match specified patterns.
 
 greps recursively, implies '-g'.
 If the file list is empty then grep starts in the current directory.
+
+=item -f (-flist)
+
+builds the file list from the trailing arguments automatically when option '-'
+is not specified.
 
 =item -l
 
@@ -690,8 +724,8 @@ explicitly separates global and highlight options.
 =item -
 
 separates global and highlight options from list of files to process.
-As soon as hl may read from standard input, using a list of files to process is
-not obligatory.
+As soon as hl may read from standard input or use option '-f', using a list of
+files to process is not obligatory.
 
 =back
 

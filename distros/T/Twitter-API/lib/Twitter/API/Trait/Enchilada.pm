@@ -1,6 +1,6 @@
 package Twitter::API::Trait::Enchilada;
 # ABSTRACT: Sometimes you want the whole enchilada
-$Twitter::API::Trait::Enchilada::VERSION = '1.0001';
+$Twitter::API::Trait::Enchilada::VERSION = '1.0002';
 use Moo::Role;
 use namespace::clean;
 
@@ -28,7 +28,7 @@ Twitter::API::Trait::Enchilada - Sometimes you want the whole enchilada
 
 =head1 VERSION
 
-version 1.0001
+version 1.0002
 
 =head1 SYNOPSIS
 

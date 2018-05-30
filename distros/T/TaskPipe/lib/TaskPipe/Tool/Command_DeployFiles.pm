@@ -71,6 +71,8 @@ In particular, the database parameters (database name, host etc.) need to be fil
 
 The name of the sample to use to deploy files
 
+=back
+
 =cut
 
 has sample => (is => 'ro', isa => 'Str', default => 'stubs');

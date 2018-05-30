@@ -20,8 +20,6 @@ C<screen> - always log to screen
 C<shell> - log to file if command is run in the background, but screen otherwise
 C<always> - always log to both screen and file
 
-=back
-
 =cut
 
 has log_mode => (is => 'ro', isa => 'Str', default => 'shell');
@@ -51,7 +49,7 @@ The logging pattern to use with files. See the documentation for Log::Log4perl f
 
 =cut
 
-has log_file_pattern => (is => 'ro', isa => 'Str', default => '[%d] (%p) %F line %L: %m%n');
+has log_file_pattern => (is => 'ro', isa => 'Str', default => '[%d] (%p) %N: %m%n');
 
 
 =item log_screen_pattern
@@ -60,7 +58,7 @@ The logging pattern to use when displaying to terminal. See the documentation fo
 
 =cut
 
-has log_screen_pattern => (is => 'ro', isa => 'Str', default => '%-5p%5J%3i%6P%3h%N %m%n');
+has log_screen_pattern => (is => 'ro', isa => 'Str', default => '%-5p%6J%6P%3h%N %m%n');
 
 
 =item log_screen_colors

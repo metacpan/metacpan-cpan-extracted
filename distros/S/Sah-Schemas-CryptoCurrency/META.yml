@@ -3,10 +3,13 @@ abstract: 'Various Sah cryptocurrency schemas'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
+  Data::Sah: '0.84'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Test::More: '0'
+  Test::More: '0.98'
+  strict: '0'
+  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -17,14 +20,19 @@ meta-spec:
   version: '1.4'
 name: Sah-Schemas-CryptoCurrency
 requires:
+  Perinci::Sub::XCompletion::cryptocurrency: '0'
   Perinci::Sub::XCompletion::cryptocurrency_code: '0'
   Perinci::Sub::XCompletion::cryptocurrency_code_or_name: '0'
+  Perinci::Sub::XCompletion::cryptocurrency_safename: '0'
+  Perinci::Sub::XCompletion::cryptoexchange: '0'
+  Perinci::Sub::XCompletion::cryptoexchange_code: '0'
   Perinci::Sub::XCompletion::cryptoexchange_name: '0'
+  Perinci::Sub::XCompletion::cryptoexchange_safename: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-CryptoCurrency
   homepage: https://metacpan.org/release/Sah-Schemas-CryptoCurrency
   repository: git://github.com/perlancar/perl-Sah-Schemas-CryptoCurrency.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -32,7 +40,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Sah::Schemas
       name: Sah::Schemas
-      version: '0.010'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -372,6 +380,14 @@ x_Dist_Zilla:
           phase: develop
           type: x_spec
       name: DevelopX_spec
+      version: '6.010'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: TestRequires
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode

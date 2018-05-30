@@ -1,6 +1,20 @@
 Revision history for Perl extension Test::XPath.
 
-0.16  2011-11-23T05:24:03Z
+0.19  2018-05-29T01:40:00
+      - Added Makefile.PL script. (MANWAR)
+      - Added MANIFEST file. (MANWAR)
+
+0.18  2018-05-28T13:15:00
+      - Fixed broken SEE ALSO link. (MANWAR)
+
+0.17  2018-05-27T04:00:03
+      - Updated repository details. (MANWAR)
+      - Updated link to issues. (MANWAR)
+      - Added `contains()` to the list of XPath predicates in the
+        documentation, since it's later used in an example. Suggested by Jim
+        Keenan (RT #100902).
+
+0.16  2011-11-23T05:24:03
       - Bumped Test::Pod requirement up to 1.41 to support L<text|scheme:...>
         directives. Thanks to Fitz Elliott for the report.
 

@@ -1,3 +1,19 @@
+0.27 2018-05-26
+-declare POD encoding
+
+0.26 2018-05-25
+-switch from Dist::Zilla and Inline::C to vanilla XS and ExtUtils::MakeMaker to
+ simplify building binary distributions
+-support for interpreter threads
+-remove separate URI::Fast::IRI module as Dist::Zilla's POD generator is no
+ longer used
+
+0.25 (failed)
+-failed due to version conflict in URI::Fast::IRI, which has no version
+
+0.24 2018-05-23
+-bugfix: move URI::Fast::IRI to its own file to unconfuse Dist::Zilla when generating docs
+
 0.23 2018-04-26
 -support for IRIs via new constructor, iri()
 -documented uri_split()

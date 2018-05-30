@@ -23,8 +23,7 @@
       "build" : {
          "requires" : {
             "App::FatPacker" : "0",
-            "IPC::Run3" : "0",
-            "Test::More" : "0"
+            "parent" : "0"
          }
       },
       "configure" : {
@@ -38,9 +37,29 @@
             "Pod::Usage" : "0",
             "perl" : "5.010"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Carp" : "0",
+            "Config" : "0",
+            "Cwd" : "0",
+            "Exporter" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "2.5",
+            "IPC::Run3" : "0",
+            "Import::Into" : "0",
+            "List::Util" : "1.33",
+            "Pod::Usage" : "0",
+            "Test::More" : "0",
+            "Text::Diff" : "0",
+            "Text::ParseWords" : "0",
+            "constant" : "0",
+            "rlib" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "v0.4.0",
+   "version" : "0.500003",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

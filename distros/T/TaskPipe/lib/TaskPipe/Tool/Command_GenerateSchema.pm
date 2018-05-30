@@ -134,6 +134,8 @@ If you set a default project in your global config file, and you want to run C<g
 
 Specify C<project> to generate the schema over the tables in your project (both cache and plan tables) - or C<global> to generate the global schema
 
+=back
+
 =cut
 
 has scope => (is => 'rw', isa => 'ScopeMode', default => 'project');

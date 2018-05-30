@@ -4,7 +4,7 @@ Test::Roo::DataDriven - simple data-driven tests with Test::Roo
 
 # VERSION
 
-version v0.3.1
+version v0.4.0
 
 # SYNOPSIS
 
@@ -243,13 +243,6 @@ unloaded.
 # KNOWN ISSUES
 
 See also ["BUGS"](#bugs) below.
-
-## Support for older Perl versions
-
-This module requires Perl v5.10.1 or newer.
-
-Pull requests to support older versions of Perl are welcome. See
-["SOURCE"](#source).
 
 ## Skipping test cases
 

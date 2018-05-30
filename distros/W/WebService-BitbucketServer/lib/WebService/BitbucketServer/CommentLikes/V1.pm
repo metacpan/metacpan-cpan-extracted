@@ -6,7 +6,7 @@ package WebService::BitbucketServer::CommentLikes::V1;
 use warnings;
 use strict;
 
-our $VERSION = '0.603'; # VERSION
+our $VERSION = '0.604'; # VERSION
 
 use Moo;
 use namespace::clean;
@@ -106,7 +106,7 @@ WebService::BitbucketServer::CommentLikes::V1 - Bindings for a Bitbucket Server 
 
 =head1 VERSION
 
-version 0.603
+version 0.604
 
 =head1 SYNOPSIS
 
@@ -119,7 +119,7 @@ version 0.603
 
 =head1 DESCRIPTION
 
-This is a Bitbucket Server REST API for L<CommentLikes::V1|https://developer.atlassian.com/static/rest/bitbucket-server/5.5.0/bitbucket-comment-likes-rest.html>.
+This is a Bitbucket Server REST API for L<CommentLikes::V1|https://developer.atlassian.com/static/rest/bitbucket-server/5.10.0/bitbucket-comment-likes-rest.html>.
 
 Original API documentation created by and copyright Atlassian.
 
@@ -414,7 +414,7 @@ Charles McGarvey <chazmcgarvey@brokenzipper.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Charles McGarvey.
+This software is copyright (c) 2018 by Charles McGarvey.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

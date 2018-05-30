@@ -1,4 +1,4 @@
-Test/Warn version 0.30
+Test/Warn version 0.33
 ======================
 
 INSTALLATION
@@ -70,6 +70,7 @@ AUTHOR
 COPYRIGHT AND LICENSE
     Copyright 2002 by Janek Schleicher
     Copyright 2007-2014 by Alexandr Ciornii
+    Copyright 2015-2018 by Janek Schleicher
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

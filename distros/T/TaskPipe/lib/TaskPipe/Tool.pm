@@ -26,7 +26,7 @@ use POSIX qw(isatty);
 
 with 'MooseX::ConfigCascade';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 
 has cmd => (is => 'rw', isa => 'ArrayRef');
@@ -74,12 +74,7 @@ sub get_conf{
         
     } catch {
 
-        $self->message( qq|=pod
-
-Failed to retrieve the path to the taskpipe root directory from the file ${\$ps->home_filepath}. The following error was reported: $_
-
-=cut
-|);
+        $self->message( qq|=pod\n\nFailed to retrieve the path to the taskpipe root directory from the file ${\$ps->home_filepath}. The following error was reported: $_\n\n=cut|);
         exit;
     };
 

@@ -13,6 +13,8 @@ sub new_client {
 
     my $user_agent = mock();
     $user_agent->stubs(request => sub {
+        like $_[1]->headers->header('authorization'), qr/^OAuth\s/, 'The Authorization header should start with OAuth';
+
         my ( $code, $reason ) = is_ref($$response[0])
             ? @{ shift @$response // [ 999 => 'off the end' ] }
             : @{ $response };

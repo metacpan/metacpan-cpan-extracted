@@ -1,7 +1,12 @@
-0.11 - Tue Feb 12 23:17:14 2013
+Revision history for Perl module Surveyor::Benchmark::SchwartzianTransform::SortFilesBySize
+
+0.121 2018-05-24T14:55:07Z
+	* Change to the Artistic License 2.0
+
+0.11 - 2013-02-12
 	* First release of a module with the Schwartzian Transform
 	benchmarks I use in Mastering Perl
 
-0.12 - Fri Jan  3 12:23:45 2014
+0.12 - 2014-01-03
 	* Git rid of MYMETA
 

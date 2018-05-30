@@ -3,23 +3,26 @@ abstract: 'Run benchmarks from a package'
 author:
   - 'brian d foy <bdfoy@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  Test::More: '0.95'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Surveyor-App
 no_index:
   directory:
     - t
     - inc
 requires:
-  Benchmark: 0
-  Test::More: 0.94
+  Benchmark: '0'
+  perl: '5.014'
 resources:
-  repository: https://github.com/briandfoy/surveyor-app
-version: 0.12
+  bugtracker: https://github.com/briandfoy/surveyor-app/issues
+  homepage: https://github.com/briandfoy/surveyor-app
+  repository: https://github.com/briandfoy/surveyor-app.git
+version: '0.121'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

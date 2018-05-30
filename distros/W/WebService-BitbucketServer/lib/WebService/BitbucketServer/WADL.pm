@@ -4,7 +4,7 @@ package WebService::BitbucketServer::WADL;
 use warnings;
 use strict;
 
-our $VERSION = '0.603'; # VERSION
+our $VERSION = '0.604'; # VERSION
 
 use WebService::BitbucketServer::Spec qw(api_info documentation_url package_name sub_name);
 
@@ -13,6 +13,8 @@ use namespace::clean -except => [qw(import)];
 
 our @EXPORT_OK = qw(parse_wadl generate_package generate_submap);
 
+
+sub _croak { require Carp; Carp::croak(@_) }
 
 
 sub parse_wadl {
@@ -179,9 +181,9 @@ sub _handle_doc {
 sub generate_submap {
     my $wadl = shift;
 
-    my $api_info    = api_info($wadl);
+    my $api_info    = api_info($wadl) or _croak('Cannot get API info from WADL');
+    my $api         = package_name($wadl) or _croak('Cannot determine package name from WADL');
     my $method      = $api_info->{id};
-    my $api         = package_name($wadl);
 
     my $out;
     $out .= "# Map endpoints to subroutine names in $api.\nuse strict;\n{\n";
@@ -229,9 +231,9 @@ sub generate_package {
     my $wadl = shift;
     my $args = @_ == 1 ? shift : {@_};
 
-    my $api_info    = api_info($wadl);
+    my $api_info    = api_info($wadl) or _croak('Cannot get API info from WADL');
+    my $api         = package_name($wadl) or _croak('Cannot determine package name from WADL');
     my $method      = $api_info->{id};
-    my $api         = package_name($wadl);
     my $package     = $args->{package} || "$args->{base}::${api}";
     my $abstract    = $args->{abstract} || 'Bindings for a Bitbucket Server REST API';
     my $doc_url     = $args->{documentation_url} || documentation_url($wadl->[0], 'html', $args->{version});
@@ -355,7 +357,16 @@ END
 
     my %seen;
 
-    for my $endpoint (sort { $a->{path} cmp $b->{path} } @$wadl) {
+    my %method_order = (
+        POST    => 0,
+        GET     => 1,
+        PUT     => 2,
+        PATCH   => 3,
+        DELETE  => 4,
+    );
+
+    for my $endpoint (sort { $a->{path} cmp $b->{path} ||
+            ($method_order{$a->{method}} || 99) <=> ($method_order{$a->{method}} || 99) } @$wadl) {
         # fix paths that have 2+ slash separators
         $endpoint->{path} =~ s!/+!/!g;
 
@@ -497,6 +508,9 @@ sub _html_to_pod {
     $text =~ s!\{\@code ([^}]+)\}!C<<< $1 >>>!ig;
     $text =~ s!\{\@link (?:[A-Za-z0-9#]+)(?:\([^)]*\))? ([^}]+)\}!$1!ig;
 
+    # remove trailing whitespace:
+    $text =~ s!\h+\n!\n!sg;
+
     return $text;
 }
 
@@ -514,7 +528,7 @@ WebService::BitbucketServer::WADL - Subroutines for parsing WADL and generating 
 
 =head1 VERSION
 
-version 0.603
+version 0.604
 
 =head1 FUNCTIONS
 
@@ -554,7 +568,7 @@ Charles McGarvey <chazmcgarvey@brokenzipper.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Charles McGarvey.
+This software is copyright (c) 2018 by Charles McGarvey.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

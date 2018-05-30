@@ -6,7 +6,7 @@ package WebService::BitbucketServer::MirroringUpstream::V1;
 use warnings;
 use strict;
 
-our $VERSION = '0.603'; # VERSION
+our $VERSION = '0.604'; # VERSION
 
 use Moo;
 use namespace::clean;
@@ -214,7 +214,7 @@ WebService::BitbucketServer::MirroringUpstream::V1 - Bindings for a Bitbucket Se
 
 =head1 VERSION
 
-version 0.603
+version 0.604
 
 =head1 SYNOPSIS
 
@@ -704,7 +704,7 @@ Charles McGarvey <chazmcgarvey@brokenzipper.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Charles McGarvey.
+This software is copyright (c) 2018 by Charles McGarvey.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

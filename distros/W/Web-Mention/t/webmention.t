@@ -2,6 +2,7 @@ use warnings; use strict;
 use Test::More;
 use Test::Exception;
 use FindBin;
+use Path::Class::File;
 
 use_ok ("Web::Mention");
 
@@ -61,6 +62,16 @@ qr/same URL/,
     'Caught identical-URL error (with extra fragment).'
     ;
 
+my $source = "http://example.com/webmention-source";
+my $valid_html = Path::Class::File->new( "$FindBin::Bin/sources/valid.html")->slurp;
+my @webmentions = Web::Mention->new_from_html(
+    source => $source,
+    html => $valid_html,
+);
+is ( scalar @webmentions, 2, "Extracted correct number of outgoing webmentions from HTML.");
+is ( $webmentions[0]->source, $source, "Source looks good.");
+is ( $webmentions[0]->target, $target, "First target looks good.");
+is ( $webmentions[1]->target, 'http://example.com/some-other-target', "Second target looks good.");
 
 done_testing();
 

@@ -29,7 +29,9 @@ __PACKAGE__->add_columns(
   "status",
   { data_type => "varchar", is_nullable => 1, size => 255 },
   "info",
-  { data_type => "text", is_nullable => 1 },
+  { data_type => "varchar", is_nullable => 1, size => 255 },
+  "temp_dir",
+  { data_type => "varchar", is_nullable => 1, size => 255 },
   "last_checked",
   {
     data_type => "datetime",

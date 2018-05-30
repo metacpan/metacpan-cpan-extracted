@@ -3,26 +3,31 @@ abstract: 'A POE Component providing TCP client services for test cases'
 author:
   - 'Chris Williams <chris@bingosnet.co.uk>'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
-  Test::More: 0.47
-  Text::ParseWords: 0
+  ExtUtils::MakeMaker: '6.59'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.47'
+  Text::ParseWords: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Test-POE-Client-TCP
 requires:
-  POE: 1.28
-  POE::Filter: 0
-  POE::Filter::Line: 0
-  POE::Wheel::ReadWrite: 0
-  POE::Wheel::SocketFactory: 0
-  perl: 5.006
+  POE: '1.28'
+  POE::Filter: '0'
+  POE::Filter::Line: '0'
+  POE::Wheel::ReadWrite: '0'
+  POE::Wheel::SocketFactory: '0'
+  perl: '5.006'
 resources:
   homepage: https://github.com/bingos/test-poe-client-tcp
   repository: https://github.com/bingos/test-poe-client-tcp.git
-version: 1.12
+version: '1.14'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

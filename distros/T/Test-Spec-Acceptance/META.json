@@ -1,0 +1,56 @@
+{
+   "abstract" : "Aliases for acceptance-like testing using Test::Spec",
+   "author" : [
+      "Marc Egea i Sala <marc.egea.sala@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-Spec-Acceptance",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "0",
+            "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0",
+            "Dist::Zilla::Plugin::Git::GatherDir" : "0",
+            "Dist::Zilla::Plugin::License" : "0",
+            "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
+            "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0",
+            "Dist::Zilla::Plugin::StaticInstall" : "0",
+            "Dist::Zilla::Plugin::VersionFromModule" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::Spec" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/meis/Test-Spec-Acceptance/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/meis/Test-Spec-Acceptance.git",
+         "web" : "https://github.com/meis/Test-Spec-Acceptance/"
+      }
+   },
+   "version" : "0.02",
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
+   "x_static_install" : 1
+}
+

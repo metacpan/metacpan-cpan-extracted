@@ -1,3 +1,57 @@
+0.0340 2018-05-28
+  - rename byte_value to bval
+  - rename short_value to sval
+  - rename int_value to ival
+  - rename long_value to lval
+  - rename float_value to fval
+  - rename double_value to dval
+  - rename object_value to oval
+  - pointer_value, string_value, object_address_value is merged to oval
+  - rename SPVM_API_byte to SPVM_VALUE_byte
+  - rename SPVM_API_short to SPVM_VALUE_short
+  - rename SPVM_API_int to SPVM_VALUE_int
+  - rename SPVM_API_long to SPVM_VALUE_long
+  - rename SPVM_API_float to SPVM_VALUE_float
+  - rename SPVM_API_double to SPVM_VALUE_double
+  - rename SPVM_API_OBJECT to SPVM_VALUE_object
+  - rename SPVM_API to SPVM_ENV
+  - rename spvm_api.h to spvm_native.h
+  - rename $obj->get_elements to $obj->to_elements
+  - rename $obj->to_data to $obj->to_bin
+  - rename $obj->set_data to $obj->set_bin
+  - rename SPVM::new_byte_array_data to SPVM::new_byte_array_bin
+  - rename SPVM::new_short_array_data to SPVM::new_short_array_bin
+  - rename SPVM::new_int_array_data to SPVM::new_int_array_bin
+  - rename SPVM::new_long_array_data to SPVM::new_long_array_bin
+  - rename SPVM::new_float_array_data to SPVM::new_float_array_bin
+  - rename SPVM::new_double_array_data to SPVM::new_double_array_bin
+  - remove range methods
+  - rename $array->set to $array->set_element
+  - rename SPVM::Perl::Object to SPVM::Object
+  - add SPVM::new_multi_array_len
+0.0339 2018-05-26
+  - rename Std::Math to Math
+  - renmae Std::Time to Time
+  - renmae Std::TypeUtil to TypeUtil
+  - rename Std::IO to IO
+  - rename Std to CORE
+  - merged CORE::Time to CORE
+  - merged CORE::IO to CORE
+  - CORE module is loaded by default
+  - CORE functions become static functions
+0.0338 2018-05-25
+  - add examples
+  - add const byte[] type
+  - String type become string type to express it is core type.
+  - Otring type become object type to express it is core type.
+  - string type become syntax sugar of const byte[].
+  - string next of end character become '\0'
+0.0337 2018-05-24
+  - remove jit descriptor
+  - add SPVM::JIT moudle
+  - JIT compile unit become package
+  - implement JIT compile cache system
+  - improve test peformance very much
 0.0336 2018-05-19
   - fix hash insert and search bug
   - name string is shared intenally

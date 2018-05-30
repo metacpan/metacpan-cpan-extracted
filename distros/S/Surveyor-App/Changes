@@ -1,7 +1,12 @@
-0.11 - Sat Feb  9 18:34:27 2013
+Revision history for Perl module Surveyor::App
+
+0.121 2018-05-23T22:50:56Z
+	* Change to the Artistic License 2.0
+
+0.11 - 2013-02-09
 	* First release of the Surveyor::App module to run distributable
 	benchmarks.
 
-0.12 - Fri Jan  3 12:22:42 2014
+0.12 - 2014-01-03
 	* Get rid of MYMETA
 

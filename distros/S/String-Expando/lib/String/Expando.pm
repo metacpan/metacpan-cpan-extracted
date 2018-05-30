@@ -5,7 +5,7 @@ use warnings;
 
 use vars qw($VERSION);
 
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 sub new {
     my $cls = shift;
@@ -16,9 +16,9 @@ sub new {
 sub init {
     my ($self) = @_;
     if (defined $self->{'expando'}) {
-        my $rx = qr/(?gc)\G$self->{'expando'}/;
+        my $rx = qr/\G$self->{'expando'}/;
         $self->{'consume_expando'} = sub {
-            $_ =~ $rx ? (defined $2 ? $2 : $1) : ()
+            $_ =~ /$rx/gc ? (defined $2 ? $2 : $1) : ()
         }
     }
     else {
@@ -29,9 +29,9 @@ sub init {
         };
     }
     if (defined $self->{'literal'}) {
-        my $rx = qr/(?gc)\G$self->{'literal'}/;
+        my $rx = qr/\G$self->{'literal'}/;
         $self->{'consume_literal'} = sub {
-            $_ =~ $rx ? ($1) : ()
+            $_ =~ /$rx/gc ? ($1) : ()
         }
     }
     else {
@@ -40,9 +40,9 @@ sub init {
         }
     }
     if (defined $self->{'escaped_literal'}) {
-        my $rx = qr/(?gc)\G$self->{'escaped_literal'}/;
+        my $rx = qr/\G$self->{'escaped_literal'}/;
         $self->{'consume_escaped_literal'} = sub {
-            $_ =~ $rx ? ($1) : ()
+            $_ =~ /$rx/gc ? ($1) : ()
         }
     }
     else {

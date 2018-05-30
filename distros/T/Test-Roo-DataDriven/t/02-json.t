@@ -21,7 +21,7 @@ Example::Class->run_data_tests(
     filter  => sub {
         my ($case, $file) = @_;
 
-        $case->{data_file} //= $file;
+        $case->{data_file} ||= $file;
         $case->{regex} = qr/$case->{regex}/;
         $case->{epoch} += time;
 

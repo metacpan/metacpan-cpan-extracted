@@ -1060,6 +1060,10 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_CROAK);
                   return CROAK;
                 }
+                else if (strcmp(keyword, "const") == 0) {
+                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_CONST);
+                  return CONST;
+                }
                 break;
               case 'd' :
                 if (strcmp(keyword, "default") == 0) {
@@ -1139,14 +1143,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   return INT;
                 }
                 break;
-              case 'j' :
-                if (strcmp(keyword, "jit") == 0) {
-                  SPVM_OP* op_descriptor = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_JIT, compiler->cur_file, compiler->cur_line);
-                  yylvalp->opval = op_descriptor;
-                  
-                  return DESCRIPTOR;
-                }
-                break;
               case 'l' :
                 if (strcmp(keyword, "last") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_LAST);
@@ -1210,7 +1206,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 
                 break;
               case 'O' :
-                if (strcmp(keyword, "Object") == 0) {
+                if (strcmp(keyword, "object") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_OBJECT);
                   return OBJECT;
                 }
@@ -1263,12 +1259,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 else if (strcmp(keyword, "short") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_SHORT);
                   return SHORT;
-                }
-                break;
-              case 'S' :
-                if (strcmp(keyword, "String") == 0) {
-                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_STRING);
-                  return STRING;
                 }
                 break;
               case 'u' :

@@ -1,0 +1,40 @@
+#! /usr/bin/env perl
+
+use Sympatic;
+use MetaCPAN::Client;
+use Sympa::ModDef;
+
+fun cpan_version ( $module ) {
+    state $client = MetaCPAN::Client->new;
+    state $version_for = { };
+    $$version_for{ $module } //=
+        $client
+        -> module( $module )
+        -> version;
+}
+
+my $len=0;
+my @n =
+    map { $len = length if length > $len; $_ }
+    sort keys %Sympa::ModDef::cpan_modules;
+$len += 4;
+
+for (@n) {
+    my $current =
+        $Sympa::ModDef::cpan_modules
+        {$_}
+        {required_version}
+        || 0;
+
+    my $latest = cpan_version $_;
+    my $status = $current eq $latest ? 'ok ' : 'new';
+
+    printf "%8s%-${len}s => %-12s, # latest is %s ($status)\n"
+    , ""
+    , "'$_'"
+    , "'$current'"
+    , "'$latest'"
+    ;
+
+};
+

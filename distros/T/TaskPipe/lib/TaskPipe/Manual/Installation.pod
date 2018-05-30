@@ -78,6 +78,8 @@ Test phantomjs
 
 =back
 
+=item 3.
+
 Install TOR
 
     yum install tor
@@ -100,6 +102,7 @@ Having commented these lines out, save the file.
 
 B<NOTE> There is no need to start TOR. C<TaskPipe> will launch TOR instances as and when are needed.
 
+=back
 
 =head2 Install L<TaskPipe>
 
@@ -254,6 +257,22 @@ Again, the next step is to tell your project about the database. L<TaskPipe> use
 Grant privileges to the mysql user you created earlier
 
     grant all privileges on SP500.* to taskpipe_user@localhost;
+
+Edit the project configuration file and enter the details of your project database:
+
+    vi /home/myusername/taskpipe/projects/SP500/conf/project.yml
+
+Complete the information in the C<TaskPipe::SchemaManager::Settings_Project> section:
+
+    TaskPipe::SchemaManager::Settings_Project:
+      database: SP500
+      host: localhost
+      method: dbi
+      module: TaskPipe::Schema
+      password: somecrazypassword
+      table_prefix: tp_
+      type: mysql
+      username: taskpipe_user
 
 And now (back at the command line):
 

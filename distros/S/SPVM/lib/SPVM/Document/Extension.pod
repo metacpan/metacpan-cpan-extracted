@@ -15,11 +15,11 @@ This is similar with L<Extension::C>, but L<SPVM> implement this feature by defa
   }
   
   // SPVM/TestCase/Extension.native/Extension.c
-  #include <spvm_api.h>
+  #include <spvm_native.h>
   
-  int32_t SPVM__TestCase__Extension__sum(SPVM_API* api, SPVM_API_VALUE* args) {
+  int32_t SPVM__TestCase__Extension__sum(SPVM_ENV* env, SPVM_VALUE* args) {
     
-    int32_t total = args[0].int_value + args[1].int_value;
+    int32_t total = args[0].ival + args[1].ival;
     
     return total;
   }
@@ -36,35 +36,35 @@ Next, you create "SPVM/TestCase/Extension/Extension.c" file
   SPVM/TestCase/Extension.spvm
   SPVM/TestCase/Extension.native/Extension.c
 
-Next, you write C language. You include C<spvm_api.h>.
+Next, you write C language. You include C<spvm_native.h>.
 
-  #include <spvm_api.h>
+  #include <spvm_native.h>
 
 C Function name must be replace C<:> with <_> and add C<SPVM__> to top of SPVM subroutine name. SPVM subroutine absolute name is
 C<TestCase::Extension::sum>. C function name is C<SPVM__TestCase__Extension__sum>.
 
-  int32_t SPVM__TestCase__Extension__sum(SPVM_API* api, SPVM_API_VALUE* args) {
+  int32_t SPVM__TestCase__Extension__sum(SPVM_ENV* env, SPVM_VALUE* args) {
 
-    int32_t total = args[0].int_value + args[1].int_value;
+    int32_t total = args[0].ival + args[1].ival;
     
     return total;
   }
 
-First argument is C<api>. This is the pointer to C<SPVM_API>. Second argument is C<args>. This is array of C<SPVM_API_VALUE>.
+First argument is C<env>. This is the pointer to C<SPVM_ENV>. Second argument is C<args>. This is array of C<SPVM_VALUE>.
 
-SPVM_API_VALUE is union of C language. If you want to get int value, you do the followng.
+SPVM_VALUE is union of C language. If you want to get int value, you do the followng.
 
-  args[0].int_value
+  args[0].ival
 
 You can get all type of value by the following member.
 
-  args[0].byte_value
-  args[0].short_value
-  args[0].int_value
-  args[0].long_value
-  args[0].float_value
-  args[0].double_value
-  args[0].object_value
+  args[0].bval
+  args[0].sval
+  args[0].ival
+  args[0].lval
+  args[0].fval
+  args[0].dval
+  args[0].oval
 
 Type of return value is corresponding the folloing type.
 
@@ -75,5 +75,5 @@ Type of return value is corresponding the folloing type.
   long                int64_t
   float               float
   double              double
-  [Object value]      SPVM_API_OBJECT*
+  [Object value]      void*
 

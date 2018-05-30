@@ -18,7 +18,13 @@ Artistic_1_0: |
   
   On Debian systems, the complete text of the Artistic License can be
   found in '/usr/share/common-licenses/Artistic'.
+CC0_1_0: |
+ To the extent possible under law, the author(s) have dedicated all
+ copyright and related and neighboring rights to this software to the public
+ domain worldwide. This software is distributed without any warranty.
 
+ On Debian systems, the complete text of the CC0 license, version 1.0,
+ can be found in /usr/share/common-licenses/CC0-1.0.
 GPL_1: |
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -67,3 +73,15 @@ LGPL_3_0: |
   
   On Debian systems, the complete text of version 3 of the GNU Lesser
   General Public License can be found in '/usr/share/common-licenses/LGPL-3'.
+Mozilla_1_1: |
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 1.1.
+
+  On Debian systems, the complete text of Mozilla Public License v 1.1
+  can be found in '/usr/share/common-licenses/MPL-1.1'.
+Mozilla_2_0: |
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0.
+
+  On Debian systems, the complete text of Mozilla Public License v 2.0
+  can be found in '/usr/share/common-licenses/MPL-2.0'.

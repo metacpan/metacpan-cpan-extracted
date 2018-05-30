@@ -1,6 +1,6 @@
 package Twitter::API::Trait::ApiMethods;
 # ABSTRACT: Convenient API Methods
-$Twitter::API::Trait::ApiMethods::VERSION = '1.0001';
+$Twitter::API::Trait::ApiMethods::VERSION = '1.0002';
 use 5.14.1;
 use Carp;
 use Moo::Role;
@@ -1212,7 +1212,7 @@ Twitter::API::Trait::ApiMethods - Convenient API Methods
 
 =head1 VERSION
 
-version 1.0001
+version 1.0002
 
 =head1 DESCRIPTION
 

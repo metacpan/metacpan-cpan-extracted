@@ -5,7 +5,7 @@ use 5.6.2;
 use XML::LibXML '1.69';
 use Test::Builder;
 
-our $VERSION = '0.16';
+our $VERSION = '0.19';
 
 sub new {
     my ($class, %p) = @_;
@@ -307,6 +307,11 @@ Select all "p" nodes that have any attribute.
 
 Select a count of all "p" nodes in the document.
 
+=item C<contains(//title, "Welcome")>
+
+Select true if the title node contains the string "Welcome", and false if it
+does not.
+
 =back
 
 There are a bunch of core functions in XPath. In addition to the (C<last()>
@@ -604,7 +609,7 @@ L<XML Path Language (XPath) Version 1.0 W3C Recommendation|http://www.w3.org/TR/
 
 =item *
 
-L<W3Schools XPath Tutorial|http://www.w3schools.com/Xpath/default.asp>.
+L<W3Schools XPath Tutorial|https://www.w3schools.com/xml/xpath_intro.asp>.
 
 =item *
 
@@ -625,16 +630,18 @@ C<no_xpath()> test functions.
 =head1 Support
 
 This module is stored in an open L<GitHub
-repository|http://github.com/theory/test-xpath/tree/>. Feel free to fork and
+repository|http://github.com/manwar/test-xpath/tree/>. Feel free to fork and
 contribute!
 
 Please file bug reports via L<GitHub
-Issues|http://github.com/theory/test-xpath/issues/> or by sending mail to
+Issues|http://github.com/manwar/test-xpath/issues/> or by sending mail to
 L<bug-Test-XPath@rt.cpan.org|mailto:bug-Test-XPath@rt.cpan.org>.
 
 =head1 Author
 
 David E. Wheeler <david@kineticode.com>
+
+Currently maintained by Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 Copyright and License
 

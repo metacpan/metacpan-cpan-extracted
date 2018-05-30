@@ -6,7 +6,7 @@ package WebService::BitbucketServer::RepositoryRefSync::V1;
 use warnings;
 use strict;
 
-our $VERSION = '0.603'; # VERSION
+our $VERSION = '0.604'; # VERSION
 
 use Moo;
 use namespace::clean;
@@ -79,7 +79,7 @@ WebService::BitbucketServer::RepositoryRefSync::V1 - Bindings for a Bitbucket Se
 
 =head1 VERSION
 
-version 0.603
+version 0.604
 
 =head1 SYNOPSIS
 
@@ -92,7 +92,7 @@ version 0.603
 
 =head1 DESCRIPTION
 
-This is a Bitbucket Server REST API for L<RepositoryRefSync::V1|https://developer.atlassian.com/static/rest/bitbucket-server/5.5.0/bitbucket-repository-ref-sync-rest.html>.
+This is a Bitbucket Server REST API for L<RepositoryRefSync::V1|https://developer.atlassian.com/static/rest/bitbucket-server/5.10.0/bitbucket-repository-ref-sync-rest.html>.
 
 Original API documentation created by and copyright Atlassian.
 
@@ -334,7 +334,7 @@ Charles McGarvey <chazmcgarvey@brokenzipper.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Charles McGarvey.
+This software is copyright (c) 2018 by Charles McGarvey.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

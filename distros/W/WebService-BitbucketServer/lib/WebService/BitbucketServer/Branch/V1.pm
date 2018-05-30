@@ -6,7 +6,7 @@ package WebService::BitbucketServer::Branch::V1;
 use warnings;
 use strict;
 
-our $VERSION = '0.603'; # VERSION
+our $VERSION = '0.604'; # VERSION
 
 use Moo;
 use namespace::clean;
@@ -38,21 +38,21 @@ sub _get_path_parameter {
 }
 
 
-sub delete_branch {
-    my $self = shift;
-    my $args = {@_ == 1 ? %{$_[0]} : @_};
-    my $url  = _get_url('branch-utils/1.0/projects/{projectKey}/repos/{repositorySlug}/branches', $args);
-    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
-    $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
-}
-
-
 sub create_branch {
     my $self = shift;
     my $args = {@_ == 1 ? %{$_[0]} : @_};
     my $url  = _get_url('branch-utils/1.0/projects/{projectKey}/repos/{repositorySlug}/branches', $args);
     my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
     $self->context->call(method => 'POST', url => $url, $data ? (data => $data) : ());
+}
+
+
+sub delete_branch {
+    my $self = shift;
+    my $args = {@_ == 1 ? %{$_[0]} : @_};
+    my $url  = _get_url('branch-utils/1.0/projects/{projectKey}/repos/{repositorySlug}/branches', $args);
+    my $data = (exists $args->{data} && $args->{data}) || (%$args && $args);
+    $self->context->call(method => 'DELETE', url => $url, $data ? (data => $data) : ());
 }
 
 
@@ -88,7 +88,7 @@ WebService::BitbucketServer::Branch::V1 - Bindings for a Bitbucket Server REST A
 
 =head1 VERSION
 
-version 0.603
+version 0.604
 
 =head1 SYNOPSIS
 
@@ -101,7 +101,7 @@ version 0.603
 
 =head1 DESCRIPTION
 
-This is a Bitbucket Server REST API for L<Branch::V1|https://developer.atlassian.com/static/rest/bitbucket-server/5.5.0/bitbucket-branch-rest.html>.
+This is a Bitbucket Server REST API for L<Branch::V1|https://developer.atlassian.com/static/rest/bitbucket-server/5.10.0/bitbucket-branch-rest.html>.
 
 Original API documentation created by and copyright Atlassian.
 
@@ -120,6 +120,38 @@ Get the instance of L<WebService::BitbucketServer> passed to L</new>.
 Create a new API.
 
 Normally you would use C<<< $webservice_bitbucketserver_obj->branch >>> instead.
+
+=head2 create_branch
+
+Creates a branch in the specified repository.
+
+The authenticated user must have an effective B<<< REPO_WRITE >>> permission to call this resource. If
+branch permissions are set up in the repository, the authenticated user must also have access to the branch name
+that is to be created.
+
+    POST branch-utils/1.0/projects/{projectKey}/repos/{repositorySlug}/branches
+
+Responses:
+
+=over 4
+
+=item * C<<< 201 >>> - data, type: application/json
+
+a JSON representation of the newly created branch
+
+=item * C<<< 400 >>> - errors, type: application/json
+
+the branch was not created because the request was invalid, e.g. the provided
+ref name already existed in the repository, or was not a valid ref name in the
+repository
+
+=item * C<<< 401 >>> - errors, type: application/json
+
+The currently authenticated user has insufficient permissions to create a
+branch. This could be due to insufficient repository permissions, or lack of
+branch permission for the provided ref name
+
+=back
 
 =head2 delete_branch
 
@@ -158,38 +190,6 @@ branch permission for the provided ref name.
 =item * C<<< 204 >>> - data, type: unknown
 
 an empty response indicating that the branch no longer exists in the repository
-
-=back
-
-=head2 create_branch
-
-Creates a branch in the specified repository.
-
-The authenticated user must have an effective B<<< REPO_WRITE >>> permission to call this resource. If
-branch permissions are set up in the repository, the authenticated user must also have access to the branch name
-that is to be created.
-
-    POST branch-utils/1.0/projects/{projectKey}/repos/{repositorySlug}/branches
-
-Responses:
-
-=over 4
-
-=item * C<<< 201 >>> - data, type: application/json
-
-a JSON representation of the newly created branch
-
-=item * C<<< 400 >>> - errors, type: application/json
-
-the branch was not created because the request was invalid, e.g. the provided
-ref name already existed in the repository, or was not a valid ref name in the
-repository
-
-=item * C<<< 401 >>> - errors, type: application/json
-
-The currently authenticated user has insufficient permissions to create a
-branch. This could be due to insufficient repository permissions, or lack of
-branch permission for the provided ref name
 
 =back
 
@@ -276,7 +276,7 @@ Charles McGarvey <chazmcgarvey@brokenzipper.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Charles McGarvey.
+This software is copyright (c) 2018 by Charles McGarvey.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

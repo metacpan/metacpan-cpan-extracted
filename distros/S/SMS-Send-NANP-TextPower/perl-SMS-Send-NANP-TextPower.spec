@@ -1,5 +1,5 @@
 Name:           perl-SMS-Send-NANP-TextPower
-Version:        0.03
+Version:        0.06
 Release:        1%{?dist}
 Summary:        SMS::Send driver for TextPower WebService
 License:        CHECK(Distributable)
@@ -10,9 +10,9 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(Test::Simple) >= 0.44
-BuildRequires:  perl(SMS::Send::Driver::WebService)
+BuildRequires:  perl(SMS::Send::Driver::WebService) >= 0.06
 BuildRequires:  perl(XML::Simple)
-Requires:       perl(SMS::Send::Driver::WebService)
+Requires:       perl(SMS::Send::Driver::WebService) >= 0.06
 Requires:       perl(XML::Simple)
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 

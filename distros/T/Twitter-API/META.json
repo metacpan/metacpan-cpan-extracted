@@ -77,55 +77,55 @@
    "provides" : {
       "Twitter::API" : {
          "file" : "lib/Twitter/API.pm",
-         "version" : "1.0001"
+         "version" : "1.0002"
       },
       "Twitter::API::Context" : {
          "file" : "lib/Twitter/API/Context.pm",
-         "version" : "1.0001"
+         "version" : "1.0002"
       },
       "Twitter::API::Error" : {
          "file" : "lib/Twitter/API/Error.pm",
-         "version" : "1.0001"
+         "version" : "1.0002"
       },
       "Twitter::API::Role::RequestArgs" : {
          "file" : "lib/Twitter/API/Role/RequestArgs.pm",
-         "version" : "1.0001"
+         "version" : "1.0002"
       },
       "Twitter::API::Trait::ApiMethods" : {
          "file" : "lib/Twitter/API/Trait/ApiMethods.pm",
-         "version" : "1.0001"
+         "version" : "1.0002"
       },
       "Twitter::API::Trait::AppAuth" : {
          "file" : "lib/Twitter/API/Trait/AppAuth.pm",
-         "version" : "1.0001"
+         "version" : "1.0002"
       },
       "Twitter::API::Trait::DecodeHtmlEntities" : {
          "file" : "lib/Twitter/API/Trait/DecodeHtmlEntities.pm",
-         "version" : "1.0001"
+         "version" : "1.0002"
       },
       "Twitter::API::Trait::Enchilada" : {
          "file" : "lib/Twitter/API/Trait/Enchilada.pm",
-         "version" : "1.0001"
+         "version" : "1.0002"
       },
       "Twitter::API::Trait::Migration" : {
          "file" : "lib/Twitter/API/Trait/Migration.pm",
-         "version" : "1.0001"
+         "version" : "1.0002"
       },
       "Twitter::API::Trait::NormalizeBooleans" : {
          "file" : "lib/Twitter/API/Trait/NormalizeBooleans.pm",
-         "version" : "1.0001"
+         "version" : "1.0002"
       },
       "Twitter::API::Trait::RateLimiting" : {
          "file" : "lib/Twitter/API/Trait/RateLimiting.pm",
-         "version" : "1.0001"
+         "version" : "1.0002"
       },
       "Twitter::API::Trait::RetryOnError" : {
          "file" : "lib/Twitter/API/Trait/RetryOnError.pm",
-         "version" : "1.0001"
+         "version" : "1.0002"
       },
       "Twitter::API::Util" : {
          "file" : "lib/Twitter/API/Util.pm",
-         "version" : "1.0001"
+         "version" : "1.0002"
       }
    },
    "release_status" : "stable",
@@ -141,7 +141,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#net-twitter"
    },
-   "version" : "1.0001",
+   "version" : "1.0002",
    "x_contributors" : [
       "Andrew Grangaard <granny-github@ofb.net>",
       "Dave Jacoby <jacoby.david@gmail.com>",
