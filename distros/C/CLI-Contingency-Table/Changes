@@ -1,0 +1,11 @@
+Revision history for CLI-Contingency-Table
+
+0.53    2018-06-03
+		Taking off the file "init.sh" from to be installed into bin files. 
+
+0.52    2018-06-02
+        Changed the status from unstable to stable on Build.PL
+
+0.51    2018-06-02
+        First version as a collection of "freq", "crosstable", "venn", "venn4", "saikoro", "init.sh". 
+

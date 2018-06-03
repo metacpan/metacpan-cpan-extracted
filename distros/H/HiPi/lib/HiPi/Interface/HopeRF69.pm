@@ -15,12 +15,11 @@ use warnings;
 use parent qw( HiPi::Interface );
 use Carp;
 use HiPi qw( :rpi :spi :hrf69 );
-use Time::HiRes qw( usleep );
 
 __PACKAGE__->create_accessors( qw( devicename reset_gpio update_default_on_reset
                                    fsk_config ook_config ook_repeat) );
 
-our $VERSION ='0.70';
+our $VERSION ='0.71';
 
 # Hope recommended updated reset defaults
 my $reset_defaults = [
@@ -189,7 +188,7 @@ sub reset {
     my $gpio = HiPi::GPIO->new;
     $gpio->set_pin_mode( $pin, RPI_MODE_OUTPUT ) if( $gpio->get_pin_mode($pin) != RPI_MODE_OUTPUT );
     $gpio->pin_write($pin, RPI_HIGH);
-    usleep( 100000 ); # 0.1 secs
+    $self->delay( 100 ); # 0.1 secs
     $gpio->pin_write($pin, RPI_LOW);
         
     if ($self->update_default_on_reset) {

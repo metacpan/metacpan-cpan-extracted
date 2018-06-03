@@ -1,7 +1,7 @@
 package Data::Sah::CoerceJS;
 
-our $DATE = '2018-03-27'; # DATE
-our $VERSION = '0.024'; # VERSION
+our $DATE = '2018-06-02'; # DATE
+our $VERSION = '0.025'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,6 @@ sub gen_coercer {
     my %args = @_;
 
     my $rt = $args{return_type} // 'val';
-    my $rt_sv = $rt eq 'str+val';
 
     my $rules = Data::Sah::CoerceCommon::get_coerce_rules(
         %args,
@@ -50,17 +49,37 @@ sub gen_coercer {
         my $expr;
         for my $i (reverse 0..$#{$rules}) {
             my $rule = $rules->[$i];
+
+            my $prev_term;
             if ($i == $#{$rules}) {
-                if ($rt_sv) {
-                    $expr = "($rule->{expr_match}) ? [\"$rule->{name}\", $rule->{expr_coerce}] : [null, data]";
-                } else {
-                    $expr = "($rule->{expr_match}) ? ($rule->{expr_coerce}) : data";
+                if ($rt eq 'val') {
+                    $prev_term = 'data';
+                } elsif ($rt eq 'status+val') {
+                    $prev_term = '[null, data]';
+                } else { # status+err+val
+                    $prev_term = '[null, null, data]';
                 }
             } else {
-                if ($rt_sv) {
-                    $expr = "($rule->{expr_match}) ? [\"$rule->{name}\", $rule->{expr_coerce}] : ($expr)";
+                $prev_term = $expr;
+            }
+
+            if ($rt eq 'val') {
+                if ($rule->{meta}{might_fail}) {
+                    $expr = "(function() { if ($rule->{expr_match}) { var _tmp1 = $rule->{expr_coerce}; if (_tmp1[0]) { return null } else { return _tmp1[1] } } else { return $prev_term } })()";
                 } else {
-                    $expr = "($rule->{expr_match}) ? ($rule->{expr_coerce}) : ($expr)";
+                    $expr = "($rule->{expr_match}) ? ($rule->{expr_coerce}) : $prev_term";
+                }
+            } elsif ($rt eq 'status+val') {
+                if ($rule->{meta}{might_fail}) {
+                    $expr = "(function() { if ($rule->{expr_match}) { var _tmp1 = $rule->{expr_coerce}; if (_tmp1[0]) { return [true, null] } else { return [true, _tmp1[1]] } } else { return $prev_term } })()";
+                } else {
+                    $expr = "($rule->{expr_match}) ? [true, $rule->{expr_coerce}] : $prev_term";
+                }
+            } else { # status+err+val
+                if ($rule->{meta}{might_fail}) {
+                    $expr = "(function() { if ($rule->{expr_match}) { var _tmp1 = $rule->{expr_coerce}; if (_tmp1[0]) { return [true, _tmp1[0], null] } else { return [true, null, _tmp1[1]] } } else { return $prev_term } })()";
+                } else {
+                    $expr = "($rule->{expr_match}) ? [true, null, $rule->{expr_coerce}] : $prev_term";
                 }
             }
         }
@@ -68,18 +87,22 @@ sub gen_coercer {
         $code = join(
             "",
             "function (data) {\n",
-            ($rt_sv ?
-                 "    if (data === undefined || data === null) return [null, null];\n" :
-                 "    if (data === undefined || data === null) return null;\n"
-             ),
+            "    if (data === undefined || data === null) {\n",
+            "        ", ($rt eq 'val' ? "return null;" :
+                             $rt eq 'status+val' ? "return [null, null];" :
+                             "return [null, null, null];" # status+err+val
+                         ), "\n",
+            "    }\n",
             "    return ($expr);\n",
             "}",
         );
     } else {
-        if ($rt_sv) {
+        if ($rt eq 'val') {
+            $code = 'function (data) { return data }';
+        } elsif ($rt eq 'status+val') {
             $code = 'function (data) { return [null, data] }';
         } else {
-            $code = 'function (data) { return data }';
+            $code = 'function (data) { return [null, null, data] }';
         }
     }
 
@@ -130,7 +153,7 @@ Data::Sah::CoerceJS - Generate coercer code
 
 =head1 VERSION
 
-This document describes version 0.024 of Data::Sah::CoerceJS (from Perl distribution Data-Sah-Coerce), released on 2018-03-27.
+This document describes version 0.025 of Data::Sah::CoerceJS (from Perl distribution Data-Sah-Coerce), released on 2018-06-02.
 
 =head1 SYNOPSIS
 

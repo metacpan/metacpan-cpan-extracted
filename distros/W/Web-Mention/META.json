@@ -75,7 +75,7 @@
    "provides" : {
       "Web::Mention" : {
          "file" : "lib/Web/Mention.pm",
-         "version" : "0.5"
+         "version" : "0.501"
       },
       "Web::Mention::Author" : {
          "file" : "lib/Web/Mention/Author.pm"
@@ -92,7 +92,7 @@
          "web" : "https://github.com/jmacdotorg/webmention-perl"
       }
    },
-   "version" : "0.5",
+   "version" : "0.501",
    "x_contributors" : [
       "Jason McIntosh <jmac@jmac.org>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"

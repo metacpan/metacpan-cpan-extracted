@@ -12,3 +12,4 @@ t/00-use_ok.t
 t/01-export_ok.t
 t/02-output_ok.t
 t/03-change_config.t
+test.tgz

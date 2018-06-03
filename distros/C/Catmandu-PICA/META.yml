@@ -9,9 +9,9 @@ build_requires:
   Test::More: '1.001003'
   Test::XML: '0.08'
 configure_requires:
-  Module::Build::Tiny: '0.034'
+  Module::Build::Tiny: '0.039'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,29 +19,26 @@ meta-spec:
 name: Catmandu-PICA
 no_index:
   directory:
-    - eg
-    - examples
-    - inc
-    - share
     - t
     - xt
+    - inc
+    - share
+    - eg
+    - examples
 requires:
   Catmandu: '1.0601'
   Catmandu::SRU: '0.41'
   Moo: '1.0'
-  PICA::Data: '0.35'
-  PICA::Parser: '0.585'
+  PICA::Data: '0.36'
   perl: v5.12.0
 resources:
   bugtracker: https://github.com/gbv/Catmandu-PICA/issues
   homepage: https://github.com/gbv/Catmandu-PICA
   repository: https://github.com/gbv/Catmandu-PICA.git
-version: '0.25'
+version: '0.26'
 x_contributors:
-  - 'Carsten Klee <carsten.klee@sbb.spk-berlin.de>'
-  - 'Carsten Klee <cKlee@users.noreply.github.com>'
+  - 'Carsten Klee <klee@cpan.org>'
   - 'E. Choroba <choroba@matfyz.cz>'
   - 'Jakob Voß <jakob.voss@gbv.de>'
   - 'Johann Rolschewski <jorol@cpan.org>'
-  - 'Julian Ladisch <julianladisch@users.noreply.github.com>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+  - 'julianladisch <julianladisch@users.noreply.github.com>'

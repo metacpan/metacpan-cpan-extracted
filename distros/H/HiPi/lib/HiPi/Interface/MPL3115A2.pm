@@ -17,7 +17,7 @@ use HiPi qw( :i2c :mpl3115a2 :rpi );
 use HiPi::RaspberryPi;
 use Carp;
 
-our $VERSION ='0.70';
+our $VERSION ='0.71';
 
 __PACKAGE__->create_accessors( qw( osdelay backend ) );
 
@@ -352,7 +352,7 @@ sub os_all_data {
 
 sub sea_level_pressure {
     my( $class, $pressure, $altitude, $temperature, $gravity) = @_;
-    $gravity ||= 9.81;   # acceleratio due to gravity
+    $gravity ||= 9.81;   # acceleration due to gravity
     my $dgc    = 287.0; # dry gas constant
     
     # Po = ((P * 1000) * Math.exp((g*Zg)/(Rd *  (Tv_avg + 273.15))))/1000;

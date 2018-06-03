@@ -22,8 +22,29 @@ my (@lines) = ( 'Line 1', 'Line 2', 'Line 3', );
 my $lc = 0;
 my @flret;
 
+subtest dolines_inline => sub {
+    my @result;
+    @flret = ();
+
+    my $lineno  = 0;
+    my $linecnt = dolines {
+        $lineno++;
+        my $line = shift;
+
+        push @result, $line;
+
+        is( $line, $_, "Line $lineno - Local \$_ and \$_[0] are the same" );
+      }
+      "t/data/3lines.txt";
+
+    is( \@result, \@lines,        'Read 3 line file' );
+    is( $linecnt, scalar(@lines), 'Return value is proper' );
+};
+
 subtest forlines_inline => sub {
     my @result;
+    @flret = ();
+
     my $lineno = 0;
     my $linecnt = forlines "t/data/3lines.txt", sub {
         $lineno++;
@@ -48,12 +69,25 @@ sub flsub {
     return;
 }
 
+subtest dolines_sub => sub {
+    my @result;
+    @flret = ();
+
+    my $lineno = 0;
+    my $linecnt = dolines \&flsub, "t/data/3lines.txt";
+
+    is( \@flret,  \@lines,        'Read 3 line file' );
+    is( $linecnt, scalar(@lines), 'Return value is proper' );
+};
+
 subtest forlines_sub => sub {
     my @result;
+    @flret = ();
+
     my $lineno = 0;
     my $linecnt = forlines "t/data/3lines.txt", \&flsub;
 
-    is( \@flret, \@lines,         'Read 3 line file' );
+    is( \@flret,  \@lines,        'Read 3 line file' );
     is( $linecnt, scalar(@lines), 'Return value is proper' );
 };
 

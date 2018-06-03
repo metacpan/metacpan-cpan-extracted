@@ -30,7 +30,7 @@ foreach my $xml_file (@xml_files)
         {
             'source' =>
             {
-                'file' => 
+                'file' =>
                     File::Spec->catfile(
                         File::Spec->curdir(),
                         "t", "data", "valid-xmls",

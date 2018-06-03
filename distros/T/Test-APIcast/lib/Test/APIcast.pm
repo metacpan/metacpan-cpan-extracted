@@ -3,7 +3,7 @@ use v5.10.1;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = "0.11";
+our $VERSION = "0.12";
 
 BEGIN {
     $ENV{TEST_NGINX_BINARY} ||= 'openresty';
@@ -36,6 +36,7 @@ if ($ENV{DEBUG}) {
 
 our @EXPORT = qw( get_random_port );
 
+our @PORTS = ();
 
 sub get_random_port {
     my $tries = 1000;
@@ -52,7 +53,7 @@ sub get_random_port {
         );
 
         if (defined $sock) {
-            $sock->close();
+            push @PORTS, $sock;
             $ServerPort = $port;
             last;
         }
@@ -81,6 +82,14 @@ add_block_preprocessor(sub {
 
     $ENV{TEST_NGINX_RANDOM_PORT} = $block->random_port;
 });
+
+
+sub close_random_ports {
+   my $sock;
+    while (defined($sock = shift @PORTS)){
+        $sock->close();
+    }
+};
 
 our $dns = sub ($$$) {
     my ($host, $ip, $ttl) = @_;
@@ -172,6 +181,18 @@ sub Test::Base::Filter::fixture {
     my $contents = read_file($file);
 
     return $contents;
+}
+
+
+BEGIN {
+    no warnings 'redefine';
+
+    *write_config_file= \&Test::Nginx::Util::write_config_file;
+
+    *Test::Nginx::Util::write_config_file = sub ($$) {
+        write_config_file(@_);
+        close_random_ports();
+    };
 }
 
 1;

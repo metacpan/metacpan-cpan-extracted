@@ -22,8 +22,7 @@ sub API_app_init ( $self, $req, $data = undef ) {
 
 sub API_signin ( $self, $req, $data ) {
     $self->{app}->{api}->authenticate(
-        $data->{user_name},
-        $data->{password},
+        [ $data->{user_name}, $data->{password} ],
         Coro::unblock_sub sub ($auth) {
 
             # authentication error
@@ -65,7 +64,7 @@ sub API_signout ( $self, $req, @ ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 1, 5                 | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 73                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 77 does not match the package declaration       |
+## |    1 | 72                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 76 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

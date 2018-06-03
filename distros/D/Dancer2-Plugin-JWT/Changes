@@ -1,3 +1,9 @@
+0.015  2018-06-01
+   - Check for undefined secret (thanks to Mohammad S Anwar)
+
+0.014  2018-05-31
+   - Check for JWT in a cookie.
+
 0.013  2017-07-10
    - Make 'Authorization' header available to clients through ACEH.
 

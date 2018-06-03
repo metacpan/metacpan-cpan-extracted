@@ -92,7 +92,7 @@ sub new
     return $self;
 }
 
-sub _init 
+sub _init
 {
     return 0;
 }
@@ -109,7 +109,7 @@ sub get
     {
         die "Incorrect url.";
     }
-    
+
     my ($size, $asin) = ($1, $2);
 
     return HTTP::Response->new({size => $size, asin => $asin});

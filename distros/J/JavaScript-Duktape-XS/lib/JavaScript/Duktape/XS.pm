@@ -7,7 +7,7 @@ use parent 'Exporter';
 use Text::Trim qw(trim rtrim);
 use XSLoader;
 
-our $VERSION = '0.000052';
+our $VERSION = '0.000061';
 XSLoader::load( __PACKAGE__, $VERSION );
 
 our @EXPORT_OK = qw[];
@@ -95,7 +95,7 @@ engine
 
 =head1 VERSION
 
-Version 0.000052
+Version 0.000061
 
 =head1 SYNOPSIS
 
@@ -109,6 +109,12 @@ Version 0.000052
 
     $duk->set('my.object.slot', { foo => [ 4, 5 ] });
     my $href = $duk->get('my.object.slot');
+
+    if ($duk->exists('my.object.slot')) { ... }
+
+    my $typeof = $duk->typeof('my.object.slot');
+
+    my $ok = $duk->instanceof('my.car.object', 'Car');
 
     # When function_name is called from JS, the arguments passed in
     # will be converted to Perl values; likewise, the value returned
@@ -125,6 +131,12 @@ Version 0.000052
     $duk->reset_msgs();
 
     my $context = $duk->parse_js_stacktrace($stacktrace_lines, 2);
+
+    my $rounds = $duk->run_gc();
+
+    $duk->set('perl_module_resolve', \&module_resolve);
+    $duk->set('perl_module_load',    \&module_load);
+    $duk->eval('var badger = require("badger");');
 
 =head1 DESCRIPTION
 
@@ -176,6 +188,23 @@ The JavaScript value is converted into an equivalent Perl value, so you can
 freely pass nested structures (hashes of arrays of hashes) and they will be
 handled correctly.
 
+=head2 exists
+
+Checks to see if there is a value stored in a JavaScript variable or object
+slot. Returns a boolean and avoids all JavaScript to Perl value converions.
+
+=head2 typeof
+
+Returns a string with the JavaScript type of a given variable.
+
+It returns C<null> for null values, which fixes the long-standing bug of
+returning C<object> for null values.
+
+=head2 instanceof
+
+Returns a true value when the variable given by the first parameter is an
+instance of the class given by the second parameter.
+
 =head2 eval
 
 Run a piece of JavaScript code, given as a string, and return the results.
@@ -219,6 +248,24 @@ Parse a JavaScript stacktrace (usually returned via C<get_msgs>) and obtain
 structured information from it.  For each of the number of frames requested
 (default to 1), it gets the error message, the file name and line number where
 the error happened, and an array of lines surrounding the actual error message.
+
+=head2 run_gc
+
+Run at least one round of the Duktape garbage collector, and return the number
+of rounds that were effectively run.  The documentation recommends to run two
+rounds, so that's what we always do.
+
+=head1 MODULE SUPPORT
+
+There is support for managing JavaScript modules in the style of node.js.  In
+order to do this, you need to set two Perl callbacks:
+
+    $duk->set('perl_module_resolve', \&module_resolve);
+    $duk->set('perl_module_load',    \&module_load);
+
+Please see
+L<https://github.com/svaarala/duktape/tree/master/extras/module-node> for more
+details.
 
 =head1 SEE ALSO
 

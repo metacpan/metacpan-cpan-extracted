@@ -55,6 +55,11 @@ xt/group_modify_list.t
 xt/group_modify_selectbox.t
 xt/initialdata.t
 xt/mandatory_pattern.t
+xt/multivalued_mandatory_pattern.t
+xt/multivalued_ticket_display.t
+xt/multivalued_ticket_modify_list.t
+xt/multivalued_ticket_modify_selectbox.t
+xt/multivalued_user_summary.t
 xt/queue_modify_dropdown.t
 xt/queue_modify_list.t
 xt/queue_modify_selectbox.t
@@ -66,3 +71,4 @@ xt/user_modify_dropdown.t
 xt/user_modify_list.t
 xt/user_modify_selectbox.t
 xt/user_summary.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

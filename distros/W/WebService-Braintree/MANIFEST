@@ -14,14 +14,11 @@ devops/within_container
 dist.ini
 docs/FEATURE_PARITY.md
 lib/WebService/Braintree.pm
-lib/WebService/Braintree/#CustomerSearch.pm#
-lib/WebService/Braintree/#Types.pm#
 lib/WebService/Braintree/AddOn.pm
 lib/WebService/Braintree/AddOnGateway.pm
 lib/WebService/Braintree/Address.pm
 lib/WebService/Braintree/AddressGateway.pm
 lib/WebService/Braintree/AdvancedSearch.pm
-lib/WebService/Braintree/AdvancedSearch/#Types.pm#
 lib/WebService/Braintree/AdvancedSearchFields.pm
 lib/WebService/Braintree/AdvancedSearchNodes.pm
 lib/WebService/Braintree/ApplePay.pm
@@ -265,7 +262,6 @@ t/sandbox/subscription_search.t
 t/sandbox/transaction.t
 t/sandbox/transaction_search.t
 t/sandbox/transparent_redirect.t
-t/unit/#types.t#
 t/unit/00-load.t
 t/unit/address.t
 t/unit/advanced_search.t

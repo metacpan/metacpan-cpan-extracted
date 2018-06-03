@@ -33,6 +33,7 @@ L<RPi::Const> module.
     IC           -  integrated circuit
     GPS          -  Global Positioning System
     TPV          -  Time-Position Velocity
+    RTC          -  Real-Time Clock (RTC)
 
 
 =head1 SETUP
@@ -128,11 +129,11 @@ the C<pi> user to the C<spi> group:
 
     sudo adduser pi spi
 
-=head1 Serial configuration
+=head2 Serial configuration
 
 In order to use GPIO pins 14 and 15 as a serial interface on the Raspberry Pi,
-you need to disable the built-in Bluetooth adaptor. This distribution will not
-operate correctly without this being done.
+you need to disable the built-in Bluetooth adaptor. This distribution's  serial
+functionality will not operate correctly without this being done.
 
 First, in C<raspi-config>, in the C<Serial> section in C<Interfacing Options>,
 disable "login shell" on the serial interface, then disable Bluetooth by editing
@@ -146,9 +147,9 @@ Save the file, then reboot the Pi.
 
 =head2 Create a Raspberry Pi object
 
-The first thing you need to do is call the C<setup()> method. We do
-that automatically. See L<new()|RPi::WiringPi/"new-args">. We use the GPIO pin
-numbering scheme.
+First thing that needs doing is some back-end Pi configuration. We take care of
+that automatically during the Raspberry Pi object creation. Upon instantiation,
+we set the system to use the GPIO pin numbering scheme.
 
     my $pi = RPi::WiringPi->new;
 
@@ -177,7 +178,7 @@ information.
 
     $pin->write(HIGH);
 
-    # get the current status of a pin (HIGH or LOW)
+    # get the current status of a pin (HIGH or LOW, ie. on or off)
 
     my $state = $pin->read;
 
@@ -190,7 +191,7 @@ information.
 All GPIO pins on the Raspberry Pi have built-in pull up/down resistors to
 prevent pins being in a "floating" state when not connected to either ground or
 power. This is very important in many situations, particularly when using
-interrupts.
+things like interrupts, buttons etc.
 
     # HIGH when not in use
 
@@ -199,6 +200,10 @@ interrupts.
     # LOW when not in use
 
     $pin->pull(PUD_DOWN);
+
+    # disable the resistors entirely (go back to floating)
+
+    $pin->pull(PUD_OFF);
 
 =head2 Pulse Width Modulation (PWM)
 
@@ -235,8 +240,8 @@ The PWM clock can be set to control the PWM pulse widths. The PWM clock is
 derived from a 19.2MHz clock. You can set any divider.
 
 For example, say you wanted to drive a DC motor with PWM at about 1kHz, and
-control the speed in 1/1024 increments from 0/1024 (stopped) through to
-1024/1024 (full on). In that case you might set the clock divider to be 16, and
+control the speed in 1/1024 increments from 0/1023 (stopped) through to
+1023/1023 (full on). In that case you might set the clock divider to be 16, and
 the RANGE to 1024. The pulse repetition frequency will be
 1.2MHz/1024 = 1171.875Hz.
 
@@ -390,7 +395,7 @@ usage instructions.
     $spi->rw($buf, $len);
 
     # do a read-only call. Send in the number of bytes you want back as dummy
-    # bytes (ie. 0)
+    # bytes (eg. 0)
 
     my $dummy = [0x00, 0x00, 0x00];
 
@@ -413,17 +418,18 @@ that documentation for full usage instructions.
 
     my $v = $adc->volts(0);
 
-    # fetch the percentage of input on pin A0
+    # fetch the percentage of input on pin A1
 
-    my $p = $adc->percent(0);
+    my $p = $adc->percent(1);
 
 You can also request an MCP300x ADC from L<RPi::ADC::MCP3008>. Again, for full
 details, see that documentation.
 
     my $adc = $pi->adc(model => 'MCP3008', channel => 0);
 
-    my $raw = $adc->raw(0);
-    my $percent = $adc->percent(0);
+    my $raw = $adc->raw(0);         # 1st analog input
+    my $volts = $adc->volts(2);     # 3rd analog input
+    my $percent = $adc->percent(7); # 8th analog input
 
 =head1 DIGITAL TO ANALOG CONVERTERS (DAC)
 
@@ -672,6 +678,22 @@ through the L<RPi::HCSR04> distribution.
     my $cm     = $sensor->cm;
     my $raw    = $sensor->raw;
 
+=head1 REAL-TIME CLOCK
+
+We provide access to the C<DS3231> and C<DS1307> real-time clock modules (RTC)
+via the L<RPi::RTC::DS3231> distribution. Please see its documentation for full
+usage instructions.
+
+=head2 Usage
+
+    my $rtc = $pi->rtc;
+
+    my $dt_string = $rtc->date_time;
+
+    $rtc->clock_hours(12);
+
+    my $meridien = $rtc->am_pm;
+
 =head1 SERVO
 
 =head2 Description
@@ -790,6 +812,13 @@ variable to a true value:
 
     export RPI_LCD=1
 
+=head3 RTC Testing
+
+To test the L<RPi::RTC::DS3231> distribution, you must set the following
+environment variable:
+
+    export RPI_RTC=1
+
 =head2 Automated with L<Test::BrewBuild>
 
 L<Test::BrewBuild> has some special features specifically to facilitate the
@@ -816,7 +845,7 @@ C<-a> flag with no parameters runs continuously, sleeping for a default of 60
 seconds between runs. Simply send in an integer value that represents a certain
 number of runs if desired.
 
-    bbdispatch -t localhost -r https://github.com/stevieb9/rpi-wiringpi -a
+    bbdispatch -t localhost -r stevieb9/rpi-wiringpi -a
 
 To use the LCD functionality which displays the last date/time that a test run
 succeeded, along with the last commit tested and it's result (PASS/FAIL), set
@@ -833,7 +862,7 @@ have is a two row by 16 column LCD.
 To make it work. I set this one in C</etc/environment> as well. You then need to
 restart the dispatcher with the C<--rpi> or the equivalent C<-R> flag:
 
-    bbdispatch -t localhost -r https://stevieb9/rpi-wiringpi -a --rpi
+    bbdispatch -t localhost -r stevieb9/rpi-wiringpi -a --rpi
 
 The C<--rpi> flag is rather hidden (but it *is* documented subtly), as this is
 a feature that most likely I'll be the only consumer of.
@@ -851,6 +880,7 @@ column unit, leave those last two digits off.
     RPI_SERIAL=1
     RPI_HCSR04=1
     BB_RPI_LCD=5,6,4,17,27,22,4,20
+    RPI_RTC=1
     RELEASE_TESTING=1
 
 =head1 DEVELOPMENT

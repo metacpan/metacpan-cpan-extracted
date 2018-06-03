@@ -1,0 +1,186 @@
+#!/usr/bin/perl
+use v5.8 ; use strict ; use warnings ; 
+use Scalar::Util qw/looks_like_number/; # 5.7 ~
+use Getopt::Std; getopts '^:~=/:+:,@:1:e:qvm:' , \my %o ;
+use Term::ANSIColor qw/:constants color/; $Term::ANSIColor::AUTORESET = 1 ;# v5.6 ~ 
+#use utf8 ; 
+my $isep = $o{'/'} // "\t" ; # 入力の区切り文字
+my $oemp = $o{e} // 0 ; # 出力のセルが未定義値の場合に代わりに出力する文字列
+my $sec = $o{'@'} // 10 ; # 何秒ごとに処理状態を出力するか。
+my $addC ; # ある列を加算する場合の列の指定
+my $t00 ;  # 表の左上隅に載せる文字列
+my %ax2 ; # キーは横軸の項目名となる。
+my %C ; # セルの値 
+my %Cc ; # 1件を1個と数える。
+my %Ce ; # 空文字列の個数を数える。
+
+
+$SIG{ALRM} = sub { 
+	(my $n=$.) =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/g ; # 3桁ごとに区切る。
+	print STDERR GREEN "$n lines read. " , scalar localtime , " " , RESET '' ; 
+	alarm $sec 
+} ; 
+my $IntFirst = sub {
+	&{ $SIG{ALRM} } ;
+	print STDERR BRIGHT_RED 
+	 'Do you want to get the halfway result? Then type Ctrl + C again within 2 seconds. '. "\n" .
+	 'Really want to Quit? Then press Ctrl + "\" or Ctrl + Yen-Mark. (Ctrl+Z may be what you want.) ' . RESET "\n" ;
+	$SIG{INT} = sub { select *STDERR ; & Output ; select *STDOUT ; return } ; 
+	sleep 2 ; 
+	return ;
+} ;
+$SIG{INT} = $IntFirst ;
+
+
+& Init ;
+& Input ; 
+& Output ; 
+exit 0 ; 
+
+sub Init { 
+    * CYAN = * GREEN = sub { @_ } if $o{q} ; # -q により着色コマンドを無効化する。
+    $addC = $o{'+'} > 0 ? $o{'+'} - 1 : $o{'+'} if $o{'+'} ; 
+    $addC = $o{'^'} > 0 ? $o{'^'} - 1 : $o{'^'} if $o{'^'} ; 
+}
+
+sub Input { 
+  	$t00= $o{'='}? <> : "X1\tX2" ; 
+  	chomp $t00; $t00 =~ s{\t}{*}g ;
+    $t00 = $o{1} if defined $o{1} ; # ) { my $t = quotemeta $o{1} ; $t00 =~ s/.*/$t/ }
+  	#s/.*\t/\Q$o{1}\E/ if defined $o{1} ;
+
+  	alarm $sec ; 
+	while(<>){
+	    chomp;
+	    my @F = split /$isep/ , $_ , -1 ; #($addC//2)+1 ; #3列目以降は連結する。  -x と組み合わせて使うとよいかも。
+	    my $add = defined $addC ? splice ( @F, $addC , 1 ) : 1 ; # 加算する場合の処理
+	    grep { $_ //= 'undef' } @F[0,1] ;
+
+	    $ax2 { $F[1] } ++ ;  
+	    $o{'^'} and $C { $F[0] } { $F[1] } = $add or  $C  { $F[0] } { $F[1] } += $add || 0 ;  
+	    next unless $o{v} ;
+	    $Ce { $F[0] } { $F[1] } ++ if $add eq '' ;
+	    $Cc { $F[0] } { $F[1] } ++ if $o{3} ;
+	}
+}
+
+sub Output { 
+	
+	cellMult ( \%C, $o{m} ) if defined $o{m} ;	# -x のオプションで、指定された数をかけ算して、整数部分を取り出す。
+    #insComma ( \%C, 3 ) if defined $o{','} ; # -, のオプションがあれば、数値に3桁ごとにコンマを挿入
+		
+	# 一番目のクロス表を表示
+	showMat(  \%C , $t00 ) ;
+	#return  if !$o{3} ;
+	
+	# -v が指定しているかどうかで異なるクロス表を表示する。
+	if ( $o{v} ) { 
+		print "\n" ;
+		showMat( \%Cc , "items" ) ;  # カウント対象となったすべての行数
+		print "\n" ;
+		showMat( \%Ce , "empties" ) ; # 空文字列がいくつ出現したか
+	}
+
+	$SIG{INT} = $IntFirst
+
+	# my %Cv ; for my$i(@a1){for my$j(@a2){$Cv{$i}{$j}=($Cc{$i}{$j}//0)-($Ce{$i}{$j}//0)}}
+}
+
+
+sub StrNumSort ( @ ) {
+	+( sort { $a cmp $b } grep { ! looks_like_number ($_) } @_ ) ,
+	 ( sort { $a <=> $b } grep {   looks_like_number ($_) } @_ ) ;
+}
+
+sub showMat ( $$ ) { 
+	my ($C,$h11) = @_ ; # セル, 縦軸, 横軸, 出力表の左上の文字列
+	my @a1 = StrNumSort ( keys %{$C} ) ; # 縦軸の各項目名
+	my @a2 = StrNumSort ( keys %ax2 ) ; # 横軸の各項目名
+
+
+	if ( ! $o{'~'} ) { 
+		print CYAN "$h11\t" , GREEN join("\t",@a2 ),"\n" ; # 出力の1行目
+		for my $i ( @a1 ) {
+		    print GREEN $i, "\t" ;  #  出力の1列目
+		    print join ( "\t" , map { insComma( $C->{$i}{$_}//$oemp , 3 )  } @a2 ) , "\n" ;
+		}
+	} else {
+		print CYAN "$h11\t" , GREEN join("\t",@a1 ),"\n" ; # 出力の1行目
+		for my $i ( @a2 ) {
+		    print GREEN $i, "\t" ;  #  出力の1列目
+		    #print join ( "\t" , map { $C -> { $_ }{ $i } // $oemp } @a1 ) , "\n" ;
+		    print join ( "\t" , map { insComma ( $C->{$_}{$i}//$oemp , 3 )  } @a1 ) , "\n" ;
+		}
+	}
+}
+
+sub cellMult ( $$ ) {
+    for my $i ( keys %{ $_[0] } ) {
+        for my $j ( keys %{ ($_[0]) -> {$i} }  ) {
+            #$_[0]->{$i}{$j} = defined $_[0]->{$i}{$j} ? int ( $_[0]->{$i}{$j} * $_[1] ) . "." : '' ;
+            $_[0]->{$i}{$j} = int ( $_[0]->{$i}{$j} * $_[1] ) . "." ;
+        }
+    } 
+}
+
+sub insComma ( $$ ) {
+    (my $tmp = $_[0]) =~ s/(?<=\d)(?=(\d{$_[1]})+($|\D))/,/g ; # 3桁ごとに区切る。
+    return $tmp
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {print "1.01\n" ;} 
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+
+=encoding utf8
+
+=head1 NAME
+ 
+ crosstable -- Produce the crosstable from the 2 column data. Can also sum up a additional column by -3 switch option.
+
+ 2列のデータを度数を数えて、クロステーブルにする。
+ Count the numbers of the frequencies of the combination of the 2 columns, and produce crosstable.
+   
+
+ オプション : 
+   -/ REGEX : 区切り文字の指定。コンマ , などに変更が可能。未指定ならタブ文字。Specify the delimiter. Default : tab
+   -~   : 出力表の、縦軸と横軸を反転する。 (Transpose the output table btw. vertical and horizontal axis.)
+   -=   : 入力の1行目を列名の並びと見なし、データの値とは扱わない。2行目からを加算対象のデータとして扱う。(Skip the 1st input line.)
+   -1 str ; 出力の1行1列目に入れる文字列の指定。出力のレイアウトを見やすくのにも便利。　空文字列の指定には -1 '' とする。
+
+   -+ N : N列目を残りの先頭2列の値の組合せごとに集計した値を出力する。Nは1始まり(Sum N-th column along the rest 2 first columns.)
+   -^ N : 実際はおそらく -\^ で Nを指定。N列目の値を足すのではなくただ書き込む。実験的な実装。
+   -@ N : N 秒ごとに，何行を読んだかを報告する。 Report how many have read every N seconds.
+
+   -,   : 出力表の各セルの値を3桁ごとにコンマで区切る。Put comma(,) in the numbers such as 12,345,678.
+   -m N : 出力表において、N をかけ算した数の整数部を表示する。(Multiply number and take Integer part. E.g. N=1e-5)
+
+   -e STR : 出力表で埋まらないセルに埋める値。The value to be replaced on the unfilled output table cell.
+   -v   : -+ が指定された場合に他の有用な情報も出力 (個数、空文字列) Other entailing information.
+   -q   : 色を出さないようにする。 No color by ANSI color.
+
+
+
+ Ctrl+C に関して : 
+   Try the following : 
+     $0 <( yes 1 )  # This is a little different from " yes 1 | $0 " because not only "$0" but also "yes 1" stops by Ctrl +C. 
+
+ 関連するコマンド : 
+   keyvalues 
+
+ 開発上のメモ :
+   * 縦軸と横軸のそれぞれの表示順序を豊富にしても良さそう。
+   * オプションスイッチが10個を超えたので、うまく整理したい。
+
+=cut

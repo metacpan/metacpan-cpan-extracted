@@ -231,7 +231,7 @@ sub authenticate ( $self, $cb ) {
         my $env = $self->{env};
 
         # get auth token from query param, header, cookie
-        my ( $user_name, $token );
+        my $token;
 
         if ( $env->{QUERY_STRING} && $env->{QUERY_STRING} =~ /\baccess_token=([^&]+)/sm ) {
             $token = $1;
@@ -242,14 +242,15 @@ sub authenticate ( $self, $cb ) {
         elsif ( $env->{HTTP_AUTHORIZATION} && $env->{HTTP_AUTHORIZATION} =~ /Basic\s+(.+)\b/smi ) {
             $token = eval { from_b64 $1};
 
-            ( $user_name, $token ) = split /:/sm, $token if $token;
+            $token = [ split /:/sm, $token ] if $token;
+
+            undef $token if !defined $token->[0];
         }
         elsif ( $env->{HTTP_COOKIE} && $env->{HTTP_COOKIE} =~ /\btoken=([^;]+)\b/sm ) {
             $token = $1;
         }
 
         $self->{app}->{api}->authenticate(
-            $user_name,
             $token,
             sub ($auth) {
                 $cb->( $self->{_auth} = $auth );

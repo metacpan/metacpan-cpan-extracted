@@ -1046,7 +1046,8 @@
             $m->{"capture"} = $m->{"capture"}->[1];
             return Perlito5::Grammar::String::double_quoted_var_with_subscript($m, $interpolate)
         }
-        elsif ($c eq "\@" && join('', @{$str}[$pos + 1 .. $pos + length($delimiter)]) ne $delimiter && ($c2 lt 0 || $c2 gt 9)) {
+        elsif ($c eq "\@" && join('', @{$str}[$pos + 1 .. $pos + length($delimiter)]) ne $delimiter && ($c2 lt 0 || $c2 gt 9) && ($c2 ne " ") && ($c2 ne "\x{9}") && ($c2 ne "
+")) {
             my $m = Perlito5::Grammar::Sigil::term_sigil($str, $pos);
             $m || return $m;
             $m->{"capture"} = $m->{"capture"}->[1];

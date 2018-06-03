@@ -1,3 +1,7 @@
+0.017     2018-05-30 14:14:52+01:00 Europe/London
+    - Prevented new apps from having a git origin. The existing one was always
+      wrong, and any alternative was 99% wrong
+
 0.016     2018-04-23 13:55:49+01:00 Europe/London
     - New apps (default profile) now have their PSGI put in bin/ so it is
       installed by CPAN and thus discoverable.

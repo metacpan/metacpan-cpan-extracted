@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-use File::Spec;
-use lib File::Spec->catdir(File::Spec->curdir(), "inc");
+use lib "./inc";
 
+use Module::Build 0.4004;
 use XML::Grammar::Builder;
 
 my $builder = XML::Grammar::Builder->new(
@@ -26,7 +26,7 @@ my $builder = XML::Grammar::Builder->new(
         'strict' => 0,
         'warnings' => 0,
     },
-    build_requires => {
+    test_requires => {
         'Test::More' => 0,
         'Test::XML' => 0,
     },

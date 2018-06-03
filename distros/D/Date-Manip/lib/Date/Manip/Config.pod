@@ -475,6 +475,15 @@ variable, and can be set to any of the following:
 
 The default value is "none".
 
+=item B<MaxRecurAttempts>
+
+Occasionally, a recurrence is invalid (though it cannot be easily determined
+in advance).
+
+When searching for dates that match the recurrence, this is the maximum number
+of attempts that will be done.  If none are found, the recurrence will be
+assumed to be invalid.
+
 =back
 
 =head1 TIME ZONE RELATED CONFIGURATION VARIABLES

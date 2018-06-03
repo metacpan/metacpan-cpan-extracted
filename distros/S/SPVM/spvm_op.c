@@ -31,7 +31,7 @@
 #include "spvm_use.h"
 #include "spvm_our.h"
 #include "spvm_package_var.h"
-#include "spvm_jitcode_builder.h"
+#include "spvm_csource_builder.h"
 #include "spvm_block.h"
 #include "spvm_basic_type.h"
 #include "spvm_core_func.h"
@@ -147,6 +147,7 @@ const char* const SPVM_OP_C_ID_NAMES[] = {
   "ISA",
   "SEQUENCE",
   "COSNT",
+  "COMPILE",
 };
 
 SPVM_OP* SPVM_OP_new_op_var_tmp(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_TYPE* type, const char* file, int32_t line) {
@@ -1717,11 +1718,6 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
   // Add package
   op_package->uv.package = package;
 
-
-  // JIT compile
-  _Bool jit = (_Bool)SPVM_HASH_search(compiler->jit_package_name_symtable, package_name, strlen(package_name));
-  package->is_jit = jit;
-
   // Register subrotuine
   {
     int32_t i;
@@ -1729,11 +1725,11 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
       SPVM_OP* op_sub = SPVM_LIST_fetch(package->op_subs, i);
 
       SPVM_SUB* sub = op_sub->uv.sub;
-
+      
       SPVM_OP* op_name_sub = sub->op_name;
       const char* sub_name = op_name_sub->uv.name;
       const char* sub_abs_name = SPVM_OP_create_abs_name(compiler, package_name, sub_name);
-      
+
       // Method check
       
       // Set first argument type if not set
@@ -1811,7 +1807,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
         SPVM_OP* op_sub = SPVM_LIST_fetch(package->op_subs, i);
         SPVM_SUB* sub = op_sub->uv.sub;
         
-        if (sub->is_native) {
+        if (sub->have_native_desc) {
           // Sub abs name
           const char* sub_abs_name = sub->abs_name;
           
@@ -2011,15 +2007,22 @@ SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op
     SPVM_DESCRIPTOR* descriptor = op_descriptor->uv.descriptor;
     
     if (descriptor->id == SPVM_DESCRIPTOR_C_ID_NATIVE) {
-      sub->is_native = 1;
+      sub->have_native_desc = 1;
+    }
+    else if (descriptor->id == SPVM_DESCRIPTOR_C_ID_COMPILE) {
+      sub->have_compile_desc = 1;
     }
     else {
       SPVM_yyerror_format(compiler, "invalid subroutine descriptor %s", SPVM_DESCRIPTOR_C_ID_NAMES[descriptor->id], op_descriptors->file, op_descriptors->line);
     }
   }
-  
+
+  if (sub->have_native_desc && sub->have_compile_desc) {
+    SPVM_yyerror_format(compiler, "native and compile descriptor can't be used together", op_descriptors->file, op_descriptors->line);
+  }
+
   // Native subroutine can't have block
-  if (sub->is_native && op_block) {
+  if (sub->have_native_desc && op_block) {
     SPVM_yyerror_format(compiler, "Native subroutine can't have block", op_block->file, op_block->line);
   }
   
@@ -2046,7 +2049,7 @@ SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op
   }
 
   // Native my vars is same as arguments
-  if (sub->is_native) {
+  if (sub->have_native_desc) {
     SPVM_OP* op_arg = op_args->first;
     while ((op_arg = SPVM_OP_sibling(compiler, op_arg))) {
       SPVM_LIST_push(sub->op_mys, op_arg->first);

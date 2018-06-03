@@ -4,7 +4,12 @@ use strict;
 use warnings;
 
 use parent 'Exporter';
-our @EXPORT_OK = qw< is_32bit compare_times generate_times_and_compare is_true is_false >;
+our @EXPORT_OK =
+(
+	qw< is_32bit compare_times generate_times_and_compare >,
+	qw< date_parse_test_cases date_parse_result >,
+	qw< is_true is_false >,
+);
 
 use Carp;
 use Test::More;
@@ -115,6 +120,43 @@ sub generate_times_and_compare (&$)
 
 	local $Test::Builder::Level = $Test::Builder::Level + 1;
 	is $got, $expected, $testname;
+}
+
+
+# These are the values we use for testing date parsing.  Some are handled as compact datestrings (in
+# which case we know in advance what the date will be), and some are handled as epoch seconds (in
+# which case we need to calculate the date manually; see below under `date_parse_result`).
+
+my %TEST_DATES =
+(
+	1426446360		=>	'EPOCH',					# simple epoch
+	20120930		=>	'2012-09-30',				# simple datestring
+	29000000		=>	'EPOCH',					# epoch (too big to be a datestring)
+	28991231		=>	'2899-12-31',				# datestring (upper bound)
+	10000101		=>	'1000-01-01',				# datestring (lower bound)
+	9999999			=>	'EPOCH',					# epoch (too small to be a datestring)
+	-99590400		=>	'EPOCH',					# epoch (negative)
+);
+
+sub date_parse_test_cases { keys %TEST_DATES }
+
+sub date_parse_result
+{
+	my $t = shift;
+	my $res = $TEST_DATES{$t};
+	if ($res eq 'EPOCH')
+	{
+		# Since dates are always parsed in the local timezone (but stored as UTC),
+		# and we don't know what the local timezone is (because our client could be
+		# calling us from anywhere in the world), any input that should be treated
+		# as epoch seconds could be one of two days, depending on the time portion
+		# of the value and the offset of the local timezone.  Therefore, we have
+		# to calcualte the value for ourselves here.
+		my (undef, undef, undef, $day, $mon, $year) = localtime($t);
+		++$mon, $year += 1900;						# handle localtime conversion to human-readable
+		$res = sprintf("%04d-%02d-%02d", $year, $mon, $day);
+	}
+	return $res;
 }
 
 

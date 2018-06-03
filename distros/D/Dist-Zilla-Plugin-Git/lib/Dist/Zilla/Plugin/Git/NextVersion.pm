@@ -12,7 +12,7 @@ use warnings;
 package Dist::Zilla::Plugin::Git::NextVersion;
 # ABSTRACT: Provide a version number by bumping the last git release tag
 
-our $VERSION = '2.043';
+our $VERSION = '2.044';
 
 use Dist::Zilla 4 ();
 use version 0.80 ();
@@ -88,7 +88,7 @@ sub _last_version {
 
   if ($by_branch) {
     my $head;
-    my $cachefile = path(_cache_fn);
+    my $cachefile = $self->zilla->root->child(_cache_fn);
     if (-f $cachefile) {
       ($head) = $git->rev_parse('HEAD');
       return $1 if $cachefile->slurp =~ /^\Q$head\E (.+)/;
@@ -208,7 +208,7 @@ Dist::Zilla::Plugin::Git::NextVersion - Provide a version number by bumping the 
 
 =head1 VERSION
 
-version 2.043
+version 2.044
 
 =head1 SYNOPSIS
 
@@ -270,7 +270,7 @@ the last tag is 0.005 and you want to jump to 1.000 you can set V = 1.000.
 
 Because tracing history takes time, if you use the
 C<version_by_branch> option, Git::NextVersion will create a
-F<.gitnxtver_cache> file in your repository to track the highest
+F<.gitnxtver_cache> file in your repository root to track the highest
 version number that is an ancestor of the HEAD revision.  You should
 add F<.gitnxtver_cache> to your F<.gitignore> file.  It will
 automatically be pruned from the distribution.

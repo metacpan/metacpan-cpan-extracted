@@ -4,15 +4,11 @@ use 5.006001;
 use strict;
 use warnings;
 
-use Readonly;
-
-
 use Perl::Critic::Utils::Perl qw< :all >;
-
 
 use Test::More tests => 7;
 
-our $VERSION = '1.130';
+our $VERSION = '1.132';
 use Perl::Critic::TestUtils;
 Perl::Critic::TestUtils::assert_version( $VERSION );
 

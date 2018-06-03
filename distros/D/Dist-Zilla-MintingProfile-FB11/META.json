@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dist-Zilla-MintingProfile-FB11",
    "no_index" : {
@@ -66,18 +66,21 @@
    "provides" : {
       "Dist::Zilla::MintingProfile::FB11" : {
          "file" : "lib/Dist/Zilla/MintingProfile/FB11.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/OpusVL/Dist-Zilla-MintingProfile-FB11/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/OpusVL/Dist-Zilla-MintingProfile-FB11.git",
          "web" : "https://github.com/OpusVL/Dist-Zilla-MintingProfile-FB11"
       }
    },
-   "version" : "0.016",
+   "version" : "0.017",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
@@ -101,17 +104,17 @@
                   "include_untracked" : 0
                }
             },
-            "name" : "@Author::OpusVL/GatherActualCode",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/GatherActualCode",
             "version" : "2.042"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyFilesFromBuild",
-            "name" : "@Author::OpusVL/CopyLicenseAndThings",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/CopyLicenseAndThings",
             "version" : "0.170880"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::FromCPANfile",
-            "name" : "@Author::OpusVL/Prereqs::FromCPANfile",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/Prereqs::FromCPANfile",
             "version" : "0.08"
          },
          {
@@ -206,22 +209,22 @@
                   ]
                }
             },
-            "name" : "@Author::OpusVL/SurgicalPodWeaver",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/SurgicalPodWeaver",
             "version" : "0.0023"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
-            "name" : "@Author::OpusVL/@Starter/PruneCruft",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/PruneCruft",
             "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
-            "name" : "@Author::OpusVL/@Starter/ManifestSkip",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/ManifestSkip",
             "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
-            "name" : "@Author::OpusVL/@Starter/MetaConfig",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/MetaConfig",
             "version" : "6.010"
          },
          {
@@ -231,7 +234,7 @@
                   "finder_objects" : [
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
-                        "name" : "@Author::OpusVL/@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+                        "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
                         "version" : "6.010"
                      }
                   ],
@@ -239,36 +242,36 @@
                },
                "Dist::Zilla::Role::MetaProvider::Provider" : {
                   "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
-                  "inherit_missing" : "1",
-                  "inherit_version" : "1",
-                  "meta_noindex" : "1"
+                  "inherit_missing" : 1,
+                  "inherit_version" : 1,
+                  "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
                   "Module::Metadata" : "1.000033",
                   "version" : "0.004"
                }
             },
-            "name" : "@Author::OpusVL/@Starter/MetaProvides::Package",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/MetaProvides::Package",
             "version" : "2.004003"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaNoIndex",
-            "name" : "@Author::OpusVL/@Starter/MetaNoIndex",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/MetaNoIndex",
             "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
-            "name" : "@Author::OpusVL/@Starter/MetaYAML",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/MetaYAML",
             "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
-            "name" : "@Author::OpusVL/@Starter/MetaJSON",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/MetaJSON",
             "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
-            "name" : "@Author::OpusVL/@Starter/License",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/License",
             "version" : "6.010"
          },
          {
@@ -278,34 +281,34 @@
                   "version" : "0.006"
                }
             },
-            "name" : "@Author::OpusVL/@Starter/ReadmeAnyFromPod",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/ReadmeAnyFromPod",
             "version" : "0.163250"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
-            "name" : "@Author::OpusVL/@Starter/ExecDir",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/ExecDir",
             "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
-            "name" : "@Author::OpusVL/@Starter/ShareDir",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/ShareDir",
             "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
-            "name" : "@Author::OpusVL/@Starter/PodSyntaxTests",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/PodSyntaxTests",
             "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
-            "name" : "@Author::OpusVL/@Starter/Test::ReportPrereqs",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/Test::ReportPrereqs",
             "version" : "0.027"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
             "config" : {
                "Dist::Zilla::Plugin::Test::Compile" : {
-                  "bail_out_on_fail" : "0",
+                  "bail_out_on_fail" : 0,
                   "fail_on_warning" : "author",
                   "fake_home" : 0,
                   "filename" : "xt/author/00-compile.t",
@@ -321,7 +324,7 @@
                   "switch" : []
                }
             },
-            "name" : "@Author::OpusVL/@Starter/Test::Compile",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/Test::Compile",
             "version" : "2.057"
          },
          {
@@ -331,12 +334,12 @@
                   "default_jobs" : 1
                }
             },
-            "name" : "@Author::OpusVL/@Starter/MakeMaker",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/MakeMaker",
             "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
-            "name" : "@Author::OpusVL/@Starter/Manifest",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/Manifest",
             "version" : "6.010"
          },
          {
@@ -346,17 +349,17 @@
                   "default_jobs" : 1
                }
             },
-            "name" : "@Author::OpusVL/@Starter/RunExtraTests",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/RunExtraTests",
             "version" : "0.029"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
-            "name" : "@Author::OpusVL/@Starter/ConfirmRelease",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/ConfirmRelease",
             "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangesHasContent",
-            "name" : "@Author::OpusVL/CheckChangesHasContent",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/CheckChangesHasContent",
             "version" : "0.010"
          },
          {
@@ -372,22 +375,17 @@
                   "skip_version_provider" : 0
                }
             },
-            "name" : "@Author::OpusVL/RewriteVersion",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/RewriteVersion",
             "version" : "0.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
-            "name" : "@Author::OpusVL/NextRelease",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/NextRelease",
             "version" : "6.010"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Repository",
-            "name" : "@Author::OpusVL/Repository",
-            "version" : "0.21"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::Encoding",
-            "name" : "@Author::OpusVL/CommonBinaryFiles",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/CommonBinaryFiles",
             "version" : "6.010"
          },
          {
@@ -415,17 +413,17 @@
                   "time_zone" : "local"
                }
             },
-            "name" : "@Author::OpusVL/CommitGeneratedFiles",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/CommitGeneratedFiles",
             "version" : "2.042"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
-            "name" : "@Author::OpusVL/ExecDir",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/ExecDir",
             "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
-            "name" : "@Author::OpusVL/ScriptDir",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/ScriptDir",
             "version" : "6.010"
          },
          {
@@ -435,7 +433,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.016",
+                  "tag" : "v0.017",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
@@ -447,7 +445,7 @@
                   "time_zone" : "local"
                }
             },
-            "name" : "@Author::OpusVL/Git::Tag",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/Git::Tag",
             "version" : "2.042"
          },
          {
@@ -462,7 +460,7 @@
                   "munge_makefile_pl" : 1
                }
             },
-            "name" : "@Author::OpusVL/BumpVersionAfterRelease",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/BumpVersionAfterRelease",
             "version" : "0.015"
          },
          {
@@ -490,7 +488,7 @@
                   "time_zone" : "local"
                }
             },
-            "name" : "@Author::OpusVL/CommitVersionBump",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/CommitVersionBump",
             "version" : "2.042"
          },
          {
@@ -507,13 +505,8 @@
                   "repo_root" : "."
                }
             },
-            "name" : "@Author::OpusVL/Git::Push",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/Git::Push",
             "version" : "2.042"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::CPAN::Mini::Inject::REST",
-            "name" : "@Author::OpusVL/CPAN::Mini::Inject::REST",
-            "version" : "0.004"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -523,8 +516,18 @@
                   "type" : "requires"
                }
             },
-            "name" : "@Author::OpusVL/TestMoreWithSubtests",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/TestMoreWithSubtests",
             "version" : "6.010"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@Author::OpusVL::ToCPAN/UploadToCPAN",
+            "version" : "6.010"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GitHub::Meta",
+            "name" : "@Author::OpusVL::ToCPAN/GitHub::Meta",
+            "version" : "0.44"
          },
          {
             "class" : "Dist::Zilla::Plugin::MungeFile::WithDataSection",
@@ -602,18 +605,18 @@
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
-            "name" : "@Author::OpusVL/@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+            "name" : "@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
             "version" : "6.010"
          }
       ],
       "zilla" : {
          "class" : "Dist::Zilla::Dist::Builder",
          "config" : {
-            "is_trial" : "0"
+            "is_trial" : 0
          },
          "version" : "6.010"
       }
    },
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

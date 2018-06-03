@@ -13,7 +13,7 @@ use warnings;
 package Dist::Zilla::Plugin::Git::Push;
 # ABSTRACT: Push current branch
 
-our $VERSION = '2.043';
+our $VERSION = '2.044';
 
 use Moose;
 use MooseX::Has::Sugar;
@@ -122,7 +122,7 @@ Dist::Zilla::Plugin::Git::Push - Push current branch
 
 =head1 VERSION
 
-version 2.043
+version 2.044
 
 =head1 SYNOPSIS
 
@@ -135,8 +135,8 @@ In your F<dist.ini>:
 
 =head1 DESCRIPTION
 
-Once the release is done, this plugin will push current git branch to
-remote end, with the associated tags.
+Once the release is done, this plugin will push the current git branch to
+the remote, with the associated tags.
 
 The plugin accepts the following options:
 

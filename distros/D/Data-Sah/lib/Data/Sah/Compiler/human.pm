@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::human;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.88'; # VERSION
+our $DATE = '2018-05-29'; # DATE
+our $VERSION = '0.890'; # VERSION
 
 use 5.010;
 use strict;
@@ -144,7 +144,7 @@ sub _add_ccl {
         my $suffix = $lang eq $dlang ? "" : ".alt.lang.$lang";
         if ($clause) {
             delete $cd->{uclset}{$_} for
-                grep /\A\Q$clause.human\E(\.|\z)/, keys %{$cd->{uclset}};
+                grep {/\A\Q$clause.human\E(\.|\z)/} keys %{$cd->{uclset}};
             if (defined $cd->{clset}{"$clause.human$suffix"}) {
                 $ccl->{type} = 'clause';
                 $ccl->{fmt}  = $cd->{clset}{"$clause.human$suffix"};
@@ -152,7 +152,7 @@ sub _add_ccl {
             }
         } else {
             delete $cd->{uclset}{$_} for
-                grep /\A\.name(\.|\z)/, keys %{$cd->{uclset}};
+                grep {/\A\.name(\.|\z)/} keys %{$cd->{uclset}};
             if (defined $cd->{clset}{".name$suffix"}) {
                 $ccl->{type} = 'noun';
                 $ccl->{fmt}  = $cd->{clset}{".name$suffix"};
@@ -544,7 +544,7 @@ Data::Sah::Compiler::human - Compile Sah schema to human language
 
 =head1 VERSION
 
-This document describes version 0.88 of Data::Sah::Compiler::human (from Perl distribution Data-Sah), released on 2017-07-10.
+This document describes version 0.890 of Data::Sah::Compiler::human (from Perl distribution Data-Sah), released on 2018-05-29.
 
 =head1 SYNOPSIS
 
@@ -634,7 +634,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

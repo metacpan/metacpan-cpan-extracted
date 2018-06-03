@@ -3,7 +3,7 @@ package RPi::I2C;
 use strict;
 use warnings;
 
-our $VERSION = '2.3605';
+our $VERSION = '2.3606';
 our @ISA = qw(IO::Handle);
  
 use Carp;
@@ -29,11 +29,13 @@ sub new {
     
     my $self = bless $fh, $class;
 
-    if ($self->ioctl(I2C_SLAVE_FORCE, int($addr)) < 0){
-        printf("Device 0x%x not found\n", $addr);
-        exit 1;
-    }
-    
+    my $i2c_conn = $self->ioctl(I2C_SLAVE_FORCE, int($addr));
+
+    if (! defined $i2c_conn || $i2c_conn < 0){
+        if (! $ENV{I2C_TESTING}){
+            croak "I2C device at address 0x%x not found\n", $addr;
+        }
+    } 
     return $self;
 }        
 sub process {
@@ -75,7 +77,8 @@ sub read_block {
     my ($self, $num_bytes, $reg) = @_;
     $reg = _set_reg($reg);
     my $read_val = '0' x ($num_bytes);
-    my $retval = _readI2CBlockData($self->fileno, $reg, $read_val);
+    _readI2CBlockData($self->fileno, $reg, $read_val);
+    print $@;
     my @return = unpack( "C*", $read_val );
     return @return;
 }

@@ -2,7 +2,7 @@
 
 package main v0.1.0;
 
-use Pcore -rpc;
+use Pcore -forktmpl;
 use <: $module_name :>;
 use <: $module_name ~ "::Const qw[:CONST]" :>;
 

@@ -1,5 +1,5 @@
 
-==== version history of Log::Report
+==== version history of distribution Log::Report
 
 Unless noted otherwise, these changes where initiated and applied by
 Mark Overmeer.
@@ -7,7 +7,15 @@ Mark Overmeer.
 TODO:
 	. connect to Message::Passing framework
 
-version 1.26:
+version 1.27:
+
+	Fixes:
+	- fix metadata [Mohammad S Anwar]
+
+	Improvements:
+	- Dancer2 add custom fatal handlers [Andrew Beverley]
+
+version 1.26: Tue Jan 23 23:45:55 CET 2018
 
 	Improvements:
 	- convert to GIT

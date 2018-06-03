@@ -15,20 +15,25 @@ is $d->strftime($FMT), '01/04/2001', 'sanity check: base date';
 my $d2 = $d + 1;
 isa_ok $d2, $CLASS, 'object after addition' or diag('    isa ', ref $d2);
 is $d2->strftime($FMT), '01/05/2001', 'simple addition test';
+test_date_subtract_date($d, $d2, 1);
 
 $d2 = $d - 1;
 isa_ok $d2, $CLASS, 'object after subtraction' or diag('    isa ', ref $d2);
 is $d2->strftime($FMT), '01/03/2001', 'simple subtraction test';
+test_date_subtract_date($d, $d2, -1);
 
 
 # slightly more complex
 # let's cross some month and year boundaries
+# at every point, make sure we can subtract dates from each other
 
 $d2 = $d + 30;
 is $d2->strftime($FMT), '02/03/2001', 'math across month boundary';
+test_date_subtract_date($d, $d2, 30);
 
 $d2 = $d - 5;
 is $d2->strftime($FMT), '12/30/2000', 'math across year boundary';
+test_date_subtract_date($d, $d2, -5);
 
 
 # seriously trickty
@@ -36,12 +41,14 @@ is $d2->strftime($FMT), '12/30/2000', 'math across year boundary';
 
 $d2 = $d + 90;
 is $d2->strftime($FMT), '04/04/2001', 'addition across DST boundary';
+test_date_subtract_date($d, $d2, 90);
 is $d2->hour,   0, "time remains zero after crossing DST (add, hour)";
 is $d2->minute, 0, "time remains zero after crossing DST (add, min)";
 is $d2->second, 0, "time remains zero after crossing DST (add, sec)";
 
 $d2 = $d - 92;
 is $d2->strftime($FMT), '10/04/2000', 'subtraction across DST boundary';
+test_date_subtract_date($d, $d2, -92);
 is $d2->hour,   0, "time remains zero after crossing DST (sub, hour)";
 is $d2->minute, 0, "time remains zero after crossing DST (sub, min)";
 is $d2->second, 0, "time remains zero after crossing DST (sub, sec)";
@@ -90,3 +97,14 @@ throws_ok { $d->$_ } qr/cannot call $_ on a Date value/, "::Date properly disall
 
 
 done_testing;
+
+
+sub test_date_subtract_date
+{
+	my ($d1, $d2, $expected) = @_;
+
+	is $d2 - $d1,      $expected, "date subtraction (positive  days) for $d1/$d2";
+	is $d1 - $d2,     -$expected, "date subtraction (negative  days) for $d1/$d2";
+	is $d1 - $d1,              0, "date subtraction (zero      days) for $d1/$d2";
+	is $d2 - $d1, int($d2 - $d1), "date subtraction (integer result) for $d1/$d2";
+}

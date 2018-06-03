@@ -22,13 +22,34 @@ my $fixer = Catmandu::Fix->new(fixes => [q|
 		if pica_match("010@a",'ger')
 			add_field(is_ger,true)
 		end
+		if pica_match("001U0")
+			add_field(has_encoding,true)
+		end
+		if pica_match("001Ua")
+			add_field(is_bogus,true)
+		end
+	end
+	do pica_each('010@')
+		if all_match(record.0.0,'010@')
+          add_field(from_var,true)
+        end
+	end
+	do pica_each('010@')
+		if all_match(record.0.0,'010U')
+          add_field(from_var2,true)
+        end
 	end
 |]);
+
 
 my $importer = Catmandu::Importer::PICA->new( file => './t/files/picaplus.dat', type => "PLUS" );
 my $record = $fixer->fix($importer->first);
 
 ok exists $record->{record}, 'created a PICA record';
 is $record->{is_ger}, 'true', 'created is_ger tag';
+is $record->{has_encoding}, 'true', 'created has_encoding tag';
+isnt $record->{is_bogus}, 'true', 'not created is_bogus tag';
+is $record->{from_var}, 'true', 'created from_var tag';
+isnt $record->{from_var2}, 'true', 'not created from_var tag';
 
 done_testing;

@@ -32,7 +32,7 @@
 
 //  poller.hpp decides which polling mechanism to use.
 #include "poller.hpp"
-#if defined ZMQ_USE_SELECT
+#if defined ZMQ_IOTHREAD_POLLER_USE_SELECT
 
 #include <stddef.h>
 #include <vector>
@@ -48,7 +48,6 @@
 
 #include "ctx.hpp"
 #include "fd.hpp"
-#include "thread.hpp"
 #include "poller_base.hpp"
 
 namespace zmq
@@ -58,12 +57,12 @@ struct i_poll_events;
 //  Implements socket polling mechanism using POSIX.1-2001 select()
 //  function.
 
-class select_t : public poller_base_t
+class select_t : public worker_poller_base_t
 {
   public:
     typedef fd_t handle_t;
 
-    select_t (const ctx_t &ctx_);
+    select_t (const thread_ctx_t &ctx_);
     ~select_t ();
 
     //  "poller" concept.
@@ -73,20 +72,13 @@ class select_t : public poller_base_t
     void reset_pollin (handle_t handle_);
     void set_pollout (handle_t handle_);
     void reset_pollout (handle_t handle_);
-    void start ();
     void stop ();
 
     static int max_fds ();
 
   private:
-    //  Main worker thread routine.
-    static void worker_routine (void *arg_);
-
     //  Main event loop.
     void loop ();
-
-    //  Reference to ZMQ context.
-    const ctx_t &ctx;
 
     //  Internal state.
     struct fds_set_t
@@ -119,7 +111,7 @@ class select_t : public poller_base_t
 
         fd_entries_t fd_entries;
         fds_set_t fds_set;
-        bool retired;
+        bool has_retired;
     };
 
     void select_family_entry (family_entry_t &family_entry_,
@@ -136,18 +128,18 @@ class select_t : public poller_base_t
         ~wsa_events_t ();
 
         //  read, write, error and readwrite
-        WSAEVENT events [4];
+        WSAEVENT events[4];
     };
 
-    family_entries_t family_entries;
+    family_entries_t _family_entries;
     // See loop for details.
-    family_entries_t::iterator current_family_entry_it;
+    family_entries_t::iterator _current_family_entry_it;
 
-    bool try_remove_fd_entry (family_entries_t::iterator family_entry_it,
-                              zmq::fd_t &handle_);
+    int try_retire_fd_entry (family_entries_t::iterator family_entry_it_,
+                             zmq::fd_t &handle_);
 
     static const size_t fd_family_cache_size = 8;
-    std::pair<fd_t, u_short> fd_family_cache [fd_family_cache_size];
+    std::pair<fd_t, u_short> _fd_family_cache[fd_family_cache_size];
 
     u_short get_fd_family (fd_t fd_);
 
@@ -155,22 +147,18 @@ class select_t : public poller_base_t
     static u_short determine_fd_family (fd_t fd_);
 #else
     //  on non-Windows, we can treat all fds as one family
-    family_entry_t family_entry;
-    fd_t maxfd;
-    bool retired;
+    family_entry_t _family_entry;
+    fd_t _max_fd;
 #endif
 
+    void cleanup_retired ();
+    bool cleanup_retired (family_entry_t &family_entry_);
+
     //  Checks if an fd_entry_t is retired.
-    static bool is_retired_fd (const fd_entry_t &entry);
+    static bool is_retired_fd (const fd_entry_t &entry_);
 
     static fd_entries_t::iterator
-    find_fd_entry_by_handle (fd_entries_t &fd_entries, handle_t handle_);
-
-    //  If true, thread is shutting down.
-    bool stopping;
-
-    //  Handle of the physical thread doing the I/O work.
-    thread_t worker;
+    find_fd_entry_by_handle (fd_entries_t &fd_entries_, handle_t handle_);
 
     select_t (const select_t &);
     const select_t &operator= (const select_t &);

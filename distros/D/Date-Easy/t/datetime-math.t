@@ -38,6 +38,11 @@ is $dt3 <=> $dt1,  1, "datetime spaceship (greater than)";
 is $dt1 + 30, $dt3, "datetimes add seconds";
 is $dt3 - 30, $dt1, "datetimes subtract seconds";
 
+# subtract datetimes from each other
+is $dt3 - $dt1,  30, "datetime subtraction (positive seconds)";
+is $dt1 - $dt3, -30, "datetime subtraction (negative seconds)";
+is $dt1 - $dt2,   0, "datetime subtraction (zero     seconds)";
+
 
 # type checks for things
 isa_ok $dt1 + 30, $CLASS, 'addition result';

@@ -15,13 +15,12 @@ use warnings;
 use parent qw( HiPi::Interface );
 use HiPi qw( :i2c :rpi  );
 use Carp;
-use Time::HiRes qw( usleep );
 
 __PACKAGE__->create_ro_accessors( qw(
     backend
 ) );
 
-our $VERSION ='0.70';
+our $VERSION ='0.71';
 
 
 sub new {

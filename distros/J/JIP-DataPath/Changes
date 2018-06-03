@@ -1,5 +1,9 @@
 Revision history for JIP-DataPath
 
+0.03         2018-06-03
+        Added default_value parameter to JIP::DataPath::get.
+
+
 0.02         2018-05-01
         Increased Perl version requirement to 5.10.1.
         Improved documentation.

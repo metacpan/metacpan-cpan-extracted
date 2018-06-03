@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie;
 
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 use Date::Easy::Date ();
 use Date::Easy::Datetime ();
@@ -43,7 +43,7 @@ Date::Easy - easy dates with Time::Piece compatibility
 
 =head1 VERSION
 
-This document describes version 0.04 of Date::Easy.
+This document describes version 0.05 of Date::Easy.
 
 =head1 SYNOPSIS
 
@@ -165,7 +165,8 @@ is to say, it will probably handle most common uses, but may fail for pathologic
 
 =head3 Leap Seconds
 
-Date::Easy doesn't deal with leap seconds at all.
+Date::Easy doesn't deal with leap seconds at all.  In fact, it's likely that the unit tests will
+fail during module install if your local timezone includes leap seconds.
 
 =head3 Language
 
@@ -276,7 +277,7 @@ Buddy Burden <barefootcoder@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Buddy Burden.
+This software is Copyright (c) 2018 by Buddy Burden.
 
 This is free software, licensed under:
 

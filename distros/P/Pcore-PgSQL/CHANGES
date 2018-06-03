@@ -1,3 +1,13 @@
+v0.18.2 2018-05-30T08:42:20Z
+ - invalid attr access fixed
+
+v0.18.1 2018-05-30T06:59:10Z
+
+v0.18.0 2018-05-30T06:58:22Z
+ - docker moved to dnf
+ - Docker base image changed from "softvisio/pcore:v0.65.0" to
+   "softvisio/pcore:v0.66.0"
+
 v0.17.1 2018-05-17T16:44:56Z
  - postgres path fixed
 

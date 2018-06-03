@@ -97,7 +97,7 @@ is_deeply(
         around_the_world_in_80_days.jpg
         little_women.jpg
         programming_perl.jpg
-        ) 
+        )
     ],
     "Testing for the existence of the jpegs",
 );

@@ -1,4 +1,0 @@
-package WebServie::Braintree::AdvancedSearch::Types.pm;
-use Moose::Util::TypeContstraints;
-
-subtype 

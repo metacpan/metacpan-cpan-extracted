@@ -4,7 +4,7 @@
       "Shlomi Fish <shlomif@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "mit"
    ],
@@ -14,12 +14,6 @@
    },
    "name" : "XML-Grammar-ProductsSyndication",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Test::More" : "0",
-            "Test::XML" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
             "Module::Build" : "0.36"
@@ -38,12 +32,18 @@
             "strict" : "0",
             "warnings" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::XML" : "0"
+         }
       }
    },
    "provides" : {
       "XML::Grammar::ProductsSyndication" : {
          "file" : "lib/XML/Grammar/ProductsSyndication.pm",
-         "version" : "0.0404"
+         "version" : "0.0405"
       }
    },
    "release_status" : "stable",
@@ -55,5 +55,6 @@
          "url" : "http://bitbucket.org/shlomif/perl-xml-grammar-productssyndication"
       }
    },
-   "version" : "0.0404"
+   "version" : "0.0405",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,0 +1,11 @@
+Artistic
+Changes
+GPL-1
+lib/Plack/Middleware/Auth/FCGI.pm
+LICENSE.md
+Makefile.PL
+MANIFEST
+README.md
+t/Plack-Middleware-Auth-FCGI.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

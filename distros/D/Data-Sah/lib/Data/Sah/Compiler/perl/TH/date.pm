@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::perl::TH::date;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.88'; # VERSION
+our $DATE = '2018-05-29'; # DATE
+our $VERSION = '0.890'; # VERSION
 
 use 5.010;
 use strict;
@@ -176,7 +176,7 @@ Data::Sah::Compiler::perl::TH::date - perl's type handler for type "date"
 
 =head1 VERSION
 
-This document describes version 0.88 of Data::Sah::Compiler::perl::TH::date (from Perl distribution Data-Sah), released on 2017-07-10.
+This document describes version 0.890 of Data::Sah::Compiler::perl::TH::date (from Perl distribution Data-Sah), released on 2018-05-29.
 
 =head1 DESCRIPTION
 
@@ -223,7 +223,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

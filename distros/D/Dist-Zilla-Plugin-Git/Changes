@@ -1,5 +1,9 @@
 Revision history for Dist::Zilla::Plugin::Git
 
+2.044     2018-06-03 01:37:38Z
+  - fix for Dist::Zilla 7: ensure that the proper directory is used as the
+    base for the repo root and .gitnxtver_cache.
+
 2.043     2017-12-10 00:49:29Z
  - replace uses of File::HomeDir with a simple glob()
 

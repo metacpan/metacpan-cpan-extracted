@@ -17,7 +17,7 @@ use JSON::PP;
 use MIME::Base64 'decode_base64';
 use Data::Dumper;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 our @CARP_NOT;
 
 =head1 NAME
@@ -122,6 +122,7 @@ Interesting parameters might be
     '--allow-running-insecure-content',
 
     '--load-extension'
+    '--no-sandbox'
 
 =item B<profile>
 
@@ -158,6 +159,28 @@ A premade L<Chrome::DevToolsProtocol> object.
 
 If set to 1, after each request tests for Javascript errors and warns. Useful
 for testing with C<use warnings qw(fatal)>.
+
+=item B<background_networking>
+
+=item B<client_side_phishing_detection>
+
+=item B<component_update>
+
+=item B<hang_monitor>
+
+=item B<prompt_on_repost>
+
+=item B<sync>
+
+=item B<web_resources>
+
+=item B<default_apps>
+
+=item B<infobars>
+
+=item B<default_apps>
+
+=item B<popup_blocking>
 
 =back
 
@@ -204,6 +227,29 @@ sub build_command_line {
 
     if( ! exists $options->{disable_prompt_on_repost}) {
         push @{ $options->{ launch_arg }}, "--disable-prompt-on-repost";
+    } else {
+        carp "Option 'disable_prompt_on_repost' is deprecated, use prompt_on_repost instead";
+    };
+
+    for my $option (qw(
+        background_networking
+        client_side_phishing_detection
+        component_update
+        hang_monitor
+        prompt_on_repost
+        sync
+        web_resources
+        default_apps
+        infobars
+        default_apps
+        popup_blocking
+    )) {
+        (my $optname = $option) =~ s!_!-!g;
+        if( ! exists $options->{$option}) {
+            push @{ $options->{ launch_arg }}, "--disable-$optname";
+        } elsif( ! (my $value = delete $options->{$option}))  {
+            push @{ $options->{ launch_arg }}, "--disable-$optname";
+        };
     };
 
     push @{ $options->{ launch_arg }}, "--headless"
@@ -910,8 +956,9 @@ sub DESTROY {
 
     eval {
         # Shut down our websocket connection
-        $_[0]->{ driver }->close
-            if $_[0]->{ driver };
+        if( $_[0]->{ driver }) {
+            $_[0]->{ driver }->close
+        };
     };
     delete $_[0]->{ driver };
 
@@ -1943,7 +1990,7 @@ This method is specific to WWW::Mechanize::Chrome.
 sub base {
     my ($self) = @_;
     (my $base) = $self->selector('base');
-    $base = $base->{href}
+    $base = $base->get_attribute('href')
         if $base;
     $base ||= $self->uri;
 };
@@ -2043,7 +2090,7 @@ sub make_link {
             carp "Unknown link-spec tag '$tag'";
             $url= '';
         } else {
-            $url = $node->{ $link_spec{ $tag }->{url} };
+            $url = $node->get_attribute( $link_spec{ $tag }->{url} );
         };
     };
 
@@ -2068,11 +2115,20 @@ sub make_link {
             attrs => {},
         });
 
-        $res
+        return $res
     } else {
         ()
     };
 }
+
+sub links {
+    my ($self) = @_;
+    my @links = $self->selector( join ",", sort keys %link_spec);
+    my $base = $self->base;
+    return map {
+        $self->make_link($_,$base)
+    } @links;
+};
 
 =head2 C<< $mech->selector( $css_selector, %options ) >>
 

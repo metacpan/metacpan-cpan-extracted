@@ -1,5 +1,35 @@
 Changes file for Date-Holidays
 
+1.11 2018-06-01 Feature release, update recommended
+
+- Added adapter for:
+    Date::Holidays::SK the integration had some flaws, which have now been 
+    addressed witht the new adapter
+
+    Ref: https://github.com/jonasbn/Date-Holidays/issues/23
+
+
+1.10 2018-05-31 Feature release, update recommended
+
+- Added adapter for:
+    Date::Holidays::NZ the distribution has been supported for some time, 
+    but the latest changes revealed a sub-optimal integration. Support 
+    for regions was also added
+
+    Ref: https://github.com/jonasbn/Date-Holidays/issues/22
+
+
+1.09 2018-05-30 Bug fix release, update not required
+
+- Based on issue #21 several issues with the test suite was spotted
+  and corrected, at the same time there was created issues for 
+  implementation of adapters for SK and NZ. An issue with ES was also 
+  created since this distribution seems to rely on Date::Holidays, 
+  which does not seem to make sense.
+
+  Ref: https://github.com/jonasbn/Date-Holidays/issues/21
+
+
 1.08 2018-05-28 Feature release, update recommended
 
 - Added adapter for:

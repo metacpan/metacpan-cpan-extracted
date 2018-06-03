@@ -18,7 +18,7 @@ my %module_build_args = (
     "Pablo Rodr\x{ed}guez Gonz\x{e1}lez <pablo.rodriguez.gonzalez\@gmail.com>"
   ],
   "dist_name" => "Bat-Interpreter",
-  "dist_version" => "0.009",
+  "dist_version" => "0.010",
   "license" => "mit",
   "module_name" => "Bat::Interpreter",
   "recursive_test_files" => 1,
@@ -26,9 +26,10 @@ my %module_build_args = (
     "App::BatParser" => "0.005",
     "Carp" => 0,
     "Data::Dumper" => 0,
-    "Moose" => 0,
-    "Moose::Role" => 0,
+    "Moo" => 0,
+    "Moo::Role" => 0,
     "Path::Tiny" => 0,
+    "Types::Standard" => 0,
     "namespace::autoclean" => 0,
     "perl" => "5.012",
     "utf8" => 0

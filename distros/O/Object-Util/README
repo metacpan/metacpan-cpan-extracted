@@ -141,7 +141,7 @@ DESCRIPTION
         if $object is undefined, returns false instead of throwing an
         exception.
 
-        A shortcut for `$object->$_call_if_method(isa => $class)`.
+        A shortcut for `$object->$_call_if_object(isa => $class)`.
 
         Same as Safe::Isa.
 
@@ -150,7 +150,7 @@ DESCRIPTION
         Moose::Object, but if $object is undefined, returns false instead of
         throwing an exception.
 
-        A shortcut for `$object->$_call_if_method(does => $role)`.
+        A shortcut for `$object->$_call_if_object(does => $role)`.
 
         Same as Safe::Isa.
 
@@ -159,7 +159,7 @@ DESCRIPTION
         but if $object is undefined, returns false instead of throwing an
         exception.
 
-        A shortcut for `$object->$_call_if_method(DOES => $role)`.
+        A shortcut for `$object->$_call_if_object(DOES => $role)`.
 
         Same as Safe::Isa.
 

@@ -84,7 +84,7 @@ time (a delta) to a date to get a second date.
 
 =item B<*>
 
-Work with dates with dates using international formats (foreign month
+Work with dates using international formats (foreign month
 names, 12/10/95 referring to October rather than December, etc.).
 
 =item B<*>

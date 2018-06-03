@@ -1,0 +1,9 @@
+Revision history for Perl extension Plack::Middleware::Auth::FCGI.
+
+0.02  Thu May 31 22:51:46 2018
+	- Missing dependency to Plack
+
+0.01  Wed May 30 07:57:31 2018
+	- original version; created by h2xs 1.23 with options
+		-AXfn Plack::Middleware::Auth::FCGI
+

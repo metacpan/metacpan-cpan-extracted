@@ -45,5 +45,5 @@ requires:
   perl: '5.010'
 resources:
   repository: git://gitlab.com/waterkip/dist-zilla-pluginbundle-author-waterkip
-version: '1.7'
+version: '1.8'
 x_serialization_backend: 'YAML::Tiny version 1.70'

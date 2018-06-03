@@ -1,5 +1,11 @@
 Revision history for Web::Mention
 
+0.501 2018-05-29T13:32:33Z
+
+    - Documentation cleanup.
+    
+    - Reducing the default maximum content length to 200 characters.
+
 0.5 2018-05-28T22:33:03Z
 
     - Adding the from_html batch-creation class method.

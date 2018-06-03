@@ -243,6 +243,7 @@ $Data{'language'}{'iana'}{'orig'}{'name'} = {
    "Löyöp"                                         => "Loyop",
    "Lü"                                            => "Lu",
    "Macaguán"                                      => "Macaguan",
+   "Magɨ (Madang Province)"                       => "Mag (Madang Province)",
    "Magdalena Peñasco Mixtec"                      => "Magdalena Penasco Mixtec",
    "Magɨyi"                                        => "Magyi",
    "Mainfränkisch"                                 => "Mainfrankisch",

@@ -14,8 +14,8 @@ BEGIN {
     eval 'require XML::LibXML::Error';
     plan skip_all => 'XML::LibXML::Error not available' if $@;
 
-	eval 'require XML::LibXML';
-	plan skip_all => 'Your installation of XML::LibXML is broken' if $@;
+    eval 'require XML::LibXML';
+    plan skip_all => 'Your installation of XML::LibXML is broken' if $@;
 }
 
 # The XML::LibXML::Error object does not have a constructor, so we

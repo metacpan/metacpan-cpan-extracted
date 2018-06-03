@@ -3,6 +3,7 @@ package Pcore::Chrome::Tab;
 use Pcore -class;
 use Pcore::Util::Data qw[to_json from_json];
 use Pcore::Util::Scalar qw[weaken is_plain_coderef];
+use Pcore::WebSocket::raw;
 
 use overload    #
   q[&{}] => sub ( $self, @ ) {
@@ -10,14 +11,14 @@ use overload    #
   },
   fallback => undef;
 
-has chrome => ( is => 'ro', isa => InstanceOf ['Pcore::WebDriver::ChromeDevTools'], required => 1 );
-has id => ( is => 'ro', isa => Str, required => 1 );
+has chrome => ( required => 1 );
+has id     => ( required => 1 );
 
-has listen => ( is => 'ro', isa => HashRef );
+has listen => ();    # HashRef
 
-has _ws      => ( is => 'ro', isa => InstanceOf ['Pcore::WebSocket::Protocol::raw'], init_arg => undef );
-has _cb      => ( is => 'ro', isa => HashRef,                                        init_arg => undef );
-has _conn_cb => ( is => 'ro', isa => ArrayRef,                                       init_arg => undef );
+has _ws      => ();  # ( is => 'ro', isa => InstanceOf ['Pcore::WebSocket::raw'], init_arg => undef );
+has _cb      => ();  # ( is => 'ro', isa => HashRef,                                        init_arg => undef );
+has _conn_cb => ();  # ( is => 'ro', isa => ArrayRef,                                       init_arg => undef );
 
 our $_MSG_ID = 0;
 
@@ -85,45 +86,15 @@ sub _connect ( $self, $cb ) {
 
     weaken $self;
 
-    Pcore::WebSocket->connect_ws(
-        "ws://$self->{chrome}->{host}:$self->{chrome}->{port}/devtools/page/$self->{id}",
+    my $c;
+
+    $c = Pcore::WebSocket::raw->new(
         max_message_size => 0,
         compression      => 0,
-        connect_timeout  => 1000,
-        tls_ctx          => undef,
-        on_connect_error => sub ($res) {
+        on_connect       => sub ( $ws, $headers ) {
+            undef $c;
 
-            # call callbacks
-            if ( my $callbacks = delete $self->{_conn_cb} ) {
-                for my $cb ( $callbacks->@* ) {
-                    $cb->();
-                }
-            }
-
-            return;
-        },
-        on_connect => sub ( $ws, $headers ) {
             $self->{_ws} = $ws;
-
-            $ws->{on_text} = sub ($data_ref) {
-                my $msg = from_json $data_ref;
-
-                if ( exists $msg->{id} ) {
-                    if ( my $cb = delete $self->{_cb}->{ $msg->{id} } ) {
-                        $cb->[1]->( $cb->[0], $msg->{result} );
-                    }
-                }
-                elsif ( $msg->{method} ) {
-                    if ( my $cb = $self->{listen}->{ $msg->{method} } ) {
-                        $cb->( $self, $msg->{method}, $msg->{params} );
-                    }
-                }
-                else {
-                    dump $msg;
-                }
-
-                return;
-            };
 
             # call callbacks
             if ( my $callbacks = delete $self->{_conn_cb} ) {
@@ -135,7 +106,15 @@ sub _connect ( $self, $cb ) {
             return;
         },
         on_disconnect => sub ( $ws, $status ) {
+            undef $c;
             undef $self->{_ws};
+
+            # on_connect_error call callbacks
+            if ( my $callbacks = delete $self->{_conn_cb} ) {
+                for my $cb ( $callbacks->@* ) {
+                    $cb->();
+                }
+            }
 
             # call pending callbacks
             if ( my $callbacks = delete $self->{_cb} ) {
@@ -146,6 +125,31 @@ sub _connect ( $self, $cb ) {
 
             return;
         },
+        on_text => sub ( $ws, $data_ref ) {
+            my $msg = from_json $data_ref;
+
+            if ( exists $msg->{id} ) {
+                if ( my $cb = delete $self->{_cb}->{ $msg->{id} } ) {
+                    $cb->[1]->( $cb->[0], $msg->{result} );
+                }
+            }
+            elsif ( $msg->{method} ) {
+                if ( my $cb = $self->{listen}->{ $msg->{method} } ) {
+                    $cb->( $self, $msg->{method}, $msg->{params} );
+                }
+            }
+            else {
+                dump $msg;
+            }
+
+            return;
+        },
+    );
+
+    $c->connect(
+        "ws://$self->{chrome}->{host}:$self->{chrome}->{port}/devtools/page/$self->{id}",
+        connect_timeout => 1000,
+        tls_ctx         => undef,
     );
 
     return;

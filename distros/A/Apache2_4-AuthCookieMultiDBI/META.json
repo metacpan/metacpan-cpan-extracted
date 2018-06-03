@@ -1,0 +1,47 @@
+{
+   "abstract" : "An AuthCookie module backed by a DBI database for apache 2.4.",
+   "author" : [
+      "Details <details -at- cpan -dot- org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Apache2_4-AuthCookieMultiDBI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "1.302136"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Apache2_4::AuthCookie" : "3.26",
+            "DBI" : "1.641",
+            "Date::Calc" : "6.4",
+            "Digest::MD5" : "2.55",
+            "English" : "1.10",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01"
+}

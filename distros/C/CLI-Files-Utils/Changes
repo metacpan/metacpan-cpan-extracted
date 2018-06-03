@@ -1,13 +1,21 @@
 Revision history for CLI-Files-Utils
 
-0.102    2018-03-30
-        First uploading to CPAN. (Removed.)
-        2 program 'madeafter' and 'dirhier' are included.
-        The first scratch of the programs appeared before 2017-08.
-
-0.103    2018-05-26
-        Second uploading to CPAN as a kind of trial uploading.        
+0.105    2018-06-02 
+        Added -p option on 'madeafter' to see file permissions.
+        Begin to provide init.sh
+        Rewrote files such as README. 
 
 0.104    2018-05-26
         Added -s option upon 'madeafter' to show file byte sizes.
         Added the script colorplus for number readability by eyes.
+        Also provides 'colorplus'
+
+
+0.103    2018-05-26
+        Second uploading to CPAN as a kind of trial uploading.        
+
+
+0.102    2018-03-30
+        First uploading to CPAN. (Removed.)
+        2 program 'madeafter' and 'dirhier' are included.
+        The first scratch of the programs appeared before 2017-08.

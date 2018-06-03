@@ -2,6 +2,7 @@ package CallBackery::GuiPlugin::Users;
 use Mojo::Base 'CallBackery::GuiPlugin::AbstractTable';
 use CallBackery::Translate qw(trm);
 use CallBackery::Exception qw(mkerror);
+use Mojo::JSON qw(true false);
 
 =head1 NAME
 
@@ -37,34 +38,34 @@ has tableCfg => sub {
             type => 'number',
             width => '1*',
             key => 'cbuser_id',
-            sortable => $self->true,
-            primary => $self->true,
+            sortable => true,
+            primary => true,
         },
         {
             label => trm('Username'),
             type => 'string',
             width => '3*',
             key => 'cbuser_login',
-            sortable => $self->true,
+            sortable => true,
         },
         {
             label => trm('Given Name'),
             type => 'string',
             width => '4*',
             key => 'cbuser_given',
-            sortable => $self->true,
+            sortable => true,
         },
         {
             label => trm('Family Name'),
             type => 'string',
             width => '4*',
             key => 'cbuser_family',
-            sortable => $self->true,
+            sortable => true,
         },
         {
             label => trm('Rights'),
             type => 'string',
-            sortable => $self->false,
+            sortable => false,
             width => '8*',
             key => 'cbuser_cbrights',
         },
@@ -89,7 +90,7 @@ has actionCfg => sub {
         $admin ? ({
             label => trm('Add User'),
             action => 'popup',
-            addToContextMenu => $self->true,
+            addToContextMenu => true,
             name => 'userFormAdd',
             popupTitle => trm('New User'),
             backend => {
@@ -102,11 +103,12 @@ has actionCfg => sub {
         {
             label => trm('Edit User'),
             action => 'popup',
-            addToContextMenu => $self->true,
-            defaultAction => $self->true,
+            addToContextMenu => true,
+            defaultAction => true,
             name => 'userFormEdit',
             popupTitle => trm('Edit User'),
-            handler => sub {
+            actionHandler => sub {
+                my $self = shift;
                 my $args = shift;
                 my $id = $args->{selection}{cbuser_id};
                 die mkerror(393,"You have to select a user first")
@@ -122,11 +124,12 @@ has actionCfg => sub {
         $admin ? ({
             label => trm('Delete User'),
             action => 'submitVerify',
-            addToContextMenu => $self->true,
+            addToContextMenu => true,
             question => trm('Do you really want to delete the selected user ?'),
             key => 'delete',
-            handler => sub {
-                my $args = shift;
+            actionHandler => sub {
+                my $self = shift;
+                my $args = shift;                
                 my $id = $args->{selection}{cbuser_id};
                 die mkerror(4992,"You have to select a user first")
                     if not $id;

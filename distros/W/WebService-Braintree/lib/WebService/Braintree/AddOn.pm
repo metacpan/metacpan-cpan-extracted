@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::AddOn;
-$WebService::Braintree::AddOn::VERSION = '1.3';
+$WebService::Braintree::AddOn::VERSION = '1.4';
 use 5.010_001;
 use strictures 1;
 
@@ -11,7 +11,7 @@ WebService::Braintree::AddOn
 
 =head1 PURPOSE
 
-This class lists all add-ons
+This class lists all add-ons.
 
 =cut
 

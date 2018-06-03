@@ -1,7 +1,7 @@
 package Perl::Critic::Policy::Variables::ProhibitLoopOnHash;
 our $AUTHORITY = 'cpan:XSAWYERX';
 # ABSTRACT: Don't write loops on hashes, only on keys and values of hashes
-$Perl::Critic::Policy::Variables::ProhibitLoopOnHash::VERSION = '0.004';
+$Perl::Critic::Policy::Variables::ProhibitLoopOnHash::VERSION = '0.005';
 use strict;
 use warnings;
 use parent 'Perl::Critic::Policy';
@@ -55,7 +55,9 @@ sub violates {
     # for $foo (%hash)
     # we simply skip the "$foo"
     if ( ( my $topical = $elem->snext_sibling )->isa('PPI::Token::Symbol') ) {
-        if ( $topical->snext_sibling->isa('PPI::Structure::List') ) {
+        if (   $topical->snext_sibling
+            && $topical->snext_sibling->isa('PPI::Structure::List') )
+        {
             $elem = $topical;
         } else {
             # for $foo (%hash);
@@ -123,7 +125,7 @@ Perl::Critic::Policy::Variables::ProhibitLoopOnHash - Don't write loops on hashe
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 

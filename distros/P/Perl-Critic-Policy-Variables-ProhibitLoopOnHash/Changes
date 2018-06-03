@@ -1,3 +1,8 @@
+0.005     2018-05-31 11:59:25+03:00 Asia/Jerusalem
+
+    * RT#125437: Fix "say for @array", reported by
+      Ahmed Abdrabo and Andy (@petdance) Lester
+
 0.004     2018-05-28 12:19:40+03:00 Asia/Jerusalem
 
     * Fix handling of $hash{for} and $hashref->{for}.

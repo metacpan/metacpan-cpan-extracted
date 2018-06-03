@@ -1,3 +1,9 @@
+0.007   2018-05-29 (PERLANCAR)
+
+        - [build] Rebuild with update DZP:Sah::Schemas to add prereqs to coerce
+          modules [RT#125432].
+
+
 0.006   2018-05-29 (PERLANCAR)
 
 	- Add schemas: cryptocurrency, cryptocurrency::safename,

@@ -16,7 +16,7 @@ use Encode 'encode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0341';
+our $VERSION = '0.0342';
 
 our $COMPILER;
 our $API;
@@ -25,7 +25,6 @@ our %PACKAGE_INFO_SYMTABLE;
 our $BUILD_DIR;
 our $INITIALIZED;
 our $BUILD;
-our @JIT_PACKAGE_NAMES;
 
 require XSLoader;
 XSLoader::load('SPVM', $VERSION);
@@ -344,7 +343,7 @@ SPVM provide B<easy way to Bind C/C++ Language to Perl>.
 
 =item *
 
-B<Fast array operation>, B<Fast numeric operation>, B<Static typing>, B<Virtual machine>, B<JIT>, B<Pre compile>
+B<Fast array operation>, B<Fast numeric operation>, B<Static typing>, B<Virtual machine>, B<Precompile>, B<Pre compile>
 
 =item *
 
@@ -504,10 +503,11 @@ L<Kazutake Hiramatsu|https://github.com/kazhiramatsu>
 
 =back
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT & LICENSE
 
-Copyright (C) 2017-2018 by Yuki Kimoto
+Copyright 2017-2018 Yuki Kimoto, all rights reserved.
 
-MIT License
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =cut

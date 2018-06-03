@@ -3,8 +3,8 @@
    "author" : [
       "Graham Ollis <plicease@cpan.org>"
    ],
-   "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -14,32 +14,39 @@
    },
    "name" : "FFI-Platypus-Lang-CPP-Demangle-XS",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.28"
-         }
-      },
       "configure" : {
          "requires" : {
             "ExtUtils::CppGuess" : "0",
-            "Module::Build" : "0.28",
+            "ExtUtils::MakeMaker" : "7.12",
             "perl" : "5.008001"
          }
       },
       "develop" : {
          "requires" : {
-            "Devel::PPPort" : "3.23"
+            "Devel::PPPort" : "3.23",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "base" : "0",
             "perl" : "5.008001"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.94",
+            "Test2::V0" : "0.000060",
             "perl" : "5.008001"
          }
       }
@@ -47,15 +54,18 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/plicease/FFI-Platypus-Lang-CPP-Demangle-XS/issues"
+         "web" : "https://github.com/Perl5-FFI/FFI-Platypus-Lang-CPP-Demangle-XS/issues"
       },
-      "homepage" : "http://perl.wdlabs.com/FFI-Platypus-Lang-CPP-Demangle-XS",
+      "homepage" : "https://metacpan.org/pod/FFI::Platypus::Lang::CPP::Demangle::XS",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/plicease/FFI-Platypus-Lang-CPP-Demangle-XS.git",
-         "web" : "https://github.com/plicease/FFI-Platypus-Lang-CPP-Demangle-XS"
-      }
+         "url" : "git://github.com/Perl5-FFI/FFI-Platypus-Lang-CPP-Demangle-XS.git",
+         "web" : "https://github.com/Perl5-FFI/FFI-Platypus-Lang-CPP-Demangle-XS"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.02"
+   "version" : "0.03",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
+   "x_use_unsafe_inc" : 0
 }
 

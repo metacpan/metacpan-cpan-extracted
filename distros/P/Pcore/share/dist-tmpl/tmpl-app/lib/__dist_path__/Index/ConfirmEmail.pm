@@ -1,6 +1,6 @@
 package Lcom::Index::ConfirmEmail;
 
-use Pcore -class, -l10n => 'Lcom';
+use Pcore -class, -l10n;
 
 with qw[Pcore::App::Controller];
 

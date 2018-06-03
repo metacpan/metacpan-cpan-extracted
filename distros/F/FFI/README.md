@@ -1,4 +1,4 @@
-# FFI [![Build Status](https://secure.travis-ci.org/plicease/FFI.png)](http://travis-ci.org/plicease/FFI)
+# FFI [![Build Status](https://secure.travis-ci.org/Perl5-FFI/FFI.png)](http://travis-ci.org/Perl5-FFI/FFI)
 
 Perl Foreign Function Interface based on GNU ffcall
 
@@ -17,7 +17,7 @@ $ret = FFI::call($addr, $signature, $cb->addr, ...);
 # DESCRIPTION
 
 If you are interested in FFI and Perl you should probably consider newer 
-projects, such as FFI::Platypus or FFI::Raw instead.  They have more 
+projects, such as FFI::Platypus instead.  They have more 
 features, are usually faster and are actively maintained.
 
 The original README follows.

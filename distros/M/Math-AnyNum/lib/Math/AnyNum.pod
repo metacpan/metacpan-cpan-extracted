@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =head1 SYNOPSIS
 
@@ -65,10 +65,10 @@ Additionally, each Math::AnyNum object is B<immutable>.
     fibonacci(n,k)            n-th Fibonacci number of k-th order
     polygonal(n,k)            n-th k-gonal number
     harmonic(n)               n-th harmonic numbers: 1+1/2+...+1/n
-    euler(n)                  n-th Euler number
-    bernoulli(n)              n-th Bernoulli number
-    euler(n,x)                Euler polynomial
-    bernoulli(n,x)            Bernoulli polynomial
+    euler(n)                  n-th Euler number: E_n
+    bernoulli(n)              n-th Bernoulli number: B_n
+    euler(n,x)                Euler polynomial: E_n(x)
+    bernoulli(n,x)            Bernoulli polynomial: B_n(x)
     faulhaber_sum(n,k)        sum of powers: 1^k + 2^k + ... + n^k
     geometric_sum(n,r)        geometric sum: r^0 + r^1 + ... + r^n
     kronecker(n,k)            Kronecker (Jacobi) symbol
@@ -189,10 +189,10 @@ Additionally, each Math::AnyNum object is B<immutable>.
 
   :misc
 
-    rand(a)             pseudo-random floating-point: 0 <= r < a
-    rand(a,b)           pseudo-random floating-point: a <= r < b
-    irand(a)            pseudo-random integer: 0 <= r <= a
-    irand(a,b)          pseudo-random integer: a <= r <= b
+    rand(a)             pseudorandom floating-point: 0 <= R < a
+    rand(a,b)           pseudorandom floating-point: a <= R < b
+    irand(a)            pseudorandom integer: 0 <= R <= a
+    irand(a,b)          pseudorandom integer: a <= R <= b
     seed(n)             re-seed the `rand()` function
     iseed(n)            re-seed the `irand()` function
     int(x)              truncate x to an integer
@@ -206,9 +206,9 @@ Additionally, each Math::AnyNum object is B<immutable>.
     rat(x)              convert x into a rational number
     rat(str)            parse a decimal expansion as fraction
     rat_approx(x)       rational approximation of real number x
-    numerator(q)        numerator of rational number q
-    denominator(q)      denominator of rational number q
-    nude(q)             numerator and denominator of q
+    numerator(r)        numerator of rational number r
+    denominator(r)      denominator of rational number r
+    nude(r)             numerator and denominator of r
     float(x)            convert x to a floating-point number
     complex(x)          convert x to a floating-point complex number
     complex(a,b)        complex number: a + b*i
@@ -818,13 +818,13 @@ Identities (assumming x>0):
 
     bernoulli_polynomial(n, x)                    #=> Any
 
-Returns the n-th Bernoulli polynomial.
+Returns the n-th Bernoulli polynomial: C<B_n(x)>.
 
 =head2 euler_polynomial
 
     euler_polynomial(n, x)                        #=> Any
 
-Returns the n-th Euler polynomial.
+Returns the n-th Euler polynomial: C<E_n(x)>.
 
 =head2 bernoulli / bernfrac
 
@@ -833,7 +833,7 @@ Returns the n-th Euler polynomial.
 
 Returns the n-th Bernoulli number C<B_n> as an exact fraction, with C<bernoulli(1) = 1/2>.
 
-When an additional argument is provided, it returns the the n-th Bernoulli polynomial.
+When an additional argument is provided, it returns the the n-th Bernoulli polynomial: C<B_n(x)>.
 
 =head2 euler
 
@@ -842,7 +842,7 @@ When an additional argument is provided, it returns the the n-th Bernoulli polyn
 
 Returns the n-th Euler number C<E_n>, starting with C<euler(0) = 1>.
 
-When an additional argument is provided, it returns the the n-th Euler polynomial.
+When an additional argument is provided, it returns the the n-th Euler polynomial: C<E_n(x)>.
 
 =head2 bernreal
 
@@ -1314,7 +1314,7 @@ Generalized m-factorial of C<n>. Returns NaN when C<n> or C<m> is negative. (req
     subfactorial(n, k)                            #=> Int | NaN
 
 The number of permutations of C<{1, ..., n}> that have exactly C<k> fixed points,
-given a positive integer C<n> and an optional integer C<k> (if C<k> is ommited, then C<k=0>).
+given a positive integer C<n> and an optional integer C<k> (if C<k> is omitted, then C<k=0>).
 
 See also:
 
@@ -1565,13 +1565,11 @@ Product of a list of numbers.
     bsearch(n, \&f)                               #=> Int | undef
     bsearch(a, b, \&f)                            #=> Int | undef
 
-Binary search from to 0 to n, or from a to b, which can be any arbitrary large integers.
+Binary search from to C<0> to C<n>, or from C<a> to C<b>, which can be any arbitrary large integers.
 
 The last argument is a subroutine reference which does the comparisons.
 
 This function finds a value C<k> such that f(k) = 0. Returns C<undef> otherwise.
-
-Example:
 
     bsearch(20,      sub { $_*$_  <=> 49   });   #=> 7   (7*7  = 49)
     bsearch(3, 1000, sub { $_**$_ <=> 3125 });   #=> 5   (5**5 = 3125)
@@ -1581,13 +1579,11 @@ Example:
     bsearch_le(n, \&f)                               #=> Int | undef
     bsearch_le(a, b, \&f)                            #=> Int | undef
 
-Binary search from to 0 to n, or from a to b, which can be any arbitrary large integers.
+Binary search from to C<0> to C<n>, or from C<a> to C<b>, which can be any arbitrary large integers.
 
 The last argument is a subroutine reference which does the comparisons.
 
 This function finds a value C<k> such that f(k) <= 0 and f(k+1) > 0. Returns C<undef> otherwise.
-
-Example:
 
     bsearch_le(10**6,         sub { exp($_) <=> 1e+9 });  #=>  20   (exp( 20) <= 1e+9)
     bsearch_le(-10**6, 10**6, sub { exp($_) <=> 1e-9 });  #=> -21   (exp(-21) <= 1e-9)
@@ -1597,7 +1593,7 @@ Example:
     bsearch_ge(n, \&f)                               #=> Int | undef
     bsearch_ge(a, b, \&f)                            #=> Int | undef
 
-Binary search from to 0 to n, or from a to b, which can be any arbitrary large integers.
+Binary search from to C<0> to C<n>, or from C<a> to C<b>, which can be any arbitrary large integers.
 
 The last argument is a subroutine reference which does the comparisons.
 
@@ -1652,14 +1648,16 @@ Returns a pseudorandom floating-point value. When an additional argument is prov
 it returns a number between C<x> (inclusive) and C<y> (exclusive). Otherwise, returns a number between
 C<0> (inclusive) and C<x> (exclusive).
 
+If C<x> is greater than C<y>, the returned value will be in the range "[y, x)".
+
 The PRNG behind this function is called the "Mersenne Twister". Although it generates pseudorandom
 numbers of very good quality, B<it is NOT cryptographically secure>. You should not rely on it in
 security-sensitive situations.
 
 Example:
 
-    rand(10)        # a random number in the interval [0, 10)
-    rand(10, 20)    # a random number in the interval [10, 20)
+    rand(10)        # a pseudorandom floating-point in the interval [0, 10)
+    rand(10, 20)    # a pseudorandom floating-point in the interval [10, 20)
 
 =head2 irand
 
@@ -1671,7 +1669,7 @@ Returns a pseudorandom integer. Unlike the C<rand()> function, C<irand()> is inc
 When an additional argument is provided, it returns an integer between C<x> (inclusive) and C<y> (inclusive),
 otherwise returns an integer between C<0> (inclusive) and C<x> (inclusive).
 
-If C<x> is greater that C<y>, the returned result will be in the range C<[y, x]>.
+If C<x> is greater than C<y>, the returned integer will be in the range C<[y, x]>.
 
 The PRNG behind this function is called the "Mersenne Twister". Although it generates high-quality
 pseudorandom integers, B<it is NOT cryptographically secure>. You should not rely on it in
@@ -1679,8 +1677,8 @@ security-sensitive situations.
 
 Example:
 
-    irand(10)        # a random integer in the interval [0, 10]
-    irand(10, 20)    # a random integer in the interval [10, 20]
+    irand(10)        # a pseudorandom integer in the interval [0, 10]
+    irand(10, 20)    # a pseudorandom integer in the interval [10, 20]
 
 =head2 seed / iseed
 
@@ -1980,7 +1978,7 @@ Returns a string representing the value of C<x>, in base 10.
 
     !!$x                                          #=> Bool
 
-Returns a false value when the number is zero. True otherwise.
+Returns a false value when the number is zero or when the value of the number is C<NaN>. True otherwise.
 
 =head2 numify
 

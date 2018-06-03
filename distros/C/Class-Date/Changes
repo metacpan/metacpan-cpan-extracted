@@ -1,5 +1,12 @@
 Revision history for Class::Date
 
+1.1.17 2018-06-01
+  [ BUG FIXES ]
+    - Modules still had the hard-coded $VERSIONs in them. (GH#11)
+
+  [ STATISTICS ]
+    - code churn: 4 files changed, 191 insertions(+), 180 deletions(-)
+
 1.1.16 2018-05-26
   - Remove the xs part of the distribution, which  was not adding much for
     the extra pain.

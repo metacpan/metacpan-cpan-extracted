@@ -26,16 +26,16 @@ no_index:
 provides:
   Class::Date:
     file: lib/Class/Date.pm
-    version: v1.1.16
+    version: v1.1.17
   Class::Date::Const:
     file: lib/Class/Date/Const.pm
-    version: v1.1.16
+    version: v1.1.17
   Class::Date::Invalid:
     file: lib/Class/Date/Invalid.pm
-    version: v1.1.16
+    version: v1.1.17
   Class::Date::Rel:
     file: lib/Class/Date/Rel.pm
-    version: v1.1.16
+    version: v1.1.17
 requires:
   Carp: '0'
   Date::Parse: '0'
@@ -53,7 +53,7 @@ resources:
   bugtracker: https://github.com/yanick/perl-class-date/issues
   homepage: https://github.com/yanick/perl-class-date
   repository: https://github.com/yanick/perl-class-date.git
-version: 1.1.16
+version: 1.1.17
 x_authority: cpan:YANICK
 x_contributors:
   - 'Vladimir Timofeev <vovkasm@gmail.com>'

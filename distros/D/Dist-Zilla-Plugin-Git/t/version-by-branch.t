@@ -103,7 +103,7 @@ $git->commit({ message => 'committing 1.2.3'});
 $git->tag("v1.2.3");
 ok( (grep { /v1\.2\.3/ } $git->tag), "wrote v1.2.3 tag" );
 
-is( _zilla_version, "1.2.4", "initialized from last tag" );
+is( _zilla_version, "1.2.4", "next version of 1.2.4 determined from last tag" );
 head_last_ver("1.2.3");
 
 # make a dev branch
@@ -115,13 +115,13 @@ $git->commit({ message => 'committing 1.3.0'});
 $git->tag("v1.3.0");
 ok( (grep { /v1\.3\.0/ } $git->tag), "wrote v1.3.0 tag" );
 
-is( _zilla_version, "1.3.1", "initialized from 1.3.0 tag" );
+is( _zilla_version, "1.3.1", "next version of 1.3.1 determined from 1.3.0 tag on dev" );
 head_last_ver("1.3.0");
 
 # go back to master branch
 $git->checkout(qw(master));
 
-is( _zilla_version, "1.2.4", "initialized from 1.2.3 tag on master" );
+is( _zilla_version, "1.2.4", "next version of 1.2.4 determined from 1.2.3 tag on master" );
 head_last_ver("1.2.3");
 
 # tag stable 1.2.4
@@ -130,7 +130,7 @@ $git->commit({ message => 'committing 1.2.4 on master'});
 $git->tag("v1.2.4");
 ok( (grep { /v1\.2\.4/ } $git->tag), "wrote v1.2.4 tag" );
 
-is( _zilla_version, "1.2.5", "initialized from 1.2.4 tag" );
+is( _zilla_version, "1.2.5", "next version of 1.2.5 determined from 1.2.4 tag on master" );
 head_last_ver("1.2.4");
 
 # go back to dev branch
@@ -139,16 +139,16 @@ $git->checkout(qw(dev));
 append_and_add(Changes => "1.3.1 in progress\n");
 $git->commit({ message => 'committing 1.3.1 change'});
 
-is( _zilla_version, "1.3.1", "using dev branch 1.3.0 tag" );
+is( _zilla_version, "1.3.1", "next version of 1.3.1 determined from 1.3.0 tag on dev" );
 head_last_ver("1.3.0");
 
 # go back to master branch
 $git->checkout(qw(master));
 
 append_and_add(Changes => "1.2.5 still in progress\n");
-$git->commit({ message => 'committing 1.2.5 change'});
+$git->commit({ message => 'committing 1.2.5 change to master'});
 
-is( _zilla_version, "1.2.5", "using master branch 1.2.4 tag" );
+is( _zilla_version, "1.2.5", "next version of 1.2.5 determined from 1.2.4 tag on master" );
 head_last_ver("1.2.4");
 
 # see if it reads the cache

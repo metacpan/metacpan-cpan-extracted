@@ -35,6 +35,12 @@
 
 namespace zmq
 {
+const char zap_version[] = "1.0";
+const size_t zap_version_len = sizeof (zap_version) - 1;
+
+const char id[] = "1";
+const size_t id_len = sizeof (id) - 1;
+
 zap_client_t::zap_client_t (session_base_t *const session_,
                             const std::string &peer_address_,
                             const options_t &options_) :
@@ -43,23 +49,23 @@ zap_client_t::zap_client_t (session_base_t *const session_,
 {
 }
 
-void zap_client_t::send_zap_request (const char *mechanism,
-                                    size_t mechanism_length,
-                                    const uint8_t *credentials,
-                                    size_t credentials_size)
+void zap_client_t::send_zap_request (const char *mechanism_,
+                                     size_t mechanism_length_,
+                                     const uint8_t *credentials_,
+                                     size_t credentials_size_)
 {
-    send_zap_request (mechanism, mechanism_length, &credentials,
-                      &credentials_size, 1);
+    send_zap_request (mechanism_, mechanism_length_, &credentials_,
+                      &credentials_size_, 1);
 }
 
-void zap_client_t::send_zap_request (const char *mechanism,
-                                    size_t mechanism_length,
-                                    const uint8_t **credentials,
-                                    size_t *credentials_sizes,
-                                    size_t credentials_count)
+void zap_client_t::send_zap_request (const char *mechanism_,
+                                     size_t mechanism_length_,
+                                     const uint8_t **credentials_,
+                                     size_t *credentials_sizes_,
+                                     size_t credentials_count_)
 {
-    // write_zap_msg cannot fail. It could only fail if the HWM was exceeded, 
-    // but on the ZAP socket, the HWM is disabled. 
+    // write_zap_msg cannot fail. It could only fail if the HWM was exceeded,
+    // but on the ZAP socket, the HWM is disabled.
 
     int rc;
     msg_t msg;
@@ -72,17 +78,17 @@ void zap_client_t::send_zap_request (const char *mechanism,
     errno_assert (rc == 0);
 
     //  Version frame
-    rc = msg.init_size (3);
+    rc = msg.init_size (zap_version_len);
     errno_assert (rc == 0);
-    memcpy (msg.data (), "1.0", 3);
+    memcpy (msg.data (), zap_version, zap_version_len);
     msg.set_flags (msg_t::more);
     rc = session->write_zap_msg (&msg);
     errno_assert (rc == 0);
 
     //  Request ID frame
-    rc = msg.init_size (1);
+    rc = msg.init_size (id_len);
     errno_assert (rc == 0);
-    memcpy (msg.data (), "1", 1);
+    memcpy (msg.data (), id, id_len);
     msg.set_flags (msg_t::more);
     rc = session->write_zap_msg (&msg);
     errno_assert (rc == 0);
@@ -113,21 +119,21 @@ void zap_client_t::send_zap_request (const char *mechanism,
     errno_assert (rc == 0);
 
     //  Mechanism frame
-    rc = msg.init_size (mechanism_length);
+    rc = msg.init_size (mechanism_length_);
     errno_assert (rc == 0);
-    memcpy (msg.data (), mechanism, mechanism_length);
-    if (credentials_count)
+    memcpy (msg.data (), mechanism_, mechanism_length_);
+    if (credentials_count_)
         msg.set_flags (msg_t::more);
     rc = session->write_zap_msg (&msg);
     errno_assert (rc == 0);
 
     //  Credentials frames
-    for (size_t i = 0; i < credentials_count; ++i) {
-        rc = msg.init_size (credentials_sizes[i]);
+    for (size_t i = 0; i < credentials_count_; ++i) {
+        rc = msg.init_size (credentials_sizes_[i]);
         errno_assert (rc == 0);
-        if (i < credentials_count - 1)
+        if (i < credentials_count_ - 1)
             msg.set_flags (msg_t::more);
-        memcpy (msg.data (), credentials[i], credentials_sizes[i]);
+        memcpy (msg.data (), credentials_[i], credentials_sizes_[i]);
         rc = session->write_zap_msg (&msg);
         errno_assert (rc == 0);
     }
@@ -136,15 +142,16 @@ void zap_client_t::send_zap_request (const char *mechanism,
 int zap_client_t::receive_and_process_zap_reply ()
 {
     int rc = 0;
-    msg_t msg[7]; //  ZAP reply consists of 7 frames
+    const size_t zap_reply_frame_count = 7;
+    msg_t msg[zap_reply_frame_count];
 
     //  Initialize all reply frames
-    for (int i = 0; i < 7; i++) {
+    for (size_t i = 0; i < zap_reply_frame_count; i++) {
         rc = msg[i].init ();
         errno_assert (rc == 0);
     }
 
-    for (int i = 0; i < 7; i++) {
+    for (size_t i = 0; i < zap_reply_frame_count; i++) {
         rc = session->read_zap_msg (&msg[i]);
         if (rc == -1) {
             if (errno == EAGAIN) {
@@ -152,7 +159,8 @@ int zap_client_t::receive_and_process_zap_reply ()
             }
             return close_and_return (msg, -1);
         }
-        if ((msg[i].flags () & msg_t::more) == (i < 6 ? 0 : msg_t::more)) {
+        if ((msg[i].flags () & msg_t::more)
+            == (i < zap_reply_frame_count - 1 ? 0 : msg_t::more)) {
             session->get_socket ()->event_handshake_failed_protocol (
               session->get_endpoint (), ZMQ_PROTOCOL_ERROR_ZAP_MALFORMED_REPLY);
             errno = EPROTO;
@@ -170,7 +178,8 @@ int zap_client_t::receive_and_process_zap_reply ()
     }
 
     //  Version frame
-    if (msg[1].size () != 3 || memcmp (msg[1].data (), "1.0", 3)) {
+    if (msg[1].size () != zap_version_len
+        || memcmp (msg[1].data (), zap_version, zap_version_len)) {
         session->get_socket ()->event_handshake_failed_protocol (
           session->get_endpoint (), ZMQ_PROTOCOL_ERROR_ZAP_BAD_VERSION);
         errno = EPROTO;
@@ -178,7 +187,7 @@ int zap_client_t::receive_and_process_zap_reply ()
     }
 
     //  Request id frame
-    if (msg[2].size () != 1 || memcmp (msg[2].data (), "1", 1)) {
+    if (msg[2].size () != id_len || memcmp (msg[2].data (), id, id_len)) {
         session->get_socket ()->event_handshake_failed_protocol (
           session->get_endpoint (), ZMQ_PROTOCOL_ERROR_ZAP_BAD_REQUEST_ID);
         errno = EPROTO;
@@ -186,7 +195,7 @@ int zap_client_t::receive_and_process_zap_reply ()
     }
 
     //  Status code frame, only 200, 300, 400 and 500 are valid status codes
-    char *status_code_data = static_cast<char *> (msg[3].data ());
+    const char *status_code_data = static_cast<const char *> (msg[3].data ());
     if (msg[3].size () != 3 || status_code_data[0] < '2'
         || status_code_data[0] > '5' || status_code_data[1] != '0'
         || status_code_data[2] != '0') {
@@ -214,7 +223,7 @@ int zap_client_t::receive_and_process_zap_reply ()
     }
 
     //  Close all reply frames
-    for (int i = 0; i < 7; i++) {
+    for (size_t i = 0; i < zap_reply_frame_count; i++) {
         const int rc2 = msg[i].close ();
         errno_assert (rc2 == 0);
     }
@@ -255,7 +264,7 @@ zap_client_common_handshake_t::zap_client_common_handshake_t (
     mechanism_base_t (session_, options_),
     zap_client_t (session_, peer_address_, options_),
     state (waiting_for_hello),
-    zap_reply_ok_state (zap_reply_ok_state_)
+    _zap_reply_ok_state (zap_reply_ok_state_)
 {
 }
 
@@ -263,7 +272,7 @@ zmq::mechanism_t::status_t zap_client_common_handshake_t::status () const
 {
     if (state == ready)
         return mechanism_t::ready;
-    else if (state == error_sent)
+    if (state == error_sent)
         return mechanism_t::error;
     else
         return mechanism_t::handshaking;
@@ -283,7 +292,7 @@ void zap_client_common_handshake_t::handle_zap_status_code ()
     //  i.e. 200, 300, 400 or 500
     switch (status_code[0]) {
         case '2':
-            state = zap_reply_ok_state;
+            state = _zap_reply_ok_state;
             break;
         case '3':
             //  a 300 error code (temporary failure)

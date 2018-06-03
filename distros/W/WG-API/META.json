@@ -4,7 +4,7 @@
       "Cyrill Novgorodcev , C<< <cynovg at cpan.org> >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.10",
+   "generated_by" : "Minilla/v3.0.17",
    "license" : [
       "artistic_2"
    ],
@@ -61,52 +61,48 @@
    "provides" : {
       "WG::API" : {
          "file" : "lib/WG/API.pm",
-         "version" : "v0.8.5"
+         "version" : "v0.8.6"
       },
       "WG::API::Auth" : {
          "file" : "lib/WG/API/Auth.pm",
-         "version" : "v0.8.5"
+         "version" : "v0.8.6"
       },
       "WG::API::Base" : {
          "file" : "lib/WG/API/Base.pm",
-         "version" : "v0.8.5"
+         "version" : "v0.8.6"
       },
       "WG::API::Error" : {
          "file" : "lib/WG/API/Error.pm",
-         "version" : "v0.8.5"
+         "version" : "v0.8.6"
       },
       "WG::API::NET" : {
          "file" : "lib/WG/API/NET.pm",
-         "version" : "v0.8.5"
+         "version" : "v0.8.6"
       },
       "WG::API::WoT" : {
          "file" : "lib/WG/API/WoT.pm",
-         "version" : "v0.8.5"
+         "version" : "v0.8.6"
       },
       "WG::API::WoWp" : {
          "file" : "lib/WG/API/WoWp.pm",
-         "version" : "v0.8.5"
+         "version" : "v0.8.6"
       },
       "WG::API::WoWs" : {
          "file" : "lib/WG/API/WoWs.pm",
-         "version" : "v0.8.5"
+         "version" : "v0.8.6"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/cynovg/WG-API/issues"
-      },
-      "homepage" : "https://github.com/cynovg/WG-API",
       "repository" : {
-         "url" : "git://github.com/cynovg/WG-API.git",
-         "web" : "https://github.com/cynovg/WG-API"
+         "url" : "git://gitlab.com/cynovg/WG-API.git"
       }
    },
-   "version" : "v0.8.5",
+   "version" : "v0.8.6",
    "x_contributors" : [
-      "root <root@cynovg-debian.local>",
-      "Cyrill Novgorodcev <cynovg@gmail.com>",
-      "Kirill Novgorodcev <novgorodtsev.kirill@220-volt.ru>"
-   ]
+      "Novgorodcev Cyrill <cynovg@gmail.com>",
+      "Novgorodcev Cyrill <novgorodtsev.kirill@220-volt.ru>",
+      "root <root@cynovg-debian.local>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

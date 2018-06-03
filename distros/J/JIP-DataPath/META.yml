@@ -28,4 +28,4 @@ resources:
   bugtracker: https://github.com/outtaspace/jip_datapath/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/outtaspace/jip_datapath.git
-version: '0.02'
+version: '0.03'

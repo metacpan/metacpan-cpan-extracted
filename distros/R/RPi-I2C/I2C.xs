@@ -4,10 +4,32 @@
  
 #include "ppport.h"
 #include "i2c-dev.h"
- 
+
+/* readI2CBlockData() must be defined in C to catch panic situations */
+
+int I2C__readI2CBlockData(int file, int command, SV* output){
+    STRLEN len;
+    char *buf = SvPV(output, len);
+    int ret;
+
+    ret = i2c_smbus_read_i2c_block_data(file, command, len, buf);
+
+    if (ret == -1){
+        croak("read_block() has invalid return. Is I2C device connected?\n");
+    }
+    sv_setpvn(output, buf, ret);
+
+    return ret;
+}
+
 MODULE = RPi::I2C PACKAGE = RPi::I2C PREFIX = I2C_
 PROTOTYPES: DISABLE
- 
+
+int I2C__readI2CBlockData(file, command, output)
+    int file
+    int command
+    SV* output
+
 int I2C__checkDevice(file, value)
     int file
     int value
@@ -113,24 +135,7 @@ int I2C__blockProcessCall(file, command, value)
     RETVAL = i2c_smbus_block_process_call(file, command, len, buf);
   OUTPUT:
     RETVAL
- 
-int I2C__readI2CBlockData(file, command, output)
-    int file
-    int command
-    SV * output 
-  INIT:
-    STRLEN len;
-    char *buf = SvPV(output, len);
-    int ret;
-  CODE:
-    ret = i2c_smbus_read_i2c_block_data(file, command, len, buf);
-    if (ret == -1)
-      RETVAL = ret;
-    sv_setpvn(output, buf, ret);
-    RETVAL = ret;
-  OUTPUT:
-    RETVAL
- 
+
 int I2C__writeI2CBlockData(file, command, value)
     int file
     int command

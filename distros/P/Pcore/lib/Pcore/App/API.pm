@@ -2,6 +2,7 @@ package Pcore::App::API;
 
 use Pcore -role, -const, -export;
 use Pcore::App::API::Map;
+use Pcore::Util::Scalar qw[is_plain_arrayref];
 use Pcore::Util::Data qw[from_b64 from_b64_url];
 use Pcore::Util::Digest qw[sha3_512];
 use Pcore::Util::Text qw[encode_utf8];
@@ -77,7 +78,7 @@ around init => sub ( $orig, $self ) {
 
 # AUTHENTICATE
 # parse token, create private token, forward to authenticate_private
-sub authenticate ( $self, $user_name_utf8, $token, $cb ) {
+sub authenticate ( $self, $token, $cb ) {
 
     # no auth token provided
     if ( !defined $token ) {
@@ -89,10 +90,10 @@ sub authenticate ( $self, $user_name_utf8, $token, $cb ) {
     my ( $token_type, $token_id, $private_token_hash );
 
     # authenticate user password
-    if ($user_name_utf8) {
+    if ( is_plain_arrayref $token) {
 
         # generate private token hash
-        $private_token_hash = eval { sha3_512 encode_utf8($token) . encode_utf8 $user_name_utf8 };
+        $private_token_hash = eval { sha3_512 encode_utf8( $token->[1] ) . encode_utf8 $token->[0] };
 
         # error decoding token
         if ($@) {
@@ -103,7 +104,7 @@ sub authenticate ( $self, $user_name_utf8, $token, $cb ) {
 
         $token_type = $TOKEN_TYPE_USER_PASSWORD;
 
-        \$token_id = \$user_name_utf8;
+        \$token_id = \$token->[0];
     }
 
     # authenticate token
@@ -207,9 +208,7 @@ sub authenticate_private ( $self, $private_token, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 80                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 113                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 114                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -5,9 +5,9 @@
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Thu Mar  1 10:39:45 EST 2018
-#    Data version: tzdata2018c
-#    Code version: tzcode2018c
+#    Generated on: Wed May 30 14:52:52 EDT 2018
+#    Data version: tzdata2018e
+#    Code version: tzcode2018e
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -716,6 +716,7 @@ default alias can be overridden as described above.
                                           America/Nome
      CAT-2CAST                            Africa/Juba
                                           Africa/Khartoum
+     CAT-2WAT                             Africa/Windhoek
      CET-1CEST                            CET
                                           Europe/Berlin
                                           Europe/Brussels
@@ -866,6 +867,7 @@ default alias can be overridden as described above.
      GMT0IST                              Europe/Dublin
      HKT-8HKST                            Asia/Hong_Kong
      HST10HDT                             America/Adak
+     IST-1GMT                             Europe/Dublin
      IST-2EEST                            Asia/Gaza
                                           Asia/Hebron
      IST-2IDT                             Asia/Jerusalem
@@ -941,7 +943,6 @@ default alias can be overridden as described above.
                                           America/Tijuana
                                           America/Vancouver
      SAST-2SAST                           Africa/Johannesburg
-     WAT-1WAST                            Africa/Windhoek
      WET-1WEST                            Europe/Luxembourg
      WET0WEST                             WET
                                           Europe/Lisbon
@@ -1352,7 +1353,7 @@ L<Date::Manip::TZ> module.
      0      -05:09:30   America/Nassau
      0      -05:08:36   America/Lima
      0      -05:08:12   America/Lima
-     0      -05:07:11   America/Jamaica
+     0      -05:07:10   America/Jamaica
                         America/Grand_Turk
      0      -05:00:00   America/New_York
                         America/Nipigon
@@ -1495,6 +1496,7 @@ L<Date::Manip::TZ> module.
                         America/Miquelon
                         America/Argentina/Buenos_Aires
                         America/Cayenne
+                        America/Montevideo
                         Antarctica/Palmer
      0      -03:59:48   America/Glace_Bay
      0      -03:58:29   America/Barbados
@@ -1504,7 +1506,7 @@ L<Date::Manip::TZ> module.
      0      -03:50:40   America/Asuncion
      0      -03:48:28   America/Blanc-Sablon
      0      -03:45:00   America/Guyana
-     0      -03:44:44   America/Montevideo
+     0      -03:44:51   America/Montevideo
      0      -03:44:40   America/Miquelon
      0      -03:44:20   America/Cuiaba
      0      -03:40:52   America/Paramaribo
@@ -1610,7 +1612,6 @@ L<Date::Manip::TZ> module.
                         Europe/Lisbon
                         Africa/Abidjan
                         Africa/Casablanca
-                        Europe/Dublin
                         Africa/Accra
                         Atlantic/Canary
                         Atlantic/Madeira
@@ -1628,6 +1629,7 @@ L<Date::Manip::TZ> module.
                         Atlantic/Azores
                         Africa/Ceuta
                         Africa/Algiers
+                        Europe/Dublin
                         America/Rankin_Inlet
                         Europe/Gibraltar
                         America/Inuvik
@@ -1702,17 +1704,16 @@ L<Date::Manip::TZ> module.
                         Europe/Monaco
                         Europe/Andorra
                         Europe/Gibraltar
+                        Europe/Dublin
                         Africa/Ceuta
                         Africa/Sao_Tome
                         Etc/GMT+1
                         N
-                        Africa/Windhoek
                         Africa/Tripoli
                         Europe/Vilnius
                         Europe/Lisbon
                         Europe/Uzhgorod
                         Africa/Casablanca
-                        Europe/Dublin
                         Europe/London
                         Europe/Sofia
                         Europe/Kaliningrad
@@ -2054,6 +2055,7 @@ L<Date::Manip::TZ> module.
                         Asia/Singapore
                         Etc/GMT+8
                         U
+                        Antarctica/Casey
                         Asia/Chita
                         Asia/Krasnoyarsk
                         Asia/Dili
@@ -2063,7 +2065,6 @@ L<Date::Manip::TZ> module.
                         Asia/Ho_Chi_Minh
                         Asia/Jakarta
                         Asia/Ust-Nera
-                        Antarctica/Casey
      0      +08:04:00   Asia/Manila
      0      +08:05:43   Asia/Shanghai
      0      +08:06:00   Asia/Taipei
@@ -2080,6 +2081,7 @@ L<Date::Manip::TZ> module.
      0      +08:57:56   Pacific/Palau
      0      +09:00:00   Asia/Tokyo
                         Pacific/Palau
+                        Asia/Pyongyang
                         Asia/Seoul
                         Asia/Chita
                         Asia/Khandyga
@@ -2088,7 +2090,6 @@ L<Date::Manip::TZ> module.
                         Asia/Dili
                         Etc/GMT+9
                         V
-                        Asia/Pyongyang
                         Asia/Irkutsk
                         Asia/Choibalsan
                         Asia/Vladivostok
@@ -2429,27 +2430,31 @@ L<Date::Manip::TZ> module.
                         America/Pangnirtung
                         Antarctica/Palmer
      1      -01:30:00   America/St_Johns
+                        America/Montevideo
      1      -01:00:00   America/Noronha
                         America/Scoresbysund
                         Atlantic/Azores
                         Atlantic/Cape_Verde
      1      +00:00:00   Atlantic/Azores
+                        Europe/Dublin
                         America/Scoresbysund
                         Atlantic/Reykjavik
                         Atlantic/Madeira
+                        Europe/Prague
      1      +00:20:00   Africa/Accra
      1      +00:34:39   Europe/Dublin
      1      +01:00:00   WET
                         Europe/Lisbon
                         Europe/London
-                        Europe/Dublin
                         Africa/Casablanca
                         Atlantic/Madeira
                         Africa/El_Aaiun
                         Atlantic/Canary
                         Atlantic/Faroe
+                        Africa/Windhoek
                         Africa/Algiers
                         Africa/Ceuta
+                        Europe/Dublin
                         Europe/Gibraltar
                         Europe/Monaco
                         Europe/Paris
@@ -2483,7 +2488,6 @@ L<Date::Manip::TZ> module.
                         Europe/Andorra
                         Africa/Ceuta
                         Antarctica/Troll
-                        Africa/Windhoek
                         Africa/Tripoli
                         Africa/Tunis
                         Europe/Vilnius
@@ -3182,6 +3186,7 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       America/Danmarkshavn
                       Africa/Sao_Tome
                       Europe/Gibraltar
+                      Europe/Prague
      GMT+1            Etc/GMT+1
      GMT+10           Etc/GMT+10
      GMT+11           Etc/GMT+11
@@ -3457,8 +3462,7 @@ most commonly used, I'm willing to entertain arguments for altering the order.
      UTC              UTC
      V                V
      W                W
-     WAST             Africa/Windhoek
-                      Africa/Ndjamena
+     WAST             Africa/Ndjamena
      WAT              Africa/Ndjamena
                       Africa/Lagos
                       Africa/Sao_Tome

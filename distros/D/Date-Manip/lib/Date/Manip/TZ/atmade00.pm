@@ -6,9 +6,9 @@ Date::Manip::TZ::atmade00;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Thu Mar  1 10:33:48 EST 2018
-#    Data version: tzdata2018c
-#    Code version: tzcode2018c
+#    Generated on: Wed May 30 14:49:28 EDT 2018
+#    Data version: tzdata2018e
+#    Code version: tzcode2018e
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.61';
+$VERSION='6.71';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -38,14 +38,14 @@ END { undef $VERSION; }
    1884 =>
      [
         [ [1884,1,1,1,7,36],[1884,1,1,0,0,0],'-01:07:36',[-1,-7,-36],
-          'FMT',0,[1912,1,1,1,7,35],[1911,12,31,23,59,59],
-          '1884010101:07:36','1884010100:00:00','1912010101:07:35','1911123123:59:59' ],
+          'FMT',0,[1912,1,1,0,59,59],[1911,12,31,23,52,23],
+          '1884010101:07:36','1884010100:00:00','1912010100:59:59','1911123123:52:23' ],
      ],
    1912 =>
      [
-        [ [1912,1,1,1,7,36],[1912,1,1,0,7,36],'-01:00:00',[-1,0,0],
+        [ [1912,1,1,1,0,0],[1912,1,1,0,0,0],'-01:00:00',[-1,0,0],
           '-01',0,[1916,6,17,23,59,59],[1916,6,17,22,59,59],
-          '1912010101:07:36','1912010100:07:36','1916061723:59:59','1916061722:59:59' ],
+          '1912010101:00:00','1912010100:00:00','1916061723:59:59','1916061722:59:59' ],
      ],
    1916 =>
      [

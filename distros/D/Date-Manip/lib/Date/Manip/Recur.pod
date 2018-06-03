@@ -1163,6 +1163,13 @@ errors may be returned:
    Base invalid
       An invalid date was entered for one of the dates.
 
+   Not found
+      In some cases, a recurrence may appear valid, but
+      does not refer to any actual occurrences.  If no
+      dates are found within a certain number of attempts
+      (given by the MaxRecurAttempts config variable), this
+      error is returned.
+
 There are a few special circumstances to be aware of.
 
 1) If the recurrence contains no interval (i.e. is of the form

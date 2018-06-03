@@ -1,0 +1,52 @@
+{
+   "abstract" : "The beginning of a Perl universe",
+   "author" : [
+      "Yang Bo <rslovers@yandex.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dot",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/057a3dd61f99517a3afea0051a49cb27994f94d/Dot/issues"
+      },
+      "homepage" : "https://github.com/057a3dd61f99517a3afea0051a49cb27994f94d/Dot",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/057a3dd61f99517a3afea0051a49cb27994f94d/Dot.git",
+         "web" : "https://github.com/057a3dd61f99517a3afea0051a49cb27994f94d/Dot"
+      }
+   },
+   "version" : "v1.0.1"
+}

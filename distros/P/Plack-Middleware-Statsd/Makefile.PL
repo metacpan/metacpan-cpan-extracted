@@ -18,13 +18,8 @@ my %WriteMakefileArgs = (
   "NAME" => "Plack::Middleware::Statsd",
   "PREREQ_PM" => {
     "Plack::Middleware" => 0,
-    "Plack::Util" => 0,
-    "Plack::Util::Accessor" => 0,
-    "Time::HiRes" => 0,
     "Try::Tiny" => 0,
-    "parent" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "parent" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -41,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "lib" => 0
   },
-  "VERSION" => "v0.3.4",
+  "VERSION" => "v0.3.5",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,18 +53,13 @@ my %FallbackPrereqs = (
   "Plack::Middleware::ContentLength" => 0,
   "Plack::Middleware::Head" => 0,
   "Plack::Test" => 0,
-  "Plack::Util" => 0,
-  "Plack::Util::Accessor" => 0,
   "Sub::Util" => "1.40",
   "Test::Differences" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,
-  "Time::HiRes" => 0,
   "Try::Tiny" => 0,
   "lib" => 0,
-  "parent" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "parent" => 0
 );
 
 

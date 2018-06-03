@@ -107,9 +107,10 @@ use warnings;
 use Moo       ();
 use Moo::Role ();
 
+use List::Util qw/ any /;
 use Sub::Quote qw/ quote_sub /;
 
-our $VERSION = '0.0.11';
+our $VERSION = '0.0.13';
 
 my %Attributes;
 
@@ -137,8 +138,23 @@ sub import {
         quote_sub "${target}::json_ld_type", "'${type}'";
     }
 
-    quote_sub "${target}::json_ld_fields",
-      __PACKAGE__ . "::_json_ld_fields('${target}',\@_)";
+    my $name   = "json_ld_fields";
+
+    quote_sub "${target}::${name}", '$code->(@_)',
+        {
+            '$code' => \sub {
+                my ($self) = @_;
+                my $fields = eval { $self->next::method };
+                return [
+                    @{$fields || []},
+                    @{$Attributes{$target} || []}
+                ];
+            },
+        }, {
+            no_defer => 1,
+            package  => $target,
+        };
+
 
     Moo::Role->apply_single_role_to_package( $target, 'MooX::Role::JSON_LD' );
 
@@ -167,12 +183,5 @@ sub _process_has {
 
     ( $name, %opts );
 }
-
-sub _json_ld_fields {
-    my ( $class, $self ) = @_;
-    $Attributes{$class} ;
-}
-
-1;
 
 1;

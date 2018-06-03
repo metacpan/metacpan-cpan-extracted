@@ -1,11 +1,12 @@
 package Data::Sah::Coerce;
 
-our $DATE = '2018-03-27'; # DATE
-our $VERSION = '0.024'; # VERSION
+our $DATE = '2018-06-02'; # DATE
+our $VERSION = '0.025'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+no warnings 'once';
 use Log::ger;
 
 use Data::Sah::CoerceCommon;
@@ -35,7 +36,6 @@ sub gen_coercer {
     my %args = @_;
 
     my $rt = $args{return_type} // 'val';
-    my $rt_sv = $rt eq 'str+val';
 
     my $rules = Data::Sah::CoerceCommon::get_coerce_rules(
         %args,
@@ -58,17 +58,36 @@ sub gen_coercer {
         my $expr;
         for my $i (reverse 0..$#{$rules}) {
             my $rule = $rules->[$i];
+            my $prev_term;
             if ($i == $#{$rules}) {
-                if ($rt_sv) {
-                    $expr = "($rule->{expr_match}) ? ['$rule->{name}', $rule->{expr_coerce}] : [undef, \$data]";
-                } else {
-                    $expr = "($rule->{expr_match}) ? ($rule->{expr_coerce}) : \$data";
+                if ($rt eq 'val') {
+                    $prev_term = '$data';
+                } elsif ($rt eq 'status+val') {
+                    $prev_term = '[undef, $data]';
+                } else { # status+err+val
+                    $prev_term = '[undef, undef, $data]';
                 }
             } else {
-                if ($rt_sv) {
-                    $expr = "($rule->{expr_match}) ? ['$rule->{name}', $rule->{expr_coerce}] : ($expr)";
+                $prev_term = $expr;
+            }
+
+            if ($rt eq 'val') {
+                if ($rule->{meta}{might_fail}) {
+                    $expr = "do { if ($rule->{expr_match}) { my \$res = $rule->{expr_coerce}; \$res->[0] ? undef : \$res->[1] } else { $prev_term } }";
                 } else {
-                    $expr = "($rule->{expr_match}) ? ($rule->{expr_coerce}) : ($expr)";
+                    $expr = "($rule->{expr_match}) ? ($rule->{expr_coerce}) : $prev_term";
+                }
+            } elsif ($rt eq 'status+val') {
+                if ($rule->{meta}{might_fail}) {
+                    $expr = "do { if ($rule->{expr_match}) { my \$res = $rule->{expr_coerce}; \$res->[0] ? [1,undef] : [1,\$res->[1]] } else { $prev_term } }";
+                } else {
+                    $expr = "($rule->{expr_match}) ? [1, $rule->{expr_coerce}] : $prev_term";
+                }
+            } else { # status+err+val
+                if ($rule->{meta}{might_fail}) {
+                    $expr = "do { if ($rule->{expr_match}) { my \$res = $rule->{expr_coerce}; \$res->[0] ? [1, \$res->[0], undef] : [1, undef, \$res->[1]] } else { $prev_term } }";
+                } else {
+                    $expr = "($rule->{expr_match}) ? [1, undef, $rule->{expr_coerce}] : $prev_term";
                 }
             }
         }
@@ -78,18 +97,22 @@ sub gen_coercer {
             $code_require,
             "sub {\n",
             "    my \$data = shift;\n",
-            ($rt_sv ?
-                 "    return [undef, undef] unless defined(\$data);\n" :
-                 "    return undef unless defined(\$data);\n"
-             ),
+            "    unless (defined \$data) {\n",
+            "        ", ($rt eq 'val' ? "return undef;" :
+                             $rt eq 'status+val' ? "return [undef, undef];" :
+                             "return [undef, undef, undef];" # status+err+val
+                         ), "\n",
+            "    }\n",
             "    $expr;\n",
             "}",
         );
     } else {
-        if ($rt_sv) {
+        if ($rt eq 'val') {
+            $code = 'sub { $_[0] }';
+        } elsif ($rt eq 'status+val') {
             $code = 'sub { [undef, $_[0]] }';
         } else {
-            $code = 'sub { $_[0] }';
+            $code = 'sub { [undef, undef, $_[0]] }';
         }
     }
 
@@ -119,7 +142,7 @@ Data::Sah::Coerce - Coercion rules for Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.024 of Data::Sah::Coerce (from Perl distribution Data-Sah-Coerce), released on 2018-03-27.
+This document describes version 0.025 of Data::Sah::Coerce (from Perl distribution Data-Sah-Coerce), released on 2018-06-02.
 
 =head1 SYNOPSIS
 
@@ -162,8 +185,15 @@ the following keys (C<*> marks that the key is required):
 
 =item * v* => int (default: 1)
 
-Metadata specification version. Currently at 2 (bumped from 1 to exclude old
-module names).
+Metadata specification version. Currently at 3.
+
+History: bumped from 2 to 3 to allow coercion expression to return error message
+explaining why coercion fails. The C<might_die> metadata property is replaced
+with C<might_fail>. When C<might_fail> is set to true, C<expr_coerce> must
+return array containing error message and coerced data, instead of just coerced
+data.
+
+History: Bumped from 1 to 2 to exclude old module names.
 
 =item * enable_by_default* => bool
 
@@ -176,22 +206,18 @@ C<x.perl.coerce_rules> to something like C<< ["!str_iso8601", "str_alami"] >>
 (this means to exclude the C<str_iso8601> rule but enable the C<str_alami>
 rule).
 
-=item * might_die => bool (default: 0)
+=item * might_fail => bool (default: 0)
 
-Whether the rule will generate code that might die (e.g. does not trap failure
-in a conversion process). An example of a rule like this is coercing from string
-in the form of "YYYY-MM-DD" to a DateTime object. The rule might match any
-string in the form of C<< /\A(\d{4})-(\d{2})-(\d{2})\z/ >> and feed it to C<<
-DateTime->new >>, without checking of a valid date, so the DateTime object
-construction might die.
+Whether coercion might fail, e.g. because of invalid input. If set to 1,
+C<expr_coerce> key that the C<coerce()> routine returns must be an expression
+that returns an array (envelope) of C<< (error_msg, data) >> instead of just
+coerced data. Error message should be a string that is set when coercion fails
+and explains why. Otherwise, if coercion succeeds, the string should be set to
+undefined value.
 
-An example of rule that "might not die" is coercing from a comma-separated
-string into array. This process should not die unless under extraordinary
-condition (e.g. out of memory).
-
-For a rule that might die, the program/library that uses the rule module might
-want to add an eval block around the C<expr_coerce> code that is generated by
-the rule module.
+An example of a rule like this is coercing from string in the form of
+"YYYY-MM-DD" to a DateTime object. The rule might match any string in the form
+of C<< /\A(\d{4})-(\d{2})-(\d{2})\z/ >> while it might not be a valid date.
 
 =item * prio => int (0-100, default: 50)
 

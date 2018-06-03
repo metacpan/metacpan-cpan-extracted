@@ -16,7 +16,7 @@ use Carp;
 use HiPi;
 use parent qw( HiPi::Device );
 
-our $VERSION ='0.70';
+our $VERSION ='0.71';
 
 our %idmap = (
     '01' => [ '2401/11', 'silicon serial number'], 

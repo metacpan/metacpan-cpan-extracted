@@ -16,8 +16,8 @@ name: CLI-Files-Utils
 provides:
   CLI::Files::Utils:
     file: lib/CLI/Files/Utils.pm
-    version: '0.104'
+    version: '0.105'
 resources:
   license: http://www.gnu.org/licenses/gpl-3.0.txt
-version: '0.104'
+version: '0.105'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

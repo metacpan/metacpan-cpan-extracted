@@ -9,7 +9,7 @@ use base qw( Exporter );
 our @EXPORT = qw( demangle );
 
 # ABSTRACT: Demangle C++ symbols using the C++ ABI API
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 require XSLoader;
@@ -29,7 +29,7 @@ FFI::Platypus::Lang::CPP::Demangle::XS - Demangle C++ symbols using the C++ ABI 
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

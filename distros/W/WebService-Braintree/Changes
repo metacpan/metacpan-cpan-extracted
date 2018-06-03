@@ -1,4 +1,7 @@
 Revision history for WebService-Braintree
+1.4     2018-06-02
+        Force TLS 1.2 - thanks tonyo
+        Add support for the use of the object interface.
 1.3     2018-03-03
         Removed unused hexdigest_256() method
         Add support for options to PaymentMethod->delete()

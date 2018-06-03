@@ -2,7 +2,8 @@ package Bat::Interpreter;
 
 use utf8;
 
-use Moose;
+use Moo;
+use Types::Standard qw(ConsumerOf);
 use App::BatParser 0.005;
 use Carp;
 use Data::Dumper;
@@ -10,13 +11,13 @@ use Bat::Interpreter::Delegate::FileStore::LocalFileSystem;
 use Bat::Interpreter::Delegate::Executor::PartialDryRunner;
 use namespace::autoclean;
 
-our $VERSION = '0.009';    # VERSION
+our $VERSION = '0.010';    # VERSION
 
 # ABSTRACT: Pure perl interpreter for a small subset of bat/cmd files
 
 has 'batfilestore' => (
     is      => 'rw',
-    does    => 'Bat::Interpreter::Role::FileStore',
+    isa     => ConsumerOf ['Bat::Interpreter::Role::FileStore'],
     default => sub {
         Bat::Interpreter::Delegate::FileStore::LocalFileSystem->new;
     }
@@ -24,7 +25,7 @@ has 'batfilestore' => (
 
 has 'executor' => (
     is      => 'rw',
-    does    => 'Bat::Interpreter::Role::Executor',
+    isa     => ConsumerOf ['Bat::Interpreter::Role::Executor'],
     default => sub {
         Bat::Interpreter::Delegate::Executor::PartialDryRunner->new;
     }
@@ -320,27 +321,29 @@ sub _variable_substitution {
         my $variable_name = shift();
         my $manipulation  = shift();
 
-        my $result = $context->{'ENV'}{$1};
-        if ( defined $result ) {
-            if ( defined $manipulation && $manipulation ne '' ) {
-                $manipulation =~ s/^://;
-                if ( $manipulation =~ /~(?<from>\d+),(?<length>\d+)/ ) {
-                    $result = substr( $result, $+{'from'}, $+{'length'} );
-                } elsif ( $manipulation =~ /\~(\-\d)+/ ) {
-                    $result = substr( $result, $1 );
-                }
-            }
-            return $result;
-        } else {
-            print "Variable: $variable_name not defined\n";
+        if ( defined $variable_name && $variable_name ne '' ) {
 
-            #print "Environment known: " . Dumper($context->{'ENV'});
+            my $result = $context->{'ENV'}{$1};
+            if ( defined $result ) {
+                if ( defined $manipulation && $manipulation ne '' ) {
+                    $manipulation =~ s/^://;
+                    if ( $manipulation =~ /~(?<from>\d+),(?<length>\d+)/ ) {
+                        $result = substr( $result, $+{'from'}, $+{'length'} );
+                    } elsif ( $manipulation =~ /\~(\-\d)+/ ) {
+                        $result = substr( $result, $1 );
+                    }
+                }
+                return $result;
+            } else {
+                print "Variable: $variable_name not defined\n";
+            }
+            return '';
+        } else {
+            return '%%';
         }
-        return '';
     };
 
-    #$string =~ s/(?<!%)(?:%([^:%]+?)(:.+?)?%)/$handle_variable_manipulations->($1, $2)/eg;
-    $string =~ s/(?<!%)%(?!%)([^:%]{2,}?)(:.+?)?%(?!%)/$handle_variable_manipulations->($1, $2)/eg;
+    $string =~ s/%([\w\#\$\'\(\)\*\+\,\-\.\?\@\[\]\`\{\}\~]*?)(:.+?)?%/$handle_variable_manipulations->($1, $2)/eg;
 
     $string =~ s/%%/%/g;
 
@@ -380,17 +383,7 @@ sub _for_command_evaluation {
     my $self    = shift();
     my $comando = shift();
     return $self->executor->execute_for_command($comando);
-
-    if ( $comando =~ /^horalocal\.pl(.*)/ ) {
-        my $resultado_hora_local = HoraLocal($1);
-        return $resultado_hora_local;
-    } else {
-        my $salida = `$comando`;
-        chomp $salida;
-    }
 }
-
-__PACKAGE__->meta->make_immutable();
 
 1;
 
@@ -406,7 +399,7 @@ Bat::Interpreter - Pure perl interpreter for a small subset of bat/cmd files
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -449,7 +442,7 @@ This is free software, licensed under:
 
 =head1 CONTRIBUTORS
 
-=for stopwords eva.dominguez Eva Dominguez pablo.rodriguez
+=for stopwords eva.dominguez Eva Dominguez pablo.rodriguez Toby Inkster
 
 =over 4
 
@@ -464,6 +457,10 @@ Eva Dominguez <meloncego@gmail.com>
 =item *
 
 pablo.rodriguez <pablo.rodriguez@meteologica.com>
+
+=item *
+
+Toby Inkster <tobyink@cpan.org>
 
 =back
 

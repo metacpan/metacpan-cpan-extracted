@@ -15,9 +15,8 @@ use warnings;
 use parent qw( HiPi::Interface );
 use Carp;
 use HiPi qw( :lcd );
-use Time::HiRes;
 
-our $VERSION ='0.70';
+our $VERSION ='0.71';
 
 __PACKAGE__->create_accessors( qw(
     width lines backlightcontrol positionmap devicename serialbuffermode
@@ -100,7 +99,7 @@ sub move_cursor_right  {
 
 sub home  { $_[0]->send_command( HD44780_HOME_UNSHIFT ); }
 
-sub clear { $_[0]->send_command( HD44780_CLEAR_DISPLAY ); Time::HiRes::usleep(2000); }
+sub clear { $_[0]->send_command( HD44780_CLEAR_DISPLAY ); $_[0]->delayMicroseconds(2000); }
 
 sub set_cursor_mode { $_[0]->send_command( $_[1] ); }
 

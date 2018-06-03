@@ -1,11 +1,10 @@
 package Class::Date::Invalid;
 our $AUTHORITY = 'cpan:YANICK';
+$Class::Date::Invalid::VERSION = '1.1.17';
 use strict;
 use warnings;
 
 use Class::Date::Const;
-
-our $VERSION = '1.1.15';
 
 use overload 
   '0+'     => "zero",
@@ -48,7 +47,7 @@ Class::Date::Invalid
 
 =head1 VERSION
 
-version 1.1.16
+version 1.1.17
 
 =head1 AUTHORS
 

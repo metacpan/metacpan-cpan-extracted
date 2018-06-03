@@ -1,5 +1,26 @@
 # Change Log
 
+## [0.0.13] - 2018-06-02
+
+### Fixed
+
+- Removed Perl v5.10+ code that was not actually used.
+
+## [0.0.12] - 2018-05-30
+
+### Fixed
+
+- Fix handling of subclasses in MooX::JSON_LD. It will inherit fields
+  defined in parent classes.
+
+- Fixed namespace::autoclean pre-req.
+
+## [0.0.11] - 2018-05-28
+
+### Fixed
+
+- Added namespace::autoclean
+
 ## [0.0.10] - 2018-05-28
 
 ### Fixed

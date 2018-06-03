@@ -4,6 +4,7 @@ author:
   - 'Dave Cross <dave@perlhacks.com>'
 build_requires:
   Test::More: '0'
+  namespace::autoclean: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -21,10 +22,14 @@ requires:
   JSON::MaybeXS: '0'
   Moo: '0'
   Moose: '0'
+  Ref::Util: '0'
   Sub::Quote: '0'
   Types::Standard: '0'
   perl: '5.006000'
 resources:
   repository: git://github.com/davorg/moox-role-json_ld.git
-version: v0.0.11
+version: v0.0.13
+x_contributors:
+  - 'Robert Rothenberg <rrwo@cpan.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

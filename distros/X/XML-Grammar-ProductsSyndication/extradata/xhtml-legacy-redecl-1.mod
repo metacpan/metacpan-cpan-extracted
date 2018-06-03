@@ -122,7 +122,7 @@
 >
 
 <!ENTITY % InlSpecial.class
-     "| %img.qname; | %map.qname; 
+     "| %img.qname; | %map.qname;
       | %applet.qname; | %object.qname;" >
 
 <!ENTITY % BlkPres.class

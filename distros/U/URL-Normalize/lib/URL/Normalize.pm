@@ -11,11 +11,11 @@ URL::Normalize - Normalize/optimize URLs.
 
 =head1 VERSION
 
-Version 0.36
+Version 0.38
 
 =cut
 
-our $VERSION = '0.36';
+our $VERSION = '0.38';
 
 =head1 SYNOPSIS
 
@@ -164,7 +164,7 @@ sub URI {
     my $URI = undef;
 
     eval {
-        $URI = URI->new( $self->url );
+        $URI = URI->new( $self->url )->canonical;
     };
 
     if ( $@ ) {
@@ -241,43 +241,32 @@ Example:
 sub remove_dot_segments {
     my $self = shift;
 
-    my @old_path_segments = ();
-    my @new_path_segments = ();
-
-    my $URI = $self->URI;
-
     if ( my $URI = $self->URI ) {
-        @old_path_segments = split( '/', $URI->path_segments );
+        my $path = $URI->path;
 
-        foreach my $segment ( @old_path_segments ) {
+        my @new_segments = ();
+
+        foreach my $segment ( split('/', $path) ) {
             if ( $segment eq '.' || $segment eq '...' ) {
                 next;
             }
 
             if ( $segment eq '..' ) {
-                pop( @new_path_segments );
+                pop( @new_segments );
                 next;
             }
 
-            push( @new_path_segments, $segment );
+            push( @new_segments, $segment );
         }
 
-        if ( @new_path_segments ) {
-            $URI->path_segments( @new_path_segments );
-        }
-        else {
-            $URI->path_segments( '' );
-        }
+        my $new_path = join( '/', @new_segments );
+        $new_path .= '/' if ( $new_path !~ m,/$, && $path =~ m,/$, );
+        $new_path  = '/' . $new_path unless ( $new_path =~ m,^/, );
 
-        my $new_url = $URI->as_string;
-        $new_url =  '/' . $new_url if ( $self->url =~ m,^/, );
-        $new_url =  $new_url . '/' if ( $self->url =~ m,/$, );
-        $new_url =~ s,^/+,/,;
+        $URI->path( $new_path );
 
-        $self->_set_url( $new_url );
+        $self->_set_url( $URI->as_string );
     }
-
-    $self->make_canonical;
 }
 
 =head2 remove_directory_index

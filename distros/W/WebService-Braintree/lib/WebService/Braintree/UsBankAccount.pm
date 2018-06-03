@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::UsBankAccount;
-$WebService::Braintree::UsBankAccount::VERSION = '1.3';
+$WebService::Braintree::UsBankAccount::VERSION = '1.4';
 use 5.010_001;
 use strictures 1;
 
@@ -41,7 +41,7 @@ transaction on the provided token.
 
 sub sale {
     my ($class, $token, $params) = @_;
-    WebService::Braintree::Transaction->sale({
+    $class->gateway->transaction->sale({
         %{$params//{}},
         payment_method_token => $token,
         options => { submit_for_settlement => 1 },

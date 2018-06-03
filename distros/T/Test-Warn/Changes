@@ -1,5 +1,12 @@
 Revision history for Perl extension Test::Warn.
 
+0.34  2018-05-31
+        - Added a note that XS warnings might not be caught
+          https://rt.cpan.org/Ticket/Display.html?id=42070&results=3c71d1b101a730e185691657f3b02f21
+          https://github.com/hanfried/test-warn/issues/1
+        - Removed TODO section
+        - Updated Copyright section
+
 0.33  2018-05-29
         - Patch from Era Eriksson to clean up some manpage language
           Bug-Debian: #322351

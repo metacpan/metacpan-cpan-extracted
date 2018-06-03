@@ -1,5 +1,9 @@
 Changelog for Catmandu-PICA
 
+0.26  2018-05-30 20:14:10 CEST
+ - fix failing test caused by new release of PICA::Data
+ - make second argument of pica_match optional 
+
 0.25  2018-02-01 15:00:11 CET
  - add modules to documentation
  - set minimum version for PICA::Data

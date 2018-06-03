@@ -2,9 +2,10 @@ package Data::Processor;
 
 use strict;
 use 5.010_001;
-our $VERSION = '1.0.1';
+our $VERSION = '1.0.2';
 
 use Carp;
+use Scalar::Util qw(blessed);
 use Data::Processor::Error::Collection;
 use Data::Processor::Validator;
 use Data::Processor::Transformer;
@@ -214,7 +215,14 @@ sub validate_schema {
                     description => 'a callback which gets called with (value,section) to validate the value. If it returns anything, this is treated as an error message',
                     optional => 1,
                     validator => sub {
-                        ref shift eq 'CODE' ? undef : 'expected a callback'
+                        my $v = shift;
+                        # "0" is a valid package, but is "false"
+                        my $blessed = blessed $v;
+                        if (defined $blessed){
+                            $v->can('validate') && return undef;
+                            return 'validator object must implement method "validate()"';
+                        }
+                        ref $v eq 'CODE' ? undef : 'expected a callback';
                     },
                     example => 'sub { my ($value,$section) = @_; return $value <= 1 ? "value must be > 1" : undef}'
                 },
@@ -603,7 +611,46 @@ value you return nothing:
 
 See also L<Data::Processor::ValidatorFactory>
 
+=head3 Validator objects
 
+Validator may also be an object, in this case the object must implement a
+"validate" method.
+
+The "validate" method should return undef if valid, or an error message string if there is a problem.
+
+ package FiveChecker;
+
+ sub new {
+     bless {}, shift();
+ }
+
+ sub validate{
+     my( $self, $val ) = @_;
+     $val == 5 or return "I wanted five!";
+     return;
+ }
+ package main;
+
+ my $checker = FiveChecker->new;
+ my $schema = (
+     five => (
+         validator => $checker,
+     ),
+ );
+ my $dp = Data::Processor->new($schema);
+ $dp->validate({five => 6}); # fails
+ $dp->validate({five => 5}); # passes
+
+You can for example use MooseX::Types and Type::Tiny type constraints that are objects
+which offer validate methods which work this way.
+
+ use Types::Standard -all;
+
+ # ... in schema ...
+      foo => {
+          validator => ArrayRef[Int],
+          description => 'an arrayref of integers'
+      },
 
 =head1 AUTHOR
 

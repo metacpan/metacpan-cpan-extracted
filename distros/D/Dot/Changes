@@ -1,0 +1,5 @@
+v1.0.1 - 2018-05-30
+       - Avoid using v-string as a version number.
+
+v1 - 2018-05-28
+   - Initial release.

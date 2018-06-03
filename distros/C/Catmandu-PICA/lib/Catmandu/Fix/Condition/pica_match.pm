@@ -1,6 +1,6 @@
 package Catmandu::Fix::Condition::pica_match;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use Catmandu::Sane;
 use Catmandu::Fix::pica_map;
@@ -13,7 +13,7 @@ use Catmandu::Fix::Has;
 with 'Catmandu::Fix::Condition';
 
 has pica_path  => (fix_arg => 1);
-has value      => (fix_arg => 1);
+has value      => (fix_arg => 1, default => sub {'.*'});
 
 sub emit {
     my ($self,$fixer,$label) = @_;
@@ -48,6 +48,13 @@ Catmandu::Fix::Condition::pica_match - Conditionals on PICA fields
    
    if pica_match('021Aa','My funny title')
    	add_field('my.funny.title','true')
+   end
+
+   # pica_match(PICA_PATH)
+   # checks weather a field exists
+   
+   if pica_match('001U0')
+   	add_field('my.encode_info','true')
    end
 
 =head1 DESCRIPTION

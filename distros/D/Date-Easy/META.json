@@ -61,19 +61,19 @@
    "provides" : {
       "Date::Easy" : {
          "file" : "lib/Date/Easy.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Date::Easy::Date" : {
          "file" : "lib/Date/Easy/Date.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Date::Easy::Datetime" : {
          "file" : "lib/Date/Easy/Datetime.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Date::Easy::Units" : {
          "file" : "lib/Date/Easy/Units.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -88,7 +88,7 @@
          "web" : "https://github.com/barefootcoder/date-easy"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

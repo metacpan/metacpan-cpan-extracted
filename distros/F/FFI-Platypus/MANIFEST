@@ -10,7 +10,6 @@ META.yml
 README
 SUPPORT
 author.yml
-cpanfile
 dist.ini
 examples/archive.pl
 examples/attach_from_pointer.pl

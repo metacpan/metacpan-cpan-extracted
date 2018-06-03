@@ -14,7 +14,7 @@ qx.Class.define("callbackery.ui.form.renderer.NoteForm", {
     /**
      * create a page for the View Tab with the given title
      *
-     * @param vizWidget {Widget} visualization widget to embedd
+     * @param vizWidget {Widget} visualization widget to embed
      */
     construct: function(form) {
         this.base(arguments,form);
@@ -22,8 +22,10 @@ qx.Class.define("callbackery.ui.form.renderer.NoteForm", {
         // have plenty of space for input, not for the labels
         fl.setColumnFlex(0, 0);
         fl.setColumnAlign(0, "left", "top");
-        fl.setColumnFlex(1, 1);
+        fl.setColumnFlex(1, 4);
         fl.setColumnMinWidth(1, 130);
+        fl.setColumnFlex(2,1);
+        fl.setColumnMaxWidth(2,250);
     },
 
     members: {

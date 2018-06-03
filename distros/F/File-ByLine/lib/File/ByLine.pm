@@ -6,7 +6,7 @@
 #
 
 package File::ByLine;
-$File::ByLine::VERSION = '1.002';
+$File::ByLine::VERSION = '1.005';
 use v5.10;
 
 # ABSTRACT: Line-by-line file access loops
@@ -18,8 +18,6 @@ use autodie;
 use Carp;
 use Fcntl;
 
-use Parallel::WorkUnit 1.117;
-
 
 #
 # Exports
@@ -28,10 +26,19 @@ require Exporter;
 our @ISA = qw(Exporter);
 
 ## no critic (Modules::ProhibitAutomaticExportation)
-our @EXPORT = qw(forlines greplines maplines parallel_forlines parallel_greplines parallel_maplines readlines);
+our @EXPORT =
+  qw(dolines forlines greplines maplines parallel_dolines parallel_forlines parallel_greplines parallel_maplines readlines);
 ## use critic
 
-our @EXPORT_OK = qw(forlines greplines maplines parallel_forlines parallel_greplines parallel_maplines readlines);
+our @EXPORT_OK =
+  qw(dolines forlines greplines maplines parallel_dolines parallel_forlines parallel_greplines parallel_maplines readlines);
+
+
+sub dolines (&$) {
+    my ( $code, $file ) = @_;
+
+    return _forlines_chunk( $code, $file, 1, 0 );
+}
 
 
 sub forlines ($&) {
@@ -41,7 +48,31 @@ sub forlines ($&) {
 }
 
 
+sub parallel_dolines (&$$) {
+    _require_parallel();
+    my ( $code, $file, $procs ) = @_;
+
+    if ( !defined($procs) ) {
+        croak("Must include number of child processes");
+    }
+
+    if ( $procs <= 0 ) { croak("Number of processes must be >= 1"); }
+
+    my $wu = Parallel::WorkUnit->new();
+    $wu->asyncs( $procs, sub { return _forlines_chunk( $code, $file, $procs, $_[0] ); } );
+    my (@linecounts) = $wu->waitall();
+
+    my $total_lines = 0;
+    foreach my $cnt (@linecounts) {
+        $total_lines += $cnt;
+    }
+
+    return $total_lines;
+}
+
+
 sub parallel_forlines ($$&) {
+    _require_parallel();
     my ( $file, $procs, $code ) = @_;
 
     if ( !defined($procs) ) {
@@ -72,6 +103,7 @@ sub greplines (&$) {
 
 
 sub parallel_greplines (&$$) {
+    _require_parallel();
     my ( $code, $file, $procs ) = @_;
 
     if ( !defined($procs) ) {
@@ -153,7 +185,6 @@ sub _forlines_chunk {
 
     return $lineno;
 }
-
 
 # Internal function to perform a grep on a single chunk of the file.
 #
@@ -297,6 +328,21 @@ sub _open_and_seek {
     return ( $fh, $end );
 }
 
+sub _require_parallel {
+    if ( scalar(@_) != 0 ) { confess 'invalid call'; }
+
+    require Parallel::WorkUnit
+      or die("You must install Parallel::WorkUnit to use the parallel_* methods");
+
+    if ( $Parallel::WorkUnit::VERSION < 1.117 ) {
+        die( "Parallel::WorkUnit version 1.117 or newer required. You have "
+              . $Parallel::WorkUnit::Version );
+    }
+
+    return;
+}
+
+
 1;
 
 __END__
@@ -311,7 +357,7 @@ File::ByLine - Line-by-line file access loops
 
 =head1 VERSION
 
-version 1.002
+version 1.005
 
 =head1 SYNOPSIS
 
@@ -320,6 +366,7 @@ version 1.002
   #
   # Execute a routine for each line of a file
   #
+  dolines { say "Line: $_" } "file.txt";
   forlines "file.txt", { say "Line: $_" };
 
   #
@@ -333,8 +380,10 @@ version 1.002
   my (@result) = maplines { lc($_) } "file.txt";
 
   #
-  # Parallelized forlines routnie
+  # Parallelized forlines/dolines routines
+  # (Note: Requires Parallel::WorkUnit to be installed)
   #
+  parallel_dolines { foo($_) } "file.txt", 10;
   parallel_forlines "file.txt", 10, { foo($_); };
 
   #
@@ -357,6 +406,24 @@ needed.
 
 =head1 FUNCTIONS
 
+=head2 dolines
+
+  dolines { say "Line: $_" } "file.txt";
+  dolines \&func, "file.txt";
+
+This function calls a coderef once for each line in the file.  The file is read
+line-by-line, removes the newline character(s), and then executes the coderef.
+
+Each line (without newline) is passed to the coderef as the first parameter and
+only parameter to the coderef.  It is also placed into C<$_>.
+
+This function returns the number of lines in the file.
+
+This is similar to C<forlines()>, except for order of arguments.  The author
+recommends this form for short code blocks - I.E. a coderef that fits on
+one line.  For longer, multi-line code blocks, the author recommends
+the C<forlines()> syntax.
+
 =head2 forlines
 
   forlines "file.txt", { say "Line: $_" };
@@ -370,9 +437,46 @@ only parameter to the coderef.  It is also placed into C<$_>.
 
 This function returns the number of lines in the file.
 
+This is similar to C<dolines()>, except for order of arguments.  The author
+recommends this when using longer, multi-line code blocks, even though it is
+not orthogonal with the C<maplines()>/C<greplines()> routines.
+
+=head2 parallel_dolines
+
+  my (@result) = parallel_dolines { foo($_) } "file.txt", 10;
+
+Requires L<Parallel::WorkUnit> to be installed.
+
+Three parameters are requied: a codref, a filename, and number of simultanious
+child threads to use.
+
+This function performs similar to C<dolines()>, except that it does its'
+operations in parallel using C<fork()> and L<Parallel::WorkUnit>.  Because
+the code in the coderef is executed in a child process, any changes it makes
+to variables in high scopes will not be visible outside that single child.
+In general, it will be safest to not modify anything that belongs outside
+this scope.
+
+Note that the file will be read in several chunks, with each chunk being
+processed in a different thread.  This means that the child threads may be
+operating on very different sections of the file simultaniously and no specific
+order of execution of the coderef should be expected!
+
+Because of the mechanism used to split the file into chunks for processing,
+each thread may process a somewhat different number of lines.  This is
+particularly true if there are a mix of very long and very short lines.  The
+splitting routine splits the file into roughly equal size chunks by byte
+count, not line count.
+
+Otherwise, this function is identical to C<dolines()>.  See the documentation
+for C<dolines()> or C<forlines()> for information about how this might differ
+from C<parallel_forlines()>.
+
 =head2 parallel_forlines
 
   my (@result) = parallel_forlines "file.txt", 10, { foo($_) };
+
+Requires L<Parallel::WorkUnit> to be installed.
 
 Three parameters are requied: a filename, a codref, and number of simultanious
 child threads to use.
@@ -395,11 +499,15 @@ particularly true if there are a mix of very long and very short lines.  The
 splitting routine splits the file into roughly equal size chunks by byte
 count, not line count.
 
-Otherwise, this function is identical to C<forlines()>.
+Otherwise, this function is identical to C<forlines()>.  See the documentation
+for C<forlines()> or C<dolines()> for information about how this might differ
+from C<parallel_dolines()>.
 
 =head2 greplines
 
   my (@result) = greplines { m/foo/ } "file.txt";
+
+Requires L<Parallel::WorkUnit> to be installed.
 
 This function calls a coderef once for each line in the file, and, based on
 the return value of that coderef, returns only the lines where the coderef
@@ -500,6 +608,17 @@ Otherwise, this function is identical to C<maplines()>.
 
 This function simply returns an array of lines (without newlines) read from
 a file.
+
+=head1 SUGGESTED DEPENDENCY
+
+The L<Parallel::WorkUnit> module is a recommended dependency.  It is required
+to use the C<parallel_*> functions - all other functionality works fine without
+it.
+
+Some CPAN clients will automatically try to install recommended dependency, but
+others won't (L<cpan> often, but not always, will; L<cpanm> will not by
+default).  In the cases where it is not automatically installed, you need to
+install L<Parallel::WorkUnit> to get this functionality.
 
 =head1 AUTHOR
 

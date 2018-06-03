@@ -15,10 +15,9 @@ use parent qw( HiPi::Device );
 use Carp;
 use HiPi qw( :rpi );
 use HiPi::Device::GPIO::Pin;
-use Time::HiRes;
 use Fcntl;
 
-our $VERSION ='0.70';
+our $VERSION ='0.71';
 
 my $sysroot = '/sys/class/gpio';
 
@@ -40,7 +39,7 @@ sub new {
 
 sub export_pin {
     my( $class, $pinno ) = @_;
-    my $pinroot = _do_export( $pinno );
+    my $pinroot = $class->_do_export( $pinno );
     return HiPi::Device::GPIO::Pin->_open( pinid => $pinno );
 }
 
@@ -201,7 +200,7 @@ sub get_pin_interrupt {
 }
 
 sub _do_export {
-    my $pinno = shift;
+    my ($class, $pinno ) = @_;
     my $pinroot = qq(${sysroot}/gpio${pinno});
     return $pinroot if -d $pinroot;
     system(qq(/bin/echo $pinno > ${sysroot}/export)) and croak qq(failed to export pin $pinno : $!);
@@ -212,7 +211,7 @@ sub _do_export {
     my $counter = 100;
     while( $counter ){
         last if( -e $checkpath && -w $checkpath );
-        Time::HiRes::sleep( 0.1 );
+        $class->delay( 100 );
         $counter --;
     }
     
@@ -225,7 +224,7 @@ sub _do_export {
 
 sub _get_pin_filepath {
     my( $pinno, $type ) = @_;
-    my $pinroot = _do_export( $pinno );
+    my $pinroot = __PACKAGE__->_do_export( $pinno );
         
     my $filepath = qq($pinroot/$type);
     

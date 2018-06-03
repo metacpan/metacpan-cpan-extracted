@@ -1,3 +1,13 @@
+0.500   2018-05-31 (PERLANCAR)
+
+	- [Bugfix] Re-add 'require Win32::Console::ANSI', which was
+	  accidentally removed during refactoring.
+
+	- [dist] Require Win32::Console::ANSI using OSPrereqs.
+
+	- [dist] Add spec dependency to Color::Theme.
+
+
 0.49    2017-07-10 (PERLANCAR)
 
 	- No functional changes.

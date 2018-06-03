@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::ErrorCodes::PayPalAccount;
-$WebService::Braintree::ErrorCodes::PayPalAccount::VERSION = '1.3';
+$WebService::Braintree::ErrorCodes::PayPalAccount::VERSION = '1.4';
 use 5.010_001;
 use strictures 1;
 

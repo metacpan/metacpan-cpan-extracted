@@ -28,6 +28,23 @@ NAME
     tests run/pass for this module than for the original module
     Net::Braintree.
 
+ OBJECT VS CLASS INTERFACE
+
+    As of January, 2018, Braintree released a large refactoring to how
+    clients interact with the Braintre API. They call the different class
+    (old-style) vs. object (new-style). Under the old style, configuration
+    is global and all the interactions with the API use the same
+    configuration. Under the new style, each call could use a new
+    configuration, if needed.
+
+    Both styles will be supported for the foreseeable future. Clients can
+    still set a global configuration and use the class interface, just like
+    before.
+
+    In the documentation below, everything applies to both styles, except
+    where otherwise noted. If there is a difference between them, an
+    exmaple of both will be provided.
+
  GENERAL STYLE
 
     In general, clients of this library will not instantiate any objects.
@@ -37,9 +54,18 @@ NAME
     Unless otherwise noted, all attributes in these objects will be
     read-only and will have been populated by the responses from Braintree.
 
+  Object Style
+
+    If you use the object style, then you will instantiate and manage
+    instances of gateway objects. Each gateway object will have its own
+    configuration.
+
  CONFIGURATION
 
-    You will need to set some configuration.
+    You will need to set some configuration. Please see "" in
+    WebService::Braintree::Configuration for details.
+
+  Class Style
 
         use WebService::Braintree;
     
@@ -48,9 +74,25 @@ NAME
         $conf->merchant_id( 'use_your_merchant_id' );
         $conf->public_key( 'use_your_public_key' );
         $conf->private_key( 'use_your_private_key' );
+    
+        my $result = WebService::Braintree::Transaction->sale(
+            ...
+        );
 
-    Please see "" in WebService::Braintree::Configuration for more
-    information.
+  Object Style
+
+        use WebService::Braintree;
+    
+        my $gateway = WebService::Braintree::Gateway->new({
+            environment => 'sandbox',
+            merchant_id => 'use_your_merchant_id',
+            public_key  => 'use_your_public_key',
+            private_key => 'use_your_private_key',
+        });
+    
+        my $result = $gateway->transaction->sale(
+            ...
+        );
 
   Client Tokens
 
@@ -63,7 +105,16 @@ NAME
     This token is created with "generate" in
     WebService::Braintree::ClientToken.
 
- INTERFACE
+ OBJECT INTERFACE
+
+    The object interface is described on each of the gateway classes. In
+    general, they are identical to the class interface described below,
+    with the change that you have invoked a method on a generic $gateway
+    object instead of using the class.
+
+    q.v. WebService::Braintree::Gateway for more information.
+
+ CLASS INTERFACE
 
     These are the classes that you will interface with. Please see their
     respective documentation for more detail on how to use them. These
@@ -107,6 +158,10 @@ NAME
 
     Accept, and find disputes.
 
+  WebService::Braintree::DocumentUpload
+
+    Manage document uploads.
+
   WebService::Braintree::EuropeBankAccount
 
     Find Europe Bank Accounts.
@@ -126,6 +181,10 @@ NAME
   WebService::Braintree::PaymentMethod
 
     Create, update, delete, and find payment methods.
+
+  WebService::Braintree::PaymentMethodNonce
+
+    Create, update, delete, and find payment method nonces.
 
   WebService::Braintree::PayPalAccount
 
@@ -164,8 +223,8 @@ NAME
 
  SEARCHING
 
-    Several of the class interfaces provide a search() method. This method
-    is unique in that it takes a subroutine reference (subref) instead of a
+    Several of the interfaces provide a search() method. This method is
+    unique in that it takes a subroutine reference (subref) instead of a
     hashref or other parameters.
 
   Example

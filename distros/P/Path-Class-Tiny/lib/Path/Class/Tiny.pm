@@ -4,7 +4,7 @@ use 5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 use Exporter;
 our @EXPORT = qw< path file >;
@@ -21,6 +21,7 @@ use Carp;
 use Module::Runtime qw< require_module >;
 
 
+use File::Spec ();
 use Path::Tiny ();
 our @ISA = qw< Path::Tiny >;
 
@@ -54,10 +55,11 @@ sub child { path(shift->[0], @_) }
 
 
 # essentially just reblessings
-sub parent	{ path( &Path::Tiny::parent ) }
+sub parent		{ path( &Path::Tiny::parent   ) }
+sub realpath	{ path( &Path::Tiny::realpath ) }
 
 # simple correspondences
-*dir		=	\&Path::Tiny::parent;
+*dir		=	\&parent;
 *subdir		=	\&child;
 *rmtree		=	\&Path::Tiny::remove_tree;
 
@@ -67,6 +69,31 @@ sub open		{ my $io_class = -d $_[0] ? 'IO::Dir' : 'IO::File'; require_module $io
 
 
 # reimplementations
+
+sub dir_list
+{
+	my $self = shift;
+	my @list = ( File::Spec->splitdir($self->parent), $self->basename );
+
+	# The return value of dir_list is remarkably similar to that of splice: it's identical for all
+	# cases in list context, and even for one case in scalar context.  So we'll cheat and use splice
+	# for most of the cases, and handle the other two scalar context cases specially.
+	if (@_ == 0)
+	{
+		return @list;			# will DTRT regardless of context
+	}
+	elsif (@_ == 1)
+	{
+		return wantarray ? splice @list, $_[0] : $list[shift];
+	}
+	else
+	{
+		return splice @list, $_[0], $_[1];
+	}
+}
+# components is really just an alias for `dir_list`
+*components	=	\&dir_list;
+
 
 # This is more or less how Path::Class::File does it.
 sub slurp
@@ -145,7 +172,7 @@ Path::Class::Tiny - a Path::Tiny wrapper for Path::Class compatibility
 
 =head1 VERSION
 
-This document describes version 0.01 of Path::Class::Tiny.
+This document describes version 0.03 of Path::Class::Tiny.
 
 =head1 SYNOPSIS
 
@@ -229,7 +256,12 @@ sent as a hash and B<not> as a hashref.
 
 =head1 DETAILS
 
-A Path::Class::Tiny isa Path::Tiny, but I<not> isa Path::Class::Entity.  At least not currently.
+B<This module is still undergoing active development.>  While the general UI is somewhat constrained
+by the design goals, specific choices may, and almost certainly will, change.  I think this module
+can be useful to you, but for right now I would only use it for personal scripts.
+
+A Path::Class::Tiny C<isa> Path::Tiny, but I<not> C<isa> Path::Class::Entity.  At least not
+currently.
 
 Path::Class::Tiny is not entirely a drop-in replacement for Path::Class, and most likely never will
 be.  In particular, I have no interest in implementing any of the "foreign" methods.  However, it
@@ -240,6 +272,45 @@ me know.
 
 The POD is somewhat impoverished at the moment.  Hopefully that will improve over time.  Again,
 patches welcomed.
+
+=head1 PATH::CLASS STYLE METHODS
+
+=head2 cleanup
+
+Redirects to L<Path::Tiny/canonpath>.
+
+=head2 components
+
+Basically just like C<components> from L<Path::Class::Dir>, which means that it accepts offset and
+length arguments (which L<Path::Class::File> doesn't).  Another nice difference: calling
+C<components> from Path::Class::File in scalar context doesn't do anything useful, whereas
+Path::Class::Tiny always returns the number of components, which is (hopefully) what you expect.
+
+The only real difference between Path::Class::Tiny's C<components> and Path::Class::Dir's
+C<components> is that you don't get the volume returned in the Path::Class::Dir version.  In this
+version, the volume (if any) will just be part of the first component in the list.
+
+=head2 dir_list
+
+Just an alias for L</components>, so it also works on files (L<Path::Class::File> doesn't have a
+C<dir_list> method).  This means the basename is always the last entity in the list, even for files.
+Basically this is just here for compatibility's sake, and you probably shouldn't use it for new
+code, because the name doesn't really sound like what it does.
+
+=head2 next
+
+Uses L<Path::Tiny/iterator> (with its default value of no recursion) to implement the interface of
+C<next> from L<Path::Class::Dir>.  The primary difference this engenders is that the
+Path::Class::Dir version I<will> return C<.> and C<..>, whereas this version will I<not>.  I also
+don't guarantee this version is re-entrant.
+
+=head2 rmtree
+
+Just an alias to L<Path::Tiny/remove_tree>.
+
+=head2 subdir
+
+Just an alias to L<Path::Tiny/child>.
 
 =head1 NEW METHODS
 

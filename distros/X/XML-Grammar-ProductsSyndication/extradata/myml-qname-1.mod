@@ -28,7 +28,7 @@
    "xmlns:%MyML.prefix;  %URI.datatype;  #FIXED '%MyML.xmlns;'"
 >
 
-<!-- Declare a Parameter Entity (PE) that defines any external namespaces 
+<!-- Declare a Parameter Entity (PE) that defines any external namespaces
      that are used by this module -->
 <!ENTITY % MyML.xmlns.extra.attrib "" >
 

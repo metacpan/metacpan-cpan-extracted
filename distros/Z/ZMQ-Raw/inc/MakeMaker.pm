@@ -83,11 +83,14 @@ my @opts = (
 if ($is_osx || $is_bsd)
 {
 	push @opts,
+		'ZMQ_IOTHREAD_POLLER_USE_KQUEUE',
 		'ZMQ_USE_KQUEUE';
 }
 elsif ($is_linux)
 {
 	push @opts,
+		'ZMQ_IOTHREAD_POLLER_USE_EPOLL',
+		'ZMQ_IOTHREAD_POLLER_USE_EPOLL_CLOEXEC',
 		'ZMQ_USE_EPOLL',
 		'ZMQ_USE_EPOLL_CLOEXEC',
 		'ZMQ_HAVE_EVENTFD',
@@ -97,18 +100,33 @@ elsif ($is_linux)
 elsif ($is_solaris)
 {
 	push @opts,
+		'ZMQ_IOTHREAD_POLLER_USE_DEVPOLL',
 		'ZMQ_USE_DEVPOLL';
 }
 elsif ($is_windows)
 {
 	push @opts,
+		'ZMQ_IOTHREAD_POLLER_USE_SELECT',
 		'ZMQ_USE_SELECT';
 }
 else
 {
 	push @opts,
+		'ZMQ_IOTHREAD_POLLER_USE_POLL',
 		'ZMQ_USE_POLL 1';
 }
+
+if ($is_windows)
+{
+	push @opts,
+		'ZMQ_POLL_BASED_ON_SELECT';
+}
+else
+{
+	push @opts,
+		'ZMQ_POLL_BASED_ON_POLL';
+}
+
 
 if (($is_linux || $is_osx || $is_bsd) && !$is_gkfreebsd)
 {
@@ -225,15 +243,20 @@ sub MY::c_o {
 		$out_switch = '/Fo';
 	}
 
+	my $std_switch = '';
+	if ($is_gcc) {
+		$std_switch = '-std=c++11'
+	}
+
 	my $line = qq{
 .c\$(OBJ_EXT):
 	\$(CCCMD) \$(CCCDLFLAGS) "-I\$(PERL_INC)" \$(PASTHRU_DEFINE) \$(DEFINE) \$*.c $out_switch\$@
 
 .cc\$(OBJ_EXT):
-	\$(CCCMD) \$(CCCDLFLAGS) "-I\$(PERL_INC)" \$(PASTHRU_DEFINE) \$(DEFINE) \$*.cc $out_switch\$@
+	\$(CCCMD) \$(CCCDLFLAGS) "-I\$(PERL_INC)" \$(PASTHRU_DEFINE) \$(DEFINE) \$*.cc $std_switch $out_switch\$@
 
 .cpp\$(OBJ_EXT):
-	\$(CCCMD) \$(CCCDLFLAGS) "-I\$(PERL_INC)" \$(PASTHRU_DEFINE) \$(DEFINE) \$*.cpp $out_switch\$@
+	\$(CCCMD) \$(CCCDLFLAGS) "-I\$(PERL_INC)" \$(PASTHRU_DEFINE) \$(DEFINE) \$*.cpp $std_switch $out_switch\$@
 };
 	return $line;
 }

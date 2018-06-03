@@ -5,9 +5,9 @@ package Date::Manip::Zones;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Thu Mar  1 10:39:45 EST 2018
-#    Data version: tzdata2018c
-#    Code version: tzcode2018c
+#    Generated on: Wed May 30 14:52:52 EDT 2018
+#    Data version: tzdata2018e
+#    Code version: tzcode2018e
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -37,8 +37,8 @@ END {
    undef %Offmod;
 }
 
-$TzdataVersion = 'tzdata2018c';
-$TzcodeVersion = 'tzcode2018c';
+$TzdataVersion = 'tzdata2018e';
+$TzcodeVersion = 'tzcode2018e';
 $FirstDate     = '0001010200:00:00';
 $LastDate      = '9999123100:00:00';
 $LastYear      = '2068';
@@ -1465,6 +1465,7 @@ $LastYear      = '2068';
   'awst-8awdt'                         => 'australia/perth',
   'bst11bdt'                           => 'america/adak',
   'cat-2cast'                          => 'africa/juba',
+  'cat-2wat'                           => 'africa/windhoek',
   'cet-1cest'                          => 'cet',
   'cet-1wemt'                          => 'europe/monaco',
   'cet-1west'                          => 'europe/luxembourg',
@@ -1479,6 +1480,7 @@ $LastYear      = '2068';
   'gmt0ist'                            => 'europe/dublin',
   'hkt-8hkst'                          => 'asia/hong_kong',
   'hst10hdt'                           => 'america/adak',
+  'ist-1gmt'                           => 'europe/dublin',
   'ist-2eest'                          => 'asia/gaza',
   'ist-2idt'                           => 'asia/jerusalem',
   'jst-9jdt'                           => 'asia/tokyo',
@@ -1494,7 +1496,6 @@ $LastYear      = '2068';
   'pst8pdt'                            => 'america/los_angeles',
   'pst8ppt'                            => 'america/los_angeles',
   'sast-2sast'                         => 'africa/johannesburg',
-  'wat-1wast'                          => 'africa/windhoek',
   'wet-1west'                          => 'europe/luxembourg',
   'wet0west'                           => 'wet',
   'yst9ydt'                            => 'america/yakutat',
@@ -2124,7 +2125,8 @@ $LastYear      = '2068';
                      'africa/bissau',
                      'america/danmarkshavn',
                      'africa/sao_tome',
-                     'europe/gibraltar' ],
+                     'europe/gibraltar',
+                     'europe/prague' ],
   'gmt+1'       => [ 'etc/gmt+1' ],
   'gmt+10'      => [ 'etc/gmt+10' ],
   'gmt+11'      => [ 'etc/gmt+11' ],
@@ -2400,8 +2402,7 @@ $LastYear      = '2068';
   'utc'         => [ 'utc' ],
   'v'           => [ 'v' ],
   'w'           => [ 'w' ],
-  'wast'        => [ 'africa/windhoek',
-                     'africa/ndjamena' ],
+  'wast'        => [ 'africa/ndjamena' ],
   'wat'         => [ 'africa/ndjamena',
                      'africa/lagos',
                      'africa/sao_tome',
@@ -2762,7 +2763,7 @@ $LastYear      = '2068';
   '-03:40:52'  => 'off286',
   '-03:44:20'  => 'off287',
   '-03:44:40'  => 'off288',
-  '-03:44:44'  => 'off289',
+  '-03:44:51'  => 'off289',
   '-03:45:00'  => 'off290',
   '-03:48:28'  => 'off291',
   '-03:50:40'  => 'off292',
@@ -2811,7 +2812,7 @@ $LastYear      = '2068';
   '-04:56:02'  => 'off335',
   '-04:56:16'  => 'off336',
   '-05:00:00'  => 'off337',
-  '-05:07:11'  => 'off338',
+  '-05:07:10'  => 'off338',
   '-05:08:12'  => 'off339',
   '-05:08:36'  => 'off340',
   '-05:09:30'  => 'off341',

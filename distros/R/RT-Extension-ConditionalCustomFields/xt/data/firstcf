@@ -1,7 +1,8 @@
 @CustomFields = (
     {
         Name => 'ExistingCondition',
-        Type => 'SelectSingle',
+        Type => 'Select',
+        MaxValues => 1,
         RenderType => 'Dropdown',
         Queue => [ 'General' ],
         LookupType => 'RT::Queue-RT::Ticket',

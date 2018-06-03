@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::PayPalAccount;
-$WebService::Braintree::PayPalAccount::VERSION = '1.3';
+$WebService::Braintree::PayPalAccount::VERSION = '1.4';
 use 5.010_001;
 use strictures 1;
 
@@ -75,7 +75,7 @@ with that token.
 
 sub sale {
     my ($class, $token, $params) = @_;
-    WebService::Braintree::Transaction->sale({
+    $class->gateway->transaction->sale({
         %{$params // {}},
         payment_method_token => $token,
     });

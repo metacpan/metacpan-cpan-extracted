@@ -21,7 +21,7 @@ use XML::Entities::Data;
 use Time::HiRes qw(gettimeofday sleep);
 binmode(STDOUT,':utf8');
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 =head1 NAME
 
@@ -1309,7 +1309,7 @@ sub Error {
   my $X = shift;
   my $ErrStr = shift;
   Msg($X,$ErrStr."\n",'e');
-  $X->Cleanup(1);
+  Cleanup($X,1);
   exit;
 }
 
@@ -1331,7 +1331,7 @@ sub Cleanup {
   
   if ($X->{'unzipped'} && $X->{'SourceDir'}) { #если наследили распаковкой в tmp
     ForceRmDir($X,$X->{'SourceDir'});
-    $X->Msg("Clean tmp directory ".$X->{'SourceDir'}."\n");
+    Msg($X,"Clean tmp directory ".$X->{'SourceDir'}."\n");
   }
   
   #просят почистить результат
@@ -1582,6 +1582,17 @@ sub MetaFix {
   return $Str;
 }
 
+#phantomjs любит превращать кое-что в нечитаемое для Libxml
+sub SomeFix {
+  my $X = shift;
+  my $Str = shift;
+
+  $Str =~ s/<\s*[bB][rR]\s*>/<br\/>/g; # <br> => <br/>
+
+  return $Str;
+}
+
+
 sub ShitFix {
   my $X = shift;
   my $Str = shift;
@@ -1589,9 +1600,10 @@ sub ShitFix {
   $Str =~ s#<([iI][mM][gG]) ([^>]+?/?)>\s*</\1>#<img $2>#g; # <img> </img> => <img/>t
 
   #DOM такое не любит
-  $Str =~ s/<\s*([aA])(.*?)\/\s*>/<$1$2><\/$1>/g; # <a/> => <a></a>
-  #$Str =~ s/<\s*([iI][mM][gG])(.*?)\/\s*>/<$1$2>/g; # <a/> => <a></a>
+  $Str =~ s/<([aA])([^>]*?)\/\s*>/<$1$2><\/$1>/g; # <a/> => <a></a>
+  $Str =~ s/<([dD][iI][vV])([^>]*?)\/\s*>/<$1$2><\/$1>/g; # <div/> => <div></div>
 
+  $Str = $X->SomeFix($Str);
   $Str = $X->MetaFix($Str);
 
   return $Str;

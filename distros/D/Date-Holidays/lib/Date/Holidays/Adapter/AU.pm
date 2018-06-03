@@ -6,7 +6,7 @@ use vars qw($VERSION);
 
 use base 'Date::Holidays::Adapter';
 
-$VERSION = '1.08';
+$VERSION = '1.11';
 
 use constant DEFAULT_STATE => 'VIC';
 
@@ -48,7 +48,7 @@ Date::Holidays::Adapter::AU - an adapter class for Date::Holidays::AU
 
 =head1 VERSION
 
-This POD describes version 1.08 of Date::Holidays::Adapter::AU
+This POD describes version 1.11 of Date::Holidays::Adapter::AU
 
 =head1 DESCRIPTION
 
@@ -104,13 +104,7 @@ for L<Date::Holidays::AU> for documentation on this.
 
 =head1 BUG REPORTING
 
-Please report issues via CPAN RT:
-
-  http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Holidays
-
-or by sending mail to
-
-  bug-Date-Holidays@rt.cpan.org
+Please refer to BUG REPORTING in L<Date::Holidays>
 
 =head1 AUTHOR
 

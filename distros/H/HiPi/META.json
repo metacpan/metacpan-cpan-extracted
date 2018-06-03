@@ -48,95 +48,454 @@
    "provides" : {
       "HiPi" : {
          "file" : "lib/HiPi.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Class" : {
          "file" : "lib/HiPi/Class.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Constant" : {
          "file" : "lib/HiPi/Constant.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Device" : {
          "file" : "lib/HiPi/Device.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Device::GPIO" : {
          "file" : "lib/HiPi/Device/GPIO.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Device::GPIO::Pin" : {
          "file" : "lib/HiPi/Device/GPIO/Pin.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Device::I2C" : {
          "file" : "lib/HiPi/Device/I2C.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Device::OneWire" : {
          "file" : "lib/HiPi/Device/OneWire.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Device::SPI" : {
          "file" : "lib/HiPi/Device/SPI.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Device::SerialPort" : {
          "file" : "lib/HiPi/Device/SerialPort.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Energenie" : {
          "file" : "lib/HiPi/Energenie.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Energenie::Command" : {
          "file" : "lib/HiPi/Energenie/Command.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Energenie::ENER314" : {
          "file" : "lib/HiPi/Energenie/ENER314.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Energenie::ENER314_RT" : {
          "file" : "lib/HiPi/Energenie/ENER314_RT.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::GPIO" : {
          "file" : "lib/HiPi/GPIO.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::GPIO::Pin" : {
          "file" : "lib/HiPi/GPIO/Pin.pm",
-         "version" : "0.70"
+         "version" : "0.71"
+      },
+      "HiPi::Graphics::BitmapFont" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont.pm",
+         "version" : "0.71"
+      },
+      "HiPi::Graphics::BitmapFont::Mono10" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Mono10.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::Mono12" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Mono12.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::Mono14" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Mono14.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::Mono15" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Mono15.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::Mono19" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Mono19.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::Mono20" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Mono20.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::Mono26" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Mono26.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::Mono33" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Mono33.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::MonoEPD102" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/MonoEPD102.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::MonoEPD15" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/MonoEPD15.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::MonoEPD19" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/MonoEPD19.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::MonoEPD23" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/MonoEPD23.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::MonoEPD28" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/MonoEPD28.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::MonoEPD31" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/MonoEPD31.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::MonoEPD38" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/MonoEPD38.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::MonoEPD50" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/MonoEPD50.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::MonoEPD76" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/MonoEPD76.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::MonoExtended11" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/MonoExtended11.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::MonoExtended13" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/MonoExtended13.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::MonoExtended15" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/MonoExtended15.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::MonoExtended17" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/MonoExtended17.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::MonoExtended21" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/MonoExtended21.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::MonoExtended23" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/MonoExtended23.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::MonoExtended30" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/MonoExtended30.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::MonoExtended38" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/MonoExtended38.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::Sans10" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Sans10.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::Sans12" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Sans12.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::Sans14" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Sans14.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::Sans15" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Sans15.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::Sans19" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Sans19.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::Sans20" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Sans20.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::Sans26" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Sans26.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::Sans33" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Sans33.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SansEPD102" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SansEPD102.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SansEPD15" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SansEPD15.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SansEPD19" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SansEPD19.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SansEPD23" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SansEPD23.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SansEPD28" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SansEPD28.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SansEPD31" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SansEPD31.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SansEPD38" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SansEPD38.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SansEPD50" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SansEPD50.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SansEPD76" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SansEPD76.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SansExtended11" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SansExtended11.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SansExtended13" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SansExtended13.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SansExtended15" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SansExtended15.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SansExtended17" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SansExtended17.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SansExtended21" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SansExtended21.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SansExtended23" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SansExtended23.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SansExtended30" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SansExtended30.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SansExtended38" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SansExtended38.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::Serif11" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Serif11.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::Serif14" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Serif14.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::Serif15" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Serif15.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::Serif17" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Serif17.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::Serif21" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Serif21.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::Serif26" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Serif26.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::Serif33" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Serif33.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::Serif9" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/Serif9.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SerifEPD103" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SerifEPD103.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SerifEPD16" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SerifEPD16.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SerifEPD20" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SerifEPD20.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SerifEPD22" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SerifEPD22.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SerifEPD27" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SerifEPD27.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SerifEPD33" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SerifEPD33.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SerifEPD37" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SerifEPD37.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SerifEPD50" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SerifEPD50.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SerifEPD76" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SerifEPD76.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SerifExtended12" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SerifExtended12.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SerifExtended16" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SerifExtended16.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SerifExtended17" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SerifExtended17.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SerifExtended20" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SerifExtended20.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SerifExtended24" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SerifExtended24.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SerifExtended29" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SerifExtended29.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SerifExtended37" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SerifExtended37.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::BitmapFont::SerifExtended9" : {
+         "file" : "lib/HiPi/Graphics/BitmapFont/SerifExtended9.pm",
+         "version" : "0.01"
+      },
+      "HiPi::Graphics::DrawingContext" : {
+         "file" : "lib/HiPi/Graphics/DrawingContext.pm",
+         "version" : "0.71"
       },
       "HiPi::Interface" : {
          "file" : "lib/HiPi/Interface.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Interface::Common::HD44780" : {
          "file" : "lib/HiPi/Interface/Common/HD44780.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Interface::Common::MCP23X17" : {
          "file" : "lib/HiPi/Interface/Common/MCP23X17.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Interface::Common::MIHomeAdapter" : {
          "file" : "lib/HiPi/Interface/Common/MIHomeAdapter.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Interface::DS18X20" : {
          "file" : "lib/HiPi/Interface/DS18X20.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Interface::ENER002" : {
          "file" : "lib/HiPi/Interface/ENER002.pm",
          "version" : "0.59"
       },
+      "HiPi::Interface::EPaper" : {
+         "file" : "lib/HiPi/Interface/EPaper.pm",
+         "version" : "0.71"
+      },
+      "HiPi::Interface::EPaper::DisplayBuffer" : {
+         "file" : "lib/HiPi/Interface/EPaper/DisplayBuffer.pm",
+         "version" : "0.71"
+      },
+      "HiPi::Interface::EPaper::PartialContext" : {
+         "file" : "lib/HiPi/Interface/EPaper/DisplayBuffer.pm"
+      },
+      "HiPi::Interface::EPaper::Pimoroni::EPDInkyPHAT_V2" : {
+         "file" : "lib/HiPi/Interface/EPaper/Pimoroni/EPDInkyPHAT_V2.pm",
+         "version" : "0.71"
+      },
+      "HiPi::Interface::EPaper::TypeA" : {
+         "file" : "lib/HiPi/Interface/EPaper/TypeA.pm",
+         "version" : "0.71"
+      },
+      "HiPi::Interface::EPaper::TypeB" : {
+         "file" : "lib/HiPi/Interface/EPaper/TypeB.pm",
+         "version" : "0.71"
+      },
+      "HiPi::Interface::EPaper::Waveshare::EPD152X152" : {
+         "file" : "lib/HiPi/Interface/EPaper/Waveshare/EPD152X152.pm",
+         "version" : "0.71"
+      },
+      "HiPi::Interface::EPaper::Waveshare::EPD200X200" : {
+         "file" : "lib/HiPi/Interface/EPaper/Waveshare/EPD200X200.pm",
+         "version" : "0.71"
+      },
+      "HiPi::Interface::EPaper::Waveshare::EPD200X200B" : {
+         "file" : "lib/HiPi/Interface/EPaper/Waveshare/EPD200X200B.pm",
+         "version" : "0.71"
+      },
+      "HiPi::Interface::EPaper::Waveshare::EPD212X104" : {
+         "file" : "lib/HiPi/Interface/EPaper/Waveshare/EPD212X104.pm",
+         "version" : "0.71"
+      },
+      "HiPi::Interface::EPaper::Waveshare::EPD250X122" : {
+         "file" : "lib/HiPi/Interface/EPaper/Waveshare/EPD250X122.pm",
+         "version" : "0.71"
+      },
+      "HiPi::Interface::EPaper::Waveshare::EPD296X128" : {
+         "file" : "lib/HiPi/Interface/EPaper/Waveshare/EPD296X128.pm",
+         "version" : "0.71"
+      },
+      "HiPi::Interface::EPaper::Waveshare::EPD296X128B" : {
+         "file" : "lib/HiPi/Interface/EPaper/Waveshare/EPD296X128B.pm",
+         "version" : "0.71"
+      },
       "HiPi::Interface::EnergenieSwitch" : {
          "file" : "lib/HiPi/Interface/EnergenieSwitch.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Interface::HTADCI2C" : {
          "file" : "lib/HiPi/Interface/HTADCI2C.pm",
@@ -148,27 +507,27 @@
       },
       "HiPi::Interface::HobbyTronicsADC" : {
          "file" : "lib/HiPi/Interface/HobbyTronicsADC.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Interface::HobbyTronicsBackpackV2" : {
          "file" : "lib/HiPi/Interface/HobbyTronicsBackpackV2.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Interface::HopeRF69" : {
          "file" : "lib/HiPi/Interface/HopeRF69.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Interface::LCDBackpackPCF8574" : {
          "file" : "lib/HiPi/Interface/LCDBackpackPCF8574.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Interface::MCP23017" : {
          "file" : "lib/HiPi/Interface/MCP23017.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Interface::MCP23S17" : {
          "file" : "lib/HiPi/Interface/MCP23S17.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Interface::MCP3004" : {
          "file" : "lib/HiPi/Interface/MCP3004.pm",
@@ -180,7 +539,7 @@
       },
       "HiPi::Interface::MCP3ADC" : {
          "file" : "lib/HiPi/Interface/MCP3ADC.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Interface::MCP49XX" : {
          "file" : "lib/HiPi/Interface/MCP49XX.pm",
@@ -188,265 +547,85 @@
       },
       "HiPi::Interface::MCP4DAC" : {
          "file" : "lib/HiPi/Interface/MCP4DAC.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Interface::MPL3115A2" : {
          "file" : "lib/HiPi/Interface/MPL3115A2.pm",
-         "version" : "0.70"
+         "version" : "0.71"
+      },
+      "HiPi::Interface::MS5611" : {
+         "file" : "lib/HiPi/Interface/MS5611.pm",
+         "version" : "0.71"
       },
       "HiPi::Interface::MonoOLED" : {
          "file" : "lib/HiPi/Interface/MonoOLED.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Interface::MonoOLED::DisplayBuffer" : {
          "file" : "lib/HiPi/Interface/MonoOLED/DisplayBuffer.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::DrawingContext" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/DrawingContext.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Mono10" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Mono10.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Mono12" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Mono12.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Mono14" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Mono14.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Mono15" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Mono15.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Mono19" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Mono19.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Mono20" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Mono20.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Mono26" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Mono26.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Mono33" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Mono33.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::MonoExtended11" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/MonoExtended11.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::MonoExtended13" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/MonoExtended13.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::MonoExtended15" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/MonoExtended15.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::MonoExtended17" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/MonoExtended17.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::MonoExtended21" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/MonoExtended21.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::MonoExtended23" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/MonoExtended23.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::MonoExtended30" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/MonoExtended30.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Sans10" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Sans10.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Sans12" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Sans12.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Sans14" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Sans14.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Sans15" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Sans15.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Sans19" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Sans19.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Sans20" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Sans20.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Sans26" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Sans26.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Sans33" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Sans33.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::SansExtended11" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/SansExtended11.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::SansExtended13" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/SansExtended13.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::SansExtended15" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/SansExtended15.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::SansExtended17" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/SansExtended17.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::SansExtended21" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/SansExtended21.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::SansExtended23" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/SansExtended23.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::SansExtended30" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/SansExtended30.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Serif11" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Serif11.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Serif14" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Serif14.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Serif15" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Serif15.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Serif17" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Serif17.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Serif21" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Serif21.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Serif26" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Serif26.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Serif33" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Serif33.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::Serif9" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/Serif9.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::SerifExtended12" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/SerifExtended12.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::SerifExtended16" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/SerifExtended16.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::SerifExtended17" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/SerifExtended17.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::SerifExtended20" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/SerifExtended20.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::SerifExtended24" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/SerifExtended24.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::SerifExtended29" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/SerifExtended29.pm",
-         "version" : "0.70"
-      },
-      "HiPi::Interface::MonoOLED::Font::SerifExtended9" : {
-         "file" : "lib/HiPi/Interface/MonoOLED/Font/SerifExtended9.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Interface::PCA9544" : {
          "file" : "lib/HiPi/Interface/PCA9544.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Interface::PCA9685" : {
          "file" : "lib/HiPi/Interface/PCA9685.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Interface::PCF8574" : {
          "file" : "lib/HiPi/Interface/PCF8574.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Interface::SerLCD" : {
          "file" : "lib/HiPi/Interface/SerLCD.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Interface::Si470N" : {
          "file" : "lib/HiPi/Interface/Si470N.pm",
-         "version" : "0.70"
+         "version" : "0.71"
+      },
+      "HiPi::Interface::TMP102" : {
+         "file" : "lib/HiPi/Interface/TMP102.pm",
+         "version" : "0.71"
       },
       "HiPi::Pin" : {
          "file" : "lib/HiPi/Pin.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::RF::OpenThings" : {
          "file" : "lib/HiPi/RF/OpenThings.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::RF::OpenThings::Message" : {
          "file" : "lib/HiPi/RF/OpenThings/Message.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::RF::OpenThings::Message::Record" : {
          "file" : "lib/HiPi/RF/OpenThings/Message.pm"
       },
       "HiPi::RaspberryPi" : {
          "file" : "lib/HiPi/RaspberryPi.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Utils" : {
          "file" : "lib/HiPi/Utils.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Utils::Config" : {
          "file" : "lib/HiPi/Utils/Config.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Utils::Exec" : {
          "file" : "lib/HiPi/Utils/Exec.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "HiPi::Utils::OLEDFont" : {
          "file" : "lib/HiPi/Utils/OLEDFont.pm"
       },
       "REPLACEMODULEBASE::REPLACENAME" : {
          "file" : "lib/HiPi/Utils/OLEDFont.pm",
-         "version" : "0.01"
+         "version" : "0.71"
       }
    },
    "release_status" : "stable",
@@ -456,6 +635,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.70",
+   "version" : "0.71",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -12,7 +12,7 @@ use Scalar::Util qw(blessed);
 
 use base 'Date::Holidays::Adapter';
 
-$VERSION = '1.08';
+$VERSION = '1.11';
 
 sub new {
     my ( $class, %params ) = @_;
@@ -313,7 +313,7 @@ Date::Holidays - Date::Holidays::* adapter and aggregator for all your holiday n
 
 =head1 VERSION
 
-The documentation describes version 1.07 of Date::Holidays
+The documentation describes version 1.11 of Date::Holidays
 
 =head1 FEATURES
 
@@ -721,13 +721,29 @@ to be used by L<Date::Holidays::Adapter::Local>.
 
 =item * L<Module::Load>
 
-=item * L<Date::Holidays::Adapter>
-
 =item * L<TryCatch>
 
 =item * L<Scalar::Util>
 
+=item * L<JSON>
+
+=item * L<File::Slurp>
+
 =back
+
+=head2 FOR TESTING
+
+=over
+
+=item * L<Test::Class>
+
+=item * L<Test::More>
+
+=item * L<FindBin>
+
+=back
+
+Please see the F<cpanfile> included in the distribution for a complete listing.
 
 =head1 INCOMPATIBILITIES
 
@@ -833,6 +849,8 @@ all the wrapped (adapted and aggregated) distributions.
 
 =item * L<Date::Holidays::NZ>
 
+=item * L<Date::Holidays::Adapter::NZ>
+
 =item * L<Date::Holidays::PL>
 
 =item * L<Date::Holidays::Adapter::PL>
@@ -852,6 +870,8 @@ all the wrapped (adapted and aggregated) distributions.
 =item * L<Date::Holidays::UK>
 
 =item * L<Date::Holidays::USFederal>
+
+=item * L<Date::Holidays::Adapter::USFederal>
 
 =item * L<Date::Japanese::Holiday>
 

@@ -40,15 +40,14 @@ sub init ( $self ) {
     # run hash RPC
     print 'Starting API RPC ... ';
 
-    say $self->{app}->rpc->run_rpc(
-        {   type           => 'Pcore::App::API::RPC::Hash',
-            workers        => $self->{app}->{app_cfg}->{api}->{rpc}->{workers},
-            token          => undef,
-            listen_events  => undef,
-            forward_events => undef,
-            buildargs      => $self->{app}->{app_cfg}->{api}->{rpc}->{argon},
+    say $self->{app}->{node}->run_node(
+        {   type      => 'Pcore::App::API::RPC::Hash',
+            workers   => $self->{app}->{app_cfg}->{api}->{rpc}->{workers},
+            buildargs => $self->{app}->{app_cfg}->{api}->{rpc}->{argon},
         },
     );
+
+    $self->{app}->{node}->wait_for('Pcore::App::API::RPC::Hash');
 
     print 'Creating root user ... ';
 
@@ -95,7 +94,7 @@ sub _verify_token_hash ( $self, $private_token_hash, $hash ) {
         return $self->{_hash_cache}->{$cache_id};
     }
     else {
-        my $res = $self->{app}->{rpc}->rpc_call( 'Pcore::App::API::RPC::Hash', 'verify_hash', $private_token_hash, $hash );
+        my $res = $self->{app}->{node}->rpc_call( 'Pcore::App::API::RPC::Hash', 'verify_hash', $private_token_hash, $hash );
 
         return $self->{_hash_cache}->{$cache_id} = $res->{data} ? res 200 : res [ 400, 'Invalid token' ];
     }
@@ -108,7 +107,7 @@ sub _generate_user_password_hash ( $self, $user_name_utf8, $user_password_utf8 )
 
     my $private_token_hash = sha3_512 $user_password_bin . $user_name_bin;
 
-    my $res = $self->{app}->{rpc}->rpc_call( 'Pcore::App::API::RPC::Hash', 'create_hash', $private_token_hash );
+    my $res = $self->{app}->{node}->rpc_call( 'Pcore::App::API::RPC::Hash', 'create_hash', $private_token_hash );
 
     return $res if !$res;
 
@@ -122,7 +121,7 @@ sub _generate_token ( $self, $token_type ) {
 
     my $private_token_hash = sha3_512 $public_token;
 
-    my $res = $self->{app}->{rpc}->rpc_call( 'Pcore::App::API::RPC::Hash', 'create_hash', $private_token_hash );
+    my $res = $self->{app}->{node}->rpc_call( 'Pcore::App::API::RPC::Hash', 'create_hash', $private_token_hash );
 
     return $res if !$res;
 
@@ -590,7 +589,7 @@ SQL
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 104, 132, 188        | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 103, 131, 187        | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

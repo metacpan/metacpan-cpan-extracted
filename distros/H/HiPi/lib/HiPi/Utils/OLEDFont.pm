@@ -34,7 +34,7 @@ __PACKAGE__->create_accessors( qw(
 sub new {
     my($class, %params ) = @_;
     
-    $params{module_base} //= 'HiPi::Interface::MonoOLED::Font';
+    $params{module_base} //= 'HiPi::Graphics::BitmapFont';
     
     my $self = $class->SUPER::new( %params );
     return $self;
@@ -332,9 +332,9 @@ package REPLACEMODULEBASE::REPLACENAME;
 use utf8;
 use strict;
 use warnings;
-use parent qw( HiPi::Interface::MonoOLED::Font);
+use parent qw( HiPi::Graphics::BitmapFont);
 
-our $VERSION ='0.01';
+our $VERSION ='0.71';
 
 REPLACEFONTCONTENT
 

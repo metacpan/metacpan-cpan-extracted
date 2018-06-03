@@ -3,6 +3,7 @@ package Plack::Middleware::Statsd;
 # ABSTRACT: send statistics to statsd
 
 # RECOMMEND PREREQ:  Net::Statsd::Tiny v0.3.0
+# RECOMMEND PREREQ:  HTTP::Status 6.16
 
 use v5.10;
 
@@ -16,7 +17,7 @@ use Plack::Util::Accessor qw/ client sample_rate /;
 use Time::HiRes;
 use Try::Tiny;
 
-our $VERSION = 'v0.3.4';
+our $VERSION = 'v0.3.5';
 
 sub call {
     my ( $self, $env ) = @_;
@@ -154,7 +155,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 =head1 VERSION
 
-version v0.3.4
+version v0.3.5
 
 =head1 SYNOPSIS
 
@@ -325,6 +326,11 @@ You can access the configured statsd client from L<Catalyst>:
   }
 
 =head1 KNOWN ISSUES
+
+=head2 Non-standard HTTP status codes
+
+If your application is returning a status code that is not handled by
+L<HTTP::Status>, then the metrics may not be logged for that reponse.
 
 =head2 Support for older Perl versions
 

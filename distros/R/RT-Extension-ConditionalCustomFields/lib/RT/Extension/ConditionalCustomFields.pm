@@ -4,7 +4,7 @@ use warnings;
 no warnings qw(redefine);
 package RT::Extension::ConditionalCustomFields;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =encoding utf8
 
@@ -14,9 +14,13 @@ RT::Extension::ConditionalCustomFields - CF conditionned by the value of another
 
 =head1 DESCRIPTION
 
-Provide the ability to display/edit a L<custom field|RT::CustomField> conditioned by the value of another (select) L<custom field|RT::CustomField> for the same object, which can be anything that can have custom fields (L<ticket|RT::Ticket>, L<queue|RT::Queue>, L<user|RT::User>, L<group|RT::Group>, L<article|RT::Article> or L<asset|RT::Asset>). If a L<custom field|RT::CustomField> is based on another (parent) L<custom field|RT::CustomField> which is conditioned by, this (child) L<custom field|RT::CustomField> will of course also be conditioned by (with the same condition as its parent).
+Provide the ability to display/edit a L<custom field|RT::CustomField> conditioned by the value of another (select) L<custom field|RT::CustomField> for the same object, which can be anything that can have custom fields (L<ticket|RT::Ticket>, L<queue|RT::Queue>, L<user|RT::User>, L<group|RT::Group>, L<article|RT::Article> or L<asset|RT::Asset>).
 
-From version 0.07, the condition can be multivalued, that is: the conditioned custom field can be displayed/edited if the condition custom field has one of these values (In other words: there is an C<OR> bewteen the values of the condition). The condition custom field can be a select custom field with values defined by L<CustomFieldValues|RT::CustomFieldValues> or an L<external custom field|RT::CustomFieldValues::External>.
+If a L<custom field|RT::CustomField> is based on another (parent) L<custom field|RT::CustomField> which is conditioned by, this (child) L<custom field|RT::CustomField> will of course also be conditioned by (with the same condition as its parent).
+
+If the condition L<custom field|RT::CustomField> is a multivalued select, the condition for an object is met as soon as the condition is met by at least one value of the L<instanciated custom field|RT::ObjectCustomField> for this object.
+
+From version 0.07, the condition can be multivalued, that is: the conditioned L<custom field|RT::CustomField> can be displayed/edited if the condition L<custom field|RT::CustomField> has one of these values (In other words: there is an C<OR> bewteen the values of the condition). The condition L<custom field|RT::CustomField> can be a select custom field with values defined by L<CustomFieldValues|RT::CustomFieldValues> or an L<external custom field|RT::CustomFieldValues::External>.
 
 I<Note that version 0.07 is a complete redesign: the API described below has changed; also, the way that ConditionedBy property is store has changed. If you upgrade from a previous version, you have to reconfigure the custom fields which are conditionned by.>
 
@@ -196,7 +200,7 @@ sub _findGrouping {
 my $old_MatchPattern = RT::CustomField->can("MatchPattern");
 *RT::CustomField::MatchPattern = sub {
     my $self = shift;
-    my $match = $old_MatchPattern->($self);
+    my $match = $old_MatchPattern->($self, @_);
     my $conditioned_by = $self->ConditionedBy;
 
     unless (!$conditioned_by || $match) {
@@ -212,11 +216,28 @@ my $old_MatchPattern = RT::CustomField->can("MatchPattern");
                     my $condition_arg = RT::Interface::Web::GetCustomFieldInputName(Object => $self->ContextObject, CustomField => $condition_cf, Grouping => $condition_grouping );
 
                     my $condition_val = $mason_args{ARGSRef}->{$condition_arg};
-                    if ($condition_val && !grep {$_ eq $condition_val} @{$conditioned_by->{vals}}) {
-                        $match = 1;
+                    my @condition_vals = ref($condition_val) eq 'ARRAY' ? @$condition_val : ($condition_val);
+                    my $condition_met = 0;
+                    foreach my $val (@condition_vals) {
+                        if (grep {$_ eq $val} @{$conditioned_by->{vals}}) {
+                            $condition_met = 1;
+                            last;
+                        }
                     }
+                    $match = 1 unless $condition_met;
                 }
             }
+        } else {
+            my $object = $self->ContextObject;
+            my $condition_vals = $object->CustomFieldValues($conditioned_by->{CF});
+            my $condition_met = 0;
+            while (my $condition_val = $condition_vals->Next) {
+                if (grep {$_ eq $condition_val->Content} @{$conditioned_by->{vals}}) {
+                    $condition_met = 1;
+                    last;
+                }
+            }
+            $match = 1 unless $condition_met;
         }
     }
 

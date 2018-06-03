@@ -18,11 +18,11 @@
                     <creator type="author">Louisa May Alcott</creator>
                     <rellink href="http://en.wikipedia.org/wiki/Little_Women"
                         text="Wikipedia" />
-                    <rellink href="http://www.gutenberg.org/etext/514" 
+                    <rellink href="http://www.gutenberg.org/etext/514"
                         text="Project Gutenberg" />
                     <desc>
                         <p>
-                            Little Women by <a href="http://en.wikipedia.org/wiki/Louisa_May_Alcott" rel="author">Louisa May Alcott</a> is an 
+                            Little Women by <a href="http://en.wikipedia.org/wiki/Louisa_May_Alcott" rel="author">Louisa May Alcott</a> is an
                             <b>early</b> and <strong>intriguing</strong>
                             book.
                         </p>
@@ -31,9 +31,9 @@
                 <prod id="around_the_world_in_80_days">
                     <title>Around the World in 80 Days</title>
                     <isbn>12340987</isbn>
-                    <ref 
-                        href="http://www.amazon.com/exec/obidos/ASIN/1577656806/ref=nosim/shlomifishhom-20" 
-                        affil="amazon" 
+                    <ref
+                        href="http://www.amazon.com/exec/obidos/ASIN/1577656806/ref=nosim/shlomifishhom-20"
+                        affil="amazon"
                         />
                     <ref
                         href="http://search.barnesandnoble.com/booksearch/isbnInquiry.asp?z=y&amp;EAN=9780140367119&amp;itm=1"
@@ -63,7 +63,7 @@
                     <prod id="indiana_jones_1">
                         <title>Raiders of the Lost Ark</title>
                         <isbn>111</isbn>
-                        <rellink href="http://www.imdb.com/title/tt0082971/" 
+                        <rellink href="http://www.imdb.com/title/tt0082971/"
                             text="IMDB" />
                         <rellink href="http://en.wikipedia.org/wiki/Raiders_of_the_Lost_Ark"
                             text="Wikipedia" />

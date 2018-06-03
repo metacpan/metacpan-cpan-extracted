@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.16
+    version 0.21
 
 SYNOPSIS
 
@@ -22,6 +22,18 @@ DESCRIPTION
     It will NOT attempt to download or install libffi. If you need that,
     then install the original Alien::FFI instead.
 
+CAVEATS
+
+    Test::Alien is now part of Alien::Build, so if you need to run the
+    tests, the prereqs aren't that much lighter than the real ALien::FFI,
+    so you should consider:
+
+    do your own testing
+
+    skip tests
+
+    switch to the real Alien::FFI
+
 SEE ALSO
 
     Alt
@@ -29,8 +41,6 @@ SEE ALSO
     Alien::FFI
 
     FFI::Platypus
-
-    FFI::Raw
 
     FFI::CheckLib
 

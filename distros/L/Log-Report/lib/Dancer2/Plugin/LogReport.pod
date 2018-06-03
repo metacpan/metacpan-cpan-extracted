@@ -4,6 +4,11 @@
 
 Dancer2::Plugin::LogReport - logging and exceptions via Log::Report
 
+=head1 INHERITANCE
+
+ Dancer2::Plugin::LogReport
+   is a Dancer2::Plugin
+
 =head1 SYNOPSIS
 
   # Load the plugin into Dancer2
@@ -61,6 +66,48 @@ Read the L</DETAILS> in below in this manual-page.
 =head1 METHODS
 
 =over 4
+
+=item $obj-E<gt>B<fatal_handler>()
+
+C<fatal_handler()> allows alternative handlers to be defined in place of (or in
+addition to) the default redirect handler that is called on a fatal error.
+
+Calls should be made with 1 parameter: the subroutine to call in the case of a
+fatal error. The subroutine is passed 3 parameters: the DSL, the message in
+question, and the reason. The subroutine should return true or false depending
+on whether it handled the error. If it returns false, the next fatal handler is
+called, and if there are no others then the default redirect fatal handler is
+called.
+
+example: Error handler based on URL (e.g. API)
+
+  fatal_handler sub {
+    my ($dsl, $msg, $reason) = @_;
+    return if $dsl->app->request->uri !~ m!^/api/!;
+    status $reason eq 'PANIC' ? 'Internal Server Error' : 'Bad Request';
+    $dsl->send_as(JSON => {
+        error             => 1,
+        error_description => $msg->toString,
+    }, {
+        content_type => 'application/json; charset=UTF-8',
+    });
+  };
+
+example: Return JSON responses for requests with content-type of application/json
+
+fatal_handler sub {
+    my ($dsl, $msg, $reason, $default) = @_;
+
+    (my $ctype = $dsl->request->header('content-type')) =~ s/;.*//;
+    return if $ctype ne 'application/json';
+    status $reason eq 'PANIC' ? 'Internal Server Error' : 'Bad Request';
+    $dsl->send_as(JSON => {
+        error       => 1,
+        description => $msg->toString,
+    }, {
+        content_type => 'application/json; charset=UTF-8',
+    });
+  };
 
 =item $obj-E<gt>B<process>()
 
@@ -466,12 +513,12 @@ configuration options and defaults.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.26,
-built on January 23, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report distribution version 1.27,
+built on June 01, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

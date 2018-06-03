@@ -1,12 +1,23 @@
 package <: $module_name ~ "::RPC::Worker" :>;
 
-use Pcore -rpc, -class, -const;
+use Pcore -class, -const;
 use <: $module_name ~ "::Const qw[:CONST]" :>;
 
 with qw[<: $module_name ~ "::RPC" :>];
 
-const our $RPC_LISTEN_EVENTS  => [];
-const our $RPC_FORWARD_EVENTS => [];
+const our $NODE_REQUIRES       => undef;
+const our $NODE_FORWARD_EVENTS => undef;
+const our $NODE_LISTEN_EVENTS  => undef;
+
+sub NODE_ON_SUBSCRIBE ( $self, $event ) {
+    return 1;
+}
+
+sub NODE_ON_EVENT ( $self, $ev ) {
+    P->forward_event($ev);
+
+    return;
+}
 
 sub BUILD ( $self, $args ) {
     return;
@@ -35,7 +46,7 @@ sub API_test ( $self, $req, @args ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 1, 4                 | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 43                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 47 does not match the package declaration       |
+## |    1 | 54                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 58 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

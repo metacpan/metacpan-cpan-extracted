@@ -1,6 +1,6 @@
 package Catmandu::PICA;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 1;
 __END__
@@ -13,8 +13,9 @@ Catmandu::PICA - Catmandu modules for working with PICA+ data
 
 =begin markdown
 
-[![Build Status](https://travis-ci.org/gbv/Catmandu-PICA.png)](https://travis-ci.org/gbv/Catmandu-PICA)
-[![Coverage Status](https://coveralls.io/repos/gbv/Catmandu-PICA/badge.png?branch=master)](https://coveralls.io/r/gbv/Catmandu-PICA?branch=master)
+[![Unix Build Status](https://travis-ci.org/gbv/Catmandu-PICA.svg)](https://travis-ci.org/gbv/Catmandu-PICA)
+[![Windows Build status](https://ci.appveyor.com/api/projects/status/myyyxpobr8kn6aby?svg=true)](https://ci.appveyor.com/project/nichtich/catmandu-pica)
+[![Coverage Status](https://coveralls.io/repos/gbv/Catmandu-PICA/badge.svg?branch=master)](https://coveralls.io/r/gbv/Catmandu-PICA?branch=master)
 [![Kwalitee Score](http://cpants.cpanauthors.org/dist/Catmandu-PICA.png)](http://cpants.cpanauthors.org/dist/Catmandu-PICA)
 
 =end markdown

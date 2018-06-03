@@ -3,6 +3,7 @@ package <%= $p->{class} %>::GuiPlugin::Song;
 use Mojo::Base 'CallBackery::GuiPlugin::AbstractTable';
 use CallBackery::Translate qw(trm);
 use CallBackery::Exception qw(mkerror);
+use Mojo::JSON qw(true false);
 
 =head1 NAME
 
@@ -60,43 +61,43 @@ has tableCfg => sub {
             type => 'number',
             width => '1*',
             key => 'song_id',
-            sortable => $self->true,
-            primary => $self->true
+            sortable => true,
+            primary => true
         },
         {
             label => trm('Title'),
             type => 'string',
             width => '6*',
             key => 'song_title',
-            sortable => $self->true,
+            sortable => true,
         },
         {
             label => trm('Voices'),
             type => 'string',
             width => '1*',
             key => 'song_voices',
-            sortable => $self->true,
+            sortable => true,
         },
         {
             label => trm('Composer'),
             type => 'string',
             width => '2*',
             key => 'song_composer',
-            sortable => $self->true,
+            sortable => true,
         },
         {
             label => trm('Page'),
             type => 'string',
             width => '1*',
             key => 'song_page',
-            sortable => $self->true,
+            sortable => true,
         },
         {
             label => trm('Note'),
             type => 'string',
             width => '3*',
             key => 'song_note',
-            sortable => $self->true,
+            sortable => true,
         },
      ]
 };
@@ -115,7 +116,7 @@ has actionCfg => sub {
         {
             label => trm('Add Song'),
             action => 'popup',
-            addToContextMenu => $self->false,
+            addToContextMenu => false,
             name => 'songFormAdd',
             popupTitle => trm('New Song'),
             set => {
@@ -135,8 +136,8 @@ has actionCfg => sub {
         {
             label => trm('Edit Song'),
             action => 'popup',
-            addToContextMenu => $self->true,
-            defaultAction => $self->true,
+            addToContextMenu => true,
+            defaultAction => true,
             name => 'songFormEdit',
             popupTitle => trm('Edit Song'),
             backend => {
@@ -149,10 +150,11 @@ has actionCfg => sub {
         {
             label => trm('Delete Song'),
             action => 'submitVerify',
-            addToContextMenu => $self->true,
+            addToContextMenu => true,
             question => trm('Do you really want to delete the selected Song '),
             key => 'delete',
-            handler => sub {
+            actionHandler => sub {
+                my $self = shift;
                 my $args = shift;
                 my $id = $args->{selection}{song_id};
                 die mkerror(4992,"You have to select a song first")

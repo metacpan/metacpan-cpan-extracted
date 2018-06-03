@@ -10,7 +10,7 @@ use constant 1.32 ();
 our @EXPORT = qw( record_layout );
 
 # ABSTRACT: FFI support for structured records data
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.50'; # VERSION
 
 
 sub record_layout
@@ -128,7 +128,7 @@ FFI::Platypus::Record - FFI support for structured records data
 
 =head1 VERSION
 
-version 0.48
+version 0.50
 
 =head1 SYNOPSIS
 
@@ -155,7 +155,7 @@ Perl:
    int       age
    string(3) title
    string_rw name
- );
+ ));
  
  package main;
  

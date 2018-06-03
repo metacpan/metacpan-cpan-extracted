@@ -1,18 +1,22 @@
 Revision history for Perl extension App::Wax.
 
-2.2.0 - Fri 27 Apr 14:51:00 2018
+2.2.1 - 2018-06-01
+
+    - make the version declaration(s) compatible with perl 5.8
+
+2.2.0 - 2018-04-27
 
     - the version of the command (wax) is now separate from that
       of its library (App::Wax). this means breaking changes in the
       latter no longer trigger major SemVer bumps in the former
     - log messages now display the index of the URL they apply to
 
-2.1.0 Thu 15 Mar 23:18:36 2018
+2.1.0 - 2018-03-15
 
     - update metadata to reflect updated dependencies in the build file
     - minor doc tweaks/fixes
 
-2.0.0 Thu 15 Mar 15:50:25 2018
+2.0.0 - 2018-03-15
 
     - breaking changes:
         - `resolve_temp` now returns a ($filename, $error) pair rather than
@@ -26,39 +30,39 @@ Revision history for Perl extension App::Wax.
     - fix -u/--user-agent option
     - misc doc tweaks/fixes
 
-1.1.1 Tue 6 Jun 22:42:39 2017
+1.1.1 - 2017-06-06
 
    - perl 5.26 compatibility fix: add '.' to @INC to load inc::Module::Install
 
-1.1.0 Fri 16 Dec 23:15:52 2016
+1.1.0 - 2016-12-16
 
     - add -D option equivalent to -d "${XDG_CACHE_HOME:-$HOME/.cache}/wax"
     - automatically create the -d/-D directories if their parent directories exist
       (otherwise raise an error)
 
-1.0.5 Mon Feb 16 20:52:30 2015
+1.0.5 - 2015-02-16
 
     - fix logging of unresolved URLs
 
-1.0.4 Thu Feb 12 19:04:07 2015
+1.0.4 - 2015-02-12
 
     - make sure temp files are removed on error
     - changelog: fix --cache/--mirror descriptions
 
-1.0.3 Wed Feb 4 22:26:26 2015
+1.0.3 - 2015-02-04
 
     - remove duplicate POD from CPAN
 
-1.0.2 Wed Feb 4 22:04:09 2015
+1.0.2 - 2015-02-04
 
     - fix release date
 
-1.0.1 Wed Feb 4 21:41:59 2015
+1.0.1 - 2015-02-04
 
     - fix usage/help display
     - doc/code nitfixen
 
-1.0.0 Tue Feb 3 23:21:47 2015
+1.0.0 - 2015-02-03
 
     - breaking changes:
         - the separator is now opt-in i.e. `--` is no longer the default separator
@@ -70,16 +74,16 @@ Revision history for Perl extension App::Wax.
     - parallelize downloads
     - improve tests
 
-0.3.1 Fri Jun 17 21:16:43 2011
+0.3.1 - 2011-06-17
 
     - docfixen
     - rm README.md from CPAN
 
-0.3.0 Fri Jun 17 19:29:40 2011
+0.3.0 - 2011-06-17
 
     - add -S/--no-separator option, allowing detection of the "stop waxing" token to be disabled
 
-0.2.0 Fri Jun 17 18:23:13 2011
+0.2.0 - 2011-06-17
 
     - fix user-agent and timeout accessors
     - increase default timeout to 60 seconds
@@ -89,16 +93,16 @@ Revision history for Perl extension App::Wax.
     - better repo link
     - add README.md
 
-0.1.0 Fri Jun 17 14:28:28 2011
+0.1.0 - 2011-06-17
 
     - fix extension handling
     - better error handling
     - s/URI/URL/g
 
-0.0.2 Fri Jun 17 05:11:59 2011
+0.0.2 - 2011-06-17
 
     - docfixen
 
-0.0.1 Thu Jun 16 23:59:31 2011
+0.0.1 - 2011-06-16
 
     - initial release

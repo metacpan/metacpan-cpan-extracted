@@ -3,23 +3,27 @@ package Pcore::Ext::Context::L10N;
 use Pcore -class;
 use Pcore::Util::Scalar qw[refaddr];
 
-has ext       => ( is => 'ro', isa => InstanceOf ['Pcore::Ext::Context'], required => 1 );
-has is_plural => ( is => 'ro', isa => Bool,                               required => 1 );
-has msgid     => ( is => 'ro', isa => Str,                                required => 1 );
-has domain    => ( is => 'ro', isa => Str,                                required => 1 );
-has msgid_plural => ( is => 'ro', isa => Maybe [Str] );
-has num          => ( is => 'ro', isa => Maybe [Str] );
+has ext          => ();
+has domain       => ();
+has msgid        => ();
+has msgid_plural => ();
+has num          => ();
 
 use overload    #
   q[""] => sub {
     return $_[0]->to_js->$*;
+  },
+  q[&{}] => sub {
+    my $self = $_[0];
+
+    return sub { $self->to_js(@_)->$* };
   },
   fallback => undef;
 
 sub TO_JSON ( $self ) {
     my $id = refaddr $self;
 
-    $self->{ext}->{js_gen_cache}->{$id} = $self->to_js;
+    $self->{ext}->{_js_gen_cache}->{$id} = $self->to_js;
 
     return "__JS${id}__";
 }
@@ -27,23 +31,21 @@ sub TO_JSON ( $self ) {
 sub to_js ( $self ) {
     my $js;
 
-    my $l10n_class_name = $self->{ext}->{ctx}->{l10n_class_name};
-
     # quote
-    my $msgid  = $self->{msgid} =~ s/'/\\'/smgr;
     my $domain = $self->{domain} =~ s/'/\\'/smgr;
+    my $msgid  = $self->{msgid} =~ s/'/\\'/smgr;
 
-    if ( $self->{is_plural} ) {
+    if ( $self->{msgid_plural} ) {
 
         # quote $msgid_plural
         my $msgid_plural = $self->{msgid_plural} =~ s/'/\\'/smgr;
 
         my $num = $self->{num} // 1;
 
-        $js = qq[$l10n_class_name.l10np('$msgid', '$msgid_plural', $num, '$domain')];
+        $js = qq[Ext.L10N.l10n('$domain', '$msgid', '$msgid_plural', $num)];
     }
     else {
-        $js = qq[$l10n_class_name.l10n('$msgid', '$domain')];
+        $js = qq[Ext.L10N.l10n('$domain', '$msgid')];
     }
 
     return \$js;

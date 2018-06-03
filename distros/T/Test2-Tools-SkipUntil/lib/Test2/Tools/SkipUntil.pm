@@ -5,7 +5,7 @@ use Carp 'croak';
 use Test2::API 'context';
 use Time::Piece;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 our @EXPORT = qw(skip_until skip_all_until);
 use base 'Exporter';
 

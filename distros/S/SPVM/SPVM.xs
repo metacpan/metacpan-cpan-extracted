@@ -28,9 +28,9 @@
 #include "spvm_object.h"
 #include "spvm_native.h"
 #include "spvm_opcode_builder.h"
-#include "spvm_jitcode_builder.h"
+#include "spvm_csource_builder.h"
 #include "spvm_list.h"
-#include "spvm_jitcode_builder.h"
+#include "spvm_csource_builder.h"
 #include "spvm_string_buffer.h"
 #include "spvm_basic_type.h"
 #include "spvm_use.h"
@@ -841,9 +841,13 @@ get_subs_from_package_id(...)
       int32_t sub_is_enum = sub->is_enum;
       SV* sv_sub_is_enum = sv_2mortal(newSViv(sub_is_enum));
 
-      // Subroutine is_native
-      int32_t sub_is_native = sub->is_native;
-      SV* sv_sub_is_native = sv_2mortal(newSViv(sub_is_native));
+      // Subroutine have_native_desc
+      int32_t sub_have_native_desc = sub->have_native_desc;
+      SV* sv_sub_have_native_desc = sv_2mortal(newSViv(sub_have_native_desc));
+
+      // Subroutine have_compile_desc
+      int32_t sub_have_compile_desc = sub->have_compile_desc;
+      SV* sv_sub_have_compile_desc = sv_2mortal(newSViv(sub_have_compile_desc));
 
       // Subroutine
       HV* hv_sub = (HV*)sv_2mortal((SV*)newHV());
@@ -851,7 +855,8 @@ get_subs_from_package_id(...)
       hv_store(hv_sub, "name", strlen("name"), SvREFCNT_inc(sv_sub_name), 0);
       hv_store(hv_sub, "id", strlen("id"), SvREFCNT_inc(sv_sub_id), 0);
       hv_store(hv_sub, "is_enum", strlen("is_enum"), SvREFCNT_inc(sv_sub_is_enum), 0);
-      hv_store(hv_sub, "is_native", strlen("is_native"), SvREFCNT_inc(sv_sub_is_native), 0);
+      hv_store(hv_sub, "have_native_desc", strlen("have_native_desc"), SvREFCNT_inc(sv_sub_have_native_desc), 0);
+      hv_store(hv_sub, "have_compile_desc", strlen("have_compile_desc"), SvREFCNT_inc(sv_sub_have_compile_desc), 0);
       
       SV* sv_sub = sv_2mortal(newRV_inc((SV*)hv_sub));
       av_push(av_subs, SvREFCNT_inc((SV*)sv_sub));
@@ -893,10 +898,6 @@ get_packages(...)
       int32_t package_id = package->id;
       SV* sv_package_id = sv_2mortal(newSViv(package_id));
 
-      // Is JIT
-      int32_t package_is_jit = package->is_jit;
-      SV* sv_package_is_jit = sv_2mortal(newSViv(package_is_jit));
-
       // Is interface
       int32_t package_is_interface = package->is_interface;
       SV* sv_package_is_interface = sv_2mortal(newSViv(package_is_interface));
@@ -906,7 +907,6 @@ get_packages(...)
       
       hv_store(hv_package, "name", strlen("name"), SvREFCNT_inc(sv_package_name), 0);
       hv_store(hv_package, "id", strlen("id"), SvREFCNT_inc(sv_package_id), 0);
-      hv_store(hv_package, "is_jit", strlen("is_jit"), SvREFCNT_inc(sv_package_is_jit), 0);
       hv_store(hv_package, "is_interface", strlen("is_interface"), SvREFCNT_inc(sv_package_is_interface), 0);
       
       SV* sv_package = sv_2mortal(newRV_inc((SV*)hv_package));
@@ -940,7 +940,7 @@ get_native_sub_names(...)
       SPVM_OP* op_sub = SPVM_LIST_fetch(op_subs, sub_index);
       SPVM_SUB* sub = op_sub->uv.sub;
       
-      if (sub->is_native) {
+      if (sub->have_native_desc) {
         const char* sub_name = sub->abs_name;
         SV* sv_sub_name = sv_2mortal(newSVpvn(sub_name, strlen(sub_name)));
         av_push(av_sub_names, SvREFCNT_inc(sv_sub_name));
@@ -1045,22 +1045,6 @@ compile(...)
     }
   }
 
-  // Add package
-  AV* av_jit_package_names = get_av("SPVM::JIT_PACKAGE_NAMES", 0);
-  int32_t av_jit_package_names_length = (int32_t)av_len(av_jit_package_names) + 1;
-  {
-    int32_t i;
-    for (i = 0; i < av_jit_package_names_length; i++) {
-      SV** sv_jit_package_name_ptr = av_fetch(av_jit_package_names, i, 0);
-      SV* sv_jit_package_name = sv_jit_package_name_ptr ? *sv_jit_package_name_ptr : &PL_sv_undef;
-      
-      char* jit_package_name = SvPV_nolen(sv_jit_package_name);
-      
-      SPVM_LIST_push(compiler->jit_package_names, jit_package_name);
-      SPVM_HASH_insert(compiler->jit_package_name_symtable, jit_package_name, strlen(jit_package_name), (void*)(intptr_t)1);
-    }
-  }
-  
   // Set compiler
   size_t iv_compiler = PTR2IV(compiler);
   SV* sviv_compiler = sv_2mortal(newSViv(iv_compiler));
@@ -1096,38 +1080,6 @@ build_opcode(...)
   
   // Build opcode
   SPVM_OPCODE_BUILDER_build_opcode_array(compiler);
-  
-  XSRETURN(0);
-}
-
-SV*
-bind_native_sub(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  SV* sv_self = ST(0);
-  SV* sv_native_sub_name = ST(1);
-  SV* sv_native_address = ST(2);
-  
-  // API
-  SPVM_ENV* env = SPVM_XS_UTIL_get_env();
-
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
-  SPVM_COMPILER* compiler = runtime->compiler;
-  
-  
-  // Native subroutine name
-  const char* native_sub_name = SvPV_nolen(sv_native_sub_name);
-  
-  // Native address
-  void* native_address = INT2PTR(void*, SvIV(sv_native_address));
-  
-  // Set native address to subroutine
-  SPVM_OP* op_sub = SPVM_HASH_search(compiler->op_sub_symtable, native_sub_name, strlen(native_sub_name));
-  SPVM_SUB* sub = op_sub->uv.sub;
-  
-  sub->native_address = native_address;
   
   XSRETURN(0);
 }
@@ -1176,32 +1128,73 @@ free_compiler(...)
   XSRETURN(0);
 }
 
-MODULE = SPVM::Build::JIT		PACKAGE = SPVM::Build::JIT
+MODULE = SPVM::Build::Native		PACKAGE = SPVM::Build::Native
 
 SV*
-build_jitcode(...)
+bind_sub(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  SV* sv_native_sub_name = ST(1);
+  SV* sv_native_address = ST(2);
+  
+  // API
+  SPVM_ENV* env = SPVM_XS_UTIL_get_env();
+
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
+  SPVM_COMPILER* compiler = runtime->compiler;
+  
+  
+  // Native subroutine name
+  const char* native_sub_name = SvPV_nolen(sv_native_sub_name);
+  
+  // Native address
+  void* native_address = INT2PTR(void*, SvIV(sv_native_address));
+  
+  // Set native address to subroutine
+  SPVM_OP* op_sub = SPVM_HASH_search(compiler->op_sub_symtable, native_sub_name, strlen(native_sub_name));
+  SPVM_SUB* sub = op_sub->uv.sub;
+  
+  sub->native_address = native_address;
+  
+  XSRETURN(0);
+}
+
+MODULE = SPVM::Build::Precompile		PACKAGE = SPVM::Build::Precompile
+
+SV*
+build_csource(...)
   PPCODE:
 {
   SV* sv_self = ST(0);
-  SV* sv_sub_id = ST(1);
-  int32_t sub_id = SvIV(sv_sub_id);
+  SV* sv_sub_name = ST(1);
+  const char* sub_name = SvPV_nolen(sv_sub_name);
+
+  SPVM_ENV* env = SPVM_XS_UTIL_get_env();
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
+  SPVM_COMPILER* compiler = runtime->compiler;
   
-  // String buffer for jitcode
+  SPVM_OP* op_sub = SPVM_HASH_search(compiler->op_sub_symtable, sub_name, strlen(sub_name));
+  int32_t sub_id = op_sub->uv.sub->id;
+  
+  // String buffer for csource
   SPVM_STRING_BUFFER* string_buffer = SPVM_STRING_BUFFER_new(0);
   
-  // Build sub jitcode
-  SPVM_JITCODE_BUILDER_build_sub_jitcode(string_buffer, sub_id);
+  // Build sub csource
+  SPVM_CSOURCE_BUILDER_build_sub_csource(string_buffer, sub_id);
   
-  SV* sv_jitcode_source = sv_2mortal(newSVpv(string_buffer->buffer, string_buffer->length));
+  SV* sv_csource_source = sv_2mortal(newSVpv(string_buffer->buffer, string_buffer->length));
   
   SPVM_STRING_BUFFER_free(string_buffer);
   
-  XPUSHs(sv_jitcode_source);
+  XPUSHs(sv_csource_source);
   XSRETURN(1);
 }
 
 SV*
-bind_jitcode_sub(...)
+bind_sub(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -1211,7 +1204,7 @@ bind_jitcode_sub(...)
   SV* sv_sub_native_address = ST(2);
   
   const char* sub_abs_name = SvPV_nolen(sv_sub_abs_name);
-  void* sub_jit_address = INT2PTR(void*, SvIV(sv_sub_native_address));
+  void* sub_precompile_address = INT2PTR(void*, SvIV(sv_sub_native_address));
   
   // API
   SPVM_ENV* env = SPVM_XS_UTIL_get_env();
@@ -1225,8 +1218,8 @@ bind_jitcode_sub(...)
   SPVM_OP* op_sub = SPVM_LIST_fetch(compiler->op_subs, sub_id);
   SPVM_SUB* sub = op_sub->uv.sub;
   
-  sub->jit_address = sub_jit_address;
-  sub->is_jit_compiled = 1;
+  sub->precompile_address = sub_precompile_address;
+  sub->is_compiled = 1;
   
   XSRETURN(0);
 }

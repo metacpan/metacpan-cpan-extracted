@@ -1,0 +1,15 @@
+#!/bin/bash -x
+
+set -euo pipefail
+IFS=$'\n\t'
+
+rm -rf /tmp/Test2-Tools-HTTP
+
+cpanm -n Dist::Zilla
+
+
+git clone --depth 2 https://github.com/plicease/Test2-Tools-HTTP.git /tmp/Test2-Tools-HTTP
+cd /tmp/Test2-Tools-HTTP
+dzil authordeps --missing | cpanm -n
+dzil listdeps   --missing | cpanm -n
+dzil install --install-command 'cpanm -n .'

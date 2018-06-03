@@ -64,6 +64,8 @@ the changes are good.
 #########################################################################
 Update the Change file with the date
 
+../support/pod_to_changes > Changes
+
 #########################################################################
 Regenerate the MANIFEST, Build.PL, Makefile.PL
 Run the kwalitee tests

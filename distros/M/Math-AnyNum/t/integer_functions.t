@@ -92,10 +92,10 @@ is(rising_factorial(12, -13), 'NaN');
 is(falling_factorial(-13, -14), 'NaN');
 
 is(superfactorial(-1), 'NaN');
-is(superfactorial(5),  '34560');
-
 is(hyperfactorial(-1), 'NaN');
-is(hyperfactorial(5),  '86400000');
+
+is(join(', ', map { superfactorial($_) } 0 .. 7), '1, 1, 2, 12, 288, 34560, 24883200, 125411328000');
+is(join(', ', map { hyperfactorial($_) } 0 .. 7), '1, 1, 4, 108, 27648, 86400000, 4031078400000, 3319766398771200000');
 
 is(bell(-1),    'NaN');
 is(catalan(-1), 'NaN');

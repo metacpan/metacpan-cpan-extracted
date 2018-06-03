@@ -12,12 +12,12 @@ package HiPi::Interface::MonoOLED::DisplayBuffer;
 
 use strict;
 use warnings;
-use parent qw( HiPi::Interface::MonoOLED::DrawingContext );
+use parent qw( HiPi::Graphics::DrawingContext );
 use Carp;
 
 __PACKAGE__->create_ro_accessors( qw( rows cols bytes_per_col buffer ) );
 
-our $VERSION ='0.70';
+our $VERSION ='0.71';
 
 sub new {
     my( $class, %params) = @_;

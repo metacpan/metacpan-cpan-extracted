@@ -6,17 +6,17 @@ use RT::Extension::ConditionalCustomFields::Test tests => 20;
 use WWW::Mechanize::PhantomJS;
 
 my $cf_condition = RT::CustomField->new(RT->SystemUser);
-$cf_condition->Create(Name => 'Condition', Type => 'SelectSingle', Queue => 'General', RenderType => 'Dropdown');
+$cf_condition->Create(Name => 'Condition', Type => 'Select', MaxValues => 1, Queue => 'General', RenderType => 'Dropdown');
 $cf_condition->AddValue(Name => 'Passed', SortOder => 0);
 $cf_condition->AddValue(Name => 'Failed', SortOrder => 1);
 $cf_condition->AddValue(Name => 'Schrödingerized', SortOrder => 2);
 my $cf_values = $cf_condition->Values->ItemsArrayRef;
 
 my $cf_conditioned_by = RT::CustomField->new(RT->SystemUser);
-$cf_conditioned_by->Create(Name => 'ConditionedBy', Type => 'FreeformSingle', Queue => 'General');
+$cf_conditioned_by->Create(Name => 'ConditionedBy', Type => 'Freeform', MaxValues => 1, Queue => 'General');
 
 my $cf_conditioned_by_child = RT::CustomField->new(RT->SystemUser);
-$cf_conditioned_by_child->Create(Name => 'Child', Type => 'FreeformSingle', Queue => 'General', BasedOn => $cf_conditioned_by->id);
+$cf_conditioned_by_child->Create(Name => 'Child', Type => 'Freeform', MaxValues => 1, Queue => 'General', BasedOn => $cf_conditioned_by->id);
 
 RT->Config->Set('CustomFieldGroupings',
     'RT::Ticket' => [

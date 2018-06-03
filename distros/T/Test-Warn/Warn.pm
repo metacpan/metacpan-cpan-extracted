@@ -208,14 +208,9 @@ The C<warning_like BLOCK CATEGORY, TEST_NAME> method isn't fully tested.
 Please take note if you use this this calling style,
 and report any bugs you find.
 
-=head1 TODO
+=head2 XS warnings
 
-Improve this documentation.
-
-The code has some parts doubled - especially in the test scripts.
-This is really awkward and must be changed.
-
-Please feel free to suggest improvements.
+As described in https://rt.cpan.org/Ticket/Display.html?id=42070&results=3c71d1b101a730e185691657f3b02f21 or https://github.com/hanfried/test-warn/issues/1 XS warnings might not be caught.
 
 =head1 SEE ALSO
 
@@ -236,6 +231,8 @@ Copyright 2002 by Janek Schleicher
 
 Copyright 2007-2014 by Alexandr Ciornii, L<http://chorny.net/>
 
+Copyright 2015-2018 by Janek Schleicher
+
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
 
@@ -248,10 +245,9 @@ use 5.006;
 use strict;
 use warnings;
 
-#use Array::Compare;
 use Sub::Uplevel 0.12;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 require Exporter;
 

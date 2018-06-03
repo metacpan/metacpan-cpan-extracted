@@ -1,3 +1,0 @@
-ExtUtils::CppGuess
-Module::Build
-Test::More

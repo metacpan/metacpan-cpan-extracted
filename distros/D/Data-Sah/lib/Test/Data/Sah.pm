@@ -1,7 +1,9 @@
+## no critic: (ControlStructures::ProhibitUnreachableCode)
+
 package Test::Data::Sah;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.88'; # VERSION
+our $DATE = '2018-05-29'; # DATE
+our $VERSION = '0.890'; # VERSION
 
 use 5.010;
 use strict;
@@ -107,7 +109,7 @@ sub run_spectest {
     my @specfiles;
     {
         local $CWD = "$dir/spectest";
-        @specfiles = <*.json>;
+        @specfiles = glob("*.json");
     }
 
     # to test certain files only
@@ -232,7 +234,7 @@ sub run_spectest {
     {
         use experimental 'smartmatch';
 
-        for my $file (grep /^10-type-/, @specfiles) {
+        for my $file (grep {/^10-type-/} @specfiles) {
             unless (!@files || $file ~~ @files) {
                 diag "Skipping file $file";
                 next;
@@ -327,7 +329,7 @@ Test::Data::Sah - Test routines for Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.88 of Test::Data::Sah (from Perl distribution Data-Sah), released on 2017-07-10.
+This document describes version 0.890 of Test::Data::Sah (from Perl distribution Data-Sah), released on 2018-05-29.
 
 =head1 FUNCTIONS
 
@@ -397,7 +399,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,11 +1,11 @@
-[![Build Status](https://travis-ci.org/cynovg/WG-API.svg?branch=master)](https://travis-ci.org/cynovg/WG-API) [![Coverage Status](https://img.shields.io/coveralls/cynovg/WG-API/master.svg?style=flat)](https://coveralls.io/r/cynovg/WG-API?branch=master) [![MetaCPAN Release](https://badge.fury.io/pl/WG-API.svg)](https://metacpan.org/release/WG-API)
+
 # NAME
 
 WG::API - Module for work with Wargaming.net Public API
 
 # VERSION
 
-Version v0.8.5
+Version v0.8.6
 
 # SYNOPSIS
 

@@ -52,8 +52,9 @@ resources:
   bugtracker: https://github.com/phochste/RDF-LDF/issues
   homepage: https://github.com/phochste/RDF-LDF
   repository: https://github.com/phochste/RDF-LDF.git
-version: '0.23'
+version: '0.24'
 x_contributors:
+  - 'Edward Betts <edward@4angle.com>'
   - 'Gregory Todd Williams <greg@evilfunhouse.com>'
   - 'Jakob Voß <jakob@nichtich.de>'
   - 'Jakob Voss <voss@gbv.de>'

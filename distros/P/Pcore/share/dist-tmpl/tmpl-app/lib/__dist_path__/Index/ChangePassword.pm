@@ -1,13 +1,13 @@
 package Lcom::Index::ChangePassword;
 
-use Pcore -class, -l10n => 'Lcom';
+use Pcore -class, -l10n;
 
 with qw[Pcore::App::Controller::Ext];
 
-has ext_app            => 'ChangePassword';
-has ext_app_title      => l10n('Change Password');
-has ext_default_locale => 'ru';
-has path               => '/change-password/', init_arg => undef;
+has ext_app    => 'ChangePassword';
+has ext_title  => l10n('Change Password');
+has ext_locale => ();
+has path       => '/change-password/', init_arg => undef;
 
 1;
 __END__

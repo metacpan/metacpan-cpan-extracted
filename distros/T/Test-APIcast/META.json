@@ -4,7 +4,7 @@
       "Michal Cichra <mcichra@redhat.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.13",
+   "generated_by" : "Minilla/v3.1.0",
    "license" : [
       "apache_2_0"
    ],
@@ -61,7 +61,7 @@
    "provides" : {
       "Test::APIcast" : {
          "file" : "lib/Test/APIcast.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       },
       "Test::APIcast::Blackbox" : {
          "file" : "lib/Test/APIcast/Blackbox.pm"
@@ -78,12 +78,13 @@
          "web" : "https://github.com/3scale/Test-APIcast"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_authority" : "cpan:MCICHRA",
    "x_contributors" : [
       "David Ortiz <z.david.ortiz@gmail.com>",
       "Michal Cichra <michal@cichra.cz>",
       "Michal Cichra <mikz@users.noreply.github.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97000"
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
 }

@@ -8,8 +8,7 @@
 %           if ($conditioned_by_cf->RenderType eq 'List') {
 %               $Grouping =~ s/\W//g if $Grouping;
 %               my $cf_id = GetCustomFieldInputName(Object => $Object, CustomField => $CustomField, Grouping => $Grouping );
-%               my @conditioned_by_groupings = $conditioned_by_cf->_findGrouping($Object);
-%               my $conditioned_by_grouping = @conditioned_by_groupings ? $conditioned_by_groupings[0] : undef;
+%               my $conditioned_by_grouping = $conditioned_by_cf->_findGrouping($Object);
 %               $conditioned_by_grouping =~ s/\W//g if $conditioned_by_grouping;
 %               my $conditionedby_name = GetCustomFieldInputName(Object => $Object, CustomField => $conditioned_by_cf, Grouping => $conditioned_by_grouping );
 <script type="text/javascript">
@@ -40,8 +39,7 @@ jQuery(function() {
 %           else {
 %               $Grouping =~ s/\W//g if $Grouping;
 %               my $cf_id = GetCustomFieldInputName(Object => $Object, CustomField => $CustomField, Grouping => $Grouping );
-%               my @conditioned_by_groupings = $conditioned_by_cf->_findGrouping($Object);
-%               my $conditioned_by_grouping = @conditioned_by_groupings ? $conditioned_by_groupings[0] : undef;
+%               my $conditioned_by_grouping = $conditioned_by_cf->_findGrouping($Object);
 %               $conditioned_by_grouping =~ s/\W//g if $conditioned_by_grouping;
 %               my $conditionedby_id = GetCustomFieldInputName(Object => $Object, CustomField => $conditioned_by_cf, Grouping => $conditioned_by_grouping );
 <script type="text/javascript">
@@ -52,11 +50,23 @@ jQuery(function() {
         var cf_id = <% "$cf_id" |h,n,j%>;
         cf_id = cf_id.replace(/:/g,'\\:');
         var conditionedby_vals = ["<% join('", "', @conditioned_by_vals) |n%>"];
-        if (jQuery.inArray(jQuery(this).val(), conditionedby_vals) == -1) {
-            jQuery('#'+cf_id).closest('<% $ParentSelector %>').hide();
+        var condition_met = false;
+        var condition_vals = jQuery(this).val();
+        if (jQuery.isArray(condition_vals)) {
+            jQuery.each(condition_vals, function(i, condition_val) {
+                if (jQuery.inArray(condition_val, conditionedby_vals) != -1) {
+                    condition_met = true;
+                    return false;
+                }
+            });
+        } else {
+            condition_met = (jQuery.inArray(condition_vals, conditionedby_vals) != -1);
+        }
+        if (condition_met) {
+            jQuery('#'+cf_id).closest('<% $ParentSelector %>').show();
         }
         else {
-            jQuery('#'+cf_id).closest('<% $ParentSelector %>').show();
+            jQuery('#'+cf_id).closest('<% $ParentSelector %>').hide();
         }
     });
     jQuery('#'+conditionedby_id).trigger('change');

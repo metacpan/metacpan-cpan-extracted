@@ -1,5 +1,8 @@
 Revision history for Perl module Net::ACME2
 
+0.11 1 Jun 2018
+- Add Types::Serialiser to Makefile.PL (thanks, Chris Novakovic!)
+
 0.10 2 Apr 2018
 - Add “Content-Type” header to outgoing POSTs.
 

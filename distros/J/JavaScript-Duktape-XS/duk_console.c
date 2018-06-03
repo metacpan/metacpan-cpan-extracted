@@ -7,7 +7,6 @@
  */
 
 #include <stdio.h>
-#include "util.h"
 #include "duktape.h"
 #include "duk_console.h"
 

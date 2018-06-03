@@ -73,3 +73,29 @@ $hash->{ for }
 $hash{foreach}
 $hash->{foreach}
 $hash->{ foreach }
+
+# These came from Ahmed Abdrabo and Andy Lester
+## name thing() for @array statement
+## failures 0
+## cut
+
+print for @INC
+say for @INC
+END { $dbh->do("DROP TABLE $_") foreach @table }
+{ print foreach @y }
+{ print foreach 1..2 }
+{ print foreach @y; }
+{ print }
+print foreach @y;
+
+## name thing() for %hash statement
+## failures 7
+## cut
+
+print for %INC
+say for %INC
+END { $dbh->do("DROP TABLE $_") foreach %tables }
+{ print foreach %y }
+{ print foreach %{@y} }
+{ print foreach %y; }
+print foreach %y;

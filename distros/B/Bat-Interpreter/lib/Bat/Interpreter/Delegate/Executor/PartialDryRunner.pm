@@ -2,19 +2,22 @@ package Bat::Interpreter::Delegate::Executor::PartialDryRunner;
 
 use utf8;
 
-use Moose;
+use Moo;
+use Types::Standard qw(ArrayRef);
 use namespace::autoclean;
 
 with 'Bat::Interpreter::Role::Executor';
 
-our $VERSION = '0.009';    # VERSION
+our $VERSION = '0.010';    # VERSION
 
 has 'commands_executed' => ( is      => 'ro',
-                             isa     => 'ArrayRef',
-                             traits  => ['Array'],
+                             isa     => ArrayRef,
                              default => sub { [] },
-                             handles => { add_command => 'push' }
 );
+
+sub add_command {
+    push @{ shift->commands_executed }, @_;
+}
 
 sub execute_command {
     my $self    = shift();
@@ -45,7 +48,7 @@ Bat::Interpreter::Delegate::Executor::PartialDryRunner
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -72,6 +75,10 @@ some sort of conditional using ERRORLEVEL
 Bat::Interpreter::Delegate::Executor::PartialDryRunner - Executor for executing for commands and printing out the rest
 
 =head1 METHODS
+
+=head2 commands_executed
+
+Returns an arrayref to the commands that are going to be executed but not part of a for command (aka: backticks executed in perl)
 
 =head2 execute_command
 

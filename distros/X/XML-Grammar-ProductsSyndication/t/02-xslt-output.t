@@ -36,7 +36,7 @@ foreach my $xml_file (@xml_files)
         {
             'source' =>
             {
-                'file' => 
+                'file' =>
                     File::Spec->catfile(
                         File::Spec->curdir(),
                         "t", "data", "valid-xmls", "$xml_file.xml"
@@ -55,12 +55,12 @@ foreach my $xml_file (@xml_files)
 sub load_xml
 {
     my $xml_file = shift;
-    my $path = 
+    my $path =
         File::Spec->catfile(
             File::Spec->curdir(),
             "t", "data", "output-htmls", "$xml_file.html"
         );
-   
+
     open my $in, "<", $path;
     my $contents;
     {

@@ -4,13 +4,13 @@
       "Mike Schilli <cpan@perlmeister.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Archive-Tar-Wrapper",
    "no_index" : {
@@ -36,15 +36,19 @@
             "File::Temp" : "0",
             "File::Which" : "0",
             "IPC::Run" : "0",
-            "Log::Log4perl" : "0"
+            "Log::Log4perl" : "0",
+            "perl" : "5.008001"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "X_type" : "git",
+      "X_url" : "https://github.com/glasswalk3r/archive-tar-wrapper-perl.git",
       "repository" : {
-         "url" : "http://github.com/mschilli/archive-tar-wrapper-perl"
+         "url" : "https://github.com/glasswalk3r/archive-tar-wrapper-perl"
       }
    },
-   "version" : "0.23"
+   "version" : "0.24",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

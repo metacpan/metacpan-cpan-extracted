@@ -25,7 +25,7 @@ sub run ( $self ) {
 
     # run RPC
     print 'Starting RPC hub ... ';
-    say $self->rpc->run_rpc(
+    say $self->{node}->run_node(
         {   type           => '<: $module_name :>::RPC::Worker',
             workers        => 1,
             token          => undef,
@@ -48,6 +48,8 @@ sub run ( $self ) {
         },
     );
 
+    $self->{node}->wait_for_online;
+
     # app ready
     return res 200;
 }
@@ -63,7 +65,7 @@ sub run ( $self ) {
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 9, 29, 39            | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 71                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 75 does not match the package declaration       |
+## |    1 | 73                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 77 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

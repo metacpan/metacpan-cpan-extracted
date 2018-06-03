@@ -52,6 +52,6 @@
          "web" : "https://github.com/dnmfarrell/Test2-Tools-SkipUntil"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

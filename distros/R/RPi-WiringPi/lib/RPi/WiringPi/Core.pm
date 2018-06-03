@@ -7,7 +7,7 @@ use parent 'WiringPi::API';
 use JSON;
 use RPi::Const qw(:all);
 
-our $VERSION = '2.3625';
+our $VERSION = '2.3627';
 
 sub gpio_layout {
     return $_[0]->gpio_layout;
@@ -79,6 +79,7 @@ sub pwm_range {
         $self->{pwm_range} = $range;
         $self->pwm_set_range($range);
     }
+    #FIXME: add const
     return defined $self->{pwm_range} ? $self->{pwm_range} : 1023;
 }
 sub pwm_clock {
@@ -87,11 +88,11 @@ sub pwm_clock {
         $self->{pwm_clock} = $divisor;
         $self->pwm_set_clock($divisor);
     }
-    return defined $self->{pwm_clock} ? $self->{pwm_clock} : 32;
+    return defined $self->{pwm_clock} ? $self->{pwm_clock} : PWM_DEFAULT_CLOCK;
 }
 sub pwm_mode {
     my ($self, $mode) = @_;
-    if (defined $mode && ($mode == 0 || $mode == 1)){
+    if (defined $mode && ($mode == 0 || $mode == PWM_DEFAULT_MODE)){
         $self->{pwm_mode} = $mode;
         $self->pwm_set_mode($mode);
     }
@@ -121,10 +122,9 @@ sub unregister_pin {
 }
 sub cleanup{
     if ($ENV{PWM_IN_USE}){
-        #FIXME: aack! magic numbers... yuck!
-        WiringPi::API::pwm_set_mode(PWM_MODE_BAL);
-        WiringPi::API::pwm_set_clock(32);
-        WiringPi::API::pwm_set_range(1023);
+        WiringPi::API::pwm_set_mode(PWM_DEFAULT_MODE);
+        WiringPi::API::pwm_set_clock(PWM_DEFAULT_CLOCK);
+        WiringPi::API::pwm_set_range(PWM_DEFAULT_RANGE);
     }
 
     return if ! $ENV{RPI_PINS};
@@ -257,7 +257,7 @@ For C<'GPIO'> scheme:
 =head2 pin_to_gpio($pin, [$scheme])
 
 Dynamically converts the specified pin from the specified scheme
-(C<RPI_MODE_WPI> (wiringPi), or C<RPI_MODE_PHYS> (physical board numbering
+C<RPI_MODE_WPI> (wiringPi), or C<RPI_MODE_PHYS> (physical board numbering
 scheme) to the GPIO number format.
 
 If C<$scheme> is not sent in, we'll attempt to fetch the scheme currently in
@@ -329,9 +329,9 @@ The PWM clock can be set to control the PWM pulse widths. The PWM clock is
 derived from a 19.2MHz clock. You can set any divider.
 
 For example, say you wanted to drive a DC motor with PWM at about 1kHz, and
-control the speed in 1/1024 increments from 0/1024 (stopped) through to
-1024/1024 (full on). In that case you might set the clock divider to be 16, and
-the RANGE to 1024. The pulse repetition frequency will be
+control the speed in 1/1024 increments from 0/1023 (stopped) through to
+1023/1023 (full on). In that case you might set the clock divider to be 16, and
+the RANGE to 1023. The pulse repetition frequency will be
 1.2MHz/1024 = 1171.875Hz.
 
 Parameters:

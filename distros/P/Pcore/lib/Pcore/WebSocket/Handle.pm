@@ -1,11 +1,13 @@
 package Pcore::WebSocket::Handle;
 
 use Pcore -const, -role, -res;
-use Pcore::Util::Scalar qw[weaken refaddr];
+use Pcore::Util::Scalar qw[is_ref weaken];
 use Pcore::Util::Text qw[decode_utf8 encode_utf8];
+use Pcore::Util::UUID qw[uuid_v1mc_str];
 use Pcore::Util::Data qw[to_b64 to_xor];
-use Compress::Raw::Zlib;
 use Pcore::Util::Digest qw[sha1];
+use Pcore::AE::Handle qw[];
+use Compress::Raw::Zlib;
 
 # Websocket v13 spec. https://tools.ietf.org/html/rfc6455
 
@@ -14,24 +16,24 @@ use Pcore::Util::Digest qw[sha1];
 # https://tools.ietf.org/html/rfc7692#page-10
 # https://www.igvita.com/2013/11/27/configuring-and-optimizing-websocket-compression/
 
-requires qw[protocol before_connect_server before_connect_client on_connect_server on_connect_client on_disconnect on_text on_binary];
+requires qw[_on_connect _on_disconnect _on_text _on_binary];
 
-has max_message_size => ( is => 'ro', isa => PositiveOrZeroInt, default => 1_024 * 1_024 * 100 );    # 0 - do not check message size
-has pong_interval    => ( is => 'ro', isa => PositiveOrZeroInt, default => 0 );                      # 0 - do not pong automatically
-has compression      => ( is => 'ro', isa => Bool,              default => 0 );                      # use permessage_deflate compression
-has on_disconnect => ( isa => Maybe [CodeRef] );                                                     # ($ws, $status)
-has on_ping       => ( isa => Maybe [CodeRef] );                                                     # ($ws, $status)
-has on_pong       => ( isa => Maybe [CodeRef] );                                                     # ($ws, $status)
+has max_message_size => 1_024 * 1_024 * 100;    # PositiveOrZeroInt, 0 - do not check message size
+has compression      => ();                     # Bool, use permessage_deflate compression
+has pong_timeout     => ();                     # send pong on inactive connection
+has on_ping          => ();                     # Maybe [CodeRef], ($self, \$payload)
+has on_pong          => ();                     # Maybe [CodeRef], ($self, \$payload)
 
-has h => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle'], init_arg => undef );
-has is_connected => ( is => 'ro', isa => Bool, default => 0, init_arg => undef );
-
-# mask data on send, for websocket client only
-has _send_masked => ( is => 'ro', isa => Bool, default => 0, init_arg => undef );
-
-has _msg     => ( is => 'ro', isa      => ArrayRef, init_arg => undef );                             # fragmentated message data, [$payload, $op, $rsv1]
-has _deflate => ( is => 'ro', init_arg => undef );
-has _inflate => ( is => 'ro', init_arg => undef );
+has id           => sub {uuid_v1mc_str};
+has is_connected => ();                         # Bool
+has _connect     => ();                         # prepared connect data
+has _is_client   => ();
+has _h           => ();                         # InstanceOf ['Pcore::AE::Handle']
+has _compression => ();                         # Bool, use compression, set after connected
+has _send_masked => ();                         # Bool, mask data on send, for websocket client only
+has _msg         => ();                         # ArrayRef, fragmentated message data, [$payload, $op, $rsv1]
+has _deflate     => ();
+has _inflate     => ();
 
 const our $WEBSOCKET_VERSION => 13;
 const our $WEBSOCKET_GUID    => '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
@@ -65,6 +67,8 @@ const our $WEBSOCKET_STATUS_REASON => {
     1015 => 'TLS handshake',
 };
 
+our $SERVER_CONN;
+
 sub DESTROY ( $self ) {
     if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' ) {
         $self->disconnect( res [ 1001, $WEBSOCKET_STATUS_REASON ] );
@@ -73,26 +77,244 @@ sub DESTROY ( $self ) {
     return;
 }
 
+sub accept ( $self, $req ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
+    my $env = $req->{env};
+
+    # websocket version is not specified or not supported
+    if ( !$env->{HTTP_SEC_WEBSOCKET_VERSION} || $env->{HTTP_SEC_WEBSOCKET_VERSION} ne $WEBSOCKET_VERSION ) {
+        $req->return_xxx( [ 400, q[Unsupported WebSocket version] ] );
+
+        return;
+    }
+
+    # websocket key is not specified
+    if ( !$env->{HTTP_SEC_WEBSOCKET_KEY} ) {
+        $req->return_xxx( [ 400, q[WebSocket SEC_WEBSOCKET_KEY header is required] ] );
+
+        return;
+    }
+
+    my $protocol = do {
+        no strict qw[refs];
+
+        ${ ref($self) . '::PROTOCOL' };
+    };
+
+    # check websocket protocol
+    if ($protocol) {
+        if ( !$env->{HTTP_SEC_WEBSOCKET_PROTOCOL} || $env->{HTTP_SEC_WEBSOCKET_PROTOCOL} !~ /\b$protocol\b/smi ) {
+            $req->return_xxx( [ 400, q[Unsupported WebSocket protocol] ] );
+
+            return;
+        }
+    }
+    elsif ( $env->{HTTP_SEC_WEBSOCKET_PROTOCOL} ) {
+        $req->return_xxx( [ 400, q[Unsupported WebSocket protocol] ] );
+
+        return;
+    }
+
+    # server send unmasked frames
+    $self->{_send_masked} = 0;
+
+    # drop compression
+    $self->{_compression} = 0;
+
+    # create response headers
+    my @headers = (    #
+        'Sec-WebSocket-Accept' => $self->_get_challenge( $env->{HTTP_SEC_WEBSOCKET_KEY} ),
+        ( $protocol ? ( 'Sec-WebSocket-Protocol' => $protocol ) : () ),
+    );
+
+    # check and set extensions
+    if ( $env->{HTTP_SEC_WEBSOCKET_EXTENSIONS} ) {
+
+        # use compression, if server and client support compression
+        if ( $self->{compression} && $env->{HTTP_SEC_WEBSOCKET_EXTENSIONS} =~ /\bpermessage-deflate\b/smi ) {
+            $self->{_compression} = 1;
+
+            push @headers, ( 'Sec-WebSocket-Extensions' => 'permessage-deflate' );
+        }
+    }
+
+    # accept websocket connection
+    my $h = $req->accept_websocket( \@headers );
+
+    # store connestion
+    $SERVER_CONN->{ $self->{id} } = $self;
+
+    # start listen
+    $self->__on_connect($h);
+
+    return 1;
+}
+
+# TODO store connection args for reconnect???
+sub connect ( $self, $uri, %args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
+    my $protocol = do {
+        no strict qw[refs];
+
+        ${ ref($self) . '::PROTOCOL' };
+    };
+
+    $self->{_is_client}   = 1;
+    $self->{_send_masked} = 1;
+
+    if ( $uri =~ m[\Awss?://unix:(.+)?/]sm ) {
+        $self->{_connect} = [ 'unix/', $1 ];
+
+        $uri = P->uri($uri) if !is_ref $uri;
+    }
+    elsif ( $uri =~ m[\A(wss?)://[*]:(.+)]sm ) {
+        $uri = P->uri("$1://127.0.0.1:$2");
+
+        $self->{_connect} = $uri;
+    }
+    else {
+        $uri = P->uri($uri) if !is_ref $uri;
+
+        $self->{_connect} = $uri;
+    }
+
+    my $on_connect_error = sub ($status) {
+        $self->_on_disconnect($status);
+
+        return;
+    };
+
+    Pcore::AE::Handle->new(
+        connect         => $self->{_connect},
+        connect_timeout => $args{connect_timeout},
+        tls_ctx         => $args{tls_ctx},
+        bind_ip         => $args{bind_ip},
+        on_error => sub ( $h, $fatal, $reason ) {
+            $on_connect_error->( res [ 596, $reason ] );
+
+            return;
+        },
+        on_connect => sub ( $h, $host, $port, $retry ) {
+
+            # start TLS, only if TLS is required and TLS is not established yet
+            $h->starttls('connect') if $uri->is_secure && !exists $h->{tls};
+
+            # generate websocket key
+            my $sec_websocket_key = to_b64 rand 100_000, q[];
+
+            my $request_path = $uri->path->to_uri . ( $uri->query ? q[?] . $uri->query : q[] );
+
+            my @headers = (    #
+                "GET $request_path HTTP/1.1",
+                'Host:' . $uri->host,
+                "User-Agent:Pcore-HTTP/$Pcore::VERSION",
+                'Upgrade:websocket',
+                'Connection:upgrade',
+                "Sec-WebSocket-Version:$Pcore::WebSocket::Handle::WEBSOCKET_VERSION",
+                "Sec-WebSocket-Key:$sec_websocket_key",
+                ( $protocol            ? "Sec-WebSocket-Protocol:$protocol"            : () ),
+                ( $self->{compression} ? 'Sec-WebSocket-Extensions:permessage-deflate' : () ),
+            );
+
+            # client always send masked frames
+            $self->{_send_masked} = 1;
+
+            # write headers
+            $h->push_write( join( $CRLF, @headers ) . $CRLF . $CRLF );
+
+            # read response headers
+            $h->read_http_res_headers(
+                headers => 1,
+                sub ( $h1, $headers, $error_reason ) {
+
+                    # headers parsing error
+                    if ($error_reason) {
+                        $on_connect_error->( res [ 596, $error_reason ] );
+
+                        return;
+                    }
+
+                    my $res_headers = $headers->{headers};
+
+                    # check response status
+                    if ( $headers->{status} != 101 ) {
+                        $on_connect_error->( res [ $headers->{status}, $headers->{reason} ] );
+
+                        return;
+                    }
+
+                    # check response connection headers
+                    if ( !$res_headers->{CONNECTION} || !$res_headers->{UPGRADE} || $res_headers->{CONNECTION} !~ /\bupgrade\b/smi || $res_headers->{UPGRADE} !~ /\bwebsocket\b/smi ) {
+                        $on_connect_error->( res [ 596, q[WebSocket handshake error] ] );
+
+                        return;
+                    }
+
+                    # validate SEC_WEBSOCKET_ACCEPT
+                    if ( !$res_headers->{SEC_WEBSOCKET_ACCEPT} || $res_headers->{SEC_WEBSOCKET_ACCEPT} ne $self->_get_challenge($sec_websocket_key) ) {
+                        $on_connect_error->( res [ 596, q[Invalid SEC_WEBSOCKET_ACCEPT header] ] );
+
+                        return;
+                    }
+
+                    # check protocol
+                    if ( $res_headers->{SEC_WEBSOCKET_PROTOCOL} ) {
+                        if ( !$protocol || $res_headers->{SEC_WEBSOCKET_PROTOCOL} !~ /\b$protocol\b/smi ) {
+                            $on_connect_error->( res [ 596, qq[WebSocket server returned unsupported protocol "$res_headers->{SEC_WEBSOCKET_PROTOCOL}"] ] );
+
+                            return;
+                        }
+                    }
+                    elsif ($protocol) {
+                        $on_connect_error->( res [ 596, q[WebSocket server returned no protocol] ] );
+
+                        return;
+                    }
+
+                    # drop compression
+                    $self->{_compression} = 0;
+
+                    # check compression support
+                    if ( $res_headers->{SEC_WEBSOCKET_EXTENSIONS} ) {
+
+                        # use compression, if server and client support compression
+                        if ( $self->{compression} && $res_headers->{SEC_WEBSOCKET_EXTENSIONS} =~ /\bpermessage-deflate\b/smi ) {
+                            $self->{_compression} = 1;
+                        }
+                    }
+
+                    # call protocol on_connect
+                    $self->__on_connect($h);
+
+                    return;
+                }
+            );
+
+            return;
+        }
+    );
+
+    return;
+}
+
 sub send_text ( $self, $data_ref ) {
-    $self->{h}->push_write( $self->_build_frame( 1, $self->{compression}, 0, 0, $WEBSOCKET_OP_TEXT, $data_ref ) );
+    $self->{_h}->push_write( $self->_build_frame( 1, $self->{_compression}, 0, 0, $WEBSOCKET_OP_TEXT, $data_ref ) );
 
     return;
 }
 
 sub send_binary ( $self, $data_ref ) {
-    $self->{h}->push_write( $self->_build_frame( 1, $self->{compression}, 0, 0, $WEBSOCKET_OP_BINARY, $data_ref ) );
+    $self->{_h}->push_write( $self->_build_frame( 1, $self->{_compression}, 0, 0, $WEBSOCKET_OP_BINARY, $data_ref ) );
 
     return;
 }
 
 sub send_ping ( $self, $payload = $WEBSOCKET_PING_PONG_PAYLOAD ) {
-    $self->{h}->push_write( $self->_build_frame( 1, 0, 0, 0, $WEBSOCKET_OP_PING, \$payload ) );
+    $self->{_h}->push_write( $self->_build_frame( 1, 0, 0, 0, $WEBSOCKET_OP_PING, \$payload ) );
 
     return;
 }
 
 sub send_pong ( $self, $payload = $WEBSOCKET_PING_PONG_PAYLOAD ) {
-    $self->{h}->push_write( $self->_build_frame( 1, 0, 0, 0, $WEBSOCKET_OP_PONG, \$payload ) );
+    $self->{_h}->push_write( $self->_build_frame( 1, 0, 0, 0, $WEBSOCKET_OP_PONG, \$payload ) );
 
     return;
 }
@@ -109,39 +331,36 @@ sub disconnect ( $self, $status = undef ) {
     undef $self->{_msg};
 
     # send close message
-    $self->{h}->push_write( $self->_build_frame( 1, 0, 0, 0, $WEBSOCKET_OP_CLOSE, \( pack( 'n', $status->{status} ) . encode_utf8 $status->{reason} ) ) );
+    $self->{_h}->push_write( $self->_build_frame( 1, 0, 0, 0, $WEBSOCKET_OP_CLOSE, \( pack( 'n', $status->{status} ) . encode_utf8 $status->{reason} ) ) );
 
     # destroy handle
-    $self->{h}->destroy;
+    $self->{_h}->destroy;
 
-    # remove from cache, affect only server handles
-    delete $Pcore::WebSocket::HANDLE->{ refaddr $self};
+    # remove from conn, on server only
+    delete $SERVER_CONN->{ $self->{id} } if !$self->{_is_client};
 
     # call protocol on_disconnect
-    $self->on_disconnect($status);
-
-    # call on_disconnect callback, if defined
-    $self->{on_disconnect}->( $self, $status ) if $self->{on_disconnect};
+    $self->_on_disconnect($status);
 
     return;
 }
 
 # UTILS
-sub get_challenge ( $self, $key ) {
+sub _get_challenge ( $self, $key ) {
     return to_b64( sha1( ($key) . $WEBSOCKET_GUID ), q[] );
 }
 
-sub on_connect ( $self, $h ) {
+sub __on_connect ( $self, $h ) {
     return if $self->{is_connected};
 
     $self->{is_connected} = 1;
 
-    $self->{h} = $h;
+    $self->{_h} = $h;
 
     weaken $self;
 
     # set on_error handler
-    $self->{h}->on_error(
+    $self->{_h}->on_error(
         sub ( $h, @ ) {
             $self->disconnect( res [ 1001, $WEBSOCKET_STATUS_REASON ] ) if $self;    # 1001 - Going Away
 
@@ -150,7 +369,7 @@ sub on_connect ( $self, $h ) {
     );
 
     # start listen
-    $self->{h}->on_read( sub ($h) {
+    $self->{_h}->on_read( sub ($h) {
         if ( my $header = $self->_parse_frame_header( \$h->{rbuf} ) ) {
 
             # check protocol errors
@@ -164,13 +383,6 @@ sub on_connect ( $self, $h ) {
 
                     # restore message "op", "rsv1"
                     ( $header->{op}, $header->{rsv1} ) = ( $self->{_msg}->[1], $self->{_msg}->[2] );
-                }
-
-                # this is the single-frame message
-                else {
-
-                    # set "rsv1" flag
-                    $header->{rsv1} = $self->{compression} && $header->{rsv1} ? 1 : 0;
                 }
             }
             else {
@@ -191,8 +403,8 @@ sub on_connect ( $self, $h ) {
                     # store message "op"
                     $self->{_msg}->[1] = $header->{op};
 
-                    # set and store "rsv1" flag
-                    $self->{_msg}->[2] = $header->{rsv1} = $self->{compression} && $header->{rsv1} ? 1 : 0;
+                    # store "rsv1" flag
+                    $self->{_msg}->[2] = $header->{rsv1};
                 }
             }
 
@@ -231,16 +443,20 @@ sub on_connect ( $self, $h ) {
         return;
     } );
 
-    # start autopong
-    if ( my $pong_interval = $self->pong_interval ) {
-        $self->{h}->on_timeout( sub ($h) {
+    # auto-pong on timeout
+    if ( $self->{pong_timeout} ) {
+        $self->{_h}->on_timeout( sub ($h) {
+            return if !$self;
+
             $self->send_pong;
 
             return;
         } );
 
-        $self->{h}->timeout($pong_interval);
+        $self->{_h}->timeout( $self->{pong_timeout} );
     }
+
+    $self->_on_connect;
 
     return;
 }
@@ -289,16 +505,12 @@ sub _on_frame ( $self, $header, $payload_ref ) {
 
         # TEXT message
         if ( $header->{op} == $WEBSOCKET_OP_TEXT ) {
-            if ($payload_ref) {
-                return $self->disconnect( res [ 1003, 'UTF-8 decode error', $WEBSOCKET_STATUS_REASON ] ) if $@;
-
-                $self->on_text($payload_ref);
-            }
+            $self->_on_text($payload_ref) if $payload_ref;
         }
 
         # BINARY message
         elsif ( $header->{op} == $WEBSOCKET_OP_BINARY ) {
-            $self->on_binary($payload_ref) if $payload_ref;
+            $self->_on_binary($payload_ref) if $payload_ref;
         }
 
         # CLOSE message
@@ -306,7 +518,7 @@ sub _on_frame ( $self, $header, $payload_ref ) {
             my ( $status, $reason );
 
             if ( $payload_ref && length $payload_ref->$* >= 2 ) {
-                $status = unpack( 'n', substr $payload_ref->$*, 0, 2, q[] );
+                $status = unpack 'n', substr $payload_ref->$*, 0, 2, q[];
 
                 $reason = decode_utf8 $payload_ref->$* if length $payload_ref->$*;
             }
@@ -465,17 +677,16 @@ sub _parse_frame_header ( $self, $buf_ref ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 88, 94, 338          | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 134                  | * Subroutine "on_connect" with high complexity score (27)                                                      |
-## |      | 248                  | * Subroutine "_on_frame" with high complexity score (30)                                                       |
+## |      | 153                  | * Subroutine "connect" with high complexity score (26)                                                         |
+## |      | 353                  | * Subroutine "__on_connect" with high complexity score (23)                                                    |
+## |      | 464                  | * Subroutine "_on_frame" with high complexity score (29)                                                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 399, 401             | NamingConventions::ProhibitAmbiguousNames - Ambiguously named variable "second"                                |
+## |    3 | 310, 316, 550        | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 39, 264              | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    3 | 611, 613             | NamingConventions::ProhibitAmbiguousNames - Ambiguously named variable "second"                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 309                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    2 | 41, 480              | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

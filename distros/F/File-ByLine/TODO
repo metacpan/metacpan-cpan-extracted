@@ -1,0 +1,14 @@
+Todo Items:
+
+  * OO Interface for more customization
+  * Ability to handle header differently than the rest of the file
+    * Should also be able to call something on the header in chlid
+      processes.
+  * UTF-8 and other encoding support
+  * SUpport CRLF line endings on all platforms (:crlf)
+  * Documentation on parallel_ that these methods do a SEEK_EOF, so you
+    shouldn't use them on things like terminal input.  There's a little
+    note already, but it's not particularly clear.
+  * A write routine wouldn't be a bad thing.
+  * A more detailed CONTRIBUTING file
+

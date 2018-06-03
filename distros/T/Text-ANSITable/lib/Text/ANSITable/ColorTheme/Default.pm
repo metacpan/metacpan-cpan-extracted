@@ -1,7 +1,7 @@
 package Text::ANSITable::ColorTheme::Default;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.49'; # VERSION
+our $DATE = '2018-05-31'; # DATE
+our $VERSION = '0.500'; # VERSION
 
 use 5.010;
 use strict;
@@ -123,7 +123,7 @@ Text::ANSITable::ColorTheme::Default - Default color themes
 
 =head1 VERSION
 
-This document describes version 0.49 of Text::ANSITable::ColorTheme::Default (from Perl distribution Text-ANSITable), released on 2017-07-10.
+This document describes version 0.500 of Text::ANSITable::ColorTheme::Default (from Perl distribution Text-ANSITable), released on 2018-05-31.
 
 =head1 COLOR THEMES
 
@@ -187,7 +187,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

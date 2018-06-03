@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::duration::str_human;
 
-our $DATE = '2018-03-27'; # DATE
-our $VERSION = '0.024'; # VERSION
+our $DATE = '2018-06-02'; # DATE
+our $VERSION = '0.025'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,9 +9,9 @@ use warnings;
 
 sub meta {
     +{
-        v => 2,
+        v => 3,
         enable_by_default => 1,
-        might_die => 1, # we feed most string to Time::Duration::Parse::AsHash which might croak when fed invalid string
+        might_fail => 1, # we feed most string to Time::Duration::Parse::AsHash which might croak when fed invalid string
         prio => 60,
     };
 }
@@ -33,10 +33,10 @@ sub coerce {
     $res->{modules}{"Time::Duration::Parse::AsHash"} //= 0;
     if ($coerce_to eq 'float(secs)') {
         # approximation
-        $res->{expr_coerce} = "do { my \$p = Time::Duration::Parse::AsHash::parse_duration($dt); (\$p->{years}||0) * 365.25*86400 + (\$p->{months}||0) * 30.4375*86400 + (\$p->{weeks}||0) * 7*86400 + (\$p->{days}||0) * 86400 + (\$p->{hours}||0) * 3600 + (\$p->{minutes}||0) * 60 + (\$p->{seconds}||0) }";
+        $res->{expr_coerce} = qq(do { my \$p; eval { \$p = Time::Duration::Parse::AsHash::parse_duration($dt) }; my \$err = \$@; if (\$err) { \$err =~ s/ at .+//s; ["Invalid duration: \$err"] } else { [undef, (\$p->{years}||0) * 365.25*86400 + (\$p->{months}||0) * 30.4375*86400 + (\$p->{weeks}||0) * 7*86400 + (\$p->{days}||0) * 86400 + (\$p->{hours}||0) * 3600 + (\$p->{minutes}||0) * 60 + (\$p->{seconds}||0)] } });
     } elsif ($coerce_to eq 'DateTime::Duration') {
         $res->{modules}{"DateTime::Duration"} //= 0;
-        $res->{expr_coerce} = "do { my \$p = Time::Duration::Parse::AsHash::parse_duration($dt); DateTime::Duration->new( (years=>\$p->{years}) x !!defined(\$p->{years}), (months=>\$p->{months}) x !!defined(\$p->{months}), (weeks=>\$p->{weeks}) x !!defined(\$p->{weeks}), (days=>\$p->{days}) x !!defined(\$p->{days}), (hours=>\$p->{hours}) x !!defined(\$p->{hours}), (minutes=>\$p->{minutes}) x !!defined(\$p->{minutes}), (seconds=>\$p->{seconds}) x !!defined(\$p->{seconds})) }";
+        $res->{expr_coerce} = qq(do { my \$p; eval { \$p = Time::Duration::Parse::AsHash::parse_duration($dt) }; my \$err = \$@; if (\$err) { \$err =~ s/ at .+//s; ["Invalid duration: \$err"] } else { [undef, DateTime::Duration->new( (years=>\$p->{years}) x !!defined(\$p->{years}), (months=>\$p->{months}) x !!defined(\$p->{months}), (weeks=>\$p->{weeks}) x !!defined(\$p->{weeks}), (days=>\$p->{days}) x !!defined(\$p->{days}), (hours=>\$p->{hours}) x !!defined(\$p->{hours}), (minutes=>\$p->{minutes}) x !!defined(\$p->{minutes}), (seconds=>\$p->{seconds}) x !!defined(\$p->{seconds}))] } });
     } else {
         die "BUG: Unknown coerce_to value '$coerce_to', ".
             "please use float(secs) or DateTime::Duration";
@@ -60,7 +60,7 @@ Data::Sah::Coerce::perl::duration::str_human - Coerce duration from human notati
 
 =head1 VERSION
 
-This document describes version 0.024 of Data::Sah::Coerce::perl::duration::str_human (from Perl distribution Data-Sah-Coerce), released on 2018-03-27.
+This document describes version 0.025 of Data::Sah::Coerce::perl::duration::str_human (from Perl distribution Data-Sah-Coerce), released on 2018-06-02.
 
 =head1 DESCRIPTION
 

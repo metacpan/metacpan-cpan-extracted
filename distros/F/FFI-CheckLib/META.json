@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -54,22 +54,23 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/plicease/FFI-CheckLib/issues"
+         "web" : "https://github.com/Perl5-FFI/FFI-CheckLib/issues"
       },
       "homepage" : "https://metacpan.org/pod/FFI::CheckLib",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/plicease/FFI-CheckLib.git",
-         "web" : "https://github.com/plicease/FFI-CheckLib"
+         "url" : "git://github.com/Perl5-FFI/FFI-CheckLib.git",
+         "web" : "https://github.com/Perl5-FFI/FFI-CheckLib"
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Bakkiaraj Murugesan (bakkiaraj)",
       "Dan Book (grinnz, DBOOK)"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
+   "x_use_unsafe_inc" : 0
 }
 

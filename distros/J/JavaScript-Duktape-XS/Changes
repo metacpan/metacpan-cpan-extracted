@@ -1,3 +1,15 @@
+0.000061    2018-05-30
+            * Stop declaring variables inside a for loop -- doh.
+
+0.000060    2018-05-30
+            * Add new methods: exists, typeof, instanceof and run_gc.
+            * Allow get, exists, typeof and instanceof to work on global
+              objects and on object properties.
+            * Add support for node-like modules.
+            * Fix hash keys with UTF8 characters.
+            * Add a REPL in bin/duktape-repl.
+            * Refactor C code and split into multiple files.
+
 0.000052    2018-05-09
             * Mark Perl strings as UTF-8 always.
 

@@ -19,7 +19,7 @@ use Encode qw(decode_utf8);
 use Web::Microformats2::Parser;
 use Web::Mention::Author;
 
-our $VERSION = '0.5';
+our $VERSION = '0.501';
 
 has 'source' => (
     isa => Uri,
@@ -119,7 +119,7 @@ class_has 'ua' => (
 class_has 'max_content_length' => (
     isa => 'Num',
     is => 'rw',
-    default => 280,
+    default => 200,
 );
 
 class_has 'content_truncation_marker' => (
@@ -529,7 +529,6 @@ Web::Mention - Implementation of the IndieWeb Webmention protocol
          $name = $wm->source->host;
      }
 
-
      if ( $wm->is_like ) {
          say "Hooray, $name likes $target!";
      }
@@ -584,9 +583,11 @@ the IndieWeb community. (See: L<https://indieweb.org/Webmention>)
 
 An object of this class represents a single webmention, with target and
 source URLs. It can verify itself, determining whether or not the
-document found at the source URL does indeed mention the target URL. It
-can also use the Indieweb authorship algorithm to identify and describe
-the author of source document, if possible.
+document found at the source URL does indeed mention the target URL.
+
+It can also use IndieWeb algorithms to attempt identification of the
+source document's author, and to provide a short summary of that
+document's content, using Microformats2 metadata when available.
 
 =head1 METHODS
 
@@ -594,7 +595,9 @@ the author of source document, if possible.
 
 =head3 new
 
- $wm = Web::Mention->new( source => $source_url, target => $target_url
+ $wm = Web::Mention->new(
+    source => $source_url,
+    target => $target_url,
  );
 
 Basic constructor. The B<source> and B<target> URLs are both required
@@ -609,8 +612,10 @@ part of either, if present).
 
 =head3 new_from_html
 
- @wms = Web::Mention->new_from_html( source => $source_url, html =>
- $html );
+ @wms = Web::Mention->new_from_html(
+    source => $source_url,
+    html   => $html,
+ );
 
 Convenience batch-construtor that returns a (possibly empty) I<list> of
 Web::Mention objects based on the single source URL (or I<URI> object)
@@ -640,8 +645,11 @@ or if it does but does not define both required HTTP parameters.
 
 =head3 FROM_JSON
 
- $wm = Web::Mention->FROM_JSON( JSON::decode_json(
- $serialized_webmention ) );
+ use JSON;
+
+ $wm = Web::Mention->FROM_JSON(
+    JSON::decode_json( $serialized_webmention )
+ );
 
 Converts an unblessed hash reference resulting from an earlier
 serialization (via L<JSON>) into a fully fledged Web::Mention object.
@@ -668,7 +676,7 @@ Defaults to C<...>.
 Gets or sets the maximum length, in characters, of the content displayed
 by that object method prior to truncation. (See L<"content">.)
 
-Defaults to 280.
+Defaults to 200.
 
 =head2 Object Methods
 
@@ -837,8 +845,8 @@ quotation
 
 =head1 SERIALIZATION
 
-To serialize a Web::Mention object into JSON, enable <the JSON module's
-"convert_blessed" fetaure|JSON/"convert_blessed">, and then use one of
+To serialize a Web::Mention object into JSON, enable L<the JSON module's
+"convert_blessed" feature|JSON/"convert_blessed">, and then use one of
 that module's JSON-encoding functions on this object. This will result
 in a JSON string containing all the pertinent information about the
 webmention, including its verification status, any content and metadata
@@ -917,11 +925,11 @@ you don't have to.)
 
 =item *
 
-L<The American Civil Liberties Union|http://aclu.org>
+L<The American Civil Liberties Union|https://aclu.org>
 
 =item *
 
-L<The Democratic National Committee|http://democrats.org>
+L<The Democratic National Committee|https://democrats.org>
 
 =item *
 

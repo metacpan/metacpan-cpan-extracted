@@ -4,7 +4,7 @@
       "Johann Rolschewski <rolschewski@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -15,23 +15,23 @@
    "name" : "Catmandu-PICA",
    "no_index" : {
       "directory" : [
-         "eg",
-         "examples",
+         "t",
+         "xt",
          "inc",
          "share",
-         "t",
-         "xt"
+         "eg",
+         "examples"
       ]
    },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.034"
+            "Module::Build::Tiny" : "0.039"
          }
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.18",
+            "Dist::Milla" : "v1.0.15",
             "Test::Pod" : "1.41"
          }
       },
@@ -40,8 +40,7 @@
             "Catmandu" : "1.0601",
             "Catmandu::SRU" : "0.41",
             "Moo" : "1.0",
-            "PICA::Data" : "0.35",
-            "PICA::Parser" : "0.585",
+            "PICA::Data" : "0.36",
             "perl" : "v5.12.0"
          }
       },
@@ -67,15 +66,13 @@
          "web" : "https://github.com/gbv/Catmandu-PICA"
       }
    },
-   "version" : "0.25",
+   "version" : "0.26",
    "x_contributors" : [
-      "Carsten Klee <carsten.klee@sbb.spk-berlin.de>",
-      "Carsten Klee <cKlee@users.noreply.github.com>",
+      "Carsten Klee <klee@cpan.org>",
       "E. Choroba <choroba@matfyz.cz>",
-      "Jakob Vo\u00df <jakob.voss@gbv.de>",
+      "Jakob Voß <jakob.voss@gbv.de>",
       "Johann Rolschewski <jorol@cpan.org>",
-      "Julian Ladisch <julianladisch@users.noreply.github.com>"
-   ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+      "julianladisch <julianladisch@users.noreply.github.com>"
+   ]
 }
 

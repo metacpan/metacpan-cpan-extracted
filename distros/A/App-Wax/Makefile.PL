@@ -39,6 +39,7 @@ WriteMakefile(
         'Parallel::parallel_map'     => '0.02',
         'Try::Tiny'                  => '0.30',
         'URI'                        => '1.73',
+        'version'                    => '0.77',
     },
     ($EUMM_VERSION >= 6.5503 ? (BUILD_REQUIRES => $TEST_REQUIRES) : ()),
     ($EUMM_VERSION >= 6.31 ? (LICENSE => 'artistic_2') : ()),

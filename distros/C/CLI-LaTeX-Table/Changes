@@ -1,0 +1,16 @@
+Revision history for CLI-LaTeX-Table
+
+0.54    2018-06-03 : 
+			Debugging of the installer setup file "Build.PL". I forgot "[" and "]".
+			Also small text change on *.pm 
+
+0.53    2018-06-03 : 
+			A small text change on the files *.pm README and Changes.
+
+0.52    2018-06-02 : 
+			Second release virtually nothing has changed.
+
+0.51    2018-06-02 : 
+			First release.
+        
+

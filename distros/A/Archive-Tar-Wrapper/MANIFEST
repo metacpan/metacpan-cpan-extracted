@@ -1,12 +1,11 @@
 Changes
 eg/tarflat
 lib/Archive/Tar/Wrapper.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 META.yml			Module meta-data (added by MakeMaker)
-MYMETA.json
-MYMETA.yml
 README
 t/001Basic.t
 t/002Mult.t
@@ -18,4 +17,5 @@ t/007bzip.t
 t/data/bar.tar
 t/data/foo.tar.bz2
 t/data/foo.tgz
+README.md
 META.json                                Module JSON meta-data (added by MakeMaker)

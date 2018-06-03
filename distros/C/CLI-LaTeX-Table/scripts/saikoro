@@ -1,0 +1,145 @@
+#!/usr/bin/perl
+use 5.014 ; use strict ; use warnings ;
+use Getopt::Std ; getopts '~.:g:s:qy:', \my %o ; #or HELP_MESSAGE () ;
+use Term::ANSIColor qw[ :constants ] ; $Term::ANSIColor::AUTORESET = 1 ; 
+
+# 乱数を生成する関数設定
+sub rand_gen ( ) ; 
+
+my ($r,$c) ; # 列数 と 行数
+my ($d,$u) ; # 下限 と 上限
+
+& init ; 
+& main ;
+& info ;
+exit 0 ;
+
+sub init ( ) {
+    # 乱数シードの指定
+    $o{s} = defined $o{s} ? srand $o{s} : srand ; 
+
+     # 列数と行数
+    ( $c, $r ) = split /[,x]+/ , $o{g} // '' , 2 ; 
+    $c //= 1 ; # 列数の未指定値
+    $r //= 12 ; # 行数の未指定値
+    ( $r, $c ) = ( $c, $r ) if $o{'~'} ; 
+
+    # 生成する乱数の範囲
+    ( $d , $u ) = split /(?:,|\.\.)/ , $o{y} // '' , 2 ;
+    $d //= 6 ;  # さいころの目の最大値 数の指定が1個もない場合もある。
+    ($d,$u) = (defined$o{'.'}?0:1, $d) if ! defined $u ; # 範囲指定がd..uの形式で無いなら -uのユニフォーム指定に従い0..nまたは1..n
+    # 使用する乱数生成関数の設定
+    * rand_gen = defined $o{'.'}? * rand_gen_unif_fmt : * rand_gen_int ; 
+    sub rand_gen_int { state $base=$d; state $range = $u-$d+1 ; $base + int rand $range } ; 
+    sub rand_gen_unif { state $base=$d; state $range =  $u-$d ; $base + rand $range } ; 
+    sub rand_gen_unif_fmt { state $fmt="% 0.$o{'.'}f" ; sprintf $fmt , rand_gen_unif } ; 
+}
+
+sub main ( ) {
+    for ( 1 .. $r ) { 
+        print join "\t" , map { rand_gen } 1 .. $c ;
+        print "\n" ; 
+    }
+}
+
+sub info ( ) {
+    exit 0 if $o{q} ;
+    $0 =~ s|.*/||;
+    print STDERR CYAN "used random seed = $o{s} ($0 -s $o{s} -g ${c}x${r} -y $d..$u" . 
+       (defined $o{'.'} ? " -. $o{'.'})" : '' ) ."\n" ;
+}
+
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script $Bin ] ;
+    sub EnvJ ( ) { $ENV{LANG} =~ m/^ja_JP/ ? 1 : 0 } ; # # ja_JP.UTF-8 
+    sub en( ) { grep ( /^en(g(i(sh?)?)?)?/i , @ARGV ) ? 1 : 0 } # English という文字列を先頭から2文字以上を含むか 
+    sub ja( ) { grep ( /^jp$|^ja(p(a(n?)?)?)?/i , @ARGV ) ? 1 : 0 } # jp または japan という文字列を先頭から2文字以上を含むか 
+    sub opt( ) { grep (/^opt(i(o(ns?)?)?)?$/i, @ARGV ) ? 1 : 0 } # options という文字列を先頭から3文字以上含むから
+    sub noPOD ( ) { grep (/^no-?p(od?)?\b/i, @ARGV) ? 1 : 0 } # POD を使わないと言う指定がされているかどうか
+    my $jd = "JapaneseManual" ;
+    my $flagE = ! ja && ( en || ! EnvJ ) ; # 英語にするかどうかのフラグ
+    exec "perldoc $0" if $flagE &&  ! opt && ! noPOD   ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\Q'=script='\E/$Script/gi ;
+        s/\Q'=bin='\E/$Bin/gi ;
+        if ( s/^=head1\b\s*// .. s/^=cut\b\s*// ) { 
+            if ( s/^=begin\s+$jd\b\s*// .. s/^=end\s+$jd\b\s*// xor $flagE ) {
+                print $_ if ! opt || m/^\s+\-/  ; 
+            }
+        } 
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8 
+
+=head1
+
+  saikoro -- a random number/matrix generator from uniform distributions.
+
+  Program name : saikoro  ('=bin=')
+
+    saikoro -g X,Y  -y L..U   # X,Y,L,U are all numbers.
+
+    Generates random uniform variable. Discrete/uniform can be specified.
+
+  Usage Example : 
+    saikoro     # Outputs 12 random numbers from {1,2,3,4,5,6} horizontally.
+    saikoro -~  # Outputs 12 random numbers from {1,2,3,4,5,6} vertically.
+    saikoro -g 5,8 -y 0,100   # 5 columuns times 8 rows numbers from {0,1,2,..100}.
+    saikoro -g 5,8 -. 3 # Continuous random variables with 3 digits after decimal points.
+
+ オプション:  
+   -g N     ; Get N random variables.
+   -g N1,N2 ; Get N1 times N2 variables. N1 for horizontal, N2 for vertical.
+   -~       ; Number specifications N1 and N2 are reversed.
+   -y N1,N2 ; Limit the values in [N1,N2].  Form "-y N1..N2" is also allowed. 
+
+   -. N     : Switch to continuous from discrete. N digits after decimal points by rounding.
+   -q       : Switch to no secondary information that would be output to STDOUT. (Quiet)
+   -s N     : Random seeed specification. Essentially the residual divided by 2^32 is used.
+
+    --help : Print this online help manual of this command "'=SCRIPT='". Similar to "perldoc `which [-t] '=SCRIPT='` ".
+    --help opt ..or..  --help options : Only shows the option helps. It is easy to read when you are in very necessary.
+    --help ja : Shows Japanese online help manual. ; "saikoro --help ja" で日本語のオンラインマニュアルを表示します。
+    --help nopod : Print this online manual using the code insdide this program without using the function of Perl POD.
+
+ # This program has been made since 2016-03-04(Fri) by Toshiyuki Shimono, as a part of TSV hacking toolset for table data.
+
+=begin JapaneseManual 
+
+  プログラム名 : '=script='  ('=bin=')
+
+    '=script=' -g 列数,行数  -y 下限,上限
+
+    乱数または乱数行列を生成。各要素は 1以上で上限を超えない整数になる。
+
+ オプション:  
+   -g N     ; 乱数をN行1列の形で出力する。
+   -g N1,N2 ; 乱数をN2行N1列の形で出力する。区切り文字は , の代わりに、xでも良い。 (Get)
+   -~       ; 出力する行数と列数の指定を反転する。
+   -y N1,N2 ; 乱数の値をn1とn2の範囲とする。 -y N1..N2 の形式も許容される。
+
+   -. N     : 出力は整数ではなく、連続型の一様乱数になる。小数点以下N桁が出力される。四捨五入(sprintfに依存)。
+   -q       : ランダムシードの情報を出力しない。
+   -s N     : ランダムシードの指定。2^32 (約43億<10^10) で割った剰余が渡される。
+
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+  --help en : 英語版のオンラインヘルプマニュアルを出力。Online help in English version. 
+
+ 例:
+
+  '=script=' -y 1000 -g 5,8  # 縦8行 横5列で要素が 1 から 1000 までの整数の一様乱数の 乱数行列を生成する。
+  '=script=' -q -g 2,3 -y1..5   # -q によりランダムシードの情報を表示しない。
+  '=script=' -u         # 実数(整数とは限らない) 一様乱数の出力。
+  '=script=' -s 123 -u -d50 -g1,10 -y1 ; # 小数点以下50桁表示されるはず。2進数48桁で内部が動く事が分かる。
+
+  # このブログラムは 2016年3月4日(金)から表形式データに対する道具作りの一環として、下野寿之が作成したものである。
+=end JapaneseManual   
+=cut
+

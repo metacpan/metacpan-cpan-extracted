@@ -1,5 +1,15 @@
 Revision history for URL::Normalize
 
+0.38    2018-05-30
+        - Canonicalise URLs when creating the object. Handles some issues that
+          URI::Normalize solved better than this module.
+
+0.37    2018-05-30
+        - Rewrote 'remove_dot_segments' to handle fragments better. This fixes
+          issue #3. Improved tests accordingly. (thanks cyga)
+        - Added dzil [MetaJSON]. (thanks manwar)
+        - Upped versions on dependencies.
+
 0.36    2017-12-27
         - Added 'remove_query_parameter' and 'remove_empty_query_parameters'.
         - Deprecated 'get_url'; 'url' should be used instead.

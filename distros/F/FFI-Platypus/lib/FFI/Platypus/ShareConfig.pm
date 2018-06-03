@@ -4,23 +4,25 @@ use strict;
 use warnings;
 use File::ShareDir qw( dist_dir );
 use File::Spec;
-use JSON::PP qw( decode_json );
 
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.50'; # VERSION
 
 sub get
 {
   my(undef, $name) = @_;
   my $config;
-  
+
   unless($config)
   {
-    my $fn = File::Spec->catfile(dist_dir('FFI-Platypus'), 'config.json');
-    my $fh;
-    open $fh, '<', $fn;
-    my $raw = do { local $/; <$fh> };
-    close $fh;
-    $config = decode_json $raw;
+    my $fn = File::Spec->catfile(dist_dir('FFI-Platypus'), 'config.pl');
+    $fn = File::Spec->rel2abs($fn) unless File::Spec->file_name_is_absolute($fn);
+    local $@;
+    unless($config = do $fn)
+    {
+      die "couldn't parse configuration $fn $@" if $@;
+      die "couldn't do $fn $!"                  if $!;
+      die "bad or missing config file $fn";
+    };
   }
   
   $config->{$name};
@@ -40,7 +42,7 @@ FFI::Platypus::ShareConfig
 
 =head1 VERSION
 
-version 0.48
+version 0.50
 
 =head1 AUTHOR
 

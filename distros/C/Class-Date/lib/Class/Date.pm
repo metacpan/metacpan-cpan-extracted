@@ -1,7 +1,7 @@
 package Class::Date;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Class for easy date and time manipulation
-$Class::Date::VERSION = '1.1.16';
+$Class::Date::VERSION = '1.1.17';
 use 5.006;
 
 use strict;
@@ -587,7 +587,7 @@ Class::Date - Class for easy date and time manipulation
 
 =head1 VERSION
 
-version 1.1.16
+version 1.1.17
 
 =head1 SYNOPSIS
 

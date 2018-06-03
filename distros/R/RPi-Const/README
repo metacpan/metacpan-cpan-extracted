@@ -1,14 +1,15 @@
 NAME
 
-    RPi::WiringPi::Constant - Constant variables for RPi::WiringPi
+    RPi::Const - Constant variables for embedded programming, including the
+    RPi:: family of modules
 
 SYNOPSIS
 
-        use RPi::WiringPi::Constant (:all);
+        use RPi::Const (:all);
     
         # or...
     
-        use RPi::WiringPi::Constant (:pinmode);
+        use RPi::Const (:pinmode);
     
         # etc
 
@@ -71,6 +72,13 @@ CONSTANT EXPORT TAGS
         LOW  => 0,
         ON   => 1,
         OFF  => 0,
+
+ :pwm_mode
+
+    The modes the PWM can be set to.
+
+        PWM_MODE_MS  => 0,
+        PWM_MODE_BAL => 1,
 
  :interrupt
 

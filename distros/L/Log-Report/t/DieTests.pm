@@ -1,10 +1,10 @@
-# Copyrights 2007-2018 by [Mark Overmeer].
+# Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
 package DieTests;
 use vars '$VERSION';
-$VERSION = '1.26';
+$VERSION = '1.27';
 
 use warnings;
 use strict;

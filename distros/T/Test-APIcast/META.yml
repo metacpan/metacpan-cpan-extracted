@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.0, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Test::APIcast:
     file: lib/Test/APIcast.pm
-    version: '0.11'
+    version: '0.12'
   Test::APIcast::Blackbox:
     file: lib/Test/APIcast/Blackbox.pm
 requires:
@@ -38,10 +38,11 @@ resources:
   bugtracker: https://github.com/3scale/Test-APIcast/issues
   homepage: https://github.com/3scale/Test-APIcast
   repository: git://github.com/3scale/Test-APIcast.git
-version: '0.11'
+version: '0.12'
 x_authority: cpan:MCICHRA
 x_contributors:
   - 'David Ortiz <z.david.ortiz@gmail.com>'
   - 'Michal Cichra <michal@cichra.cz>'
   - 'Michal Cichra <mikz@users.noreply.github.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

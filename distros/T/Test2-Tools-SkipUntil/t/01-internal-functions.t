@@ -68,7 +68,7 @@ subtest 'should_skip' => sub {
   my $tp_past = Time::Piece->strptime('2005-07-24', '%Y-%m-%d');
   ok !$sub->($tp_past), 'don\'t skip for past date';
 
-  my $tp_future = Time::Piece->strptime('2999-07-24', '%Y-%m-%d');
+  my $tp_future = Time::Piece->strptime('2037-07-24', '%Y-%m-%d');
   ok my $tp_now =  $sub->($tp_future), 'do skip for future date';
 };
 

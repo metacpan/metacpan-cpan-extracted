@@ -1,0 +1,17 @@
+Written by:
+   Sullivan Beck (sbeck@cpan.org)
+Any suggestions, bug reports, or donations :-) should be sent to me.
+
+This describes the changes made to the Date::Manip module in the 6.xx
+series of releases.  Major changes are marked with asterisks (*).
+Backward incompatible changes are marked with an exclamation mark (!).
+
+For changes in older (5.xx releases), refer to the following documents:
+       Date::Manip::Changes5
+       Date::Manip::Changes5to6
+
+Also, the Changes document is automatically generated from the document:
+       Date::Manip::Changes6
+and that document should be considered the canonical source for all change
+related information.
+

@@ -649,6 +649,15 @@ CREATE VIEW talk_list AS
      LEFT JOIN events ON ((talks.event = events.id)))
      LEFT JOIN tracks ON ((talks.track = tracks.id)));
 ALTER TABLE rooms DROP outputname;
+-- 11 up
+ALTER TABLE talks
+  ADD CONSTRAINT check_positive_length
+  CHECK (starttime < endtime);
+ALTER TABLE events ADD inputdir VARCHAR, ADD outputdir VARCHAR;
+-- 11 down
+ALTER TABLE talks
+  DROP CONSTRAINT check_positive_length;
+ALTER TABLE events DROP inputdir, DROP outputdir;
 EOF
 	return $db->migrations->migrate;
 }

@@ -13,7 +13,7 @@ use Chrome::DevToolsProtocol::Transport;
 use Scalar::Util 'weaken', 'isweak';
 use Try::Tiny;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 our @CARP_NOT;
 
 sub _build_log( $self ) {
@@ -212,7 +212,10 @@ sub connect( $self, %args ) {
 
 sub close( $self ) {
     if( my $t = $self->transport) {
-        $t->close() if ref $t;
+        if( ref $t ) {
+            undef $self->{transport};
+            $t->close();
+        };
     };
 };
 

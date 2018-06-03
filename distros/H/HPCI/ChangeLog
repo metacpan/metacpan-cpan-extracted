@@ -1,3 +1,5 @@
+0.70 - fixed bug in handling multiple out-req files from the same stage
+
 0.69 - converted rename files directive to use new HPCI::File methods
 
 0.68 - ouch Path::Class::File method resolve throws an exception if the file

@@ -17,7 +17,7 @@ use constant {
               LONG_MIN  => Math::GMPq::_long_min(),
              };
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -1349,7 +1349,7 @@ sub numify {    # used in overloading
   Math_GMPq: {
 
         if (Math::GMPq::Rmpq_integer_p($x)) {
-            @_ = ($x = _mpq2mpz($x));
+            $x = _mpq2mpz($x);
             goto Math_GMPz;
         }
 
@@ -1383,7 +1383,7 @@ sub boolify {    # used in overloading
     goto(ref($x) =~ tr/:/_/rs);
 
   Math_MPFR: {
-        return !Math::MPFR::Rmpfr_zero_p($x);
+        return !!Math::MPFR::Rmpfr_sgn($x);
     }
 
   Math_GMPq: {
@@ -1397,9 +1397,10 @@ sub boolify {    # used in overloading
   Math_MPC: {
         my $r = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPC::RMPC_RE($r, $x);
-        Math::MPFR::Rmpfr_zero_p($r) || return 1;
+        Math::MPFR::Rmpfr_sgn($r)   && return 1;
+        Math::MPFR::Rmpfr_nan_p($r) && return 0;
         Math::MPC::RMPC_IM($r, $x);
-        return !Math::MPFR::Rmpfr_zero_p($r);
+        return !!Math::MPFR::Rmpfr_sgn($r);
     }
 }
 
@@ -7232,6 +7233,7 @@ sub superfactorial ($) {
         push @list, $z;
     }
 
+    @list || goto &one;
     bless \_binsplit(\@list, \&__mul__);
 }
 
@@ -7283,6 +7285,7 @@ sub hyperfactorial ($) {
         push @list, $z;
     }
 
+    @list || goto &one;
     bless \_binsplit(\@list, \&__mul__);
 }
 
@@ -9135,7 +9138,7 @@ sub as_dec ($;$) {
 
         if ($prec < $min_prec or $prec > $max_prec) {
             require Carp;
-            Carp::croak("precision must be between $min_prec and $max_prec, got ", $prec >> 2);
+            Carp::croak("precision must be between $min_prec and $max_prec, got ", $prec);
         }
     }
 
@@ -9398,8 +9401,10 @@ sub bsearch ($$;$) {
         Math::GMPz::Rmpz_add($middle, $left, $right);
         Math::GMPz::Rmpz_div_2exp($middle, $middle, 1);
 
-        local $_ = bless \Math::GMPz::Rmpz_init_set($middle);
-        my $cmp = $block->($_) || return $_;
+        my $cmp = do {
+            local $_ = bless \Math::GMPz::Rmpz_init_set($middle);
+            $block->($_) || return $_;
+        };
 
         if ($cmp > 0) {
             Math::GMPz::Rmpz_sub_ui($right, $middle, 1);
@@ -9432,8 +9437,10 @@ sub bsearch_ge ($$;$) {
         Math::GMPz::Rmpz_add($middle, $left, $right);
         Math::GMPz::Rmpz_div_2exp($middle, $middle, 1);
 
-        local $_ = bless \Math::GMPz::Rmpz_init_set($middle);
-        my $cmp = $block->($_) || return $_;
+        my $cmp = do {
+            local $_ = bless \Math::GMPz::Rmpz_init_set($middle);
+            $block->($_) || return $_;
+        };
 
         if ($cmp < 0) {
             Math::GMPz::Rmpz_add_ui($left, $middle, 1);
@@ -9472,8 +9479,10 @@ sub bsearch_le ($$;$) {
         Math::GMPz::Rmpz_add($middle, $left, $right);
         Math::GMPz::Rmpz_div_2exp($middle, $middle, 1);
 
-        local $_ = bless \Math::GMPz::Rmpz_init_set($middle);
-        my $cmp = $block->($_) || return $_;
+        my $cmp = do {
+            local $_ = bless \Math::GMPz::Rmpz_init_set($middle);
+            $block->($_) || return $_;
+        };
 
         if ($cmp < 0) {
             Math::GMPz::Rmpz_add_ui($left, $middle, 1);

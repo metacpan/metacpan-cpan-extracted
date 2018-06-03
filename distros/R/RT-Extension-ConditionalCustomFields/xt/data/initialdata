@@ -1,7 +1,8 @@
 @CustomFields = (
     {
         Name => 'Condition',
-        Type => 'SelectSingle',
+        Type => 'Select',
+        MaxValues => 1,
         RenderType => 'Dropdown',
         Queue => [ 'General' ],
         LookupType => 'RT::Queue-RT::Ticket',
@@ -15,7 +16,8 @@
     },
     {
         Name => 'Conditioned with cf name and value',
-        Type => 'FreeformSingle',
+        Type => 'Freeform',
+        MaxValues => 1,
         Queue => [ 'General' ],
         LookupType => 'RT::Queue-RT::Ticket',
         ConditionedByCF => 'Condition',
@@ -23,7 +25,8 @@
     },
     {
         Name => 'Conditioned with cf id and value',
-        Type => 'FreeformSingle',
+        Type => 'Freeform',
+        MaxValues => 1,
         Queue => [ 'General' ],
         LookupType => 'RT::Queue-RT::Ticket',
         ConditionedByCF => 3,
@@ -31,7 +34,8 @@
     },
     {
         Name => 'Conditioned with multiple values',
-        Type => 'FreeformSingle',
+        Type => 'Freeform',
+        MaxValues => 1,
         Queue => [ 'General' ],
         LookupType => 'RT::Queue-RT::Ticket',
         ConditionedByCF => 'Condition',

@@ -1,0 +1,42 @@
+#!perl
+
+# PODNAME: bin/duktape-repl
+# ABSTRACT: A simple JavaScript REPL using JavaScript::Duktape::XS
+
+use strict;
+use warnings;
+
+use IO::Prompt::Tiny 'prompt';
+use Data::Dumper     'Dumper';
+
+use JavaScript::Duktape::XS;
+
+my $JS = JavaScript::Duktape::XS->new;
+
+while (1) {
+    my $line; 1 until $line = prompt('>');
+    eval {
+        if ( my $ret = $JS->eval( $line ) ) {
+            print Dumper $ret;
+        }
+        1;
+    } or do {
+        print 'INPUT : `' . $line . "`\n";
+        print 'ERROR : '.$@;
+    }
+}
+
+exit;
+
+1;
+
+__END__
+
+=pod
+
+=head1 DESCRIPTION
+
+This is just a very simple REPL (read, eval, print loop) to
+demonstrate the capabilities of JavaScript::Duktape::XS.
+
+=cut

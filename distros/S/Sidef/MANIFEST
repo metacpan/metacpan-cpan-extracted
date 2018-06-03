@@ -369,6 +369,7 @@ scripts/RosettaCode/function_definition.sf
 scripts/RosettaCode/function_frequency.sf
 scripts/RosettaCode/gamma_function.sf
 scripts/RosettaCode/gamma_function_1.sf
+scripts/RosettaCode/gauss_jordan_matrix_inversion.sf
 scripts/RosettaCode/general_fizzbuzz.sf
 scripts/RosettaCode/generate_lower_case_ascii_alphabet.sf
 scripts/RosettaCode/generator_exponential.sf
@@ -576,6 +577,7 @@ scripts/RosettaCode/standard_deviation.sf
 scripts/RosettaCode/standard_deviation_2.sf
 scripts/RosettaCode/stem_and_leaf_plot.sf
 scripts/RosettaCode/string_comparison.sf
+scripts/RosettaCode/substitution_cipher.sf
 scripts/RosettaCode/suffix_tree.sf
 scripts/RosettaCode/sum_digits_of_an_integer.sf
 scripts/RosettaCode/sutherland_hodgman.sf
@@ -663,6 +665,7 @@ scripts/Tests/cnp.sf
 scripts/Tests/code_interpolation.sf
 scripts/Tests/combs_and_perms.sf
 scripts/Tests/complex_numbers.sf
+scripts/Tests/constant_folding.sf
 scripts/Tests/cpp_input_output.sf
 scripts/Tests/cramers_method.sf
 scripts/Tests/cramers_rule.sf
@@ -687,6 +690,7 @@ scripts/Tests/enumerator_object.sf
 scripts/Tests/eq_g2.sf
 scripts/Tests/equal_classes.sf
 scripts/Tests/escape_unescape.sf
+scripts/Tests/euler_and_bernoulli_numbers.sf
 scripts/Tests/eval.sf
 scripts/Tests/execute_system_command.sf
 scripts/Tests/extreme_floating_point_values.sf
@@ -806,6 +810,7 @@ scripts/Tests/names_to_numbers.sf
 scripts/Tests/nested_evals.sf
 scripts/Tests/non_continuous_seq.sf
 scripts/Tests/nth_prime.sf
+scripts/Tests/number_binary_search.sf
 scripts/Tests/object_copy.sf
 scripts/Tests/object_methods_reflection.sf
 scripts/Tests/objects_init.sf

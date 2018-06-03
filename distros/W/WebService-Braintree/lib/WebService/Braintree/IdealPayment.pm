@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::IdealPayment;
-$WebService::Braintree::IdealPayment::VERSION = '1.3';
+$WebService::Braintree::IdealPayment::VERSION = '1.4';
 use 5.010_001;
 use strictures 1;
 
@@ -43,7 +43,7 @@ settlement.
 
 sub sale {
     my ($class, $ideal_payment_id, $params) = @_;
-    WebService::Braintree::Transaction->sale({
+    $class->gateway->transaction->sale({
         %{$params//{}},
         payment_method_nonce => $ideal_payment_id,
         options => { submit_for_settlement => 1 },

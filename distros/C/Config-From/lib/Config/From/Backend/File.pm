@@ -1,5 +1,5 @@
 package Config::From::Backend::File;
-$Config::From::Backend::File::VERSION = '0.06';
+$Config::From::Backend::File::VERSION = '0.08';
 
 use utf8;
 use Moose;
@@ -39,7 +39,7 @@ Config::From::Backend::File -  File Backend for Config::From
 
 =head1 VERSION
 
-version 0.06
+version 0.08
 
 =head1 SYNOPSIS
 

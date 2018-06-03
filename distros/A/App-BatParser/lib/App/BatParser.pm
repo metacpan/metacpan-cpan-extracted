@@ -3,10 +3,10 @@ package App::BatParser;
 use utf8;
 
 use Regexp::Grammars;
-use Moose;
+use Moo;
 use namespace::autoclean;
 
-our $VERSION = '0.005';    # VERSION
+our $VERSION = '0.006';    # VERSION
 
 # ABSTRACT: Parse DOS .bat and .cmd files
 
@@ -104,7 +104,7 @@ App::BatParser - Parse DOS .bat and .cmd files
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -123,6 +123,10 @@ Parse DOS .bat and .cmd files
 
 =head1 METHODS
 
+=head2 grammar
+
+Returns the L<Regexp::Grammars>'s grammar
+
 =head2 parse
 
 Parses the text as a bat/cmd file
@@ -130,8 +134,6 @@ Parses the text as a bat/cmd file
 =head3 Returns
 
 Hash representation of file on success, empty list on fail
-
-Exception on fail
 
 =head1 AUTHOR
 
@@ -144,10 +146,20 @@ This software is copyright (c) 2018 by Pablo Rodríguez González.
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords eva.dominguez
+=for stopwords eva.dominguez Toby Inkster
+
+=over 4
+
+=item *
 
 eva.dominguez <eva.dominguez@meteologica.com>
+
+=item *
+
+Toby Inkster <tobyink@cpan.org>
+
+=back
 
 =cut

@@ -1,10 +1,9 @@
 ---
-abstract: 'App::perlbrew - Manage perl installations in your $HOME'
+abstract: 'Manage perl installations in your C<$HOME>'
 author:
   - 'Kang-min Liu  C<< <gugod@gugod.org> >>'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
-  File::Temp: '0.2304'
+  ExtUtils::MakeMaker: '6.86'
   File::Which: '1.21'
   IO::All: '0.51'
   Path::Class: '0.33'
@@ -15,31 +14,28 @@ build_requires:
   Test::Output: '1.03'
   Test::Simple: '1.001002'
   Test::Spec: '0.47'
+  Test::TempDir::Tiny: '0.016'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.17'
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.023, CPAN::Meta::Converter version 2.150005'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
-module_name: App::perlbrew
+  version: '1.4'
 name: App-perlbrew
-no_index:
-  directory:
-    - inc
-    - t
+provides:
+  App::perlbrew:
+    file: lib/App/perlbrew.pm
+    version: '0.83'
 requires:
   CPAN::Perl::Releases: '3.24'
   Capture::Tiny: '0.36'
   Devel::PatchPerl: '1.40'
   File::Temp: '0.2304'
+  JSON::PP: '0'
   Pod::Parser: '1.63'
   Pod::Usage: '1.68'
   local::lib: '2.000014'
-  perl: 5.8.0
-resources:
-  license: http://opensource.org/licenses/mit-license.php
-  repository: git://github.com/gugod/App-perlbrew.git
-version: '0.82'
+version: '0.83'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

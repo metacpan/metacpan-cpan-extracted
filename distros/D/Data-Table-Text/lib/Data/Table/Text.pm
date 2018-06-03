@@ -8,7 +8,7 @@
 
 package Data::Table::Text;
 use v5.8.0;
-our $VERSION = '20180527';
+our $VERSION = '20180530';
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -500,8 +500,8 @@ sub makePath($)                                                                 
  }
 
 sub writeFile($$)                                                               # Write a unicode string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
- {my ($file, $string) = @_;                                                     # File to write to, unicode string to write
-  $file or confess "No file name supplied\n";
+ {my ($file, $string) = @_;                                                     # File to write to or undef for a temporary file, unicode string to write
+  $file //= temporaryFile;
   $string or carp "No string for file:\n$file\n";
   makePath($file);
   open my $F, ">$file" or confess "Cannot open file for write because:\n".
@@ -1186,7 +1186,7 @@ END
 
   for my $l(keys @lines)                                                        # Tests associated with each method
    {my $line = $lines[$l];
-    if (my @tags = $line =~ m/(?:\s#T(\w+))/g)
+    if (my @tags = $line =~ m/(?:\s#T((?:\w|:)+))/g)
      {my %tags; $tags{$_}++ for @tags;
 
       for(grep {$tags{$_} > 1} sort keys %tags)                                 # Check for duplicate example names on the same line
@@ -2042,9 +2042,9 @@ Make the path for the specified file name or folder.
 
 Write a unicode string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
 
-     Parameter  Description              
-  1  $file      File to write to         
-  2  $string    Unicode string to write  
+     Parameter  Description                                     
+  1  $file      File to write to or undef for a temporary file  
+  2  $string    Unicode string to write                         
 
 =head3 writeFiles($$)
 

@@ -59,7 +59,7 @@ sub _fetch : Test(5) {
 
         ok( $adapter->_fetch( { no_check => 1 } ) );
 
-        is( $adapter->{_countrycode}, 'dk' );
+        is( $adapter->{_countrycode}, 'DK' );
 
         is( $adapter->{_adaptee}, 'Date::Holidays::DK' );
     }

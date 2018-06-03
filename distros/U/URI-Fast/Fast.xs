@@ -160,10 +160,6 @@ size_t uri_decode(const char *in, size_t len, char *out) {
   unsigned char v1, v2;
   char decoded;
 
-  if (len == 0) {
-    len = strlen((char*) in);
-  }
-
   while (i < len) {
     decoded = '\0';
 

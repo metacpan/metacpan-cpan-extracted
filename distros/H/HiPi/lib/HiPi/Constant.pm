@@ -15,7 +15,7 @@ use warnings;
 use parent qw( Exporter );
 use HiPi::RaspberryPi;
 
-our $VERSION ='0.70';
+our $VERSION ='0.71';
 
 our @EXPORT_OK = ( qw( hipi_export_ok  hipi_export_constants hipi_export_tags ) );
 our %EXPORT_TAGS = ( hipi => \@EXPORT_OK );
@@ -890,6 +890,71 @@ my $const = {
         
         SH1106_128_X_64_SPI   => 0x02 + 0x04 + 0x08 + 0x40,
         SH1106_128_X_32_SPI   => 0x02 + 0x04 + 0x10 + 0x40,
+    },
+    
+    ms5611 => {
+        MS5611_OSR_256  => 0x00, # // ADC OSR=256
+        MS5611_OSR_512  => 0x02, # // ADC OSR=512
+        MS5611_OSR_1024 => 0x04, # // ADC OSR=1024
+        MS5611_OSR_2048 => 0x06, # // ADC OSR=2048
+        MS5611_OSR_4096 => 0x08, #  // ADC OSR=4096  
+    },
+    
+    tmp102 => {
+        TMP102_CR_0_25HZ => 0,
+        TMP102_CR_1HZ    => 1,
+        TMP102_CR_4HZ    => 2,
+        TMP102_CR_8HZ    => 3,
+        
+        TMP102_FAULTS_1   => 0,
+        TMP102_FAULTS_2   => 1,
+        TMP102_FAULTS_4   => 2,
+        TMP102_FAULTS_6   => 3,
+    },
+    
+    epaper => {
+        EPD_WS_1_54_200_X_200_A => 0x01,
+        EPD_WS_1_54_200_X_200_B => 0x02,
+        EPD_WS_1_54_152_X_152_C => 0x03,
+        EPD_WS_2_13_250_X_122_A => 0x04,
+        EPD_WS_2_13_212_X_104_B => 0x05,
+        EPD_WS_2_90_296_X_128_A => 0x06,
+        EPD_WS_2_90_296_X_128_B => 0x07,
+        
+        EPD_PIMORONI_INKY_PHAT_V2 => 0x80,
+        
+        EPD_ROTATION_0     => 0,
+        EPD_ROTATION_90    => 90,
+        EPD_ROTATION_180   => 180,
+        EPD_ROTATION_270   => 270,
+        
+        EPD_FRAME_BPP_1       => 0x01,
+        EPD_FRAME_BPP_2       => 0x02,
+        EPD_FRAME_TYPE_BLACK  => 0x01,
+        EPD_FRAME_TYPE_COLOUR => 0x02,
+        EPD_FRAME_TYPE_COLOR  => 0x02,
+        EPD_FRAME_TYPE_WHITE  => 0x03,
+        EPD_FRAME_TYPE_UNUSED => 0x04,
+        
+        EPD_BLACK_PEN         => 0x01,
+        EPD_COLOUR_PEN        => 0x02,
+        EPD_COLOR_PEN         => 0x02,
+        EPD_RED_PEN           => 0x02,
+        EPD_YELLOW_PEN        => 0x02,
+        
+        EPD_UPD_MODE_FIXED    => 0x01,
+        EPD_UPD_MODE_FULL     => 0x02,
+        EPD_UPD_MODE_PARTIAL  => 0x03,
+        
+        EPD_BORDER_FLOAT      => 0x00,
+        EPD_BORDER_WHITE      => 0x01,
+        EPD_BORDER_BLACK      => 0x02,
+        EPD_BORDER_COLOUR     => 0x03,
+        EPD_BORDER_COLOR      => 0x03,
+        EPD_BORDER_RED        => 0x03,
+        EPD_BORDER_YELLOW     => 0x03,
+        
+        EPD_BORDER_POR        => 0xFF,
     },
 };
 

@@ -46,7 +46,7 @@ sub parse_import {
                 $res->{pragma}->{$arg} = shift;
             }
             elsif ( $export_pragma && exists $export_pragma->{$arg} ) {
-                $res->{pragma}->{$arg} = $export_pragma->{$arg} ? shift : 1;
+                $res->{pragma}->{$arg} = 1;
             }
             else {
                 die qq[Unknown exporter pragma found "-$arg" while importing package "$caller"];

@@ -13,10 +13,10 @@
 #include <sys/time.h>
 #include <poll.h>
 
-#include "util.h"
-#include "duk_console.h"
 #include "duktape.h"
+#include "duk_console.h"
 #include "c_eventloop.h"
+#include "pl_util.h"
 
 #if !defined(DUKTAPE_EVENTLOOP_DEBUG)
 #define DUKTAPE_EVENTLOOP_DEBUG 0       /* set to 1 to debug with printf */

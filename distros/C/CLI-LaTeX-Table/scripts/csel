@@ -1,0 +1,194 @@
+#!/usr/bin/perl
+use 5.008 ; use strict ; use warnings ; # 5.011
+use Getopt::Std ; getopts '~/:=!d:e:h:np:rt:' , \my %o ; 
+#use List::MoreUtils qw/any none/ ; 
+use List::Util qw [ max ] ;
+use Encode qw/decode_utf8/ ; 
+use Memoize ; 
+
+use Data::Dumper ;
+use Term::ANSIColor qw[ :constants] ; $Term::ANSIColor::AUTORESET = 1 ;
+
+memoize ( 'sCols' ) ; # このプログラムに現れる sCols 関数を高速化する。 
+$| = 1 if $o{'!'} ; 
+
+my %cream ; # 列の番号の配列を格納する。
+ # $cream{p} 出力するよう指定した列番号の無名配列
+ # $cream{d} 削除するよう指定した列番号の無名配列
+ # $cream{h} 先頭に移動するように指定した列番号の無名配列
+ # $cream{t} 末尾に移動するように指定した列番号の無名配列
+my $emp = $o{e} // "undef" ; ; # 存在しないセルを参照したときに表示する文字列
+my %colNamePos ; # 列の名前から、1始まりの列番を参照する
+my $isep = $o{'/'} // "\t" ; # 入力の区切り文字
+my $split_limit = $isep eq '' ? 0 : -1 ; # split で使う。split//はLIMIT=0にしないと、結果に空文字列の値が最後に生じる
+my $osep = $isep eq '' && $o{n} ? ' ' : $isep ; # 出力の区切り子
+
+
+& init ; # オプションについての処理 
+& main ;  # メインの処理  printColsMain
+exit 0 ;
+
+#  初期化処理の為の展開の処理
+
+sub expand ( $ ) { # まず コンマで分割, # 次に .. を展開する。 # 最後に正の数は 1を引く。
+  #print BRIGHT_BLUE Dumper ["cNP=",%colNamePos] ; 
+  return () if ! defined $_[0] ;
+  my @gr = split /,/ , $_[0]  ; # grain 穀物の粒のつもり。expandedも考えたが、スペル長過ぎ。
+  my $l = scalar @gr ; 
+  for ( reverse 0 .. $#gr ) { 
+    if ( $gr [ $_ ] =~ m|(.+)\.\.(.+)| ) {  # *末尾* から数字を展開する。
+      my ($c1,$c2) = ($1,$2) ; 
+      if ( $o{'='} ) { $c1 = $colNamePos { $c1 } ; $c2 = $colNamePos { $c2 } } #; print "\$c1=$c1, \$c2=$c2\n" } ;
+      splice @gr , $_ , 1 , ( $c1 <= $c2 ? $c1 .. $c2 : reverse $c2 .. $c1 ) ;  
+    } else  { 
+      $gr[ $_ ] = $colNamePos { $gr[ $_ ] } if $o{'='} ;
+    }
+  }
+  #print CYAN Dumper [@gr], Dumper  ;
+  #print CYAN join ", " , @gr ;
+  #@gr = grep { $_ ne 0 } @gr ; # 0は取り除く。$0 が -ptdhの引数に0を与えるのは、ヘルプの抑制が主目的となる。  
+  grep { $_ = $_ - ( $_ > 0 ? 1 : 0 ) } @gr ;  # 1始まりで与えられた列番号を0始まりにする。ただし、負の数は変えない。
+  return @gr ; 
+}
+
+#  初期化処理。コマンド引数のオプションについての処理 ; 2個の関数
+sub init { 
+    if ( ! scalar grep { defined }  @o{qw/p d h t n/} ) { *STDOUT= *STDERR ; &HELP_MESSAGE ; exit  } 
+}
+
+
+# 列数ごとに、どの列を見せるかの列番の無名配列を返す。
+sub sCols ( $ ) {
+
+  sub none ( &@ ) { my $f = shift; foreach ( @_ ) { return 0 if $f->(); } return 1 ; }
+  sub drop ( $@ ) { my$o = shift @_ ; return grep { my$x=$_;none{$x==$_} @_ } @{$o} } ; # []
+
+  my $W = $_[0] ; # 各行の、セル(列)　の個数が与えられる。
+  $cream {p} = [ 0 .. $W - 1 ] if ! defined $o{p} ; 
+  my @p_ = @{ $cream{p} } ; 
+  my @d_ = @{ $cream{d} } ; 
+  my @h_ = @{ $cream{h} } ; 
+  my @t_ = @{ $cream{t} } ; 
+  $_ =  $W == 0 || abs ($_) >= $W && ! $o{r} ? -1 : $_ % $W for @p_ , @d_ , @h_ , @t_ ; # -r指定で単純にサイクリック
+  @p_ = drop  \@p_ , @d_ , @h_ , @t_  ;
+  @h_ = drop  \@h_ , @d_  ;  # -h,-tで指定された列でも、-dで指定されたものは消す。。
+  @t_ = drop  \@t_ , @d_  ;  # 
+  my @out = (@h_ , @p_ , @t_) ;
+
+  #print join ". " , @{ $cream{p}} , "#" ; # map ( $_ // "u" , @out, @{$cream{p}}) , "\n" ;
+  if ( $o{'~'} ){ 
+    my @tmp = (-1) x ( 1 + max (@out , @{$cream{p}}   ) )  ; # = map { $out[$_] } 0 .. $#out ; 
+    for ( 0 .. $#out ) { $tmp [ $out[$_] ] = $_ }
+    @out = @tmp ; #print join ", " , map ( $_+1, @out) , "\n" ;
+  }
+ 
+  return [ @out ] ; 
+}
+
+
+# 各行の出力処理。 sCols関数を呼び出して、選択する。-n で列番号も付ける。
+sub line ( ) { 
+  chomp ; 
+  $_ = decode_utf8 ( $_ ) if $isep eq '' ; # 入力がSTDINとは限らないので binmode を使わず decode_utf8
+  my @F = split /$isep/ , $_ , $split_limit   ; #use Data::Dumper ; print scalar @F , Dumper [@F];  
+  @F = map { $_ + 1 . ":$F[$_]" } 0 .. $#F  if $o{n} ;   # -n で列番号をコロンを付けて出力
+  push @F , $emp ; # $F[-1] で参照する
+  print join ( "$osep" , @F [ @{ sCols $#F } ] ) , "\n" ; 
+}
+
+# main 
+sub main { 
+
+  binmode STDOUT ,":utf8" if $isep eq ''  ; # 文字単位で処理する場合、utf8としての扱いをする。
+  # 一行目かつ -= が指定された場合の処理
+  if ( $o{'='} ) { 
+      $_ = <> ; 
+      chomp ;  
+      my $c = 0 ;
+      $colNamePos { $_ } = ++ $c  for split /$isep/ , $_ , $split_limit ; # <-- 分割文字列に気をつけたい
+      $cream{ $_ } = [ expand $o{$_} ] for qw/p d h t/ ;    
+      line ;  # <-- - 
+  }
+  else { 
+    $cream{ $_ } = [ expand $o{$_} ] for qw/p d h t/ ;    
+  }
+  
+  #print BRIGHT_GREEN Dumper [%colNamePos] ; 
+  # 引き続く処理。-=が無い場合には、ここらか始まる。
+  while ( <> ) {
+    line 
+  } ;
+
+}
+
+
+
+
+
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+  csel -- Easier interface than cut/AWK to handle TSV/CSV input,
+  with the options such as -p(Printing)/-d(Deleting)/-h(moving to Head)/-t(moving to Tail).
+ 
+
+    AWK言語やコマンドcutよりも列の抽出を簡単に書けるコマンドラインを提供する。
+
+概要: 
+
+  TSVファイル等の指定された列を表示する。Specifying the column(s) by
+   -p で表示する列を指定する。 for printing by -p
+   -d で表示しない列を指定する。for hiding by -d 
+   -h で先頭(各行の左部分に表示する列を指定する。 for moving the leftmost by -h 
+   -t で末尾(各行の右部分に表示する列を指定する。 for moving the rightmost by -t
+
+ 利用例 :  
+  $0 -p 5..9,2 -d 6..8 ; # 5列目から9列目の後に2列目を表示するが、ただし6,7,8列目は省く。 
+  $0 -p -1  ; # 最後から1列目のみを表示
+
+ 他のオプション : 
+   -= : データの1行目に記載された列名で指定する。-= を用いない場合は列指定は，左からの1から始まる番号になる。Utilizes the 1st line as a list of column names.
+   -e : 存在しないセルを指定したときに表示する文字列
+   -r : 存在しないセルを指定したときは、その時の入力行が横に無限に周期的につながっていると仮定して、指定位置を取り出す。
+
+   -/ STRING ; 入出力の区切り子の指定。空文字列を指定する(-/ '' のように空白が間に必要)と、文字単位の処理になる。未指定ならタブ文字。
+         
+   -n  : 列に番号を付与する。
+   -~  : 列の順番を逆転して、元に戻したい時に使う。 $0 -t3 | $0 -~ -t3 のように使う。5列に対して $0 -~ -p3,4,2,1,5 のような使い方をする。
+
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+
+ 補足 : 
+   - 列番号は左の列から数える。1始まりである。The leftmost column is numbered "1(one)". Not "0(zero)"
+   - 列番号を負の数で指定すると、末尾から数える。 The rightmost column is numbered "-1".
+   - 範囲を指定することもできる。たとえば、-p 2..5 とすると2列目から5列目のみ表示する。 5..2 とすると、逆順になる。 ".." means range.
+   
+ 開発上のメモ : 
+    * -/ の指定は正規表現と見なされるが、入力のsplitにも出力のjoin にも用いるので、注意が必要。
+
+このプログラムに求められる要件 (テストにも含めたい) :
+
+    * 十分高速に動作すること。gawk と同じ程度が目標だった。cut よりは高速にしたかった。。
+    * cutより早くするのが厳しければ、 同じファイルを Unix コマンドsort の半分程度であること。
+    * $0 -p -1 できちんと最後の列を表示すること。
+    * 列数が行毎に異なる入力データでも、きちんと動作すること。
+
+# このブログラムは 2016年2月9日(火)から表形式データに対する道具作りの一環として、下野寿之が作成したものである。    
+=cut

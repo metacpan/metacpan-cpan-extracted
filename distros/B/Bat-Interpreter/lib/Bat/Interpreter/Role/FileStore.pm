@@ -2,10 +2,10 @@ package Bat::Interpreter::Role::FileStore;
 
 use utf8;
 
-use Moose::Role;
+use Moo::Role;
 use namespace::autoclean;
 
-our $VERSION = '0.009';    # VERSION
+our $VERSION = '0.010';    # VERSION
 
 requires 'get_contents';
 
@@ -23,7 +23,7 @@ Bat::Interpreter::Role::FileStore
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

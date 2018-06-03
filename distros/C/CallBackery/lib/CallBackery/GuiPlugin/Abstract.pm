@@ -12,7 +12,7 @@ use Scalar::Util 'blessed';
 use IPC::Open3;
 use POSIX qw<F_SETFD F_GETFD FD_CLOEXEC>;
 use Time::HiRes qw(usleep);
-use Mojo::JSON qw(encode_json decode_json);
+use Mojo::JSON qw(encode_json decode_json true false);
 use Mojo::File;
 # disable warnings below, otherwise testing will give warnings
 eval { local $^W=0; require "sys/ioctl.ph" };
@@ -77,26 +77,6 @@ Should the plugin in the webui be instanciated immediately or only when the tab 
 
 has instanciationMode => sub {
     return 'onTabSelection'; # or onStartup
-};
-
-=head2 true
-
-true value
-
-=cut
-
-has true => sub {
-    Mojo::JSON::true;
-};
-
-=head2 false
-
-false value
-
-=cut
-
-has false => sub {
-    Mojo::JSON::false;
 };
 
 =head2 grammar
@@ -262,11 +242,11 @@ sub filterHashKey {
     my $data = shift;
     my $filterKey = shift;
     my $ref = ref $data;
-    if (not $ref or $ref eq ref Mojo::JSON::true){
+    if (not $ref or $ref eq ref true){
         return $data;
     }
     elsif ($ref eq 'CODE'){
-        return $self->true;
+        return true;
     }
     elsif ($ref eq 'ARRAY'){
         return [ map { $self->filterHashKey($_,$filterKey) } @$data ];

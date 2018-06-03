@@ -1,5 +1,9 @@
 Revision history for FFI-CheckLib
 
+0.19      2018-05-30 21:09:32 -0400
+  - Administrative release to note that this dist is moving its
+    repository to the Perl5-FFI org on github.com
+
 0.18      2017-10-25 10:00:47 -0400
   - Production version identical to 0.17_02
 

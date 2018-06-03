@@ -123,7 +123,7 @@ sub connect ( $self, %args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHo
     };
 
     my $host = $self->{handle}->host;
-    my $port = $self->{handle}->port;
+    my $port = $self->{handle}->{port};
 
     Pcore::AE::Handle->new(
         connect => "pgsql://$host:$port",

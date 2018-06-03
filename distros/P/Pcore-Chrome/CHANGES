@@ -1,3 +1,10 @@
+v0.3.0 2018-05-30T06:44:10Z
+ - OOP DEMOLISH replaced with DESTROY
+ - DEMOLISH replaced with DESTROY
+ - close
+ - net util added
+ - ported to the new websockets api
+
 v0.2.3 2018-04-12T18:25:43Z
  - use Coro::rouse_wait instead of $cv->recv
  - blocking http call

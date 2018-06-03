@@ -6,6 +6,8 @@ INSTALL
 internal/_no_tests
 internal/ADDING_CODESET
 internal/build.yaml
+internal/changes.head
+internal/changes.pod
 internal/curr.yaml
 internal/data.country.pl
 internal/data.currency.pl

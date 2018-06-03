@@ -1,5 +1,16 @@
 Revision history for Date-Easy
 
+0.05      2018-05-31 02:50:30-07:00 America/Los_Angeles
+
+    [New Features]
+    * Can now subtract one datetime from another (gives seconds).
+    * Can now subtract one date from another (gives days).
+
+    [Distro Fixes]
+    * Change date-parse unit tests to calculate epoch dates
+      so they work in all timezones.
+      github #10 (thx Ron Savage (RSAVAGE))
+
 0.04      2017-07-27 17:47:54-07:00 America/Los_Angeles
 
     [Bug Fixes]

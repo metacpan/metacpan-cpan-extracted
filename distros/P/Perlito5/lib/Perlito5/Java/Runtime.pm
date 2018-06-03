@@ -740,8 +740,9 @@ class PerlOp {
     }
 
     private static final void getSymbolTableScan(PlHash out, HashMap<String, PlStringConstant> vars, String nameSpace, int pos, boolean isMain) {
+        String[] keys = vars.keySet().toArray(new String[0]);
         if (isMain) {
-            for (String name : vars.keySet()) {
+            for (String name : keys) {
                 if (name.length() > pos + 2 && name.indexOf(nameSpace) == 0 && name.lastIndexOf("::") == pos) {
                     // normal variable like "ARGV" in $main::ARGV
                     out.hset(name.substring(pos+2), PlV.fget(name));
@@ -754,7 +755,7 @@ class PerlOp {
             }
         }
         else {
-            for (String name : vars.keySet()) {
+            for (String name : keys) {
                 if (name.length() > pos + 2 && name.indexOf(nameSpace) == 0) {
                     if (name.lastIndexOf("::") == pos) {
                         // normal variable like "ARGV" in $main::ARGV
@@ -1158,7 +1159,7 @@ class PerlOp {
         PlV.local_stack.a.add(PlCx.INT3);
         PlLvalue newValue = new PlLvalue();
         newValue.set(value);
-        glob.codeRef = newValue;
+        glob.cset_alias( newValue );
         return newValue;
     }
     public static final PlObject push_local_scalar(PlObject value, String name) {
@@ -1245,7 +1246,7 @@ EOT
                     break;
                 case 3:
                     index     = PlV.local_stack.pop();
-                    PlStringConstant.getConstant(index.toString()).codeRef = (PlLvalue)v;
+                    PlStringConstant.getConstant(index.toString()).cset_alias( (PlLvalue)v );
                     break;
                 case 20:      // XXX magic number
                     index     = PlV.local_stack.pop();
@@ -2774,13 +2775,13 @@ EOT
         return PlStringConstant.getConstant(name).codeRef;
     }
     public static final PlObject cset(String name, PlObject v) {
-        return PlStringConstant.getConstant(name).codeRef.set(v);
+        return PlStringConstant.getConstant(name).cset(v);
     }
     public static final PlObject cset_local(String name, PlObject v) {
         return PerlOp.push_local_named_sub(v, name);
     }
     public static final void cset_alias(String name, PlLvalue v) {
-        PlStringConstant.getConstant(name).codeRef = v;
+        PlStringConstant.getConstant(name).cset_alias(v);
     }
 
     // hash
@@ -2841,7 +2842,7 @@ EOT
         return (PlLvalue)PerlOp.push_local_array(new PlArrayRef(), name);
     }
     public static final PlObject aset(String name, PlObject v) {
-        return PlStringConstant.getConstant(name).arrayRef.set(v);
+        return PlStringConstant.getConstant(name).arrayRef.array_deref_set(v);
     }
     public static final PlObject aset_local(String name, PlObject v) {
         return (PlLvalue)PerlOp.push_local_array(v, name);
@@ -2906,7 +2907,7 @@ EOT
             PlV.hset(name, value);
         }
         else if (value.is_arrayref()) {
-            PlV.aset(name, value);
+            PlStringConstant.getConstant(name).arrayRef.set(value);
         }
         else if (value.is_scalarref()) {
             PlV.sset(name, value.scalar_deref(nameSpace));
@@ -4137,7 +4138,7 @@ class PlFileHandle extends PlScalarImmutable {
     public StringBuilder printBuffer;
     public boolean eof;
     public boolean is_argv;
-    public Path    path;     // filename
+    public Path    path;     // filename, can be null
     public String  mode;     // ">", "+<"
     public String  charset;  // "UTF-8"
     public boolean binmode;
@@ -4163,6 +4164,25 @@ class PlFileHandle extends PlScalarImmutable {
             this.is_argv = true;
         }
         this.typeglob_name = name;
+    }
+
+    public void dupFileHandle(PlFileHandle o) {
+        this.typeglob_name =     o.typeglob_name;
+        this.outputStream =      o.outputStream;    // System.out, System.err
+        this.inputStream =       o.inputStream;     // System.in
+        this.directoryIterator = o.directoryIterator;
+        this.directoryStream =   o.directoryStream;
+        this.reader =            o.reader;       // Console.reader
+        this.readlineBuffer =    o.readlineBuffer;
+        this.printBuffer =       o.printBuffer;
+        this.eof =               o.eof;
+        this.is_argv =           o.is_argv;
+        this.path =              o.path;     // filename
+        this.mode =              o.mode;     // ">", "+<"
+        this.charset =           o.charset;  // "UTF-8"
+        this.binmode =           o.binmode;
+        this.output_autoflush =  o.output_autoflush;
+        this.tied =              o.tied;
     }
 
     public boolean is_filehandle() {
@@ -4282,7 +4302,7 @@ class PlFileHandle extends PlScalarImmutable {
         }
 
         PlStringConstant glob = PlStringConstant.getConstant(typeglob_name);
-        glob.codeRef.set(PlCx.UNDEF);
+        glob.cset(PlCx.UNDEF);
         glob.scalarRef.set(PlCx.UNDEF);
         glob.arrayRef.set(new PlArrayRef());
         glob.hashRef.set(new PlHashRef());
@@ -4990,6 +5010,20 @@ class PlClass {
         }
 
         return methodCode;
+    }
+
+    public void invalidate_method_cache(String method, int level) {
+        if (this.methodCache.containsKey(method)) {
+            this.methodCache.remove(method);
+        }
+        // TODO - lookup in all classes that inherit from us
+        // for (PlObject className : PlV.array_get(className + "::ISA")) {
+        //     // prevent infinite loop
+        //     if (level >= 100) {
+        //         PlCORE.die("Recursive inheritance detected in package '" + className + "'");
+        //     }
+        //     PlClass.getInstance(className).invalidate_method_cache(method, level+1);
+        // }
     }
 
     public PlObject method_lookup(String method, int level) {
@@ -7316,12 +7350,19 @@ EOT
         if (v.is_array()) {
             return this.push( (PlArray)v );
         }
+        else if (v.is_hash()) {
+            return this.push( (PlHash)v );
+        }
         this.a.add(v.scalar());
         return new PlInt(this.a.size());
     }
     public void push_void(PlObject v) {
         if (v.is_array()) {
             this.push_void( (PlArray)v );
+            return;
+        }
+        else if (v.is_hash()) {
+            this.push_void( (PlHash)v );
             return;
         }
         this.a.add(v.scalar());
@@ -7333,6 +7374,12 @@ EOT
     }
     public void push_void(PlLvalue v) {
         this.a.add(v.get());
+    }
+    public PlObject push(PlHash args) {
+        return push(args.to_array());
+    }
+    public void push_void(PlHash args) {
+        push_void(args.to_array());
     }
     public PlObject push(PlArray args) {
         int size = args.a.size();
@@ -7373,12 +7420,18 @@ EOT
         if (v.is_array()) {
             return this.unshift( (PlArray)v );
         }
+        else if (v.is_hash()) {
+            return this.unshift( (PlHash)v );
+        }
         this.a.add(0, v.scalar());
         return new PlInt(this.a.size());
     }
     public PlObject unshift(PlLvalue v) {
         this.a.add(0, v.get());
         return new PlInt(this.a.size());
+    }
+    public PlObject unshift(PlHash args) {
+        return unshift(args.to_array());
     }
     public PlObject unshift(PlArray args) {
         args = new PlArray(args);   // allow "unshift @x, @x" - TODO: optimize
@@ -8471,6 +8524,59 @@ class PlStringLazyError extends PlString {
     public boolean to_boolean() {
         return true;
     }
+
+    public PlObject abs() {
+        this.toString();
+        return this.parse().abs();
+    }
+    public PlObject num_cmp(PlObject b) {
+        this.toString();
+        return this.parse().num_cmp(b);
+    }
+    public PlObject num_cmp2(PlObject b) {
+        this.toString();
+        return b.num_cmp(this.parse());
+    }
+    public boolean is_integer_range() {
+        this.toString();
+        return this.parse().is_integer_range();
+    }
+EOT
+    , ((map {
+            my $perl = $_;
+            my $native  = $number_binop{$perl}{op};
+            my $returns = $number_binop{$perl}{returns};
+            my $num_returns = $number_binop{$perl}{num_returns};
+            if ($returns eq 'PlDouble') {
+"    public PlObject ${perl}(PlObject b) {
+        // 'num' - int, 'num' - num
+        this.toString();
+        return this.parse().${perl}(b);
+    }
+    public PlObject ${perl}2(PlObject b) {
+        // int - 'num'
+        this.toString();
+        return b.${perl}(this.parse());
+    }
+"
+            }
+            else {
+"    public PlObject ${perl}(PlObject b) {
+        // 'num' - int, 'num' - num
+        this.toString();
+        return this.parse().${perl}(b);
+    }
+    public PlObject ${perl}2(PlObject b) {
+        // int - 'num'
+        this.toString();
+        return b.${perl}(this.parse());
+    }
+"
+            }
+            }
+            sort keys %number_binop ))
+
+    , <<'EOT'
 }
 class PlStringConstant extends PlString {
     public static HashMap<String, PlStringConstant> constants = new HashMap<String, PlStringConstant>();
@@ -8482,9 +8588,20 @@ class PlStringConstant extends PlString {
     public PlLvalue arrayRef;  // ARRAY
     public PlLvalue hashRef;   // HASH
     public PlLvalue fileRef;   // IO
+    // TODO - "FORMAT"
+
+    public String namespace;   // PACKAGE - "main" in "main::x"; maybe null
+    public String name;        // NAME    - "x" in "main::x"; maybe null
 
     public PlStringConstant(String s) {
         super(s);
+
+        int pos = s.lastIndexOf("::");
+        if (pos != -1) {
+            this.namespace = s.substring(0, pos);
+            this.name      = s.substring(pos+2);
+        }
+
         this.codeRef = new PlLvalue();
         this.scalarRef = new PlLvalue();
         this.arrayRef = new PlLvalue(new PlArrayRef());
@@ -8507,15 +8624,20 @@ class PlStringConstant extends PlString {
         }
         return cls;
     }
+    public PlObject cset(PlObject v) {
+        PlClass.getInstance(this.namespace).invalidate_method_cache(this.name, 0);
+        return this.codeRef.set(v);
+    }
+    public PlObject cset_alias(PlLvalue v) {
+        PlClass.getInstance(this.namespace).invalidate_method_cache(this.name, 0);
+        return this.codeRef = v;
+    }
     public PlObject apply(int want, PlArray List__) {
         if (this.codeRef.is_undef()) {
-            String name = this.s;
-            int pos = name.lastIndexOf("::");
-            if (pos != -1) {
-                String namespace = name.substring(0, pos);
-                PlLvalue autoload = PlV.cget_no_autoload(namespace + "::AUTOLOAD");
+            if (this.namespace != null) {
+                PlLvalue autoload = PlV.cget_no_autoload(this.namespace + "::AUTOLOAD");
                 if ( autoload.is_coderef() ) {
-                    PlV.sset(namespace + "::AUTOLOAD", new PlString(name));
+                    PlV.sset(this.namespace + "::AUTOLOAD", new PlString(this.s));
                     return autoload.apply(want, List__);
                 }
             }

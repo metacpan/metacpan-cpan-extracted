@@ -1,11 +1,15 @@
 use 5.10.1;
 use strict;
 use warnings;
+
 package Data::Processor::Validator;
+
+use Carp;
+use Scalar::Util qw(blessed);
+
 use Data::Processor::Error::Collection;
 use Data::Processor::Transformer;
 
-use Carp;
 
 # XXX document this with pod. (if standalone)
 
@@ -16,7 +20,7 @@ sub new {
     my $schema = shift;
     my %p      = @_;
     my $self = {
-        schema => $schema  // croak ('cannot validate without "schema"'),
+        schema => $schema  // confess ('cannot validate without "schema"'),
         data   => $p{data} // undef,
         verbose=> $p{verbose} // undef,
         errors => $p{errors}  // Data::Processor::Error::Collection->new(),
@@ -30,8 +34,8 @@ sub new {
     return $self;
 }
 
-# (recursively) checks data, or a section thereof;
-# by instantiatin D::P::V objects and calling validate on them
+# (recursively) checks data, or a section thereof,
+# by instantiating D::P::V objects and calling validate on them
 
 sub validate {
     my $self = shift;
@@ -276,7 +280,14 @@ sub __validator_returns_undef {
         }
     }
     else {
-        my $return_value = $self->{schema}->{$schema_key}->{validator}->($self->{data}->{$key}, $self->{data});
+        my $validator = $self->{schema}->{$schema_key}->{validator};
+        my $return_value;
+        if (defined blessed $validator){
+            $return_value = $validator->validate($self->{data}{$key});
+        }
+        else {
+            $return_value = $validator->($self->{data}->{$key}, $self->{data});
+        }
         if ($return_value){
             $self->explain("validator error: $return_value\n");
             $self->error("Execution of validator for '$key' returns with error: $return_value");

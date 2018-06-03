@@ -18,7 +18,7 @@ use Carp;
 
 __PACKAGE__->create_accessors( qw( groupid backend repeat ) );
 
-our $VERSION ='0.70';
+our $VERSION ='0.71';
 
 # Switch Data
 # $data = $switchmask->[$socketnum - 1]->[$offon];

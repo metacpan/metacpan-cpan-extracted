@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::js::date::obj_Date;
 
-our $DATE = '2018-03-27'; # DATE
-our $VERSION = '0.024'; # VERSION
+our $DATE = '2018-06-02'; # DATE
+our $VERSION = '0.025'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,9 +9,9 @@ use warnings;
 
 sub meta {
     +{
-        v => 2,
+        v => 3,
         enable_by_default => 1,
-        might_die => 1, # we throw exception date is invalid
+        might_fail => 1, # we return error when date is invalid
         prio => 50,
     };
 }
@@ -28,7 +28,7 @@ sub coerce {
         "($dt instanceof Date)",
     );
 
-    $res->{expr_coerce} = "isNaN($dt) ? (function(){throw new Error('Invalid date')})() : $dt";
+    $res->{expr_coerce} = "isNaN($dt) ? ['Invalid date'] : [null, $dt]";
 
     $res;
 }
@@ -48,7 +48,7 @@ Data::Sah::Coerce::js::date::obj_Date - Coerce date from Date object
 
 =head1 VERSION
 
-This document describes version 0.024 of Data::Sah::Coerce::js::date::obj_Date (from Perl distribution Data-Sah-Coerce), released on 2018-03-27.
+This document describes version 0.025 of Data::Sah::Coerce::js::date::obj_Date (from Perl distribution Data-Sah-Coerce), released on 2018-06-02.
 
 =head1 DESCRIPTION
 

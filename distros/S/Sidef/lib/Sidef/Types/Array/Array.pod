@@ -23,16 +23,6 @@ Inherits methods from:
 =head1 METHODS
 
 
-=head2 !=
-
-I<Obj> B<!=> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<ne>
-
-=cut
-
 =head2 &
 
 I<Obj> B<&> I<Obj> -> I<Obj>
@@ -105,7 +95,7 @@ I<Obj> B</> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<div>
+Aliases: I<÷>, I<div>
 
 =cut
 
@@ -116,6 +106,16 @@ I<Obj> B<:> I<Obj> -> I<Obj>
 Return the
 
 Aliases: I<pair_with>
+
+=cut
+
+=head2 <
+
+I<Obj> B<E<lt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<lt>
 
 =cut
 
@@ -136,6 +136,16 @@ I<Obj> B<==> I<Obj> -> I<Obj>
 Return the
 
 Aliases: I<eq>
+
+=cut
+
+=head2 >
+
+I<Obj> B<E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<gt>
 
 =cut
 
@@ -709,6 +719,22 @@ Aliases: I<slice>
 
 =cut
 
+=head2 gauss_jordan_invert
+
+Array.gauss_jordan_invert() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gauss_jordan_solve
+
+Array.gauss_jordan_solve() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 getopt
 
 Array.getopt() -> I<Obj>
@@ -964,6 +990,14 @@ Array.map() -> I<Obj>
 Return the
 
 Aliases: I<collect>
+
+=cut
+
+=head2 map_cons
+
+Array.map_cons() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -1276,6 +1310,16 @@ Aliases: I<rindex_by>, I<last_index>, I<last_index_by>
 Array.rotate() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 rref
+
+Array.rref() -> I<Obj>
+
+Return the
+
+Aliases: I<reduced_row_echelon_form>
 
 =cut
 
@@ -1632,5 +1676,35 @@ I<Obj> B<»> I<Obj> -> I<Obj>
 Return the
 
 Aliases: I<E<gt>E<gt>>, I<assign_to>
+
+=cut
+
+=head2 ≠
+
+I<Obj> B<≠> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<!=>, I<ne>
+
+=cut
+
+=head2 ≤
+
+I<Obj> B<≤> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<lt>=>, I<le>
+
+=cut
+
+=head2 ≥
+
+I<Obj> B<≥> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<gt>=>, I<ge>
 
 =cut

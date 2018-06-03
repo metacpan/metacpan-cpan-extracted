@@ -1,0 +1,35 @@
+Revision history for Test2-Tools-HTTP
+
+0.08      2018-06-02 15:47:39 -0400
+  - Require HTTP::Message 6.07 for API reasons
+
+0.07      2018-06-02 06:48:07 -0400
+  - First CPAN release
+
+0.06      2018-05-29 19:33:09 -0400
+  - Rename short version of psgi_app_add from app to app_add
+    to avoid conflicting with Mojolicious::Lite
+
+0.05      2018-05-27 21:14:20 -0400
+  - Added Test2::Tools::HTTP::UA::LWPClass
+  - Allow UA wrapper classes to register for arbitrary
+    UA classes/instances
+  - Wrapper constructor is no longer private
+  - The apps method on wrapper is now a class rather than
+    instance method
+
+0.04      2018-05-22 16:16:24 -0400
+  - Remove dep on Inport for :short tag
+  - Rename short name for http_header from head to header
+    (in case we want to add a HTTP HEAD method later)
+
+0.03      2018-05-22 13:19:13 -0400
+  - documentation fixes
+
+0.02      2018-05-18 15:43:19 -0400
+  - internal release
+  - Add http_headers [headers]
+  - Add http_Header [head]
+
+0.01      2018-05-13 13:38:52 -0400
+  - initial version

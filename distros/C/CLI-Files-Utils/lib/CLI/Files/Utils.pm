@@ -12,19 +12,20 @@ CLI::Files::Utils - Extra CLI utilies for handling file bunches.
 
 =head1 VERSION
 
-Version 0.104
+Version 0.105
 
 =cut
 
-our $VERSION = '0.104';
+our $VERSION = '0.105';
 
 
 =head1 SUPPORT
 
-You can find documentation for this module with the perldoc command.
+You can find documentation for programs provided by this module as follows : 
 
     madeafter --help
     dirhier --help
+    colorplus --help
 
 =head1 LICENSE AND COPYRIGHT
 

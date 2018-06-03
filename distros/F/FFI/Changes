@@ -1,5 +1,12 @@
 Revision history for Perl extension FFI.
 
+1.12  Thu May 31, 2018
+  - Documentation
+
+1.11  Tue May 29, 2018
+  - Fix mismatched binary error
+  - Move repository to Perl5-FFI github org
+
 1.10  Tue Mar 23, 2017
   - More aggressive libm discovery for tests on Debian
 

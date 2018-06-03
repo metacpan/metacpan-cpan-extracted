@@ -9,61 +9,49 @@ use JavaScript::Beautifier qw[];
 
 with qw[Pcore::App::Controller];
 
-require Pcore::Share::Ext_v6_2_0;
+require Pcore::Resources;
 
-has ext_app_title             => 'ExtJS Application';
-has ext_app                   => undef;
-has ext_default_theme_classic => 'triton';              # { is => 'ro', isa => Str, default => 'triton' };
-has ext_default_theme_modern  => 'triton';              # { is => 'ro', isa => Str, default =>  };
-has ext_default_locale        => 'en';                  # { is => 'ro', isa => Str, default =>  };
-has ext_resources             => sub { [] };            # is => 'ro', isa => ArrayRef
+has ext_app    => undef;                 # name of the linked application, required
+has ext_title  => 'ExtJS Application';
+has ext_locale => ();
+has ext_theme  => ();
 
-has cache => ();                                        # => ( is => 'ro', isa => ScalarRef, init_arg => undef );
+has _cache => ();
 
-our $EXT_VER       = 'v6.2.0';
-our $EXT_FRAMEWORK = 'classic';
-our $ext_framework = 'Pcore::Share::Ext_v6_2_0';
-
-const our $DEFAULT_LOCALE => 'en';
+const our $DEFAULT_THEME_CLASSIC => 'aria';
+const our $DEFAULT_THEME_MODERN  => 'material';
 
 sub BUILD ( $self, $args ) {
-    Pcore::Ext->SCAN( $self->{app}, $ext_framework->get_cfg, $EXT_FRAMEWORK );
+    Pcore::Ext->scan( $self->{app}, ref( $self->{app} ) . '::Ext' );
 
-    die qq[Ext app "$self->{ext_app}" not found] if !$Pcore::Ext::CFG->{app}->{ $self->{ext_app} };
+    die qq[Ext app "$self->{ext_app}" not found] if !$Pcore::Ext::APP->{ $self->{ext_app} };
 
     return;
 }
 
+sub build_resources ( $self, $req, $type ) {
+    return;
+}
+
+sub build_theme ( $self, $req, $type ) {
+    ( my $theme ) = $req->{env}->{QUERY_STRING} =~ m/theme=([[:alpha:]-]+)/sm;
+
+    return $theme;
+}
+
+sub build_locale ( $self, $req, $type ) {
+    ( my $locale ) = $req->{env}->{QUERY_STRING} =~ m/locale=([[:alpha:]-]+)/sm;
+
+    return $locale;
+}
+
 around run => sub ( $orig, $self, $req ) {
-
-    # if path tail is not empty - fallback to the original method
     if ( $req->{path_tail} ) {
-
-        # .js file request
-        if ( $req->{path_tail} =~ /\A(.+)[.]js\z/sm ) {
-            if ( $req->{path_tail} eq 'overrides.js' ) {
-                $self->_return_overrides($req);
-            }
-            elsif ( $req->{path_tail} eq 'app.js' ) {
-                $self->_return_app($req);
-            }
-            else {
-                my $class = $Pcore::Ext::CFG->{class}->{"$Pcore::Ext::NS.$1"};
-
-                if ( !$class ) {
-                    $req->(404)->finish;
-                }
-                else {
-                    if ( !exists $self->{cache}->{class}->{ $class->{class} } ) {
-                        $self->{cache}->{class}->{ $class->{class} } = $self->_prepare_js( $class->{js}->$* );
-                    }
-
-                    $req->( 200, [ 'Content-Type' => 'application/javascript' ], $self->{cache}->{class}->{ $class->{class} } )->finish;
-                }
-            }
+        if ( $req->{path_tail} eq 'app.js' ) {
+            $self->_return_app($req);
         }
-        elsif ( $req->{path_tail} eq 'app.js.map' ) {
-            $self->_return_src_map($req);
+        elsif ( $req->{path_tail} eq 'locale.js' ) {
+            $self->_return_locale($req);
         }
         else {
             $self->$orig($req);
@@ -90,80 +78,113 @@ sub run ( $self, $req ) {
 }
 
 sub _return_html ( $self, $req ) {
+    my $app = $Pcore::Ext::APP->{ $self->{ext_app} };
 
-    # get locale
-    my $locale = $self->_get_locale($req);
+    my $theme = $self->build_theme( $req, $app->{ext_type} ) || $self->{ext_theme} || ( $app->{ext_type} eq 'classic' ? $DEFAULT_THEME_CLASSIC : $DEFAULT_THEME_MODERN );
 
-    if ( !$self->{cache}->{app}->{$locale}->{html} ) {
-        my $resources = [ $self->{ext_resources}->@* ];
+    my $locale = $self->build_locale( $req, $app->{ext_type} ) || $self->{ext_locale} || 'en';
 
-        # pcoreApi
-        push $resources->@*, q[<script src="/static/pcore-api.js" integrity="" crossorigin="anonymous"></script>];
+    if ( !$self->{_cache}->{html}->{$theme}->{$locale} ) {
+        my $resources = [ ( $self->build_resources( $req, $app->{ext_type} ) // [] )->@* ];
 
-        # FontAwesome
-        push $resources->@*, Pcore::Share::WWW->fontawesome;
+        # pcore/api.js
+        push $resources->@*, q[<script src="/static/pcore/api.js" integrity="" crossorigin="anonymous"></script>];
 
-        my $ext_resources;
+        # ExtJS resources
+        push $resources->@*, Pcore::Resources->ext(    #
+            $app->{ext_ver},
+            $app->{ext_type},
+            $theme,
+            $app->{ext_type} eq 'classic' ? $DEFAULT_THEME_CLASSIC : $DEFAULT_THEME_MODERN,
+            $self->{app}->{devel}
+        )->@*;
 
-        # get theme from query
-        if ( $req->{env}->{QUERY_STRING} =~ /\btheme=([[:lower:]-]+)/sm ) {
-            my $theme = $1;
-
-            $ext_resources = $ext_framework->ext( $EXT_FRAMEWORK, $theme, $self->{app}->{devel} );
+        # ExtJS locale
+        if ( $locale ne 'en' ) {
+            push $resources->@*, qq[<script src="$self->{path}locale.js?locale=$locale" integrity="" crossorigin="anonymous"></script>];
         }
-
-        # fallback to the default theme
-        if ( !$ext_resources ) {
-            my $theme = $EXT_FRAMEWORK eq 'classic' ? $self->{ext_default_theme_classic} : $self->{ext_default_theme_modern};
-
-            $ext_resources = $ext_framework->ext( $EXT_FRAMEWORK, $theme, $self->{app}->{devel} );
-        }
-
-        push $resources->@*, $ext_resources->@*;
-
-        # Ext locale
-        push $resources->@*, $ext_framework->ext_locale( $EXT_FRAMEWORK, $locale, $self->{app}->{devel} );
 
         # TODO calc checksum 'sha384-' . P->digest->sha384_b64( $res->{body}->$* );
-        push $resources->@*, qq[<script src="$self->{path}overrides.js" integrity="" crossorigin="anonymous"></script>];
-        push $resources->@*, qq[<script src="$self->{path}app.js?locale=$locale" integrity="" crossorigin="anonymous"></script>];
+        push $resources->@*, qq[<script src="$self->{path}app.js" integrity="" crossorigin="anonymous"></script>];
+
+        # FontAwesome resources
+        push $resources->@*, Pcore::Resources->fontawesome;
 
         # generate HTML tmpl
-        $self->{cache}->{app}->{$locale}->{html} = P->tmpl->render(
-            'ext/index.html',
-            {   INDEX => {    #
-                    title => $self->{ext_app_title}
-                },
-                resources => $resources,
-            }
+        $self->{_cache}->{html}->{$theme}->{$locale} = \P->text->encode_utf8(
+            P->tmpl->render(
+                'ext/index.html',
+                {   INDEX => {    #
+                        title => $self->{ext_title}
+                    },
+                    resources => $resources,
+                }
+            )->$*
         );
     }
 
-    $req->( 200, [ 'Content-Type' => 'text/html; charset=UTF-8' ], $self->{cache}->{app}->{$locale}->{html} )->finish;
+    $req->( 200, [ 'Content-Type' => 'text/html; charset=UTF-8' ], $self->{_cache}->{html}->{$theme}->{$locale} )->finish;
 
     return;
 }
 
-sub _return_overrides ( $self, $req ) {
-    if ( !$self->{cache}->{overrides} ) {
-        $self->{cache}->{overrides} = $self->_prepare_js( $ext_framework->get_overrides->$* );
+sub _return_locale ( $self, $req ) {
+
+    # get locale from query param
+    ( my $locale ) = $req->{env}->{QUERY_STRING} =~ m/locale=([[:alpha:]-]+)/sm;
+
+    if ( !$locale ) {
+        $req->(404)->finish;
+
+        return;
     }
 
-    $req->( 200, [ 'Content-Type' => 'application/javascript', ], $self->{cache}->{overrides} )->finish;
+    if ( !$self->{_cache}->{locale}->{$locale} ) {
+        my $app = $Pcore::Ext::APP->{ $self->{ext_app} };
+
+        my $locale_path = $ENV->{share}->get( 'Pcore-Resources', 'www', "static/ext/$app->{ext_ver}/$app->{ext_type}/locale/locale-${locale}.js" );
+
+        # locale wasn't found
+        if ( !$locale_path ) {
+            $req->(404)->finish;
+
+            return;
+        }
+
+        my $js = P->file->read_text($locale_path)->$*;
+
+        # load locale domains
+        Pcore::Core::L10N::load_locale($locale) if !exists $Pcore::Core::L10N::MESSAGES->{$locale};
+
+        my $plural_form_exp = $Pcore::Core::L10N::LOCALE_PLURAL_FORM->{$locale}->{exp} // 0;
+
+        $js .= <<"JS";
+            Ext.L10N.pluralFormExp = function (n) { return $plural_form_exp; };
+            Ext.L10N.messages = @{[ to_json( $Pcore::Core::L10N::MESSAGES->{$locale}, canonical => 1 )->$* ]};
+JS
+
+        $self->{_cache}->{locale}->{$locale}->{js} = \P->text->encode_utf8( $self->_prepare_js($js)->$* );
+
+        $self->{_cache}->{locale}->{$locale}->{etag} = 'W/' . P->digest->md5_hex( $self->{_cache}->{locale}->{$locale}->{js}->$* );
+    }
+
+    if ( $req->{env}->{HTTP_IF_NONE_MATCH} && $req->{env}->{HTTP_IF_NONE_MATCH} eq $self->{_cache}->{locale}->{$locale}->{etag} ) {
+        $req->(304)->finish;    # not modified
+    }
+    else {
+        $req->( 200, [ 'Content-Type' => 'application/javascript', 'Cache-Control' => 'must-revalidate', Etag => $self->{_cache}->{locale}->{$locale}->{etag} ], $self->{_cache}->{locale}->{$locale}->{js} )->finish;
+    }
 
     return;
 }
 
 sub _return_app ( $self, $req ) {
+    my $app = $Pcore::Ext::APP->{ $self->{ext_app} };
 
-    # get locale
-    my $locale = $self->_get_locale($req);
-
-    if ( !$self->{cache}->{app}->{$locale}->{app} ) {
-        my $ext_app = $Pcore::Ext::CFG->{app}->{ $self->{ext_app} };
+    if ( !$self->{_cache}->{app} ) {
+        my $ext_app = $Pcore::Ext::APP->{ $self->{ext_app} };
 
         my $data = {
-            locale   => $self->_get_app_locale($locale),
             api_path => $self->{app}->{router}->get_host_api_path( $req->{host} ),
             api_map  => to_json( {
                 type    => 'websocket',                                                 # remoting
@@ -171,8 +192,8 @@ sub _return_app ( $self, $req ) {
                 actions => $ext_app->{api},
 
                 # not mandatory options
-                id              => 'api',
-                namespace       => 'API.' . ref( $self->{app} ) =~ s[::][]smgr,
+                # id              => 'api',
+                namespace       => 'EXTDIRECT.' . ref( $self->{app} ) =~ s[::][]smgr,
                 timeout         => 0,                                                   # milliseconds, 0 - no timeout
                 version         => undef,
                 maxRetries      => 0,                                                   # number of times to re-attempt delivery on failure of a call
@@ -180,260 +201,51 @@ sub _return_app ( $self, $req ) {
                 enableBuffer    => 10,                                                  # \1, \0, milliseconds
                 enableUrlEncode => undef,
             } ),
-            loader_paths => to_json( {
-                $Pcore::Ext::NS => '.',
-                Ext             => '/static/ext/src/',
-                'Ext.ux'        => '/static/ext/ux/',
-            } ),
-            app_namespace  => $Pcore::Ext::NS,
-            viewport_class => $ext_app->{viewport},
         };
 
-        my $header = <<"JS";
-            $data->{locale};
-
+        my $js = <<"JS";
             Ext.Loader.setConfig({
-                enabled: true,
-                disableCaching: false,
-                paths: $data->{loader_paths}->$*
+                enabled: false,
+                disableCaching: false
             });
-JS
 
-        my $footer = <<"JS";
-            Ext.onReady(function() {
-                Ext.ariaWarn = Ext.emptyFn;
+            // app classes
+            $ext_app->{content}
 
-                SERVER_API = new PCORE({
+            Ext.ariaWarn = Ext.emptyFn;
+
+            // ExtDirect api
+            Ext.direct.Manager.addProvider($data->{api_map}->$*);
+
+            Ext.application({
+                name: 'APP',
+                api: new PCORE({
                     url: '$data->{api_path}',
-                    version: 'v1',
+                    version: '$ext_app->{api_ver}',
                     listenEvents: null,
                     onConnect: function(api) {},
                     onDisconnect: function(api, status, reason) {},
                     onEvent: function(api, ev) {},
                     onListen: function(api, events) {},
                     onRpc: null
-                });
-
-                Ext.direct.Manager.addProvider($data->{api_map}->$*);
-
-                Ext.application({
-                    extend: 'Ext.app.Application',
-                    requires: ['$data->{viewport_class}'],
-                    name: '$data->{app_namespace}',
-                    appFolder: '.',
-                    glyphFontFamily: '&quot;Font Awesome 5 Free&quot;;font-weight:900',
-                    mainView: '$data->{viewport_class}'
-                });
+                }),
+                mainView: '$ext_app->{viewport}'
             });
 JS
 
-        if ( $self->{app}->{devel} ) {
-            ( $self->{cache}->{app}->{$locale}->{app}, $self->{cache}->{app}->{$locale}->{src_map} ) = $self->_add_src_map( \$header, map( { [ $Pcore::Ext::CFG->{class}->{$_}->{js}, s/\A$Pcore::Ext::NS[.]//smr . '.js' ] } $ext_app->{classes}->@* ), \$footer );
+        $self->{_cache}->{app}->{js} = \P->text->encode_utf8( $self->_prepare_js($js)->$* );
 
-            $self->{cache}->{app}->{$locale}->{src_map} = to_json $self->{cache}->{app}->{$locale}->{src_map};
-        }
-        else {
-            my $classes = join ';', map { $Pcore::Ext::CFG->{class}->{$_}->{js}->$* } $ext_app->{classes}->@*;
-
-            $self->{cache}->{app}->{$locale}->{app} = $self->_prepare_js("${header}${classes};${footer}");
-        }
+        $self->{_cache}->{app}->{etag} = 'W/' . P->digest->md5_hex( $self->{_cache}->{app}->{js}->$* );
     }
 
-    $req->(
-        200,
-        [   'Content-Type' => 'application/javascript',
-            ( $self->{app}->{devel} ? ( 'X-SourceMap' => "$self->{path}app.js.map?locale=$locale" ) : () ),
-        ],
-        $self->{cache}->{app}->{$locale}->{app}
-    )->finish;
-
-    return;
-}
-
-sub _return_src_map ( $self, $req ) {
-
-    # get locale
-    my $locale = $self->_get_locale($req);
-
-    my $src_map = $self->{cache}->{app}->{$locale}->{src_map};
-
-    if ($src_map) {
-        $req->( 200, [ 'Content-Type' => 'application/json; charset=UTF-8' ], $src_map )->finish;
+    if ( $req->{env}->{HTTP_IF_NONE_MATCH} && $req->{env}->{HTTP_IF_NONE_MATCH} eq $self->{_cache}->{app}->{etag} ) {
+        $req->(304)->finish;    # not modified
     }
     else {
-        $req->(404)->finish;
+        $req->( 200, [ 'Content-Type' => 'application/javascript', 'Cache-Control' => 'must-revalidate', Etag => $self->{_cache}->{app}->{etag} ], $self->{_cache}->{app}->{js} )->finish;
     }
 
     return;
-}
-
-sub _get_locale ( $self, $req ) {
-
-    # get locale from query string
-    my ($locale) = $req->{env}->{QUERY_STRING} =~ /\blocale=([[:alpha:]-]+)/sm;
-
-    # validate locale
-    my $locales = $ext_framework->get_locale;
-
-    $locale = defined $locale && exists $locales->{$locale} ? $locale : exists $locales->{ $self->{ext_default_locale} } ? $self->{ext_default_locale} : $DEFAULT_LOCALE;
-
-    return $locale;
-}
-
-sub _get_app_locale ( $self, $locale ) {
-    my $ext_app = $Pcore::Ext::CFG->{app}->{ $self->{ext_app} };
-
-    # load locale domains
-    my $locale_domains = [qw[Lcom]];
-
-    for my $domain ( keys $ext_app->{l10n_domain}->%* ) {
-        Pcore::Core::L10N::load_domain_locale( $domain, $locale );
-    }
-
-    # prepare locale messages
-    my $locale_messages;
-
-    for my $domain ( keys $Pcore::Core::L10N::MESSAGES->%* ) {
-        $locale_messages->{$domain} = $Pcore::Core::L10N::MESSAGES->{$domain}->{$locale};
-    }
-
-    my $data->{locale} = {
-        class_name      => $ext_app->{l10n_class_name},
-        messages        => to_json( $locale_messages, canonical => 1 ),
-        plural_form_exp => $Pcore::Core::L10N::LOCALE_PLURAL_FORM->{$locale}->{exp} // 'null',
-    };
-
-    return <<"JS";
-        Ext.define('$data->{locale}->{class_name}', {
-            singleton: true,
-
-            messages: $data->{locale}->{messages}->$*,
-
-            l10n: function(msgid, domain) {
-                if (msgid in this.messages[domain] && typeof this.messages[domain][msgid][0] !== 'undefined' ) {
-                    return this.messages[domain][msgid][0];
-                }
-                else {
-                    return msgid;
-                }
-            },
-
-            l10np: function(msgid, msgid_plural, n, domain) {
-                var idx = $data->{locale}->{plural_form_exp};
-
-                if (msgid in this.messages[domain] && typeof this.messages[domain][msgid][idx] !== 'undefined' ) {
-                    return this.messages[domain][msgid][idx];
-                }
-                else {
-                    if ( n == 1 ) {
-                        return msgid;
-                    }
-                    else {
-                        return msgid_plural;
-                    }
-                }
-            }
-        })
-JS
-}
-
-sub _add_src_map ( $self, @js ) {
-
-    # https://www.html5rocks.com/en/tutorials/developertools/sourcemaps/#toc-base64vlq
-    # https://docs.google.com/document/d/1U1RGAehQwRypUTovF1KRlpiOFze0b-_2gc6fAH0KY0k/view#
-    # http://www.murzwin.com/base64vlq.html
-
-    state $to_vlq = sub( @num ) {
-        state $map = do {
-            my $i = 0;
-
-            my %m = map { $i++ => $_ } split //sm, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-
-            \%m;
-        };
-
-        my $result = q[];
-
-        for my $num (@num) {
-            if ( $num < 0 ) {
-                $num = ( -$num << 1 ) | 1;
-            }
-            else {
-                $num <<= 1;
-            }
-
-            do {
-                my $clamped = $num & 31;
-
-                $num >>= 5;
-
-                if ( $num > 0 ) {
-                    $clamped |= 32;
-                }
-
-                $result .= $map->{$clamped};
-            } while ( $num > 0 );
-        }
-
-        return $result;
-    };
-
-    my $src_map = {
-        version    => 3,
-        file       => 'app.js',
-        sourceRoot => $self->{path},
-        sources    => [],
-        names      => [],
-        mappings   => q[],
-    };
-
-    my $buf    = q[];
-    my $ln_idx = 0;
-    my $src_idx;
-
-    for my $js (@js) {
-        my $src_name;
-
-        if ( is_plain_arrayref $js) {
-            ( $js, $src_name ) = $js->@*;
-        }
-
-        $js = $self->_prepare_js( $js->$* . q[;] );
-
-        if ( defined $src_name ) {
-            push $src_map->{sources}->@*, $src_name;
-        }
-
-        my @lines = split /$LF/sm, $js->$*;
-
-        for my $ln ( 0 .. $#lines ) {
-            $buf .= $lines[$ln] . $LF;
-
-            if ( defined $src_name ) {
-
-                if ( !$ln ) {
-
-                    # generated column, original file this appeared in, original line number, original column
-                    $src_map->{mappings} .= $to_vlq->( 0, $src_idx // 0, 0 - $ln_idx, 0 ) . q[;];
-                }
-                else {
-                    $src_map->{mappings} .= $to_vlq->( 0, 0, 1, 0 ) . q[;];
-                }
-            }
-            else {
-
-                # generated column
-                $src_map->{mappings} .= q[;];
-            }
-        }
-
-        if ( defined $src_name ) {
-            $src_idx //= 1;
-            $ln_idx = @lines - 1;
-        }
-    }
-
-    return \$buf, $src_map;
 }
 
 sub _prepare_js ( $self, $js ) {
@@ -457,16 +269,6 @@ sub _prepare_js ( $self, $js ) {
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    2 | 375                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

@@ -18,11 +18,10 @@ use warnings;
 use parent qw( HiPi::Interface );
 use Carp;
 use HiPi qw( :i2c :si470n :rpi );
-use Time::HiRes qw( usleep );
 use HiPi::GPIO;
 use HiPi::Device::I2C;
 
-our $VERSION ='0.70';
+our $VERSION ='0.71';
 
 __PACKAGE__->create_accessors( qw(
     devicename address
@@ -595,7 +594,7 @@ sub wait_for_stc {
 
 sub sleep_seconds {
     my($self, $seconds) = @_;
-    Time::HiRes::sleep( $seconds );
+    $self->delay( $seconds * 1000 );
 }
 
 # whole register access

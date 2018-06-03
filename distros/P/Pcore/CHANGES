@@ -1,3 +1,40 @@
+v0.66.0 2018-05-30T06:38:58Z
+ - web2 removed
+ - argon2 create_hash args added
+ - swarm added
+ - api authenticate username/password as arrayref
+ - net util added
+ - swarm fixes
+ - typo
+ - fixed child kill in fork tmpl
+ - swarm client is_online method added
+ - pcore pragma -forktmpl
+ - rpc pragma replaced with -node
+ - Swarm renamed to Node
+ - RPC replaced with Node
+ - RPC removed
+ - swarm replaced with server
+ - node - run server automatically
+ - node pragma removed
+ - RPC_ renamed to NODE_
+ - websocket updated
+ - app ported to new websocket + node api
+ - node check_status fixed
+ - node import protect
+ - kill node fixed
+ - Pcore::WebSocket::Protocol removed
+ - improvements
+ - pcore js api ported to the new websocket protocol
+ - pcore api.js moved
+ - Pcore::Share::WWW -> Pcore::Resources
+ - share write fixed
+ - pod
+ - ext locale fixed
+ - l10n.pot template updated
+ - localization
+ - pragma argument removed
+ - release tests fixed
+
 v0.65.1 2018-05-17T18:20:35Z
  - docker moved to dnf
 

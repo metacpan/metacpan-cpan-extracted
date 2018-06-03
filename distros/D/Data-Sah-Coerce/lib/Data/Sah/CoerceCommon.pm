@@ -1,7 +1,7 @@
 package Data::Sah::CoerceCommon;
 
-our $DATE = '2018-03-27'; # DATE
-our $VERSION = '0.024'; # VERSION
+our $DATE = '2018-06-02'; # DATE
+our $VERSION = '0.025'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -80,13 +80,23 @@ _
 my %gen_coercer_args = (
     %common_args,
     return_type => {
-        schema => ['str*', in=>[qw/val str+val/]],
+        schema => ['str*', in=>[qw/val status+val status+err+val/]],
         default => 'val',
         description => <<'_',
 
-`val` returns the value (possibly) coerced. `str+val` returns a 2-element array
-where the first element is a bool value of whether the value has been coerced,
-and the second element is the (possibly) coerced value.
+`val` means the coercer will return the input (possibly) coerced or undef if
+coercion fails.
+
+`status+val` means the coercer will return a 2-element array. The first element
+is a bool value set to 1 if coercion has been performed or 0 if otherwise. The
+second element is the (possibly) coerced input (or undef if there is a failure
+during coercion).
+
+`status+err+val` means the coercer will return a 3-element array. The first
+element is a bool value set to 1 if coercion has been performed or 0 if
+otherwise. The second element is the error message string which will be set if
+there is a failure in coercion. The third element is the (possibly) coerced
+input (or undef if there is a failure during coercion).
 
 _
     },
@@ -215,9 +225,10 @@ sub get_coerce_rules {
         require $mod_pm;
         my $rule_meta = &{"$mod\::meta"};
         my $rule_v = ($rule_meta->{v} // 1);
-        if ($rule_v != 2) {
-            warn "Coercion rule module '$mod' is still at ".
-                "metadata version $rule_v, will not be used";
+        if ($rule_v != 3) {
+            warn "Only coercion rule module '$mod' following ".
+                "metadata version 3 is supported, this rule module follows ".
+                "metadata version $rule_v and will not be used";
             next;
         }
         next unless $explicitly_used_rule_names{$rule_name} ||
@@ -283,7 +294,7 @@ Data::Sah::CoerceCommon - Common stuffs for Data::Sah::Coerce and Data::Sah::Coe
 
 =head1 VERSION
 
-This document describes version 0.024 of Data::Sah::CoerceCommon (from Perl distribution Data-Sah-Coerce), released on 2018-03-27.
+This document describes version 0.025 of Data::Sah::CoerceCommon (from Perl distribution Data-Sah-Coerce), released on 2018-06-02.
 
 =head1 FUNCTIONS
 

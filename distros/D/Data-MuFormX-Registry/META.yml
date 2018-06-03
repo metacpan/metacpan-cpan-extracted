@@ -1,0 +1,26 @@
+---
+abstract: 'Manage a hierachry of Data::MuForm classes'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  Data::MuForm: '0.04'
+  Moo: '2.003004'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-MuFormX-Registry
+requires:
+  Module::Pluggable: '5.2'
+  Moo: '2.003004'
+resources:
+  bugtracker: https://github.com/jjn1056/Data-MuFormX-Registry/issues
+  homepage: https://github.com/jjn1056/Data-MuFormX-Registry
+  repository: https://github.com/jjn1056/Data-MuFormX-Registry.git
+version: '0.001'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Dancer2::Plugin::JWT;
 # ABSTRACT: JSON Web Token made simple for Dancer2
-$Dancer2::Plugin::JWT::VERSION = '0.013';
+$Dancer2::Plugin::JWT::VERSION = '0.015';
 use Dancer2::Plugin;
 use Crypt::JWT qw(encode_jwt decode_jwt);
 use URI;
@@ -17,18 +17,19 @@ my $need_iat = undef;
 my $need_nbf = undef;
 my $need_exp = undef;
 my $need_leeway = undef;
+my $cookie_domain = undef;
 
 register jwt => sub {
     my $dsl = shift;
     my @args = @_;
 
     if (@args) {
-        $dsl->app->request->var(jwt => $args[0]);
+      $dsl->app->request->var(jwt => $args[0]);
     }
     else {
-	if ($dsl->app->request->var('jwt_status') eq "missing") {
+      if ($dsl->app->request->var('jwt_status') eq "missing") {
 	    $dsl->app->execute_hook('plugin.jwt.jwt_exception' => 'No JWT is present');
-	}
+      }
     }
     return $dsl->app->request->var('jwt') || undef;
 };
@@ -37,9 +38,11 @@ on_plugin_import {
     my $dsl = shift;
 
     my $config = plugin_setting;
-    die "JWT cannot be used without a secret!" unless exists $config->{secret};
+    die "JWT cannot be used without a secret!" unless (exists $config->{secret} && defined $config->{secret});
     # For RSA and ES algorithms - path to keyfile or JWK string, others algorithms - just secret string
     $secret = $config->{secret};
+
+    $cookie_domain = $config->{cookie_domain};
 
     $alg = 'HS256';
 
@@ -156,11 +159,11 @@ on_plugin_import {
 	Dancer2::Core::Hook->new(
 	    name => 'after',
 	    code => sub {
-		my $response = shift;
-		$response->push_header('Access-Control-Expose-Headers' => 'Authorization');
+		    my $response = shift;
+		    $response->push_header('Access-Control-Expose-Headers' => 'Authorization');
 	    }
-	)
-    );
+	 )
+  );
     
     $dsl->app->add_hook(
         Dancer2::Core::Hook->new(
@@ -169,7 +172,11 @@ on_plugin_import {
                 my $app = shift;
                 my $encoded = $app->request->headers->authorization;
 
-                if ($app->request->param('_jwt')) {
+
+                if ($app->request->cookies->{_jwt}) {
+                    $encoded = $app->request->cookies->{_jwt}->value ;
+                }
+                elsif ($app->request->param('_jwt')) {
                     $encoded = $app->request->param('_jwt');
                 }
 
@@ -209,13 +216,18 @@ on_plugin_import {
                 my $decoded = $dsl->app->request->var('jwt');
                 if (defined($decoded)) {
                     my $encoded = encode_jwt( payload      => $decoded, 
-					      key          => $secret, 
-					      alg          => $alg,
-					      enc          => $enc,
-					      auto_iat     => $need_iat,
-					      relative_exp => $need_exp,
-					      relative_nbf => $need_nbf );
+					                                    key          => $secret, 
+                              					      alg          => $alg,
+                              					      enc          => $enc,
+                              					      auto_iat     => $need_iat,
+                              					      relative_exp => $need_exp,
+                              					      relative_nbf => $need_nbf );
                     $response->headers->authorization($encoded);
+
+                    my %cookie =  (value => $encoded, name => '_jwt', expires => "4 weeks", path => '/', http_only => 0);
+                    $cookie{domain} = $cookie_domain if defined $cookie_domain;
+                    $response->push_header('Set-Cookie' => Dancer2::Core::Cookie->new(%cookie)->to_header());
+
                     if ($response->status =~ /^3/) {
                         my $u = URI->new( $response->header("Location") );
                         $u->query_param( _jwt => $encoded);
@@ -288,6 +300,8 @@ To this to work it is required to have a secret defined in your config.yml file:
           need_exp: 600 
           # timeshift for expiration
           need_leeway: 30 
+          # JWT cookie domain, in case you need to override it
+          cookie_domain: my_domain.com
 
 B<NOTE:> A empty call (without arguments) to jwt will trigger the
 exception hook if there is no jwt defined.
@@ -307,7 +321,7 @@ To user2014, thanks for making the module use Crypt::JWT.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015-2017 Alberto Simões, all rights reserved.
+Copyright 2015-2018 Alberto Simões, all rights reserved.
 
 This module is free software and is published under the same terms as Perl itself.
 

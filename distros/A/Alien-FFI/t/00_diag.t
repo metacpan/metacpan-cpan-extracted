@@ -25,6 +25,7 @@ $post_diag = sub {
   diag "cflags_static  = ", Alien::FFI->cflags_static;
   diag "libs           = ", Alien::FFI->libs;
   diag "libs_static    = ", Alien::FFI->libs_static;
+  diag "my_configure   = ", Alien::FFI->runtime_prop->{my_configure} if defined Alien::FFI->runtime_prop->{my_configure};
 };
 
 my @modules = sort keys %modules;

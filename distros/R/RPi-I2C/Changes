@@ -1,5 +1,13 @@
 Revision history for RPi-I2C
 
+2.3606  2018-05-29
+        - re-wrote readI2cBlockData() in order to gracefully handle a panic
+          situation when the I2C device is no longer available (fixes #4)
+        - established new I2C_TESTING env var for RPi::WiringPi's I2C
+          exception testing (bypasses croak() if I2C device not found)
+        - refactored the logic in new() for establishing I2C connection. It now
+          properly croak()s if device not found on the bus
+
 2.3605  2018-02-09
         - fix typo in POD (closes #3)
         - made more clear the warning if having issues communicating with an

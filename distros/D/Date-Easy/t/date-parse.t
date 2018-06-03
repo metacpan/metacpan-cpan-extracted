@@ -13,36 +13,27 @@ use File::Spec;
 use Cwd 'abs_path';
 use File::Basename;
 use lib File::Spec->catdir(dirname(abs_path($0)), 'lib');
-use DateEasyTestUtil qw< is_32bit compare_times >;
+use DateEasyTestUtil qw< is_32bit compare_times date_parse_test_cases date_parse_result >;
 use DateParseTests qw< %DATE_PARSE_TESTS _date_parse_remove_timezone >;
 use TimeParseDateTests qw< @TIME_PARSE_DATE_TESTS get_ymd_from_parsedate >;
 
 
-# first go through stuff we handle specially: integers which may or not be interprested as epoch
-# seconds, or else might be a datestring (that is, YYYYMMDD).
-
-my %TEST_DATES =
-(
-	1426446360		=>	'2015-03-15',				# simple epoch
-	20120930		=>	'2012-09-30',				# simple datestring
-	29000000		=>	'1970-12-02',				# epoch (too big to be a datestring)
-	28991231		=>	'2899-12-31',				# datestring (upper bound)
-	10000101		=>	'1000-01-01',				# datestring (lower bound)
-	9999999			=>	'1970-04-26',				# epoch (too small to be a datestring)
-	-99590400		=>	'1966-11-05',				# epoch (negative)
-);
+# First go through stuff we handle specially: integers which may or not be interprested as epoch
+# seconds, or else might be a datestring (that is, YYYYMMDD).  See the `%TEST_DATES` hash in
+# t/lib/DateEasyTestUtil.pm for full details.
 
 my $t;
 my $on_32bit_machine = is_32bit();
-foreach (keys %TEST_DATES)
+foreach (date_parse_test_cases())
 {
 	TODO:
 	{
-		my $expected = $TEST_DATES{$_};
+		my $expected = date_parse_result($_);
 		local $TODO = "out of range for 32-bit machines"
 				if $on_32bit_machine and ( $expected le '1901-99-99' or $expected ge '2038-00-00' );
 		lives_ok { $t = date($_) } "parse survival: $_";
-		compare_times($t, $expected, "successful parse: $_");
+		compare_times($t, $expected, "successful parse: $_")
+				or diag "timezone offset: ", datetime($_)->strftime("%z");
 	}
 }
 

@@ -17,9 +17,8 @@ use Carp;
 use HiPi qw( :rpi :lcd :i2c );
 use HiPi::RaspberryPi;
 use HiPi::Interface::PCF8574;
-use Time::HiRes;
 
-our $VERSION ='0.70';
+our $VERSION ='0.71';
 
 __PACKAGE__->create_accessors( qw( address devicename backend _backlight ) );
 
@@ -129,22 +128,6 @@ sub _send_data {
     $self->_write_data_part($lsb);
 }
 
-sub send_htv2_command {
-    my($self, $command, @params ) = @_;
-    my @i2cvals  = ( $command );
-    if( $command == HTV2_CMD_PRINT ) {
-        # one param - a text string
-        my @strvals = split(//, $params[0]);
-        for my $p ( @strvals ) {
-            push @i2cvals, ord($p);
-        }
-    } else {
-        # all other cases - params are ASCII char codes
-        push(@i2cvals, @params) if @params;
-    }
-    return $self->device->bus_write( @i2cvals );
-}
-
 sub backlight {
     my($self, $brightness) = @_;
     
@@ -170,24 +153,23 @@ sub update_baudrate {
 sub update_geometry {
     my $self = shift;
     # not handled
-    # $self->send_htv2_command( HTV2_CMD_LCD_TYPE, $self->lines, $self->width );
     return;
 }
 
 sub _write_command_part {
     my($self, $data) = @_;
     $self->_write_to_bus( $data, SEND_MODE_CMD, SEND_ENABLE );
-    Time::HiRes::usleep(1);
+    $self->delayMicroseconds(1);
     $self->_write_to_bus( $data, SEND_MODE_CMD, SEND_DISABLE );
-    Time::HiRes::usleep(40);
+    $self->delayMicroseconds(40);
 }
 
 sub _write_data_part {
     my($self, $data) = @_;
     $self->_write_to_bus( $data, SEND_MODE_DATA, SEND_ENABLE );
-    Time::HiRes::usleep(1);
+    $self->delayMicroseconds(1);
     $self->_write_to_bus( $data, SEND_MODE_DATA, SEND_DISABLE );
-    Time::HiRes::usleep(40);
+    $self->delayMicroseconds(40);
 }
 
 sub _write_to_bus {
@@ -203,15 +185,15 @@ sub init_display {
     my $self = shift;
     
     $self->_write_to_bus(0, 0, 0);
-    Time::HiRes::usleep(50000); 
+    $self->delay(50); 
     
     # put the LCD into 4 bit mode according to the hitachi HD44780 datasheet figure 26, pg 47
     $self->_write_command_part(0x03);
-    Time::HiRes::usleep(4500); 
+    $self->delayMicroseconds(4500); 
     $self->_write_command_part(0x03);
-    Time::HiRes::usleep(4500); 
+    $self->delayMicroseconds(4500); 
     $self->_write_command_part(0x03);
-    Time::HiRes::usleep(150); 
+    $self->delayMicroseconds(150); 
     $self->_write_command_part(0x02);
     
     $self->send_command( HD44780_CURSOR_OFF );

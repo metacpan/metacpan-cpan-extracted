@@ -1,11 +1,10 @@
 package Class::Date::Const;
 our $AUTHORITY = 'cpan:YANICK';
+$Class::Date::Const::VERSION = '1.1.17';
 use strict;
 
 use vars qw(@EXPORT @ISA @ERROR_MESSAGES %EXPORT_TAGS);
 use Exporter;
-
-our $VERSION = '1.1.15';
 
 my %FIELDS = (
     # Class::Date fields
@@ -69,7 +68,7 @@ Class::Date::Const
 
 =head1 VERSION
 
-version 1.1.16
+version 1.1.17
 
 =head1 AUTHORS
 

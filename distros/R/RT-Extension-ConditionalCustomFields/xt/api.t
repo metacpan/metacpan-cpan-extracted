@@ -4,17 +4,17 @@ use warnings;
 use RT::Extension::ConditionalCustomFields::Test tests => 14;
 
 my $cf_condition = RT::CustomField->new(RT->SystemUser);
-$cf_condition->Create(Name => 'Condition', Type => 'SelectSingle', Queue => 'General');
+$cf_condition->Create(Name => 'Condition', Type => 'Select', MaxValues => 1, Queue => 'General');
 $cf_condition->AddValue(Name => 'Passed', SortOder => 0);
 $cf_condition->AddValue(Name => 'Failed', SortOrder => 1);
 $cf_condition->AddValue(Name => 'Schrödingerized', SortOrder => 2);
 my $cf_values = $cf_condition->Values->ItemsArrayRef;
 
 my $cf_conditioned_by = RT::CustomField->new(RT->SystemUser);
-$cf_conditioned_by->Create(Name => 'ConditionedBy', Type => 'FreeformSingle', Queue => 'General');
+$cf_conditioned_by->Create(Name => 'ConditionedBy', Type => 'Freeform', MaxValues => 1, Queue => 'General');
 
 my $cf_conditioned_by_child = RT::CustomField->new(RT->SystemUser);
-$cf_conditioned_by_child->Create(Name => 'Child', Type => 'FreeformSingle', Queue => 'General', BasedOn => $cf_conditioned_by->id);
+$cf_conditioned_by_child->Create(Name => 'Child', Type => 'Freeform', MaxValues => 1, Queue => 'General', BasedOn => $cf_conditioned_by->id);
 
 my ($rv, $msg) = $cf_conditioned_by->SetConditionedBy($cf_condition->id, [$cf_values->[0]->Name, $cf_values->[2]->Name]);
 ok($rv, "SetConditionedBy: $msg");

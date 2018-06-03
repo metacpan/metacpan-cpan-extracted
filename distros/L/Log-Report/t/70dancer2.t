@@ -10,7 +10,7 @@ BEGIN {
         if $@;
 
     plan skip_all => "Dancer2 is too old: $Dancer2::VERSION"
-        if $Dancer2::VERSION < 0.151000;   # for to_app()
+        if $Dancer2::VERSION < 0.166001;   # for to_app()
 
     warn "Dancer2 version $Dancer2::VERSION\n";
 
@@ -24,7 +24,7 @@ BEGIN {
     $@ and plan skip_all => 'Unable to load HTTP::Request::Common';
     HTTP::Request::Common->import;
 
-    plan tests => 2;
+    plan tests => 3;
 }
 
 {
@@ -56,6 +56,28 @@ BEGIN {
 
     get '/process' => sub {
         process(sub { error "Fatal error text" });
+    };
+
+    # Route to add custom handlers during later tests
+    get '/add_fatal_handler/:type' => sub {
+
+        my $type = param 'type';
+
+        if ($type eq 'json') {
+            fatal_handler sub {
+                my ($dsl, $msg, $reason) = @_;
+                return unless $dsl->app->request->uri =~ /api/;
+                $dsl->send_as(JSON => {message => $msg->toString});
+            };
+        }
+        elsif ($type eq 'html')
+        {
+            fatal_handler sub {
+                my ($dsl, $msg, $reason) = @_;
+                return unless $dsl->app->request->uri =~ /html/;
+                $dsl->send_as(html => "<p>".$msg->toString."</p>");
+            };
+        }
     };
 
 }
@@ -122,6 +144,38 @@ subtest 'Throw error' => sub {
         $jar->add_cookie_header($req);
         $res = $test->request( $req );
         is ($res->content, 'Fatal error text');
+    }
+};
+
+# Tests to check custom fatal error handlers
+subtest 'Custom handler' => sub {
+
+    # Add 2 custom fatal handlers - shoudl only match relevant URLs
+    $test->request(GET "$url/add_fatal_handler/json");
+    $test->request(GET "$url/add_fatal_handler/html");
+
+    # Throw uncaught errors to see if correct handlers are called.
+    # JSON (for API)
+    {
+        my $req = GET "$url/write_message/error/api_text";
+        my $res = $test->request( $req );
+        ok $res->is_success, "get /write_message";
+        is $res->content, '{"message":"api_text"}';
+    }
+
+    # HTML without redirect
+    {
+        my $req = GET "$url/write_message/error/html_text";
+        my $res = $test->request( $req );
+        ok $res->is_success, "get /write_message";
+        is $res->content, '<p>html_text</p>';
+    }
+
+    # And default (redirect)
+    {
+        my $req = GET "$url/write_message/error/error_text";
+        my $res = $test->request( $req );
+        ok $res->is_redirect, "get /write_message";
     }
 };
 

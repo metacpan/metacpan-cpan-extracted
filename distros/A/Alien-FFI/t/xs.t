@@ -6,8 +6,8 @@ alien_ok 'Alien::FFI';
 my $xs = do { local $/; <DATA> };
 xs_ok { xs => $xs, verbose => 1 }, with_subtest {
   my($module) = @_;
-  plan 1;
-  is $module->test, 0;
+  is( test2(2), 4  );
+  is( test2(6), 12 );
 };
 
 done_testing;
@@ -19,35 +19,37 @@ __DATA__
 #include "XSUB.h"
 #include <ffi.h>
 
-unsigned int foo(void)
+/* chaar is the name of the planet the Decepticons retreated to after the fall of Unicron */
+unsigned char doublechaar(unsigned char x)
 {
-  return 0xaa;
+  return x*2;
 }
 
 int
-test(const char *class)
+test2(unsigned char input_value)
 {
-  ffi_cif   ffi_cif;
-  ffi_type *args[1];
-  void     *values[1];
-  int       return_value;
+  ffi_cif         ffi_cif;
+  ffi_type       *args[1];
+  void           *values[1];
+  unsigned char   return_value;
   
-  if(ffi_prep_cif(&ffi_cif, FFI_DEFAULT_ABI, 0, &ffi_type_uint32, args) == FFI_OK)
-  {
-    ffi_call(&ffi_cif, (void*) foo, &return_value, values);
+  args[0] = &ffi_type_uint8;
   
-    if(return_value == 0xaa)
-      return 0;
-    else
-      return 2;
-  }
-  else
+  if(ffi_prep_cif(&ffi_cif, FFI_DEFAULT_ABI, 1, &ffi_type_uint8, args) == FFI_OK)
   {
-    return 2;
+    values[0] = &input_value;
+    ffi_call(&ffi_cif, (void*) doublechaar, &return_value, values);
+    return return_value;
   }
+  return -1;
 }
 
-MODULE = TA_MODULE PACKAGE = TA_MODULE
+MODULE = main PACKAGE = main
 
-int test(class);
-    const char *class;
+int
+test2(input_value);
+    unsigned char input_value;
+  CODE:
+    RETVAL = test2(input_value);
+  OUTPUT:
+    RETVAL

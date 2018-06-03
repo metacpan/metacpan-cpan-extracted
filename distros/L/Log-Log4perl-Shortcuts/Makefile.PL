@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "File::Copy" => 0,
+    "File::Temp" => 0,
     "Moose" => 0,
     "Test::Exception" => 0,
     "Test::Fatal" => 0,
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,6 +48,7 @@ my %FallbackPrereqs = (
   "Exporter" => 0,
   "File::Copy" => 0,
   "File::HomeDir" => 0,
+  "File::Temp" => 0,
   "Log::Log4perl" => 0,
   "Moose" => 0,
   "Test::Exception" => 0,

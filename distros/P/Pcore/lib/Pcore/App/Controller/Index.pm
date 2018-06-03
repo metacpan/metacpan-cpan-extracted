@@ -4,7 +4,7 @@ use Pcore -role;
 
 with qw[Pcore::App::Controller];
 
-eval { require Pcore::Share::WWW };
+eval { require Pcore::Resources };
 
 sub run ( $self, $req ) {
     if ( $req->{path_tail}->is_file ) {

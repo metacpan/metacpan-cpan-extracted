@@ -1,3 +1,21 @@
+0.025   2018-06-02 (PERLANCAR)
+
+	[INCOMPATIBLE CHANGE]
+
+        - Bump coerce module's metadata version from 2 to 3. This is to allow
+	  the coercer code to return error message (when coercion fails) in
+	  addition to coerced data. The metadata property 'might_die' is now
+	  replaced by 'might_fail'. The coercer code is not expected to die,
+	  unless there's an extraordinary situation in which case the whole
+	  coercer code or schema validator code which uses the coercer code will
+	  die anyway. Instead, when 'might_fail' is set to true, the coercer
+	  code is expected to return an array containing (error_message,
+	  coerced_data) instead of just coerced_data. When coercion succeeds,
+	  error_message should be set to undef and when coercion fails,
+	  error_message is set to a string detailing why coercion fails, and
+	  coerced_data is set to undef.
+
+
 0.024   2018-03-27 (PERLANCAR)
 
 	- Allow space in addition to 'T' as date and time separator, so we

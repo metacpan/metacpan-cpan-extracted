@@ -26,7 +26,7 @@ use Date::Manip::Base;
 use Date::Manip::TZ;
 
 our $VERSION;
-$VERSION='6.70';
+$VERSION='6.71';
 END { undef $VERSION; }
 
 ########################################################################
@@ -349,7 +349,6 @@ sub frequency {
          return 1;
       }
 
-      my($l,$r);
       my $err = $self->_parse_lang($string);
       if ($err) {
          $$self{'err'} = "[frequency] Invalid frequency string";
@@ -397,37 +396,62 @@ sub frequency {
    #
    # Day can be:
    #    doy     : 1 to 366 or  -1 to -366  (day of the year)
-   #    dom     : 1 to 31  or  -1 to -31   (day of the month)
+   #    dom     : 1 to DiM or  -1 to -31   (day of the month)
    #    dow     : 1 to 7                   (day of the week)
    #
    # Other values must be zero or positive.
 
-   my($mtype,$wtype,$dtype) = ('','','');
-   my @f = (@int,@rtime);
-   my $m = $f[1];
-   my $w = $f[2];
-   my $d = $f[3];
+   my @ftype = ('y','m','w','d','h','mn','s');
+   my @vtype = ('' ,'' ,'' ,'' ,'' ,''  ,'');
 
-   if ($d  &&  @int < 4) {
-      if ($w) {
-         $dtype = 'dow';
-      } elsif ($m) {
-         $dtype = 'dom';
-      } else {
-         $dtype = 'doy';
-      }
+   my ($y,$m,$w,$d,$h,$mn,$s) = (@int,@rtime);
+
+   if (@rtime == 7) {
+      $vtype[0] = 'y';
    }
 
-   if ($w  &&  @int < 3) {
+   if (@rtime >= 6) {
       if ($m) {
-         $wtype = 'wom';
+         $vtype[1] = 'moy';
       } else {
-         $wtype = 'woy';
+         $vtype[1] = 'zero';
       }
    }
 
-   if ($m  &&  @int < 2) {
-      $mtype = 'moy';
+   if (@rtime >= 5) {
+      if ($w) {
+         if ($m) {
+            $vtype[2] = 'wom';
+         } else {
+            $vtype[2] = 'woy';
+         }
+      } else {
+         $vtype[2] = 'zero';
+      }
+   }
+
+   if (@rtime >= 4) {
+      if ($d) {
+         if ($w) {
+            $vtype[3] = 'dow';
+         } elsif ($m) {
+            $vtype[3] = 'dom';
+         } else {
+            $vtype[3] = 'doy';
+         }
+      } else {
+         $vtype[3] = 'zero';
+      }
+   }
+
+   if (@rtime >= 3) {
+      $vtype[4] = 'time';
+   }
+   if (@rtime >= 2) {
+      $vtype[5] = 'time';
+   }
+   if (@rtime) {
+      $vtype[6] = 'time';
    }
 
    # Test the format of @rtime.
@@ -440,30 +464,36 @@ sub frequency {
 
    my $rfieldrx = $self->_rx('rfield');
    my $rrangerx = $self->_rx('rrange');
-   my @type     = qw(y m w d h mn s);
-   while ($#type > $#rtime) {
-      shift(@type);
-   }
 
-   foreach my $rfield (@rtime) {
-      my $type = shift(@type);
+   my $i        = -1;
+   foreach my $f (@int,@rtime) {
+      $i++;
+      my $vtype = $vtype[$i];
+      my $type  = $ftype[$i];
 
-      if ($rfield !~ $rfieldrx) {
+      # $f          3   -6   2-3   1,5-6
+      # $type       y m w d h mn s
+      # $vtype      '' dom woy time      ('' is a frequency field)
+
+      # Ignore the frequency part
+      next  if (! $vtype);
+
+      if ($f  &&  $f !~ $rfieldrx) {
          $$self{'err'} = "[frequency] Invalid rtime string";
          return 1;
       }
 
-      my @rfield = split(/,/,$rfield);
+      my @rfield = split(/,/,$f);
       my @val;
 
       foreach my $vals (@rfield) {
          if ($vals =~ $rrangerx) {
             my ($num1,$num2) = ($1+0,$2+0);
 
-            my $err = $self->_frequency_values($num1,$type,$mtype,$wtype,$dtype);
+            my $err = $self->_frequency_values($num1,$type,$vtype);
             return $err  if ($err);
 
-            $err    = $self->_frequency_values($num2,$type,$mtype,$wtype,$dtype);
+            $err    = $self->_frequency_values($num2,$type,$vtype);
             return $err  if ($err);
 
             if ( ($num1 > 0  &&  $num2 > 0)  ||
@@ -480,14 +510,14 @@ sub frequency {
          } else {
             $vals += 0;
 
-            my $err = $self->_frequency_values($vals,$type,$mtype,$wtype,$dtype);
+            my $err = $self->_frequency_values($vals,$type,$vtype);
             return $err  if ($err);
 
             push(@val,$vals);
          }
       }
 
-      $rfield = [ @val ];
+      $f = [ @val ];
    }
 
    # Store it
@@ -545,84 +575,75 @@ sub frequency {
 }
 
 sub _frequency_values {
-   my($self,$num,$type,$mtype,$wtype,$dtype) = @_;
+   my($self,$num,$type,$vtype) = @_;
    my $err;
 
-   if ($type eq 'm') {
-      if ($mtype eq 'moy') {
-         if ($num < 1) {
-            $$self{'err'} = "[frequency] Month of year must be 1-12 (zero/negative not allowed)";
+   if ($type eq 'y') {
+      if ($vtype eq 'y') {
+         if ($num < 0  ||  $num > 9999) {
+            $$self{'err'} = "[frequency] Year must be in the range 1-9999";
             return 1;
-         } elsif ($num > 12) {
+         }
+      }
+
+   } elsif ($type eq 'm') {
+      if ($vtype eq 'moy') {
+         if ($num < 1  ||  $num > 12) {
             $$self{'err'} = "[frequency] Month of year must be 1-12";
             return 1;
          }
       }
-      return 0;
-   }
 
-   if ($type eq 'w') {
-      if ($wtype eq 'woy') {
-         if ($num == 0) {
-            $$self{'err'} = "[frequency] Week of year must be nonzero";
-            return 1;
-
-         } elsif ($num > 53  ||  $num < -53) {
+   } elsif ($type eq 'w') {
+      if ($vtype eq 'woy') {
+         if ($num == 0  ||  $num > 53  ||  $num < -53) {
             $$self{'err'} = "[frequency] Week of year must be 1-53 or -1 to -53";
             return 1;
          }
 
-      } elsif ($wtype eq 'wom') {
-         if ($num == 0) {
-            $$self{'err'} = "[frequency] Week of month must be nonzero";
-            return 1;
-
-         } elsif ($num > 5  ||  $num < -5) {
+      } elsif ($vtype eq 'wom') {
+         if ($num == 0  ||  $num > 5  ||  $num < -5) {
             $$self{'err'} = "[frequency] Week of month must be 1-5 or -1 to -5";
             return 1;
          }
 
       }
-      return 0;
-   }
 
-   if ($type eq 'd') {
-      if ($dtype eq 'dow') {
-         if ($num < 1) {
-            $$self{'err'} = "[frequency] Day of week must be 1-7 (zero/negative not allowed)";
-            return 1;
-         } elsif ($num > 7) {
+   } elsif ($type eq 'd') {
+      if ($vtype eq 'dow') {
+         if ($num < 1  ||  $num > 7) {
             $$self{'err'} = "[frequency] Day of week must be 1-7";
             return 1;
          }
 
-      } elsif ($dtype eq 'dom') {
-         if ($num == 0) {
-            $$self{'err'} = "[frequency] Day of month must be nonzero";
-            return 1;
-
-         } elsif ($num > 31  ||  $num < -31) {
+      } elsif ($vtype eq 'dom') {
+         if ($num == 0  ||  $num > 31  ||  $num < -31) {
             $$self{'err'} = "[frequency] Day of month must be 1-31 or -1 to -31";
             return 1;
          }
 
-      } elsif ($dtype eq 'doy') {
-         if ($num == 0) {
-            $$self{'err'} = "[frequency] Day of year must be nonzero";
-            return 1;
-
-         } elsif ($num > 366  ||  $num < -366) {
+      } elsif ($vtype eq 'doy') {
+         if ($num == 0  ||  $num > 366  ||  $num < -366) {
             $$self{'err'} = "[frequency] Day of year must be 1-366 or -1 to -366";
             return 1;
          }
-
       }
-      return 0;
-   }
 
-   if ($num < 0) {
-      $$self{'err'} = "[frequency] Negative values only allowed for day/week";
-      return 1;
+   } elsif ($type eq 'h') {
+      if ($vtype eq 'time') {
+         if ($num < 0  ||  $num > 23) {
+            $$self{'err'} = "[frequency] Hour must be 0-23";
+            return 1;
+         }
+      }
+
+   } else {
+      if ($vtype eq 'time') {
+         if ($num < 0  ||  $num > 59) {
+            $$self{'err'} = "[frequency] Minute/second must be 0-59";
+            return 1;
+         }
+      }
    }
 
    return 0;
@@ -895,6 +916,7 @@ sub next {
              defined $$self{'data'}{'end'}) {
 
             my $n = $self->_locate_n('first');
+            return (undef,'Not found')  if ($$self{'err'});
             $$self{'data'}{'curr'} = $n-1;
 
          } else {
@@ -947,6 +969,7 @@ sub prev {
              defined $$self{'data'}{'end'}) {
 
             my $n = $self->_locate_n('last');
+            return (undef,'Not found')  if ($$self{'err'});
             $$self{'data'}{'curr'} = $n+1;
 
          } else {
@@ -1019,7 +1042,9 @@ sub dates {
    my($end,$first,$last,@dates);
 
    $first = $self->_locate_n('first');
+   return ()  if ($$self{'err'});
    $last  = $self->_locate_n('last');
+   return ()  if ($$self{'err'});
 
    if (defined($first)  &&  defined($last)) {
       for (my $n = $first; $n <= $last; $n++) {
@@ -1934,9 +1959,12 @@ sub _locate_n {
 
    return $$self{'data'}{$op}  if (defined $$self{'data'}{$op});
 
-   my $start = $$self{'data'}{'start'};
-   my $end   = $$self{'data'}{'end'};
-   my $unmod = $$self{'data'}{'unmod_range'};
+   my $start  = $$self{'data'}{'start'};
+   my $end    = $$self{'data'}{'end'};
+   my $unmod  = $$self{'data'}{'unmod_range'};
+   my $dmt    = $$self{'tz'};
+   my $dmb    = $$dmt{'base'};
+   my $maxatt = $dmb->_config('maxrecurattempts');
 
    if ($$self{'data'}{'noint'} == 2) {
       # If there is no interval, then we have calculated all the dates
@@ -2024,7 +2052,14 @@ sub _locate_n {
 
       $first_int    = 0;
       if ($unmod) {
+         my $n = 0;
          while (1) {
+            $n++;
+            if ($n > $maxatt) {
+               $$self{'err'} =
+                 "[_locate_n] Unable to find an interval in $maxatt attempts";
+               return;
+            }
             $self->_nth_interval($first_int);
             my $date = $$self{'data'}{'idate'}{$first_int}[0];
             last  if (defined $date  &&  $date->cmp($start) < 0);
@@ -2032,7 +2067,14 @@ sub _locate_n {
          }
 
       } else {
+         my $n = 0;
          while (1) {
+            $n++;
+            if ($n > $maxatt) {
+               $$self{'err'} =
+                 "[_locate_n] Unable to find an interval in $maxatt attempts";
+               return;
+            }
             $self->_nth_interval($first_int);
             my $ptr   = $$self{'data'}{'idate'}{$first_int}[2];
             if (defined $ptr) {
@@ -2047,7 +2089,14 @@ sub _locate_n {
       #   i.e. Date(y) >= start  for modified dates
 
       if ($unmod) {
+         my $n = 0;
          while (1) {
+            $n++;
+            if ($n > $maxatt) {
+               $$self{'err'} =
+                 "[_locate_n] Unable to find an interval in $maxatt attempts";
+               return;
+            }
             $self->_nth_interval($first_int);
             my $date = $$self{'data'}{'idate'}{$first_int}[0];
             last  if (defined $date  &&  $date->cmp($start) >= 0);
@@ -2056,7 +2105,14 @@ sub _locate_n {
          $first = $$self{'data'}{'idate'}{$first_int}[1];
 
       } else {
+         my $n = 0;
          while (1) {
+            $n++;
+            if ($n > $maxatt) {
+               $$self{'err'} =
+                 "[_locate_n] Unable to find an interval in $maxatt attempts";
+               return;
+            }
             $self->_nth_interval($first_int);
             my $ptr   = $$self{'data'}{'idate'}{$first_int}[2];
             if (defined $ptr) {
@@ -2082,7 +2138,14 @@ sub _locate_n {
       $last_int = $first_int;
 
       if ($unmod) {
+         my $n = 0;
          while (1) {
+            $n++;
+            if ($n > $maxatt) {
+               $$self{'err'} =
+                 "[_locate_n] Unable to find an interval in $maxatt attempts";
+               return;
+            }
             $self->_nth_interval($last_int);
             my $date = $$self{'data'}{'idate'}{$last_int}[0];
             last  if (defined $date  &&  $date->cmp($end) > 0);
@@ -2100,7 +2163,14 @@ sub _locate_n {
          }
 
       } else {
+         my $n = 0;
          while (1) {
+            $n++;
+            if ($n > $maxatt) {
+               $$self{'err'} =
+                 "[_locate_n] Unable to find an interval in $maxatt attempts";
+               return;
+            }
             $self->_nth_interval($last_int);
             my $ptr   = $$self{'data'}{'idate'}{$last_int}[1];
             if (defined $ptr) {
@@ -2156,7 +2226,14 @@ sub _locate_n {
 
    $first_int    = $nn;
    if ($unmod) {
+      my $n = 0;
       while (1) {
+         $n++;
+         if ($n > $maxatt) {
+            $$self{'err'} =
+              "[_locate_n] Unable to find an interval in $maxatt attempts";
+            return;
+         }
          $self->_nth_interval($first_int);
          my $date = $$self{'data'}{'idate'}{$first_int};
          last  if (defined $date  &&  $date->cmp($start) < 0);
@@ -2164,8 +2241,15 @@ sub _locate_n {
       }
 
    } else {
+      my $n = 0;
       LOOP:
       while (1) {
+         $n++;
+         if ($n > $maxatt) {
+            $$self{'err'} =
+              "[_locate_n] Unable to find an interval in $maxatt attempts";
+            return;
+         }
          $self->_nth_interval($first_int);
          for (my $i=($first_int+1)*$ev - 1; $i >= $first_int*$ev; $i--) {
             next  if (! exists $$self{'data'}{'dates'}{$i});
@@ -2180,7 +2264,14 @@ sub _locate_n {
    #   i.e. Date(y) >= start  for modified dates
 
    if ($unmod) {
+      my $n = 0;
       while (1) {
+         $n++;
+         if ($n > $maxatt) {
+            $$self{'err'} =
+              "[_locate_n] Unable to find an interval in $maxatt attempts";
+            return;
+         }
          $self->_nth_interval($first_int);
          my $date = $$self{'data'}{'idate'}{$first_int};
          last  if (defined $date  &&  $date->cmp($start) >= 0);
@@ -2188,8 +2279,15 @@ sub _locate_n {
       }
 
    } else {
+      my $n = 0;
       LOOP:
       while (1) {
+         $n++;
+         if ($n > $maxatt) {
+            $$self{'err'} =
+              "[_locate_n] Unable to find an interval in $maxatt attempts";
+            return;
+         }
          $self->_nth_interval($first_int);
          for (my $i=($first_int+1)*$ev - 1; $i >= $first_int*$ev; $i--) {
             next  if (! exists $$self{'data'}{'dates'}{$i});
@@ -2207,7 +2305,14 @@ sub _locate_n {
    $last_int = $first_int;
 
    if ($unmod) {
+      my $n = 0;
       while (1) {
+         $n++;
+         if ($n > $maxatt) {
+            $$self{'err'} =
+              "[_locate_n] Unable to find an interval in $maxatt attempts";
+            return;
+         }
          $self->_nth_interval($last_int);
          my $date = $$self{'data'}{'idate'}{$last_int};
          last  if (defined $date  &&  $date->cmp($end) > 0);
@@ -2216,8 +2321,15 @@ sub _locate_n {
       $last_int--;
 
    } else {
+      my $n = 0;
       LOOP:
       while (1) {
+         $n++;
+         if ($n > $maxatt) {
+            $$self{'err'} =
+              "[_locate_n] Unable to find an interval in $maxatt attempts";
+            return;
+         }
          $self->_nth_interval($last_int);
          for (my $i=($last_int+1)*$ev - 1; $i >= $last_int*$ev; $i--) {
             next  if (! exists $$self{'data'}{'dates'}{$i});

@@ -1,0 +1,7 @@
+Parse::SSA = ASS/SSA subtitle parser
+version 1.0
+
+This module can parse text, time, comments, names from SSA/ASS subtitle fromat.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

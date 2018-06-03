@@ -7,7 +7,7 @@ BEGIN {
 
 use 5.008001;
 use ExtUtils::MakeMaker;
-use Alien::FFCall;
+use Alien::Base::Wrapper qw( Alien::FFCall );
 
 WriteMakefile(
   'NAME'               => 'FFI',
@@ -17,11 +17,10 @@ WriteMakefile(
   'LICENSE'            => 'gpl_2',
   'DEFINE'             => ($^O eq "MSWin32" ? '-DWIN32' : ''),
   'MIN_PERL_VERSION'   => '5.008001',
-  'CCFLAGS'            => Alien::FFCall->cflags,
-  'LIBS'               => Alien::FFCall->libs,
   'CONFIGURE_REQUIRES' => {
-    'Alien::FFCall'       => 0.02,
-    'ExtUtils::MakeMaker' => '6.52',
+    'Alien::FFCall'         => 0.02,
+    'Alien::Base::Wrapper' => '0',
+    'ExtUtils::MakeMaker'   => '6.52',
   },
   'clean'              => {
     'FILES' => "vc*.pdb FFI.obj FFI.o FFI_def.old FFI-*",
@@ -30,15 +29,16 @@ WriteMakefile(
     'meta-spec' => { version => 2 },
     'resources' => {
       'bugtracker' => {
-        'web'  => 'https://github.com/plicease/FFI/issues',
+        'web'  => 'https://github.com/Perl5-FFI/FFI/issues',
       },
-      'homepage' => 'https://github.com/plicease/FFI',
+      'homepage' => 'https://github.com/Perl5-FFI/FFI',
       'repository' => {
         'type' => 'git',
-        'url'  => 'https://github.com/plicease/FFI.git',
-        'web'  => 'https://github.com/plicease/FFI',
+        'url'  => 'https://github.com/Perl5-FFI/FFI.git',
+        'web'  => 'https://github.com/Perl5-FFI/FFI',
       },
       x_IRC => "irc://irc.perl.org/#native",
      },
   },
+  Alien::Base::Wrapper->mm_args,
 );

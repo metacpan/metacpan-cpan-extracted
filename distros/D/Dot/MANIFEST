@@ -1,0 +1,12 @@
+Changes
+COPYING
+Dot.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/attribute-method.t
+t/attribute-tie.t
+t/method-modifier.t
+t/mi-wo-diamond.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

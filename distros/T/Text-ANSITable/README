@@ -3,8 +3,8 @@ NAME
     ANSI colors
 
 VERSION
-    This document describes version 0.49 of Text::ANSITable (from Perl
-    distribution Text-ANSITable), released on 2017-07-10.
+    This document describes version 0.500 of Text::ANSITable (from Perl
+    distribution Text-ANSITable), released on 2018-05-31.
 
 SYNOPSIS
      use 5.010;
@@ -1107,7 +1107,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014, 2013 by
+    This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

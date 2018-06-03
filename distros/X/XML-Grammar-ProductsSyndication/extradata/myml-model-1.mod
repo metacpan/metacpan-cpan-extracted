@@ -14,7 +14,7 @@
 
 <!-- ....................  Inline Elements  ...................... -->
 
-<!ENTITY % HeadOpts.mix  
+<!ENTITY % HeadOpts.mix
      "( %meta.qname; )*" >
 
 <!ENTITY % I18n.class "" >
@@ -22,8 +22,8 @@
 <!ENTITY % InlStruct.class "%br.qname; | %span.qname;" >
 
 <!ENTITY % InlPhras.class
-     "| %em.qname; | %strong.qname; | %dfn.qname; | %code.qname; 
-      | %samp.qname; | %kbd.qname; | %var.qname; | %cite.qname; 
+     "| %em.qname; | %strong.qname; | %dfn.qname; | %code.qname;
+      | %samp.qname; | %kbd.qname; | %var.qname; | %cite.qname;
       | %abbr.qname; | %acronym.qname; | %q.qname;" >
 
 <!ENTITY % Anchor.class "| %a.qname;" >
@@ -69,15 +69,15 @@
 
 <!-- .....................  Block Elements  ...................... -->
 
-<!ENTITY % Heading.class 
-     "%h1.qname; | %h2.qname; | %h3.qname; 
+<!ENTITY % Heading.class
+     "%h1.qname; | %h2.qname; | %h3.qname;
       | %h4.qname; | %h5.qname; | %h6.qname;" >
 
 <!ENTITY % List.class "%ul.qname; | %ol.qname; | %dl.qname;" >
 
 <!ENTITY % BlkStruct.class "%p.qname; | %div.qname;" >
 
-<!ENTITY % BlkPhras.class 
+<!ENTITY % BlkPhras.class
      "| %pre.qname; | %blockquote.qname; | %address.qname;" >
 
 <!ENTITY % BlkPres.class "" >

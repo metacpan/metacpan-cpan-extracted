@@ -15,8 +15,8 @@ use warnings;
 use parent qw( HiPi::Interface );
 use HiPi qw( :i2c :rpi :spi :oled );
 use Carp;
-use Time::HiRes qw( usleep );
-use HiPi::Interface::MonoOLED::Font;
+use HiPi::Graphics::BitmapFont;
+use HiPi::Graphics::DrawingContext;
 use HiPi::Interface::MonoOLED::DisplayBuffer;
 
 __PACKAGE__->create_ro_accessors( qw(
@@ -27,7 +27,7 @@ __PACKAGE__->create_ro_accessors( qw(
 
 __PACKAGE__->create_accessors( qw( context gpio ) );
 
-our $VERSION ='0.70';
+our $VERSION ='0.71';
 
 use constant {
     CONTROL_CONTINUE        => 0x80,
@@ -246,9 +246,9 @@ sub display_reset {
     
     if(defined($self->reset_pin)) {
         $self->gpio->set_pin_level($self->reset_pin, RPI_LOW );
-        Time::HiRes::usleep(1000);
+        $self->delayMicroseconds(1000);
         $self->gpio->set_pin_level($self->reset_pin, RPI_HIGH );
-        Time::HiRes::usleep(1000);
+        $self->delayMicroseconds(1000);
     }
     
     $self->send_command(OLED_DISPLAYOFF);
@@ -324,7 +324,7 @@ sub send_data {
 sub _spi_send_command {
     my($self, @commands) = @_;
     $self->gpio->set_pin_level( $self->dc_pin, RPI_LOW );
-    Time::HiRes::usleep(10);
+    $self->delayMicroseconds(10);
     $self->device->transfer( pack('C*', @commands ) );
     return;
 }
@@ -332,7 +332,7 @@ sub _spi_send_command {
 sub _spi_send_data {
     my($self, @data) = @_;
     $self->gpio->set_pin_level( $self->dc_pin, RPI_HIGH );
-    Time::HiRes::usleep(10);
+    $self->delayMicroseconds(10);
     $self->device->transfer( pack('C*', @data ) );
     return;
 }
@@ -422,12 +422,11 @@ sub set_start_line {
 }
 
 sub create_context {
-    return HiPi::Interface::MonoOLED::DrawingContext->new;
+    return HiPi::Graphics::DrawingContext->new;
 }
 
 sub display_update {
     my( $self ) = @_;
-    my $rows = 
     $self->block_update(0,0, $self->cols -1, $self->buffer_rows - 1);
     return;
 }

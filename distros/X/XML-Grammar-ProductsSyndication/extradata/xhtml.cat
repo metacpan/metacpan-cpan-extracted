@@ -6,7 +6,7 @@
     Revision:  $Id: xhtml.cat,v 1.7 2000/03/29 18:52:38 ahby Exp $ SMI
 
     This is the catalog data file for various versions of the XHTML DTD.
-    You do not need to use the file names listed here, and do not need 
+    You do not need to use the file names listed here, and do not need
     to use the filename method of identifying storage objects at all.
 
     See "Entity Management", SGML Open Technical Resolution 9401 for detailed
@@ -60,7 +60,7 @@ PUBLIC "-//W3C//DTD XHTML Architecture 1.1//EN"                "xhtml11-arch.dtd
 PUBLIC "-//W3C//ELEMENTS XHTML Param Element 1.0//EN"          "xhtml-param-1.mod"
 PUBLIC "-//W3C//ELEMENTS XHTML Presentation 1.0//EN"           "xhtml-pres-1.mod"
 PUBLIC "-//W3C//ELEMENTS XHTML Editing Elements 1.0//EN"       "xhtml-edit-1.mod"
-PUBLIC "-//W3C//ELEMENTS XHTML BIDI Override Element 1.0//EN"  "xhtml-bdo-1.mod" 
+PUBLIC "-//W3C//ELEMENTS XHTML BIDI Override Element 1.0//EN"  "xhtml-bdo-1.mod"
 PUBLIC "-//W3C//ELEMENTS XHTML Basic Forms 1.0//EN"            "xhtml-basic-form-1.mod"
 PUBLIC "-//W3C//ELEMENTS XHTML Forms 1.0//EN"                  "xhtml-form-1.mod"
 PUBLIC "-//W3C//ELEMENTS XHTML Basic Tables 1.0//EN"           "xhtml-basic-table-1.mod"
@@ -77,7 +77,7 @@ PUBLIC "-//W3C//ELEMENTS XHTML Base Element 1.0//EN"           "xhtml-base-1.mod
 
 PUBLIC "-//W3C//ELEMENTS XHTML Legacy Redeclarations 1.0//EN"  "xhtml-legacy-redecl-1.mod"
 PUBLIC "-//W3C//ELEMENTS XHTML Legacy Markup 1.0//EN"          "xhtml-legacy-1.mod"
-PUBLIC "-//W3C//ELEMENTS XHTML Embedded Object 1.0//EN"        "xhtml-object-1.mod" 
+PUBLIC "-//W3C//ELEMENTS XHTML Embedded Object 1.0//EN"        "xhtml-object-1.mod"
 PUBLIC "-//W3C//ELEMENTS XHTML Frames 1.0//EN"                 "xhtml-frames-1.mod"
 PUBLIC "-//W3C//ELEMENTS XHTML Target 1.0//EN"                 "xhtml-target-1.mod"
 PUBLIC "-//W3C//ELEMENTS XHTML Inline Frame Element 1.0//EN"   "xhtml-iframe-1.mod"

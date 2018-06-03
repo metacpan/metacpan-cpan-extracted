@@ -1,13 +1,12 @@
 package Class::Date::Rel;
 our $AUTHORITY = 'cpan:YANICK';
+$Class::Date::Rel::VERSION = '1.1.17';
 use strict;
 use warnings;
 
 use vars qw(@NEW_FROM_SCALAR);
 use Class::Date::Const;
 use Scalar::Util qw(blessed);
-
-our $VERSION = '1.1.15';
 
 use constant SEC_PER_MONTH => 2_629_744;
 
@@ -26,17 +25,18 @@ use overload
 sub new { my ($proto,$val)=@_;
   my $class = ref($proto) || $proto;
   return undef if !defined $val;
-  if (blessed($val) && $val->isa( __PACKAGE__ )) {
-    return $class->new_copy($val);
-  } elsif (ref($val) eq 'ARRAY') {
-    return $class->new_from_array($val);
-  } elsif (ref($val) eq 'HASH') {
-    return $class->new_from_hash($val);
-  } elsif (ref($val) eq 'SCALAR') {
-    return $class->new_from_scalar($$val);
-  } else {
-    return $class->new_from_scalar($val);
-  };
+
+  my $ref = ref $val or return $class->new_from_scalar($val);
+
+  return $class->new_copy($val)
+    if (blessed($val) && $val->isa( __PACKAGE__ ));
+    
+  return $class->new_from_array($val) if $ref eq 'ARRAY';
+
+  return $class->new_from_hash($val) if $ref eq 'HASH';
+
+  # can only be a scalar ref by now
+  return $class->new_from_scalar($$val);
 }
 
 sub new_copy { my ($s,$val)=@_;
@@ -154,7 +154,7 @@ Class::Date::Rel
 
 =head1 VERSION
 
-version 1.1.16
+version 1.1.17
 
 =head1 AUTHORS
 

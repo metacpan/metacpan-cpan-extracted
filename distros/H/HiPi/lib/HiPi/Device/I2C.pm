@@ -19,7 +19,6 @@ use HiPi::RaspberryPi;
 use IO::File;
 use XSLoader;
 use Carp;
-use Time::HiRes qw( usleep );
 use Try::Tiny;
 
 use constant {
@@ -27,7 +26,7 @@ use constant {
     I2C_BCM2835 => 2,
 };
 
-our $VERSION ='0.70';
+our $VERSION ='0.71';
 
 __PACKAGE__->create_accessors( qw ( fh fno address busmode readmode ) );
 
@@ -307,16 +306,6 @@ sub bus_write_bits {
         $bytecount --;
     }
     $self->bus_write($register, @bytes);
-}
-
-sub delay {
-    my($class, $millis) = @_;
-    usleep( $millis * 1000);
-}
-
-sub delayMicroseconds {
-    my($class, $micros) = @_;
-    usleep($micros);
 }
 
 #-------------------------------------------

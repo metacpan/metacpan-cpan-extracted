@@ -308,4 +308,5 @@ LEGALESE
 
 AUTHOR
     2005, Mike Schilli <cpan@perlmeister.com>
-
+MAINTAINER
+    2018, Alceu Rodrigues de Freitas Junior <arfreitas@.cpan.org>

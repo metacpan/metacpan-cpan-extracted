@@ -12,22 +12,22 @@ use warnings;
 use lib qw(../lib);
 use Math::AnyNum qw(is_square isqrt);
 
-sub sqrt_convergents {
+sub sqrt_cfrac_period {
     my ($n) = @_;
 
     my $x = isqrt($n);
     my $y = $x;
     my $z = 1;
 
-    my @convergents = ($x);
+    my @sqrt_cfrac = ($x);
 
     do {
         $y = int(($x + $y) / $z) * $z - $y;
         $z = int(($n - $y * $y) / $z);
-        push @convergents, int(($x + $y) / $z);
+        push @sqrt_cfrac, int(($x + $y) / $z);
     } until (($y == $x) && ($z == 1));
 
-    return @convergents;
+    return @sqrt_cfrac;
 }
 
 sub cfrac_numerator {
@@ -47,7 +47,7 @@ sub solve_pell {
 
     return if is_square($d);
 
-    my ($k, @period) = sqrt_convergents($d);
+    my ($k, @period) = sqrt_cfrac_period($d);
 
     my @solutions;
 

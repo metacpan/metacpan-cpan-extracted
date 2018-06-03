@@ -7,7 +7,7 @@ use FFI::Platypus;
 use constant _is_win32 => $^O =~ /^(MSWin32|cygwin|msys2?)$/ && do { require Config; $Config::Config{longsize} == 4 };
 
 # ABSTRACT: Perl Foreign Function Interface based on libffi
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 our $ffi = FFI::Platypus->new;
 $ffi->lib(undef);
@@ -31,28 +31,45 @@ our %typemap = qw(
   v   void
 );
 
-sub call
+sub _ffi
 {
-  my($addr, $signature, @args) = @_;
-  my $ffi = $FFI::ffi;
-  if($signature =~ s/^([sc])//)
+  if($_[0] =~ s/^([sc])//)
   {
-    $ffi = $stdcall_ffi if $1 eq 's';
+    return $stdcall_ffi if $1 eq 's';
   }
   else
   {
     Carp::croak("first character of signature must be s or c");
   }
+  
+  $ffi;
+}
+
+sub call
+{
+  my($addr, $signature, @args) = @_;
+  my $ffi = _ffi($signature);
   my($ret_type, @args_types) = map { $typemap{$_} } split //, $signature;
   $ffi->function($addr => \@args_types => $ret_type)->call(@args);
 }
 
 sub callback
 {
-  Carp::croak("not supported yet");
+  my($signature, $sub) = @_;
+  my $ffi = _ffi($signature);
+  my($ret_type, @args_types) = map { $typemap{$_} } split //, $signature;
+  my $type = '(' . join(',', @args_types) . ')->' . $ret_type;
+  my $closure = $ffi->closure($sub);
+  bless {
+    addr    => $ffi->cast($type => 'opaque', $closure),
+    sub     => $sub,
+    closure => $closure,
+  }, 'FFI::Callback';
 }
 
 package FFI::Callback;
+
+sub addr { shift->{addr} }
 
 1;
 
@@ -68,7 +85,7 @@ FFI - Perl Foreign Function Interface based on libffi
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -82,7 +99,7 @@ version 0.01
 
 =head1 DESCRIPTION
 
-B<NOTE>: Newer FFI modules such as L<FFI::Platypus> and L<FFI::Raw>
+B<NOTE>: Newer and better maintained FFI modules such as L<FFI::Platypus>
 provide more functionality and so it is strongly recommend that you use
 one of them for new projects and even consider migrating to one of
 them for existing projects.
@@ -249,10 +266,6 @@ Portable functions for finding libraries.
 
 Platypus is another FFI interface based on libffi.  It has a more 
 extensive feature set, and libffi has a less restrictive license.
-
-=item L<FFI::Raw>
-
-Another FFI interface based on libffi.
 
 =item L<Win32::API>
 

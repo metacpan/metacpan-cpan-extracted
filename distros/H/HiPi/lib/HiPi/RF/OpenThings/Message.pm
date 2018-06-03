@@ -18,7 +18,7 @@ use HiPi::RF::OpenThings;
 use Try::Tiny;
 use JSON;
 
-our $VERSION ='0.70';
+our $VERSION ='0.71';
 
 __PACKAGE__->create_accessors( qw(
     cryptseed
@@ -453,7 +453,6 @@ sub decode_value {
             return $result / ( 2 ** $self->get_value_type_bits( $typeid ) );
         }
     } elsif( $typeid == OPENTHINGS_CHAR ) {
-        my $numbytes = scalar @$bytes;
         my $format = 'C*';
         my $result = pack($format, @$bytes);
         return $result;
@@ -470,8 +469,7 @@ sub decode_value {
 		# turn to signed int based on high bit of MSB
 		# 2's comp is 1's comp plus 1
 		if(($bytes->[0] & 0x80) == 0x80) {
-            my $onescomp = (~$result) & ( ( 2 ** ( $numbytes * 8) ) -1 );
-            $result = -($onescomp + 1);
+            $result = - HiPi->twos_compliment( $result, $numbytes );
         }
 		# adjust for binary point
 		if( $typeid == OPENTHINGS_SINT ) {

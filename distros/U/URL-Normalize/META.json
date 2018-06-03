@@ -1,0 +1,52 @@
+{
+   "abstract" : "Normalize/optimize URLs.",
+   "author" : [
+      "Tore Aursand <toreau@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "URL-Normalize",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.34"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "2.2011",
+            "URI" : "1.74",
+            "namespace::autoclean" : "0.28"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.302136"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/toreau/URL-Normalize/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/toreau/URL-Normalize"
+      }
+   },
+   "version" : "0.38",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01"
+}
+

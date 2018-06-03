@@ -1,5 +1,45 @@
 Revision history for Perl module Perl::Critic
 
+
+1.32    Thu May 31 21:48:48 CDT 2018
+    [New Features]
+    Added the ability to specify a regex to tell what unused private
+    subroutines are OK in Subroutines::ProhibitUnusedPrivateSubroutines.
+    This is handy for Moose classes where there could be many false
+    positives on _build_xxxx() subroutines.
+    Thanks, Dave Cross.  (GH #811, #812)
+
+    [Dependencies]
+    Perl::Critic now no longer relies on the deprecated Email::Address.
+    (GH #816)
+
+1.131_02 Tue Feb 20 17:18:03 CST 2018
+    [New Features]
+    Perl::Critic now assumes that .psgi files are Perl, too.  Thanks, Tom
+    Hukins. (GH#805)
+
+    Variables::ProhibitUnusedVariables no longer gives a false positive for
+    variables used in interpolation.  Thanks, Omer Gazit. (GH#801)
+
+    [Bug Fixes]
+    Added missing requirement for Fatal.pm.
+
+
+1.131_01 Tue Nov 21 17:28:06 CST 2017
+    [New Features]
+    In the ProhibitLeadingZeros policy, added an exception for mkfifo.
+    Thanks, Evan Zacks. (GH#786)
+
+    Add color support for Windows platforms.  Thanks, Roy Ivy III. (GH#700)
+
+    [Bug Fixes]
+    Recode Perl::Critic::Utils::all_perl_files() to use File::Find instead
+    of opendir/readdir.  This solves endless directory traversals if
+    the directories contain circular symbolic references.  Thanks, Tom Wyant.
+
+    [Documentation]
+    Added CONTRIBUTING.md.  Thanks, Jonas B. Nielsen.
+
 1.130   Thu Jul 20 23:16:34 CDT 2017
     [New Features]
     * Policies which ensure that system calls are checked such as

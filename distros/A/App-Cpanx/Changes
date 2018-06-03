@@ -1,0 +1,20 @@
+Revision history for App::Cpanx
+
+0.06  Fri Jun  1 14:40:16 CDT 2018
+    - Store $VERSION in the module
+
+0.05  Fri Jun  1 14:18:53 CDT 2018
+    - Do not use -k with gzip
+
+0.04  Fri Jun  1 13:53:32 CDT 2018
+    - Use -R option for curl
+
+0.03  Fri Jun  1 13:46:50 CDT 2018
+    - Run pings simultaneously
+
+0.02  Fri Jun  1 12:20:14 CDT 2018
+    - Add EXE_FILES to Makefile.PL
+
+0.01  Fri Jun  1 00:59:34 CDT 2018
+    - cpanx, a CPAN downloader script
+

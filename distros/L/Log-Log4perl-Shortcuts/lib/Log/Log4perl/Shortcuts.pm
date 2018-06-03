@@ -1,5 +1,5 @@
 package Log::Log4perl::Shortcuts ;
-$Log::Log4perl::Shortcuts::VERSION = '0.006';
+$Log::Log4perl::Shortcuts::VERSION = '0.007';
 use Carp;
 use Log::Log4perl;
 use File::HomeDir;
@@ -28,7 +28,7 @@ BEGIN {
 
 sub change_config_file {
   $current_config = shift;
-  my $file = File::HomeDir->my_home . $config_dir . $current_config;
+  my $file = $home_dir . $config_dir . $current_config;
   if (!-f $file) { 
     carp ("Configuration file $file does not exist. Configuration file unchanged.");
   } else {
@@ -141,7 +141,7 @@ Log::Log4perl::Shortcuts - shortcut functions to make log4perl even easier
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 OVERVIEW
 

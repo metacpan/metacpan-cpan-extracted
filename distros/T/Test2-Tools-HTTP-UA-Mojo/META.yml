@@ -1,0 +1,39 @@
+---
+abstract: 'Mojo user agent wrapper for Test2::Tools::HTTP'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test2::Require::Internet: '0'
+  Test2::Require::Module: '0.000060'
+  Test2::Tools::HTTP: '0.05'
+  Test2::Tools::JSON::Pointer: '0'
+  Test2::V0: '0.000060'
+  perl: '5.01001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.01001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test2-Tools-HTTP-UA-Mojo
+recommends:
+  EV: '0'
+requires:
+  HTTP::Message: '0'
+  HTTP::Request: '0'
+  Mojolicious: '7.52'
+  Mojolicious::Plugin::MountPSGI: '0'
+  Plack: '0'
+  Test2::Tools::HTTP: '0.05'
+  parent: '0'
+  perl: '5.01001'
+resources:
+  bugtracker: https://github.com/plicease/Test2-Tools-HTTP-UA-Mojo/issues
+  homepage: https://metacpan.org/pod/Test2::Tools::HTTP::UA::Mojo
+  repository: git://github.com/plicease/Test2-Tools-HTTP-UA-Mojo.git
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_use_unsafe_inc: 0

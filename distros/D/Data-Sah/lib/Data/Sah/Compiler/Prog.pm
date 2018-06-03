@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::Prog;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.88'; # VERSION
+our $DATE = '2018-05-29'; # DATE
+our $VERSION = '0.890'; # VERSION
 
 use 5.010;
 use strict;
@@ -870,7 +870,7 @@ Data::Sah::Compiler::Prog - Base class for programming language compilers
 
 =head1 VERSION
 
-This document describes version 0.88 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2017-07-10.
+This document describes version 0.890 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2018-05-29.
 
 =head1 SYNOPSIS
 
@@ -1111,14 +1111,22 @@ The kind of code to generate. For now the only valid (and default) value is
 =item * return_type => STR (default: bool)
 
 Specify what kind of return value the generated code should produce. Either
-C<bool>, C<str>, or C<full>.
+C<bool>, C<bool+val>, C<str>, C<str+val>, or C<full>.
 
 C<bool> means generated validator code should just return true/false depending
 on whether validation succeeds/fails.
 
+C<bool+val> is like C<bool>, but instead of just C<bool> the validator code will
+return a two-element arrayref C<< [bool, val] >> where C<val> is the final value
+of data (after setting of default, coercion, etc.)
+
 C<str> means validation should return an error message string (the first one
 encountered) if validation fails and an empty string/undef if validation
 succeeds.
+
+C<str+val> is like C<str>, but instead of just C<str> the validator code will
+return a two-element arrayref C<< [str, val] >> where C<val> is the final value
+of data (after setting of default, coercion, etc.)
 
 C<full> means validation should return a full data structure. From this
 structure you can check whether validation succeeds, retrieve all the collected
@@ -1194,7 +1202,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

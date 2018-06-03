@@ -8,17 +8,17 @@ RT->Config->Set('UserSummaryExtraInfo', "RealName, EmailAddress, Name, CustomFie
 use WWW::Mechanize::PhantomJS;
 
 my $cf_condition = RT::CustomField->new(RT->SystemUser);
-$cf_condition->Create(Name => 'Condition', LookupType => 'RT::User', Type => 'SelectSingle');
+$cf_condition->Create(Name => 'Condition', LookupType => 'RT::User', Type => 'Select', MaxValues => 1);
 $cf_condition->AddValue(Name => 'Passed', SortOder => 0);
 $cf_condition->AddValue(Name => 'Failed', SortOrder => 1);
 $cf_condition->AddValue(Name => 'Schrödingerized', SortOrder => 2);
 my $cf_values = $cf_condition->Values->ItemsArrayRef;
 
 my $cf_conditioned_by = RT::CustomField->new(RT->SystemUser);
-$cf_conditioned_by->Create(Name => 'ConditionedBy', LookupType => 'RT::User', Type => 'FreeformSingle');
+$cf_conditioned_by->Create(Name => 'ConditionedBy', LookupType => 'RT::User', Type => 'Freeform', MaxValues => 1);
 
 my $cf_conditioned_by_child = RT::CustomField->new(RT->SystemUser);
-$cf_conditioned_by_child->Create(Name => 'Child', LookupType => 'RT::User', Type => 'FreeformSingle', BasedOn => $cf_conditioned_by->id);
+$cf_conditioned_by_child->Create(Name => 'Child', LookupType => 'RT::User', Type => 'Freeform', MaxValues => 1, BasedOn => $cf_conditioned_by->id);
 
 my $user = RT::User->new(RT->SystemUser);
 $user->Create(Name => 'Test User ConditionalCF', EmailAddress => 'test-user-conditionalCF@example.com');

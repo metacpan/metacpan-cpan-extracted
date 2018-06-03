@@ -1,5 +1,8 @@
 Revision history for XML::Grammar::ProductsSyndication
 
+0.0405  2018-05-29
+        - Change build_requires to test_requires .
+
 0.0404  2015-05-31
         - Add repository link to META.yml / META.json .
 

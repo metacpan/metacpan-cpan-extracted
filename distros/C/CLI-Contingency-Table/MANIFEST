@@ -1,0 +1,18 @@
+Build.PL
+Changes
+lib/CLI/Contingency/Table.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+scripts/init.sh
+scripts/venn
+scripts/freq
+scripts/csel
+scripts/crosstable
+scripts/saikoro
+scripts/venn4
+META.yml
+META.json

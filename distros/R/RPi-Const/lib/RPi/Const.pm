@@ -3,7 +3,7 @@ package RPi::Const;
 use strict;
 use warnings;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 require Exporter;
 use base qw( Exporter );
@@ -23,6 +23,23 @@ use constant {
 
     push @EXPORT_OK, @const;
     $EXPORT_TAGS{pwm_mode} = \@const;
+}
+
+use constant {
+    PWM_DEFAULT_MODE => 1, # balanced
+    PWM_DEFAULT_CLOCK => 32,
+    PWM_DEFAULT_RANGE => 1023,
+};
+
+{ # PWM defaults
+    my @const = qw(
+        PWM_DEFAULT_MODE
+        PWM_DEFAULT_CLOCK
+        PWM_DEFAULT_RANGE
+        );
+
+    push @EXPORT_OK, @const;
+    $EXPORT_TAGS{pwm_defaults} = \@const;
 }
 
 use constant {
@@ -158,7 +175,8 @@ __END__
 
 =head1 NAME
 
-RPi::Const - Constant variables for RPi::WiringPi
+RPi::Const - Constant variables for embedded programming, including the RPi::
+family of modules
 
 =head1 SYNOPSIS
 
@@ -235,6 +253,14 @@ The modes the PWM can be set to.
 
     PWM_MODE_MS  => 0,
     PWM_MODE_BAL => 1,
+
+=head2 :pwm_defaults
+
+Hardware defaults for PWM settings.
+
+    PWM_DEFAULT_MODE => 1, # balanced mode
+    PWM_DEFAULT_CLOCK => 32,
+    PWM_DEFAULT_RANGE => 1023
 
 =head2 :interrupt
 

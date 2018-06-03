@@ -1,5 +1,15 @@
 Revision history for Math-AnyNum
 
+0.26    2018-05-30
+
+        [CHANGES]
+
+        - Boolification of `NaN` is now false (before `NaN` evaluated to a true value in boolean context, which was not very convenient).
+
+        [BUG-FIXES]
+
+        - Fixed `superfactorial(n)` and `hyperfactorial(n)` for n={0, 1}.
+
 0.25    2018-05-25
 
         [ADDITIONS]

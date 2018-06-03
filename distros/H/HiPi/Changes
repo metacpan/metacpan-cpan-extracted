@@ -1,3 +1,8 @@
+Version 0.71  - 30 May 2018
+                Added HiPi::Interface::MS5611 - pressure / temp sensor
+                Added HiPi::Interface::TMP102 - temperature sensor
+                Added EPaper / E-Ink interfaces
+
 Version 0.70  - 08 May 2018
                 Added HiPi::Interface::MonoOLED for monochrome OLED's
                 that use SSD1306 and SH1106 controllers.

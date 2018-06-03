@@ -23,6 +23,8 @@ my %WriteMakefileArgs = (
     "Moose" => "2.1404",
     "Moose::Util::TypeConstraints" => "2.1404",
     "MooseX::MarkAsMethods" => "0.15",
+    "MooseX::NonMoose" => "0.26",
+    "SQL::Translator" => "0.11018",
     "YAML" => "1.15"
   },
   "TEST_REQUIRES" => {
@@ -30,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => "1.48",
     "Test::Pod::Coverage" => "1.10"
   },
-  "VERSION" => "0.06",
+  "VERSION" => "0.08",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,6 +47,8 @@ my %FallbackPrereqs = (
   "Moose" => "2.1404",
   "Moose::Util::TypeConstraints" => "2.1404",
   "MooseX::MarkAsMethods" => "0.15",
+  "MooseX::NonMoose" => "0.26",
+  "SQL::Translator" => "0.11018",
   "Test::Most" => 0,
   "Test::Pod" => "1.48",
   "Test::Pod::Coverage" => "1.10",

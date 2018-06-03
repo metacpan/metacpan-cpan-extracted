@@ -10,7 +10,7 @@ has alien_data_dir => ( is => 'lazy', isa => Str, init_arg => undef );
 has alien_bin_path => ( is => 'lazy', isa => Str, init_arg => undef );
 has alien_cfg_path => ( is => 'lazy', isa => Str, init_arg => undef );
 
-has alien_pid => ( is => 'rwp', isa => Int, init_arg => undef );
+has alien_pid => ( isa => Int, init_arg => undef );
 
 has term_state => ( is => 'rw', isa => Bool, default => 0, init_arg => undef );
 
@@ -54,7 +54,7 @@ around app_run => sub ( $orig, $self ) {
             $self->term_state(1);
 
             # send TERM to child process
-            kill 'TERM', $self->alien_pid;    ## no critic qw[InputOutput::RequireCheckedSyscalls]
+            kill 'TERM', $self->{alien_pid};    ## no critic qw[InputOutput::RequireCheckedSyscalls]
 
             return;
         };
@@ -95,7 +95,7 @@ around app_run => sub ( $orig, $self ) {
 
 sub _fork_child ($self) {
     if ( my $alien_pid = fork ) {    # parent process
-        $self->_set_alien_pid($alien_pid);
+        $self->{alien_pid} = $alien_pid;
 
         return;
     }

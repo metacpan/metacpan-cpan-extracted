@@ -70,7 +70,7 @@ sub make_request {
     $request->header("environment" => $self->config->environment);
     $request->header("User-Agent" => "Braintree Perl Module " . CLIENT_VERSION );
 
-    my $agent = LWP::UserAgent->new;
+    my $agent = LWP::UserAgent->new(ssl_opts => {SSL_version => 'TLSv12:!SSLv2:!SSLv3:!TLSv1:!TLSv11'});
 
     warn Dumper $request if $ENV{WEBSERVICE_BRAINTREE_DEBUG};
     my $response;

@@ -52,7 +52,7 @@ driver -->
      SYSTEM "xhtml-pres-1.mod" >
 %xhtml-pres.mod;
 
-<!-- My Elements Module   ........................................ 
+<!-- My Elements Module   ........................................
 <!ENTITY % MyML-elements.mod
      SYSTEM "myml-elements-1.mod" >
 %MyML-elements.mod;

@@ -9,13 +9,24 @@
 package Dist::Zilla::Role::Git::Repo;
 # ABSTRACT: Provide repository information for Git plugins
 
-our $VERSION = '2.043';
+our $VERSION = '2.044';
 
 use Moose::Role;
 use MooseX::Types::Moose qw(Str Maybe);
 use namespace::autoclean;
 
-has 'repo_root'   => ( is => 'ro', isa => Str, default => '.' );
+has repo_root => (
+    is => 'ro',
+    isa => Str,
+    lazy => 1,
+    builder => '_build_repo_root',
+);
+
+sub _build_repo_root
+{
+    my $self = shift;
+    $self->zilla->root->stringify;
+}
 
 #pod =method current_git_branch
 #pod
@@ -99,7 +110,7 @@ Dist::Zilla::Role::Git::Repo - Provide repository information for Git plugins
 
 =head1 VERSION
 
-version 2.043
+version 2.044
 
 =head1 DESCRIPTION
 
@@ -110,7 +121,8 @@ repository structure, and to create a Git::Wrapper object.
 
 =head2 repo_root
 
-The repository root, either as a full path or relative to the distribution root. Default is C<.>.
+The repository root, either as a full path or relative to the distribution
+root. The default is the distribution root (C<$zilla->root>).
 
 =head1 METHODS
 

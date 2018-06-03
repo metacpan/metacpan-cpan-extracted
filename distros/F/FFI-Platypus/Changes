@@ -1,5 +1,29 @@
 Revision history for FFI-Platypus
 
+0.50      2018-06-01 07:58:33 -0400
+  - Additional diagnostics
+
+0.49_05   2018-05-29 12:44:45 -0400
+  - Require Alien::FFI 0.20 for bugfixes
+
+0.49_04   2018-05-27 07:36:58 -0400
+  - Additional diagnostics
+  - Added a FAQ section.  Some other minor documentation enhancements.
+
+0.49_03   2018-05-19 10:09:15 -0400
+  - The previous version contained build files that would break the install
+    unless you were building on my machine.  This is what the previous
+    version should have been.
+
+0.49_02   2018-05-18 22:08:43 -0400
+  - Fix version mismatch error with XS
+
+0.49_01   2018-05-18 16:16:13 -0400
+  - Move the source repository for this project into the GitHub org Perl5-FFI
+    The new URL is https://github.org/Perl5-FFI/FFI-Platypus
+  - Remove dependency on JSON::PP, use Data::Dumper for build configuration.
+    This may improve startup performance.
+
 0.48      2018-02-20 09:37:32 -0500
   - setting lib => undef is now the same as setting it to [undef] in the constructor
     (previously lib => undef was ignored)

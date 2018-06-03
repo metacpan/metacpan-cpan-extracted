@@ -1,0 +1,85 @@
+{
+   "abstract" : "Test HTTP / PSGI",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test2-Tools-HTTP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Message" : "6.07",
+            "HTTP::Message::PSGI" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Response" : "0",
+            "LWP::Protocol" : "0",
+            "LWP::UserAgent" : "0",
+            "Plack" : "0",
+            "Test2::API" : "1.302015",
+            "Test2::Compare" : "0.000060",
+            "Test2::Compare::Custom" : "0.000060",
+            "Test2::Compare::Object" : "0.000060",
+            "Test2::Compare::Wildcard" : "0.000060",
+            "Test2::Require" : "0.000060",
+            "URI" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "Test2::Mock" : "0.000060",
+            "Test2::Require::Module" : "0.000060",
+            "Test2::Tools::URL" : "0",
+            "Test2::V0" : "0.000060",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/Test2-Tools-HTTP/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Test2::Tools::HTTP",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/Test2-Tools-HTTP.git",
+         "web" : "https://github.com/plicease/Test2-Tools-HTTP"
+      }
+   },
+   "version" : "0.08",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
+   "x_use_unsafe_inc" : 0
+}
+

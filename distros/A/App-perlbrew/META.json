@@ -1,0 +1,66 @@
+{
+   "abstract" : "Manage perl installations in your C<$HOME>",
+   "author" : [
+      "Kang-min Liu  C<< <gugod@gugod.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.023",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-perlbrew",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.023",
+            "Pod::Markdown" : "2.002"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Perl::Releases" : "3.24",
+            "Capture::Tiny" : "0.36",
+            "Devel::PatchPerl" : "1.40",
+            "File::Temp" : "0.2304",
+            "JSON::PP" : "0",
+            "Pod::Parser" : "1.63",
+            "Pod::Usage" : "1.68",
+            "local::lib" : "2.000014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.86",
+            "File::Which" : "1.21",
+            "IO::All" : "0.51",
+            "Path::Class" : "0.33",
+            "Pod::Markdown" : "2.002",
+            "Test::Exception" : "0.32",
+            "Test::More" : "1.001002",
+            "Test::NoWarnings" : "1.04",
+            "Test::Output" : "1.03",
+            "Test::Simple" : "1.001002",
+            "Test::Spec" : "0.47",
+            "Test::TempDir::Tiny" : "0.016"
+         }
+      }
+   },
+   "provides" : {
+      "App::perlbrew" : {
+         "file" : "lib/App/perlbrew.pm",
+         "version" : "0.83"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.83",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

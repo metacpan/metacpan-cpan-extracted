@@ -6,7 +6,7 @@ use Test::More;
 use Test::Output;
 use JavaScript::Duktape::XS;
 
-sub test_set_get {
+sub test_set_get_and_exists {
     my $duk = JavaScript::Duktape::XS->new();
     ok($duk, "created JavaScript::Duktape::XS object");
 
@@ -39,8 +39,10 @@ sub test_set_get {
     foreach my $case (sort keys %values) {
         my $name = "name_$case";
         my $expected = $values{$case};
+        ok(!$duk->exists($name), "does not exist yet for [$case]");
         $duk->set($name, $expected);
         my $got = $duk->get($name);
+        ok($duk->exists($name), "exists for [$case]");
         is_deeply($got, $expected, "set and get for [$case]")
             or printf STDERR ("%s", Dumper({got => $got, expected => $expected}));
     }
@@ -123,7 +125,7 @@ sub test_roundtrip {
 }
 
 sub main {
-    test_set_get();
+    test_set_get_and_exists();
     test_eval();
     test_roundtrip();
     done_testing;

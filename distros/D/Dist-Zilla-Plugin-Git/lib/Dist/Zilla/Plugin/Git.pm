@@ -10,10 +10,10 @@ use 5.008;
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::Git; # git description: v2.042-12-g6cc6fe0
+package Dist::Zilla::Plugin::Git; # git description: v2.043-11-g9d36216
 # ABSTRACT: Update your git repository after release
 
-our $VERSION = '2.043';
+our $VERSION = '2.044';
 
 1;
 
@@ -29,7 +29,7 @@ Dist::Zilla::Plugin::Git - Update your git repository after release
 
 =head1 VERSION
 
-version 2.043
+version 2.044
 
 =head1 DESCRIPTION
 
@@ -96,38 +96,6 @@ when you do S<C<dzil new>>.
 
 Calculates the version number of your distribution from your Git tags
 using L<Version::Next>.
-
-=back
-
-=head1 SEE ALSO
-
-You can look for information on this module at:
-
-=over 4
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Dist-Zilla-Plugin-Git>
-
-=item * See open / report bugs
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dist-Zilla-Plugin-Git>
-
-=item * Mailing-list (same as L<Dist::Zilla>)
-
-L<http://www.listbox.com/subscribe/?list_id=139292>
-
-=item * Git repository
-
-L<http://github.com/madsen/dist-zilla-plugin-git>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Dist-Zilla-Plugin-Git>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Dist-Zilla-Plugin-Git>
 
 =back
 

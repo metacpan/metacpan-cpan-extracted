@@ -32,7 +32,7 @@ use strict;
 use warnings;
 
 our($VERSION);
-$VERSION='6.61';
+$VERSION='6.71';
 
 END {
    my $tmp;

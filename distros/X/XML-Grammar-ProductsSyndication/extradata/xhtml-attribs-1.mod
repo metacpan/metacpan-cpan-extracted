@@ -20,9 +20,9 @@
      This module declares many of the common attributes for the XHTML DTD.
      %NS.decl.attrib; is declared in the XHTML Qname module.
 
-	 Note that this file was extended in XHTML Modularization Second Edition to 
+	 Note that this file was extended in XHTML Modularization Second Edition to
 	 include declarations of "global" versions of the attribute collections.
-	 The global versions of the attributes are for use on elements in other 
+	 The global versions of the attributes are for use on elements in other
 	 namespaces.  The global version of "common" includes the xmlns declaration
 	 for the prefixed version of the xhtml namespace.  If you are only using a
 	 specific attribute or an individual attribute collection, you must also

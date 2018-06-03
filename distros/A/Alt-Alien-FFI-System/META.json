@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -50,9 +50,8 @@
       },
       "test" : {
          "requires" : {
-            "Test2::Suite" : "0.000060",
+            "Test2::V0" : "0.000060",
             "Test::Alien" : "0",
-            "Test::More" : "0.94",
             "perl" : "5.008001"
          }
       }
@@ -69,7 +68,8 @@
          "web" : "https://github.com/plicease/Alt-Alien-FFI-System"
       }
    },
-   "version" : "0.16",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+   "version" : "0.21",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
+   "x_use_unsafe_inc" : 0
 }
 

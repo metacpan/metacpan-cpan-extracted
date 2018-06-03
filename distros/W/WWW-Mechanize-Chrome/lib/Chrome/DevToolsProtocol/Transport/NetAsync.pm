@@ -9,7 +9,7 @@ use IO::Async::Loop;
 use Net::Async::WebSocket::Client;
 Net::Async::WebSocket::Client->VERSION(0.12); # fixes some errors with masked frames
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head1 NAME
 
@@ -82,8 +82,9 @@ sub send( $self, $message ) {
 
 sub close( $self ) {
     my $c = delete $self->{connection};
-    $c->finish
-        if $c;
+    if( $c) {
+        $c->close
+    };
     delete $self->{ua};
 }
 

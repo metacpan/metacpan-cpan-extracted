@@ -1,5 +1,5 @@
 package Config::From::Backend;
-$Config::From::Backend::VERSION = '0.06';
+$Config::From::Backend::VERSION = '0.08';
 
 use utf8;
 use Moose;
@@ -21,6 +21,24 @@ sub _log{
 
   say STDERR "[debug] $msg";
 }
+
+=head1 NAME
+
+Config::From::Backend -  Base Backend
+
+=head1 VERSION
+
+version 0.08
+
+=head1 SUBROUTINES/METHODS
+
+
+
+=head1 AUTHOR
+
+Daniel Brosseau, C<< <dab at catapulse.org> >>
+
+=cut
 
 
 1;

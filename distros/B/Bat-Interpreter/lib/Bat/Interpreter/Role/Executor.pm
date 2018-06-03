@@ -2,10 +2,10 @@ package Bat::Interpreter::Role::Executor;
 
 use utf8;
 
-use Moose::Role;
+use Moo::Role;
 use namespace::autoclean;
 
-our $VERSION = '0.009';    # VERSION
+our $VERSION = '0.010';    # VERSION
 
 requires 'execute_command';
 
@@ -25,7 +25,7 @@ Bat::Interpreter::Role::Executor
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 DESCRIPTION
 

@@ -1,3 +1,7 @@
+0.28 2018-05-30
+-bugfix: segfault when c function uri_decode called with len=0 and an input
+ string with length > 0
+
 0.27 2018-05-26
 -declare POD encoding
 

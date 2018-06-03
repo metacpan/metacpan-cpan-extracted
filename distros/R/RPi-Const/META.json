@@ -1,10 +1,10 @@
 {
-   "abstract" : "Constant variables for RPi::WiringPi",
+   "abstract" : "Constant variables for embedded programming, including the RPi:: family of modules",
    "author" : [
       "Steve Bertrand <steveb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -47,6 +47,6 @@
          "web" : "https://github.com/stevieb9/rpi-const"
       }
    },
-   "version" : "1.02",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "1.03",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

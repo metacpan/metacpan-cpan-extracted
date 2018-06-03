@@ -1063,8 +1063,8 @@ after '_analyse_completion_state' => sub {
         my $script_time = $self->_file_timestamp_for_out( $self->script_file );
         if ( my $outfiles = $files->{out}) {
             my $fs_delay = $self->group->file_system_delay;
-          FILE:
             while ( my ($type, $fileval) = each %$outfiles ) {
+              FILE:
                 for my $file ( @$fileval ) {
                     while ($fs_delay && ! $file->exists_out_file) {
                         my $sleep_time = ($fs_delay > 5) ? 5 : $fs_delay;

@@ -12,7 +12,7 @@ plan tests => 9;
 subtest 'Require some module' => sub {
     plan tests => 2;
 
-    use_ok 'JIP::DataPath', '0.02';
+    use_ok 'JIP::DataPath', '0.03';
     require_ok 'JIP::DataPath';
 
     diag(
@@ -45,7 +45,7 @@ subtest 'new()' => sub {
 };
 
 subtest 'get()' => sub {
-    plan tests => 2;
+    plan tests => 3;
 
     subtest 'when document is not defined' => sub {
         plan tests => 3;
@@ -85,6 +85,29 @@ subtest 'get()' => sub {
                 ],
             },
         };
+    };
+
+    subtest 'default_value' => sub {
+        plan tests => 9;
+
+        my $document = {foo => 'bar'};
+
+        my $o = JIP::DataPath->new(document => $document);
+
+        is_deeply $o->get([qw()]),     $document;
+        is_deeply $o->get([qw()], 42), $document;
+
+        is_deeply $o->get([qw(foo)]),     $document->{'foo'};
+        is_deeply $o->get([qw(foo)], 42), $document->{'foo'};
+
+        is_deeply $o->get([qw(foo bar)]),     undef;
+        is_deeply $o->get([qw(foo bar)], 42), 42;
+
+        is_deeply $o->get([qw(foo bar 0)]),     undef;
+        is_deeply $o->get([qw(foo bar 0)], 42), 42;
+
+        # side effects
+        is_deeply $document, {foo => 'bar'};
     };
 };
 
@@ -221,10 +244,20 @@ subtest 'perform()' => sub {
     });
 
     subtest 'perform get()' => sub {
-        plan tests => 1;
+        plan tests => 3;
 
-        my $result = $o->perform('get', [qw(foo bar 0 wtf)]);
-        is $result, 42;
+        {
+            my $result = $o->perform('get', [qw(foo bar 0 wtf)]);
+            is $result, 42;
+        }
+        {
+            my $result = $o->perform('get', [qw(tratata)]);
+            is $result, undef;
+        }
+        {
+            my $result = $o->perform('get', [qw(tratata)], 42);
+            is $result, 42;
+        }
     };
 
     subtest 'perform set()' => sub {

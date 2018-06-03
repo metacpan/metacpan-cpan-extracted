@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::CreditCard;
-$WebService::Braintree::CreditCard::VERSION = '1.3';
+$WebService::Braintree::CreditCard::VERSION = '1.4';
 use 5.010_001;
 use strictures 1;
 
@@ -100,7 +100,7 @@ C<< payment_method_token >> appropriately.
 
 sub credit {
     my ($class, $token, $params) = @_;
-    WebService::Braintree::Transaction->credit({
+    $class->gateway->transaction->credit({
         %{$params//{}},
         payment_method_token => $token,
     });
@@ -116,7 +116,7 @@ C<< payment_method_token >> appropriately.
 
 sub sale {
     my ($class, $token, $params) = @_;
-    WebService::Braintree::Transaction->sale({
+    $class->gateway->transaction->sale({
         %{$params//{}},
         payment_method_token => $token,
     });

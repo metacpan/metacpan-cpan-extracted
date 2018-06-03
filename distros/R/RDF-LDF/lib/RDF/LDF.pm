@@ -20,7 +20,7 @@ use JSON;
 use URI::Template;
 use RDF::LDF::Error;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 has url => (
     is => 'ro' ,
@@ -230,7 +230,7 @@ sub _apply_binding {
 #
 #    my ($pattern, $rest) = $self->_find_best_pattern($triples);
 #
-#    $pattern => Pattern in $triples which least ammount of results
+#    $pattern => Pattern in $triples which least amount of results
 #    $rest    => All patterns in $triples except $pattern
 #
 sub _find_best_pattern {
@@ -324,7 +324,7 @@ sub _parse_triple_pattern {
 #   rdf_subject   => <name_of_subject_variable> ,
 #   rdf_predicate => <name_of_predicate_variable> ,
 #   rdf_object    => <name_of_object_variable>
-#   void_uriLookupEndpoint => <endpoint_for_tripple_pattern>
+#   hydra_template => <endpoint_for_tripple_pattern>
 # }
 sub get_query_pattern {
     my ($self,$url) = @_;
@@ -339,7 +339,7 @@ sub get_query_pattern {
 
     return undef unless _is_hash_ref($info);
 
-    return undef unless $info->{void_uriLookupEndpoint};
+    return undef unless $info->{hydra_template};
 
     for (keys %$info) {
         next unless _is_hash_ref($info->{$_}) && $info->{$_}->{hydra_property};
@@ -353,7 +353,7 @@ sub get_query_pattern {
     return undef unless $pattern->{rdf_predicate};
     return undef unless $pattern->{rdf_object};
 
-    $pattern->{void_uriLookupEndpoint} = $info->{void_uriLookupEndpoint};
+    $pattern->{hydra_template} = $info->{hydra_template};
 
     $pattern;
 }
@@ -393,7 +393,7 @@ sub get_statements {
         $params{ $pattern->{rdf_predicate} } = $predicate if _is_string($predicate);
         $params{ $pattern->{rdf_object} }    = $object if _is_string($object);
 
-        my $template  = URI::Template->new($pattern->{void_uriLookupEndpoint});
+        my $template  = URI::Template->new($pattern->{hydra_template});
         push @federated , $template->process(%params)->as_string;
     }
 

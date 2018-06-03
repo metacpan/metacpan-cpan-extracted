@@ -23,17 +23,17 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "Exporter" => 0,
     "Fcntl" => 0,
-    "Parallel::WorkUnit" => "1.117",
     "autodie" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "File::Temp" => 0,
+    "Test2::Require::Module" => 0,
     "Test2::V0" => 0,
     "Test::UseAllModules" => "0.17"
   },
-  "VERSION" => "1.002",
+  "VERSION" => "1.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +45,7 @@ my %FallbackPrereqs = (
   "Exporter" => 0,
   "Fcntl" => 0,
   "File::Temp" => 0,
-  "Parallel::WorkUnit" => "1.117",
+  "Test2::Require::Module" => 0,
   "Test2::V0" => 0,
   "Test::UseAllModules" => "0.17",
   "autodie" => 0,

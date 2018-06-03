@@ -1,3 +1,13 @@
+0.13.0 2018-05-30
+  * fighting circular references and thus all sorts of leaks
+
+    - getters are now called with an object reference as the first argument
+      so if your getter uses $self, put a my $self = shift at the start of the callback
+    - handlers are deprecated, user actionHandler instead. It also gets self
+      as the first call argument.
+    - true and false do not exist as GuiPlugin methods anymore.
+      use Mojo:JSON qw(true false) instead
+
 0.8.14
   * added some dependencies back in
 

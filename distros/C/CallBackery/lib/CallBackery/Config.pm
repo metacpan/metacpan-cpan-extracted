@@ -21,7 +21,6 @@ CallBackery gets much of its configuration from this config file.
 use Mojo::Base -base;
 use CallBackery::Exception qw(mkerror);
 use CallBackery::Translate qw(trm);
-use CallBackery::User;
 use Config::Grammar::Dynamic;
 use Carp;
 use autodie;
@@ -419,7 +418,7 @@ return the configuration state of the system as a blob
 
 has configPlugins => sub {
     my $self = shift;
-    my $user = CallBackery::User->new(app=>$self->app,userId=>'__CONFIG');
+    my $user = $self->app->userObject->new(app=>$self->app,userId=>'__CONFIG');
     my $cfg = $self->cfgHash;
     my @plugins;
     for my $name (@{$cfg->{PLUGIN}{list}}){
@@ -501,7 +500,7 @@ sub restoreConfigBlob {
     $config = $self->unpack16($crypt->decrypt($config));
 
     my $cfg = $self->cfgHash;
-    my $user = CallBackery::User->new(app=>$self->app,userId=>'__CONFIG');
+    my $user = $self->app->userObject->new(app=>$self->app,userId=>'__CONFIG');
     open my $fh ,'<', \$config;
     my $zip = Archive::Zip->new();
     $zip->readFromFileHandle($fh);

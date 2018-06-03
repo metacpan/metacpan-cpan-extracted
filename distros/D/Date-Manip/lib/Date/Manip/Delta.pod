@@ -467,12 +467,12 @@ For example, for English, the document is L<Date::Manip::Lang::English> and
 the field names include strings like:
 
    y:  y, yr, year, years
-   m:  m, mon, month, months
+   m:  m, mon, mons, month, months
    w:  w, wk, ws, wks, week, weeks
    d:  d, day, days
-   h:  h, hr, hour, hours
-   mn: mn, min, minute, minutes
-   s:  s, sec, second, seconds
+   h:  h, hr, hrs, hour, hours
+   mn: mn, min, mins, minute, minutes
+   s:  s, sec, secs, second, seconds
 
 This list may not be complete.  You should refer to the language document
 for the full list.

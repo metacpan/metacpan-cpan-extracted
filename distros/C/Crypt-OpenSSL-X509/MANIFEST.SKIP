@@ -1,2 +1,14 @@
 \B\.git\b
 \B\.gitignore
+\B.vstags
+\B.github
+\.gz
+\.tar
+\.bak
+.travis.yml
+^Makefile$
+blib/
+X509.bs
+X509.c
+X509.o
+pm_to_blib

@@ -4,7 +4,7 @@ use Catmandu::Util qw(:io :is :check);
 use PICA::Schema;
 use Moo;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 with qw(Catmandu::Validator);
 
@@ -51,14 +51,16 @@ __END__
 
 =head1 NAME
 
-Catmandu::Validator::PICA - Validate PICA+ records with PICA Schema
+Catmandu::Validator::PICA - Validate PICA+ records with an Avram Schema
 
 =head1 SYNOPSIS
+
+In Perl code:
 
     use Catmandu::Validator::PICA;
     use Catmandu qw(importer);
 
-    my $validator = Catmandu::Validator::PICA->new( schema => 'pica-schema.json' );
+    my $validator = Catmandu::Validator::PICA->new( schema => 'schema.json' );
 
     importer('PICA', file => 'pica.xml')->each( sub {
         my $record = shift;
@@ -67,14 +69,18 @@ Catmandu::Validator::PICA - Validate PICA+ records with PICA Schema
         }
     }});
 
+In Catmandu Fix language:
+
+    # reject all items not conforming to the schema
+    select valid('', PICA, schema: 'schema.json')
+
 =head1 DESCRIPTION
 
-This L<Catmandu::Validator> can be used to check PICA+ records against a
-L<PICA::Schema>. Either use it in Perl code or in Catmandu Fix language with
-L<Catmandu::Fix::Condition::valid>:
+This L<Catmandu::Validator> can be used to check PICA+ records against an
+L<Avram Schema language|https://format.gbv.de/schema/avram/specification>.
 
-    # reject all items not conforming to a PICA schema
-    select valid('', PICA, schema: 'pica-schema.json')
+See also L<Catmandu::Fix::validate>, and L<Catmandu::Fix::Condition::valid> for
+usage of validators in Catmandu Fix language.
 
 =head1 CONFIGURATION
 
@@ -82,7 +88,8 @@ L<Catmandu::Fix::Condition::valid>:
 
 =item schema
 
-PICA Schema given as hash reference, filename (JSON), or instance of L<PICA::Schema>.
+Avram Schema given as hash reference, filename (JSON), or instance of
+L<PICA::Schema>.
 
 =item ignore_unknown_fields
 

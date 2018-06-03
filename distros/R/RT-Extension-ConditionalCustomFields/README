@@ -6,9 +6,15 @@ DESCRIPTION
     Provide the ability to display/edit a custom field conditioned by the
     value of another (select) custom field for the same object, which can be
     anything that can have custom fields (ticket, queue, user, group,
-    article or asset). If a custom field is based on another (parent) custom
-    field which is conditioned by, this (child) custom field will of course
-    also be conditioned by (with the same condition as its parent).
+    article or asset).
+
+    If a custom field is based on another (parent) custom field which is
+    conditioned by, this (child) custom field will of course also be
+    conditioned by (with the same condition as its parent).
+
+    If the condition custom field is a multivalued select, the condition for
+    an object is met as soon as the condition is met by at least one value
+    of the instanciated custom field for this object.
 
     From version 0.07, the condition can be multivalued, that is: the
     conditioned custom field can be displayed/edited if the condition custom

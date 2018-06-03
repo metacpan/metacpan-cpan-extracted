@@ -6,9 +6,9 @@ Date::Manip::TZ::pakiri00;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Thu Mar  1 10:33:50 EST 2018
-#    Data version: tzdata2018c
-#    Code version: tzcode2018c
+#    Generated on: Wed May 30 14:49:45 EDT 2018
+#    Data version: tzdata2018e
+#    Code version: tzcode2018e
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.61';
+$VERSION='6.71';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -44,14 +44,14 @@ END { undef $VERSION; }
    1979 =>
      [
         [ [1979,10,1,10,40,0],[1979,10,1,0,40,0],'-10:00:00',[-10,0,0],
-          '-10',0,[1995,1,1,9,59,59],[1994,12,31,23,59,59],
-          '1979100110:40:00','1979100100:40:00','1995010109:59:59','1994123123:59:59' ],
+          '-10',0,[1994,12,31,9,59,59],[1994,12,30,23,59,59],
+          '1979100110:40:00','1979100100:40:00','1994123109:59:59','1994123023:59:59' ],
      ],
-   1995 =>
+   1994 =>
      [
-        [ [1995,1,1,10,0,0],[1995,1,2,0,0,0],'+14:00:00',[14,0,0],
+        [ [1994,12,31,10,0,0],[1995,1,1,0,0,0],'+14:00:00',[14,0,0],
           '+14',0,[9999,12,31,0,0,0],[9999,12,31,14,0,0],
-          '1995010110:00:00','1995010200:00:00','9999123100:00:00','9999123114:00:00' ],
+          '1994123110:00:00','1995010100:00:00','9999123100:00:00','9999123114:00:00' ],
      ],
 );
 

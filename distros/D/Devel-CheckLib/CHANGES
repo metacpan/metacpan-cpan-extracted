@@ -1,3 +1,6 @@
+1.12    2018-05-23      Fix order of flags for gcc
+                        Fix problems with executable binaries
+
 1.11    2017-05-23      Prevent concatenation warnings when LD_RUN_PATH is
                         undefined.
 

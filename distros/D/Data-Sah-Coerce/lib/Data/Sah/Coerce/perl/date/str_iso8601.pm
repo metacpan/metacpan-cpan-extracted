@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::date::str_iso8601;
 
-our $DATE = '2018-03-27'; # DATE
-our $VERSION = '0.024'; # VERSION
+our $DATE = '2018-06-02'; # DATE
+our $VERSION = '0.025'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,9 +9,9 @@ use warnings;
 
 sub meta {
     +{
-        v => 2,
+        v => 3,
         enable_by_default => 1,
-        might_die => 1, # we match any (YYYY-MM-DD... string, so the conversion to date might fail on invalid dates)
+        might_fail => 1, # we match any (YYYY-MM-DD... string, so the conversion to date might fail on invalid dates)
         prio => 50,
     };
 }
@@ -35,13 +35,13 @@ sub coerce {
 
     my $code_epoch = '$4 ? ($8 ? Time::Local::timegm($7, $6, $5, $3, $2-1, $1-1900) : Time::Local::timelocal($7, $6, $5, $3, $2-1, $1-1900)) : Time::Local::timelocal(0, 0, 0, $3, $2-1, $1-1900)';
     if ($coerce_to eq 'float(epoch)') {
-        $res->{expr_coerce} = $code_epoch;
+        $res->{expr_coerce} = qq(do { my \$time; eval { \$time = $code_epoch }; my \$err = \$@; if (\$err) { \$err =~ s/ at .+//s; ["Invalid date/time: \$err"] } else { [undef, \$time] } });
     } elsif ($coerce_to eq 'DateTime') {
         $res->{modules}{"DateTime"} //= 0;
-        $res->{expr_coerce} = "DateTime->from_epoch(epoch => $code_epoch, time_zone => \$8 ? 'UTC' : 'local')";
+        $res->{expr_coerce} = qq(do { my \$time; eval { \$time = $code_epoch }; my \$err = \$@; if (\$err) { \$err =~ s/ at .+//s; ["Invalid date/time: \$err"] } else { [undef, DateTime->from_epoch(epoch => \$time, time_zone => \$8 ? 'UTC' : 'local')] } });
     } elsif ($coerce_to eq 'Time::Moment') {
         $res->{modules}{"Time::Moment"} //= 0;
-        $res->{expr_coerce} = "Time::Moment->from_epoch($code_epoch)";
+        $res->{expr_coerce} = qq(do { my \$time; eval { \$time = $code_epoch }; my \$err = \$@; if (\$err) { \$err =~ s/ at .+//s; ["Invalid date/time: \$err"] } else { [undef, Time::Moment->from_epoch(\$time)] } });
     } else {
         die "BUG: Unknown coerce_to value '$coerce_to', ".
             "please use float(epoch), DateTime, or Time::Moment";
@@ -65,7 +65,7 @@ Data::Sah::Coerce::perl::date::str_iso8601 - Coerce date from (a subset of) ISO8
 
 =head1 VERSION
 
-This document describes version 0.024 of Data::Sah::Coerce::perl::date::str_iso8601 (from Perl distribution Data-Sah-Coerce), released on 2018-03-27.
+This document describes version 0.025 of Data::Sah::Coerce::perl::date::str_iso8601 (from Perl distribution Data-Sah-Coerce), released on 2018-06-02.
 
 =head1 DESCRIPTION
 

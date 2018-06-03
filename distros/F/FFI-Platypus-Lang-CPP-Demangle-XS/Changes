@@ -1,5 +1,8 @@
 Revision history for FFI-Platypus-Lang-CPP-Demangle-XS
 
+0.03      2018-05-30 22:25:46 -0400
+  - Migrate to EUMM
+
 0.02      2015-02-01 23:57:27 -0500
   - First release to CPAN
   - identical to 0.01 release

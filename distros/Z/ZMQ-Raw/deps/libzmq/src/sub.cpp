@@ -45,8 +45,9 @@ zmq::sub_t::~sub_t ()
 {
 }
 
-int zmq::sub_t::xsetsockopt (int option_, const void *optval_,
-    size_t optvallen_)
+int zmq::sub_t::xsetsockopt (int option_,
+                             const void *optval_,
+                             size_t optvallen_)
 {
     if (option_ != ZMQ_SUBSCRIBE && option_ != ZMQ_UNSUBSCRIBE) {
         errno = EINVAL;
@@ -57,12 +58,8 @@ int zmq::sub_t::xsetsockopt (int option_, const void *optval_,
     msg_t msg;
     int rc = msg.init_size (optvallen_ + 1);
     errno_assert (rc == 0);
-    unsigned char *data = (unsigned char*) msg.data ();
-    if (option_ == ZMQ_SUBSCRIBE)
-        *data = 1;
-    else
-    if (option_ == ZMQ_UNSUBSCRIBE)
-        *data = 0;
+    unsigned char *data = static_cast<unsigned char *> (msg.data ());
+    *data = (option_ == ZMQ_SUBSCRIBE);
     //  We explicitly allow a NULL subscription with size zero
     if (optvallen_) {
         assert (optval_);

@@ -14,16 +14,27 @@ use strict;
 use warnings;
 use parent qw( HiPi::Class );
 use HiPi qw( :rpi );
+use Time::HiRes qw( usleep );
 use Carp;
 
 __PACKAGE__->create_accessors( qw( devicename ) );
 
-our $VERSION ='0.70';
+our $VERSION ='0.71';
 
 sub new {
     my ($class, %params) = @_;
     my $self = $class->SUPER::new(%params);
     return $self;
+}
+
+sub delay {
+    my($class, $millis) = @_;
+    usleep( int($millis * 1000));
+}
+
+sub delayMicroseconds {
+    my($class, $micros) = @_;
+    usleep( int($micros) );
 }
 
 sub modules_are_loaded {

@@ -5,7 +5,7 @@ use warnings;
 use Carp qw( croak );
 use FFI;
 
-our $VERSION = '1.10';
+our $VERSION = '1.12';
 
 if ($^O eq 'MSWin32') {
     require Win32;
@@ -78,8 +78,8 @@ This module provides access from Perl to functions exported from dynamically
 linked libraries. Functions are described by C<signatures>, for details of
 which see the L<FFI> module's documentation.
 
-Newer FFI modules such as L<FFI::Platypus> and L<FFI::Raw> provide more
-functionality and should probably be considered for new projects.
+Newer and better maintained FFI modules such as L<FFI::Platypus> provide 
+more functionality and should probably be considered for new projects.
 
 =head1 EXAMPLES
 
@@ -93,7 +93,7 @@ functionality and should probably be considered for new projects.
 Please open any support tickets with this project's GitHub repository 
 here:
 
-L<https://github.com/plicease/FFI/issues>
+L<https://github.com/Perl5-FFI/FFI/issues>
 
 =head1 SEE ALSO
 
@@ -111,10 +111,6 @@ Portable functions for finding libraries.
 
 Platypus is another FFI interface based on libffi.  It has a more
 extensive feature set, and libffi has a less restrictive license.
-
-=item L<FFI::Raw>
-
-Another FFI interface based on libffi.
 
 =item L<Win32::API>
 

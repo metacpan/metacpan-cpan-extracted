@@ -1,5 +1,24 @@
 Revision history for Alien-FFI
 
+0.21      2018-06-01 07:48:31 -0400
+  - Production release identical to 0.20_05
+
+0.20_05   2018-05-30 20:51:57 -0400
+  - Diagnostic release
+
+0.20_04   2018-05-30 07:49:31 -0400
+  - Diagnostic release
+
+0.20_03   2018-05-29 15:25:11 -0400
+  - Added additional tests
+
+0.20_02   2018-05-29 12:41:38 -0400
+  - Add some simple minded detection for avx and aes flags on i386
+    Only works on systems with /proc/cpuinfo
+
+0.20_01   2018-05-29 10:02:17 -0400
+  - Disable avx and aes instructions on i386
+
 0.19      2018-05-19 09:40:13 -0400
   - Identical to 0.18_01 release except for the hardcoded RC0
   - Moved git repository to
@@ -78,8 +97,7 @@ Revision history for Alien-FFI
     in FFI::Platypus.
 
 0.03      2015-01-21 07:30:24 -0500
-  - Work-around for unthreaded OpenBSD.  Basically applied same wonky "fix" as I did to FFI::Raw:
-    https://github.com/plicease/p5-FFI-Raw/commit/e223cf61f599ea7f51e5f5ff088de43028c8f506
+  - Work-around for unthreaded OpenBSD.
 
 0.02      2014-09-11 16:56:51 -0400
   - make Alien::Base a configure requires

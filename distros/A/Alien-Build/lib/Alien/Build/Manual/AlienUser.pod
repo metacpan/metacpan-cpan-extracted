@@ -14,7 +14,7 @@ Alien::Build::Manual::AlienUser - Alien user documentation
 
 =head1 VERSION
 
-version 1.42
+version 1.43
 
 =head1 SYNOPSIS
 
@@ -53,8 +53,8 @@ What follows are the main use cases.
  my $build = Module::Build->new(
    ...
    configure_requires => {
-     'Alien::Build::Wrapper' => '0',
-     'Alien::Foo'            => '0',
+     'Alien::Base::Wrapper' => '0',
+     'Alien::Foo'           => '0',
      ...
    },
    Alien::Base::Wrapper->mb_args
@@ -75,8 +75,8 @@ prerequisite.
  WriteMakefile(
    ...
    CONFIGURE_REQUIRES => {
-     'Alien::Build::Wrapper' => '0',
-     'Alien::Foo'            => '0',
+     'Alien::Base::Wrapper' => '0',
+     'Alien::Foo'           => '0',
    },
    Alien::Base::Wrapper->mm_args
    ...
@@ -108,7 +108,7 @@ a configure prerequisite.
  );
 
 Not all L<Alien>s provide dynamic libraries, but those that do can be
-used by L<FFI::Raw> or L<FFI::Platypus>.  Unlike an XS module, these
+used by L<FFI::Platypus>.  Unlike an XS module, these
 need to be a regular run time prerequisite.
 
 =head2 Inline::C

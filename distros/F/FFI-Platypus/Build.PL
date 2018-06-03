@@ -5,7 +5,7 @@ BEGIN {
   #{
   #  print "Configuration not supported.\n";
   #  print "Please reinstall Alien::FFI with ALIEN_FORCE=1\n";
-  #  print "See https://github.com/plicease/FFI-Platypus/issues/19\n";
+  #  print "See https://github.com/Perl5-FFI/FFI-Platypus/issues/19\n";
   #  exit 0;
   #}
   unless(eval q{ use 5.008001; 1}) {
@@ -26,11 +26,10 @@ my %module_build_args = (
     "Module::Build" => "0.3601"
   },
   "configure_requires" => {
-    "Alien::FFI" => "0.12",
+    "Alien::FFI" => "0.20",
     "Config::AutoConf" => "0.309",
     "ExtUtils::CBuilder" => 0,
     "FFI::CheckLib" => "0.05",
-    "JSON::PP" => 0,
     "Module::Build" => "0.3601",
     "perl" => "5.008001"
   },
@@ -39,14 +38,13 @@ my %module_build_args = (
     "Graham Ollis <plicease\@cpan.org>"
   ],
   "dist_name" => "FFI-Platypus",
-  "dist_version" => "0.48",
+  "dist_version" => "0.50",
   "license" => "perl",
   "module_name" => "FFI::Platypus",
   "recursive_test_files" => 1,
   "requires" => {
     "FFI::CheckLib" => 0,
     "File::ShareDir" => 0,
-    "JSON::PP" => 0,
     "constant" => "1.32",
     "perl" => "5.008001"
   },

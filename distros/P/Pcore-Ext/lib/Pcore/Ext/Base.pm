@@ -16,38 +16,7 @@ sub MODIFY_CODE_ATTRIBUTES ( $pkg, $ref, @attrs ) {
                     $sub = *{$sym}{NAME};
 
                     if ( $sub =~ s/\AEXT_//sm ) {
-
-                        # extend is not defined, this is a singleton
-                        if ( !defined $extend ) {
-                            ${"$pkg\::_EXT_MAP"}->{$sub} = undef;
-                        }
-                        else {
-                            my $extend_class;
-
-                            # type
-                            if ( $extend =~ /\A[[:lower:].]+\z/sm ) {
-                                if ( index( $extend, '.' ) == -1 ) {
-                                    if ( exists $Pcore::Ext::EXT->{'classic'}->{alias_class}->{"widget.$extend"} ) {
-                                        $extend_class = $Pcore::Ext::EXT->{$Pcore::Ext::EXT_FRAMEWORK}->{alias_class}->{"widget.$extend"};
-                                    }
-                                }
-                                elsif ( exists $Pcore::Ext::EXT->{'classic'}->{alias_class}->{$extend} ) {
-                                    $extend_class = $Pcore::Ext::EXT->{$Pcore::Ext::EXT_FRAMEWORK}->{alias_class}->{$extend};
-                                }
-                            }
-
-                            # ExtJS class name
-                            else {
-                                $extend_class = $extend;
-                            }
-
-                            if ($extend_class) {
-                                ${"$pkg\::_EXT_MAP"}->{$sub} = $extend_class;
-                            }
-                            else {
-                                die qq[ExtJS extend attribute "$extend" can't be resolved for sub "$pkg\::$sub"];
-                            }
-                        }
+                        ${"$pkg\::_EXT_MAP"}->{$sub} = $extend;
                     }
                     else {
                         push @bad, $attr;
@@ -66,16 +35,6 @@ sub MODIFY_CODE_ATTRIBUTES ( $pkg, $ref, @attrs ) {
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    3 | 21, 28, 29, 30, 44   | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

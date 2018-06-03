@@ -171,16 +171,31 @@ subtest 'query' => sub{
         };
 
         subtest 'edge cases' => sub {
+          subtest 'empty parameter' => sub {
+            my $uri = uri 'http://www.test.com?foo=';
+            is $uri->param('foo'), '', 'expected param value';
+          };
+
+          subtest 'empty parameter w/ previous parameter parameter' => sub {
+            my $uri = uri 'http://www.test.com?bar=baz&foo=';
+            is $uri->param('foo'), '', 'expected param value';
+          };
+
+          subtest 'empty parameter w/ following parameter' => sub {
+            my $uri = uri 'http://www.test.com?foo=&bar=baz';
+            is $uri->param('foo'), '', 'expected param value';
+          };
+
           subtest 'unset only parameter' => sub {
             my $uri = uri 'http://www.test.com?foo=bar';
             $uri->param('foo', undef, $sep);
-            is $uri->query, '', 'expected query valuee';
+            is $uri->query, '', 'expected query value';
           };
 
           subtest 'unset final parameter' => sub {
             my $uri = uri "http://www.test.com?bar=bat${sep}foo=bar";
             $uri->param('foo', undef, $sep);
-            is $uri->query, 'bar=bat', 'expected query valuee';
+            is $uri->query, 'bar=bat', 'expected query value';
           };
 
           subtest 'unset initial parameter' => sub {

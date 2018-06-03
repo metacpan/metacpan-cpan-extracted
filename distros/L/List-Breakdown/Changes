@@ -6,6 +6,10 @@ documented here anyway for comprehensiveness' sake. Entries with "No
 important changes" are likely to be trivial things like documentation
 fixes or Perl::Tidy runs.
 
+0.22 2018-05-30
+
+ - Adjust Exporter syntax
+
 0.21 2018-02-21
 
  - Update repository metadata

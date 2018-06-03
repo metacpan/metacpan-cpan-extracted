@@ -37,6 +37,16 @@ sub startup {
 		push @{$self->static->paths}, $config->get("pubdir");
 	}
 
+	$self->hook(before_dispatch => sub {
+		my $c = shift;
+		my $vpr = $config->get('vid_prefix');
+		my $media = "media-src 'self'";
+		if(defined($vpr) && length($vpr) > 0) {
+			$media = "media-src $vpr;";
+		}
+		$c->res->headers->content_security_policy("default-src 'none'; script-src 'self' 'unsafe-inline'; font-src 'self'; style-src 'self'; img-src 'self'; frame-ancestors 'none'; $media");
+	});
+
 	$self->helper(dbh => sub {
 		state $pg = Mojo::Pg->new->dsn($config->get('dbistring'));
 		return $pg->db->dbh;
@@ -274,9 +284,9 @@ sub startup {
 		my $c = shift;
 		my $st;
 		if($config->get("anonreviews")) {
-			$st = $c->dbh->prepare('SELECT nonce, name, speakers, room, starttime, endtime, state, progress FROM talk_list WHERE eventid = ? AND state IS NOT NULL ORDER BY state, progress, room, starttime');
+			$st = $c->dbh->prepare('SELECT nonce, name, speakers, room, starttime::timestamp, endtime::timestamp, state, progress FROM talk_list WHERE eventid = ? AND state IS NOT NULL ORDER BY state, progress, room, starttime');
 		} else {
-			$st = $c->dbh->prepare('SELECT name, speakers, room, starttime, endtime, state, progress FROM talk_list WHERE eventid = ? AND state IS NOT NULL ORDER BY state, progress, room, starttime');
+			$st = $c->dbh->prepare('SELECT name, speakers, room, starttime::timestamp, endtime::timestamp, state, progress FROM talk_list WHERE eventid = ? AND state IS NOT NULL ORDER BY state, progress, room, starttime');
 		}
 		my $tot = $c->dbh->prepare('SELECT state, count(*) FROM talks WHERE event = ? GROUP BY state ORDER BY state;');
 		my %expls;
@@ -321,30 +331,10 @@ sub startup {
 		$c->render;
 	} => 'table');
 
-	$r->post('/talk_update' => sub {
-		my $c = shift;
-		my $nonce = $c->param("nonce");
-		if(!defined($nonce)) {
-			$c->stash(message=>"Unauthorized.");
-			$c->res->code(403);
-			$c->render('error');
-			return undef;
-		}
-		my $sth = $c->dbh->prepare("SELECT id FROM talks WHERE nonce = ? AND state IN ('preview', 'broken')");
-		$sth->execute($nonce);
-		my $row = $sth->fetchrow_arrayref;
-		if(scalar($row) == 0) {
-			$c->stash(message=>"Change not allowed. If this talk exists, it was probably reviewed by someone else while you were doing so too. Please try again later, or check the overview page.");
-			$c->res->code(403);
-			$c->render('error');
-			return undef;
-		}
-		$c->stash(layout => 'default');
-		$c->stash(template => 'talk');
-		$c->flash(completion_message => 'Your change has been accepted. Thanks for your help!');
-		$c->talk_update($row->[0]);
-		$c->redirect_to("/review/$nonce");
-	} => 'talk_update');
+	$r->post('/talk_update')->to(controller => 'talk', action => 'update',
+			layout => 'default', name => 'talk_update',
+			notfound_message => "Unauthorized.",
+			notfound_code => 403);
 
 	my $vol = $r->under('/volunteer' => sub {
 		my $c = shift;
@@ -356,31 +346,7 @@ sub startup {
 		return 1;
 	});
 
-	$vol->get('/list' => sub {
-		my $c = shift;
-		my @talks;
-		$c->dbh->begin_work;
-		my $already = $c->dbh->prepare("SELECT nonce, title, id, state FROM talks WHERE reviewer = ? AND state <= 'preview'");
-		my $new = $c->dbh->prepare("SELECT nonce, title, id, state FROM talks WHERE reviewer IS NULL AND state = 'preview'::talkstate LIMIT ? FOR UPDATE");
-		my $claim = $c->dbh->prepare("UPDATE talks SET reviewer = ? WHERE id = ?");
-		$already->execute($c->session->{id});
-		my $count = $already->rows;
-		if($count < 5) {
-			$new->execute(5 - $count);
-		}
-		for(my $i = 0; $i < $count; $i++) {
-			my $row = [ $already->fetchrow_array ];
-			push @talks, $row;
-		}
-		for(my $i = 0; $i < $new->rows; $i++) {
-			my $row = [ $new->fetchrow_array ];
-			$claim->execute($c->session->{id}, $row->[2]);
-			push @talks, $row;
-		}
-		$c->stash(talks => \@talks);
-		$c->stash(layout => 'admin');
-		$c->dbh->commit;
-	} => 'volunteer/list');
+	$vol->get('/list')->to('volunteer#list');
 
 	my $admin = $r->under('/admin' => sub {
 		my $c = shift;
@@ -402,38 +368,7 @@ sub startup {
 	$admin->any('/schedule/talk/')->to(controller => 'schedule', action => 'mod_talk');
 	$admin->any('/schedule/')->to(controller => 'schedule', action => 'index');
 
-	$admin->get('/' => sub {
-		my $c = shift;
-		my $st;
-		my $talks = ();
-		my $room;
-		my $lastroom = '';
-
-		if(defined($c->session->{room})) {
-			$st = $c->dbh->prepare('SELECT id, room, name, starttime, speakers, state FROM talk_list WHERE eventid = ? AND roomid = ? ORDER BY starttime');
-			$st->execute($c->eventid, $c->session->{room});
-		} else {
-			$st = $c->dbh->prepare('SELECT id, room, name, starttime, speakers, state FROM talk_list WHERE eventid = ? ORDER BY room, starttime');
-			$st->execute($c->eventid);
-		}
-		while(my $row = $st->fetchrow_hashref("NAME_lc")) {
-			if ($row->{'room'} ne $lastroom) {
-				if(defined($room)) {
-					push @$talks, c($lastroom => $room);
-				}
-				$room = [];
-			}
-			$lastroom = $row->{'room'};
-			next unless defined($row->{id});
-			push @$room, [$row->{'starttime'} . ': ' . $row->{'name'} . ' by ' . $row->{'speakers'} . ' (' . $row->{'state'} . ')' => $row->{'id'}];
-		}
-		if(defined($room)) {
-			push @$talks, c($lastroom => $room);
-		}
-		$c->stash(email => $c->session->{email});
-		$c->stash(talks => $talks);
-		$c->render;
-	} => 'admin/main');
+	$admin->get('/')->to('admin#main');
 
 	$admin->get('/logout' => sub {
 		my $c = shift;
@@ -498,19 +433,10 @@ sub startup {
 		$c->render(template => 'talk');
 	} => 'admin_talk');
 
-	$admin->post('/talk_update' => sub {
-		my $c = shift;
-		my $talk = $c->param("talk");
-		if(!defined($talk)) {
-			$c->stash(message => "Required parameter talk missing.");
-			$c->render("error");
-			return undef;
-		}
-		$c->stash(template => 'talk');
-		$c->flash(completion_message => 'Your change has been accepted. Thanks for your help!');
-		$c->talk_update($talk);
-		$c->redirect_to("/admin/talk?talk=$talk");
-	} => 'talk_update_admin');
+	$admin->post('/talk_update')->to(controller => 'talk', action => 'update',
+			name => 'talk_update_admin',
+			notfound_message => "Required parameter talk missing",
+			notfound_code => 404);
 
 	$admin->get('/brokens' => sub {
 		my $c = shift;

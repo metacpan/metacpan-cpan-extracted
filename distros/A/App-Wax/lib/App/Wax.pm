@@ -16,7 +16,9 @@ use Pod::Usage qw(pod2usage);
 use Try::Tiny qw(try catch);
 use URI::Split qw(uri_split);
 
-our $VERSION = 'v3.0.0';
+# XXX this declaration must be on a single line
+# https://metacpan.org/pod/version#How-to-declare()-a-dotted-decimal-version
+use version; our $VERSION = version->declare('v3.0.0');
 
 # defaults
 use constant {
@@ -58,8 +60,8 @@ has app_name => (
 
 has app_version => (
     is      => 'ro',
-    isa     => 'Str',
-    default => $VERSION,
+    isa     => 'version',
+    default => sub { $VERSION },
 );
 
 has cache => (

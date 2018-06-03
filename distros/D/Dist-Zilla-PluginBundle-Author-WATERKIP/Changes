@@ -1,5 +1,9 @@
 Revision history for Dist::Zilla::PluginBundle::Author::WATERKIP
 
+1.8       2018-06-03 10:13:19Z
+
+    * Add more files to exclude files
+
 1.7       2018-05-20 13:50:38Z
 
     * Disable Test::Perl::Critic from @TestingMania

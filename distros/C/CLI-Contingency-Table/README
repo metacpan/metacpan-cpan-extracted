@@ -1,0 +1,90 @@
+CLI-Contingency-Table
+
+ The following programs for handling bunch of files on your computer
+ will be installed, which augment functionality of Unix/Linux commands 
+ such as 'ls' and 'find', also accomanying other utility programs. 
+
+   1. freq : yields 1-way contingency table.
+   2. crosstable : yields 2-way contingency table. 
+
+   3. venn4 : performs drawing the Venn diagram for 4 sets.
+   4. venn : performs a kind of equivalent things to draw Venn diagrams for any number of set (but practical for < 10)
+   5. csel : this is a utility like `cut' or `AWK' but it works with simpler arguments specification.
+   6. saikoro : random number generator for many kinds of uniform distributions. "Saikoro" is a dice in Japanese.
+   7. init.sh : helps to install the programs above by the minimum affecting to your computer environment. 
+
+ The detail of each program is accessed by "--help" such as "venn4 --help" or "venn4 --help opt".
+ The help manuals of some programs are written only in Japanese at this moment.
+
+
+INSTALLATION
+
+ The programs are provided in a form of Perl modules to 
+ be uploaded on CPAN. Each of the program is written
+ as a single Perl program that works (almost) stand-alone.
+
+
+ You can choose the way to install programs from the following
+ plural ways. 
+
+1. Download and uncompress the file CLI-Contingency-Table-0.51.tar.gz 
+   from CPAN. Find the programs under the "scripts" directory
+   inside it. Copy them into a directory whatever you like and you can
+   (and call it "someWhere" in the next paragraph.) 
+
+   Then add that directory someWhere to the PATH environment 
+   variable (for either of Windows or Unix-like environments). 
+   If you use bash or zsh, add a line like the following
+   into to  .bash_profile or .zshrc respectively, to use the 
+   program files provided in this module always you login, 
+   with the minimum affect to your computer environment
+   (in the follwoing someWhere should be in abosolute path
+   or "~/myScripts" ) : 
+
+      source someWhere/init.sh
+
+2. If you like "Build" methot to install CPAN modules, 
+   run the following commands after uncompressing:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+3. You can also install the programs by the following simpler steps:
+
+    cpan CLI::Files::Utils 
+
+   or
+
+    cpanm CLI::Files::Utils
+
+   The above requires your knowledge/understanding of
+   the prepation of using the commands of 'cpan' or 'cpanm'
+   and administrative rights on your computer to install 
+   programs (root privileges). 
+
+   This optional installaion way (3.) is written here because
+   the author of the programs just want to explain that 
+   the programs provided are uploaded to CPAN can work 
+   in a kind of standard way.  
+
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2018 "Toshiyuki Shimono"
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+

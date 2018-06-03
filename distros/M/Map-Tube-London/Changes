@@ -1,5 +1,8 @@
 Revision history for Map::Tube::London
 
+1.04  2018-06-02
+      - Updated dependency on Map::Tube v3.51.
+
 1.03  2018-05-16
       - Tidied up code in the pod.
 

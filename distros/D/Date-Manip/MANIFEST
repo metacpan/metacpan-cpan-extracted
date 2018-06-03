@@ -18,6 +18,8 @@ internal/benchmarks/parse-1.dm6_opts.pl
 internal/benchmarks/parse-1.in.pl
 internal/benchmarks/parse-1.sh
 internal/build.yaml
+internal/changes.head
+internal/changes.pod
 internal/data.abbrev.pl
 internal/data.alias.pl
 internal/data.misc.pl

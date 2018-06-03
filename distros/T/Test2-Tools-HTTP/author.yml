@@ -1,0 +1,39 @@
+---
+pod_spelling_system:
+  skip: 0
+  # list of words that are spelled correctly
+  # (regardless of what spell check thinks)
+  # or stuff that I like to spell incorrectly
+  # intentionally
+  stopwords:
+    - diag
+    - undecoded
+    - subchecks
+    - req
+    - tx
+    - ua
+    - rebless
+
+pod_coverage:
+  skip: 0
+  # format is "Class#method" or "Class",regex allowed
+  # for either Class or method.
+  private:
+    - Test2::Require::Internet#skip
+    - Test2::Tools::HTTP::UA#new
+    - Test2::Tools::HTTP::Apps#new
+    - Test2::Tools::HTTP::UA::LWP
+    - Test2::Tools::HTTP::UA::LWPClass
+    - Test2::Tools::HTTP#app_add
+    - Test2::Tools::HTTP#charset
+    - Test2::Tools::HTTP#code
+    - Test2::Tools::HTTP#content
+    - Test2::Tools::HTTP#content_length
+    - Test2::Tools::HTTP#content_length_ok
+    - Test2::Tools::HTTP#content_type
+    - Test2::Tools::HTTP#header
+    - Test2::Tools::HTTP#headers
+    - Test2::Tools::HTTP#location_uri
+    - Test2::Tools::HTTP#message
+    - Test2::Tools::HTTP#tx
+    - Test2::Tools::HTTP#ua

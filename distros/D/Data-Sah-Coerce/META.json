@@ -75,7 +75,7 @@
          "web" : "https://github.com/perlancar/perl-Data-Sah-Coerce"
       }
    },
-   "version" : "0.024",
+   "version" : "0.025",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

@@ -31,9 +31,13 @@ HK stdlett 1955 => __blank__
 
 HK savlett 1955 => S
 
-Iran stdlett 1980 => S
+Iran stdlett 1980 => __blank__
 
-Iran savlett 1980 => D
+Iran savlett 1980 => __blank__
+
+Canada stdlett 1980 => S
+
+Canada savlett 1980 => D
 
 Chicago lastoff 1920 => 00:00:00
 
@@ -79,7 +83,7 @@ RussiaAsia rdates 1990 =>
    1990032502:00:00
    01:00:00
    s
-   S
+   __blank__
    1990093002:00:00
    00:00:00
    s

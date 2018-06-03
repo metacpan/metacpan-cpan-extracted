@@ -3,16 +3,15 @@ package Pcore::Ext::Context::Func;
 use Pcore -class;
 use Pcore::Util::Scalar qw[refaddr];
 
-has ext => ( is => 'ro', isa => InstanceOf ['Pcore::Ext::Context'], required => 1 );
-
-has func_name => ( is => 'ro', isa => Maybe [Str] );
-has func_args => ( is => 'ro', isa => Maybe [ArrayRef] );
-has func_body => ( is => 'ro', isa => Str, required => 1 );
+has ext       => ();    # ( is => 'ro', isa => InstanceOf ['Pcore::Ext::Context'], required => 1 );
+has func_name => ();    # ( is => 'ro', isa => Maybe [Str] );
+has func_args => ();    # ( is => 'ro', isa => Maybe [ArrayRef] );
+has func_body => ();    # ( is => 'ro', isa => Str, required => 1 );
 
 sub TO_JSON ( $self ) {
     my $id = refaddr $self;
 
-    $self->{ext}->{js_gen_cache}->{$id} = $self->to_js;
+    $self->{ext}->{_js_gen_cache}->{$id} = $self->to_js;
 
     return "__JS${id}__";
 }

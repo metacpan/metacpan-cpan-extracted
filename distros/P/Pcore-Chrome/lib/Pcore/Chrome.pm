@@ -1,22 +1,21 @@
-package Pcore::Chrome v0.2.3;
+package Pcore::Chrome v0.3.0;
 
 use Pcore -dist, -const, -class;
 use Pcore::Chrome::Tab;
 use Pcore::Util::Scalar qw[is_plain_coderef];
 use Pcore::Util::Data qw[from_json];
-use Pcore::WebSocket;
 
-has host => ( is => 'ro', isa => Str, default => '127.0.0.1' );
-has port => ( is => 'ro', isa => Int, default => 9222 );
+has host => '127.0.0.1';
+has port => 9222;
 
-has user_data_dir => ( is => 'ro', init_arg => undef );
-has _proc => ( is => 'ro', isa => InstanceOf ['Pcore::Util:PM::Proc'], init_arg => undef );
+has user_data_dir => ();
+has _proc         => ();
 
 const our $DEFAULT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36';
 
 # https://chromedevtools.github.io/devtools-protocol/tot/
 
-sub DEMOLISH ( $self, $global ) {
+sub DESTROY ( $self ) {
 
     # term process group
     kill '-TERM', $self->{_proc}->{pid} if $self->{_proc};    ## no critic qw[InputOutput::RequireCheckedSyscalls]
@@ -35,7 +34,7 @@ sub run ( $self, @args ) {
 
     $args{host} ||= '127.0.0.1';
 
-    $args{port} ||= ( P->sys->get_free_port( $args{host} ) // die q[Error get free port] );
+    $args{port} ||= ( P->net->get_free_port( $args{host} ) // die q[Error get free port] );
 
     my $useragent = !exists $args{useragent} ? $DEFAULT_USERAGENT : $args{useragent};
 
@@ -120,7 +119,7 @@ sub run ( $self, @args ) {
 sub get_tabs ( $self, $cb ) {
     P->http->get(
         "http://$self->{host}:$self->{port}/json",
-        on_finish => sub ($res) {
+        sub ($res) {
             my $tabs = from_json $res->{body};
 
             for my $tab ( $tabs->@* ) {
@@ -143,7 +142,7 @@ sub new_tab ( $self, @args ) {
 
     P->http->get(
         "http://$self->{host}:$self->{port}/json/new$url",
-        on_finish => sub ($res) {
+        sub ($res) {
             my $data = from_json $res->{body};
 
             my $tab = bless { chrome => $self, id => $data->{id} }, 'Pcore::Chrome::Tab';
@@ -164,7 +163,7 @@ sub new_tab ( $self, @args ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 83                   | CodeLayout::ProhibitQuotedWordLists - List of quoted literal words                                             |
+## |    2 | 82                   | CodeLayout::ProhibitQuotedWordLists - List of quoted literal words                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

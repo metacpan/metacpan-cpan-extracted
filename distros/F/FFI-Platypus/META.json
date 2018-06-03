@@ -26,11 +26,10 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::FFI" : "0.12",
+            "Alien::FFI" : "0.20",
             "Config::AutoConf" : "0.309",
             "ExtUtils::CBuilder" : "0",
             "FFI::CheckLib" : "0.05",
-            "JSON::PP" : "0",
             "Module::Build" : "0.3601",
             "perl" : "5.008001"
          }
@@ -56,7 +55,6 @@
          "requires" : {
             "FFI::CheckLib" : "0",
             "File::ShareDir" : "0",
-            "JSON::PP" : "0",
             "constant" : "1.32",
             "perl" : "5.008001"
          }
@@ -72,17 +70,17 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/plicease/FFI-Platypus/issues"
+         "web" : "https://github.com/Perl5-FFI/FFI-Platypus/issues"
       },
       "homepage" : "https://metacpan.org/pod/FFI::Platypus",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/plicease/FFI-Platypus.git",
-         "web" : "https://github.com/plicease/FFI-Platypus"
+         "url" : "git://github.com/Perl5-FFI/FFI-Platypus.git",
+         "web" : "https://github.com/Perl5-FFI/FFI-Platypus"
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.48",
+   "version" : "0.50",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Bakkiaraj Murugesan (bakkiaraj)",
@@ -96,7 +94,7 @@
       "Damyan Ivanov",
       "Ilya Pavlov (Ilya33)"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
    "x_use_unsafe_inc" : 0
 }
 

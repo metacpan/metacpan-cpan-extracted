@@ -58,7 +58,7 @@
          "web" : "https://github.com/maettu/Data-Processor"
       }
    },
-   "version" : "1.0.1",
+   "version" : "1.0.2",
    "x_contributors" : [
       "Dominik Hassler <hadfl@cpan.org>",
       "joe <draxil@gmail.com>",

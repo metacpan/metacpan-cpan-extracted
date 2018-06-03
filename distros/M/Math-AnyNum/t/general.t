@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 78;
+plan tests => 93;
 
 {
     use Math::AnyNum qw(:overload);
@@ -14,6 +14,25 @@ plan tests => 78;
     like(sqrt(42),   qr/^6\.480740698407860230965967436087996\d*\z/);
     like(sqrt(-1),   qr/^i\z/);
     like(sqrt(-3.5), qr/^1\.87082869338697069279187436\d*i\z/);
+
+    # False values
+    ok(!0);
+    ok(!(0.0));
+    ok(!(0 / 3));
+    ok(!NaN);
+    ok(!(NaN + 4 * i));
+    ok(!(4 * i + NaN));
+    ok(!(0 * i));
+    ok(!(0 + 0 * i));
+
+    # True values
+    ok(!!(1));
+    ok(!!(3.41));
+    ok(!!(3 + 4 * i));
+    ok(!!(4 * i));
+    ok(!!(3 + 0 * i));
+    ok(!!(3 / 4));
+    ok(!!(-3 / 4));
 
     ok((Math::AnyNum->new('0.1') + Math::AnyNum->new('0.2')) == Math::AnyNum->new_f('0.3'));
     ok((Math::AnyNum->new('0.01') + Math::AnyNum->new('0.02')) == Math::AnyNum->new_f('0.03'));

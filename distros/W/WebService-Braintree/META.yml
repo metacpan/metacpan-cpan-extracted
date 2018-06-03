@@ -56,5 +56,5 @@ resources:
   bugtracker: https://github.com/singingfish/braintree_perl/issues
   homepage: https://www.braintreepayments.com
   repository: git://github.com/singingfish/braintree_perl.git
-version: '1.3'
+version: '1.4'
 x_serialization_backend: 'YAML::Tiny version 1.69'

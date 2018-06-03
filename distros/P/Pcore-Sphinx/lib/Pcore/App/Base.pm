@@ -11,10 +11,10 @@ has app_dir         => ( is => 'lazy', isa => Str,          init_arg => undef );
 has _local_cfg_path => ( is => 'lazy', isa => Str,          init_arg => undef );
 
 # RUN-TIME ENVIRONMENT
-has runtime_env  => ( is => 'rwp',  isa => Enum [qw[development test production]], default  => 'production' );
-has env_is_devel => ( is => 'lazy', isa => Bool,                                   init_arg => undef );
-has env_is_test  => ( is => 'lazy', isa => Bool,                                   init_arg => undef );
-has env_is_prod  => ( is => 'lazy', isa => Bool,                                   init_arg => undef );
+has runtime_env => ( isa => Enum [qw[development test production]], default => 'production' );
+has env_is_devel => ( is => 'lazy', isa => Bool, init_arg => undef );
+has env_is_test  => ( is => 'lazy', isa => Bool, init_arg => undef );
+has env_is_prod  => ( is => 'lazy', isa => Bool, init_arg => undef );
 
 our $CFG = { SECRET => undef, };
 
@@ -40,7 +40,7 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
     my $app = $self->new;
 
     # process -E option
-    $app->_set_runtime_env( $opt->{env} ) if $opt->{env};
+    $app->{runtime_env} = $opt->{env} if $opt->{env};
 
     if ( $opt->{app} ) {
         if ( $opt->{app} eq 'build' ) {
@@ -143,15 +143,15 @@ sub _create_local_cfg ($self) {
 
 # RUN-TIME ENVIRONMENT
 sub _build_env_is_devel ($self) {
-    return $self->runtime_env eq 'development' ? 1 : 0;
+    return $self->{runtime_env} eq 'development' ? 1 : 0;
 }
 
 sub _build_env_is_test ($self) {
-    return $self->runtime_env eq 'test' ? 1 : 0;
+    return $self->{runtime_env} eq 'test' ? 1 : 0;
 }
 
 sub _build_env_is_prod ($self) {
-    return $self->runtime_env eq 'production' ? 1 : 0;
+    return $self->{runtime_env} eq 'production' ? 1 : 0;
 }
 
 # PHASES

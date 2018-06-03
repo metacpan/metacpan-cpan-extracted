@@ -26,7 +26,7 @@ use Encode qw(encode_utf8 from_to find_encoding decode _utf8_off _utf8_on is_utf
 require Date::Manip::Lang::index;
 
 our $VERSION;
-$VERSION='6.70';
+$VERSION='6.71';
 END { undef $VERSION; }
 
 ###############################################################################
@@ -161,6 +161,7 @@ sub _init_config {
       # Use this to set the default range of the recurrence.
 
       'recurrange'       => '',
+      'maxrecurattempts' => 100,
 
       # Use this to set the default time.
 
@@ -210,6 +211,7 @@ sub _init_config {
    $self->_config_var('workweekend',  5);
    $self->_config_var('language',     'english');
    $self->_config_var('recurrange',   'none');
+   $self->_config_var('maxrecurattempts', 100);
    $self->_config_var('defaulttime',  'midnight');
 
    # Set OS specific defaults
@@ -1122,6 +1124,7 @@ sub _config_var_base {
    } elsif ($var eq 'dateformat'    ||
             $var eq 'jan1week1'     ||
             $var eq 'printable'     ||
+            $var eq 'maxrecurattempts' ||
             $var eq 'tomorrowfirst') {
       # do nothing
 

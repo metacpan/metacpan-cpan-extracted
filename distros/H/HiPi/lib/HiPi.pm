@@ -18,12 +18,18 @@ use HiPi::RaspberryPi;
 
 use constant hipi_export_constants();
 
-our $VERSION ='0.70';
+our $VERSION ='0.71';
 
 our @EXPORT_OK = hipi_export_ok();
 our %EXPORT_TAGS = hipi_export_tags();
 
 sub is_raspberry_pi { return HiPi::RaspberryPi::is_raspberry() ; }
+
+sub twos_compliment {
+    my( $class, $value, $numbytes) = @_;
+    my $onescomp = (~$value) & ( 2**(8 * $numbytes) -1 );
+    return $onescomp + 1;
+}
 
 1;
 

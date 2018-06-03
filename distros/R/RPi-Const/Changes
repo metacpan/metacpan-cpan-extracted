@@ -1,5 +1,9 @@
 Revision history for RPi-Const
 
+1.03    2018-05-29
+        - added pwm_defaults tag, constants for default PWM settings
+          (closes #2)
+
 1.02    2017-07-13
         - re-released RPi::WiringPi::Constant as RPi::Const
 

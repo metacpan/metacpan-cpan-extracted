@@ -1,7 +1,9 @@
-package Pcore::API::Majestic v0.12.3;
+package Pcore::API::Majestic v0.13.0;
 
-use Pcore -dist, -class, -const, -res, -export => { CONST => [qw[$MAJESTIC_INDEX_FRESH $MAJESTIC_INDEX_HISTORIC]] };
+use Pcore -dist, -class, -const, -res, -export;
 use IO::Uncompress::Unzip qw[];
+
+our $EXPORT = { CONST => [qw[$MAJESTIC_INDEX_FRESH $MAJESTIC_INDEX_HISTORIC]] };
 
 const our $MAJESTIC_INDEX_FRESH    => 1;
 const our $MAJESTIC_INDEX_HISTORIC => 2;
@@ -383,9 +385,9 @@ sub _login ( $self, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 289, 294             | BuiltinFunctions::ProhibitComplexMappings - Map blocks should have a single statement                          |
+## |    3 | 291, 296             | BuiltinFunctions::ProhibitComplexMappings - Map blocks should have a single statement                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 287                  | BuiltinFunctions::ProhibitStringySplit - String delimiter used with "split"                                    |
+## |    2 | 289                  | BuiltinFunctions::ProhibitStringySplit - String delimiter used with "split"                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

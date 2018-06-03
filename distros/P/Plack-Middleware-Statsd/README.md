@@ -4,7 +4,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 # VERSION
 
-version v0.3.4
+version v0.3.5
 
 # SYNOPSIS
 
@@ -163,6 +163,11 @@ sub finalize {
 ```
 
 # KNOWN ISSUES
+
+## Non-standard HTTP status codes
+
+If your application is returning a status code that is not handled by
+[HTTP::Status](https://metacpan.org/pod/HTTP::Status), then the metrics may not be logged for that reponse.
 
 ## Support for older Perl versions
 

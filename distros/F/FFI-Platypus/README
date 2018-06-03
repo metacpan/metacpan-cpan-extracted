@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.48
+    version 0.50
 
 SYNOPSIS
 
@@ -497,10 +497,10 @@ EXAMPLES
      use FFI::CheckLib;
      use FFI::Platypus;
      
-     # NOTE: I ported this from the like named eg/notify.pl that came with FFI::Raw
-     # and it seems to work most of the time, but also seems to SIGSEGV sometimes.
-     # I saw the same behavior in the FFI::Raw version, and am not really familiar
-     # with the libnotify API to say what is the cause.  Patches welcome to fix it.
+     # NOTE: I ported this from anoter Perl FFI library and it seems to work most
+     # of the time, but also seems to SIGSEGV sometimes.  I saw the same behavior
+     # in the old version, and am not really familiar with the libnotify API to
+     # say what is the cause.  Patches welcome to fix it.
      
      my $ffi = FFI::Platypus->new;
      $ffi->lib(find_lib_or_exit lib => 'notify');
@@ -1192,6 +1192,34 @@ EXAMPLES
     Even so this enables you to call Java from Perl and potentially other
     Java based languages such as Scala, Groovy or JRuby.
 
+FAQ
+
+ I get seg faults on some platforms but not others with a library using
+ pthreads.
+
+    On some platforms, Perl isn't linked with libpthreads if Perl threads
+    are not enabled. On some platforms this doesn't seem to matter,
+    libpthreads can be loaded at runtime without much ill-effect. (Linux
+    from my experience doesn't seem to mind one way or the other). Some
+    platforms are not happy about this, and about the only thing that you
+    can do about it is to build Perl such that it links with libpthreads
+    even if it isn't a threaded Perl.
+
+    This is not really an FFI issue, but a Perl issue, as you will have the
+    same problem writing XS code for the such libraries.
+
+ Doesn't work on Perl 5.10.0.
+
+    I try as best as possible to support the same range of Perls as the
+    Perl toolchain. That means all the way back to 5.8.1. Unfortunately,
+    5.10.0 seems to have a problem that is difficult to diagnose. Patches
+    to fix are welcome, if you want to help out on this, please see:
+
+    https://github.com/Perl5-FFI/FFI-Platypus/issues/68
+
+    Since this is an older buggy version of Perl it is recommended that you
+    instead upgrade to 5.10.1 or later.
+
 CAVEATS
 
     Platypus and Native Interfaces like libffi rely on the availability of
@@ -1240,28 +1268,27 @@ SUPPORT
     a feature request, please open an issue on this project's GitHub Issue
     tracker:
 
-    https://github.com/plicease/FFI-Platypus/issues
+    https://github.com/perl5-FFI/FFI-Platypus/issues
 
 CONTRIBUTING
 
     If you have implemented a new feature or fixed a bug then you may make
     a pull request on this project's GitHub repository:
 
-    https://github.com/plicease/FFI-Platypus/pulls
+    https://github.com/Perl5-FFI/FFI-Platypus/pulls
 
     This project is developed using Dist::Zilla. The project's git
-    repository also comes with Build.PL and cpanfile files necessary for
-    building, testing (and even installing if necessary) without
-    Dist::Zilla. Please keep in mind though that these files are generated
-    so if changes need to be made to those files they should be done
-    through the project's dist.ini file. If you do use Dist::Zilla and
-    already have the necessary plugins installed, then I encourage you to
-    run dzil test before making any pull requests. This is not a
-    requirement, however, I am happy to integrate especially smaller
-    patches that need tweaking to fit the project standards. I may push
-    back and ask you to write a test case or alter the formatting of a
-    patch depending on the amount of time I have and the amount of code
-    that your patch touches.
+    repository also comes with the Build.PL file necessary for building,
+    testing (and even installing if necessary) without Dist::Zilla. Please
+    keep in mind though that these files are generated so if changes need
+    to be made to those files they should be done through the project's
+    dist.ini file. If you do use Dist::Zilla and already have the necessary
+    plugins installed, then I encourage you to run dzil test before making
+    any pull requests. This is not a requirement, however, I am happy to
+    integrate especially smaller patches that need tweaking to fit the
+    project standards. I may push back and ask you to write a test case or
+    alter the formatting of a patch depending on the amount of time I have
+    and the amount of code that your patch touches.
 
     This project's GitHub issue tracker listed above is not Write-Only. If
     you want to contribute then feel free to browse through the existing
@@ -1370,7 +1397,7 @@ CONTRIBUTING
     making significant changes to the Platypus Core. For that I use
     `FFI-Performance`, which can be found in my GitHub repository here:
 
-    https://github.com/plicease/FFI-Performance
+    https://github.com/Perl5-FFI/FFI-Performance
 
  System integrators
 
@@ -1461,14 +1488,6 @@ SEE ALSO
       header files that may be relevant to an FFI application. One downside
       is that its use may require development packages to be installed.
 
-    FFI::Raw
-
-      Alternate interface to libffi with fewer features. It notably lacks
-      the ability to create real xsubs, which may make FFI::Platypus much
-      faster. Also lacking are pointers to native types, arrays and custom
-      types. In its favor, it has been around for longer that Platypus, and
-      has been battle tested to some success.
-
     Win32::API
 
       Microsoft Windows specific FFI style interface.
@@ -1516,10 +1535,9 @@ ACKNOWLEDGMENTS
     not only helped me get started with FFI but significantly influenced
     the design of Platypus.
 
-    In addition I'd like to thank Alessandro Ghedini (ALEXBIO) who was
-    always responsive to bug reports and pull requests for FFI::Raw, which
-    was important in the development of the ideas on which Platypus is
-    based.
+    In addition I'd like to thank Alessandro Ghedini (ALEXBIO) whose work
+    on another Perl FFI library helped drive some of the development ideas
+    for FFI::Platypus.
 
 AUTHOR
 

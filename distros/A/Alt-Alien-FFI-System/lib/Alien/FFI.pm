@@ -6,7 +6,7 @@ use 5.008001;
 use Carp qw( croak );
 
 # ABSTRACT: Get libffi compiler and linker flags
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.21'; # VERSION
 
 
 sub new
@@ -119,7 +119,7 @@ Alien::FFI - Get libffi compiler and linker flags
 
 =head1 VERSION
 
-version 0.16
+version 0.21
 
 =head1 SYNOPSIS
 

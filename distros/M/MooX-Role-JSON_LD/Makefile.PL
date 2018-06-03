@@ -10,9 +10,11 @@ WriteMakefile(
         Sub::Quote      => 0, # no longer part of Moo
         Types::Standard => 0,
         JSON::MaybeXS   => 0,
+        Ref::Util       => 0,
     },
     BUILD_REQUIRES    => {
         Test::More    => 0,
+        namespace::autoclean => 0,
     },
     ABSTRACT_FROM     => 'lib/MooX/Role/JSON_LD.pm',
     AUTHOR            => 'Dave Cross <dave@perlhacks.com>',
@@ -27,6 +29,9 @@ WriteMakefile(
                 web => 'https://github.com/davorg/moox-role-json_ld',
             },
         },
-
+        x_contributors => [
+            'Robert Rothenberg <rrwo@cpan.com>',
+            'Mohammad S Anwar <mohammad.anwar@yahoo.com>',
+        ],
     },
 );

@@ -1,13 +1,21 @@
 package Catmandu::Fix::Bind::pica_each;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use Moo;
+use Catmandu::Sane;
 use Catmandu::Util;
+use Catmandu::Fix::Has;
+use PICA::Path;
 
 with 'Catmandu::Fix::Bind', 'Catmandu::Fix::Bind::Group';
 
 has done => (is => 'ro');
+has pica_path => (
+    fix_arg => 1,
+    coerce => sub { $_[0] ne '....' ? PICA::Path->new($_[0]) : undef },
+    default => sub { '....' }
+);
 
 sub unit {
     my ($self,$data) = @_;
@@ -22,6 +30,10 @@ sub bind {
 
     my $rows = $mvar->{record} // [];
 
+    if ($self->pica_path) {
+        @$rows = grep { $self->pica_path->match_field($_) } @{$rows};
+    } 
+
     my @new = ();
 
     for my $row (@{$rows}) {
@@ -30,7 +42,7 @@ sub bind {
 
         my $fixed = $code->($mvar);
 
-        push @new , @{$fixed->{record}} if defined($fixed) && exists $fixed->{record};
+        push @new, @{$fixed->{record}} if defined($fixed) && exists $fixed->{record};
     }
 
     $mvar->{record} = \@new if exists $mvar->{record};
@@ -39,6 +51,9 @@ sub bind {
 
     $mvar;
 }
+
+1;
+__END__
 
 =head1 NAME
 
@@ -61,10 +76,15 @@ Catmandu::Fix::Bind::pica_each - a binder that loops over PICA fields
         end
     end
 
+    do pica_each("0...")
+        # process only level 0 fields
+    end
+
 =head1 DESCRIPTION
 
-The pica_each binder will iterate over each individual PICA field and 
-execute the fixes only in context over each individual field.
+The pica_each binder will iterate over each individual PICA field and execute
+the fixes only in context over each individual field. The current field is
+bound to C<record.0>.
 
 If a PICA record contains:
 
@@ -97,5 +117,3 @@ can write:
 L<Catmandu::Fix::Bind>
 
 =cut
-
-1;

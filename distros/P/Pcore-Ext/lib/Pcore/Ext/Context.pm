@@ -7,16 +7,14 @@ use Pcore::Ext::Context::Call;
 use Pcore::Ext::Context::Func;
 use Pcore::Ext::Context::L10N;
 
-has app => ( is => 'ro', isa => ConsumerOf ['Pcore::App'], required => 1 );
-has ctx => ( is => 'ro', isa => HashRef, required => 1 );
+has app  => ();
+has tree => ();
+has ctx  => ();
 
-has framework => ( is => 'ro', isa => Enum [ 'classic', 'modern' ], default => 'classic' );
-
-has js_gen_cache => ( is => 'ro', isa => HashRef, init_arg => undef );    # cache for JS functions strings
-
-has api   => ( is => 'ro', isa => HashRef, init_arg => undef );           # tied to $self->_ext_api_method
-has class => ( is => 'ro', isa => HashRef, init_arg => undef );           # tied to $self->_ext_class
-has type  => ( is => 'ro', isa => HashRef, init_arg => undef );           # tied to $self->_ext_type
+has api           => ();    # ( is => 'ro', isa => HashRef, init_arg => undef );    # tied to $self->_ext_api_method
+has class         => ();    # ( is => 'ro', isa => HashRef, init_arg => undef );    # tied to $self->_ext_class
+has type          => ();    # ( is => 'ro', isa => HashRef, init_arg => undef );    # tied to $self->_ext_type
+has _js_gen_cache => ();    # ( is => 'ro', isa => HashRef, init_arg => undef );    # cache for JS functions strings
 
 sub BUILD ( $self, $args ) {
     weaken $self;
@@ -79,32 +77,6 @@ sub js_func ( $self, @ ) {
 }
 
 # Ext resolvers
-sub _ext_class ( $self, $name ) {
-    if ( my $class = $self->get_class($name) ) {
-
-        # register requires
-        $self->{ctx}->{requires}->{ $class->{class} } = undef;
-
-        return $class->{class};
-    }
-    else {
-        die qq[Can't resolve Ext name "$name" in "$self->{ctx}->{namespace}::$self->{ctx}->{generator}"];
-    }
-}
-
-sub _ext_type ( $self, $name ) {
-    if ( my $class = $self->get_class($name) ) {
-
-        # register requires
-        $self->{ctx}->{requires}->{ $class->{class} } = undef;
-
-        return $class->{type};
-    }
-    else {
-        die qq[Can't resolve Ext name "$name" in "$self->{ctx}->{namespace}::$self->{ctx}->{generator}"];
-    }
-}
-
 sub _ext_api_method ( $self, $method_id ) {
     my $map = $self->{app}->{api}->{map};
 
@@ -112,8 +84,6 @@ sub _ext_api_method ( $self, $method_id ) {
     $method_id = "/$self->{ctx}->{api_ver}/$method_id" if substr( $method_id, 0, 1 ) ne q[/] && $self->{ctx}->{api_ver};
 
     my $method = $map->get_method($method_id) // die qq[API method "$method_id" is not exists in "$self->{ctx}->{namespace}::$self->{ctx}->{generator}"];
-
-    my $ext_api_namespace = 'API.' . ref( $self->{app} ) =~ s[::][]smgr;
 
     my $ext_api_action = $method->{class_path} =~ s[/][.]smgr =~ s[\A[.]][]smr;
 
@@ -133,110 +103,79 @@ sub _ext_api_method ( $self, $method_id ) {
         };
     }
 
+    my $ext_api_namespace = 'EXTDIRECT.' . ref( $self->{app} ) =~ s[::][]smgr;
+
     return "$ext_api_namespace.$ext_api_action.$method->{method_name}";
 }
 
-sub get_class ( $self, $name ) {
+sub _ext_class ( $self, $name ) {
+    if ( my $class = $self->_resolve_class_path($name) ) {
 
-    # search by full Ext class name
-    if ( my $class_cfg = $Pcore::Ext::CFG->{class}->{$name} ) {
-        return $class_cfg;
+        # register requires
+        $self->{ctx}->{requires}->{ $class->{class_path} } = undef;
+
+        return $class->{ext_class_name};
     }
-
-    # name not contains '.' - this perl class name
-    if ( index( $name, '.' ) == -1 ) {
-        my $colon_idx = index $name, '::';
-
-        if ( $colon_idx == -1 ) {
-
-            # search by perl class name, related to the current namespace
-            if ( my $class_name = $Pcore::Ext::CFG->{perl_class}->{"$self->{ctx}->{namespace}::$name"} ) {
-                return $Pcore::Ext::CFG->{class}->{$class_name};
-            }
-        }
-        elsif ( $colon_idx > 0 ) {
-
-            # search by perl class name, related to the current namespace
-            if ( my $class_name = $Pcore::Ext::CFG->{perl_class}->{"$self->{ctx}->{namespace}::$name"} ) {
-                return $Pcore::Ext::CFG->{class}->{$class_name};
-            }
-
-            # search by full perl class name
-            if ( my $class_name = $Pcore::Ext::CFG->{perl_class}->{$name} ) {
-                return $Pcore::Ext::CFG->{class}->{$class_name};
-            }
-        }
-        elsif ( $colon_idx == 0 ) {
-
-            # search by perl class name, related to the app root Ext namespace
-            if ( my $class_name = $Pcore::Ext::CFG->{perl_class}->{"$self->{ctx}->{root_namespace}$name"} ) {
-                return $Pcore::Ext::CFG->{class}->{$class_name};
-            }
-        }
-    }
-
-    # name contains '.' - this is full Ext class name or full Ext class alias
     else {
+        die qq[Can't resolve Ext name "$name" in "$self->{ctx}->{namespace}::$self->{ctx}->{generator}"];
+    }
+}
 
-        # search by full Ext class name in Ext. namespace
-        if ( my $class = $Pcore::Ext::EXT->{ $self->{framework} }->{class}->{$name} ) {
-            return $class;
-        }
+sub _ext_type ( $self, $name ) {
+    if ( my $class = $self->_resolve_class_path($name) ) {
 
-        # search by full alter Ext class name in Ext. namespace
-        if ( my $class_name = $Pcore::Ext::EXT->{ $self->{framework} }->{alter_class}->{$name} ) {
-            return $Pcore::Ext::EXT->{ $self->{framework} }->{class}->{$class_name};
-        }
+        # register requires
+        $self->{ctx}->{requires}->{ $class->{class_path} } = undef;
 
-        # search by full Ext alias in Ext. namespace
-        if ( my $class_name = $Pcore::Ext::EXT->{ $self->{framework} }->{alias_class}->{$name} ) {
-            return $Pcore::Ext::EXT->{ $self->{framework} }->{class}->{$class_name};
-        }
+        return $class->{alias};
+    }
+    else {
+        die qq[Can't resolve Ext name "$name" in "$self->{ctx}->{namespace}::$self->{ctx}->{generator}"];
+    }
+}
+
+sub _resolve_class_path ( $self, $path ) {
+    my $resolved;
+
+    # path is related to the current context app_path
+    if ( substr( $path, 0, 2 ) eq '//' ) {
+        substr $path, 0, 2, q[];
+
+        $resolved = P->path( $path, base => $self->{ctx}->{app_path} )->to_string;
     }
 
-    return;
+    # path is absolute
+    elsif ( substr( $path, 0, 1 ) eq '/' ) {
+        $resolved = P->path( $path, base => '/' )->to_string;
+    }
+
+    # path is related to the current context context_path
+    else {
+        $resolved = P->path( $path, base => $self->{ctx}->{context_path} )->to_string;
+    }
+
+    die qq[Can't resolve path "$path" in class "$self->{ctx}->{namespace}::EXT_$self->{ctx}->{generator}"] if !exists $self->{tree}->{$resolved};
+
+    return $self->{tree}->{$resolved};
 }
 
 sub to_js ( $self ) {
-    my $cfg = do {
+    my $data = do {
         my $method = "EXT_$self->{ctx}->{generator}";
 
-        my $l10n = sub ( $msgid, $locale = undef, $domain = undef ) {
-            if ( ref $msgid eq 'Pcore::Core::L10N::_deferred' ) {
-                ( $msgid, $domain ) = ( $msgid->{msgid}, $msgid->{domain} );
-            }
-            else {
-                $domain //= $Pcore::Core::L10N::PACKAGE_DOMAIN->{ caller() };
-            }
+        my $l10n = sub ( $msgid, $msgid_plural = undef, $num = undef ) : prototype($;$$) {
+            my $domain = caller;
 
             $self->{ctx}->{l10n_domain}->{$domain} = undef;
 
-            return Pcore::Ext::Context::L10N->new(
-                ext       => $self,
-                is_plural => 0,
-                msgid     => $msgid,
-                domain    => $domain,
-            );
-        };
-
-        my $l10np = sub ( $msgid, $msgid_plural, $num = undef, $locale = undef, $domain = undef ) {
-            if ( ref $msgid eq 'Pcore::Core::L10N::_deferred' ) {
-                ( $msgid, $msgid_plural, $num, $domain ) = ( $msgid->{msgid}, $msgid->{msgid_plural}, $msgid_plural, $msgid->{domain} );
-            }
-            else {
-                $domain //= $Pcore::Core::L10N::PACKAGE_DOMAIN->{ caller() };
-            }
-
-            $self->{ctx}->{l10n_domain}->{$domain} = undef;
-
-            return Pcore::Ext::Context::L10N->new(
+            return bless {
                 ext          => $self,
-                is_plural    => 1,
+                domain       => $domain,
                 msgid        => $msgid,
                 msgid_plural => $msgid_plural,
                 num          => $num // 1,
-                domain       => $domain,
-            );
+              },
+              'Pcore::Ext::Context::L10N';
         };
 
         no strict qw[refs];    ## no critic qw[TestingAndDebugging::ProhibitProlongedStrictureOverride]
@@ -244,37 +183,31 @@ sub to_js ( $self ) {
 
         local *{"$self->{ctx}->{namespace}::l10n"} = $l10n;
 
-        local *{"$self->{ctx}->{namespace}::l10np"} = $l10np;
+        tie my $l10n_hash->%*, 'Pcore::Ext::Context::_l10n', $self;
 
-        tie my $l10n_hash->%*, 'Pcore::Ext::Context::_l10n', $l10n, $l10np;
         local ${"$self->{ctx}->{namespace}::l10n"} = $l10n_hash;
 
         *{"$self->{ctx}->{namespace}::$method"}->($self);
     };
 
-    # resolve and add "extend" property
-    if ( $self->{ctx}->{extend} ) {
-        $cfg->{extend} = $self->_ext_class( $self->{ctx}->{extend} );
+    # set "extend" property
+    $data->{extend} = $self->{ctx}->{extend} if $self->{ctx}->{extend};
 
-        # add extend to requires
-        $self->{ctx}->{requires}->{ $cfg->{extend} } = undef;
-    }
-
-    # create "requires" property
-    push $cfg->{requires}->@*, sort keys $self->{ctx}->{requires}->%*;
+    # remove "requires" property, because we build full app
+    delete $data->{requires};
 
     # set alias
-    $cfg->{alias} = $self->{ctx}->{alias} if $self->{ctx}->{alias} && !exists $cfg->{alias};
+    $data->{alias} = "$self->{ctx}->{alias_namespace}.$self->{ctx}->{alias}" if $self->{ctx}->{alias};
 
-    my $js = $self->js_call( 'Ext.define', [ $self->{ctx}->{class}, $cfg ] )->to_js;
+    my $js = $self->js_call( 'Ext.define', [ $self->{ctx}->{ext_class_name}, $data ] )->to_js;
 
-    my $js_gen_cache = $self->{js_gen_cache};
+    my $js_gen_cache = $self->{_js_gen_cache};
 
     $js->$* =~ s/"__JS(\d+)__"/$js_gen_cache->{$1}->$*/smge;
 
-    undef $self->{js_gen_cache};
+    $self->{ctx}->{content} = $js;
 
-    return $js;
+    return;
 }
 
 package Pcore::Ext::Context::_TiedAttr {
@@ -291,27 +224,22 @@ package Pcore::Ext::Context::_TiedAttr {
 }
 
 package Pcore::Ext::Context::_l10n {
-    use Pcore::Util::Scalar qw[is_plain_arrayref];
 
-    sub TIEHASH ( $self, $l10n, $l10np ) {
-        return bless [ $l10n, $l10np ], $self;
+    sub TIEHASH ( $self, $ctx ) {
+        return bless [$ctx], $self;
     }
 
     sub FETCH {
-        if ( is_plain_arrayref $_[1] ) {
-            if ( $_[1]->[0]->{is_plural} ) {
-                return $_[0]->[1]->( $_[1]->[0], $_[1]->[1] );
-            }
-            else {
-                return $_[0]->[0]->( $_[1]->[0] );
-            }
-        }
-        elsif ( ref $_[1] eq 'Pcore::Core::L10N::_deferred' ) {
-            return $_[0]->[0]->( $_[1] );
-        }
-        else {
-            return $_[0]->[0]->( $_[1], undef, $Pcore::Core::L10N::PACKAGE_DOMAIN->{ caller() } );
-        }
+        my $domain = caller;
+
+        $_[0]->[0]->{ctx}->{l10n_domain}->{$domain} = undef;
+
+        return bless {
+            ext    => $_[0]->[0],
+            domain => $domain,
+            msgid  => $_[1],
+          },
+          'Pcore::Ext::Context::L10N';
     }
 }
 
@@ -323,12 +251,11 @@ package Pcore::Ext::Context::_l10n {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 95                   | * Private subroutine/method '_ext_type' declared but not used                                                  |
-## |      | 108                  | * Private subroutine/method '_ext_api_method' declared but not used                                            |
+## |      | 80                   | * Private subroutine/method '_ext_api_method' declared but not used                                            |
+## |      | 111                  | * Private subroutine/method '_ext_class' declared but not used                                                 |
+## |      | 124                  | * Private subroutine/method '_ext_type' declared but not used                                                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 24, 25, 26, 249      | Miscellanea::ProhibitTies - Tied variable used                                                                 |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 209, 227, 313        | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    2 | 22, 23, 24, 186      | Miscellanea::ProhibitTies - Tied variable used                                                                 |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

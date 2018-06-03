@@ -4,9 +4,6 @@ use 5.006001;
 use strict;
 use warnings;
 
-use Readonly;
-
-
 use PPI::Document qw< >;
 use PPI::Statement::Break qw< >;
 use PPI::Statement::Compound qw< >;
@@ -28,7 +25,7 @@ use Perl::Critic::Utils::PPI qw< :all >;
 
 use Test::More tests => 64;
 
-our $VERSION = '1.130';
+our $VERSION = '1.132';
 
 use Perl::Critic::TestUtils;
 Perl::Critic::TestUtils::assert_version( $VERSION );

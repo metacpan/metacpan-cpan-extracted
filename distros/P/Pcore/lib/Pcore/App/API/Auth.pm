@@ -21,7 +21,7 @@ has permissions      => ();    # ( isa => Maybe [HashRef] );
 has depends_on       => ();    # ( isa => Maybe [ArrayRef] );
 
 *TO_JSON = *TO_CBOR = sub ($self) {
-    die q[Direct auth object serialization is impossible for security reasons];
+    return { $self->%{qw[is_authenticated is_root user_id user_name permissions]} };
 };
 
 sub TO_DUMP ( $self, $dumper, @ ) {

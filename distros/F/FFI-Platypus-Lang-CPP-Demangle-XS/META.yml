@@ -3,25 +3,26 @@ abstract: 'Demangle C++ symbols using the C++ ABI API'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
-  Module::Build: '0.28'
-  Test::More: '0.94'
+  Test2::V0: '0.000060'
   perl: '5.008001'
 configure_requires:
   ExtUtils::CppGuess: '0'
-  Module::Build: '0.28'
+  ExtUtils::MakeMaker: '7.12'
   perl: '5.008001'
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: FFI-Platypus-Lang-CPP-Demangle-XS
 requires:
-  base: '0'
   perl: '5.008001'
 resources:
-  bugtracker: https://github.com/plicease/FFI-Platypus-Lang-CPP-Demangle-XS/issues
-  homepage: http://perl.wdlabs.com/FFI-Platypus-Lang-CPP-Demangle-XS
-  repository: git://github.com/plicease/FFI-Platypus-Lang-CPP-Demangle-XS.git
-version: '0.02'
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/Perl5-FFI/FFI-Platypus-Lang-CPP-Demangle-XS/issues
+  homepage: https://metacpan.org/pod/FFI::Platypus::Lang::CPP::Demangle::XS
+  repository: git://github.com/Perl5-FFI/FFI-Platypus-Lang-CPP-Demangle-XS.git
+version: '0.03'
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_use_unsafe_inc: 0

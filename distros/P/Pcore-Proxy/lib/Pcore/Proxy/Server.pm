@@ -16,7 +16,7 @@ has on_res => ( is => 'ro', isa => Maybe [CodeRef] );
 has _tcp_server => ( is => 'ro', isa => InstanceOf ['Guard'], init_arg => undef );
 
 sub _build_port ($self) {
-    return P->sys->get_free_port( $self->host ) // die q[Error get free port];
+    return P->net->get_free_port( $self->host ) // die q[Error get free port];
 }
 
 sub _build_key_file ($self) {

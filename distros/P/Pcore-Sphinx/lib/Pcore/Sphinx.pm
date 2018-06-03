@@ -1,4 +1,4 @@
-package Pcore::Sphinx v0.9.2;
+package Pcore::Sphinx v0.9.3;
 
 use Pcore -dist, -class;
 
@@ -6,8 +6,8 @@ extends qw[Pcore::App::Alien];
 
 with qw[Pcore::Core::CLI::Opt::Perms];
 
-has '+name' => ( default => 'sphinx' );
-has '+ns'   => ( default => 'Pcore::Sphinx' );
+has name => 'sphinx';
+has ns   => 'Pcore::Sphinx';
 
 has alien_cfg_dir          => ( is => 'lazy', isa => Str, init_arg => undef );
 has alien_indexer_bin_path => ( is => 'lazy', isa => Str, init_arg => undef );

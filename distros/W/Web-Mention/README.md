@@ -34,7 +34,6 @@ Web::Mention - Implementation of the IndieWeb Webmention protocol
             $name = $wm->source->host;
         }
 
-
         if ( $wm->is_like ) {
             say "Hooray, $name likes $target!";
         }
@@ -89,9 +88,11 @@ the IndieWeb community. (See: [https://indieweb.org/Webmention](https://indieweb
 
 An object of this class represents a single webmention, with target and
 source URLs. It can verify itself, determining whether or not the
-document found at the source URL does indeed mention the target URL. It
-can also use the Indieweb authorship algorithm to identify and describe
-the author of source document, if possible.
+document found at the source URL does indeed mention the target URL.
+
+It can also use IndieWeb algorithms to attempt identification of the
+source document's author, and to provide a short summary of that
+document's content, using Microformats2 metadata when available.
 
 # METHODS
 
@@ -99,7 +100,9 @@ the author of source document, if possible.
 
 ### new
 
-    $wm = Web::Mention->new( source => $source_url, target => $target_url
+    $wm = Web::Mention->new(
+       source => $source_url,
+       target => $target_url,
     );
 
 Basic constructor. The **source** and **target** URLs are both required
@@ -114,8 +117,10 @@ part of either, if present).
 
 ### new\_from\_html
 
-    @wms = Web::Mention->new_from_html( source => $source_url, html =>
-    $html );
+    @wms = Web::Mention->new_from_html(
+       source => $source_url,
+       html   => $html,
+    );
 
 Convenience batch-construtor that returns a (possibly empty) _list_ of
 Web::Mention objects based on the single source URL (or _URI_ object)
@@ -145,8 +150,11 @@ or if it does but does not define both required HTTP parameters.
 
 ### FROM\_JSON
 
-    $wm = Web::Mention->FROM_JSON( JSON::decode_json(
-    $serialized_webmention ) );
+    use JSON;
+
+    $wm = Web::Mention->FROM_JSON(
+       JSON::decode_json( $serialized_webmention )
+    );
 
 Converts an unblessed hash reference resulting from an earlier
 serialization (via [JSON](https://metacpan.org/pod/JSON)) into a fully fledged Web::Mention object.
@@ -173,7 +181,7 @@ Defaults to `...`.
 Gets or sets the maximum length, in characters, of the content displayed
 by that object method prior to truncation. (See ["content"](#content).)
 
-Defaults to 280.
+Defaults to 200.
 
 ## Object Methods
 
@@ -324,8 +332,8 @@ The type of webmention this is. One of:
 
 # SERIALIZATION
 
-To serialize a Web::Mention object into JSON, enable &lt;the JSON module's
-"convert\_blessed" fetaure|JSON/"convert\_blessed">, and then use one of
+To serialize a Web::Mention object into JSON, enable [the JSON module's
+"convert\_blessed" feature](https://metacpan.org/pod/JSON#convert_blessed), and then use one of
 that module's JSON-encoding functions on this object. This will result
 in a JSON string containing all the pertinent information about the
 webmention, including its verification status, any content and metadata
@@ -394,6 +402,6 @@ you to consider a donation to one of the following causes. It would mean
 a lot to me if you did. (You can tell me about it if you'd like to, but
 you don't have to.)
 
-- [The American Civil Liberties Union](http://aclu.org)
-- [The Democratic National Committee](http://democrats.org)
+- [The American Civil Liberties Union](https://aclu.org)
+- [The Democratic National Committee](https://democrats.org)
 - [Earthjustice](https://earthjustice.org)

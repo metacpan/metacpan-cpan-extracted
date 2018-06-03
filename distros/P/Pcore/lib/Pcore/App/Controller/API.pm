@@ -3,12 +3,11 @@ package Pcore::App::Controller::API;
 use Pcore -role, -const;
 use Pcore::Util::Data qw[from_json to_json from_cbor to_cbor from_uri_query];
 use Pcore::Util::Scalar qw[is_plain_arrayref];
-use Pcore::WebSocket;
+use Pcore::WebSocket::pcore;
 
 with qw[Pcore::App::Controller];
 
 const our $WS_MAX_MESSAGE_SIZE => 1_024 * 1_024 * 100;    # 100 Mb
-const our $WS_PONG_INTERVAL    => 50;
 const our $WS_COMPRESSION      => 0;
 
 const our $TX_TYPE_RPC => 'rpc';
@@ -22,48 +21,39 @@ sub run ( $self, $req ) {
 
     # WebSocket API request
     if ( $req->is_websocket_connect_request ) {
-        Pcore::WebSocket->accept_ws(
-            'pcore', $req,
-            sub ( $req, $accept, $reject ) {
 
-                # authenticate request
-                $req->authenticate( sub ( $auth ) {
-
-                    # accept websocket connection
-                    $accept->(
-                        max_message_size => $WS_MAX_MESSAGE_SIZE,
-                        pong_interval    => $WS_PONG_INTERVAL,
-                        compression      => $WS_COMPRESSION,
-                        on_listen_event  => sub ( $ws, $mask ) {
-                            return $self->on_listen_event( $ws, $mask );
-                        },
-                        on_fire_event => sub ( $ws, $key ) {
-                            return $self->on_fire_event( $ws, $key );
-                        },
-                        before_connect => undef,
-                        on_connect     => sub ($ws) {
-
-                            # store auth in websocket connection object
-                            $ws->{auth} = $auth;
-
-                            $self->on_connect($ws);
+        # create connection and accept websocket connect request
+        Pcore::WebSocket::pcore->new(
+            max_message_size => $WS_MAX_MESSAGE_SIZE,
+            compression      => $WS_COMPRESSION,
+            on_auth          => Coro::unblock_sub(
+                sub ( $h, $token, $cb ) {
+                    $self->{app}->{api}->authenticate(
+                        $token,
+                        sub ($auth) {
+                            $cb->($auth);
 
                             return;
-                        },
-                        on_disconnect => undef,
-                        on_rpc        => Coro::unblock_sub sub ( $ws, $req, $tx ) {
-                            $ws->{auth}->api_call_arrayref( $tx->{method}, $tx->{args}, $req );
-
-                            return;
-                        },
+                        }
                     );
 
                     return;
-                } );
-
-                return;
+                }
+            ),
+            on_subscribe => sub ( $h, $event ) {
+                return $self->on_subscribe_event( $h, $event );
             },
-        );
+            on_event => sub ( $h, $ev ) {
+                return $self->on_event( $h, $ev );
+            },
+            on_rpc => Coro::unblock_sub(
+                sub ( $h, $req, $tx ) {
+                    $h->{auth}->api_call_arrayref( $tx->{method}, $tx->{args}, $req );
+
+                    return;
+                }
+            ),
+        )->accept($req);
     }
 
     # HTTP API request
@@ -196,11 +186,11 @@ sub on_connect ( $self, $ws ) {
     return;
 }
 
-sub on_listen_event ( $self, $ws, $mask ) {
+sub on_subscribe_event ( $self, $h, $event ) {
     return;
 }
 
-sub on_fire_event ( $self, $ws, $key ) {
+sub on_event ( $self, $h, $ev ) {
     return;
 }
 

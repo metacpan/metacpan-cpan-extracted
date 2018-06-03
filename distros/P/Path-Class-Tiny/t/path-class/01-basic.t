@@ -96,8 +96,6 @@ SKIP: { skip "special cases for `dir` handled elsewhere";
   is $file->relative('one'), 'two/three';
 }
 
-SKIP: {	skip "dir_list() / is_dir() / subsumes() still need more work";
-
 {
   # Try out the dir_list() method
   my $dir = dir('one/two/three/four/five');
@@ -135,25 +133,29 @@ SKIP: {	skip "dir_list() / is_dir() / subsumes() still need more work";
   is $d, "four", "scalar dir_list(2, 2)";
 }
 
+SKIP: {	skip "is_dir() can't work for paths that don't exist";
+
 {
   # Test is_dir()
-  is  dir('foo')->is_dir, 1;
-  is file('foo')->is_dir, 0;
+  is !! dir('foo')->is_dir,  1, "is_dir works for dir";
+  is !!file('foo')->is_dir, '', "is_dir works for file";
 }
+
+} # SKIP block
 
 {
   # subsumes()
-  is dir('foo/bar')->subsumes('foo/bar/baz'), 1;
-  is dir('/foo/bar')->subsumes('/foo/bar/baz'), 1;
-  is dir('foo/bar')->subsumes('bar/baz'), 0;
-  is dir('/foo/bar')->subsumes('foo/bar'), 0;
-  is dir('/foo/bar')->subsumes('/foo/baz'), 0;
-  is dir('/')->subsumes('/foo/bar'), 1;
-  is dir('/')->subsumes(file('/foo')), 1;
-  is dir('/foo')->subsumes(file('/foo')), 0;
+  is !!dir('foo/bar')->subsumes('foo/bar/baz'), 1, "subsumes test: relative positive";
+  is !!dir('/foo/bar')->subsumes('/foo/bar/baz'), 1, "subsumes test: absolute positive";
+  is !!dir('foo/bar')->subsumes('bar/baz'), '', "subsumes test: relative negative";
+  is !!dir('/foo/bar')->subsumes('foo/bar'), '', "subsumes test: absolute/relative negative";
+  is !!dir('/foo/bar')->subsumes('/foo/baz'), '', "subsumes test: absolute/absolute negative";
+  is !!dir('/')->subsumes('/foo/bar'), 1, "subsumes test: root 2-dir";
+  is !!dir('/')->subsumes(file('/foo')), 1, "subsumes test: root 1-dir";
+SKIP: { skip "subsumes() test on dir vs file can't work for paths that don't exist";
+  is !!dir('/foo')->subsumes(file('/foo')), '', "subsumes test: dir vs file";
 }
-
-} # TODO block
+}
 
 
 done_testing;

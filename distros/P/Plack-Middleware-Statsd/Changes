@@ -1,5 +1,17 @@
 Revision history for Plack-Middleware-Statsd
 
+v0.3.5    2018-05-31 21:19:21+01:00 Europe/London
+  [Documentation]
+  - Documented a known issue about non-standard status codes, #2.
+
+  [Toolchain]
+  - Removed redundant prerequisites from cpanfile and META files.
+
+  - Added keywords to distribution metadata.
+
+  [Other Changes]
+  - Added HTTP::Stats 6.16 as a recommended prerequisite, #2.
+
 v0.3.4    2018-03-01 15:39:03+00:00 Europe/London
   [Bug Fixes]
   - Fix bug with counting content types that contain dots, e.g.

@@ -32,17 +32,21 @@
 */
 #include "platform.hpp"
 
-#if defined (ZMQ_USE_TWEETNACL)
+#if defined(ZMQ_USE_TWEETNACL)
 
 /*
     Disable warnings for this source only, rather than for the whole
     codebase when building with C99 (gcc >= 4.2) or with Microsoft's compiler
 */
-#if defined __GNUC__ && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2)) && __STDC_VERSION__ < 201112L
-#   pragma GCC diagnostic ignored "-Wsign-compare"
+#if defined __GNUC__                                                           \
+  && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2))                  \
+  && __STDC_VERSION__ < 201112L
+#pragma GCC diagnostic ignored "-Wsign-compare"
 #elif defined _MSC_VER
-#   pragma warning (disable:4018 4244 4146)
+#pragma warning(disable : 4018 4244 4146)
 #endif
+
+/* clang-format off */
 
 #include "tweetnacl.h"
 
@@ -922,8 +926,8 @@ void randombytes (unsigned char *x,unsigned long long xlen)
 {
     int i;
 #ifndef ZMQ_HAVE_GETRANDOM
-    //  Require that random_open has already been called, to avoid
-    //  race conditions.
+    /*  Require that random_open has already been called, to avoid
+        race conditions. */
     assert (fd != -1);
 #endif
     while (xlen > 0) {
@@ -946,7 +950,7 @@ void randombytes (unsigned char *x,unsigned long long xlen)
     }
 }
 
-//  Do not call manually! Use random_close from random.hpp
+/*  Do not call manually! Use random_close from random.hpp */
 int randombytes_close (void)
 {
     int rc = -1;
@@ -955,11 +959,11 @@ int randombytes_close (void)
         fd = -1;
         rc = 0;
     }
-#endif // ZMQ_HAVE_GETRANDOM
+#endif /* ZMQ_HAVE_GETRANDOM */
     return rc;
 }
 
-//  Do not call manually! Use random_open from random.hpp
+/*  Do not call manually! Use random_open from random.hpp */
 int sodium_init (void)
 {
 #ifndef ZMQ_HAVE_GETRANDOM
@@ -979,10 +983,11 @@ int sodium_init (void)
         assert (rc != -1);
 #endif
     }
-#endif // ZMQ_HAVE_GETRANDOM
+#endif /* ZMQ_HAVE_GETRANDOM */
     return 0;
 }
 
 #endif
 
 #endif
+/* clang-format on */

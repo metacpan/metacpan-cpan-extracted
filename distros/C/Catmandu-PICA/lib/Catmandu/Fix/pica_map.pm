@@ -1,6 +1,6 @@
 package Catmandu::Fix::pica_map;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use Catmandu::Sane;
 use Moo;
@@ -145,8 +145,8 @@ Catmandu::Fix::pica_map - copy pica values of one field to a new field
     # Copy from field 028A subfields a and d to dc.creator hash joining them by ' '
     pica_map('028Aad','dcterms.creator', -join => ' ');
 
-    # Copy from field 028A with occurrence subfields a and d to dc.contributor hash joining them by ' '
-    pica_map('028B[01]ad','dcterms.contributor', -join => ' ');
+    # Copy from field 144Z with occurrence 01 subfield a to dc.subject
+    pica_map('144Z[01]a','dcterms.subject');
 
 =head1 SEE ALSO
 

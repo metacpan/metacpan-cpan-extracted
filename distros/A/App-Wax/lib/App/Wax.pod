@@ -23,17 +23,17 @@ B<Type>: Str, rw, default: "wax".
 
 The application name used in L<debug|"debug"> and L<error|"log"> messages.
 
-=head2 version
+=head2 app_version
 
 B<Type>: Str, ro.
 
 The application version displayed in the output of the C<--version> option e.g.:
 
-    $ wax --version # 1.2.3 (App::Wax 3.0.0)
+    $ wax --version # v1.2.3 (App::Wax v3.0.0)
 
 The version is passed as a constructor argument by the command e.g.:
 
-    App::Wax->new({ version: '1.2.3' })
+    App::Wax->new({ app_version: 'v1.2.3' })
 
 If not supplied, it defaults to the module version.
 
@@ -41,7 +41,7 @@ If not supplied, it defaults to the module version.
 
 B<Type>: Bool, rw, default: false.
 
-If set to true, the remote resource is stored to a persistent file whose path is
+If set to true, the remote resource is saved to a persistent file whose path is
 substituted for the resource's URL on subsequent invocations of the command.
 
 If C<cache> and L<"mirror"> are both set to true, an exception is thrown.
@@ -73,7 +73,7 @@ An instance of L<Mime::Types> used to help determine an extension for the file.
 
 B<Type>: Bool, rw, default: false.
 
-If set to true, the remote resource is stored to a persistent file. On subsequent
+If set to true, the remote resource is saved to a persistent file. On subsequent
 invocations, the resource is re-downloaded if it has been updated, and its path
 is substituted for the resource's URL.
 
@@ -147,7 +147,7 @@ Returns a string representation of the supplied command.
 B<Signature>: [ $url: Str, $url_index: Int ] -> $extension: Str
 
 Returns the file extension for the given URL (e.g. C<.html>) if one can be determined from
-the resource's C<Content-Type> header, or the path component of the URL if it's
+the resource's C<Content-Type> header or the path component of the URL if it's
 C<text/plain> or C<application/octet-stream>. Otherwise, returns an empty string.
 
 =head2 is_url

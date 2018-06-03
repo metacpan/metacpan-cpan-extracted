@@ -27,6 +27,20 @@ sub create {
     $self->_make_request("/transactions/", "post", {transaction => $params});
 }
 
+sub sale {
+    my ($self, $params) = @_;
+    $params //= {};
+    $params->{type} = 'sale';
+    $self->create($params);
+}
+
+sub credit {
+    my ($self, $params) = @_;
+    $params //= {};
+    $params->{type} = 'credit';
+    $self->create($params);
+}
+
 sub find {
     my ($self, $id) = @_;
     confess "NotFoundError" unless validate_id($id);

@@ -58,9 +58,8 @@ DESCRIPTION
     *   Determine the amount of time between two dates, or add an amount of
         time (a delta) to a date to get a second date.
 
-    *   Work with dates with dates using international formats (foreign
-        month names, 12/10/95 referring to October rather than December,
-        etc.).
+    *   Work with dates using international formats (foreign month names,
+        12/10/95 referring to October rather than December, etc.).
 
     *   Convert dates from one timezone to another.
 

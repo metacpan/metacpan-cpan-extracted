@@ -5,6 +5,13 @@
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "PSGI",
+      "Plack",
+      "StatsD",
+      "metrics",
+      "monitoring"
+   ],
    "license" : [
       "artistic_2"
    ],
@@ -37,18 +44,14 @@
       },
       "runtime" : {
          "recommends" : {
+            "HTTP::Status" : "6.16",
             "Net::Statsd::Tiny" : "v0.3.0"
          },
          "requires" : {
             "Plack::Middleware" : "0",
-            "Plack::Util" : "0",
-            "Plack::Util::Accessor" : "0",
-            "Time::HiRes" : "0",
             "Try::Tiny" : "0",
             "parent" : "0",
-            "perl" : "v5.10.0",
-            "strict" : "0",
-            "warnings" : "0"
+            "perl" : "v5.10.0"
          }
       },
       "test" : {
@@ -75,7 +78,7 @@
    "provides" : {
       "Plack::Middleware::Statsd" : {
          "file" : "lib/Plack/Middleware/Statsd.pm",
-         "version" : "v0.3.4"
+         "version" : "v0.3.5"
       }
    },
    "release_status" : "stable",
@@ -83,13 +86,14 @@
       "bugtracker" : {
          "web" : "https://github.com/robrwo/Plack-Middleware-Statsd/issues"
       },
+      "homepage" : "https://metacpan.org/pod/Plack::Middleware::Statsd",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/robrwo/Plack-Middleware-Statsd.git",
          "web" : "https://github.com/robrwo/Plack-Middleware-Statsd"
       }
    },
-   "version" : "v0.3.4",
+   "version" : "v0.3.5",
    "x_authority" : "cpan:RRWO",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }

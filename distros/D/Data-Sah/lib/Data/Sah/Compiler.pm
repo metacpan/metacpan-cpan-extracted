@@ -1,7 +1,7 @@
 package Data::Sah::Compiler;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.88'; # VERSION
+our $DATE = '2018-05-29'; # DATE
+our $VERSION = '0.890'; # VERSION
 
 use 5.010;
 use strict;
@@ -340,7 +340,7 @@ sub _process_clause {
 
     if ($clause ~~ @{ $cd->{args}{skip_clause} }) {
         delete $cd->{uclset}{$_}
-            for grep /^\Q$clause\E(\.|\z)/, keys(%{$cd->{uclset}});
+            for grep {/^\Q$clause\E(\.|\z)/} keys(%{$cd->{uclset}});
         return;
     }
 
@@ -500,7 +500,7 @@ sub _process_clause {
     delete $cd->{uclset}{"$clause.err_msg"};
     delete $cd->{uclset}{"$clause.err_level"};
     delete $cd->{uclset}{$_} for
-        grep /\A\Q$clause\E\.human(\..+)?\z/, keys(%{$cd->{uclset}});
+        grep {/\A\Q$clause\E\.human(\..+)?\z/} keys(%{$cd->{uclset}});
 }
 
 sub _process_clsets {
@@ -716,7 +716,7 @@ sub _ignore_clause_and_attrs {
     my ($self, $cd) = @_;
     my $cl = $cd->{clause};
     delete $cd->{uclset}{$cl};
-    delete $cd->{uclset}{$_} for grep /\A\Q$cl\E\./, keys %{$cd->{uclset}};
+    delete $cd->{uclset}{$_} for grep {/\A\Q$cl\E\./} keys %{$cd->{uclset}};
 }
 
 sub _die_unimplemented_clause {
@@ -781,7 +781,7 @@ Data::Sah::Compiler - Base class for Sah compilers (Data::Sah::Compiler::*)
 
 =head1 VERSION
 
-This document describes version 0.88 of Data::Sah::Compiler (from Perl distribution Data-Sah), released on 2017-07-10.
+This document describes version 0.890 of Data::Sah::Compiler (from Perl distribution Data-Sah), released on 2018-05-29.
 
 =for Pod::Coverage ^(check_compile_args|def|expr|init_cd|literal|name|add_module|add_compile_module|add_runtime_module)$
 
@@ -1268,7 +1268,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

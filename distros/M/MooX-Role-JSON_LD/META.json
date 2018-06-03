@@ -22,7 +22,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "namespace::autoclean" : "0"
          }
       },
       "configure" : {
@@ -35,6 +36,7 @@
             "JSON::MaybeXS" : "0",
             "Moo" : "0",
             "Moose" : "0",
+            "Ref::Util" : "0",
             "Sub::Quote" : "0",
             "Types::Standard" : "0",
             "perl" : "5.006000"
@@ -49,6 +51,10 @@
          "web" : "https://github.com/davorg/moox-role-json_ld"
       }
    },
-   "version" : "v0.0.11",
+   "version" : "v0.0.13",
+   "x_contributors" : [
+      "Robert Rothenberg <rrwo@cpan.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

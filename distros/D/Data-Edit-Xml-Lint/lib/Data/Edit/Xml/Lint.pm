@@ -17,7 +17,7 @@ use Carp qw(cluck confess);
 use Data::Table::Text qw(:all);
 use Digest::SHA qw(sha256_hex);
 use Encode;
-our $VERSION = 20180527;
+our $VERSION = 20180530;
 
 #1 Constructor                                                                  # Construct a new linter
 
@@ -524,7 +524,7 @@ END
   if (my $filesFail = @filesFail)                                               # Failing files report
    {push @report, <<END;
 
-$filesFail FailingFiles
+$filesFail Fails: Number of errors per failing file.
    #  Errors  Project       File
 END
     for(1..@filesFail)
@@ -818,25 +818,25 @@ Lint xml L<files|/file> in parallel
 
 Store some xml in a L<files|/file>, apply xmllint in parallel and update the source file with the results
 
-     Parameter    Description                                
-  1  $lint        Linter                                     
-  2  %attributes  Attributes to be recorded as xml comments  
+     Parameter    Description
+  1  $lint        Linter
+  2  %attributes  Attributes to be recorded as xml comments
 
 =head2 lintNOP($@)
 
 Store some xml in a L<files|/file>, apply xmllint in single and update the source file with the results
 
-     Parameter    Description                                
-  1  $lint        Linter                                     
-  2  %attributes  Attributes to be recorded as xml comments  
+     Parameter    Description
+  1  $lint        Linter
+  2  %attributes  Attributes to be recorded as xml comments
 
 =head2 nolint($@)
 
 Store just the attributes in a file so that they can be retrieved later to process non xml objects referenced in the xml - like images
 
-     Parameter    Description                                
-  1  $lint        Linter                                     
-  2  %attributes  Attributes to be recorded as xml comments  
+     Parameter    Description
+  1  $lint        Linter
+  2  %attributes  Attributes to be recorded as xml comments
 
 =head1 Report
 
@@ -846,9 +846,9 @@ Methods for L<reporting|Data::Edit::Xml::Lint/report> the results of L<linting|/
 
 Analyse the results of prior L<lints|/lint> and return a hash reporting various statistics and a L<printable|/print> report
 
-     Parameter         Description                                  
-  1  $outputDirectory  Directory to search                          
-  2  $filter           Optional regular expression to filter files  
+     Parameter         Description
+  1  $outputDirectory  Directory to search
+  2  $filter           Optional regular expression to filter files
 
 =head2 Attributes
 
@@ -894,18 +894,18 @@ A printable L<report|/report> of the above
 
 Store some xml in a L<files|/file>, apply xmllint in parallel or single and update the source file with the results
 
-     Parameter    Description                                
-  1  $inParallel  In parallel or not                         
-  2  $lint        Linter                                     
-  3  %attributes  Attributes to be recorded as xml comments  
+     Parameter    Description
+  1  $inParallel  In parallel or not
+  2  $lint        Linter
+  3  %attributes  Attributes to be recorded as xml comments
 
 =head2 p4($$)
 
 Format a fraction as a percentage to 4 decimal places
 
-     Parameter  Description  
-  1  $p         Pass         
-  2  $f         Fail         
+     Parameter  Description
+  1  $p         Pass
+  2  $f         Fail
 
 
 =head1 Index

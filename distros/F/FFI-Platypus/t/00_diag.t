@@ -16,7 +16,6 @@ $modules{$_} = $_ for qw(
   ExtUtils::CBuilder
   FFI::CheckLib
   File::ShareDir
-  JSON::PP
   Module::Build
   PkgConfig
   Test::More
@@ -34,6 +33,7 @@ $post_diag = sub {
     diag "Alien::FFI->libs         = ", Alien::FFI->libs;
     diag "Alien::FFI->dist_dir     = ", eval { Alien::FFI->dist_dir } || 'undef';
     diag "Alien::FFI->version      = ", eval { Alien::FFI->config('version') } || 'unknown';
+    diag "my_configure             = ", Alien::FFI->runtime_prop->{my_configure} if defined Alien::FFI->runtime_prop->{my_configure};
     spacer();
     require FFI::Platypus::ShareConfig;
     my $share_config = 'FFI::Platypus::ShareConfig';
@@ -72,6 +72,20 @@ $post_diag = sub {
     diag sprintf("  %-20s %s", $_, $probe->{$_}) for keys %$probe;
   };
   diag "extended diagnostic failed: $@" if $@;
+  if(-f "/proc/cpuinfo")
+  {
+    open my $fh, '<', '/proc/cpuinfo';
+    my @lines = <$fh>;
+    close $fh;
+    my($model_name)    = grep /^model name/, @lines;
+    my($flags)         = grep /^flags/, @lines;
+    my($address_sizes) = grep /^address sizes/, @lines;
+    spacer();
+    diag "CPU Info:";
+    diag "  $model_name";
+    diag "  $flags" if $flags;;
+    diag "  $address_sizes" if $address_sizes;
+  }
 };
 
 my @modules = sort keys %modules;

@@ -14,7 +14,7 @@ FFI::Platypus::Type - Defining types for FFI::Platypus
 
 =head1 VERSION
 
-version 0.48
+version 0.50
 
 =head1 SYNOPSIS
 
@@ -312,7 +312,7 @@ difficult, but time consuming, so if you are in need of these features
 please do not hesitate to open a support ticket on the project's github 
 issue tracker:
 
-L<https://github.com/plicease/FFI-Platypus/issues>
+L<https://github.com/Perl5-FFI/FFI-Platypus/issues>
 
 In particular I am hesitant to implementing complex return types, as 
 there are performance and interface ramifications, and I would 
@@ -710,7 +710,7 @@ indicate the termination of the array.
 
 =head2 Closures
 
-A closure (called a "callback" by L<FFI::Raw>, we use the C<libffi> 
+A closure (sometimes called a "callback", we use the C<libffi> 
 terminology) is a Perl subroutine that can be called from C.  In order 
 to be called from C it needs to be passed to a C function.  To define 
 the closure type you need to provide a list of argument types and a 

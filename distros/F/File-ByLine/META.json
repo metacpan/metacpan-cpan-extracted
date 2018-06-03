@@ -34,11 +34,13 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Parallel::WorkUnit" : "1.117"
+         },
          "requires" : {
             "Carp" : "0",
             "Exporter" : "0",
             "Fcntl" : "0",
-            "Parallel::WorkUnit" : "1.117",
             "autodie" : "0",
             "perl" : "v5.10.0",
             "strict" : "0",
@@ -48,6 +50,7 @@
       "test" : {
          "requires" : {
             "File::Temp" : "0",
+            "Test2::Require::Module" : "0",
             "Test2::V0" : "0",
             "Test::UseAllModules" : "0.17"
          }
@@ -56,7 +59,7 @@
    "provides" : {
       "File::ByLine" : {
          "file" : "lib/File/ByLine.pm",
-         "version" : "1.002"
+         "version" : "1.005"
       }
    },
    "release_status" : "stable",
@@ -70,7 +73,7 @@
          "web" : "https://github.com/jmaslak/File-ByLine"
       }
    },
-   "version" : "1.002",
+   "version" : "1.005",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

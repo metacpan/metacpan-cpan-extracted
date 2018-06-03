@@ -1,0 +1,18 @@
+Build.PL
+Changes
+lib/CLI/LaTeX/Table.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+scripts/init.sh
+scripts/transpose
+scripts/csel
+scripts/saikoro
+scripts/latextable
+scripts/csv2tsv
+
+META.yml
+META.json

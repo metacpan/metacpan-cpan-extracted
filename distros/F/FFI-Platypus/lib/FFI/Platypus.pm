@@ -6,7 +6,7 @@ use 5.008001;
 use Carp qw( croak );
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.50'; # VERSION
 
 # Platypus Man,
 # Platypus Man,
@@ -23,16 +23,16 @@ our @CARP_NOT = qw( FFI::Platypus::Declare );
 
 require XSLoader;
 XSLoader::load(
-  'FFI::Platypus', eval q{ $VERSION } || do {
+  'FFI::Platypus', $FFI::Platypus::VERSION ||= do {
     # this is for testing without dzil
-    # it expects MYMETA.json for FFI::Platypus
+    # it expects MYMETA.yml for FFI::Platypus
     # to be in the current working directory.
-    require JSON::PP;
     my $fh;
-    open($fh, '<', 'MYMETA.json') || die "unable to read MYMETA.json";
-    my $config = JSON::PP::decode_json(do { local $/; <$fh> });
+    open($fh, '<', 'MYMETA.yml') || die "unable to read MYMETA.yml";
+    my($str) = grep /^version:/, <$fh>;
     close $fh;
-    $config->{version};
+    my($version) = $str =~ /^version: '?([0-9._]+)/;
+    $version;
   }
 );
 
@@ -529,7 +529,7 @@ sub _have_pm
 
 package FFI::Platypus::Function;
 
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.50'; # VERSION
 
 use overload '&{}' => sub {
   my $ffi = shift;
@@ -550,7 +550,7 @@ use overload '&{}' => sub {
   sub { $self->{code}->(@_) };
 };
 
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.50'; # VERSION
 
 sub new
 {
@@ -579,13 +579,13 @@ sub get_data
 
 package FFI::Platypus::ClosureData;
 
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.50'; # VERSION
 
 package FFI::Platypus::Type;
 
 use Carp qw( croak );
 
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.50'; # VERSION
 
 sub new
 {
@@ -679,7 +679,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 0.48
+version 0.50
 
 =head1 SYNOPSIS
 
@@ -1192,10 +1192,10 @@ includes the standard c library.
  use FFI::CheckLib;
  use FFI::Platypus;
  
- # NOTE: I ported this from the like named eg/notify.pl that came with FFI::Raw
- # and it seems to work most of the time, but also seems to SIGSEGV sometimes.
- # I saw the same behavior in the FFI::Raw version, and am not really familiar
- # with the libnotify API to say what is the cause.  Patches welcome to fix it.
+ # NOTE: I ported this from anoter Perl FFI library and it seems to work most
+ # of the time, but also seems to SIGSEGV sometimes.  I saw the same behavior
+ # in the old version, and am not really familiar with the libnotify API to
+ # say what is the cause.  Patches welcome to fix it.
  
  my $ffi = FFI::Platypus->new;
  $ffi->lib(find_lib_or_exit lib => 'notify');
@@ -1887,6 +1887,32 @@ lags behind modern Java.
 Even so this enables you to call Java from Perl and potentially other 
 Java based languages such as Scala, Groovy or JRuby.
 
+=head1 FAQ
+
+=head2 I get seg faults on some platforms but not others with a library using pthreads.
+
+On some platforms, Perl isn't linked with C<libpthreads> if Perl threads are not
+enabled.  On some platforms this doesn't seem to matter, C<libpthreads> can be
+loaded at runtime without much ill-effect.  (Linux from my experience doesn't seem
+to mind one way or the other).  Some platforms are not happy about this, and about
+the only thing that you can do about it is to build Perl such that it links with
+C<libpthreads> even if it isn't a threaded Perl.
+
+This is not really an FFI issue, but a Perl issue, as you will have the same
+problem writing XS code for the such libraries.
+
+=head2 Doesn't work on Perl 5.10.0.
+
+I try as best as possible to support the same range of Perls as the Perl toolchain.
+That means all the way back to 5.8.1.  Unfortunately, 5.10.0 seems to have a problem
+that is difficult to diagnose.  Patches to fix are welcome, if you want to help
+out on this, please see:
+
+L<https://github.com/Perl5-FFI/FFI-Platypus/issues/68>
+
+Since this is an older buggy version of Perl it is recommended that you instead
+upgrade to 5.10.1 or later.
+
 =head1 CAVEATS
 
 Platypus and Native Interfaces like libffi rely on the availability of 
@@ -1937,17 +1963,17 @@ If something does not work the way you think it should, or if you have a
 feature request, please open an issue on this project's GitHub Issue 
 tracker:
 
-L<https://github.com/plicease/FFI-Platypus/issues>
+L<https://github.com/perl5-FFI/FFI-Platypus/issues>
 
 =head1 CONTRIBUTING
 
 If you have implemented a new feature or fixed a bug then you may make a 
 pull request on this project's GitHub repository:
 
-L<https://github.com/plicease/FFI-Platypus/pulls>
+L<https://github.com/Perl5-FFI/FFI-Platypus/pulls>
 
 This project is developed using L<Dist::Zilla>.  The project's git 
-repository also comes with C<Build.PL> and C<cpanfile> files necessary 
+repository also comes with the C<Build.PL> file necessary 
 for building, testing (and even installing if necessary) without 
 L<Dist::Zilla>.  Please keep in mind though that these files are 
 generated so if changes need to be made to those files they should be 
@@ -2083,7 +2109,7 @@ making significant changes to the Platypus Core.  For that I use
 
 =over 4
 
-=item L<https://github.com/plicease/FFI-Performance>
+=item L<https://github.com/Perl5-FFI/FFI-Performance>
 
 =back
 
@@ -2179,14 +2205,6 @@ This module can extract constants and other useful objects from C header
 files that may be relevant to an FFI application.  One downside is that 
 its use may require development packages to be installed.
 
-=item L<FFI::Raw>
-
-Alternate interface to libffi with fewer features.  It notably lacks the 
-ability to create real xsubs, which may make L<FFI::Platypus> much 
-faster.  Also lacking are pointers to native types, arrays and custom 
-types.  In its favor, it has been around for longer that Platypus, and 
-has been battle tested to some success.
-
 =item L<Win32::API>
 
 Microsoft Windows specific FFI style interface.
@@ -2234,10 +2252,9 @@ work on L<FFI::Sweet|https://github.com/merrilymeredith/p5-FFI-Sweet>
 not only helped me get started with FFI but significantly influenced the 
 design of Platypus.
 
-In addition I'd like to thank Alessandro Ghedini (ALEXBIO) who was 
-always responsive to bug reports and pull requests for L<FFI::Raw>, 
-which was important in the development of the ideas on which Platypus is 
-based.
+In addition I'd like to thank Alessandro Ghedini (ALEXBIO) whose work
+on another Perl FFI library helped drive some of the development ideas
+for L<FFI::Platypus>.
 
 =head1 AUTHOR
 

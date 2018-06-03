@@ -13,7 +13,7 @@ use warnings;
 package Dist::Zilla::Role::Git::DirtyFiles;
 # ABSTRACT: Provide the allow_dirty & changelog attributes
 
-our $VERSION = '2.043';
+our $VERSION = '2.044';
 
 use Moose::Role;
 use MooseX::Types::Moose qw{ Any ArrayRef Str RegexpRef };
@@ -129,26 +129,24 @@ sub list_dirty_files
   my $git_root  = $self->repo_root;
   my @filenames = @{ $self->allow_dirty };
 
-  if ($git_root ne '.') {
-    # Interpret allow_dirty relative to the dzil root
-    my $dzil_root = Path::Tiny::path($self->zilla->root)->absolute->realpath;
-    $git_root     = Path::Tiny::path($git_root)
-                      ->absolute($dzil_root)
-                      ->realpath;
+  # Interpret allow_dirty relative to the dzil root, not git root nor cwd
+  my $dzil_root = Path::Tiny::path($self->zilla->root)->absolute->realpath;
+  $git_root     = Path::Tiny::path($git_root)
+                    ->absolute($dzil_root)
+                    ->realpath;
 
-    $self->log_fatal("Dzil root $dzil_root is not inside Git root $git_root")
-        unless $git_root->subsumes($dzil_root);
+  $self->log_fatal("Dzil root $dzil_root is not inside Git root $git_root")
+      unless $git_root->subsumes($dzil_root);
 
-    for my $fn (@filenames) {
-      try {
-        $fn = Path::Tiny::path($fn)
-                ->absolute($dzil_root)
-                ->realpath            # process ..
-                ->relative($git_root)
-                ->stringify;
-      };
-    }
-  } # end if git root ne dzil root
+  for my $fn (@filenames) {
+    try {
+      $fn = Path::Tiny::path($fn)
+              ->absolute($dzil_root)
+              ->realpath            # process ..
+              ->relative($git_root)
+              ->stringify;
+    };
+  }
 
   my $allowed = join '|', @{ $self->allow_dirty_match }, map { qr{^\Q$_\E$} } @filenames;
 
@@ -173,7 +171,7 @@ Dist::Zilla::Role::Git::DirtyFiles - Provide the allow_dirty & changelog attribu
 
 =head1 VERSION
 
-version 2.043
+version 2.044
 
 =head1 DESCRIPTION
 

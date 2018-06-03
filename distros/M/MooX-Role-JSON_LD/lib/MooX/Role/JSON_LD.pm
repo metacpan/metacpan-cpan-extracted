@@ -146,9 +146,10 @@ use 5.6.0;
 use Moo::Role;
 use Carp;
 use JSON::MaybeXS;
+use Ref::Util qw/ is_plain_coderef is_plain_hashref is_ref is_blessed_ref /;
 use Types::Standard qw[ArrayRef HashRef InstanceOf Str];
 
-our $VERSION = '0.0.11';
+our $VERSION = '0.0.13';
 
 requires qw[json_ld_type json_ld_fields];
 
@@ -173,6 +174,13 @@ sub _build_context {
   return 'http://schema.org/';
 }
 
+sub _resolve_nested {
+    my ($val) = @_;
+    is_blessed_ref($val) && $val->can('json_ld_data')
+        ? $val->json_ld_data
+        : $val;
+}
+
 sub json_ld_data {
   my $self = shift;
 
@@ -182,22 +190,36 @@ sub json_ld_data {
   };
 
   foreach (@{$self->json_ld_fields}) {
-    if (my $reftype = ref $_) {
-      if ($reftype eq 'HASH') {
-        while (my ($key, $val) = each %{$_}) {
-          if (ref $val eq 'CODE') {
-            $data->{$key} = $val->($self);
-          } else {
-            $data->{$key} = $self->$val;
+
+      if (is_ref($_)) {
+
+          if (is_plain_hashref($_)) {
+
+              while (my ($key, $val) = each %{$_}) {
+
+                  if (defined (my $res = is_plain_coderef($val)
+                               ? $val->($self)
+                               : $self->$val)) {
+                      $data->{$key} = _resolve_nested($res);
+                  }
+
+              }
+
           }
-        }
-      } else {
-        carp "Weird JSON-LD reference: $reftype";
-        next;
+          else {
+              carp "Weird JSON-LD reference: " . ref $_;
+              next;
+          }
+
       }
-    } else {
-      $data->{$_} = $self->$_;
-    }
+      else {
+
+          if (defined (my $res = $self->$_)) {
+              $data->{$_} = _resolve_nested($res);
+          }
+
+      }
+
   }
 
   return $data;

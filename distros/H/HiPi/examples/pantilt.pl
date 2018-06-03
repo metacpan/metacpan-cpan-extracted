@@ -4,7 +4,7 @@ use warnings;
 use HiPi qw( :pca9685 );
 use HiPi::Interface::PCA9685;
 
-our $VERSION ='0.70';
+our $VERSION ='0.71';
 
 use Getopt::Long;
 

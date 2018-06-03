@@ -22,18 +22,14 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
+                                        'HTTP::Status' => '6.16',
                                         'Net::Statsd::Tiny' => 'v0.3.0'
                                       },
                       'requires' => {
                                       'Plack::Middleware' => '0',
-                                      'Plack::Util' => '0',
-                                      'Plack::Util::Accessor' => '0',
-                                      'Time::HiRes' => '0',
                                       'Try::Tiny' => '0',
                                       'parent' => '0',
-                                      'perl' => 'v5.10.0',
-                                      'strict' => '0',
-                                      'warnings' => '0'
+                                      'perl' => 'v5.10.0'
                                     }
                     },
        'test' => {

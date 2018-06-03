@@ -4,10 +4,10 @@ use Pcore -class;
 
 with qw[Pcore::App::Controller::Ext];
 
-has ext_app            => 'Ext';
-has ext_app_title      => l10n('App Title');
-has ext_default_locale => 'ru';
-has ext_resources      => sub { ['<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3&sensor=false"></script>'] };
+has ext_app    => 'Ext';
+has ext_title  => l10n('App Title');
+has ext_locale => ();
+has ext_theme  => ();
 
 1;
 ## -----SOURCE FILTER LOG BEGIN-----

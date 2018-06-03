@@ -1,3 +1,6 @@
+0.010 2018-06-02 15:00:00+0000
+  -Port from Moose to Moo
+  -Improve variable substitution (Don't get confused with strftime patterns or things wiht two %%)
 0.009 2018-05-27 15:00:00+0000
   -Improve variable substitution
 0.008 2018-05-23 04:00:00+0000

@@ -229,7 +229,27 @@ for( @schemas_with_data ){
         $name) or diag( $errors);
 }
 
+package FiveChecker;
 
+sub new {
+    bless {}, shift();
+}
 
+sub validate{
+    my( $self, $val ) = @_;
+    $val == 5 or return "I wanted five!";
+    return;
+}
+package main;
+
+my $checker = FiveChecker->new;
+my $schema = (
+    five => (
+        validator => $checker,
+    ),
+);
+my $dp = Data::Processor->new($schema);
+is( $dp->validate({five => 6})->count, 1, 'Get an error for six');
+is( $dp->validate({five => 5})->count, 1, 'No error where validator passes');
 
 done_testing;

@@ -1,4 +1,7 @@
 Revision history for Alt-FFI-libffi
 
+0.02      2018-06-01 08:46:02 -0400
+  - Update test suite to match FFI 1.12
+
 0.01      2016-07-11 18:00:42 -0400
   - initial version

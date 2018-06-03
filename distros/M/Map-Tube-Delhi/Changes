@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Delhi
 
+0.73  Sun Jun 03 03:45:00 2018
+      - Updated dependency on Map::Tube v3.51.
+
 0.72  Sat May 19 05:10:00 2018
       - Fixed typo in code in the pod.
 

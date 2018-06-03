@@ -1,24 +1,69 @@
 CLI-Files-Utils
 
- The following 2 files for handling bunch of files on your computer
+ The following programs for handling bunch of files on your computer
  will be installed, which augment functionality of Unix/Linux commands 
- such as 'ls' and 'find'. 
+ such as 'ls' and 'find', also accomanying other utility programs. 
 
    1. madeafter : shows the 3 time-info ({a,m,c}time) of files in a single shot. 
    2. dirhier : the file count at each directory depth, speedily. 
-   3. colorplus : colors on numbers for eyes to read numbers easily by "colorplus -3".
 
- The detail of each program is accessed by "madeafter --help" or "dirhier --help", 
+   3. colorplus : colors on numbers for eyes to read numbers easily by "colorplus -3".
+   4. init.sh : to install the programs above with the minimum computational affecting.
+
+ The detail of each program is accessed as "madeafter --help" or "dirhier --help", 
  but written only in Japanese for dirhier.
+
 
 INSTALLATION
 
-To install this module, run the following commands:
+ The programs are provided in a form of Perl modules to 
+ be uploaded on CPAN. Each of the program is written
+ as a single Perl program that works (almost) stand-alone.
+
+
+ You can choose the way to install programs from the following
+ plural ways. 
+
+1. Download and uncompress the file CLI-Files-Utils-*.tar.gz 
+   from CPAN. Find the programs under the "scripts" directory
+   inside it. Copy them into wherever you like and you can
+   (and call it "someWhere" in the next paragraph.) 
+
+   Then add that directory someWhere to the PATH environment 
+   variable (for either of Windows or Unix-like environments). 
+   If you use bash or zsh, add a line like the following
+   into to  .bash_profile or .zshrc respectively, to use the 
+   program files provided in this module always you login, 
+   with the minimum affect to your computer environment: 
+
+      source someWhere/init.sh
+
+2. If you like "Build" methot to install CPAN modules, 
+   run the following commands:
 
 	perl Build.PL
 	./Build
 	./Build test
 	./Build install
+
+3. You can also install the programs by the following steps:
+
+    cpan CLI::Files::Utils 
+
+   or
+
+    cpanm CLI::Files::Utils
+
+   The above requires your knowledge/understanding of
+   the prepation of using the commands of 'cpan' or 'cpanm'
+   and administrative rights on your computer to install 
+   programs (root privileges). 
+
+   This optional installaion way (3.) is written here because
+   the author of the programs just want to explain that 
+   the programs provided are uploaded to CPAN can work 
+   in a kind of standard way.  
+
 
 But you do not need to follow the "Build" instruction above.
 The files decompressed from the *.tar.gz files contain program files

@@ -5,7 +5,7 @@ use warnings;
 use FFI::Platypus;
 
 # ABSTRACT: Declarative interface to FFI::Platypus
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.50'; # VERSION
 
 
 our $ffi    = {};
@@ -174,7 +174,7 @@ FFI::Platypus::Declare - Declarative interface to FFI::Platypus
 
 =head1 VERSION
 
-version 0.48
+version 0.50
 
 =head1 SYNOPSIS
 
@@ -421,12 +421,6 @@ Find dynamic libraries in a portable way.
 =item L<FFI::TinyCC>
 
 JIT compiler for FFI.
-
-=item L<FFI::Raw>
-
-Alternate interface to libffi with fewer features.  It notably lacks the 
-ability to create real xsubs, which may make L<FFI::Platypus> much 
-faster.
 
 =back
 

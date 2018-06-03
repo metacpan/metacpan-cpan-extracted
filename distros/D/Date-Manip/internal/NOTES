@@ -170,6 +170,8 @@ Switch the system timezone to America/Central and run the tests.
 #########################################################################
 Update the Changes5/Changes6 docs with the date.
 
+../support/pod_to_changes > Changes
+
 #########################################################################
 Install the module. Then run the following:
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension Search::Indexer.
 
+0.79 30.05.2018 
+  - fixed bug on full text search
+  
 0.78 11.02.2016
   - suppress spurious warnings in Indexer.pm
 

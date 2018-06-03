@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::Customer;
-$WebService::Braintree::Customer::VERSION = '1.3';
+$WebService::Braintree::Customer::VERSION = '1.4';
 use 5.010_001;
 use strictures 1;
 
@@ -121,7 +121,7 @@ appropriately.
 
 sub credit {
     my ($class, $id, $params) = @_;
-    WebService::Braintree::Transaction->credit({
+    $class->gateway->transaction->credit({
         %{$params // {}},
         customer_id => $id,
     });
@@ -137,7 +137,7 @@ appropriately.
 
 sub sale {
     my ($class, $id, $params) = @_;
-    WebService::Braintree::Transaction->sale({
+    $class->gateway->transaction->sale({
         %{$params // {}},
         customer_id => $id,
     });

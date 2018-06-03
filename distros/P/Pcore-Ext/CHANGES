@@ -1,3 +1,19 @@
+v0.16.0 2018-05-30T06:43:55Z
+ - Pcore::Share::WWW -> Pcore::Resources
+ - www static removed
+ - updates
+ - ext builder updated
+ - fa
+ - onReady disabled
+ - ext api calls updated
+ - overrides moved to js files
+ - ext locale fixed
+ - localization
+ - l10n.pot template updated
+ - l10n removed
+ - lib
+ - theme fix
+
 v0.15.0 2018-05-16T08:25:52Z
  - OOP app controllers ported
  - OOP role restored for HTTP controllers

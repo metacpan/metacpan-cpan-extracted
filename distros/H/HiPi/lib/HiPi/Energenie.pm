@@ -14,7 +14,6 @@ use strict;
 use warnings;
 use parent qw( HiPi::Interface );
 use HiPi qw( :energenie :openthings :rpi );
-use Time::HiRes qw( usleep );
 use HiPi::RF::OpenThings::Message;
 use UNIVERSAL::require;
 
@@ -22,7 +21,7 @@ use Carp;
 
 __PACKAGE__->create_accessors( qw( backend ook_repeat can_rx ) );
 
-our $VERSION ='0.70';
+our $VERSION ='0.71';
 
 use constant {
     STATE_LISTEN                => 2,
@@ -267,7 +266,7 @@ sub process_request {
             }
         }
         
-        usleep( 10000 );
+        $self->delay( 10 );
     }
     
     return $returnval;

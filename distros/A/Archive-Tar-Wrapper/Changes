@@ -1,6 +1,17 @@
 ######################################################################
 Revision history for Perl extension Archive::Tar::Wrapper
 
+0.24 (2018/06/02)
+    Added a LICENSE file (GNU GPL v3).
+    Removed MYMETA files (see https://rt.cpan.org/Ticket/Display.html?id=108171).
+    Improved Kwalitee by adding information to Makefile.PL
+    Fixed tests under OpenBSD
+    Added some code to check for OpenBSD tar, which is not quite compatible to the command line options passed by this module.
+    Also made the method is_gnu() more robust, testing the return code and properly handling STDOUT and STDERR when trying "tar --version".
+    Dependencies added are those already available on standard perl (Config and IPC::Open3).
+    Added a README.md for better formatting in Github project page.
+    Small refactorings and code formating with perltidy.
+
 0.23  (2015/05/28)
    (ms) Mark Gardner added separate skips in the test suite to deal 
         with the absense of GNU tar:

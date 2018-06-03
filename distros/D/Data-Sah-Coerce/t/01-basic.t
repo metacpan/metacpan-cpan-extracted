@@ -134,22 +134,74 @@ subtest "opt:coerce_rules" => sub {
     };
 };
 
-subtest "opt:return_type=sah+val" => sub {
+subtest "opt:return_type=status+val" => sub {
     subtest "perl" => sub {
         test_needs "Time::Duration::Parse::AsHash";
 
-        my $c_pl = Data::Sah::Coerce::gen_coercer(type=>"duration", coerce_to=>"float(secs)", return_type=>"str+val");
-        is_deeply($c_pl->("1h"), ["str_human", 3600]);
+        my $c_pl = Data::Sah::Coerce::gen_coercer(type=>"duration", coerce_to=>"float(secs)", return_type=>"status+val");
+        is_deeply($c_pl->("1h"), [1, 3600]);
         is_deeply($c_pl->("foo"), [undef, "foo"]);
     };
 
     subtest "js" => sub {
         plan skip_all => "node.js not available" unless get_nodejs_path();
 
-        my $c_js = Data::Sah::CoerceJS::gen_coercer(type=>"duration", coerce_to=>"float(secs)", return_type=>"str+val");
+        my $c_js = Data::Sah::CoerceJS::gen_coercer(type=>"duration", coerce_to=>"float(secs)", return_type=>"status+val");
         my $res;
-        is_deeply($c_js->(3600), ["float_secs", 3600]);
-        is_deeply($c_js->("foo"), [undef, "foo"]);
+
+        $res = $c_js->(3600);
+        #diag explain $res;
+        ok($res->[0]);
+        is($res->[1], 3600);
+
+        $res = $c_js->("foo");
+        ok(!$res->[0]);
+        is($res->[1], "foo");
+    };
+};
+
+subtest "opt:return_type=status+err+val" => sub {
+    subtest "perl" => sub {
+        test_needs "DateTime";
+
+        my $c_pl = Data::Sah::Coerce::gen_coercer(type=>"date", coerce_to=>"DateTime", return_type=>"status+err+val");
+        my $res;
+
+        $res = $c_pl->(1527889633);
+        #diag explain $res;
+        $res->[2] = $res->[2]->epoch;
+        is_deeply($res, [1, undef, 1527889633]);
+
+        $res = $c_pl->([]);
+        is_deeply($res, [undef, undef, []]);
+
+        $res = $c_pl->("2018-06-32");
+        is_deeply($res, [1, "Invalid date/time: Day '32' out of range 1..30", undef]);
+    };
+
+    subtest "js" => sub {
+        plan skip_all => "node.js not available" unless get_nodejs_path();
+
+        my $c_js = Data::Sah::CoerceJS::gen_coercer(type=>"date", return_type=>"status+err+val");
+        my $res;
+
+        $res = $c_js->(1527889633);
+        #diag explain $res;
+        ok($res->[0]);
+        ok(!$res->[1]);
+        is($res->[2], "2018-06-01T21:47:13.000Z");
+
+        $res = $c_js->([]);
+        #diag explain $res;
+        ok(!$res->[0]);
+        ok(!$res->[1]);
+        is_deeply($res->[2], []);
+
+        $res = $c_js->("2018-06-32");
+        #diag explain $res;
+        ok($res->[0]);
+        is($res->[1], "Invalid date");
+        is_deeply($res->[2], undef);
     };
 };
 

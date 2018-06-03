@@ -24,7 +24,7 @@ use Dist::Zilla::Role::PluginBundle                   ();
 use Dist::Zilla::Role::PluginBundle::Easy             ();
 use Dist::Zilla::Util                                 ();
 
-our $VERSION = '1.7';
+our $VERSION = '1.8';
 
 with
     'Dist::Zilla::Role::PluginBundle::Easy',
@@ -70,7 +70,7 @@ around exclude_files => sub {
     my $self = shift;
     sort(uniq(
             $self->$orig(@_),
-            qw(Dockerfile .gitlab-ci.yml docker-compose.yml docker-compose.override.yml)
+            qw(Dockerfile .gitlab-ci.yml docker-compose.yml docker-compose.override.yml .dockerignore dev-bin/cpanm)
     ));
 };
 
@@ -357,7 +357,7 @@ Dist::Zilla::PluginBundle::Author::WATERKIP - An plugin bundle for all distribut
 
 =head1 VERSION
 
-version 1.7
+version 1.8
 
 =head1 SYNOPSIS
 

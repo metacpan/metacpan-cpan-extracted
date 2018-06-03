@@ -29,9 +29,11 @@ lib/Date/Holidays/Adapter/KR.pm
 lib/Date/Holidays/Adapter/KZ.pm
 lib/Date/Holidays/Adapter/Local.pm
 lib/Date/Holidays/Adapter/NO.pm
+lib/Date/Holidays/Adapter/NZ.pm
 lib/Date/Holidays/Adapter/PL.pm
 lib/Date/Holidays/Adapter/PT.pm
 lib/Date/Holidays/Adapter/RU.pm
+lib/Date/Holidays/Adapter/SK.pm
 lib/Date/Holidays/Adapter/USFederal.pm
 scripts/report_date-holidays_modules.t
 scripts/test_countries.t

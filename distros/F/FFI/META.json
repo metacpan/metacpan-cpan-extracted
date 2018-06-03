@@ -5,13 +5,13 @@
       "Paul Moore <gustav@morpheus.demon.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "FFI",
    "no_index" : {
@@ -28,6 +28,7 @@
       },
       "configure" : {
          "requires" : {
+            "Alien::Base::Wrapper" : "0",
             "Alien::FFCall" : "0.02",
             "ExtUtils::MakeMaker" : "6.52"
          }
@@ -41,16 +42,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/plicease/FFI/issues"
+         "web" : "https://github.com/Perl5-FFI/FFI/issues"
       },
-      "homepage" : "https://github.com/plicease/FFI",
+      "homepage" : "https://github.com/Perl5-FFI/FFI",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/plicease/FFI.git",
-         "web" : "https://github.com/plicease/FFI"
+         "url" : "https://github.com/Perl5-FFI/FFI.git",
+         "web" : "https://github.com/Perl5-FFI/FFI"
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.10",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.12",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

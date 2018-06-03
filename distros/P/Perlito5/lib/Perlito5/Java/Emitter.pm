@@ -534,7 +534,7 @@ package Perlito5::AST::CompUnit;
 
         for my $comp_unit ( @$comp_units ) {
             my @str = $comp_unit->emit_java($level + 1, $wantarray);
-            $str[-1] .= ";\n" if @str && !ref($str[-1]);
+            # $str[-1] .= ";\n" if @str && !ref($str[-1]);
             push @main, @str;
         }
         if ($options{'expand_use'}) {
@@ -1134,6 +1134,8 @@ package Perlito5::AST::Lookup;
 
 package Perlito5::AST::Var;
 {
+    my $inf = 1000 ** 1000 ** 1000;
+
     sub emit_java_global {
         my ($self, $level, $wantarray, $localize) = @_;
         my $local = $localize ? "_local" : "";
@@ -1160,7 +1162,7 @@ package Perlito5::AST::Var;
 
         if ($sigil eq '$') {
             if ($self->{name} > 0
-               && $self->{name} ne "Inf"   # $Inf in Math::Complex
+               && $self->{name} != $inf   # $Inf in Math::Complex
                ) {
                 # regex captures
                 return 'PerlOp.regex_var(' . (0 + $self->{name}) . ')'
@@ -1264,7 +1266,7 @@ package Perlito5::AST::Var;
         }
 
         if ($sigil eq '$' && $self->{name} > 0
-            && $self->{name} ne "Inf"   # $Inf in Math::Complex
+            && $self->{name} != $inf    # $Inf in Math::Complex
            )
         {
             # regex captures
@@ -1584,6 +1586,7 @@ package Perlito5::AST::Call;
             $method = 'aget_arrayref'  if $autovivification_type eq 'array';
             $method = 'aget_hashref'   if $autovivification_type eq 'hash';
             $method = 'aget_lvalue'    if $autovivification_type eq 'lvalue';
+            $method = 'aget_lvalue_local' if $autovivification_type eq 'local';
             return Perlito5::Java::emit_java_autovivify( $self->{invocant}, $level, 'array' )
                 . '.' . $method . '('
                 .       Perlito5::Java::to_native_int( $self->{arguments}, $level + 1 )
@@ -1595,6 +1598,7 @@ package Perlito5::AST::Call;
             $method = 'hget_arrayref'  if $autovivification_type eq 'array';
             $method = 'hget_hashref'   if $autovivification_type eq 'hash';
             $method = 'hget_lvalue'    if $autovivification_type eq 'lvalue';
+            $method = 'hget_lvalue_local' if $autovivification_type eq 'local';
 
             my $args = $self->{arguments};
             if (  (ref($args) eq 'Perlito5::AST::Apply')

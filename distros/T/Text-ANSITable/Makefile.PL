@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "Color::Theme::Role::ANSI" => 0,
     "Function::Fallback::CoreOrPP" => 0,
     "JSON::MaybeXS" => 0,
-    "Log::ger" => "0.011",
+    "Log::ger" => "0.023",
     "Module::List" => 0,
     "Module::Load" => 0,
     "Moo" => 0,
@@ -52,7 +52,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Needs" => 0
   },
-  "VERSION" => "0.49",
+  "VERSION" => "0.500",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -69,7 +69,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON::MaybeXS" => 0,
-  "Log::ger" => "0.011",
+  "Log::ger" => "0.023",
   "Module::List" => 0,
   "Module::Load" => 0,
   "Moo" => 0,
@@ -98,5 +98,9 @@ unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
 
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+
+if ( $^O eq 'MSWin32' ) {
+	$WriteMakefileArgs{PREREQ_PM}{'Win32::Console::ANSI'} = '0';
+}
 
 WriteMakefile(%WriteMakefileArgs);

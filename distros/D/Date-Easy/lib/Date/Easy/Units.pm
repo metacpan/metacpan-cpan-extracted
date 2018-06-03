@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie;
 
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 use Carp;
 
@@ -109,7 +109,7 @@ Date::Easy::Units - units objects for easy date/datetime math
 
 =head1 VERSION
 
-This document describes version 0.04 of Date::Easy::Units.
+This document describes version 0.05 of Date::Easy::Units.
 
 =head1 SYNOPSIS
 
@@ -269,7 +269,7 @@ Buddy Burden <barefootcoder@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Buddy Burden.
+This software is Copyright (c) 2018 by Buddy Burden.
 
 This is free software, licensed under:
 

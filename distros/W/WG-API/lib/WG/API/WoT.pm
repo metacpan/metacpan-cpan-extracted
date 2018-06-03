@@ -10,11 +10,11 @@ WG::API::WoT - Modules to work with Wargaming.net Public API for World of Tanks
 
 =head1 VERSION
 
-Version v0.8.5
+Version v0.8.6
 
 =cut
 
-our $VERSION = 'v0.8.5';
+our $VERSION = 'v0.8.6';
 
 use constant api_uri => 'api.worldoftanks.ru/wot';
 
@@ -103,81 +103,6 @@ sub account_achievements {
     my $self = shift;
 
     return $self->_request( 'get', 'account/achievements', [ 'language', 'fields', 'account_id' ], ['account_id'], @_ );
-}
-
-=head2 Player ratings
-
-=head3 B<ratings_types( [ %params ] )>
-
-Method returns dictionary of rating periods and ratings details.
-
-=cut
-
-sub ratings_types {
-    my $self = shift;
-
-    return $self->_request( 'get', 'ratings/types', [ 'language', 'fields', 'battle_type' ], undef, @_ );
-}
-
-=head3 B<ratings_dates( [ %params ] )>
-
-Method returns dates with available rating data.
-
-=cut
-
-sub ratings_dates {
-    my $self = shift;
-
-    return $self->_request( 'get', 'ratings/dates', [ 'language', 'fields', 'battle_type', 'type', 'account_id' ],
-        ['type'], @_ );
-}
-
-=head3 B<ratings_accounts( [ %params ] )>
-
-Method returns player ratings by specified IDs.
-
-=cut
-
-sub ratings_accounts {
-    my $self = shift;
-
-    return $self->_request(
-        'get', 'ratings/accounts',
-        [ 'language', 'fields', 'battle_type', 'type', 'date', 'account_id' ],
-        [ 'type',     'account_id' ], @_
-    );
-}
-
-=head3 B<ratings_neighbors( [ %params ] )>
-
-Method returns list of adjacent positions in specified rating.
-
-=cut
-
-sub ratings_neighbors {
-    my $self = shift;
-
-    return $self->_request(
-        'get', 'ratings/neighbors',
-        [ 'language', 'fields',     'battle_type', 'type', 'date', 'account_id', 'rank_field', 'limit' ],
-        [ 'type',     'account_id', 'rank_field' ], @_
-    );
-}
-
-=head3 B<ratings_top( [ %params ] )>
-
-Method returns the list of top players by specified parameter.
-
-=cut
-
-sub ratings_top {
-    my $self = shift;
-
-    return $self->_request(
-        'get', 'ratings/top',
-        [ 'language', 'fields', 'battle_type', 'type', 'date', 'rank_field', 'limit', 'page_no' ],
-        [ 'type',     'rank_field' ], @_
-    );
 }
 
 =head2 Player's vehicles

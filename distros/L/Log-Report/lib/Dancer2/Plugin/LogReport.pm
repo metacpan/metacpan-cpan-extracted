@@ -1,4 +1,4 @@
-# Copyrights 2007-2018 by [Mark Overmeer].
+# Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Dancer2::Plugin::LogReport;
 use vars '$VERSION';
-$VERSION = '1.26';
+$VERSION = '1.27';
 
 
 use warnings;
@@ -157,6 +157,15 @@ sub process($$)
 
 register process => \&process;
 
+
+
+my @user_fatal_handlers;
+
+plugin_keywords fatal_handler => sub {
+    my ($plugin, $sub) = @_;
+    push @user_fatal_handlers, $sub;
+};
+
 sub _get_dsl()
 {   # Similar trick to Log::Report::Dispatcher::collectStack(), this time to
     # work out which Dancer app we were called from. We then use that app's
@@ -237,21 +246,33 @@ sub _forward_home($)
 sub _error_handler($$$$)
 {   my ($disp, $options, $reason, $message) = @_;
 
-    my $fatal_handler = sub {
+    my $default_handler = sub {
 
         # Check whether this fatal message has been caught, in which case we
         # don't want to redirect
-        return _message_add($_[0])
+        return _message_add($message)
             if exists $options->{is_fatal} && !$options->{is_fatal};
 
-        _forward_home($_[0]);
+        _forward_home($message);
     };
+
+    my $user_fatal_handler = sub {
+        my $return;
+        foreach my $ufh (@user_fatal_handlers)
+        {   last if $return = $ufh->(_get_dsl, $message, $reason);
+        }
+        $default_handler->($message) if !$return;
+    };
+
+    my $fatal_handler = @user_fatal_handlers
+      ? $user_fatal_handler
+      : $default_handler;
 
     $message->reason($reason);
 
     my %handler =
       ( # Default do nothing for the moment (TRACE|ASSERT|INFO)
-        default => sub {_message_add $_[0]}
+        default => sub { _message_add $message }
 
         # A user-created error condition that is not recoverable.
         # This could have already been caught by the process
@@ -269,7 +290,7 @@ sub _error_handler($$$$)
       );
 
     my $call = $handler{$reason} || $handler{default};
-    $call->($message);
+    $call->();
 }
 
 sub _report($@) {

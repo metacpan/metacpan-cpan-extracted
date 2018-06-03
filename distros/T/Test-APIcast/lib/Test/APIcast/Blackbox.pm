@@ -69,7 +69,12 @@ _EOC_
 
     if (defined $configuration) {
         $configuration = Test::Nginx::Util::expand_env_in_config($configuration);
-        decode_json($configuration);
+        {
+            local $SIG{__DIE__} = sub {
+                Test::More::fail("$name - configuration block JSON") || Test::More::diag $_[0];
+            };
+            decode_json($configuration);
+        }
         $block->set_value("configuration", $configuration);
     }
 
@@ -200,7 +205,9 @@ BEGIN {
 
     sub Test::Nginx::Util::write_config_file ($$) {
         my $block = shift;
-        return $write_nginx_config->($block);
+        $write_nginx_config->($block);
+
+        Test::APIcast::close_random_ports();
     }
 }
 

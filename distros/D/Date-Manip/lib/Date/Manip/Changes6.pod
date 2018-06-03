@@ -33,6 +33,38 @@ incompatible. These are marked with an exclamation mark (!).
 
 =head1 VERSION 6.71 (planned 2018-06-01)
 
+=over 4
+
+=item Fixed an extremely rare problem with recurrences
+
+It is possible to specify a recurrence that never produces a valid
+date.  In these cases, looking for dates went into an infinite loop.
+The MaxRecurAttempts config variable was added which will stop that
+from happening.  If no occurrence was found, an error condition will
+be set.  Dean Hamstead (RT 123708)
+
+=item Changes file supported
+
+It was requested that I include a valid Changes file.  I wrote a
+simple script to convert the Change6.pod file into a valid Change
+file.  The Changes6.pod file is still the canonical source of this
+information!  Requested by H. Merijn Brand
+
+=item Fix for timezone determination
+
+On MacOS X High Sierra, some of the timezone files were symlinks,
+but not properly followed.  This was fixed by Stu Tomlinson (GitHub #15).
+
+=item Time zone fixes
+
+Newest zoneinfo data (tzdata 2018e)
+
+=item Documentation fixes
+
+Minor fix provided by Mohammad S Anwar (GitHub #17)
+
+=back
+
 =head1 VERSION 6.70 (2018-03-01)
 
 =over 4
@@ -78,7 +110,8 @@ result faster.
 
 If the system timezone cannot be determined using any of the methods
 supplied by Date::Manip, operations will be done in the GMT timezone.
-Previously, Date::Manip would simply fail to load.  Based on RT 123229.
+Previously, Date::Manip would simply fail to load.  Based on a report by
+Kent Fredric (RT 123229).
 
 =item Fixed Makefile.PL
 
@@ -138,7 +171,7 @@ DateCalc (in DM6) did not support all values for $mode.  Now it does.
 =item Bug fixes
 
 Parsing a date like 01/02/2016 and calling printf with %e gave '02' instead
-of ' 2'.  RT 119787.
+of ' 2'.  Robert Wohlfarth (RT 119787).
 
 Fixed a problem where the tzdata method of determining the timezone was
 producing an error which wasn't correct.  John (GitHub #8)
@@ -162,7 +195,7 @@ Newest zoneinfo data (tzdata 2016j)
 A faulty test was failing in a few places.  RT 118705
 
 Another test was failing due to a perl bug that popped up in 5.25.7.  Tweaked
-the test to bypass the bug.  RT 118862
+the test to bypass the bug.  Kent Fredric (RT 118862)
 
 =back
 
@@ -173,7 +206,7 @@ the test to bypass the bug.  RT 118862
 =item Test fixes
 
 A faulty test was failing most places.  New release to correct that problem.
-RT 117404
+Slaven Rezic (RT 117404)
 
 =back
 
@@ -184,7 +217,7 @@ RT 117404
 =item Fixed bug where C<$::TZ> wasn't used
 
 The C<$::TZ> variable was not getting interpreted correctly when searching
-for a timezone.  RT 114949.
+for a timezone.  Steven Hartland (RT 114949)
 
 =item Fixed bug where recurrences were not parsed correctly
 
@@ -227,7 +260,7 @@ will have updated Date::Manip since March 2015 when the warning was added.
 
 =item Bug fixes
 
-Changed requirement for ExtUtils::MakeMaker to 6.67_01.  RT 112286
+Changed requirement for ExtUtils::MakeMaker to 6.67_01.  Quin Arnold (RT 112286)
 
 Fixed a bug where a timezone abbreviation was not parsed correctly when
 passed in as a value to the SetDate, ForceDate, or TZ config variables.
@@ -242,7 +275,7 @@ in a few of the default timezones being changed.
 
 =item Documentation fixes
 
-Fixed one more typo.  RT 114095
+Fixed one more typo.  Gregor Herrmann (RT 114095)
 
 Clarified the Config document.  Based on a report in perlmonks.org.
 
@@ -257,7 +290,7 @@ Clarified the Config document.  Based on a report in perlmonks.org.
 Date::Manip::Delta::cmp had a bug in it's comparison.  Ian Gibbs.
 
 The secs_since_1970_GMT method was missing a test to see if it was
-a valid object.  RT 111915
+a valid object.  Michael Stevens (RT 111915)
 
 =item Time zone fixes
 
@@ -267,7 +300,7 @@ Newest zoneinfo data (tzdata 2016a)
 
 Lots of typos fixed.  I was using podspell to do spell checking, but it was
 discarding too much real text (which wasn't getting checked as a result).
-Switched to pod2text which does a better job.  RT 110025
+Switched to pod2text which does a better job.  Gregor Herrmann (RT 110025)
 
 =back
 
@@ -301,7 +334,7 @@ Based on L<http://perlmonks.org/?node_id=1148735>.
 Fixed a bug where the RecurRange config variable wasn't getting used.
 
 Fixed a bug where some deltas were not parsed correctly as dates.
-RT 109600
+Salvatore Bonaccorso (RT 109600)
 
 =item Time zone fixes
 
@@ -332,7 +365,7 @@ Date::Manip::Date::value method which returns an empty string.
 
 Fixed a bug where date/delta calculations with deltas that are too
 large was not working correctly.  They now set an error condition
-and fail.  RT 105737
+and fail.  Jared Selengut (RT 105737)
 
 Fixed a bug introduced by the previous patch and luckily discovered
 pre-release by Tom Wyant.
@@ -341,14 +374,14 @@ Fixed code that produced a warning in 5.22.0.  Tom Wyant
 
 =item Improved DM6 ParseDate and ParseDateString
 
-Added C<@opts> argument.  Based on RT 105622.
+Added C<@opts> argument.  Based on report by Vitaly Shupak (RT 105622).
 
 =item Time zone fixes
 
 Newest zoneinfo data (tzdata 2015f)
 
 Now uses /etc/localtime as a method to determine the local timezone.
-Patch supplied in RT 105159 (modified by me).  The patch uses some
+Patch supplied by Tom Wyant (RT 105159) (modified by me).  The patch uses some
 code derived from DateTime::TimeZone .
 
 Clearer message when the date is not valid in the timezone.
@@ -360,7 +393,7 @@ releases, I intend to continue to add tests until coverage is 100%.
 
 =item Documentation fixes
 
-Fixed a typo.  RT 105546
+Fixed a typo.  Gregor Herrmann (RT 105546)
 
 =back
 
@@ -371,7 +404,7 @@ Fixed a typo.  RT 105546
 =item Bug fixes
 
 Not really a bug, but 6.49 got a bunch of NYTprof data bundled with it
-by mistake.  It's been removed.  RT 103252
+by mistake.  It's been removed.  Olivier Mengue (RT 103252)
 
 Fixed a bug where information about whether a date was complete or
 truncated was discarded.  Jim Avera
@@ -379,7 +412,8 @@ truncated was discarded.  Jim Avera
 Fixed a bug where SetDate with a zone alias failed.
 
 Added the Format_MMMYYYY config variable to allow the truncated format
-mmmYYYY to be parsed instead of mmmDDYY.  David W. Morganwalp and RT 103142
+mmmYYYY to be parsed instead of mmmDDYY.  David W. Morganwalp and
+Glenn Golden (RT 103142)
 
 Fixed Makefile.PL/Build.PL to correct for a change on perl on windows
 which changes a module prereq requirement.  Alexandr Ciornii
@@ -388,7 +422,7 @@ which changes a module prereq requirement.  Alexandr Ciornii
 
 Newest zoneinfo data (tzdata 2015d)
 
-Added aliases for older HP-UX time zones.  RT 104141
+Added aliases for older HP-UX time zones.  H. Merijn Brand (RT 104141)
 
 =item Documentation fixes
 
@@ -396,7 +430,7 @@ Fixed URL for tzdata.  Mohammad S Anwar (GitHub #3).
 
 Better POD formats.
 
-Fixed a documentation error.  RT 103966
+Fixed a documentation error.  Glenn Golden (RT 103966)
 
 =back
 
@@ -410,8 +444,8 @@ The TZ config variable is going away.  Added a deprecation warning.
 
 =item Some speedups for timezone handling
 
-Based on RT 102284, I have done some optimization of the timezone handling
-code.
+Based on a report by Glenn Golden (RT 102284), I have done some
+optimization of the timezone handling code.
 
 =item Bug fixes
 
@@ -492,7 +526,7 @@ Fixed some encoding errors in the language pod documentation.
 =item Broken distribution
 
 The distribution contained an temporary edit file that caused problems.
-RT 96459
+Alexandr Ciornii (RT 96459)
 
 =item Time zone fixes
 
@@ -500,7 +534,7 @@ Newest zoneinfo data (tzdata 2014e)
 
 =item Language fixes
 
-Added some plural abbreviations that were missing.  RT 96944
+Added some plural abbreviations that were missing.  Glenn Golden (RT 96944)
 
 =back
 
@@ -510,8 +544,8 @@ Added some plural abbreviations that were missing.  RT 96944
 
 =item Fixed a test
 
-One test was failing (reported in RT 96249 as well as several CPAN Tester
-reports).
+One test was failing (reported by Constantine Peresypkin (RT 96249) as
+well as several CPAN Tester reports).
 
 =back
 
@@ -521,8 +555,8 @@ reports).
 
 =item B<(*) Improvements to UTF8 handling>
 
-A number of changes based on RT 93545 and other discussion with Yuri Nikulin
-including:
+A number of changes based on a report and other discussion with Yuri
+Nikulin (RT 93545) including:
 
 Case insensitive matching of UTF8 strings should work all the time.
 
@@ -550,7 +584,7 @@ Newest zoneinfo data (tzdata 2014c)
 
 Clarified some DM6 functions.  David Close.
 
-Fixed a typo.  RT 95619
+Fixed a typo.  Mike Cappella (RT 95619)
 
 =back
 
@@ -570,7 +604,7 @@ Newest zoneinfo data (tzdata 2013i)
 
 =item Documentation fixes
 
-Cleaned up some of the Recur documentation.  Suggested by RT 92794
+Cleaned up some of the Recur documentation.  Suggested by Warren Young (RT 92794)
 
 =back
 
@@ -581,12 +615,12 @@ Cleaned up some of the Recur documentation.  Suggested by RT 92794
 =item Added ParseDateFormat function
 
 Added the ParseDateFormat function to the DM6 functional interface
-in response to RT 89286.
+in response to Eli Lindsey (RT 89286).
 
 =item Added Common Log format
 
 Added the date format used in apache logs: 11/Oct/2000:13:55:36 -0700
-RT 89286.
+Eli Lindsey (RT 89286).
 
 =item Time zone fixes
 
@@ -595,7 +629,7 @@ Newest zoneinfo data (tzdata 2013h)
 =item Bug fixes
 
 Fixed a bug where dates of the form of a delta with a timezone attached
-(i.e. "1 day ago at midnight UTC") failed.  RT 89256
+(i.e. "1 day ago at midnight UTC") failed.  Ludovic Lange (RT 89256)
 
 Fixed a bug where events handling gave a warning if there were no events
 that applied.  RT 90344
@@ -613,11 +647,14 @@ Removed a .swp file accidentally left in the package.  RT 85845
 Fixed a bug in parse_format where times between 00:00:00 and 01:00:00 weren't
 parsed correctly.  Ole Nomann Thomsen
 
-Fixed generated META.* files to not require Module::Build 0.39.  RT 86137
+Fixed generated META.* files to not require Module::Build 0.39.
+Carsten Wolff (RT 86137)
 
-Fixed a bug where parse_format did not work with a '%s' format.  RT 87498
+Fixed a bug where parse_format did not work with a '%s' format.  Mark
+Keisler (RT 87498)
 
-Fixed a bug where find_encoding wasn't imported from the Encode module.  RT 87665
+Fixed a bug where find_encoding wasn't imported from the Encode
+module.  Krishna Subramanian (RT 87665)
 
 Fixed a bug where recurrences with no interval did not work if a start and
 end date were specified, and no dates fell in that range.  Jan Pradac
@@ -651,7 +688,7 @@ Newest zoneinfo data (tzdata 2013c)
 
 The ParseDateDelta function (in functional interface) did not allow you
 to force a parsed delta to semi or approx where appropriate.  This
-was added.  Based on RT 82991).
+was added.  Based on RT 82991.
 
 =item Added get_config method
 
@@ -664,7 +701,7 @@ Fixed a German language problem.  Gosta Oelstrom
 =item Documentation fixes
 
 Documented workaround for dmake problem in strawberry perl.  Discussed on
-perlmonks and RT 79837.
+perlmonks and Martin Thurn (RT 79837).
 
 Clarified the Examples page.  Winston Heng
 
@@ -683,7 +720,7 @@ my linux distro (OpenSuSE) uses the 'posix' format instead of the traditional
 have had reports from OSX, Windows, and SunOS.  Future versions of
 Date::Manip will be explicitly distributed in the 'gnu' tar archive format.
 
-Reported by Jay Allen and RT 80594.
+Reported by Jay Allen and John Ralls (RT 80594).
 
 =item B<(*) Date::Manip 5.xx end-of-life>
 
@@ -723,15 +760,23 @@ Spelling error fixed.  RT 80621
 
 =head1 VERSION 6.36 (2012-10-31)
 
+=over 4
+
+=item Fix version numbers
+
 This was an interim release to fix the version numbers (6.35 was
 released with all of the version numbers 6.34).
 
+=back
+
 =head1 VERSION 6.35 (2012-10-31)
 
-This was an interim release to fix the problem with the PATH being
-replaced.
-
 =over 4
+
+=item Fix PATH
+
+This version was an interim release to fix the problem with the PATH being
+replaced.
 
 =item Removed dependency on YAML
 
@@ -742,7 +787,7 @@ Christopher Madsen.
 =item Bug fixes
 
 Last versions fix for RT 78566 overrode the PATH even when that wasn't
-appropriate.  This is fixed.  Report and patch supplied by RT 80435.
+appropriate.  This is fixed.  Report and patch supplied by Tom Wyant (RT 80435).
 
 =back
 
@@ -778,14 +823,15 @@ Added cmp method.  Henrique Martins
 The language modules read from the DATA section, but I never closed the
 filehandle.  This is fixed now.  Patch by Doru Theodor Petrescu
 
-Added better loading of DM5/DM6 modules.  RT 78512
+Added better loading of DM5/DM6 modules.  Evan Carroll (RT 78152)
 
-Added a secure PATH to TZ.pm for taint reasons.  In response to RT 78566
+Added a secure PATH to TZ.pm for taint reasons.  In response to Dan
+Pritts (RT 78566)
 
 =item Time zone fixes
 
 Now supports timezones in files with spaces where there should be
-underscores.  This occurs in RHEL desktop.  RT 78566
+underscores.  This occurs in RHEL desktop.  Dan Pritts (RT 78566)
 
 Newest zoneinfo data (tzdata 2012e)
 
@@ -802,11 +848,11 @@ Minor fix.  Henrique Martins
 =item Modified Build.PL
 
 Build.PL now has better support for building (or not building) HTML files.
-Apparently this is slow on Windows.  Patch provide in RT 75118.
+Apparently this is slow on Windows.  Patch provide by Manoj Kumar (RT 75118)
 
 =item Bug fixes
 
-Fixed a bug in business day calculations.  RT 76336
+Fixed a bug in business day calculations.  Frederic Briere (RT 76336)
 
 Fixed a bug where Delta/Recur objects weren't correctly created.  Zsban Ambrus
 
@@ -867,7 +913,7 @@ Requested by Steven Melendez.
 
 =item Deltas now support fractional values.
 
-You can now use a delta of 1.5 days.  RT 42699
+You can now use a delta of 1.5 days.  Martin Thurn (RT 42699)
 
 =item Multiple holidays supported
 
@@ -1521,11 +1567,13 @@ SetDate/ForceDate in effect.>
 
 =head1 VERSION 6.00 (2009-11-23)
 
+=over 4
+
+=item First release of the 6.xx series
+
 Date::Manip 6.00 is a total rethink of the module, and a nearly complete
 rewrite. Please refer to the Date::Manip::Changes5to6 document for a list
 of incompatible changes.
-
-=over 4
 
 =item Reorganization
 

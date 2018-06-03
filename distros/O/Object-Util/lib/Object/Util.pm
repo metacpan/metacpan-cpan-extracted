@@ -7,7 +7,7 @@ BEGIN { if ($] < 5.010000) { require UNIVERSAL::DOES } };
 package Object::Util;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.007';
+our $VERSION   = '0.008';
 
 use Carp                         qw( carp croak );
 use List::Util       1.29        qw( pairkeys pairvalues );
@@ -628,7 +628,7 @@ C<< $object->$_isa($class) >> works like C<isa> as defined in
 L<UNIVERSAL>, but if C<< $object >> is undefined, returns false
 instead of throwing an exception.
 
-A shortcut for C<< $object->$_call_if_method(isa => $class) >>.
+A shortcut for C<< $object->$_call_if_object(isa => $class) >>.
 
 Same as L<Safe::Isa>.
 
@@ -638,7 +638,7 @@ C<< $object->$_does($role) >> works like C<does> as defined in
 L<Moose::Object>, but if C<< $object >> is undefined, returns false
 instead of throwing an exception.
 
-A shortcut for C<< $object->$_call_if_method(does => $role) >>.
+A shortcut for C<< $object->$_call_if_object(does => $role) >>.
 
 Same as L<Safe::Isa>.
 
@@ -648,7 +648,7 @@ C<< $object->$_DOES($role) >> works like C<DOES> as defined in
 L<UNIVERSAL>, but if C<< $object >> is undefined, returns false
 instead of throwing an exception.
 
-A shortcut for C<< $object->$_call_if_method(DOES => $role) >>.
+A shortcut for C<< $object->$_call_if_object(DOES => $role) >>.
 
 Same as L<Safe::Isa>.
 

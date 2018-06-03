@@ -79,7 +79,7 @@
          "web" : "https://github.com/singingfish/braintree_perl"
       }
    },
-   "version" : "1.3",
+   "version" : "1.4",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

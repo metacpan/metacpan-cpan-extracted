@@ -6,9 +6,9 @@ Date::Manip::TZ::aspyon00;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Thu Mar  1 10:33:48 EST 2018
-#    Data version: tzdata2018c
-#    Code version: tzcode2018c
+#    Generated on: Wed May 30 14:49:45 EDT 2018
+#    Data version: tzdata2018e
+#    Code version: tzcode2018e
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.61';
+$VERSION='6.71';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -56,8 +56,14 @@ END { undef $VERSION; }
    2015 =>
      [
         [ [2015,8,14,15,0,0],[2015,8,14,23,30,0],'+08:30:00',[8,30,0],
-          'KST',0,[9999,12,31,0,0,0],[9999,12,31,8,30,0],
-          '2015081415:00:00','2015081423:30:00','9999123100:00:00','9999123108:30:00' ],
+          'KST',0,[2018,5,4,15,29,59],[2018,5,4,23,59,59],
+          '2015081415:00:00','2015081423:30:00','2018050415:29:59','2018050423:59:59' ],
+     ],
+   2018 =>
+     [
+        [ [2018,5,4,15,30,0],[2018,5,5,0,30,0],'+09:00:00',[9,0,0],
+          'KST',0,[9999,12,31,0,0,0],[9999,12,31,9,0,0],
+          '2018050415:30:00','2018050500:30:00','9999123100:00:00','9999123109:00:00' ],
      ],
 );
 

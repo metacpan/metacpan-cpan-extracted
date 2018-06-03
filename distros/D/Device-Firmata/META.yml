@@ -1,7 +1,9 @@
 ---
 abstract: 'Perl interface to Firmata for the arduino platform.'
 author:
-  - 'amimato <amimoto>, Norbert Truchsess <ntruchses@cpan.org>, Jens Beyer <jnsbyr@cpan.org>'
+  - 'Aki Mimoto <amimoto@cpan.org>'
+  - 'Norbert Truchsess <ntruchses@cpan.org>'
+  - 'Jens B. <jnsbyr@cpan.org>'
 build_requires:
   Test::More: '0'
 configure_requires:
@@ -19,6 +21,12 @@ no_index:
     - inc
 requires:
   Device::SerialPort: '0'
-  Test::More: '0'
+  IO::Select: '0'
+  IO::Socket::INET: '0'
+  Time::HiRes: '0'
   perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/ntruchsess/perl-firmata.git
 version: '0.64'

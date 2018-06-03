@@ -7,7 +7,7 @@ use IO::FDPass;
 
 our ( $CHILD_PID, $CHILD_FH );
 
-const our $FORK_CMD_RUN_RPC => 1;
+const our $FORK_CMD_RUN_NODE => 1;
 
 END {
     kill 'TERM', $CHILD_PID if defined $CHILD_PID;    ## no critic qw[InputOutput::RequireCheckedSyscalls]
@@ -29,6 +29,7 @@ sub _fork_tmpl {
 
     # child
     else {
+        undef $CHILD_PID;
 
         # run process in own PGRP
         # setpgrp;    ## no critic qw[InputOutput::RequireCheckedSyscalls]
@@ -41,16 +42,14 @@ sub _fork_tmpl {
     return;
 }
 
-sub run_rpc ( $type, $args ) {
+sub run_node ( $type, $args ) {
     my $msg = to_cbor {
-        cmd  => $FORK_CMD_RUN_RPC,
+        cmd  => $FORK_CMD_RUN_NODE,
         type => $type,
         args => $args,
     };
 
     syswrite $CHILD_FH, pack( 'L', length $msg->$* ) . $msg->$* or die $!;
-
-    use IO::FDPass;
 
     IO::FDPass::send fileno $CHILD_FH, $args->{fh};
 
@@ -72,7 +71,7 @@ sub _tmpl_proc ( $fh ) {
 
         $data = from_cbor $data;
 
-        if ( $data->{cmd} == $FORK_CMD_RUN_RPC ) {
+        if ( $data->{cmd} == $FORK_CMD_RUN_NODE ) {
             $data->{args}->{fh} = IO::FDPass::recv fileno $fh;
         }
 
@@ -100,14 +99,14 @@ sub _forked_proc ( $data ) {
     # redefine watcher in the forked process
     $SIG->{TERM} = AE::signal TERM => sub { exit 128 + 15 };
 
-    if ( $data->{cmd} == $FORK_CMD_RUN_RPC ) {
-        require Pcore::RPC::Server;
+    if ( $data->{cmd} == $FORK_CMD_RUN_NODE ) {
+        require Pcore::Node::Node;
 
         $0 = $data->{type};    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
 
         P->class->load( $data->{type} );
 
-        Pcore::RPC::Server::run( $data->{type}, $data->{args} );
+        Pcore::Node::Node::run( $data->{type}, $data->{args} );
     }
 
     exit;
@@ -120,7 +119,7 @@ sub _forked_proc ( $data ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 23, 98               | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    3 | 23, 97               | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

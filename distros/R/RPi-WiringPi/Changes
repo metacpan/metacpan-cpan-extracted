@@ -1,5 +1,29 @@
 Revision history for Perl extension RPi::WiringPi.
 
+2.3627  2018-05-29
+        - added "Usage" section for RTC in FAQ
+        - added t/64-i2c_exceptions.t to catch a particular panic, and test
+          fixed exceptions in that dist
+        - bumped prereq of RPi::I2C to 2.3606 that includes above fixes/changes
+        - cleanup and slight modifications/updates to POD
+
+2.3626  2018-05-29
+        - fix POD head level for SETUP's Serial configuration
+        - provide more descriptive scenarios when to disable _fatal_exit()
+          (closes #68)
+        - remove statement in POD where we claimed that the BCM pin numbers were
+          printed on the physical board (fixes #67)
+        - correct typo in POD SYNOPSYS for dac() where we were sending in
+          incorrect parameters (fixes #66)
+        - correct some method's Parameter section to follow my normal standard.
+          (closes #69)
+        - added rtc() in support for the RPi::RTC::DS3231 distribution
+          (closes #70)
+        - added pwm_defaults constants to RPi::Const, and removed PWM magic
+          numbers from Core (closes #72)
+        - added DS3231 RTC connections in the unit test physical diagram
+          (closes #71)
+
 2.3625  2018-04-19
         - in FAQ, add the 4 row 20 col config to env vars (closes #65)
         - bumped prereq RPi::Pin to 2.3606

@@ -15,7 +15,6 @@ use warnings;
 use parent qw( HiPi::Interface );
 use HiPi qw( :i2c :rpi :pca9685 );
 use Carp;
-use Time::HiRes qw( usleep );
 
 __PACKAGE__->create_ro_accessors( qw(
     devicename clock frequency _servo_position _servo_types
@@ -23,7 +22,7 @@ __PACKAGE__->create_ro_accessors( qw(
     backend
 ) );
 
-our $VERSION ='0.70';
+our $VERSION ='0.71';
 
 use constant {
     MODE1      => 0x00, 
@@ -194,7 +193,7 @@ sub restart {
     
     # bring out of sleep
     $self->device->bus_write( MODE1, CLEAR_REG | $allcall );
-    Time::HiRes::sleep(0.01);
+    $self->delay( 10 );
     
     # use autoincrement and restart
     $self->device->bus_write( MODE1, RESTART | AI | $allcall );
@@ -239,7 +238,7 @@ sub set_servo_degrees {
     while( $position != $desired_postion ) {
         $position += $increment;
         $self->write_channel( $channel, 0x00, $position & PCA_9685_SERVO_CHANNEL_MASK );
-        Time::HiRes::usleep( $delay ) if $delay;
+        $self->delayMicroseconds( $delay ) if $delay;
     }
     
     $self->_servo_position->[$channel] = $position;

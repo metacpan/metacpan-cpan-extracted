@@ -3,6 +3,8 @@ package <%= $p->{class} %>::GuiPlugin::SongForm;
 use Mojo::Base 'CallBackery::GuiPlugin::AbstractForm';
 use CallBackery::Translate qw(trm);
 use CallBackery::Exception qw(mkerror);
+use Mojo::JSON qw(true false);
+
 use POSIX qw(strftime);
 
 =head1 NAME
@@ -120,6 +122,7 @@ has actionCfg => sub {
     my $type = $self->config->{type} // 'new';
 
     my $handler = sub {
+        my $self = shift;
         my $args = shift;
 
         $args->{song_voices} = join "", map { $args->{'song_voice_'.$_} ? ($_) : () } @VOICES;
@@ -143,7 +146,7 @@ has actionCfg => sub {
                : trm('Add Tree Node'),
             action => 'submit',
             key => 'save',
-            handler => $handler
+            actionHandler => $handler
         }
     ];
 };

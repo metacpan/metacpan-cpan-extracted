@@ -159,7 +159,7 @@ I<Obj> B</> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<÷()>, I<div>
+Aliases: I<÷>, I<div>
 
 =cut
 
@@ -337,9 +337,49 @@ Aliases: I<airy>
 
 =cut
 
-=head2 arithmetic_derivative
+=head2 approx_cmp
 
-Number.arithmetic_derivative() -> I<Obj>
+Number.approx_cmp() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 approx_ge
+
+Number.approx_ge() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 approx_gt
+
+Number.approx_gt() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 approx_le
+
+Number.approx_le() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 approx_lt
+
+Number.approx_lt() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 approx_ne
+
+Number.approx_ne() -> I<Obj>
 
 Return the
 
@@ -483,6 +523,8 @@ Number.bell() -> I<Obj>
 
 Return the
 
+Aliases: I<bell_number>
+
 =cut
 
 =head2 bern
@@ -491,7 +533,15 @@ Number.bern() -> I<Obj>
 
 Return the
 
-Aliases: I<bernfrac>, I<bernoulli>
+Aliases: I<bernfrac>, I<bernoulli>, I<bernoulli_number>
+
+=cut
+
+=head2 bernoulli_polynomial
+
+Number.bernoulli_polynomial() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -537,19 +587,51 @@ Aliases: I<getbit>, I<testbit>
 
 =cut
 
+=head2 bsearch
+
+Number.bsearch() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bsearch_ge
+
+Number.bsearch_ge() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bsearch_le
+
+Number.bsearch_le() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 C
 
 Number.C() -> I<Obj>
 
 Return the
 
-Aliases: I<catalan>
+Aliases: I<catalan_G>
 
 =cut
 
 =head2 carmichael_lambda
 
 Number.carmichael_lambda() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 catalan
+
+Number.catalan() -> I<Obj>
 
 Return the
 
@@ -645,11 +727,13 @@ Aliases: I<conjug>, I<conjugate>
 
 =cut
 
-=head2 consecutive_integer_lcm
+=head2 consecutive_lcm
 
-Number.consecutive_integer_lcm() -> I<Obj>
+Number.consecutive_lcm() -> I<Obj>
 
 Return the
+
+Aliases: I<consecutive_integer_lcm>
 
 =cut
 
@@ -742,6 +826,16 @@ Number.derangements() -> I<Obj>
 Return the
 
 Aliases: I<complete_permutations>
+
+=cut
+
+=head2 derivative
+
+Number.derivative() -> I<Obj>
+
+Return the
+
+Aliases: I<arithmetic_derivative>
 
 =cut
 
@@ -840,6 +934,24 @@ Return the
 =head2 erfc
 
 Number.erfc() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 euler
+
+Number.euler() -> I<Obj>
+
+Return the
+
+Aliases: I<euler_number>
+
+=cut
+
+=head2 euler_polynomial
+
+Number.euler_polynomial() -> I<Obj>
 
 Return the
 
@@ -991,13 +1103,21 @@ Return the
 
 =cut
 
+=head2 geometric_sum
+
+Number.geometric_sum() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 harm
 
 Number.harm() -> I<Obj>
 
 Return the
 
-Aliases: I<harmfrac>, I<harmonic>
+Aliases: I<harmfrac>, I<harmonic>, I<harmonic_number>
 
 =cut
 
@@ -1006,6 +1126,24 @@ Aliases: I<harmfrac>, I<harmonic>
 Number.harmreal() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 hyperfactorial
+
+Number.hyperfactorial() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 hyperfactorial_ln
+
+Number.hyperfactorial_ln() -> I<Obj>
+
+Return the
+
+Aliases: I<lnhyperfactorial>, I<hyperfactorial_log>
 
 =cut
 
@@ -1174,6 +1312,16 @@ Return the
 Number.ipow2() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 iquadratic_formula
+
+Number.iquadratic_formula() -> I<Obj>
+
+Return the
+
+Aliases: I<integer_quadratic_formula>
 
 =cut
 
@@ -1561,6 +1709,8 @@ Number.lgamma() -> I<Obj>
 
 Return the
 
+Aliases: I<gamma_abs_log>
+
 =cut
 
 =head2 lgrt
@@ -1611,11 +1761,33 @@ Return the
 
 =cut
 
+=head2 lnbern
+
+Number.lnbern() -> I<Obj>
+
+Return the
+
+Aliases: I<bern_log>, I<lnbernreal>, I<bernoulli_log>
+
+=cut
+
 =head2 lngamma
 
 Number.lngamma() -> I<Obj>
 
 Return the
+
+Aliases: I<gamma_log>
+
+=cut
+
+=head2 lnsuperfactorial
+
+Number.lnsuperfactorial() -> I<Obj>
+
+Return the
+
+Aliases: I<superfactorial_ln>, I<superfactorial_log>
 
 =cut
 
@@ -1638,6 +1810,14 @@ Return the
 =head2 log2
 
 Number.log2() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 logarithmic_derivative
+
+Number.logarithmic_derivative() -> I<Obj>
 
 Return the
 
@@ -1845,6 +2025,8 @@ Number.partitions() -> I<Obj>
 
 Return the
 
+Aliases: I<number_of_partitions>
+
 =cut
 
 =head2 perfect_power
@@ -1990,6 +2172,14 @@ Return the
 =head2 primorial
 
 Number.primorial() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 quadratic_formula
+
+Number.quadratic_formula() -> I<Obj>
 
 Return the
 
@@ -2219,6 +2409,14 @@ Return the
 
 =cut
 
+=head2 solve_pell
+
+Number.solve_pell() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 sqr
 
 Number.sqr() -> I<Obj>
@@ -2375,7 +2573,7 @@ Number.Y() -> I<Obj>
 
 Return the
 
-Aliases: I<γ>, I<euler>
+Aliases: I<γ>, I<euler_gamma>
 
 =cut
 
@@ -2519,7 +2717,7 @@ I<Obj> B<≅> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<=~=()>, I<approx_eq>
+Aliases: I<=~=>, I<approx_eq>
 
 =cut
 
@@ -2529,7 +2727,7 @@ I<Obj> B<≠> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<!=()>, I<ne>
+Aliases: I<!=>, I<ne>
 
 =cut
 

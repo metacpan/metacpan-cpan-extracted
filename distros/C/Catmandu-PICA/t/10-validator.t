@@ -12,22 +12,21 @@ my $validator = Catmandu::Validator::PICA->new(
 sub check {
     my $record = shift;
     is @_ ? 0 : 1, $validator->is_valid({ record => $record });
-    is_deeply @_ ? \@_ : undef, $validator->last_errors;
+    is_deeply(\@_, [ map { "$_" } @{$validator->last_errors} ]) if @_;
 }
 
 my $record = [ [ '021A', undef, a => 'title' ] ];
 
 check($record);
 push @$record, $record->[0];
-check($record, { tag => '021A', message => 'field is not repeatable', unique => 1 });
+check($record, 'field 021A is not repeatable'),
 
-my $schema = { fields => { '021A' => { unique => 1 } } };
+my $schema = { fields => { '021A' => { repeatable => 0 } } };
 
 foreach ( ($schema, PICA::Schema->new($schema)) ) {
     $validator = Catmandu::Validator::PICA->new( schema => $_ );
-    check($record, { tag => '021A', message => 'field is not repeatable', unique => 1 });
+    check($record, 'field 021A is not repeatable');
 }
-
 
 $validator = Catmandu::Validator::PICA->new( schema => {}, ignore_unknown_fields => 1 );
 check($record);

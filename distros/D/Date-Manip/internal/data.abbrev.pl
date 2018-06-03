@@ -157,7 +157,7 @@
    'UTC'         => 'UTC',
    'V'           => 'V',
    'W'           => 'W',
-   'WAST'        => 'Africa/Windhoek',
+   'WAST'        => 'Africa/Ndjamena',
    'WAT'         => 'Africa/Ndjamena',
    'WEMT'        => 'Europe/Monaco',
    'WEST'        => 'WET',

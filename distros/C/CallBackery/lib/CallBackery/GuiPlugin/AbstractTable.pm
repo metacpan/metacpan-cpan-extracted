@@ -42,7 +42,7 @@ a table configuration
         type => 'number',
         flex => 1,
         key => 'id',
-        sortable => $self->true,
+        sortable => true,
     },
     {
         label => trm('Date'),

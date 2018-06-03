@@ -29,6 +29,7 @@ subtest "coerce_to=float(epoch)" => sub {
     subtest "from iso8601 string" => sub {
         test_needs "Time::Local";
         is($c->("2016-01-01T00:00:00Z"), 1451606400);
+        is($c->("2016-01-01 00:00:00Z"), 1451606400);
     };
 };
 
@@ -61,7 +62,13 @@ subtest "coerce_to=DateTime" => sub {
     };
     subtest "from iso8601 string" => sub {
         test_needs "Time::Local";
-        my $d = $c->("2016-01-01T00:00:00Z");
+        my $d;
+
+        $d = $c->("2016-01-01T00:00:00Z");
+        is(ref($d), "DateTime");
+        is($d->epoch, 1451606400);
+
+        $d = $c->("2016-01-01 00:00:00Z");
         is(ref($d), "DateTime");
         is($d->epoch, 1451606400);
     };
@@ -96,7 +103,13 @@ subtest "coerce_to=Time::Moment" => sub {
     };
     subtest "from iso8601 string" => sub {
         test_needs "Time::Local";
-        my $d = $c->("2016-01-01T00:00:00Z");
+        my $d;
+
+        $d = $c->("2016-01-01T00:00:00Z");
+        is(ref($d), "Time::Moment");
+        is($d->epoch, 1451606400);
+
+        $d = $c->("2016-01-01 00:00:00Z");
         is(ref($d), "Time::Moment");
         is($d->epoch, 1451606400);
     };

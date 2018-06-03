@@ -28,7 +28,5 @@ foreach my $f ( qw< path file dir > )
 my $p = $CLASS->new('/', 'tmp', 'foo');
 isa_ok $p, $CLASS, "obj created with new()";
 
-isa_ok $p->parent, $CLASS, "obj returned by parent()";
-
 
 done_testing;

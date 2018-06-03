@@ -1,5 +1,5 @@
 package Config::From;
-$Config::From::VERSION = '0.06';
+$Config::From::VERSION = '0.08';
 
 use utf8;
 use Moose;
@@ -61,7 +61,7 @@ Config::From - Merge the configuration from several sources
 
 =head1 VERSION
 
-version 0.06
+version 0.08
 
 =head1 SYNOPSIS
 

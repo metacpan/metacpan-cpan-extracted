@@ -5,7 +5,7 @@ use warnings;
 use 5.008001;
 
 # ABSTRACT: Simplified alternative to Alien::FFI that uses system libffi
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.21'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ Alt::Alien::FFI::System - Simplified alternative to Alien::FFI that uses system 
 
 =head1 VERSION
 
-version 0.16
+version 0.21
 
 =head1 SYNOPSIS
 
@@ -40,6 +40,22 @@ L<Alien::FFI>.
 It will NOT attempt to download or install libffi.  If you
 need that, then install the original L<Alien::FFI> instead.
 
+=head1 CAVEATS
+
+L<Test::Alien> is now part of L<Alien::Build>, so if you
+need to run the tests, the prereqs aren't that much lighter
+than the real L<ALien::FFI>, so you should consider:
+
+=over 4
+
+=item do your own testing
+
+=item skip tests
+
+=item switch to the real Alien::FFI
+
+=back
+
 =head1 SEE ALSO
 
 =over 4
@@ -49,8 +65,6 @@ need that, then install the original L<Alien::FFI> instead.
 =item L<Alien::FFI>
 
 =item L<FFI::Platypus>
-
-=item L<FFI::Raw>
 
 =item L<FFI::CheckLib>
 

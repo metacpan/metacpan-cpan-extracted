@@ -84,6 +84,10 @@ sub get ( $self, @ ) {
     return;
 }
 
+sub read_cfg ( $self, @args ) {
+    return P->cfg->read( $self->get(@args) );
+}
+
 sub write ( $self, $lib, $path, $file ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
     die qq[share lib "$lib" is not exists] if !exists $self->{_lib_idx}->{$lib};
 
@@ -97,7 +101,7 @@ sub write ( $self, $lib, $path, $file ) {    ## no critic qw[Subroutines::Prohib
         P->file->write_bin( $path, $file );
     }
     elsif ( is_plain_arrayref $file || is_plain_hashref $file ) {
-        P->cfg->read( $path, $file, readable => 1 );
+        P->cfg->write( $path, $file, readable => 1 );
     }
     else {
         P->file->copy( $file, $path );

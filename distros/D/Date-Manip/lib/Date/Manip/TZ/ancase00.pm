@@ -6,9 +6,9 @@ Date::Manip::TZ::ancase00;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Thu Mar  1 10:33:43 EST 2018
-#    Data version: tzdata2018c
-#    Code version: tzcode2018c
+#    Generated on: Wed May 30 14:49:43 EDT 2018
+#    Data version: tzdata2018e
+#    Code version: tzcode2018e
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.61';
+$VERSION='6.71';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -68,8 +68,14 @@ END { undef $VERSION; }
    2016 =>
      [
         [ [2016,10,21,16,0,0],[2016,10,22,3,0,0],'+11:00:00',[11,0,0],
-          '+11',0,[9999,12,31,0,0,0],[9999,12,31,11,0,0],
-          '2016102116:00:00','2016102203:00:00','9999123100:00:00','9999123111:00:00' ],
+          '+11',0,[2018,3,10,16,59,59],[2018,3,11,3,59,59],
+          '2016102116:00:00','2016102203:00:00','2018031016:59:59','2018031103:59:59' ],
+     ],
+   2018 =>
+     [
+        [ [2018,3,10,17,0,0],[2018,3,11,1,0,0],'+08:00:00',[8,0,0],
+          '+08',0,[9999,12,31,0,0,0],[9999,12,31,8,0,0],
+          '2018031017:00:00','2018031101:00:00','9999123100:00:00','9999123108:00:00' ],
      ],
 );
 

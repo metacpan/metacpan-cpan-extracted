@@ -14,7 +14,7 @@ sub new
     my $package = shift;
     my %args = @_;
     my @extradata_files;
-    
+
     my $module_name = $args{'module_name'};
     $module_name =~ s{::}{-}g;
 
@@ -27,7 +27,7 @@ sub new
             push @extradata_files, $filename;
         }
     };
- 
+
     find({ wanted => $filter_files_cb, no_chdir => 1}, "extradata");
 
     my $builder = $package->SUPER::new(
@@ -40,7 +40,7 @@ sub new
 
     $builder->add_build_element('extradata');
 
-    $builder->install_path()->{'extradata'} = 
+    $builder->install_path()->{'extradata'} =
         File::Spec->catdir(
                 $builder->install_destination("lib"),
                 qw(data modules),

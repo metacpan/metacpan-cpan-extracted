@@ -1,0 +1,11 @@
+Revision history for Perl extension ISO::639_1
+
+0.02 2018-06-01T13:44:59Z
+
+    - Fix pod
+    - Fix some var names
+
+0.01 2018-05-30T18:23:23Z
+
+    - original version
+

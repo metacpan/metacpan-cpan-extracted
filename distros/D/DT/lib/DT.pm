@@ -8,9 +8,11 @@ use Carp qw();
 use Scalar::Util qw(looks_like_number);
 use Sub::Install;
 
+use DateTime::Format::ISO8601;
+
 use parent 'DateTime::Moonpig';
 
-our $VERSION = '0.3.0';
+our $VERSION = '0.4.0';
 
 use overload
     '=='  => \&_dt_int_eq,
@@ -28,27 +30,7 @@ use overload
     'gt'  => \&_dt_str_gt,
     'ge'  => \&_dt_str_ge;
 
-my ($HAVE_PG, $HAVE_ISO);
-
-sub import {
-    my ($class, @args) = @_;
-
-    $HAVE_PG = $HAVE_ISO = undef;
-
-    if ( grep /^:?pg$/, @args ) {
-        eval { require DateTime::Format::Pg };
-        Carp::croak($@) if $@;
-
-        $HAVE_PG = 1;
-    }
-
-    if ( not grep /^:?no_iso(?:8601)?$/, @args ) {
-        eval { require DateTime::Format::ISO8601 };
-        Carp::croak($@) if $@;
-
-        $HAVE_ISO = 1;
-    }
-}
+my $HAVE_PG;
 
 sub new {
     my $class = shift;
@@ -62,19 +44,22 @@ sub new {
         }
         elsif ( not ref $_[0] ) {
             # May be ISO8601(ish) format used by PostgreSQL
-            $dt = eval { DateTime::Format::Pg->parse_datetime($_[0]) }
-                if $HAVE_PG;
+            $dt = eval {
+                $HAVE_PG || ($HAVE_PG = require DateTime::Format::Pg);
+                DateTime::Format::Pg->parse_datetime($_[0]);
+            };
+            
 
             # May be a real ISO8601 format date/time
             $dt = eval { DateTime::Format::ISO8601->parse_datetime($_[0]) }
-                if $HAVE_ISO and not $dt;
+                if not $dt;
         }
     }
 
     # This will croak
     $dt = DateTime->new(@_) unless $dt;
 
-    # Rebless into DT so our methods work
+    # Rebless into DT so our methods are called instead of DateTime
     return bless $dt, $class;
 }
 
@@ -119,6 +104,12 @@ sub pg_timestamp_tz {
             as => $method,
         });
     }
+}
+
+sub TO_JSON {
+    my ($self) = @_;
+    
+    return "$self";
 }
 
 ############## PRIVATE METHODS BELOW ##############
@@ -204,7 +195,7 @@ DT - DateTime wrapper that tries hard to DWYM
 
 =head1 SYNOPSIS
 
-    use DT qw(:pg);
+    use DT;
 
     my $dt_now = DT->new(time); # Just works
     my $dt_fh = DT->new('2018-02-06T15:45:00-0500'); # Just works
@@ -241,7 +232,7 @@ Consider:
 
 Versus:
 
-    use DT ':pg';
+    use DT;
     my $dt_unix = DT->new(time);
     my $dt_pg = DT->new($timestamp_from_postgres);
     my $dt_iso = DT->new($iso_datetime);

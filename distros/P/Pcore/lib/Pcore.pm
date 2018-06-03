@@ -1,4 +1,4 @@
-package Pcore v0.65.1;
+package Pcore v0.66.0;
 
 use v5.26.0;
 use common::header;
@@ -7,24 +7,23 @@ use Pcore::Core::Const qw[:CORE];
 
 # define %EXPORT_PRAGMA for exporter
 our $EXPORT_PRAGMA = {
-    ansi     => 0,    # export ANSI color variables
-    class    => 0,    # package is a Moo class
-    config   => 0,    # mark package as perl config, used automatically during .perl config evaluation, do not use directly!!!
-    const    => 0,    # export "const" keyword
-    dist     => 0,    # mark package aas Pcore dist main module
-    embedded => 0,    # run in embedded mode
-    export   => 0,    # install standart import method
-    inline   => 0,    # package use Inline
-    l10n     => 1,    # register package L10N domain
-    res      => 0,    # export Pcore::Util::Result qw[res]
-    role     => 0,    # package is a Moo role
-    rpc      => 0,    # run class as RPC server
-    sql      => 0,    # export Pcore::Handle::DBI::Const qw[:TYPES]
-    types    => 0,    # export types
+    ansi     => undef,    # export ANSI color variables
+    class    => undef,    # package is a Moo class
+    config   => undef,    # mark package as perl config, used automatically during .perl config evaluation, do not use directly!!!
+    const    => undef,    # export "const" keyword
+    dist     => undef,    # mark package aas Pcore dist main module
+    embedded => undef,    # run in embedded mode
+    export   => undef,    # install standart import method
+    forktmpl => undef,    # run fork template on startup
+    inline   => undef,    # package use Inline
+    l10n     => undef,    # register package L10N domain
+    res      => undef,    # export Pcore::Util::Result qw[res]
+    role     => undef,    # package is a Moo role
+    sql      => undef,    # export Pcore::Handle::DBI::Const qw[:TYPES]
+    types    => undef,    # export types
 };
 
 our $EMBEDDED    = 0;       # Pcore::Core used in embedded mode
-our $FORK        = 0;       # fork template proc
 our $SCRIPT_PATH = $0;
 our $WIN_ENC     = undef;
 our $CON_ENC     = undef;
@@ -47,6 +46,7 @@ our $UTIL = {
     host     => 'Pcore::Util::URI::Host',
     http     => 'Pcore::HTTP',
     list     => 'Pcore::Util::List',
+    net      => 'Pcore::Util::Net',
     path     => 'Pcore::Util::Path',
     perl     => 'Pcore::Util::Perl',
     pm       => 'Pcore::Util::PM',
@@ -86,37 +86,7 @@ sub import {
         # install run-time hook to caller package
         B::Hooks::AtRuntime::at_runtime( \&Pcore::_CORE_RUN );
 
-        # detect RPC server
-        if ( $import->{pragma}->{rpc} ) {
-            if ( $0 eq '-' ) {
-
-                # read and unpack boot args from STDIN
-                my $RPC_BOOT_ARGS = <>;
-
-                chomp $RPC_BOOT_ARGS;
-
-                require CBOR::XS;
-
-                $RPC_BOOT_ARGS = CBOR::XS::decode_cbor( pack 'H*', $RPC_BOOT_ARGS );
-
-                # init RPC environment
-                $SCRIPT_PATH   = $RPC_BOOT_ARGS->{script_path};
-                $main::VERSION = version->new( $RPC_BOOT_ARGS->{version} );
-
-                B::Hooks::AtRuntime::after_runtime( sub {
-                    require Pcore::RPC::Server;
-
-                    Pcore::RPC::Server::run( $caller, $RPC_BOOT_ARGS );
-
-                    exit;
-                } );
-            }
-            else {
-                $FORK = 1;
-            }
-        }
-
-        _CORE_INIT();
+        _CORE_INIT($import);
 
         1;
     };
@@ -144,8 +114,6 @@ sub import {
             state $L10N_INIT = !!require Pcore::Core::L10N;
 
             Pcore::Core::L10N->import( -caller => $caller );
-
-            Pcore::Core::L10N::register_package_domain( $caller, $import->{pragma}->{l10n} );
         }
 
         # export "dump"
@@ -237,7 +205,7 @@ sub _import_types ($caller) {
     return;
 }
 
-sub _CORE_INIT {
+sub _CORE_INIT ($import) {
     require Pcore::Core::Dump;
     Pcore::Core::Dump->import(':CORE');
 
@@ -304,7 +272,8 @@ sub _CORE_INIT {
 
     require Pcore::Core::Exception;    # set $SIG{__DIE__}, $SIG{__WARN__}, $SIG->{INT}, $SIG->{TERM} handlers
 
-    require Pcore::Util::PM::ForkTmpl if $FORK && !$MSWIN;
+    # process -forktmpl pragma
+    require Pcore::Util::PM::ForkTmpl if !$MSWIN && $import->{pragma}->{forktmpl};
 
     _CORE_INIT_AFTER_FORK();
 
@@ -517,13 +486,13 @@ sub sendlog ( $self, $key, $title, $data = undef ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 87                   | Variables::ProtectPrivateVars - Private variable used                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 259, 288, 291, 295,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
-## |      | 326, 329, 334, 337,  |                                                                                                                |
-## |      | 362, 388, 499        |                                                                                                                |
+## |    3 | 227, 256, 259, 263,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
+## |      | 295, 298, 303, 306,  |                                                                                                                |
+## |      | 331, 357, 468        |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 344                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_CORE_RUN' declared but not used    |
+## |    3 | 313                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_CORE_RUN' declared but not used    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 263                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
+## |    1 | 231                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

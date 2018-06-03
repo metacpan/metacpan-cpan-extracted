@@ -1,7 +1,7 @@
 package Perinci::Sub::Complete;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.92'; # VERSION
+our $DATE = '2018-06-01'; # DATE
+our $VERSION = '0.931'; # VERSION
 
 use 5.010001;
 use strict;
@@ -105,7 +105,10 @@ sub complete_from_schema {
         my $pkg = "Sah::SchemaR::$type";
         (my $pkg_pm = "$pkg.pm") =~ s!::!/!g;
         eval { require $pkg_pm; 1 };
-        goto RETURN_RES if $@;
+        if ($@) {
+            log_trace("[comp][periscomp] couldn't load schema module %s: %s, skipped", $pkg, $@);
+            goto RETURN_RES;
+        }
         my $rsch = ${"$pkg\::rschema"};
         $type = $rsch->[0];
         # let's just merge everything, for quick checking of clause
@@ -141,7 +144,10 @@ sub complete_from_schema {
                     my $mod_pm = $mod; $mod_pm =~ s!::!/!g; $mod_pm .= ".pm";
                     require $mod_pm;
                     my $fref = \&{"$mod\::gen_completion"};
+                    log_trace("[comp][periscomp] invoking gen_completion() from %s ...", $mod);
                     $comp = $fref->(%$xcargs);
+                } else {
+                    log_trace("[comp][periscomp] module %s is not installed, skipped", $mod);
                 }
             }
             if ($comp) {
@@ -417,7 +423,10 @@ sub complete_arg_val {
                         my $mod_pm = $mod; $mod_pm =~ s!::!/!g; $mod_pm .= ".pm";
                         require $mod_pm;
                         my $fref = \&{"$mod\::gen_completion"};
+                        log_trace("[comp][periscomp] invoking gen_completion() from %s ...", $mod);
                         $comp = $fref->(%$xcargs);
+                    } else {
+                        log_trace("[comp][periscomp] module %s is not installed, skipped", $mod);
                     }
                 }
                 if ($comp) {
@@ -434,10 +443,14 @@ sub complete_arg_val {
                     my $mod_pm = $mod; $mod_pm =~ s!::!/!g; $mod_pm .= ".pm";
                     require $mod_pm;
                     if (defined &{"$mod\::complete_arg_val"}) {
-                        log_trace("[comp][periscomp] using arg completion routine from complete_arg_val() from %s", $mod);
+                        log_trace("[comp][periscomp] invoking complete_arg_val() from %s ...", $mod);
                         $comp = \&{"$mod\::complete_arg_val"};
                         last GET_COMP_ROUTINE;
+                    } else {
+                        log_trace("[comp][periscomp] module %s doesn't define complete_arg_val(), skipped", $mod);
                     }
+                } else {
+                    log_trace("[comp][periscomp] module %s not installed, skipped", $mod);
                 }
             }
         } # GET_COMP_ROUTINE
@@ -580,7 +593,10 @@ sub complete_arg_elem {
                         my $mod_pm = $mod; $mod_pm =~ s!::!/!g; $mod_pm .= ".pm";
                         require $mod_pm;
                         my $fref = \&{"$mod\::gen_completion"};
+                        log_trace("[comp][periscomp] invoking gen_completion() from %s ...", $mod);
                         $elcomp = $fref->(%$xcargs);
+                    } else {
+                        log_trace("[comp][periscomp] module %s is not installed, skipped", $mod);
                     }
                 }
                 if ($elcomp) {
@@ -597,10 +613,14 @@ sub complete_arg_elem {
                     my $mod_pm = $mod; $mod_pm =~ s!::!/!g; $mod_pm .= ".pm";
                     require $mod_pm;
                     if (defined &{"$mod\::complete_arg_val"}) {
-                        log_trace("[comp][periscomp] using arg element completion routine from complete_arg_val() from %s", $mod);
+                        log_trace("[comp][periscomp] invoking complete_arg_val() from %s ...", $mod);
                         $elcomp = \&{"$mod\::complete_arg_val"};
                         last GET_ELCOMP_ROUTINE;
+                    } else {
+                        log_trace("[comp][periscomp] module %s doesn't defined complete_arg_val(), skipped", $mod);
                     }
+                } else {
+                    log_trace("[comp][periscomp] module %s is not installed, skipped", $mod);
                 }
             }
         } # GET_ELCOMP_ROUTINE
@@ -1243,7 +1263,7 @@ Perinci::Sub::Complete - Complete command-line argument using Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.92 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2017-07-10.
+This document describes version 0.931 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2018-06-01.
 
 =head1 SYNOPSIS
 
@@ -1742,7 +1762,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -13,7 +13,7 @@ use List::MoreUtils qw/uniq/;
 # TODO : experiment with bit vectors (cf vec() and pack "b*" for combining 
 #        result sets
 
-our $VERSION = "0.78";
+our $VERSION = "0.79";
 
 =head1 NAME
 
@@ -704,9 +704,11 @@ sub matchExactPhrase {
           } else { # current word found in current doc, check if positions match
             my $ixpKey = pack IXPKEYPACK, $docId, $wordId;
             my @newPos = unpack IXPPACK, $self->{ixp}{$ixpKey};
-            $pos{$docId} = nearPositions($pos{$docId}, \@newPos, $wordDelta)
-              and addToScore $scores->{$docId}, $sc->{$docId}
-                or delete $scores->{$docId};
+            if($pos{$docId} = nearPositions($pos{$docId}, \@newPos, $wordDelta)) {                
+              addToScore $scores->{$docId}, $sc->{$docId}; 
+            } else { 
+              delete $scores->{$docId}; 
+            }             
           }
         }
       }  # end foreach my $docId (keys %$scores)

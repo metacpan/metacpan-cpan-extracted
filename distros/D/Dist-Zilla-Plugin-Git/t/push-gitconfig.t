@@ -6,8 +6,6 @@ use Path::Tiny qw(path);
 use Test::More 0.88;            # done_testing
 use Test::Fatal qw(exception);
 
-use Devel::SimpleTrace;
-
 use lib 't/lib';
 use Util;
 

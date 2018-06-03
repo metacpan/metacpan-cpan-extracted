@@ -18,12 +18,12 @@ my %module_build_args = (
     "Pablo Rodr\x{ed}guez Gonz\x{e1}lez <pablo.rodriguez.gonzalez\@gmail.com>"
   ],
   "dist_name" => "App-BatParser",
-  "dist_version" => "0.005",
+  "dist_version" => "0.006",
   "license" => "perl",
   "module_name" => "App::BatParser",
   "recursive_test_files" => 1,
   "requires" => {
-    "Moose" => 0,
+    "Moo" => 0,
     "Regexp::Grammars" => "1.000",
     "namespace::autoclean" => 0,
     "perl" => "5.012",

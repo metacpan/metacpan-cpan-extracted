@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::js::date::str;
 
-our $DATE = '2018-03-27'; # DATE
-our $VERSION = '0.024'; # VERSION
+our $DATE = '2018-06-02'; # DATE
+our $VERSION = '0.025'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,9 +9,9 @@ use warnings;
 
 sub meta {
     +{
-        v => 2,
+        v => 3,
         enable_by_default => 1,
-        might_die => 1, # we throw exception date is invalid
+        might_fail => 1, # we throw exception date is invalid
         prio => 50,
     };
 }
@@ -29,7 +29,7 @@ sub coerce {
     );
 
     # note: (function(a,b,c){...})() is a trick to simulate lexical variables
-    $res->{expr_coerce} = "(function (_m) { _m = new Date($dt); if (isNaN(_m)) throw new Error('Invalid date'); return _m })()";
+    $res->{expr_coerce} = "(function (_m) { _m = new Date($dt); if (isNaN(_m)) { return ['Invalid date'] } else { return [null, _m] } })()";
 
     $res;
 }
@@ -49,7 +49,7 @@ Data::Sah::Coerce::js::date::str - Coerce date from string
 
 =head1 VERSION
 
-This document describes version 0.024 of Data::Sah::Coerce::js::date::str (from Perl distribution Data-Sah-Coerce), released on 2018-03-27.
+This document describes version 0.025 of Data::Sah::Coerce::js::date::str (from Perl distribution Data-Sah-Coerce), released on 2018-06-02.
 
 =head1 DESCRIPTION
 

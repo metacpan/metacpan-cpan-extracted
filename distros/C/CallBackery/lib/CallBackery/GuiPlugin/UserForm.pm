@@ -3,6 +3,7 @@ use Mojo::Base 'CallBackery::GuiPlugin::AbstractForm';
 use CallBackery::Translate qw(trm);
 use CallBackery::Exception qw(mkerror);
 use Mojo::Util qw(hmac_sha1_sum);
+use Mojo::JSON qw(true false);
 
 =head1 NAME
 
@@ -49,7 +50,7 @@ has formCfg => sub {
             label => trm('UserId'),
             widget => 'hiddenText',
             set => {
-                readOnly => $self->true,
+                readOnly => true,
             },
         } : (),
 
@@ -58,8 +59,8 @@ has formCfg => sub {
             label => trm('Login'),
             widget => 'text',
             set => {
-                required => $self->true,
-                readOnly => $self->user->may('admin') ? $self->false : $self->true
+                required => true,
+                readOnly => $self->user->may('admin') ? false : true
             },
         },
         {
@@ -67,7 +68,7 @@ has formCfg => sub {
             label => trm('Password'),
             widget => 'password',
             set => {
-                required => $self->true,
+                required => true,
             },
         },
         {
@@ -75,7 +76,7 @@ has formCfg => sub {
             label => trm('Password Again'),
             widget => 'password',
             set => {
-                required => $self->true,
+                required => true,
             },
         },
 
@@ -84,8 +85,8 @@ has formCfg => sub {
             label => trm('Given Name'),
             widget => 'text',
             set => {
-                required => $self->true,
-                readOnly => $self->user->may('admin') ? $self->false : $self->true
+                required => true,
+                readOnly => $self->user->may('admin') ? false : true
             },
         },
         {
@@ -93,8 +94,8 @@ has formCfg => sub {
             label => trm('Family Name'),
             widget => 'text',
             set => {
-                required => $self->true,
-                readOnly => $self->user->may('admin') ? $self->false : $self->true
+                required => true,
+                readOnly => $self->user->may('admin') ? false : true
             }
         },
         {
@@ -103,7 +104,7 @@ has formCfg => sub {
             widget => 'textArea',
             set => {
                 placeholder => 'some extra information about this user',
-                readOnly => $self->user->may('admin') ? $self->false : $self->true
+                readOnly => $self->user->may('admin') ? false : true
             }
         },
         @{$self->rightsCheckBoxes}
@@ -142,6 +143,7 @@ has actionCfg => sub {
     my $type = $self->config->{type} // 'new';
 
     my $handler = sub {
+        my $self = shift;
         my $args = shift;
         my $admin = ($self->user->may('admin') or $mode eq 'init');
 
@@ -203,7 +205,7 @@ has actionCfg => sub {
                : trm('Add User'),
             action => 'submit',
             key => 'save',
-            handler => $handler
+            actionHandler => $handler
         }
     ];
 };

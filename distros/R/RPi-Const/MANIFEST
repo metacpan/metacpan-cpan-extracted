@@ -12,6 +12,7 @@ t/26-const_state.t
 t/27-const_mode.t
 t/30-const_all.t
 t/35-pwm_mode.t
+t/40-pwm_defaults.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

@@ -6,14 +6,14 @@ use RT::Extension::ConditionalCustomFields::Test tests => 11;
 use WWW::Mechanize::PhantomJS;
 
 my $cf_condition = RT::CustomField->new(RT->SystemUser);
-$cf_condition->Create(Name => 'Condition', Type => 'SelectSingle', Queue => 'General', RenderType => 'Dropdown');
+$cf_condition->Create(Name => 'Condition', Type => 'Select', MaxValues => 1, Queue => 'General', RenderType => 'Dropdown');
 $cf_condition->AddValue(Name => 'Passed', SortOder => 0);
 $cf_condition->AddValue(Name => 'Failed', SortOrder => 1);
 $cf_condition->AddValue(Name => 'Schrödingerized', SortOrder => 2);
 my $cf_values = $cf_condition->Values->ItemsArrayRef;
 
 my $cf_conditioned_by = RT::CustomField->new(RT->SystemUser);
-$cf_conditioned_by->Create(Name => 'ConditionedBy', Type => 'FreeformSingle', Queue => 'General');
+$cf_conditioned_by->Create(Name => 'ConditionedBy', Type => 'Freeform', MaxValues => 1, Queue => 'General');
 
 RT->Config->Set('CustomFieldGroupings',
     'RT::Ticket' => [
@@ -28,7 +28,7 @@ $mjs->get($m->rt_base_url . '?user=root;pass=password');
 
 my $ticket = RT::Ticket->new(RT->SystemUser);
 $ticket->Create(Queue => 'General', Subject => 'Test Ticket ConditionalCF');
-$ticket->AddCustomFieldValue(Field => $cf_condition->id , Value => $cf_values->[0]);
+$ticket->AddCustomFieldValue(Field => $cf_condition->id , Value => $cf_values->[0]->Name);
 $ticket->AddCustomFieldValue(Field => $cf_conditioned_by->id , Value => 'See me?');
 
 $cf_conditioned_by->SetConditionedBy($cf_condition->id, [$cf_values->[0]->Name, $cf_values->[2]->Name]);
@@ -42,10 +42,10 @@ $ticket->DeleteCustomFieldValue(Field => $cf_conditioned_by->id , Value => 'See 
 is($ticket->FirstCustomFieldValue($cf_conditioned_by->Name), undef, 'ConditionedBy not mandatory value can be deleted when condition is met');
 
 $cf_conditioned_by->SetPattern('(?#Mandatory).');
-$ticket->AddCustomFieldValue(Field => $cf_condition->id , Value => $cf_values->[1]);
+$ticket->AddCustomFieldValue(Field => $cf_condition->id , Value => $cf_values->[1]->Name);
 $ticket->AddCustomFieldValue(Field => $cf_conditioned_by->id , Value => 'See me?');
-$ticket->DeleteCustomFieldValue(Field => $cf_conditioned_by->id , Value => 'See me?');
-is($ticket->FirstCustomFieldValue($cf_conditioned_by->Name), undef, 'ConditionedBy mandatory value can be deleted when condition is not met');
+my ($tok, $tmsg) = $ticket->DeleteCustomFieldValue(Field => $cf_conditioned_by->id , Value => 'See me?');
+is($ticket->FirstCustomFieldValue($cf_conditioned_by->Name), undef, 'ConditionedBy mandatory value can be deleted when condition is not met !'.$tmsg.'!');
 
 $mjs->get($m->rt_base_url . 'Ticket/Modify.html?id=' . $ticket->id);
 my $ticket_cf_condition = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField:Groupone-' . $cf_condition->id . '-Values', single => 1);

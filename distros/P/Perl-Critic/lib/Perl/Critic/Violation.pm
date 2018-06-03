@@ -4,12 +4,9 @@ use 5.006001;
 use strict;
 use warnings;
 
-use English qw< -no_match_vars >;
 use Readonly;
 
 use File::Basename qw< basename >;
-use IO::String qw< >;
-use Pod::PlainText qw< >;
 use Scalar::Util qw< blessed >;
 use String::Format qw< stringf >;
 
@@ -22,7 +19,7 @@ use Perl::Critic::Utils::POD qw<
 >;
 use Perl::Critic::Exception::Fatal::Internal qw< throw_internal >;
 
-our $VERSION = '1.130';
+our $VERSION = '1.132';
 
 
 Readonly::Scalar my $NO_EXCEPTION_NO_SPLIT_LIMIT        => -1;

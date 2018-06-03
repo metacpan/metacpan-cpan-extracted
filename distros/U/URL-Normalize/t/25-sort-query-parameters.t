@@ -12,7 +12,7 @@ BEGIN {
 
 {
     my %urls = (
-        'http://www.example.com'                                => 'http://www.example.com',
+        'http://www.example.com'                                => 'http://www.example.com/', # because canonical
         'http://www.example.com/'                               => 'http://www.example.com/',
         'http://www.example.com/?'                              => 'http://www.example.com/?',
         'http://www.example.com/?a=1&b=2&c=3'                   => 'http://www.example.com/?a=1&b=2&c=3',

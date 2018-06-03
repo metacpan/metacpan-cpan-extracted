@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.50';
+$Map::Tube::VERSION   = '3.51';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.50
+Version 3.51
 
 =cut
 
@@ -40,6 +40,8 @@ use Map::Tube::Exception::MissingPluginGraph;
 use Map::Tube::Exception::MissingPluginFormatter;
 use Map::Tube::Exception::MissingPluginFuzzyFind;
 use Map::Tube::Exception::MalformedMapData;
+use Map::Tube::Exception::InvalidLineStructure;
+use Map::Tube::Exception::InvalidStationStructure;
 use Map::Tube::Utils qw(to_perl is_same trim common_lines get_method_map is_valid_color);
 use Map::Tube::Types qw(Routes Tables Lines NodeMap LineMap);
 
@@ -71,10 +73,14 @@ documented in L<Map::Tube::Cookbook>.
     |                     |          | Sofia, Tbilisi, Vienna, Warsaw,          |
     |                     |          | Yekaterinburg)                           |
     |                     |          |                                          |
-    | Mohammad S Anwar    | MANWAR   | 6 (Barcelona, Delhi, Kolkatta, London,   |
-    |                     |          | NYC, Tokyo)                              |
+    | Mohammad S Anwar    | MANWAR   | 7 (Barcelona, Delhi, Kolkatta, London,   |
+    |                     |          | Madrid, NYC, Tokyo)                      |
     |                     |          |                                          |
     | Gisbert W Selke     | GWS      | 4 (Beijing, Glasgow, KoeinBonn, Lyon)    |
+    |                     |          |                                          |
+    | Renee Baecker       | RENEEB   | 1 (Frankfurt)                            |
+    |                     |          |                                          |
+    | Stefan Limbacher    | STELIM   | 1 (Nuremberg)                            |
     |                     |          |                                          |
     | Slaven Rezic        | SREZIC   | 1 (Berlin)                               |
     |                     |          |                                          |
@@ -480,7 +486,10 @@ sub get_map_data {
                 $data->{lines}->{line} = [ $lines ];
             }
         };
-        return $data unless ($@);
+        unless ($@) {
+            $self->_validate_map_structure($data, $caller);
+            return $data;
+        }
 
         Map::Tube::Exception::MalformedMapData->throw({
             method      => $method,
@@ -492,7 +501,10 @@ sub get_map_data {
         my $json = $self->json;
         if ($json ne '') {
             eval { $data = to_perl($json) };
-            return $data unless ($@);
+            unless ($@) {
+                $self->_validate_map_structure($data, $caller);
+                return $data;
+            }
 
             Map::Tube::Exception::MalformedMapData->throw({
                 method      => $method,
@@ -519,9 +531,9 @@ sub get_map_data {
 
 =head1 PLUGINS
 
-=head2 * L<Map::Tube::Plugin::Graph>
+=head2 L<Map::Tube::Plugin::Graph>
 
-The L<Map::Tube::Plugin::Graph> plugin add the support to generate the entire map
+The L<Map::Tube::Plugin::Graph> plugin adds the support to generate the entire map
 or map for a particular line as base64 encoded string (png image).
 
     use strict; use warnings;
@@ -548,7 +560,7 @@ or map for a particular line as base64 encoded string (png image).
 
 Please refer to the L<documentation|Map::Tube::Plugin::Graph> for more details.
 
-=head2 * L<Map::Tube::Plugin::Formatter>
+=head2 L<Map::Tube::Plugin::Formatter>
 
 The L<Map::Tube::Plugin::Formatter> plugin adds the  support to format the object
 supported by the plugin.
@@ -578,7 +590,7 @@ supported by the plugin.
 
 Please refer to the L<documentation|Map::Tube::Plugin::Formatter> for more info.
 
-=head2 * L<Map::Tube::Plugin::FuzzyFind>
+=head2 L<Map::Tube::Plugin::FuzzyFind>
 
 Gisbert W. Selke, built the add-on for L<Map::Tube> to find stations and lines by
 name, possibly partly or inexactly specified. The module is a Moo role which gets
@@ -1002,6 +1014,30 @@ sub _set_active_links {
     }
 
     $self->{_active_links} = $active_links;
+}
+
+sub _validate_map_structure {
+    my ($self, $data, $caller) = @_;
+
+    unless (exists $data->{lines}
+            && exists $data->{lines}->{line}
+            && @{$data->{lines}->{line}}) {
+        Map::Tube::Exception::InvalidLineStructure->throw({
+            method      => __PACKAGE__."::_validate_map_structure",
+            message     => "ERROR: Invalid line structure in map data.",
+            filename    => $caller->[1],
+            line_number => $caller->[2] });
+    }
+
+    unless (exists $data->{stations}
+            && exists $data->{stations}->{station}
+            && @{$data->{stations}->{station}}) {
+        Map::Tube::Exception::InvalidStationStructure->throw({
+            method      => __PACKAGE__."::_validate_map_structure",
+            message     => "ERROR: Invalid station structure in map data.",
+            filename    => $caller->[1],
+            line_number => $caller->[2] });
+    }
 }
 
 sub _validate_map_data {

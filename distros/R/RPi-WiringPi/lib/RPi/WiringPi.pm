@@ -16,11 +16,12 @@ use RPi::HCSR04;
 use RPi::I2C;
 use RPi::LCD;
 use RPi::Pin;
+use RPi::RTC::DS3231;
 use RPi::Serial;
 use RPi::SPI;
 use RPi::StepperMotor;
 
-our $VERSION = '2.3625';
+our $VERSION = '2.3627';
 
 my $fatal_exit = 1;
 
@@ -58,7 +59,7 @@ sub new {
                 $self->pin_scheme(RPI_MODE_GPIO);
             }
             else {
-                if ($self->_setup =~ /^w/) {
+                if ($self->_setup =~ /^w/i) {
                     $self->SUPER::setup();
                     $self->pin_scheme(RPI_MODE_WPI);
                 }
@@ -69,9 +70,6 @@ sub new {
                 elsif ($self->_setup =~ /^p/) {
                     $self->SUPER::setup_phys();
                     $self->pin_scheme(RPI_MODE_PHYS);
-                }
-                elsif ($self->_setup =~ /^W/){
-                    $self->pin_scheme(RPI_MODE_WPI);
                 }
                 else {
                     $self->pin_scheme(RPI_MODE_UNINIT);
@@ -89,17 +87,14 @@ sub new {
 sub adc {
     my ($self, %args) = @_;
 
-    my $adc;
-
     if (defined $args{model} && $args{model} eq 'MCP3008'){
         my $pin = $self->pin($args{channel});
-        $adc = RPi::ADC::MCP3008->new($pin->num);
+        return RPi::ADC::MCP3008->new($pin->num);
     }
     else {
         # ADSxxxx ADCs don't require any pins
-        $adc = RPi::ADC::ADS->new(%args);
+        return RPi::ADC::ADS->new(%args);
     }
-    return $adc;
 }
 sub bmp {
     return RPi::BMP180->new($_[1]);
@@ -109,31 +104,26 @@ sub dac {
     $self->pin($args{cs});
     $self->pin($args{shdn}) if defined $args{shdn};
     $args{model} = 'MCP4922' if ! defined $args{model};
-    my $dac = RPi::DAC::MCP4922->new(%args);
-    return $dac;
+    return RPi::DAC::MCP4922->new(%args);
 }
 sub dpot {
     my ($self, $cs, $channel) = @_;
     $self->pin($cs);
-    my $dpot = RPi::DigiPot::MCP4XXXX->new($cs, $channel);
-    return $dpot;
+    return RPi::DigiPot::MCP4XXXX->new($cs, $channel);
 }
 sub gps {
     my ($self, %args) = @_;
-    my $gps = GPSD::Parse->new(%args);
-    return $gps;
+    return GPSD::Parse->new(%args);
 }
 sub hcsr04 {
     my ($self, $t, $e) = @_;
-    $self->pin($t);
-    $self->pin($e);
+    $self->pin($_) for ($t, $e);
     return RPi::HCSR04->new($t, $e);
 }
 sub hygrometer {
     my ($self, $pin) = @_;
     $self->register_pin($pin);
-    my $sensor = RPi::DHT11->new($pin);
-    return $sensor;
+    return RPi::DHT11->new($pin);
 }
 sub i2c {
     my ($self, $addr, $i2c_device) = @_;
@@ -170,6 +160,10 @@ sub pin {
     my $pin = RPi::Pin->new($pin_num);
     $self->register_pin($pin);
     return $pin;
+}
+sub rtc {
+    my ($self, $rtc_addr) = @_;
+    return RPi::RTC::DS3231->new($rtc_addr);
 }
 sub serial {
     my ($self, $device, $baud) = @_;
@@ -238,7 +232,6 @@ sub _fatal_exit {
 sub _pwm_in_use {
     my $self = shift;
     $ENV{PWM_IN_USE} = 1 if @_;
-    return $self->{pwm_in_use};
 }
 sub _setup {
     return $_[0]->{setup};
@@ -354,7 +347,7 @@ various items
         cs      => $dac_cs_pin
     );
 
-    my ($dacA, $dacB) = (0, 0);
+    my ($dacA, $dacB) = (0, 1);
 
     $dac->set($dacA, 4095); # 100% output
     $dac->set($dacB, 0);    # 0% output
@@ -450,6 +443,27 @@ various items
     $pi->cleanup;
 
     #
+    # real time clock
+    #
+
+    my $rtc = $pi->rtc;
+
+    my $dt_string = $rtc->date_time;
+    my %dt_hash   = $rtc->dt_hash;
+
+    # set an individual attribute
+
+    $rtc->hour(22);
+
+    # set 12/24 hour clock
+
+    $rtc->clock_hours(12);
+
+    # get AM or PM while in 12-hour clock mode
+
+    my $meridien = $rtc->am_pm;
+
+    #
     # ultrasonic distance sensor
     #
 
@@ -496,8 +510,7 @@ module, and various other custom device specific  modules.
 L<wiringPi|http://wiringpi.com> must be installed prior to installing/using
 this module (v2.36+).
 
-We always and only use the C<GPIO> pin numbering scheme. These are the pin
-numbers that are printed on the Pi board itself.
+We always and only use the C<GPIO> pin numbering scheme.
 
 This module is essentially a 'manager' for the sub-modules (ie. components).
 You can use the component modules directly, but retrieving components through
@@ -523,8 +536,7 @@ imported into an C<RPi::WiringPi> object.
 =head2 new([%args])
 
 Returns a new C<RPi::WiringPi> object. We exclusively use the C<GPIO>
-(Broadcom (BCM) GPIO) pin numbering scheme. These pin numbers are printed on the
-Pi's board itself.
+(Broadcom (BCM) GPIO) pin numbering scheme.
 
 Parameters:
 
@@ -533,9 +545,14 @@ Parameters:
 Optional: We trap all C<die()> calls and clean up for safety reasons. If a
 call to C<die()> is trapped, by default, we clean up, and then C<exit()>. Set
 C<fatal_exit> to false (C<0>) to perform the cleanup, and then continue running
-your script. This is for unit testing purposes only.
+your script.
 
-=head2 adc()
+We recommend only disabling this feature if you're doing unit test work, want to
+allow other exit traps to catch, allow the Pi to continue on working after a
+fatal error etc. If disabled, you will be responsible for doing your own cleanup
+of the Pi hardware configuration on exit.
+
+=head2 adc
 
 There are two different ADCs that you can select from. The default is the
 ADS1x15 series:
@@ -569,13 +586,13 @@ Mandatory, Integer. C<0> or C<1> for the Pi's onboard hardware CS/SS CE0 and CE1
 pins, or any GPIO number above C<1> in order to use an arbitrary GPIO pin for
 the CS pin, and we'll do the bit-banging of the SPI bus automatically.
 
-=head2 bmp()
+=head2 bmp
 
 Returns a L<RPi::BMP180> object, which allows you to return the
 current temperature in farenheit or celcius, along with the ability to retrieve
 the barometric pressure in kPa.
 
-=head2 dac(model => 'MCP4922')
+=head2 dac
 
 Returns a L<RPi::DAC::MCP4922> object (supports all 49x2 series DACs). These
 chips provide analog output signals from the Pi's digital output. Please
@@ -592,7 +609,7 @@ Optional, String. The model of the DAC you're using. Defaults to C<MCP4922>.
 
 Mandatory, Bool. The SPI channel to use.
 
-    cs => Integer
+    cs => $pin
 
 Mandatory, Integer. A valid GPIO pin that the DAC's Chip Select is connected to.
 
@@ -624,16 +641,22 @@ Parameters:
 
     $trig
 
-The trigger pin number, in GPIO numbering scheme.
+Mandatory, Integer: The trigger pin number, in GPIO numbering scheme.
 
     $echo
 
-The echo pin number, in GPIO numbering scheme.
+Mandatory, Integer: The echo pin number, in GPIO numbering scheme.
 
 =head2 hygrometer($pin)
 
 Returns a L<RPi::DHT11> temperature/humidity sensor object, allows you to fetch
 the temperature (celcius or farenheit) as well as the current humidity level.
+
+Parameters:
+
+    $pin
+
+Mandatory, Integer: The GPIO pin the sensor is connected to.
 
 =head2 i2c($addr, [$device])
 
@@ -667,6 +690,21 @@ Parameters:
     $pin_num
 
 Mandatory, Integer: The pin number to attach to.
+
+=head2 rtc
+
+Creates a new L<RPi::RTC::DS3231> object which provides access to the C<DS3231>
+or C<DS1307> real-time clock modules.
+
+See the linked documentation for full documentation on usage, or the
+L<RPi::WiringPi::FAQ> for some usage examples.
+
+Parameters:
+
+    $i2c_addr
+
+Optional, Integer: The I2C address of the RTC module. Defaults to C<0x68> for
+the C<DS3231> unit.
 
 =head2 serial($device, $baud)
 

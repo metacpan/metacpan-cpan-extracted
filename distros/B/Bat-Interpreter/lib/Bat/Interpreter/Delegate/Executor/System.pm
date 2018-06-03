@@ -2,12 +2,12 @@ package Bat::Interpreter::Delegate::Executor::System;
 
 use utf8;
 
-use Moose;
+use Moo;
 use namespace::autoclean;
 
 with 'Bat::Interpreter::Role::Executor';
 
-our $VERSION = '0.009';    # VERSION
+our $VERSION = '0.010';    # VERSION
 
 sub execute_command {
     my $self    = shift();
@@ -37,7 +37,7 @@ Bat::Interpreter::Delegate::Executor::System
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

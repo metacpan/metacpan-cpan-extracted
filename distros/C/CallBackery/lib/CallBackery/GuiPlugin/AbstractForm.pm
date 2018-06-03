@@ -151,14 +151,17 @@ sub processData {
         }
     }
     if ($args->{key}){
-        my $handler = $self->actionCfgMap->{$args->{key}}{handler};
+        my $handler = $self->actionCfgMap->{$args->{key}}{actionHandler};
         if (ref $handler eq 'CODE'){
+            return $handler->($self,$formData);
+        }
+        $handler = $self->actionCfgMap->{$args->{key}}{handler};
+        if (ref $handler eq 'CODE'){
+            $self->log->warn("Using hand[M 2ler properties in actionCfg is deprecated. User actionHandler instead.");
             return $handler->($formData);
         }
-        else {
-            $self->log->error('Plugin instance '.$self->name." action $args->{key} has a broken handler");
-            die mkerror(7623,'Plugin instance '.$self->name." action $args->{key} has a broken handler");
-        }
+        $self->log->error('Plugin instance '.$self->name." action $args->{key} has a broken handler");
+        die mkerror(7623,'Plugin instance '.$self->name." action $args->{key} has a broken handler");
     }
 }
 
@@ -196,7 +199,7 @@ sub getFieldValue {
     return undef unless ref $entry eq 'HASH';
     if ($entry->{getter}){
         if (ref $entry->{getter} eq 'CODE'){
-            return $entry->{getter}->();
+            return $entry->{getter}->($self);
         }
         else {
             warn 'Plugin instance'.$self->name." field $field has a broken getter\n";

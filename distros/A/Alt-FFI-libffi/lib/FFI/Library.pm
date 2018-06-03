@@ -7,7 +7,7 @@ use FFI;
 use constant _is_win => $^O =~ /^(MSWin32|cygwin|msys2?)$/;
 
 # ABSTRACT: Perl Access to Dynamically Loaded Libraries
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 sub new
 {
@@ -63,7 +63,7 @@ FFI::Library - Perl Access to Dynamically Loaded Libraries
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -78,7 +78,7 @@ This module provides access from Perl to functions exported from dynamically
 linked libraries. Functions are described by C<signatures>, for details of
 which see the L<FFI> module's documentation.
 
-Newer FFI modules such as L<FFI::Platypus> and L<FFI::Raw> provide more
+Newer and better maintained FFI modules such as L<FFI::Platypus> provide more
 functionality and should probably be considered for new projects.
 
 =head1 CONSTRUCTOR

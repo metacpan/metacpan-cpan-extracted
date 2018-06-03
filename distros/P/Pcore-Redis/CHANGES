@@ -1,3 +1,8 @@
+v0.12.0 2018-05-30T06:55:28Z
+ - docker moved to dnf
+ - Docker base image changed from "softvisio/pcore:v0.65.0" to
+   "softvisio/pcore:v0.66.0"
+
 v0.11.0 2018-05-17T16:28:35Z
  - wrapper updated
  - Docker base image changed from "softvisio/pcore:v0.63.4" to

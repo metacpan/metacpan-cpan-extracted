@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Perl Foreign Function interface based on libffi
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 1;
@@ -21,7 +21,7 @@ Alt::FFI::libffi - Perl Foreign Function interface based on libffi
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 DESCRIPTION
 

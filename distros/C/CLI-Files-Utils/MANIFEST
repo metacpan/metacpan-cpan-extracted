@@ -10,5 +10,6 @@ t/pod.t
 scripts/madeafter
 scripts/dirhier
 scripts/colorplus
+scripts/init.sh
 META.yml
 META.json

@@ -10,11 +10,11 @@ WG::API::WoWp - Modules to work with Wargaming.net Public API for World of Warpl
 
 =head1 VERSION
 
-Version v0.8.5
+Version v0.8.6
 
 =cut
 
-our $VERSION = 'v0.8.5';
+our $VERSION = 'v0.8.6';
 
 use constant api_uri => 'api.worldofwarplanes.ru/wowp';
 

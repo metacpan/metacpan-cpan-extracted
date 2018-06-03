@@ -1,0 +1,304 @@
+#!/usr/bin/perl -t
+use v5.14 ; use strict ; use warnings ; # cpantersのレポートによると、5.14より前はNAだった。
+use Getopt::Std ; getopts q['/:=_0:13:9C:fjm:psw:x:H:] , \my%o ; # 5.
+use utf8 ; # v5.6 ~ 
+use Encode qw[ encode_utf8 decode_utf8 ] ; # v5.7 ~ 
+use Term::ANSIColor qw [:constants ] ; $Term::ANSIColor::AUTORESET = 1 ; # v5.6 ~ 
+
+$o{m} //= "1." ; # 表示拡大率  LaTeX displaying magnification efficient.
+$o{x} //= "0mm" ; # 大きめのテーブルのセンタリングのために、左右を削り取る長さを指定する。
+my $isep = $o{'/'} // "\t" ; # 入力の区切り文字
+my $colspec = '' ; # LaTeXのtable環境の列指定  LaTeX table environment "column specifier"
+my $rm = $o{0} if defined $o{0} ; # テーブルの値で除去対象となる値の正規表現
+my %del ; # LaTeXで使わないコマンドの指定。
+my @r3 = () ; #  3桁コンマ区切りにして右寄せにしたい列の指定。 Which columns are to be decimal being separated every 3 digits.
+my $angle = $o{9} ? 90 : 0 ; # 全体を回転する場合の指定  When -9 is specified, the entire table rotates in 90 degree.
+
+my @out ; # $0の出力文字列  The output of this command is accumulated in this variable. 
+
+& main ( ) ; 
+exit 0 ; 
+
+
+sub plain2latex ( $ ) { 
+
+	my $hlen = $o{H} if defined $o{H} ;  # ハッシュ値のような16進数の文字列を長い場合に $hlen桁に縮めて .. を続ける。
+    s/(?<=[0-9a-f]{$hlen})[0-9a-f]+/../gi if defined $o{H} ; # <-- - (?<= ) で正規表現の後読み
+
+    # ドル$文字関連 The pre-processing of the character "$ dollar". The completion process will appear much later.
+    s|\G(.*?)\$|$1=\$\$=|g ; # ドル文字の前処理。\Gは文字列の先頭、もしくは修飾子 g がついたパターンマッチングが終了した場所を記憶しておき、そこにマッチ
+
+    # LaTeX中で 数式環境を利用するもの Utilization of math formula env. of LaTeX for some specific characters such as \~!<>.
+    s/([\\\Q!~<>|"\E\x{FF0D}]+)/\$$1\$/g ; # 1. 数式環境に移行して、    ;  \Qと\Eの間はパターンメタ文字の無効化。 
+    s/\\/\\backslash/g ;        # 2. そして、まず先にバックスラッシュに処理をして、後の処理が続く。
+    s/~/\\sim/g;                # チルダ
+    s/\x{FF0D}/\Q\!\!\frac{}{{{}\atop{H}}}\!\!\E/g if $o{'_'} ;   # 全角ハイフンはその下に、H を小さく書く ; \N{FULLWIDTH HYPHEN-MINUS}
+    s/\ /\\scalebox{0.5}[0.5]{\$\\sqcup\$}/g if $o{'_'} ; # 半角スペースの強調  ; 
+    s/\x{3000}/\\scalebox{1}[0.5]{\$\\sqcup\$}/g  if $o{'_'} ;  # 全角スペース  は、 -z 指定の場合、皿の形の線が置かれる。\N{IDEOGRAPHIC SPACE}
+
+    # LaTeX中でバックスラッシュを伴うべき文字の処理 : Treatments on characters requiring backslash in LaTeX. 
+    s/(?=[\Q_%#&{}\E])/\\/g ; # (?= ) で正規表現の先読み _%#&{}
+    s/\^/\\^{}/g ; 
+
+    # ドル文字の処理  The completion of dollar character.
+    s/=\$\$=/\\\$/g ; # ドル文字の処理はここで終わり。
+
+    # 半角カナの処理  Japanese Hankaku (half-width) Katakana letters.  (I tried to found them in the A1 - DF from JISX0201.)
+    if ( $o{j} ) { 
+        s/([｡｢｣､･ｦｧ-ｯｰｱ-ﾝﾞﾟ]+)/\\scalebox{0.5}[1]{$1}/g  ; # 次の2行は範囲指定だとずれるので、一文字ずつ処理した。
+        y/｡｢｣､･ｦｧｨｩｪｫｬｭｮｯｰｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿ/。「」、・ヲァィゥェォャュョッーアイウエオカキクケコサシスセソ/ ; 
+        y/ﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝﾞﾟ/タチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン゛゜/ ;
+    }
+
+    return $_ ;
+}
+
+sub main ( ) { 
+
+    my $zflag = 0 ; 
+    
+
+    # オプション -3 についての処理
+    @r3 = split /,/, $o{3} , -1  if $o{3} ;
+
+    for ( reverse 0 .. $#r3 ) {         
+        splice @r3, $_ , 1 , $1 .. $2 if $r3[$_] =~ m/(\d+)\.\.(\d+)/
+    }
+    grep { $_ -- } @r3 ; 
+
+
+    binmode STDOUT, ":utf8" ;
+    $SIG{ALRM} = sub { print STDERR CYAN "Please enter a tabular text in TSV format..\n" if -t } ;
+    alarm 3 ;
+    while ( <> ) {
+    	alarm 0 ;
+        chomp ; 
+        if ( $o{s} ) { 
+        	s/\s*$//  ; # -s 指定で末尾の空白文字を取り除く。
+        	if (/^$/) { 
+        		$. -- ; 
+        		next ;
+        	} ; 
+        }
+
+        $_ = decode_utf8 ($_) ;
+        $zflag = 1 if m/　/ ; #全角空白 \x{3000} のチェック
+        my @F = split /$isep/ , plain2latex ( $_ )  , -1 ;   # <--- ここでコアとなる処理
+        splice @F , $o{w} if defined $o{w} ; # 列数の最大値が指定された場合の、切り取りの処理。
+        grep { s/$rm//} @F[ ($o{1} ? 1:0) .. $#F]  if defined $o{0} && $. >= ($o{'='} ? 1 :0  )  ;
+        my @t3 = grep { $_ < @F } @r3 ; 
+        $. > 1 || ! $o{'='} and s/(?<=\d)(?=(\d\d\d)+($|\D))/,/g for @F[ @t3 ]  ; # 数値3桁区切りの処理
+
+        grep { $_ = "\\rotatebox{90}{$_}"} @F if $o{q[']} and $. == 1 ; # 先頭行を回転したい場合。
+        push @out, tableStart ( scalar @F ) if $. == 1 ;  
+        push @out,  ' ' x 12 . (join ' & ' , @F  ) . "\\\\" , "\n" ;
+        push @out,  ' ' x 12 , "\\hline\n" if $o{'='} && $.== 1 ; # 1行目と2行目に横の罫線を入れる。
+    }
+    push @out, tableStart ( 1 ) if $. == 0 ; # 何も入力が無い場合の処理だったよう..
+    push @out, tableEnding( int rand() * 1000000) ; 
+    print STDERR GREEN "$. lines are read.\n" ;
+    grep { s/^\s*\%.*$//gm ; s/\n+/\n/g } @out if $o{p} ;
+
+    if ( exists $o{C} ) {
+    	for ( @out ) { 
+    		if ( m/./ ) { 
+    			s|\Q\\\E||g if $o{C} =~ /n/i ; 
+    			s|^            || ; 
+    			$_ = "\\mbox{$_}" if $o{C} =~ /m/i ; 
+    			$_ .= "\\newline" if $o{C} =~ /n/i ;  
+    			$_ = "\\hspace*{$o{x}}$_" if $o{C} =~ /h/i ;  
+    		}
+    	}
+	}
+    print @out ; 
+
+    print STDERR BLUE 'Note: "\usepackage{graphicx}" is required before "\begin{document}" in the LaTeX file to use "\rotatebox" and "\scalebox" commands.' , "\n" if !$o{p} ;
+    print STDERR CYAN "Full-width space included. Using the option '-_' is advisable.\n" if $zflag && ! $o{'_'} ;
+}
+
+sub tableStart ( $ ) { 
+	return () if exists $o{C} ; 
+    my @tmp  = ('l') x ( $o{w} // $_[0] ) ;  # 列指定
+    $tmp [$_] = 'r' for @r3 ; 
+    splice @tmp , $_ * 5 , 0 , ' ' for reverse 1 .. @tmp/5 ; # 列指定に5列ごとに空白文字を入れる。
+    splice @tmp , 1 , 0 , " | " if $o{1} ; # 縦線を入れる指定 
+    $colspec = " | " . ( join '' , @tmp ) . " | " ;
+    my $out =  << "END" ;
+\\begin{table}
+    \\center
+    \\hspace*{-$o{x}}
+    \\rotatebox{$angle}{
+    \\scalebox{$o{m}}{
+        \\begin{tabular}{$colspec}
+            \\hline
+END
+	$out =~ s/(\Q\hspace*{-0mm}\E)/%$1/ and $del{hspc} = 1 ;
+	$out =~ s/(\Q\rotatebox{0}\E)/%$1/  and $del{rttbx} = 1 ;
+	$out =~ s/(\Q\scalebox{1.}\E)/%$1/ and $del{scb} = 1 ;
+	return $out ;
+}
+
+sub tableEnding ( $ ) {
+	return () if exists $o{C} ; 	
+    my $out =  << "END" ; 
+            \\hline
+        \\end{tabular} 
+    }% closing scalebox
+    }% closing rotatebox 
+    \\hspace*{-$o{x}}
+    \\caption{}
+    \\label{tbl:$_[0]}
+\\end{table}
+END
+	$out =~ s/(\Q}% closing scalebox\E)/%$1/ if $del{scb} ;
+	$out =~ s/(\Q}% closing rotatebox\E)/%$1/ if $del{rttbx} ;
+	$out =~ s/(\Q\hspace*{\E)/%$1/ if $del{hspc} ;
+	return $out ; 
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script $Bin ] ;
+    sub EnvJ ( ) { $ENV{LANG} =~ m/^ja_JP/ ? 1 : 0 } ; # # ja_JP.UTF-8 
+    sub en( ) { grep ( /^en(g(l(i(sh?)?)?)?)?/i , @ARGV ) ? 1 : 0 } # English という文字列を先頭から2文字以上を含むか 
+    sub ja( ) { grep ( /^jp$|^ja(p(a(n?)?)?)?/i , @ARGV ) ? 1 : 0 } # jp または japan という文字列を先頭から2文字以上を含むか 
+    sub opt( ) { grep (/^opt(i(o(ns?)?)?)?$/i, @ARGV ) ? 1 : 0 } # options という文字列を先頭から3文字以上含むから
+    sub noPOD ( ) { grep (/^no-?p(od?)?\b/i, @ARGV) ? 1 : 0 } # POD を使わないと言う指定がされているかどうか
+    my $jd = "JapaneseManual" ;
+    my $flagE = ! ja && ( en || ! EnvJ ) ; # 英語にするかどうかのフラグ
+
+    exec "perldoc $0" if $flagE &&  ! opt && ! noPOD   ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\Q'=script='\E/$Script/gi ;
+        s/\Q'=bin='\E/$Bin/gi ;
+        if ( s/^=head1\b\s*// .. s/^=cut\b\s*// ) { 
+            if ( s/^=begin\s+$jd\b\s*// .. s/^=end\s+$jd\b\s*// xor $flagE ) {
+                print $_ if ! opt || m/^\s+\-/  ; 
+            }
+        } 
+        #print $_ if /^=head1/ .. /^=cut\b/ and opt ? m/^\s+\-/ : 1 and ( EnvJ && ! en xor s/^=begin $jd\b// .. s/^=end $jd\b// ) ;
+    }
+    close $FH ;
+    exit 0 ;
+
+}
+
+
+=encoding utf8
+=pod
+=head1
+
+   latextable -- produces LaTeX snippets. E.g. From table data/code into LaTeX tables/captions.
+
+   Program Name : latextable    ('=Bin=')
+
+   Usage Example : 
+     latextable -_ -w 12 -3 4..8  # Assuming 12 columns and treat some column in numbers and emphasize spaces.
+
+    Give the tab separated table from STDIN, then it yields a LaTeX table code from "\begin{table})..".
+    Labor-saving to create LaTeX tables from the copy/paste from Excel and SQL outputs, etc.
+
+    Main functions : 
+     NOT ONLY performing the tedious work in typing LaTeX codes such as 
+    (1) transforming tab characters into ampersands (&) characters for table environments,
+    (2) adding the "\hline" on the beginning and the ending inside the tabular environments,
+     BUT ALSO
+    (3) grouping every 3 digits by comma on numbers >= 1000 and aligning toward right in a column,
+    (4) properly modifying various signs \~!<>_%#&$ fitting into LaTeX (with -j, Japanese half-width as well),
+    (5) emphasizing the space chacters both usual half-size space and full-width space, 
+    (6) by with -_, emphasizing the fullsize hyphen to indicate that it differs from prolonged sound sign.
+
+ Options :     
+    -/ REGEX : Specifying the input delimter. Default is tab character. You can specify as -/ ,  for pseudo-CSV.
+    -=   : To indicate that the first line in STDIN is the header, to yield "\hline" btw. 1st and 2nd lines.
+    -w N : To explicitly indicate that the table has N columns. (Else, automatically determined by 1st line)
+    -j   : For Japanese half-width character. The LaTeX output utilize \scalebox{0.5}[1]{...}
+    -s N : N is the displaying magnifying factor. Often used for large-size table to reduce the physical size.
+    -_   : To emphasize the space character. Both for half-width \x{20} and full-width \x{3000}.
+
+    -0 regex ; The regex will be removed in the output. E.g, if you want the exact 0, specify : -0 '^0$' 
+    -1  ; The leftmost column will be  : (1) separated by horizontal line, and (2) -0 will not be applied there.
+    -3 n[..n][,n[..n]][,n[..n]].. ;  Specify number columns. The leftest columns is numbered 1. 
+    -9  : Rotate the entire table 90 degree unclockwise, using "\rotatebox{90}".
+    -x 60mm ; logical narrowing of a table for the purpose of cenering a wide table. 
+    -\'  : Rotate each cell of the 1st line unclockwise. Often used that column names are long string. 
+    -p  ; Suppresses the redundant comments on LaTeX output. (Primitive)
+    -s  ; remoring the spaces of : (1) consecutive space characters in the end of line and (2) blank lines.
+
+
+    -C [mnh]+ : Useful to table caption and main text. One or more characters from {m,n,h} is requried after -C
+       -C m : encloses mbox{} for every input line ; 
+       -C n : add "\newline" in the end of every input line, to be used in Latex table caption ; 
+       -C h : add "hspace*{-6mm}" on the head of every line where the length (here -6mm) is specified by "-x -6mm".
+    -H N : Shrinkens hexadecimal digits with more than N digits by taking the head N digits with ".." in the tail.
+
+    --help : Print this online help manual of this command "'=SCRIPT='". Similar to "perldoc `which [-t] '=SCRIPT='` ".
+    --help opt ..or..  --help options : Only shows the option helps. It is easy to read when you are in very necessary.
+    --help ja : Shows Japanese online help manual. ; "'=script=' --help ja" で日本語のオンラインマニュアルを表示します。
+    --help nopod : Print this online manual using the code insdide this program without using the function of Perl POD.
+
+ Remarks : 
+  -     \usepackage{graphicx} is needed between \documentclass and \begin{document}, for rotating and magnifying.
+  - The output LaTeX snippet does not work well if the column number of each line increase in a table.
+  - Please fill in \caption{} and \label{} as neccessary in the output LaTeX code.
+  
+ Notes for developing : 
+   * I want to add -r switching options to specify only right alignment.
+   * I have not yet fully investigate good LaTeX books yet. I only developed this program merely mainly by experience.
+
+ # This program has been made since 2018-02-09(Fri) by Toshiyuki Shimono, as a part of TSV hacking toolset for table data.
+
+=begin JapaneseManual
+  プログラム名 : '=SCRIPT='    ('=Bin=')
+
+  標準入力からタブ区切りのデータを読取り、それを LaTeX の表で使えるように変換する。
+  下記の作業などを省力化することが目的である。
+    (1) タブ区切りをアンパサンド区切りに変換すること
+    (2) \hline コマンドを書き入れること
+    (3) 数値はコンマ3桁区切りで右詰めにすること
+    (4) 各種記号や半角カナをLaTeXで出力できるようにすること
+    (5) 半角空白と全角空白を目立たせること
+    (6) 全角ハイフンも、全角長音と区別させること
+オプション : 
+    -/ REGEX :  区切り文字を 正規表現で指定する。単純なコンマ区切りであれば、-/ , と指定。未指定ならタブ文字。
+    -=   : 標準入力の最初の行は、作りたいテーブルのヘッダであると仮定する。(\hlineの処理と-0の処理に関わる)
+    -w N : 表が幅何列かを明示的に指定する。未指定なら先頭行の列数で判定する。
+    -j   : 日本語の半角カナに対応する。
+    -m N : 出力の拡大率を指定する。未指定なら 1.0。
+    -_   : 全角スペース(UTF8)と半角スペース及び全角ハイフンについて、LaTeXの出力結果において、分かる様にする。
+
+    -0 regex : テーブル中のセルで 0 など消去したい値を、正規表現で指定する。-0 '^0$' のように^と$は必要であろう。
+    -1 : 最も左の列を行名の並びとして扱う。縦線が入る。1列目が -0 の処理の対象外になる。
+    -3 n[,n][,n].. :  3桁区切りにして右寄せにしたい列を1始まりで指定する。 ..で範囲指定。
+    -9  : LaTeXで表示させる表の全体を90度左回りに回転させる。
+    -x 60mm : 幅広のテーブルを横方向中央に配置するために、表の領域を論理上狭く認識させる。-Chの指定時は右方向移動の長さの指定となる。
+    -\'   : 1行目を左回りに回転する。
+    -p  : LaTeXの冗長なコメント文を出さないようにする。(Primitive)
+    -s  : 行の末尾の空白文字を取り除く。そしてその結果空行になった場合も取り除く。入力に余計な空白文字が末尾につく場合に便利。
+
+    -C [mnh]+ : 表組みではなくて、LaTeXのtable環境のcaption{}に使えるようにする。m,n,h を1つ以上組みあわせて指定。例: -C mh 
+       -C m : 各行を mbox{}で囲む。 ; 
+       -C n : 各行の行末に\newlineを付加する。 ; 
+       -C h : 各行の先頭に hspace*{-6mm}で左に6mmずらすような指定
+    -H 15 : 16進の多数桁の数を先頭から15桁のみに短かくし、それより長い部分は..に置換。
+    --help : このコマンド '=SCRIPT=' のオンラインヘルプマニュアルを表示する。
+    --help opt ないし --help options : 分かり安くオプションのヘルプのみを表示する。
+    --help en : 英語版のオンラインヘルプマニュアルを出力。Online help in English version. 
+
+注意点 : 
+  - 途中で列数が変わると、LaTeXの動作がうまくいかなくなるので注意。
+ 
+ このプログラムの開発上のメモ : 
+   * 3桁区切りにしたい数ではなくて、単に右寄せしたい列の指定をする -r を実装したい。
+   * ドルマークとバックスラッシュの処理は内部処理上でトリッキーだった。正規表現の \Gで解決した。<-- テストを書くべし。
+   * 列数が変わる場合に警告を出して、可能なら、空文字列で埋めるようにする。
+   * 全角ハイフンが含まれていた場合に、usepackage{otf} が必要であることを表示する様にしたい。要LaTeX参考署参照。
+   * 逆にLaTeXのテーブルからTSVファイルに変換する機能を -~のオプションスイッチで実装したい。
+
+# このブログラムは 2018年2月9日(金)から表形式データに対する道具作りの一環として、下野寿之が作成したものである。
+# このプログラムファイルに最後に手を加えたのは、2018年6月3日(日)である。
+=end JapaneseManual
+=cut

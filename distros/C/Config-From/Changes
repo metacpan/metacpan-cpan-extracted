@@ -1,5 +1,11 @@
 Revision history for Config-From
 
+0.08    2018-06-03
+        Add another version dependency to pass tests of cpantesters
+
+0.07    2018-06-02
+        Add dependency to pass tests of cpantesters
+
 0.06    2018-05-28
         Change the name of a dependency
 

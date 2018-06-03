@@ -3,6 +3,8 @@ package MooTester;
 use Moo;
 with 'MooX::Role::JSON_LD';
 
+use namespace::autoclean;
+
 has foo => (
   is => 'ro',
   default => 'Foo',

@@ -11,7 +11,7 @@ enum {
 // Method information
 struct SPVM_sub {
   void* native_address;
-  void* jit_address;
+  void* precompile_address;
   SPVM_OP* op_name;
   SPVM_OP* op_return_type;
   SPVM_OP* op_block;
@@ -30,10 +30,11 @@ struct SPVM_sub {
   int32_t eval_stack_max_length;
   int32_t mortal_stack_max;
   int8_t call_type_id;
-  _Bool is_native;
+  _Bool have_native_desc;
+  _Bool have_compile_desc;
   _Bool is_enum;
   _Bool is_destructor;
-  _Bool is_jit_compiled;
+  _Bool is_compiled;
 };
 
 SPVM_SUB* SPVM_SUB_new(SPVM_COMPILER* compiler);
