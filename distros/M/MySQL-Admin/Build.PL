@@ -88,7 +88,7 @@ sub ACTION_install
 
   if( $m_hrSettings->{mod}  && -e "$cwd/blib/perl/config/mysql-admin.conf" )
   {  
-    copy("$cwd/blib/perl/config/mysql-admin.conf", "$m_hrSettings->{apacheconfig}/mysql-admin.conf") or die "$cwd/$m_hrSettings->{apacheconfig}/mysql-admin.conf \n Copy failed: $cwd/blib/perl/config/mysql-admin.conf $!";
+    copy("$cwd/blib/perl/config/mysql-admin.conf", "$m_hrSettings->{apacheconfig}/mysql-admin.conf") or die "$cwd/$m_hrSettings->{apacheconfig}/mysql-admin.conf $/ Copy failed: $cwd/blib/perl/config/mysql-admin.conf $!";
   }
 
   my %conf = (
@@ -207,16 +207,14 @@ sub cleanUp
     unlink("t/config.pl")   if -e "t/config.pl";
 }
 
-sub replace
-{
+sub replace{
     my $replace = shift;
     my $with    = shift;
     my $f       = shift;
     chmod 0644, $f;
     open(EDIT, "+<$f") or die "$! $f  $/";
     my $files = '';
-    while (<EDIT>)
-    {
+    while (<EDIT>){
         $_ =~ s/$replace/$with/g;
         $files .= $_;
     }
@@ -227,12 +225,10 @@ sub replace
     chmod 0755, $f if ($f =~ /^.*.pl$/);
 }
 
-sub ACTION_testdb
-{
+sub ACTION_testdb{
     my $self = shift;
     eval("use File::Copy;");
-    unless ($@)
-    {
+    unless ($@){
         copy("extra/00-DBI-Database.t", "t/00-DBI-Database.t") or die "Copy failed: $!";
         copy("extra/00-DBI-OO.t",       "t/00-DBI-OO.t")       or die "Copy failed: $!";
         copy("extra/00-DBI-FO.t",       "t/00-DBI-FO.t")       or die "Copy failed: $!";
@@ -241,45 +237,43 @@ sub ACTION_testdb
     }
 }
 
-sub ACTION_tarball
-{
+sub ACTION_tarball{
     my $self = shift;
     eval("use File::Copy;");
-    print "tarball\n";
-    unless ($@ && $^O eq 'MSWin32')
-    {
+    unless ($@ && $^O eq 'MSWin32'){
+		print "tarball$/";
 
-    mkpath("MySQL-Admin.$m_hrSettings->{version}-webinstaller");
-    mkpath("MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/");
+		mkpath("MySQL-Admin.$m_hrSettings->{version}-webinstaller");
+		mkpath("MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/");
 
-    system("cp -R $cwd/blib/rhtml/* MySQL-Admin.$m_hrSettings->{version}-webinstaller/");
-    system("cp -R $cwd/blib/perl/* MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/");
-    system("cp -R $cwd/blib/lib MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/");
-    copy("$cwd/extra/install.sql",  "MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/config/install.sql") or die "Copy failed: $!";
-    copy("$cwd/extra/settings.pl",  "MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/config/settings.pl") or die "Copy failed: $!";
-    copy("$cwd/extra/rpc.pl",  "MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/config/rpc.pl") or die "Copy failed: $!";
-    copy("$cwd/extra/plaintext.pl",  "MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/config/plaintext.pl") or die "Copy failed: $!";
-    &replace('%PATH%', '', "$cwd/blib/perl/mysql.pl");
-    copy("$cwd/extra/README",  "MySQL-Admin.$m_hrSettings->{version}-webinstaller/README") or die "Copy failed: $!";
-    chmod 0755, "MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/mysql.pl";
-    chmod 0755, "MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/install.pl";
-    chmod 0755, "MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/translate.pl";
-    chmod 0755, "MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/plaintext.pl";
-    chmod 0755, "MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/rpc.pl";
-    chmod 0755, "MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/menu.pl";
-    chmod 0755, "MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/rss.pl";
+		system("cp -R $cwd/blib/rhtml/* MySQL-Admin.$m_hrSettings->{version}-webinstaller/");
+		system("cp -R $cwd/blib/perl/* MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/");
+		system("cp -R $cwd/blib/lib MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/");
+		copy("$cwd/extra/install.sql",  "MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/config/install.sql") or die "Copy failed: $!";
+		copy("$cwd/extra/settings.pl",  "MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/config/settings.pl") or die "Copy failed: $!";
+		copy("$cwd/extra/rpc.pl",  "MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/config/rpc.pl") or die "Copy failed: $!";
+		copy("$cwd/extra/plaintext.pl",  "MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/config/plaintext.pl") or die "Copy failed: $!";
+		&replace('%PATH%', '', "$cwd/blib/perl/mysql.pl");
+		copy("$cwd/extra/README",  "MySQL-Admin.$m_hrSettings->{version}-webinstaller/README") or die "Copy failed: $!";
+		chmod 0755, "MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/mysql.pl";
+		chmod 0755, "MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/install.pl";
+		chmod 0755, "MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/translate.pl";
+		chmod 0755, "MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/plaintext.pl";
+		chmod 0755, "MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/rpc.pl";
+		chmod 0755, "MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/menu.pl";
+		chmod 0755, "MySQL-Admin.$m_hrSettings->{version}-webinstaller/cgi-bin/rss.pl";
 
-    system("tar -cf MySQL-Admin.$m_hrSettings->{version}-webinstaller.tar.gz MySQL-Admin.$m_hrSettings->{version}-webinstaller/");
-    system("rm -Rf MySQL-Admin.$m_hrSettings->{version}-webinstaller/");
-    }
+		system("tar -cf MySQL-Admin.$m_hrSettings->{version}-webinstaller.tar.gz MySQL-Admin.$m_hrSettings->{version}-webinstaller/");
+		system("rm -Rf MySQL-Admin.$m_hrSettings->{version}-webinstaller/");
+    }else{
+		warn "Cant create a tarball on Win32$/"
+	}
 }
 
 
-sub loadSettings
-{
+sub loadSettings{
     my $do = shift;
-    if (-e $do)
-    {
+    if (-e $do){
         do $do;
     }
 }
@@ -291,8 +285,7 @@ sub saveSettings {
     $content .= "\$m_hrSettings =\$VAR1;";
     my $rsas = $saveAs =~ /^(\S+)$/ ? $1 : 0;
     chmod 0644, $rsas;
-    if ( $rsas )
-    {
+    if( $rsas ){
         open(OUT, ">$rsas" ) or die "$/saveSettings$/ $! $/ File: $rsas $/";
         print OUT $content;
         close $fh;
@@ -313,16 +306,15 @@ my $inctance = $class->new(
 	      'MD5'                  => '>=2.03',
 	      'URI'                  => '>=1.40',
 	      'CGI::QuickForm'       => '>=1.93',
+		  'JSON::XS'			 => '>=3.04',
+		  'XML::Simple'			 => '>=2.25',
 	      'perl'                 => '5.006000',
+    	  'Search::Tools::UTF8'  => '>=1.003',
+    	  'Authen::Captcha'      => '>=1.024',
+           'Frontier::RPC2' => '>=0.06',
+           'XML::XSLT' => '>=0.48',
+		    'Mail::Sendmail'      => '>=0.79'
 	      },
-  recommends => {
-		'Authen::Captcha' => '>=1.024',
-		'Syntax::Highlight::Engine::Kate' => '>=0.10',
-		'Frontier::RPC2' => '>=0.06',
-		'XML::XSLT' => '>=0.48',
-		'Search::Tools::UTF8'  => '>=1.003',
-		'Mail::Sendmail'      => '>=0.79',
-		},
   ($] >= 5.005 ? (AUTHOR => 'Dirk Lindner <dirk.lze@gmail.com>') : ()),
   dist_abstract      => 'Just a MySQL administration Web-App and CMS System',
   license            => 'lgpl',
@@ -484,7 +476,7 @@ unless ($skip) {
     $inctance->{properties}{mod} = Module::Build->y_n('Use mod_perl ?', 'n');
 
     if ($inctance->{properties}{mod}) {
-        print qq|This script generate a virtual host config  ( mysql-admin.conf file ).\n|;
+        print qq|This script generate a virtual host config  ( mysql-admin.conf file ).$/|;
         $inctance->{properties}{apacheconfig} =
             $inctance->{properties}{apacheconfig} ? $inctance->{properties}{apacheconfig}
           : -e '/etc/apache2/sites-enabled/'      ? '/etc/apache2/sites-enabled/'
@@ -512,7 +504,7 @@ $m_hrSettings = {
             style        => 'mysql',
            },
     language    => 'en',
-    version     => '1.12',
+    version     => '1.13',
     session     => "$inctance->{properties}{cgi}/config/session.pl",
     actions     => "$inctance->{properties}{cgi}/config/actions.pl",
     translate   => "$inctance->{properties}{cgi}/config/translate.pl",

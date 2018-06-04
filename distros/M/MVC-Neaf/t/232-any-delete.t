@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use MVC::Neaf qw(:sugar);
+use MVC::Neaf;
 
 del '/foo' => sub { +{ -content => $_[0]->method} };
 any[ 'put', 'patch' ]=> '/bar' => sub { +{ -content => $_[0]->method} };

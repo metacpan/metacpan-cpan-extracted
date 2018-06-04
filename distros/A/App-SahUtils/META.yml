@@ -22,7 +22,7 @@ requires:
   Data::Dump: '0'
   Data::Dump::Color: '0'
   Data::Sah: '0.84'
-  Data::Sah::Coerce: '0.011'
+  Data::Sah::Coerce: '0.025'
   Data::Sah::CoerceCommon: '0.011'
   Data::Sah::CoerceJS: '0.011'
   Data::Sah::Compiler::perl::TH::any: '0'
@@ -38,7 +38,8 @@ requires:
   PERLANCAR::Module::List: '0'
   Package::MoreUtil: '0'
   Perinci::CmdLine::Any: '0.13'
-  Perinci::CmdLine::Base: '1.80'
+  Perinci::CmdLine::Base: '1.810'
+  Perinci::CmdLine::Classic: '1.770'
   Perinci::Sub::Gen::AccessTable: '0.55'
   String::LineNumber: '0'
   YAML::XS: '0'
@@ -49,7 +50,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-SahUtils
   homepage: https://metacpan.org/release/App-SahUtils
   repository: git://github.com/perlancar/perl-App-SahUtils.git
-version: '0.460'
+version: '0.461'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -57,47 +58,47 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript get-sah-type'
-      version: '0.420'
+      version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript is-sah-builtin-type'
-      version: '0.420'
+      version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript is-sah-type'
-      version: '0.420'
+      version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript is-sah-simple-builtin-type'
-      version: '0.420'
+      version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript is-sah-simple-type'
-      version: '0.420'
+      version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript is-sah-collection-builtin-type'
-      version: '0.420'
+      version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript is-sah-collection-type'
-      version: '0.420'
+      version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript is-sah-ref-builtin-type'
-      version: '0.420'
+      version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript is-sah-ref-type'
-      version: '0.420'
+      version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript is-sah-numeric-builtin-type'
-      version: '0.420'
+      version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript is-sah-numeric-type'
-      version: '0.420'
+      version: '0.421'
     -
       class: Dist::Zilla::Plugin::InsertExecsList
       name: InsertExecsList
@@ -173,7 +174,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.591'
+      version: '0.592'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -205,7 +206,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
@@ -385,7 +386,7 @@ x_Dist_Zilla:
           skips: []
           switch: []
       name: '@Author::PERLANCAR/Test::Compile'
-      version: '2.057'
+      version: '2.058'
     -
       class: Dist::Zilla::Plugin::Test::Perl::Critic
       name: '@Author::PERLANCAR/Test::Perl::Critic'
@@ -417,7 +418,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'
-      version: '0.005'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
       name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'

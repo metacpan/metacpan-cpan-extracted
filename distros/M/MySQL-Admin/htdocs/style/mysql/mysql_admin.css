@@ -672,12 +672,10 @@ border:0px solid;
 border-top:0px;
 overflow:auto;
 overflow-x: hidden;
-/* transition-property:all;*/
-/* transition-duration:.5s;*/
-/* transition-timing-function: cubic-bezier(0, 1, 0.5, 1); */
-/* min-width:25%; */
-/* max-width:25%; */
-/* width:300px; */
+transition-property:all;
+transition-duration:.5s;
+transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+width:300px;
 overflow:auto;
 opacity:0.9;
 padding-bottom:1%;
@@ -776,7 +774,7 @@ padding:4px;
 padding-left:8px;
 padding-right:8px;
 min-width:10px;
-max-width:200px;
+width:100px;
 white-space:nowrap;
 }
 td.headerItemHover{
@@ -798,13 +796,12 @@ padding:4px;
 padding-left:8px;
 padding-right:8px;
 min-width:10px;
-max-width:200px;
+width:100px;
 }
 .menuButton{
 text-align:right;
 font-size:1.5em;
 cursor:pointer;
-/* position:; */
 left:96%;
 top:1%;
 }
@@ -1281,12 +1278,12 @@ border-bottom-style:dashed;
 border-bottom-width:1px;
 }
 pre { color: #000000;
-font-family: courier;
+      font-family: courier;
 }
 #load{
 z-index:3;
-position: fixed;
-left: 40%;
+position: absolute;
+left: 45%;
 height: 10%;
 top: 45%;
-}
+}  

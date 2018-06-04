@@ -10,7 +10,7 @@
 use strict;
 use warnings;
 use File::Basename qw(dirname);
-use MVC::Neaf qw(:sugar);
+use MVC::Neaf;
 
 # Now obviously. Thou shalt not expose the application code in production.
 

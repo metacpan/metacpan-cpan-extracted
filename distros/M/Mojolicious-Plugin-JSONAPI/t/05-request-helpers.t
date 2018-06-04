@@ -38,4 +38,9 @@ subtest 'with dashes' => sub {
     $t->get_ok('/?include=author,email-templates');
 };
 
+subtest 'nested relationships' => sub {
+    $test = [{ author => [qw/posts/] }, 'email_templates'];
+    $t->get_ok('/?include=author.posts,email-templates');
+};
+
 done_testing;

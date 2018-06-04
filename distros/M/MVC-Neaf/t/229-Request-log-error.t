@@ -5,7 +5,7 @@ use warnings;
 use Test::More;
 use MVC::Neaf::Util qw(JSON encode_json decode_json);
 
-use MVC::Neaf qw(:sugar);
+use MVC::Neaf;
 
 neaf pre_route => sub { $_[0]->log_error( "mark 1\n" ); };
 neaf pre_route => sub { $_[0]->log_error( ); };

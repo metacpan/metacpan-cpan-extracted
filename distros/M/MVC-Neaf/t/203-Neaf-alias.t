@@ -7,17 +7,17 @@ use Test::More;
 use MVC::Neaf;
 
 my @call;
-MVC::Neaf->route( "/first/path", sub {
+neaf->route( "/first/path", sub {
     my $req = shift;
     push @call, [ $req->script_name, "/first/path" ];
     return {};
 }, path_info_regex => '.*');
 
-MVC::Neaf->alias( "/second/path", "/first/path" );
+neaf->alias( "/second/path", "/first/path" );
 
-# note explain (MVC::Neaf->get_routes);
+# note explain (neaf->get_routes);
 
-my $app = MVC::Neaf->run;
+my $app = neaf->run;
 
 is ($app->({ REQUEST_URI => '/first/path/and/more' })->[0], 200, "Path found");
 is ($app->({ REQUEST_URI => '/second/path/and/more' })->[0], 200, "Path found (2)");

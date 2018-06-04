@@ -16,7 +16,7 @@ use File::chdir;
 use Path::Tiny;
 use Getopt::Alt;
 
-our $VERSION = version->new('0.6.8');
+our $VERSION = version->new('0.6.9');
 
 requires 'repos';
 requires 'verbose';
@@ -105,7 +105,7 @@ sub pull {
         return;
     }
 
-    local $CWD = $dir if -f $dir;
+    local $CWD = $dir if -d $dir;
     warn "$cmd\n" if $self->verbose > 1;
     return `$cmd 2>&1` if !$opt->opt->quiet;
 
@@ -126,7 +126,7 @@ Group::Git::Cmd::Pull - Pull latest versions of all repositories or clone any th
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Cmd::Pull version 0.6.8.
+This documentation refers to Group::Git::Cmd::Pull version 0.6.9.
 
 =head1 SYNOPSIS
 

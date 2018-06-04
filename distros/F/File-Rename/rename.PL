@@ -11,7 +11,7 @@ print OUT while <DATA>;
 close OUT or die $!;
 exit;
 __END__
-# $Revision: 331 $$Date: 2013-04-30 21:23:41 +0100 (Tue, 30 Apr 2013) $
+# $Revision$$Date$
 # Robin's RCS header:
 # RCSfile: rename.PL,v Revision: 1.3   Date: 2006/05/25 09:20:32 
 # Larry's RCS header:
@@ -74,6 +74,7 @@ rename - renames multiple files
 B<rename>
 S<[ B<-h>|B<-m>|B<-V> ]>
 S<[ B<-v> ]>
+S<[ B<-0> ]>
 S<[ B<-n> ]>
 S<[ B<-f> ]>
 S<[ B<-e>|B<-E> I<perlexpr>]*|I<perlexpr>>
@@ -95,7 +96,7 @@ via standard input.
 For example, to rename all files matching C<*.bak> to strip the extension,
 you might say
 
-	rename 's/\e.bak$//' *.bak
+	rename 's/\.bak$//' *.bak
 
 To translate uppercase names to lower, you'd use
 
@@ -108,6 +109,10 @@ To translate uppercase names to lower, you'd use
 =item B<-v>, B<-verbose>
 
 Verbose: print names of files successfully renamed.
+
+=item B<-0>, B<-null>
+
+Use \0 as record separator when reading from STDIN.
 
 =item B<-n>, B<-nono>
 

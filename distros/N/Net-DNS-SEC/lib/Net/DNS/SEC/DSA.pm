@@ -1,9 +1,9 @@
 package Net::DNS::SEC::DSA;
 
 #
-# $Id: DSA.pm 1672 2018-05-02 07:14:35Z willem $
+# $Id: DSA.pm 1677 2018-05-22 11:59:10Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1672 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1677 $)[1];
 
 
 =head1 NAME
@@ -46,7 +46,7 @@ use integer;
 use warnings;
 use MIME::Base64;
 
-my %DSA = (
+my %parameters = (
 	3 => [sub { Net::DNS::SEC::libcrypto::EVP_sha1() }],
 	6 => [sub { Net::DNS::SEC::libcrypto::EVP_sha1() }],
 	);
@@ -56,7 +56,7 @@ sub sign {
 	my ( $class, $sigdata, $private ) = @_;
 
 	my $algorithm = $private->algorithm;
-	my ($evpmd) = @{$DSA{$algorithm} || []};
+	my ($evpmd) = @{$parameters{$algorithm} || []};
 	die 'private key not DSA' unless $evpmd;
 
 	my ( $p, $q, $g, $x, $y ) = map decode_base64( $private->$_ ),
@@ -79,7 +79,7 @@ sub verify {
 	my ( $class, $sigdata, $keyrr, $sigbin ) = @_;
 
 	my $algorithm = $keyrr->algorithm;
-	my ($evpmd) = @{$DSA{$algorithm} || []};
+	my ($evpmd) = @{$parameters{$algorithm} || []};
 	die 'public key not DSA' unless $evpmd;
 
 	return unless $sigbin;

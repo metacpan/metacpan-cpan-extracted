@@ -37,7 +37,7 @@
       "test" : {
          "requires" : {
             "CryptoExchange::Catalog" : "0",
-            "Data::Sah::Coerce" : "0.011",
+            "Data::Sah::Coerce" : "0.025",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
@@ -58,7 +58,7 @@
          "web" : "https://github.com/perlancar/perl-Data-Sah-Coerce-perl-str-str_to_cryptoexchange_safename"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

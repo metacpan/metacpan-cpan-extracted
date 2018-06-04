@@ -23,18 +23,17 @@ my @tests = (
     {schema=>["date"], input=>100_000, valid=>1}, # but invalid when x.perl.coerce_to is DateTime
     {schema=>["date"], input=>DateTime->now, valid=>1},
 
-    # fudged for now, clause value coercion not yet re-implemented
-    #{schema=>["date", min=>"2014-01-01"], input=>"2013-12-12", valid=>0},
-    #{schema=>["date", min=>"2014-01-02"], input=>"2014-01-02", valid=>1},
-    #{schema=>["date", min=>"2014-01-02"], input=>"2014-02-01", valid=>1},
+    {schema=>["date", min=>"2014-01-01"], input=>"2013-12-12", valid=>0},
+    {schema=>["date", min=>"2014-01-02"], input=>"2014-01-02", valid=>1},
+    {schema=>["date", min=>"2014-01-02"], input=>"2014-02-01", valid=>1},
 
-    #{schema=>["date", min=>"2014-01-02T02:10:10Z"],
-    # input=>"2014-01-02", valid=>0},
-    #{schema=>["date", min=>"2014-01-02T02:10:10Z"],
-    # input=>"2014-02-01T03:00:00Z", valid=>1},
+    {schema=>["date", min=>"2014-01-02T02:10:10Z"],
+     input=>"2014-01-02", valid=>0},
+    {schema=>["date", min=>"2014-01-02T02:10:10Z"],
+     input=>"2014-02-01T03:00:00Z", valid=>1},
 
-    #{schema=>["date", min=>"2014-01-02"], input=>1_000_000_000, valid=>0},
-    #{schema=>["date", min=>"2014-01-02"], input=>2_000_000_000, valid=>1},
+    {schema=>["date", min=>"2014-01-02"], input=>1_000_000_000, valid=>0},
+    {schema=>["date", min=>"2014-01-02"], input=>2_000_000_000, valid=>1},
 );
 
 test_sah_cases(\@tests);

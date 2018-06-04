@@ -1,3 +1,11 @@
+0.026   2018-06-03 (PERLANCAR)
+
+	- [Bugfix] Multiple exclusion (e.g. ["!R1","!R2"]) did not work as
+	  advertised.
+
+	- [Bugfix] Didn't sort rules by name.
+
+
 0.025   2018-06-02 (PERLANCAR)
 
 	[INCOMPATIBLE CHANGE]

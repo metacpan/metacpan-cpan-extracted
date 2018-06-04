@@ -1,5 +1,6 @@
 Changes
 examples/placeholder.pl
+INSTALL.SKIP
 lib/Tie/Timely.pm
 LICENSE
 Makefile.PL
@@ -7,9 +8,10 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 META.json
 META.yml
-README
-README.md
+README.pod
+t/expire.t
 t/load.t
 t/pod.t
 t/pod_coverage.t
 t/test_manifest
+xt/changes.t

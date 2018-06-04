@@ -27,24 +27,11 @@ is (scalar @log, 1, "1 error issued");
 like ($log[0], qr/^Fubar\s/s, "Error correct" );
 note "ERROR: $_" for @log;
 
-note "TESTING set_default()";
-my @warn;
-$SIG{__WARN__} = sub {push @warn, shift};
-$n = MVC::Neaf->new;
-$n->load_view( TT => 'TT' );
-$n->set_default( -template => \'NotFounded2', -view => 'TT' );
-$n->route( '/' => sub { +{} } );
-is ( $n->run_test({}), "NotFounded2", "Template worked" );
-is (scalar @warn, 1, "1 warning issues" );
-like ($warn[0], qr/DEPRECATED/, "deprecated" );
-note "WARN: $_" for @warn;
-delete $SIG{__WARN__};
-
 note "TESTING duplicate route protection";
 eval {
     $n->route( '/' => sub { +{ try => 2 } } );
 };
-like( $@, qr/^MVC::Neaf->route.*duplicat/, "Error starts with Neaf");
+like( $@, qr/^MVC::Neaf->add_route.*duplicat/, "Error starts with Neaf");
 note $@;
 
 } [], "And no warnings overall";

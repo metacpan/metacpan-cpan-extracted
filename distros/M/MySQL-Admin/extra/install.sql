@@ -4,128 +4,130 @@ CREATE TABLE `actions` (
   `title` varchar(100) NOT NULL,
   `right` int(1) NOT NULL DEFAULT '0',
   `sub` varchar(25) NOT NULL DEFAULT 'main',
+  `type` varchar(10) NOT NULL DEFAULT 'html',
+  `xsl` varchar(50) DEFAULT NULL,
   `id` int(25) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`),
   UNIQUE KEY `action_2` (`action`),
   KEY `action` (`action`)
-) ENGINE=InnoDB AUTO_INCREMENT=124 DEFAULT CHARSET=utf8;
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('AddFulltext','tables.pl','AddFulltext','5','AddFulltext','1');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('AnalyzeTable','tables.pl','AnalyzeTable','5','AnalyzeTable','2');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('AddPrimaryKey','tables.pl','AddPrimaryKey','5','AddPrimaryKey','3');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('ChangeEngine','tables.pl','ChangeEngine','5','ChangeEngine','4');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('ChangeAutoInCrementValue','tables.pl','ChangeAutoInCrementValue','5','ChangeAutoInCrementValue','5');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('ChangeCol','tables.pl','ChangeCol','5','ChangeCol','6');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('ChangeCharset','tables.pl','ChangeCharset','5','ChangeCharset','7');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('ChooseDataBase','tables.pl','ChooseDataBase','5','ChooseDataBase','8');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('DropTable','tables.pl','DropTable','5','DropTable','9');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('DeleteEntry','tables.pl','DeleteEntry','5','DeleteEntry','10');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('DropCol','tables.pl','DropCol','5','DropCol','11');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('ShowDumpTable','tables.pl','DumpTable','5','ShowDumpTable','12');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('ExecSql','tables.pl','ExecSql','5','ExecSql','13');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('EditTable','tables.pl','SQL','5','EditTable','14');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('EditEntry','tables.pl','EditEntry','5','EditEntry','15');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('NewEntry','tables.pl','NewEntry','5','NewEntry','16');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('NewTable','tables.pl','NewTable','5','NewTable','17');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('CreateDatabase','tables.pl','CreateDatabase','5','CreateDatabase','18');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('OptimizeTable','tables.pl','OptimizeTable','5','OptimizeTable','19');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('RepairTable','tables.pl','RepairTable','5','RepairTable','20');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('SaveEditTable','tables.pl','SaveEditTable','5','SaveEditTable','21');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('SQL','tables.pl','SQL','5','SQL','22');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('SaveEntry','tables.pl','SaveEntry','5','SaveEntry','23');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('DropFulltext','tables.pl','DropFulltext','5','DropFulltext','24');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('ShowTables','tables.pl','ShowTables','5','ShowTables','25');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('ShowTableDetails','tables.pl','ShowTableDetails','5','ShowTableDetails','26');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('ShowTable','tables.pl','ShowTable','5','ShowTable','27');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('TruncateTable','tables.pl','TruncateTable','5','TruncateTable','28');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('ShowProcesslist','tables.pl','ShowProcesslist','5','ShowProcesslist','29');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('AddIndex','tables.pl','AddIndex','5','AddIndex','30');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('DropIndex','tables.pl','DropFulltext','5','DropIndex','31');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('AddUnique','tables.pl','DropFulltext','5','AddUnique','32');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('ShowNewEntry','tables.pl','ShowNewEntry','5','ShowNewEntry','33');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('MultipleAction','tables.pl','MultipleAction','5','MultipleAction','34');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('ShowDumpDatabase','tables.pl','DumpDatabase','5','ShowDumpDatabase','35');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('SaveNewTable','tables.pl','SaveNewTable','5','SaveNewTable','36');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('EditAction','tables.pl','EditAction','5','EditAction','37');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('MultipleDbAction','tables.pl','MultipleDbAction','5','MultipleDbAction','38');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('RenameTable','tables.pl','RenameTable','5','RenameTable','39');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('SaveNewColumn','tables.pl','SaveNewColumn','5','SaveNewColumn','40');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('NewDatabase','tables.pl','NewDatabase','5','NewDatabase','41');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('ShowEditIndex','tables.pl','ShowEditIndex','5','ShowEditIndex','42');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('SaveNewIndex','tables.pl','SaveNewIndex','5','SaveNewIndex','43');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('ShowRights','tables.pl','ShowRights','5','ShowRights','44');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('SaveRights','tables.pl','SaveRights','5','SaveRights','45');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('ShowUsers','tables.pl','ShowUsers','5','ShowUsers','46');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('CreateUser','tables.pl','CreateUser','5','CreateUser','47');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('DeleteUser','tables.pl','DeleteUser','5','DeleteUser','48');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('DropDatabase','tables.pl','DropDatabase','5','DropDatabase','49');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('ShowDatabases','tables.pl','ShowDatabases','5','ShowDatabases','50');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('ShowVariables','tables.pl','ShowVariables','5','ShowVariables','51');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('searchDatabase','tables.pl','searchDatabase','5','searchDatabase','52');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('showLogin','exploit.pl','','0','main','53');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('showProfile','tables.pl','showProfile','5','showProfile','54');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('saveProfile','tables.pl','Profile','5','saveProfile','55');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('searchHelpTopic','tables.pl','Help Topic','5','searchHelpTopic','56');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('login','login.pl','Login','0','main','57');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('quickbar','quickbar.pl','quickbar','5','main','58');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('ShowNewTable','tables.pl','ShowNewTable','5','ShowNewTable','59');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('downLoadFile','tables.pl','downLoadFile','5','downLoadFile','60');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('news','news.pl','Blog','0','show','61');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('settings','quick.pl','Settings','5','main','62');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('addNews','news.pl','newMessage','0','addNews','63');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('admin','admin.pl','adminCenter','5','main','64');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('delete','news.pl','blog','0','deleteNews','65');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('edit','news.pl','blog','0','editNews','66');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('saveedit','news.pl','blog','0','saveedit','67');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('reply','news.pl','blog','0','replyNews','68');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('profile','profile.pl','Profile','1','main','69');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('reg','reg.pl','register','0','reg','70');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('addReply','news.pl','blog','0','addReply','71');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('showthread','news.pl','blog','0','showMessage','72');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('verify','reg.pl','verify','0','verify','73');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('fulltext','search.pl','search','0','fulltext','74');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('newTreeviewEntry','editTree.pl','newTreeViewEntry','5','newTreeviewEntry','75');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('saveTreeviewEntry','editTree.pl','saveTreeviewEntry','5','saveTreeviewEntry','76');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('editTreeview','editTree.pl','editTreeview','5','editTreeview','77');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('addTreeviewEntry','editTree.pl','addTreeviewEntry','5','addTreeviewEntry','78');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('editTreeviewEntry','editTree.pl','editTreeviewEntry','5','editTreeviewEntry','79');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('deleteTreeviewEntry','editTree.pl','deleteTreeviewEntry','5','deleteTreeviewEntry','80');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('upEntry','editTree.pl','upEntry','5','upEntry','81');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('downEntry','editTree.pl','downEntry','5','downEntry','82');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('links','links.pl','Bookmarks','0','ShowBookmarks','83');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('env','env.pl','env','5','main','84');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('lostpass','login.pl','lostpass','0','lostpass','85');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('getpass','login.pl','getpass','0','getpass','86');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('showDir','files.pl','Files','5','showDir','87');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('FileOpen','files.pl','FileOpen','5','FileOpen','88');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('newFile','files.pl','newFile','5','newFile','89');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('saveFile','files.pl','saveFile','5','saveFile','90');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('showMessage','news.pl','blog','0','main','91');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('chmodFile','files.pl','chmodFile','5','chmodFile','92');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('deleteFile','files.pl','deleteFile','5','deleteFile','93');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('makeDir','files.pl','Files','5','makeDir','94');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('newGbookEntry','gbook.pl','gbook','0','newGbookEntry','95');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('addnewGbookEntry','gbook.pl','gbook','0','addnewGbookEntry','96');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('gbook','gbook.pl','gbook','0','showGbook','97');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('deleteExploit','admin.pl','Admin','5','deleteExploit','98');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('ImportOperaBookmarks','links.pl','ImportOperaBookmarks','5','ImportOperaBookmarks','99');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('linkseditTreeview','editTree.pl','linkseditTreeview','5','linkseditTreeview','100');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('EditFile','files.pl','EditAction','5','EditFile','101');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('ExportOperaBookmarks','links.pl','ExportOperaBookmarks','0','ExportOperaBookmarks','102');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('MoveTreeViewEntry','editTree.pl','MoveTreeViewEntry','5','MoveTreeViewEntry','103');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('chownFile','files.pl','chownFile','5','chownFile','104');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('ImportFireFoxBookmarks','links.pl','ImportFireFoxBookmarks','5','ImportFireFoxBookmarks','105');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('rebuildtrash','news.pl','weblog','0','rebuildtrash','106');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('trash','news.pl','trash','5','trash','107');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('showaddTranslation','addtranslate.pl','showaddTranslation','5','main','108');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('translate','translate.pl','translate','5','main','109');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('deleteTreeviewEntrys','editTree.pl','Edit','5','deleteTreeviewEntrys','110');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('makeUser','reg.pl','register','0','make','111');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('navigation','navigation.pl','navigation','0','main','112');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('mainMenu','main.pl','Menu','0','main','113');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('impressum','impressum.pl','Impressum','0','main','114');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('HelpTopics','tables.pl','HelpTopics','5','HelpTopics','121');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('makePassword','reg.pl','makePassword','0','makePassword','122');
-INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`id`) values('lostPassword','reg.pl','lostPassword','0','lostPassword','123');
+) ENGINE=InnoDB AUTO_INCREMENT=125 DEFAULT CHARSET=utf8;
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('AddFulltext','tables.pl','AddFulltext','5','AddFulltext','html',NULL,'1');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('AnalyzeTable','tables.pl','AnalyzeTable','5','AnalyzeTable','html',NULL,'2');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('AddPrimaryKey','tables.pl','AddPrimaryKey','5','AddPrimaryKey','html',NULL,'3');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('ChangeEngine','tables.pl','ChangeEngine','5','ChangeEngine','html',NULL,'4');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('ChangeAutoInCrementValue','tables.pl','ChangeAutoInCrementValue','5','ChangeAutoInCrementValue','html',NULL,'5');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('ChangeCol','tables.pl','ChangeCol','5','ChangeCol','html',NULL,'6');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('ChangeCharset','tables.pl','ChangeCharset','5','ChangeCharset','html',NULL,'7');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('ChooseDataBase','tables.pl','ChooseDataBase','5','ChooseDataBase','html',NULL,'8');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('DropTable','tables.pl','DropTable','5','DropTable','html',NULL,'9');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('DeleteEntry','tables.pl','DeleteEntry','5','DeleteEntry','html',NULL,'10');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('DropCol','tables.pl','DropCol','5','DropCol','html',NULL,'11');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('ShowDumpTable','tables.pl','DumpTable','5','ShowDumpTable','html',NULL,'12');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('ExecSql','tables.pl','ExecSql','5','ExecSql','html',NULL,'13');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('EditTable','tables.pl','SQL','5','EditTable','html',NULL,'14');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('EditEntry','tables.pl','EditEntry','5','EditEntry','html',NULL,'15');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('NewEntry','tables.pl','NewEntry','5','NewEntry','html',NULL,'16');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('NewTable','tables.pl','NewTable','5','NewTable','html',NULL,'17');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('CreateDatabase','tables.pl','CreateDatabase','5','CreateDatabase','html',NULL,'18');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('OptimizeTable','tables.pl','OptimizeTable','5','OptimizeTable','html',NULL,'19');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('RepairTable','tables.pl','RepairTable','5','RepairTable','html',NULL,'20');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('SaveEditTable','tables.pl','SaveEditTable','5','SaveEditTable','html',NULL,'21');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('SQL','tables.pl','SQL','5','SQL','html',NULL,'22');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('SaveEntry','tables.pl','SaveEntry','5','SaveEntry','html',NULL,'23');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('DropFulltext','tables.pl','DropFulltext','5','DropFulltext','html',NULL,'24');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('ShowTables','tables.pl','ShowTables','5','ShowTables','html',NULL,'25');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('ShowTableDetails','tables.pl','ShowTableDetails','5','ShowTableDetails','html',NULL,'26');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('ShowTable','tables.pl','ShowTable','5','ShowTable','html',NULL,'27');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('TruncateTable','tables.pl','TruncateTable','5','TruncateTable','html',NULL,'28');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('ShowProcesslist','tables.pl','ShowProcesslist','5','ShowProcesslist','html',NULL,'29');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('AddIndex','tables.pl','AddIndex','5','AddIndex','html',NULL,'30');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('DropIndex','tables.pl','DropFulltext','5','DropIndex','html',NULL,'31');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('AddUnique','tables.pl','DropFulltext','5','AddUnique','html',NULL,'32');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('ShowNewEntry','tables.pl','ShowNewEntry','5','ShowNewEntry','html',NULL,'33');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('MultipleAction','tables.pl','MultipleAction','5','MultipleAction','html',NULL,'34');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('ShowDumpDatabase','tables.pl','DumpDatabase','5','ShowDumpDatabase','html',NULL,'35');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('SaveNewTable','tables.pl','SaveNewTable','5','SaveNewTable','html',NULL,'36');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('EditAction','tables.pl','EditAction','5','EditAction','html',NULL,'37');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('MultipleDbAction','tables.pl','MultipleDbAction','5','MultipleDbAction','html',NULL,'38');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('RenameTable','tables.pl','RenameTable','5','RenameTable','html',NULL,'39');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('SaveNewColumn','tables.pl','SaveNewColumn','5','SaveNewColumn','html',NULL,'40');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('NewDatabase','tables.pl','NewDatabase','5','NewDatabase','html',NULL,'41');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('ShowEditIndex','tables.pl','ShowEditIndex','5','ShowEditIndex','html',NULL,'42');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('SaveNewIndex','tables.pl','SaveNewIndex','5','SaveNewIndex','html',NULL,'43');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('ShowRights','tables.pl','ShowRights','5','ShowRights','html',NULL,'44');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('SaveRights','tables.pl','SaveRights','5','SaveRights','html',NULL,'45');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('ShowUsers','tables.pl','ShowUsers','5','ShowUsers','html',NULL,'46');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('CreateUser','tables.pl','CreateUser','5','CreateUser','html',NULL,'47');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('DeleteUser','tables.pl','DeleteUser','5','DeleteUser','html',NULL,'48');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('DropDatabase','tables.pl','DropDatabase','5','DropDatabase','html',NULL,'49');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('ShowDatabases','tables.pl','ShowDatabases','5','ShowDatabases','html',NULL,'50');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('ShowVariables','tables.pl','ShowVariables','5','ShowVariables','html',NULL,'51');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('searchDatabase','tables.pl','searchDatabase','5','searchDatabase','html',NULL,'52');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('showLogin','exploit.pl','','0','main','html',NULL,'53');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('showProfile','tables.pl','showProfile','5','showProfile','html',NULL,'54');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('saveProfile','tables.pl','Profile','5','saveProfile','html',NULL,'55');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('searchHelpTopic','tables.pl','Help Topic','5','searchHelpTopic','html',NULL,'56');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('login','login.pl','Login','0','main','html',NULL,'57');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('quickbar','quickbar.pl','quickbar','5','main','html',NULL,'58');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('ShowNewTable','tables.pl','ShowNewTable','5','ShowNewTable','html',NULL,'59');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('downLoadFile','tables.pl','downLoadFile','5','downLoadFile','html',NULL,'60');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('news','news.pl','Blog','0','show','html',NULL,'61');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('settings','quick.pl','Settings','5','main','html',NULL,'62');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('addNews','news.pl','newMessage','0','addNews','html',NULL,'63');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('admin','admin.pl','adminCenter','5','main','html',NULL,'64');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('delete','news.pl','blog','0','deleteNews','html',NULL,'65');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('edit','news.pl','blog','0','editNews','html',NULL,'66');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('saveedit','news.pl','blog','0','saveedit','html',NULL,'67');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('reply','news.pl','blog','0','replyNews','html',NULL,'68');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('profile','profile.pl','Profile','1','main','html',NULL,'69');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('reg','reg.pl','register','0','reg','html',NULL,'70');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('addReply','news.pl','blog','0','addReply','html',NULL,'71');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('showthread','news.pl','blog','0','showMessage','html',NULL,'72');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('verify','reg.pl','verify','0','verify','html',NULL,'73');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('fulltext','search.pl','search','0','fulltext','html',NULL,'74');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('newTreeviewEntry','editTree.pl','newTreeViewEntry','5','newTreeviewEntry','html',NULL,'75');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('saveTreeviewEntry','editTree.pl','saveTreeviewEntry','5','saveTreeviewEntry','html',NULL,'76');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('editTreeview','editTree.pl','editTreeview','5','editTreeview','html',NULL,'77');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('addTreeviewEntry','editTree.pl','addTreeviewEntry','5','addTreeviewEntry','html',NULL,'78');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('editTreeviewEntry','editTree.pl','editTreeviewEntry','5','editTreeviewEntry','html',NULL,'79');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('deleteTreeviewEntry','editTree.pl','deleteTreeviewEntry','5','deleteTreeviewEntry','html',NULL,'80');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('upEntry','editTree.pl','upEntry','5','upEntry','html',NULL,'81');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('downEntry','editTree.pl','downEntry','5','downEntry','html',NULL,'82');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('links','links.pl','Bookmarks','0','ShowBookmarks','html',NULL,'83');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('env','env.pl','env','5','main','html',NULL,'84');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('lostpass','login.pl','lostpass','0','lostpass','html',NULL,'85');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('getpass','login.pl','getpass','0','getpass','html',NULL,'86');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('showDir','files.pl','Files','5','showDir','html',NULL,'87');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('FileOpen','files.pl','FileOpen','5','FileOpen','html',NULL,'88');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('newFile','files.pl','newFile','5','newFile','html',NULL,'89');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('saveFile','files.pl','saveFile','5','saveFile','html',NULL,'90');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('showMessage','news.pl','blog','0','main','html',NULL,'91');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('chmodFile','files.pl','chmodFile','5','chmodFile','html',NULL,'92');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('deleteFile','files.pl','deleteFile','5','deleteFile','html',NULL,'93');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('makeDir','files.pl','Files','5','makeDir','html',NULL,'94');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('newGbookEntry','gbook.pl','gbook','0','newGbookEntry','html',NULL,'95');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('addnewGbookEntry','gbook.pl','gbook','0','addnewGbookEntry','html',NULL,'96');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('gbook','gbook.pl','gbook','0','showGbook','html',NULL,'97');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('deleteExploit','admin.pl','Admin','5','deleteExploit','html',NULL,'98');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('ImportOperaBookmarks','links.pl','ImportOperaBookmarks','5','ImportOperaBookmarks','html',NULL,'99');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('linkseditTreeview','editTree.pl','linkseditTreeview','5','linkseditTreeview','html',NULL,'100');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('EditFile','files.pl','EditAction','5','EditFile','html',NULL,'101');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('ExportOperaBookmarks','links.pl','ExportOperaBookmarks','0','ExportOperaBookmarks','html',NULL,'102');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('MoveTreeViewEntry','editTree.pl','MoveTreeViewEntry','5','MoveTreeViewEntry','html',NULL,'103');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('chownFile','files.pl','chownFile','5','chownFile','html',NULL,'104');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('ImportFireFoxBookmarks','links.pl','ImportFireFoxBookmarks','5','ImportFireFoxBookmarks','html',NULL,'105');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('rebuildtrash','news.pl','weblog','0','rebuildtrash','html',NULL,'106');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('trash','news.pl','trash','5','trash','html',NULL,'107');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('showaddTranslation','addtranslate.pl','showaddTranslation','5','main','html',NULL,'108');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('translate','translate.pl','translate','5','main','html',NULL,'109');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('deleteTreeviewEntrys','editTree.pl','Edit','5','deleteTreeviewEntrys','html',NULL,'110');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('makeUser','reg.pl','register','0','make','html',NULL,'111');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('navigation','navigation.pl','navigation','0','main','html',NULL,'112');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('mainMenu','main.pl','Menu','0','main','html',NULL,'113');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('impressum','impressum.pl','Impressum','0','main','html',NULL,'114');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('HelpTopics','tables.pl','HelpTopics','5','HelpTopics','html',NULL,'121');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('makePassword','reg.pl','makePassword','0','makePassword','html',NULL,'122');
+INSERT INTO `actions` (`action`,`file`,`title`,`right`,`sub`,`type`,`xsl`,`id`) values('lostPassword','reg.pl','lostPassword','0','lostPassword','html',NULL,'123');
 
 CREATE TABLE `actions_set` (
   `action` varchar(25) NOT NULL,
@@ -250,10 +252,6 @@ INSERT INTO `actions_set` (`action`,`foreign_action`,`output_id`,`id`) values('s
 INSERT INTO `actions_set` (`action`,`foreign_action`,`output_id`,`id`) values('showLogin','login','content','112');
 INSERT INTO `actions_set` (`action`,`foreign_action`,`output_id`,`id`) values('mainMenu','mainMenu','menuBar','113');
 INSERT INTO `actions_set` (`action`,`foreign_action`,`output_id`,`id`) values('impressum','impressum','content','114');
-INSERT INTO `actions_set` (`action`,`foreign_action`,`output_id`,`id`) values('mute','mute','content','115');
-INSERT INTO `actions_set` (`action`,`foreign_action`,`output_id`,`id`) values('retweet','retweet','content','116');
-INSERT INTO `actions_set` (`action`,`foreign_action`,`output_id`,`id`) values('timeLine','timeLine','content','117');
-INSERT INTO `actions_set` (`action`,`foreign_action`,`output_id`,`id`) values('feeds','feeds','content','118');
 INSERT INTO `actions_set` (`action`,`foreign_action`,`output_id`,`id`) values('ShowTables','quickbar','quickbar','121');
 INSERT INTO `actions_set` (`action`,`foreign_action`,`output_id`,`id`) values('HelpTopics','HelpTopics','content','122');
 INSERT INTO `actions_set` (`action`,`foreign_action`,`output_id`,`id`) values('makePassword','makePassword','content','123');
@@ -279,14 +277,24 @@ CREATE TABLE `exploit` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `id` (`id`),
   FULLTEXT KEY `remote_addr` (`remote_addr`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+INSERT INTO `exploit` (`date`,`referer`,`remote_addr`,`query_string`,`id`,`count`) values('2018-06-03 15:29:02','http://localhost/index.html?cgi-bin/mysql.pl?action=ShowDatabases&sid=123&m_blogin=true','::1','action=ShowDatabases;sid=123;m_blogin=true','1','39');
+INSERT INTO `exploit` (`date`,`referer`,`remote_addr`,`query_string`,`id`,`count`) values('2018-04-06 19:35:39','http://localhost/index.html?cgi-bin/mysql.pl?action=ShowUsers&sid=123&m_blogin=true','::1','action=ShowUsers;sid=123;m_blogin=true','2','3');
+INSERT INTO `exploit` (`date`,`referer`,`remote_addr`,`query_string`,`id`,`count`) values('2018-04-06 19:35:37','http://localhost/index.html?cgi-bin/mysql.pl?action=ShowTables&sid=123&m_blogin=true','::1','action=ShowTables;sid=123;m_blogin=true','3','3');
+INSERT INTO `exploit` (`date`,`referer`,`remote_addr`,`query_string`,`id`,`count`) values('2018-05-10 19:38:56','http://localhost/index.html?http://localhost/cgi-bin/mysql.pl?action=logout&sid=123&m_blogin=true','::1','action=logout;sid=123;m_blogin=true','4','3');
+INSERT INTO `exploit` (`date`,`referer`,`remote_addr`,`query_string`,`id`,`count`) values('2018-04-06 19:03:16','http://localhost/?http://localhost/cgi-bin/mysql.pl?action=FileOpen&file=F:/software/Apache24/htdocs&sid=2cb76bdd5950ffe5ef7fbfb580634a55&m_blogin=true','::1','action=FileOpen;file=F%3A%2Fsoftware%2FApache24%2Fhtdocs;sid=2cb76bdd5950ffe5ef7fbfb580634a55;m_blogin=true','5','2');
+INSERT INTO `exploit` (`date`,`referer`,`remote_addr`,`query_string`,`id`,`count`) values('2018-04-06 19:35:41','http://localhost/?cgi-bin/mysql.pl?action=ShowProcesslist&sid=123&m_blogin=true','::1','action=ShowProcesslist;sid=123;m_blogin=true','6','2');
+INSERT INTO `exploit` (`date`,`referer`,`remote_addr`,`query_string`,`id`,`count`) values('2018-04-21 07:47:20','none','127.0.0.1','none','7','1');
+INSERT INTO `exploit` (`date`,`referer`,`remote_addr`,`query_string`,`id`,`count`) values('2018-05-06 11:04:22','http://localhost/cms.html?cgi-bin/mysql.pl?action=showLogin&sid=26a7a19ae3ec3617f5456c5c54385384&m_blogin=false','::1','action=showLogin;sid=26a7a19ae3ec3617f5456c5c54385384;m_blogin=false','8','1');
+INSERT INTO `exploit` (`date`,`referer`,`remote_addr`,`query_string`,`id`,`count`) values('2018-05-10 19:39:08','http://localhost/cms.html?cgi-bin/mysql.pl?action=showLogin&sid=123&m_blogin=false','::1','action=showLogin;sid=123;m_blogin=false','9','5');
 
 CREATE TABLE `flood` (
   `remote_addr` text NOT NULL,
   `ti` text NOT NULL,
   `id` int(11) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+INSERT INTO `flood` (`remote_addr`,`ti`,`id`) values('::1','1527095185','1');
 
 CREATE TABLE `gbook` (
   `title` varchar(50) NOT NULL DEFAULT '',
@@ -298,7 +306,7 @@ CREATE TABLE `gbook` (
   FULLTEXT KEY `title` (`title`,`body`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-CREATE TABLE `mainMenu` (
+CREATE TABLE `mainmenu` (
   `title` varchar(100) NOT NULL DEFAULT '',
   `action` varchar(100) NOT NULL DEFAULT '',
   `right` int(11) NOT NULL DEFAULT '0',
@@ -308,18 +316,15 @@ CREATE TABLE `mainMenu` (
   `output` varchar(100) NOT NULL DEFAULT 'requestURI',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
-INSERT INTO `mainMenu` (`title`,`action`,`right`,`position`,`menu`,`id`,`output`) values('blog','news','0','1','top','1','requestURI');
-INSERT INTO `mainMenu` (`title`,`action`,`right`,`position`,`menu`,`id`,`output`) values('properties','profile','1','4','top','2','requestURI');
-INSERT INTO `mainMenu` (`title`,`action`,`right`,`position`,`menu`,`id`,`output`) values('links','links','0','2','top','3','requestURI');
-INSERT INTO `mainMenu` (`title`,`action`,`right`,`position`,`menu`,`id`,`output`) values('gbook','gbook','0','3','left','4','requestURI');
-INSERT INTO `mainMenu` (`title`,`action`,`right`,`position`,`menu`,`id`,`output`) values('login','showLogin','0','5','left','5','requestURI');
-INSERT INTO `mainMenu` (`title`,`action`,`right`,`position`,`menu`,`id`,`output`) values('fulltext','fulltext','0','6','left','6','requestURI');
-INSERT INTO `mainMenu` (`title`,`action`,`right`,`position`,`menu`,`id`,`output`) values('admin','location.href=\'index.html\'','5','7','left','7','javascript');
-INSERT INTO `mainMenu` (`title`,`action`,`right`,`position`,`menu`,`id`,`output`) values('Impressum','impressum','0','8','top','8','requestURI');
-INSERT INTO `mainMenu` (`title`,`action`,`right`,`position`,`menu`,`id`,`output`) values('EditFile','location.href =\'/index.html?/cgi-bin/mysql.pl?action=EditFile&name=\'+cAction','5','9','left','9','javascript');
-INSERT INTO `mainMenu` (`title`,`action`,`right`,`position`,`menu`,`id`,`output`) values('timeLine','timeLine','0','10','left','10','requestURI');
-INSERT INTO `mainMenu` (`title`,`action`,`right`,`position`,`menu`,`id`,`output`) values('viewrss','feeds','0','11','left','11','requestURI');
-
+INSERT INTO `mainmenu` (`title`,`action`,`right`,`position`,`menu`,`id`,`output`) values('blog','news','0','1','top','1','requestURI');
+INSERT INTO `mainmenu` (`title`,`action`,`right`,`position`,`menu`,`id`,`output`) values('properties','profile','1','4','top','2','requestURI');
+INSERT INTO `mainmenu` (`title`,`action`,`right`,`position`,`menu`,`id`,`output`) values('links','links','0','2','top','3','requestURI');
+INSERT INTO `mainmenu` (`title`,`action`,`right`,`position`,`menu`,`id`,`output`) values('gbook','gbook','0','3','left','4','requestURI');
+INSERT INTO `mainmenu` (`title`,`action`,`right`,`position`,`menu`,`id`,`output`) values('login','showLogin','0','5','left','5','requestURI');
+INSERT INTO `mainmenu` (`title`,`action`,`right`,`position`,`menu`,`id`,`output`) values('fulltext','fulltext','0','6','left','6','requestURI');
+INSERT INTO `mainmenu` (`title`,`action`,`right`,`position`,`menu`,`id`,`output`) values('admin','location.href=\'index.html\'','5','7','left','7','javascript');
+INSERT INTO `mainmenu` (`title`,`action`,`right`,`position`,`menu`,`id`,`output`) values('Impressum','impressum','0','8','top','8','requestURI');
+INSERT INTO `mainmenu` (`title`,`action`,`right`,`position`,`menu`,`id`,`output`) values('EditFile','location.href =\'/index.html?/cgi-bin/mysql.pl?action=EditFile&name=\'+cAction','5','9','left','9','javascript');
 CREATE TABLE `navigation` (
   `title` varchar(100) NOT NULL DEFAULT '',
   `action` varchar(100) NOT NULL DEFAULT '',
@@ -352,7 +357,7 @@ CREATE TABLE `news` (
   `format` varchar(10) NOT NULL DEFAULT 'bbcode',
   PRIMARY KEY (`id`),
   FULLTEXT KEY `title` (`title`,`body`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
 INSERT INTO `news` (`title`,`body`,`date`,`user`,`right`,`attach`,`cat`,`action`,`sticky`,`id`,`format`) values('Just a MySQL Administration Web-App.','<img src=\"images/logo.png\" alt=\"mysql-admin\" onclick=\"window.open(\'http://sourceforge.net/p/lindnerei\')\" style=\"cursor:pointer\">\r\n<br>\r\n<a target=\"_blank\" href=\"http://search.cpan.org/dist/MySQL-Admin/\">Cpan</a>|\r\n<a target=\"_blank\" href=\"http://metacpan.org/release/MySQL-Admin\">Metacpan</a>|\r\n<a target=\"_blank\" href=\"http://sourceforge.net/p/lindnerei\">Sourceforge</a>|\r\n<a target=\"_blank\" href=\"http://sourceforge.net/p/lindnerei/ajax/HEAD/tree/\">Svn</a>|\r\n<a target=\"_blank\" href=\"http://sourceforge.net/projects/lindnerei/files/latest/download\">Download</a>\r\n','2015-12-07 23:27:59','admin','0','0','news','news','0','1','html');
 
 CREATE TABLE `querys` (
@@ -435,7 +440,7 @@ CREATE TABLE `trash` (
 CREATE TABLE `users` (
   `pass` text NOT NULL,
   `user` varchar(25) NOT NULL DEFAULT '',
-  `date` date NOT NULL DEFAULT '2000-01-01',
+  `date` date NOT NULL DEFAULT '0000-00-00',
   `email` varchar(100) NOT NULL DEFAULT '',
   `right` int(11) NOT NULL DEFAULT '0',
   `name` varchar(100) NOT NULL DEFAULT '',
@@ -449,5 +454,6 @@ CREATE TABLE `users` (
   `cats` text,
   `id` int(11) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
-INSERT INTO `users` (`pass`,`user`,`date`,`email`,`right`,`name`,`firstname`,`street`,`city`,`postcode`,`phone`,`sid`,`ip`,`cats`,`id`) values('guest','guest','2001-01-01','','0','','',NULL,NULL,NULL,NULL,'123','dd','news','1');
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+INSERT INTO `users` (`pass`,`user`,`date`,`email`,`right`,`name`,`firstname`,`street`,`city`,`postcode`,`phone`,`sid`,`ip`,`cats`,`id`) values('guest','guest','0000-00-00','','0','','',NULL,NULL,NULL,NULL,'123','dd','news','1');
+

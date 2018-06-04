@@ -23,16 +23,16 @@ var wsize     = getWindowSize();
 function menu(){
   var ao = getWindowSize();
   if(!menuAktive){
-    $('menu').classList.remove('closed');
+    document.getElementById('menu').classList.remove('closed');
     visible('menuContent');
     visible('closeMenu');
-    $('menu').width= sidebarX;
-    $('menu').style.minWidth = sidebarX;
-    $('con').width = (ao.x-ScrolBarWidth() - sidebarX )+'px';
+    document.getElementById('menu').width= sidebarX;
+    document.getElementById('menu').style.minWidth = sidebarX;
+    document.getElementById('con').width = (ao.x-ScrolBarWidth() - sidebarX )+'px';
     menuAktive = true;
     showTab('tab1')
   }
-  var node = $("closeMenu");
+  var node = document.getElementById("closeMenu");
   node.addEventListener ('click', function (evt){
     if(menuAktive){
       closeMenu();
@@ -45,10 +45,10 @@ function closeMenu()
 {
   hide('menuContent');
   hide('closeMenu');
-  $('con').width= (wsize.x -5) +"px";
-  $('menu').width='5px';
-  $('menu').style.minWidth = '5px';
-  $('menu').classList.add('closed');
+  document.getElementById('con').width= (wsize.x -5) +"px";
+  document.getElementById('menu').width='5px';
+  document.getElementById('menu').style.minWidth = '5px';
+  document.getElementById('menu').classList.add('closed');
   menuAktive = false;
 }
 var bSidebarResize = false;
@@ -59,20 +59,21 @@ document.onmouseup = stopResize;
 function startResize(EVENT){
   var posX = document.all ? window.event.clientX : EVENT.pageX;
   var pos =getElementPosition('content');
-  sidebarX = pos.x;  
+  
   if(sidebarX >  posX -5  &&  sidebarX   <  posX +5  )
   {
-    $('menu').style.cursor="ew-resize";
+	sidebarX = pos.x; 
+    document.getElementById('menu').style.cursor="ew-resize";
     bSidebarResize =  true;
-    $('menu').classList.add('noselect');
-    $('menu').setAttribute('unselectable','on');
+    document.getElementById('menu').classList.add('noselect');
+    document.getElementById('menu').setAttribute('unselectable','on');
   }
 }
 function stopResize(EVENT){
   bSidebarResize = false;
-  $('menu').style.cursor="";
-  $('menu').classList.remove('noselect');
-  $('menu').setAttribute('unselectable','off');
+  document.getElementById('menu').style.cursor="";
+  document.getElementById('menu').classList.remove('noselect');
+  document.getElementById('menu').setAttribute('unselectable','off');
   drop(EVENT);
 }
 function resizeSidebar(EVENT){
@@ -80,21 +81,21 @@ function resizeSidebar(EVENT){
   posY = document.all ? window.event.clientY : EVENT.pageY;
   if(bSidebarResize && posX > 5  && posX  <  500)
   {
-    $('menu').width= posX+'px';
-    $('menu').style.minWidth= posX+'px';
+    document.getElementById('menu').width= posX+'px';
+    document.getElementById('menu').style.minWidth= posX+'px';
     sidebarX = posX;
     var ao = getWindowSize();
-    $('con').width = (ao.x-ScrolBarWidth() - posX )+'px';
+    document.getElementById('con').width = (ao.x-ScrolBarWidth() - posX )+'px';
     return;
   }
   if(sidebarX >  posX -5  &&  sidebarX   <  posX +5  )
   {
-      $('menu').style.cursor="ew-resize";
+      document.getElementById('menu').style.cursor="ew-resize";
   }
   else
   {
-      if($('menu'))
-	$('menu').style.cursor= "";
+      if(document.getElementById('menu'))
+	document.getElementById('menu').style.cursor= "";
   }
   drag(EVENT);
 }

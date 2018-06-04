@@ -20,7 +20,6 @@ Module::Build -> new (
 		'File::Temp'	=> 0,
 		'Test::More'	=> 0,
 	},
-	configure_requires => { 'Module::Build' => 0.38 },
 	recommends	=> {
 		'Getopt::Long'	=> 2.24, # for Configure qw(posix_default);
 		'Test::Pod' 	=> 0,

@@ -3,9 +3,9 @@ NAME
     beginning and end of string
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Data::Sah::Coerce::perl::str::str_trim (from Perl distribution
-    Data-Sah-Coerce-perl-str-str_trim), released on 2018-03-11.
+    Data-Sah-Coerce-perl-str-str_trim), released on 2018-06-04.
 
 DESCRIPTION
     The rule is not enabled by default. You can enable it in a schema using

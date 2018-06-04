@@ -1,23 +1,18 @@
 package JSONAPI::Document;
-$JSONAPI::Document::VERSION = '1.3';
+$JSONAPI::Document::VERSION = '1.4';
 # ABSTRACT: Turn DBIx results into JSON API documents.
 
 use Moo;
 
 use Carp ();
 use CHI;
-use Lingua::EN::Inflexion ();
+use JSONAPI::Document::Builder;
+use JSONAPI::Document::Builder::Compound;
 use Lingua::EN::Segment;
-use List::Util;
 
 has kebab_case_attrs => (
     is      => 'ro',
     default => sub { 0 });
-
-has attributes_via => (
-    is      => 'ro',
-    default => sub { 'get_inflated_columns' },
-);
 
 has api_url => (
     is  => 'ro',
@@ -47,29 +42,28 @@ sub _build_segmenter {
 
 sub compound_resource_document {
     my ($self, $row, $options) = @_;
+    $options //= {};
+    my $fields = [grep { $_ } @{ $options->{fields} // [] }];
+    my $related_fields = $options->{related_fields} //= {};
 
     my @relationships = $row->result_source->relationships();
     if ($options->{includes}) {
         @relationships = @{ $options->{includes} };
     }
 
-    my $document = $self->resource_document($row, { with_relationships => 1, includes => \@relationships });
-
-    my @included;
-    foreach my $relation (sort @relationships) {
-        my $result = $self->_related_resource_documents($row, $relation, { with_attributes => 1 });
-        if (my $related_docs = $result->{data}) {
-            if (ref($related_docs) eq 'ARRAY') {    # plural relations
-                push @included, @$related_docs;
-            } else {                                # singular relations
-                push @included, $related_docs;
-            }
-        }
-    }
+    my $builder = JSONAPI::Document::Builder::Compound->new(
+        api_url          => $self->api_url,
+        chi              => $self->chi,
+        fields           => $fields,
+        kebab_case_attrs => $self->kebab_case_attrs,
+        row              => $row,
+        segmenter        => $self->segmenter,
+        relationships    => \@relationships,
+    );
 
     return {
-        data     => $document,
-        included => \@included,
+        data     => $builder->build_document(),
+        included => $builder->build_relationships(\@relationships, $related_fields),
     };
 }
 
@@ -86,176 +80,41 @@ sub resource_document {
     Carp::confess('No row provided') unless $row;
 
     $options //= {};
-    my $attrs_method       = $options->{attributes_via} // $self->attributes_via;
-    my $with_kebab_case    = $options->{kebab_case_attrs} // $self->kebab_case_attrs;
-    my $with_attributes    = $options->{with_attributes};
-    my $with_relationships = $options->{with_relationships};
-    my $includes           = $options->{includes};
-    my $fields             = [grep { $_ } @{ $options->{fields} // [] }];
+    my $with_attributes = $options->{with_attributes};
+    my $includes        = $options->{includes} // [];
+    my $fields          = [grep { $_ } @{ $options->{fields} // [] }];
+    my $related_fields  = $options->{related_fields} //= {};
 
-    $options->{related_fields} //= {};
-
-    my $type = lc($row->result_source->source_name());
-    my $noun = Lingua::EN::Inflexion::noun($type);
-
-    my %columns = $row->$attrs_method($fields);
-    my $id      = delete $columns{id} // $row->id;
-
-    unless ($type && $id) {
-        return undef;    # Document is not valid without a type and id.
+    if (ref(\$includes) eq 'SCALAR' && $includes eq 'all_related') {
+        $includes = [$row->result_source->relationships()];
     }
 
-    my %relationships;
-    if ($with_relationships) {
-        my @relations = $includes ? @$includes : $row->result_source->relationships();
-        foreach my $rel (@relations) {
-            if ($row->has_relationship($rel)) {
-                if ($with_attributes) {
-                    $relationships{$rel} = $self->_related_resource_documents($row, $rel, $options);
-                } else {
-                    $relationships{$rel} = $self->_related_resource_links($row, $noun, $rel, $options);
-                }
-            }
+    my $builder = JSONAPI::Document::Builder->new(
+        api_url          => $self->api_url,
+        chi              => $self->chi,
+        fields           => $fields,
+        kebab_case_attrs => $self->kebab_case_attrs,
+        row              => $row,
+        segmenter        => $self->segmenter,
+    );
+
+    my $document = $builder->build();
+
+    if (@$includes) {
+        my %relationships;
+        foreach my $relationship (@$includes) {
+            my $relationship_type = $builder->format_type($relationship);
+            $relationships{$relationship_type} = $builder->build_relationship(
+                $relationship,
+                $related_fields->{$relationship},
+                { with_attributes => $with_attributes });
         }
-    }
-
-    if ($with_kebab_case) {
-        %columns = _kebab_case(%columns);
         if (values(%relationships)) {
-            %relationships = _kebab_case(%relationships);
+            $document->{relationships} = \%relationships;
         }
     }
 
-    my $resource_type = $self->chi->compute(
-        __PACKAGE__ . ':' . $noun->plural,
-        undef,
-        sub {
-            my @words = $self->segmenter->segment($noun->plural);
-            unless (@words > 0) {
-                @words = ($noun->plural);
-            }
-            return join('-', @words);
-        });
-
-    if (scalar(@$fields)) {
-        %columns = %{ $self->_sparse_attributes({%columns}, $fields) };
-    }
-
-    my %document;
-
-    $document{id}         = $id;
-    $document{type}       = $resource_type;
-    $document{attributes} = \%columns;
-
-    if (values(%relationships)) {
-        $document{relationships} = \%relationships;
-    }
-
-    return \%document;
-}
-
-sub _related_resource_links {
-    my ($self, $row, $row_noun, $relation, $options) = @_;
-    my $with_kebab_case = $options->{kebab_case_attrs} // $self->kebab_case_attrs;
-    my $relation_row    = $row->$relation;
-    my $relation_type   = $relation;
-
-    if ($with_kebab_case) {
-        $relation_type =~ s/_/-/g;
-    }
-
-    my $data;
-    my $rel_info = $row->result_source->relationship_info($relation);
-    if ($rel_info->{attrs}->{accessor} eq 'multi') {
-        $data = [];
-        my @rs = $relation_row->all();
-        foreach my $rel_row (@rs) {
-            push @$data, { id => $rel_row->id, type => $relation_type };
-        }
-    } else {
-        $data = {
-            id   => $relation_row->id,
-            type => Lingua::EN::Inflexion::noun(lc($relation))->plural,
-        };
-    }
-
-    return {
-        links => {
-            self    => $self->api_url . '/' . $row_noun->plural . '/' . $row->id . "/relationships/$relation_type",
-            related => $self->api_url . '/' . $row_noun->plural . '/' . $row->id . "/$relation_type",
-        },
-        data => $data,
-    };
-}
-
-sub _related_resource_documents {
-    my ($self, $row, $relation, $options) = @_;
-    $options //= {};
-
-    my @results;
-
-    my $rel_info = $row->result_source->relationship_info($relation);
-    if ($rel_info->{attrs}->{accessor} eq 'multi') {
-        my @rs = $row->$relation->all();
-        foreach my $rel_row (@rs) {
-            push @results,
-                $self->_relation_with_attributes($rel_row, { %$options, relation => $relation, is_multi => 1, });
-        }
-        return { data => \@results, };
-    } else {
-        return { data => $self->_relation_with_attributes($row->$relation, { %$options, relation => $relation, }) };
-    }
-}
-
-sub _relation_with_attributes {
-    my ($self, $row, $options) = @_;
-    my $with_kebab_case = $options->{kebab_case_attrs} // $self->kebab_case_attrs;
-    my $attrs_method    = $options->{attributes_via} // $self->attributes_via;
-    my $type            = $options->{relation};
-    my $fields          = $options->{related_fields}->{$type} // [];
-
-    if (!$options->{is_multi}) {
-        $type = Lingua::EN::Inflexion::noun(lc($type))->plural;
-    }
-
-    my %attributes = $row->$attrs_method();
-    if ($with_kebab_case) {
-        %attributes = _kebab_case(%attributes);
-        $type =~ s/_/-/g;
-    }
-
-    if (scalar(@$fields)) {
-        %attributes = %{ $self->_sparse_attributes({%attributes}, $fields) };
-    }
-
-    return {
-        id         => delete $attributes{id} // $row->id,
-        type       => $type,
-        attributes => \%attributes,
-    };
-}
-
-sub _sparse_attributes {
-    my ($self, $attributes, $fields) = @_;
-    my @delete;
-    for my $field (keys(%$attributes)) {
-        unless (List::Util::first { $_ eq $field } @$fields) {
-            push @delete, $field;
-        }
-    }
-    delete $attributes->{$_} for @delete;
-    return $attributes;
-}
-
-sub _kebab_case {
-    my (%row) = @_;
-    my %new_row;
-    foreach my $column (keys(%row)) {
-        my $value = $row{$column};
-        $column =~ s/_/-/g;
-        $new_row{$column} = $value;
-    }
-    return %new_row;
+    return $document;
 }
 
 1;
@@ -270,7 +129,7 @@ JSONAPI::Document - Turn DBIx results into JSON API documents.
 
 =head1 VERSION
 
-version 1.3
+version 1.4
 
 =head1 SYNOPSIS
 
@@ -285,10 +144,10 @@ version 1.3
     my $doc = $jsonapi->resource_document($user);
 
     # Same but with all relationships
-    my $doc = $jsonapi->resource_document($user, { with_relationships => 1 });
+    my $doc = $jsonapi->resource_document($user, { includes => 'all_related' });
 
     # With only the author relationship
-    my $doc = $jsonapi->resource_document($user, { with_relationships => 1, relationships => ['author'] });
+    my $doc = $jsonapi->resource_document($user, { includes => ['author'] });
 
     # Fully blown resource document with all relationships and their attributes
     my $doc = $jsonapi->compound_resource_document($user);
@@ -313,6 +172,12 @@ library does using the L<source_name|https://metacpan.org/pod/DBIx::Class::Resul
 of the result row. The type is also pluralised using L<Linua::EN::Inflexion|https://metacpan.org/pod/Lingua::EN::Inflexion>
 while keeping relationship names intact (i.e. an 'author' relationship will still be called 'author', with the type 'authors').
 
+This module supplies an opt-in Moo role that can be consumed by objects that layer over a DBIx::Class::Row,
+C<JSONAPI::Document::Role::Attributes>. Consuming objects should implement a method called C<attributes>
+which will be used throughout the creation of resource documents for that result type to build the attributes
+of the document. This is useful when you have a more complicated set of attribute that cannot be fulfilled
+by simply calling C<get_inflated_columns> (the default behaviour).
+
 =head1 ATTRIBUTES
 
 =head2 data_dir
@@ -328,14 +193,6 @@ Required; An absolute URL pointing to your servers JSON API namespace.
 
 Boolean attribute; setting this will make the column keys for each document into
 kebab-cased-strings instead of snake_cased. Default is false.
-
-=head2 attributes_via
-
-The method name to use throughout the creation of the resource document(s) to
-get the attributes of the resources/relationships. This is useful if you
-have a object that layers your DBIx results, you can instruct this
-module to call that method instead of the default, which is
-L<get_inflated_columns|https://metacpan.org/pod/DBIx::Class::Row#get_inflated_columns>.
 
 =head1 METHODS
 
@@ -370,9 +227,32 @@ The following options can be given:
 =item C<includes>
 
 An array reference specifying inclusion of a subset of relationships.
-By default all the relationships will be included, use this if you
+By default all the relationships will be included. Use this if you
 only want a subset of relationships (e.g. when accepting the C<includes>
-query parameter in your application routes).
+query parameter in your API requests, where you have to return only what
+relationships were requested).
+
+This argument should contain strings representing direct relationships to the row,
+and can also contain hash refs which specify nested inclusion. Example:
+
+    $self->compound_resource_document($post, ['author', { comments => ['author'] }]);
+
+This will include the post as the primary document, its direct relationships 'author'
+and 'comments', and the 'author' of each related comment.
+
+B<NOTE>: Nested relationships are experimental and come with the following limitations:
+
+=over 2
+
+=item
+
+many_to_many relationships are not supported
+
+=item
+
+only one level of depth is supported (so requesting 'include=comments.likes.author' will throw errors)
+
+=back
 
 =back
 
@@ -401,23 +281,21 @@ The following options can be given:
 
 =over
 
-=item C<with_relationships> I<Bool>
+=item C<includes> I<Str|ArrayRef>
 
-If true, will introspect the rows relationships and include each
-of them in the relationships key of the document.
+Optional; Used to specify any relationships of the row to include.
+
+This argument can contain either the value 'all_related', which will return all the direct
+relationships of the row, or an array ref including a subset of direct relationships.
 
 =item C<with_attributes> I<Bool>
 
-If C<with_relationships> is true, for each resulting row of a relationship,
-the attributes of that relation will be included.
+If C<includes> is used, for each resulting relationship row, the attributes (columns) of that
+relationship will be included.
 
 By default, each relationship will contain a L<links object|http://jsonapi.org/format/#document-links>.
+
 If this option is true, links object will be replaced with attributes.
-
-=item C<includes> I<ArrayRef>
-
-If C<with_relationships> is true, this optional array ref can be
-provided to include a subset of relations instead of all of them.
 
 =item C<fields> I<ArrayRef>
 

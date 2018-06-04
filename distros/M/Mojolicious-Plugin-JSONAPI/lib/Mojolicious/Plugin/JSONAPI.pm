@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::JSONAPI;
-$Mojolicious::Plugin::JSONAPI::VERSION = '1.4';
+$Mojolicious::Plugin::JSONAPI::VERSION = '1.5';
 use Mojo::Base 'Mojolicious::Plugin';
 
 use JSONAPI::Document;
@@ -21,9 +21,6 @@ sub register {
         # It's not really a JSONAPI::Document arg, but it's as close as
         # we'll get to defining a base URL at startup time.
         $jsonapi_args{namespace} = $args->{namespace};
-    }
-    if (defined($args->{attributes_via})) {
-        $jsonapi_args{attributes_via} = $args->{attributes_via};
     }
     unless ($args->{data_dir}) {
         Carp::confess('Argument missing: data_dir');
@@ -136,7 +133,7 @@ sub create_error_helpers {
             unless (defined($errors) && ref($errors) eq 'ARRAY') {
                 $errors = [{
                         status => $status || 500,
-                        title => 'Error processing request',
+                        title  => $errors || 'Error processing request',
                     }];
             }
 
@@ -159,7 +156,16 @@ sub create_request_helpers {
             my $param = $c->param('include') // '';
             $param =~ s/-/_/g;
             my @include = split(',', $param);
-            return \@include;
+            my @relationships;
+            foreach my $inc (@include) {
+                if ($inc =~ m/\./g) {
+                    my @nested = split(/\./, $inc);
+                    push @relationships, { shift @nested => [shift @nested] };
+                } else {
+                    push @relationships, $inc;
+                }
+            }
+            return \@relationships;
         });
 
     $app->helper(
@@ -209,7 +215,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 SYNOPSIS
 
@@ -291,11 +297,6 @@ meaing no prefix will be added.
 This is passed to the constructor of C<JSONAPI::Document> which will kebab case the attribute keys of each
 record (i.e. '_' to '-').
 
-=item C<attributes_via>
-
-Also passed to the constructor of C<JSONAPI::Document>. This is the method that will be used to get
-the attributes for a resource document. Should return a hash (not a hashref).
-
 =back
 
 =head1 HELPERS
@@ -355,10 +356,11 @@ sure comments is passed in as a plural noun.
 
 =back
 
-=head2 render_error(I<Str> $status, I<ArrayRef> $errors, I<HashRef> $data. I<HashRef> $meta)
+=head2 render_error(I<Str> $status, I<ArrayRef|Str> $errors, I<HashRef> $data. I<HashRef> $meta)
 
-Renders a JSON response under the required top-level C<errors> key. C<errors> is an array reference of error objects
-as described in the specification. See L<Error Objects|http://jsonapi.org/format/#error-objects>.
+Renders a JSON response under the required top-level C<errors> key. C<errors> should be an array reference of error objects
+as described in the specification, or a string that will be the content of I<title>.
+See L<Error Objects|http://jsonapi.org/format/#error-objects>.
 
 Can optionally provide a reference to the primary data for the route as well as meta information, which will be added
 to the response as-is. Use C<resource_document> to generate the right structure for this argument.
@@ -370,6 +372,14 @@ response, and splits it by ',' to return an ArrayRef.
 
  GET /api/posts?include=comments,author
  my $include = $c->requested_resources(); # ['comments', 'author']
+
+Can also include nested relationships:
+
+ GET /api/posts?include=comments,author.notes
+ my $include = $c->requested_resources(); # ['comments', { author => ['notes'] }]
+
+B<NOTE>: Only one level of nesting is supported at the moment, so requests like C<author.notes.notes_relation> won't
+give back what you expect. Stick with C<author.notes> and lazy loading C<notes_relation>.
 
 =head2 requested_fields
 

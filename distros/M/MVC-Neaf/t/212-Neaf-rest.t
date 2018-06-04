@@ -8,16 +8,16 @@ use MVC::Neaf;
 
 my @call;
 
-MVC::Neaf->route( rest => sub { push @call, "me_get"; +{} }, method => 'GET' );
-MVC::Neaf->route( rest => sub { push @call, "me_post"; +{} }, method => 'POST' );
+neaf->route( rest => sub { push @call, "me_get"; +{} }, method => 'GET' );
+neaf->route( rest => sub { push @call, "me_post"; +{} }, method => 'POST' );
 
 eval {
-    MVC::Neaf->route( rest => sub {}, method => 'GET' );
+    neaf->route( rest => sub {}, method => 'GET' );
 };
 like ($@, qr/MVC::Neaf.*duplicate/, "Dupe handler = no go");
 note $@;
 
-my $app = MVC::Neaf->run;
+my $app = neaf->run;
 
 is ($app->( { REQUEST_METHOD => 'GET', REQUEST_URI => '/rest' } )->[0], 200
     , "Get ok" );
@@ -26,7 +26,7 @@ is ($app->( { REQUEST_METHOD => 'POST', REQUEST_URI => '/rest' } )->[0], 200
 is ($app->( { REQUEST_METHOD => 'HEAD', REQUEST_URI => '/rest' } )->[0], 200
     , "Head ok - induced by GET" );
 
-my @put405 = MVC::Neaf->run_test(
+my @put405 = neaf->run_test(
     { REQUEST_METHOD => 'PUT', REQUEST_URI => '/rest' } );
 
 is( $put405[0], 405, "Put gets 405 error");

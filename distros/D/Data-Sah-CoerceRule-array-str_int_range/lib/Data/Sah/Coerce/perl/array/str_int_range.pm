@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::array::str_int_range;
 
-our $DATE = '2018-04-17'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-06-04'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,9 +9,9 @@ use warnings;
 
 sub meta {
     +{
-        v => 2,
+        v => 3,
         enable_by_default => 0,
-        might_die => 1,
+        might_fail => 1,
         prio => 60, # a bit lower than normal
     };
 }
@@ -29,8 +29,8 @@ sub coerce {
         "",
         "do { ",
         "my (\$int1, \$int2) = $dt =~ /\\A\\s*([+-]?\\d+)\\s*(?:-|\\.\\.)\\s*([+-]?\\d+)\\s*\\z/; ",
-        "if (\$int2 - \$int1 > 1_000_000) { die \"Range too big\" } ",
-        "[\$int1+0 .. \$int2+0] ",
+        "if (\$int2 - \$int1 > 1_000_000) { ['Range too big'] } ",
+        "else { [undef, [\$int1+0 .. \$int2+0]] } ",
         "}",
     );
 
@@ -52,7 +52,7 @@ Data::Sah::Coerce::perl::array::str_int_range - Coerce array of ints from string
 
 =head1 VERSION
 
-This document describes version 0.001 of Data::Sah::Coerce::perl::array::str_int_range (from Perl distribution Data-Sah-CoerceRule-array-str_int_range), released on 2018-04-17.
+This document describes version 0.002 of Data::Sah::Coerce::perl::array::str_int_range (from Perl distribution Data-Sah-CoerceRule-array-str_int_range), released on 2018-06-04.
 
 =head1 DESCRIPTION
 

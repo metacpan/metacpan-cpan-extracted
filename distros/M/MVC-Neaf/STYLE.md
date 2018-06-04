@@ -8,9 +8,9 @@ Please read this file carefully if you are going to contribute.
 
 * Use Egyptian braces always:
 
-    sub foo {
-        return "bar";
-    };
+        sub foo {
+            return "bar";
+        };
 
 * Use 5.8.8 features only (no defined-or, HOW I miss it).
 
@@ -26,16 +26,16 @@ Try to increase patch number when committing to master.
 
 * Please run tests before you commit:
 
-    prove -Ilib xt t
+        prove -Ilib xt t
 
 or
 
-    perl Makefile.PL && make test
+        perl Makefile.PL && make test
 
 * Please start commit message with a 3+capital letter tag:
 
-    git commit README -m "DOC Documentation fixup"
-    git commit lib -m "CORE Improved performance"
+        git commit README -m "DOC Documentation fixup"
+        git commit lib -m "CORE Improved performance"
 
 etc.
 

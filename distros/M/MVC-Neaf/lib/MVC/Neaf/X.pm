@@ -2,7 +2,10 @@ package MVC::Neaf::X;
 
 use strict;
 use warnings;
-our $VERSION = 0.2203;
+our $VERSION = 0.2501;
+
+# This class is empty (yet).
+# See MVC::Neaf::Util::Base for implementation
 
 =head1 NAME
 
@@ -31,19 +34,13 @@ Some convenience methods here to help develop.
 
 =cut
 
-use Carp;
+use parent qw(MVC::Neaf::Util::Base);
 
 =head2 new( %options )
 
 Will happily accept any args and pack them into self.
 
 =cut
-
-sub new {
-    my ($class, %opt) = @_;
-
-    return bless \%opt, $class;
-};
 
 =head2 my_croak( $message )
 
@@ -53,13 +50,18 @@ in which error occurred.
 
 =cut
 
-sub my_croak {
-    my ($self, $msg) = @_;
+=head1 LICENSE AND COPYRIGHT
 
-    my $sub = [caller(1)]->[3];
-    $sub =~ s/.*:://;
+This module is part of L<MVC::Neaf> suite.
 
-    croak join "", (ref $self || $self),"->",$sub,": ",$msg;
-};
+Copyright 2016-2018 Konstantin S. Uvarin C<khedin@cpan.org>.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+=cut
 
 1;

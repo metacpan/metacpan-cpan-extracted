@@ -13,6 +13,7 @@ WriteMakefile(
     MIN_PERL_VERSION => '5.10.1',
     PREREQ_PM => {
         'Cpanel::JSON::XS' => 3.0213,
+        'YAML::XS'         => 0,
         'JSON::Validator'  => 1.08,
         'String::Random'   => 0.29,
         'Mojolicious'      => '7.15',

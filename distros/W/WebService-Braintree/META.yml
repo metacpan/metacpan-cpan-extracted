@@ -22,6 +22,7 @@ meta-spec:
 name: WebService-Braintree
 requires:
   Class::Load::XS: '0'
+  DDP: '0'
   Data::GUID: '0'
   DateTime: '0'
   DateTime::Format::Atom: '0'
@@ -56,5 +57,5 @@ resources:
   bugtracker: https://github.com/singingfish/braintree_perl/issues
   homepage: https://www.braintreepayments.com
   repository: git://github.com/singingfish/braintree_perl.git
-version: '1.4'
+version: '1.5'
 x_serialization_backend: 'YAML::Tiny version 1.69'

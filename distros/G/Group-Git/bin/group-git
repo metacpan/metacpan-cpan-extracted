@@ -19,7 +19,7 @@ use Config::Any;
 use Term::ANSIColor qw/colored/;
 use File::chdir;
 
-our $VERSION = version->new('0.6.8');
+our $VERSION = version->new('0.6.9');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 main();
@@ -57,6 +57,7 @@ sub main {
             'max|M=i',
             'runtime|max-runtime|R=i',
             'local|l!',
+            'limit|L=i',
             'recurse|r!',
             'page|p!',
             'tag|t=s',
@@ -111,12 +112,14 @@ sub main {
     while ($group->runs) {
         $group->runs(0);
 
+        my $total = 0;
         for my $project ( sort sorter keys %{ $group->repos } ) {
             next if $skip  && $project =~ /$skip/;
             next if $match && $project !~ /$match/;
             next if $exclude{$project};
             next if %include && !$include{$project};
             next if !tagged($conf, $opt->tag, $project, $group->repos->{$project});
+            last if !$opt->limit || $total++ >= $opt->limit;
 
             push @threads, {
                 project => $project,
@@ -318,7 +321,7 @@ group-git - Perform operations over many git repositories at once
 
 =head1 VERSION
 
-This documentation refers to group-git version 0.6.8.
+This documentation refers to group-git version 0.6.9.
 
 =head1 SYNOPSIS
 
@@ -354,6 +357,9 @@ This documentation refers to group-git version 0.6.8.
   -v --verbose  Show more details
 
   Other:
+  -L --limit[=]int
+                Limit the total number of repos processed (useful for testing
+                commands, --limit 0 means don't limit the default)
   -M --max[=]int
                 Limit the number of symultanious threads running at once.
                 Default 10 threads

@@ -1,6 +1,8 @@
 use utf8;
 use warnings;
 no warnings 'redefine';
+#no warnings;
+
 use vars qw(
     $m_sDump 
     $m_sPdmp 
@@ -11,6 +13,8 @@ use vars qw(
     @m_aTree 
     %disallowedKeys
     %params
+    $deleteTempIndex
+    $tempDeleteRef
 );
 $m_sPdmp = param('dump') ? param('dump') : 'navigation';
 $m_sDump = $m_hrSettings->{tree}{$m_sPdmp};
@@ -121,13 +125,13 @@ sub moveEntry {
     for (my $i = 0 ; $i <= @$t ; $i++) {
         next if ref @$t[$i] ne 'HASH';
         if (@$t[$i]) {
-            if (@$t[$i]->{rid} eq $find && defined $m_hrTempNode->{id}) {
+            if (@$t[$i]->{rid} eq $find) {
+                splice @$tempDeleteRef, $deleteTempIndex, 1;
                 splice @$t, $i, 0, $m_hrTempNode;
                 return 1;
             }
-            no warnings;
-            if (defined @{@$t[$i]->{subtree}}) {
-                moveEntry(\@{@$t[$i]->{subtree}}, $find);
+            if (ref @$t[$i]->{subtree}[0] eq "HASH") {
+               moveEntry(\@{@$t[$i]->{subtree}}, $find);
             }
         }
     }
@@ -139,15 +143,16 @@ sub getEntry {
     my $goto = shift;
     for (my $i = 0 ; $i < @$t ; $i++) {
         next if ref @$t[$i] ne 'HASH';
-        no warnings;
         if (@$t[$i]->{rid} eq $find) {
             undef $m_hrTempNode;
             foreach (keys %{@$t[$i]}) {
                 $m_hrTempNode->{$_} = @$t[$i]->{$_};
             }
-            splice @$t, $i, 1;
+            $tempDeleteRef = $t;
+            $deleteTempIndex = $i;
             moveEntry(\@m_aTree, $goto);
-        } elsif (defined @{@$t[$i]->{subtree}}) {
+            
+        } elsif (ref @$t[$i]->{subtree}[0] eq "HASH") {
             getEntry(\@{@$t[$i]->{subtree}}, $find, $goto);
         }
     }
@@ -205,7 +210,6 @@ sub addEntry {
     my $find = shift;
     $find = $find ? $find : 1;
     for (my $i = 0 ; $i < @$t ; $i++) {
-        no warnings;
         if (@$t[$i]->{rid} eq $find) {
             my %params = Vars();
             my $node   = {};
@@ -234,7 +238,7 @@ sub addEntry {
             &rid();
             saveTree($m_sDump, \@m_aTree);
             return;
-        } elsif (defined @{@$t[$i]->{subtree}}) {
+        } elsif (ref @$t[$i]->{subtree}[0] eq "HASH") {
             &addEntry(\@{@$t[$i]->{subtree}}, $find);
         }
     }
@@ -244,7 +248,6 @@ sub saveEntry {
     my $t    = shift;
     my $find = shift;
     for (my $i = 0 ; $i < @$t ; $i++) {
-        no warnings;
         if (@$t[$i]->{rid} eq $find) {
             my %params = Vars();
             foreach my $key (keys %params) {
@@ -255,7 +258,7 @@ sub saveEntry {
             }
             &saveTree($m_sDump, \@m_aTree);
             return;
-        } elsif (defined @{@$t[$i]->{subtree}}) {
+        } elsif (ref @$t[$i]->{subtree}[0] eq "HASH") {
             &saveEntry(\@{@$t[$i]->{subtree}}, $find);
         }
     }
@@ -268,7 +271,6 @@ sub editEntry {
     language('de') if $ACCEPT_LANGUAGE eq 'de';
     my $node = help();
     for (my $i = 0 ; $i < @$t ; $i++) {
-        no warnings;
         if (@$t[$i]->{rid} eq $find) {
             print '<div align="center" class="marginTop"><b>'
               . @$t[$i]->{text}
@@ -298,7 +300,7 @@ sub editEntry {
               qq(<tr><td><input type="hidden" name="action" value="saveTreeviewEntry"/><input type="hidden" name="rid" value="@$t[$i]->{rid}"/><input type="hidden" name="dump" value="$m_sPdmp"/></td><td><input type="submit" value="save"/></td></tr></table></form></div>);
             saveTree($m_sDump, \@m_aTree);
             return;
-        } elsif (defined @{@$t[$i]->{subtree}}) {
+        } elsif (ref @$t[$i]->{subtree}[0] eq "HASH") {
             &editEntry(\@{@$t[$i]->{subtree}}, $find);
         }
     }
@@ -308,7 +310,6 @@ sub sortUp {
     my $t    = shift;
     my $find = shift;
     for (my $i = 0 ; $i <= @$t ; $i++) {
-        no warnings;
         if (defined @$t[$i]) {
             if (@$t[$i]->{rid} eq $find) {
                 $i++ if ($down);
@@ -316,7 +317,7 @@ sub sortUp {
                 splice @$t, $i - 1, 2, (@$t[$i], @$t[$i - 1]);
                 saveTree($m_sDump, \@m_aTree);
             }
-            if (defined @{@$t[$i]->{subtree}}) {
+            if (ref @$t[$i]->{subtree}[0] eq "HASH") {
                 sortUp(\@{@$t[$i]->{subtree}}, $find);
                 saveTree($m_sDump, \@m_aTree);
             }
@@ -328,11 +329,10 @@ sub deleteEntry {
     my $t    = shift;
     my $find = shift;
     for (my $i = 0 ; $i < @$t ; $i++) {
-        no warnings;
         if (@$t[$i]->{rid} eq $find) {
             splice @$t, $i, 1;
             saveTree($m_sDump, \@m_aTree);
-        } elsif (defined @{@$t[$i]->{subtree}}) {
+        } elsif (ref @$t[$i]->{subtree}[0] eq "HASH") {
             deleteEntry(\@{@$t[$i]->{subtree}}, $find);
         }
     }
@@ -341,11 +341,10 @@ sub deleteEntry {
 sub updateTree {
     my $t = shift;
     for (my $i = 0 ; $i < @$t ; $i++) {
-        no warnings;
         if (defined @$t[$i]) {
             @$t[$i]->{onmouseup} = 'confirmMove()';
 
-            #             @$t[$i]->{id}          = @$t[$i]->{id};
+            #@$t[$i]->{id}          = @$t[$i]->{id};
             @$t[$i]->{name}        = @$t[$i]->{id};
             @$t[$i]->{onmousedown} = "prepareMove('" . @$t[$i]->{id} . "')";
             @$t[$i]->{onmousemove} = "enableDropZone('" . @$t[$i]->{id} . "')";
@@ -356,13 +355,12 @@ sub updateTree {
 <td><a class="treeviewLink$m_nSize" target="_blank" title="@$t[$i]->{text}" href="@$t[$i]->{href}"><img src="style/$m_sStyle/$m_nSize/mimetypes/www.png" border="0" alt=""></a></td>
 <td><a class="treeviewLink$m_nSize" href="javascript:requestURI('$m_hrSettings->{cgi}{serverName}$ENV{SCRIPT_NAME}?action=editTreeviewEntry&dump=$m_sPdmp&rid=@$t[$i]->{rid}','editTreeviewEntry','editTreeviewEntry')"><img src="style/$m_sStyle/$m_nSize/mimetypes/edit.png" border="0" alt="edit"></a></td><td><a class="treeviewLink$m_nSize" onclick="confirm2('Delete ?',function(){requestURI('$m_hrSettings->{cgi}{serverName}$ENV{SCRIPT_NAME}?action=deleteTreeviewEntry&dump=$m_sPdmp&rid=@$t[$i]->{rid}','deleteTreeviewEntry','deleteTreeviewEntry')});"><img src="style/$m_sStyle/$m_nSize/mimetypes/editdelete.png" border="0" alt="delete"></a></td><td><a class="treeviewLink$m_nSize" href="javascript:requestURI('$ENV{SCRIPT_NAME}?action=upEntry&dump=$m_sPdmp&rid=@$t[$i]->{rid}#@$t[$i]->{id}','upEntry','upEntry')"><img src="style/$m_sStyle/$m_nSize/mimetypes/up.png" border="0" alt="up"></a></td><td><a class="treeviewLink$m_nSize" href="javascript:requestURI('$ENV{SCRIPT_NAME}?action=downEntry&dump=$m_sPdmp&rid=@$t[$i]->{rid}','downEntry','downEntry')"><img src="style/$m_sStyle/$m_nSize/mimetypes/down.png" border="0" alt="down"></a></td><td><a class="treeviewLink$m_nSize" href="javascript:requestURI('$ENV{SCRIPT_NAME}?action=newTreeviewEntry&dump=$m_sPdmp&rid=@$t[$i]->{rid}','newTreeviewEntry','newTreeviewEntry')"><img src="style/$m_sStyle/$m_nSize/mimetypes/filenew.png" border="0" alt="new"></a></td><td><input type="checkbox" name="markBox$i" class="markBox" value="@$t[$i]->{rid}" /></td></tr></table>|;
             @$t[$i]->{href} = '';
-            updateTree(\@{@$t[$i]->{subtree}}) if (defined @{@$t[$i]->{subtree}});
+            updateTree(\@{@$t[$i]->{subtree}}) if (ref @$t[$i]->{subtree}[0] eq "HASH");
         }
     }
 }
 
 sub rid {
-    no warnings;
     $m_nRid = 0;
     &getRid(\@m_aTree);
 
@@ -373,7 +371,7 @@ sub rid {
             next unless ref @$t[$i] eq 'HASH';
             @$t[$i]->{rid} = $m_nRid;
             @$t[$i]->{id}  = "a$m_nRid";
-            getRid(\@{@$t[$i]->{subtree}}) if (defined @{@$t[$i]->{subtree}});
+            getRid(\@{@$t[$i]->{subtree}}) if (ref @$t[$i]->{subtree}[0] eq "HASH");
         }
     }
 }

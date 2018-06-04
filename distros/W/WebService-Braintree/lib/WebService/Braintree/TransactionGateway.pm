@@ -58,19 +58,20 @@ sub retry_subscription_charge {
 }
 
 sub submit_for_settlement {
-    my ($self, $id, $params) = @_;
+    my ($self, $id, $amount, $params) = @_;
+    $params //= {};
 
     confess "NotFoundError" unless validate_id($id);
     confess "ArgumentError" unless verify_params($params, {
         order_id => 1,
-        description => {
+        descriptor => {
             name => 1,
             phone => 1,
             url => 1,
         },
     });
 
-    $self->_make_request("/transactions/$id/submit_for_settlement", "put", {transaction => $params});
+    $self->_make_request("/transactions/$id/submit_for_settlement", "put", { transaction => {%$params, amount => $amount}});
 }
 
 sub void {
@@ -134,12 +135,13 @@ sub cancel_release {
 
 sub update_details {
     my ($self, $id, $params) = @_;
+    $params //= {};
 
     confess "NotFoundError" unless validate_id($id);
     confess "ArgumentError" unless verify_params($params, {
         amount => 1,
         order_id => 1,
-        description => {
+        descriptor => {
             name => 1,
             phone => 1,
             url => 1,
@@ -151,11 +153,12 @@ sub update_details {
 
 sub submit_for_partial_settlement {
     my ($self, $id, $amount, $params) = @_;
+    $params //= {};
 
     confess "NotFoundError" unless validate_id($id);
     confess "ArgumentError" unless verify_params($params, {
         order_id => 1,
-        description => {
+        descriptor => {
             name => 1,
             phone => 1,
             url => 1,

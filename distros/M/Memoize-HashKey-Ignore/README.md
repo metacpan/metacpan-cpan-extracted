@@ -9,7 +9,7 @@ Memoize::HashKey::Ignore allows you to supply a code reference which describes, 
 This module will allow you to memoize the entire function with splitting it into cached and uncached pieces.
 
 [![Build Status](https://travis-ci.org/binary-com/perl-Memoize-HashKey-Ignore.svg?branch=master)](https://travis-ci.org/binary-com/perl-Memoize-HashKey-Ignore)
-[![Coverage Status](https://coveralls.io/repos/binary-com/perl-Memoize-HashKey-Ignore/badge.png?branch=master)](https://coveralls.io/r/binary-com/perl-Memoize-HashKey-Ignore?branch=master)
+[![codecov](https://codecov.io/gh/binary-com/perl-Memoize-HashKey-Ignore/branch/master/graph/badge.svg)](https://codecov.io/gh/binary-com/perl-Memoize-HashKey-Ignore)
 [![Gitter chat](https://badges.gitter.im/binary-com/perl-Memoize-HashKey-Ignore.png)](https://gitter.im/binary-com/perl-Memoize-HashKey-Ignore)
 
 SYNOPSIS

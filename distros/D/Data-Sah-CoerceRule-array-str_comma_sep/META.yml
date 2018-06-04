@@ -3,7 +3,7 @@ abstract: 'Coerce array from a comma-separated items in a string'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
-  Data::Sah::Coerce: '0.011'
+  Data::Sah::Coerce: '0.025'
   Data::Sah::CoerceJS: '0.011'
   File::Spec: '0'
   IO::Handle: '0'
@@ -26,8 +26,8 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-CoerceRule-array-str_comma_sep
   homepage: https://metacpan.org/release/Data-Sah-CoerceRule-array-str_comma_sep
-  repository: git://github.com///github.com/perlancar/perl-Data-Sah-CoerceRule-array-str_comma_sep.git
-version: '0.006'
+  repository: git://github.com/perlancar/perl-Data-Sah-CoerceRule-array-str_comma_sep.git
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

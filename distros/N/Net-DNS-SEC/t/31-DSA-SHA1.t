@@ -1,4 +1,4 @@
-# $Id: 31-DSA-SHA1.t 1668 2018-04-23 13:36:44Z willem $	-*-perl-*-
+# $Id: 31-DSA-SHA1.t 1677 2018-05-22 11:59:10Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -38,16 +38,15 @@ use_ok('Net::DNS::SEC::DSA');
 
 
 my $key = new Net::DNS::RR <<'END';
-DSA.example.	IN	DNSKEY	256 3 3 (
-	CMKzsCaT2Jy1w/sPdpigEE+nbeJ/x5C6cruWvStVum6/YulcR7MHeujx9c2iBDbo3kW4X8/l+qgk
-	7ZEZ+yV5lphWtJMmMtOHIU+YdAhgLpt84NKhcupWL8wfuBW/97cqIv5Z+51fwn0YEAcZsoCrE0nL
-	5+31VfkK9LTNuVo38hsbWa3eWZFalID5NesF6sJRgXZoAyeAH46EQVCq1UBnnaHslvSDkdb+Z1kT
-	bMQ64ZVI/sBRXRbqIcDlXVZurCTDV7JL9KZwwfeyrQcnVyYh5mdHPsXbpX5NQJvoqPgvRZWBpP4h
-	pjkAm9UrUbow9maPCQ1JQ3JuiU5buh9cjAI+QIyGMujKLT2OsogSZD2IFUciaZBL/rSe0gmAUv0q
-	XrczmIYFUCoRGZ6+lKVqQQ6f2U7Gsr6zRbeJN+JCVD6BJ52zjLUaWUPHbakhZb/wMO7roX/tnA/w
-	zoDYBIIF7yuRYWblgPXBJTK2Bp07xre8lKCRbzY4J/VXZFziZgHgcn9tkHnrfov04UG9zlWEdT6X
-	E/60HjrP ; Key ID = 53244
-	)
+DSA.example.	IN	DNSKEY	( 257 3 3
+	CKrKbLrir4slVXYFrA4Y8Rik/UxzkCo1Rp0Spz907VrJL8u3I/YKTTvoMh/GL2n3/NL/KgzNRWb8
+	pLB3FIWHjXXhn3r3sbld180DI4tv98CZKr86UDP0UUHVE/DkkEZw5PAy2nyhhKTJRvbR4ZT0OSZY
+	+GZA2hIzmMYk4gR2mwa3jCmAGqw2i0OtAYzSOe06uoELZLl96kRsFk69OcQxzrDKz5BEZZpNBpfZ
+	UBk/CRPDxBE2xjJkq3VpehAUCMOFpPQlEuW2D6CNuIbJY5pNpOF3RF17vkvxQx6678ZLIN3PdeG/
+	nGwoJJArbt7Y/q+b/NxnIu6RwApE40p/7pOq6qKcqPVU2oHR/N7oNiyHnh68gSonUFfy5lETiyw8
+	vDaJS/JhC2WQKzxxBo4oa/KFXFAd6NR6bE5h5XRWWqZvm2sBgcy+sKTbKcR4PDvaAoMguBjDeigm
+	/NV6phNbARV926NyQZOi5uUeBYA16v1KnUll7A3I9wt3ykVIbx0WqB4Ozzk2PF/3vH3wudO5bL72
+	zK1Yox60 ) ; Key ID = 53264
 END
 
 ok( $key, 'set up DSA public key' );
@@ -59,11 +58,11 @@ open( KEY, ">$keyfile" ) or die "$keyfile $!";
 print KEY <<'END';
 Private-key-format: v1.2
 Algorithm: 3 (DSA)
-Prime(p): x5C6cruWvStVum6/YulcR7MHeujx9c2iBDbo3kW4X8/l+qgk7ZEZ+yV5lphWtJMmMtOHIU+YdAhgLpt84NKhcupWL8wfuBW/97cqIv5Z+51fwn0YEAcZsoCrE0nL5+31VfkK9LTNuVo38hsbWa3eWZFalID5NesF6sJRgXZoAyc=
-Subprime(q): wrOwJpPYnLXD+w92mKAQT6dt4n8=
-Base(g): gB+OhEFQqtVAZ52h7Jb0g5HW/mdZE2zEOuGVSP7AUV0W6iHA5V1Wbqwkw1eyS/SmcMH3sq0HJ1cmIeZnRz7F26V+TUCb6Kj4L0WVgaT+IaY5AJvVK1G6MPZmjwkNSUNybolOW7ofXIwCPkCMhjLoyi09jrKIEmQ9iBVHImmQS/4=
-Private_value(x): vdClrOqZ1qONKg0CZH5hVnq1i40=
-Public_value(y): tJ7SCYBS/SpetzOYhgVQKhEZnr6UpWpBDp/ZTsayvrNFt4k34kJUPoEnnbOMtRpZQ8dtqSFlv/Aw7uuhf+2cD/DOgNgEggXvK5FhZuWA9cElMrYGnTvGt7yUoJFvNjgn9VdkXOJmAeByf22Qeet+i/ThQb3OVYR1PpcT/rQeOs8=
+Prime(p): kCo1Rp0Spz907VrJL8u3I/YKTTvoMh/GL2n3/NL/KgzNRWb8pLB3FIWHjXXhn3r3sbld180DI4tv98CZKr86UDP0UUHVE/DkkEZw5PAy2nyhhKTJRvbR4ZT0OSZY+GZA2hIzmMYk4gR2mwa3jCmAGqw2i0OtAYzSOe06uoELZLk=
+Subprime(q): qspsuuKviyVVdgWsDhjxGKT9THM=
+Base(g): fepEbBZOvTnEMc6wys+QRGWaTQaX2VAZPwkTw8QRNsYyZKt1aXoQFAjDhaT0JRLltg+gjbiGyWOaTaThd0Rde75L8UMeuu/GSyDdz3Xhv5xsKCSQK27e2P6vm/zcZyLukcAKRONKf+6TquqinKj1VNqB0fze6DYsh54evIEqJ1A=
+Private_value(x): drOKJBTwCM0O9U6tpIgymGyBrao=
+Public_value(y): V/LmUROLLDy8NolL8mELZZArPHEGjihr8oVcUB3o1HpsTmHldFZapm+bawGBzL6wpNspxHg8O9oCgyC4GMN6KCb81XqmE1sBFX3bo3JBk6Lm5R4FgDXq/UqdSWXsDcj3C3fKRUhvHRaoHg7POTY8X/e8ffC507lsvvbMrVijHrQ=
 END
 close(KEY);
 
@@ -72,11 +71,10 @@ ok( $private, 'set up DSA private key' );
 
 
 my $wrongkey = new Net::DNS::RR <<'END';
-RSAMD5.example. IN	KEY	512 3 1 (
-	AwEAAc6K704XNTQYlCPw1R5qBNdPg3SxOdhEWdDFlPdCeeBL1UDSdUG1ijcNkoGCKpFXLaTqeJAH
-	+VkXhOGUSvFxIOOmtxb3ubwFf80Up1iKwACNmfCgDlGm8EzGKVoPGcuXkwcxFsQtBoKqT6lWR3at
-	6MT/bnuwIIVaD91u1L+/tVw7 ; Key ID = 46428
-	)
+RSAMD5.example.	IN	KEY	( 512 3 1
+	AwEAAcUHtdNvhdBKMkUle+MJ+ntJ148yfsITtZC0g93EguURfU113BQVk6tzgXP/aXs4OptkCgrL
+	sTapAZr5+vQ8jNbLp/uUTqEUzBRMBqi0W78B3aEb7vEsC0FB6VLoCcjylDcKzzWHm4rj1ACN2Zbu
+	6eT88lDYHTPiGQskw5LGCze7 ) ; Key ID = 2871
 END
 
 ok( $wrongkey, 'set up non-DSA public key' );
@@ -88,14 +86,14 @@ open( KEY, ">$wrongfile" ) or die "$wrongfile $!";
 print KEY <<'END';
 Private-key-format: v1.2
 Algorithm: 1 (RSA)
-Modulus: zorvThc1NBiUI/DVHmoE10+DdLE52ERZ0MWU90J54EvVQNJ1QbWKNw2SgYIqkVctpOp4kAf5WReE4ZRK8XEg46a3Fve5vAV/zRSnWIrAAI2Z8KAOUabwTMYpWg8Zy5eTBzEWxC0GgqpPqVZHdq3oxP9ue7AghVoP3W7Uv7+1XDs=
+Modulus: xQe102+F0EoyRSV74wn6e0nXjzJ+whO1kLSD3cSC5RF9TXXcFBWTq3OBc/9pezg6m2QKCsuxNqkBmvn69DyM1sun+5ROoRTMFEwGqLRbvwHdoRvu8SwLQUHpUugJyPKUNwrPNYebiuPUAI3Zlu7p5PzyUNgdM+IZCyTDksYLN7s=
 PublicExponent: AQAB
-PrivateExponent: hMPcJddXNMCj4SJ67Az8Rabv+j+9zh3JmiCXrAUIMLyuPPfLtcxLJy5LQYJ5eGmQhpTNoM/vYWxz10kqj17H40ZpAbrfD8/TZtQDnEA2Nzlp3F+qswpmMRih82LzqzpBm0l8lbqnyIRthHfytisG52YWW8pZ0jlBuQb7whO+ajk=
-Prime1: 6hj6OPHOP/1AuLiiQo8FcxFyES6WAKvJlcqKX2wb7Gxz6yPfTQlR7WcueEn60r75rF9VAS46qxa3XIsvBuETJw==
-Prime2: 4d35IrQ/bVCtdQ7A9DyUNmOVtS6bPCJBEVLI+M6dmj1icGJiiwNdCXbX3uaOG0SEh2/oXGBbw9wX8D1xDWqKzQ==
-Exponent1: FvM17Mk/+CQC6Vkohy/wT9ShAzA3An/U9ntxz2MQ5b/IKYBNzwaf4o9gDejqzyhr38tE0SXQGJ/UgB0hEiKUtw==
-Exponent2: KEOs3Q3q3K7sLRjzNtbxyPxZvNHRJJgqp07tusUCfXOB7+zqCkQQOtavxvGs1ZmSUp6VeppG4ZSDw/UACVc75Q==
-Coefficient: QIVRcEFrFbmhJntBjCZOgJ4tKaiJJ3s4J97RMR6xQ1pLVwlOKKozJbjVx2tZyb11/UQliVTHlgrqYGL/oWBMKw==
+PrivateExponent: yOATgH0y8Ci1F8ofhFmoBgpCurvAgB2X/vALgQ3YZbJvDYob1l4pL6OTV7AO2pF5LvPPSTJielfUSyyRrnANJSST/Dr19DgpSpnY2GWE7xmJ6/QqnIaJ2+10pFzVRXShijJZjt9dY7JXmNIoQ+JseE08aquKHFEGVfsvkThk8Q==
+Prime1: 9lyWnGhbZZwVQo/qNHjVeWEDyc0hsc/ynT4Qp/AjVhROY+eJnBEvhtmqj3sq2gDQm2ZfT8uubSH5ZkNrnJjL2Q==
+Prime2: zL0L5kwZXqUyRiPqZgbhFEib210WZne+AI88iyi39tU/Iplx1Q6DhHmOuPhUgCCj2nqQhWs9BAkQwemLylfHsw==
+Exponent1: rcETgHChtYJmBDIYTrXCaf8get2wnAY76ObzPF7DrVxZBWExzt7YFFXEU7ncuTDF8DQ9mLvg45uImLWIWkPx0Q==
+Exponent2: qtb8vPi3GrDCGKETkHshCank09EDRhGY7CKZpI0fpMogWqCrydrIh5xfKZ2d9SRHVaF8QrhPO7TM1OIqkXdZ3Q==
+Coefficient: IUxSSCxp+TotMTbloOt/aTtxlaz0b5tSS7dBoLa7//tmHZvHQjftEw8KbXC89QhHd537YZX4VcK/uYbU6SesRA==
 END
 close(KEY);
 

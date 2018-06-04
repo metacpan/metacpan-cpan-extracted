@@ -1,4 +1,7 @@
 Revision history for WebService-Braintree
+1.5     2018-06-04
+        Add missing dependency
+        Fixes for github issue #27
 1.4     2018-06-02
         Force TLS 1.2 - thanks tonyo
         Add support for the use of the object interface.

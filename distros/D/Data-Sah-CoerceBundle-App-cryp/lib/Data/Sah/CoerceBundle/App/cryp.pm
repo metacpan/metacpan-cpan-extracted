@@ -1,7 +1,7 @@
 package Data::Sah::CoerceBundle::App::cryp;
 
-our $DATE = '2018-05-31'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-06-04'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Coercion rules for the 'cryp' app family
@@ -18,7 +18,7 @@ Data::Sah::CoerceBundle::App::cryp - Coercion rules for the 'cryp' app family
 
 =head1 VERSION
 
-This document describes version 0.002 of Data::Sah::CoerceBundle::App::cryp (from Perl distribution Data-Sah-CoerceBundle-App-cryp), released on 2018-05-31.
+This document describes version 0.003 of Data::Sah::CoerceBundle::App::cryp (from Perl distribution Data-Sah-CoerceBundle-App-cryp), released on 2018-06-04.
 
 =head1 HOMEPAGE
 

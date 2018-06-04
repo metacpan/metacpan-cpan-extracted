@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.56
+    version 0.58
 
 SYNOPSIS
 
@@ -25,7 +25,7 @@ SYNOPSIS
 DESCRIPTION
 
     Dist::Zilla::Plugin::GithubMeta is a Dist::Zilla plugin to include
-    GitHub https://github.com meta information in META.yml.
+    GitHub https://github.com meta information in META.yml and META.json.
 
     It automatically detects if the distribution directory is under git
     version control and whether the origin is a GitHub repository and will

@@ -1,0 +1,18 @@
+#!perl
+
+use strict;
+use warnings;
+use feature qw/ say /;
+
+use FindBin qw/ $Script /;
+use File::Slurper qw/ read_text /;
+use JSON::Schema::ToJSON;
+use Data::Dump qw/ dump /;
+
+my $ToJSON = JSON::Schema::ToJSON->new;
+my $str    = shift || die "Usage: $Script <json schema string or file>";
+my $struct = $ToJSON->json_schema_to_json(
+	schema_str => -f $str ? read_text( $str ) : $str,
+);
+
+say dump( $struct );

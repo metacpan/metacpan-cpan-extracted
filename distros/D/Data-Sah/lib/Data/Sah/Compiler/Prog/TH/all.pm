@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::Prog::TH::all;
 
-our $DATE = '2018-05-29'; # DATE
-our $VERSION = '0.890'; # VERSION
+our $DATE = '2018-06-03'; # DATE
+our $VERSION = '0.891'; # VERSION
 
 use 5.010;
 use strict;
@@ -42,7 +42,7 @@ Data::Sah::Compiler::Prog::TH::all - Base class for programming language compile
 
 =head1 VERSION
 
-This document describes version 0.890 of Data::Sah::Compiler::Prog::TH::all (from Perl distribution Data-Sah), released on 2018-05-29.
+This document describes version 0.891 of Data::Sah::Compiler::Prog::TH::all (from Perl distribution Data-Sah), released on 2018-06-03.
 
 =for Pod::Coverage ^(clause_.+|superclause_.+)$
 

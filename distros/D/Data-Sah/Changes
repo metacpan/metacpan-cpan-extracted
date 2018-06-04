@@ -1,3 +1,10 @@
+0.891    2018-06-03 (PERLANCAR)
+
+	- Adjust to Data::Sah::Coerce 0.025 (bump metadata version to 3, coerce
+          expression now can contain coercion error message as well as coerced
+          result).
+
+
 0.890    2018-05-29 (PERLANCAR)
 
 	- No functional changes.

@@ -2,7 +2,7 @@ package MVC::Neaf::X::Session;
 
 use strict;
 use warnings;
-our $VERSION = 0.2203;
+our $VERSION = 0.2501;
 
 =head1 NAME
 
@@ -72,7 +72,7 @@ This of course is only going to work as a standalone application server
 use Digest::MD5;
 use Time::HiRes qw(gettimeofday);
 use Sys::Hostname qw(hostname);
-use MIME::Base64 qw(encode_base64);
+use MVC::Neaf::Util qw(encode_b64);
 
 use parent qw(MVC::Neaf::X);
 
@@ -160,7 +160,7 @@ sub get_session_id {
     # salt before second round of hashing
     # public data (session_id) should NOT be used for generation
     $old_rand = int (rand() * $max );
-    my $ret = encode_base64( $Hash->( pack "a*L", $old_mix, $old_rand ) );
+    my $ret = encode_b64( $Hash->( pack "a*L", $old_mix, $old_rand ) );
     $ret =~ s/[\s=]+//gs;
     $ret = substr( $ret, 0, $Truncate )
         if $Truncate and $Truncate < length $ret;
@@ -244,5 +244,19 @@ from time to time since some users may go away without logging out
 =cut
 
 sub delete_session { return };
+
+=head1 LICENSE AND COPYRIGHT
+
+This module is part of L<MVC::Neaf> suite.
+
+Copyright 2016-2018 Konstantin S. Uvarin C<khedin@cpan.org>.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+=cut
 
 1;

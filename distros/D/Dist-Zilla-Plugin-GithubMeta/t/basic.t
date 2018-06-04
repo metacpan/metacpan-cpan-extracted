@@ -1,39 +1,12 @@
 use strict;
 use warnings;
 use Test::More 0.88;
-use IPC::Cmd qw[can_run];
-use Try::Tiny;
 use Test::Deep;
-
-unless ( can_run('git') ) {
-  ok('No git, no dice');
-  done_testing;
-  exit 0;
-}
-
-{
-  my ($gitver) = `git version`;
-  my ($ver) = $gitver =~ m!git version ([0-9.]+(\.msysgit)?[0-9.]+)!;
-  $ver =~ s![^\d._]!!g;
-  $ver =~ s!\.$!!;
-  $ver =~ s!\.+!.!g;
-  chomp $gitver;
-  require version;
-  my $ver_obj = try { version->parse( $ver ) }
-    catch { die "'$gitver' not parsable as '$ver': $_" };
-  if ( $ver_obj < version->parse('1.5.0') ) {
-    diag("$gitver is too low, 1.5.0 or above is required");
-    ok("$gitver is too low, 1.5.0 or above is required");
-    done_testing;
-    exit 0;
-  }
-  diag("Using $gitver\n");
-}
+use Test::DZil;
 
 use lib 't/lib';
+use GitSetup;
 
-use Test::Deep qw(all ignore superhashof);
-use Test::DZil;
 
 test_plugin("simplest case, ssh url" => {
   plugin => { },
@@ -109,14 +82,17 @@ sub git_config_for {
 
 sub test_plugin {
   my ($desc, $test) = @_;
+
+  my $tempdir = no_git_tempdir();
+
   my $gitconfig = git_config_for($test);
 
   my $tzil = Builder->from_config(
     { dist_root => 'corpus/GHM-Sample' },
     {
+      tempdir_root => $tempdir->stringify,
       add_files => {
         'source/dist.ini'    => simple_ini(
-          'MetaJSON',
           [ GithubMeta => $test->{plugin} ],
         ),
         'source/.git/config' => git_config_for($test->{git}),
@@ -127,6 +103,7 @@ sub test_plugin {
     },
   );
 
+  $tzil->chrome->logger->set_debug(1);
   $tzil->build;
 
   cmp_deeply(
@@ -147,4 +124,7 @@ sub test_plugin {
     ),
     $desc,
   );
+
+  diag 'got log messages: ', explain $tzil->log_messages
+    if not Test::Builder->new->is_passing;
 }

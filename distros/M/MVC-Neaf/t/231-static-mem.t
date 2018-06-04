@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use MVC::Neaf qw(:sugar);
+use MVC::Neaf;
 
 neaf static => '/foo' => [ 'Food Bard', 'text/lame' ];
 

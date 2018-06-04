@@ -1,7 +1,7 @@
 package Sah::Schema::perl::modname;
 
-our $DATE = '2018-04-03'; # DATE
-our $VERSION = '0.011'; # VERSION
+our $DATE = '2018-06-04'; # DATE
+our $VERSION = '0.012'; # VERSION
 
 our $schema = [str => {
     summary => 'Perl module name',
@@ -41,7 +41,7 @@ Sah::Schema::perl::modname - Perl module name
 
 =head1 VERSION
 
-This document describes version 0.011 of Sah::Schema::perl::modname (from Perl distribution Sah-Schemas-Perl), released on 2018-04-03.
+This document describes version 0.012 of Sah::Schema::perl::modname (from Perl distribution Sah-Schemas-Perl), released on 2018-06-04.
 
 =head1 DESCRIPTION
 

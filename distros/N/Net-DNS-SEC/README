@@ -6,7 +6,7 @@ Net::DNS::SEC - DNSSEC extensions to Net::DNS
    -----------
 
 This module is designed as an extension the Net::DNS package
-(http://search.cpan.org/dist/Net-DNS/).
+(https://metacpan.org/release/Net-DNS).
 
 The module implements the cryptographic signature generation and
 verification functions that are relevant for DNSSEC operations.
@@ -45,7 +45,7 @@ and for the use of SIG0 see:
 You can get the latest version of Net::DNS::SEC from the
 Comprehensive Perl Archive Network (CPAN):
 
-	http://search.cpan.org/dist/Net-DNS-SEC/
+	https://metacpan.org/release/Net-DNS-SEC
 
 or through
 
@@ -183,4 +183,4 @@ DEALINGS IN THE SOFTWARE.
 
 
 ------------------------------------------------------------------------------
-$Id: README 1669 2018-04-27 10:17:13Z willem $
+$Id: README 1677 2018-05-22 11:59:10Z willem $

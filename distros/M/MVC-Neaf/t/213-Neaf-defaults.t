@@ -7,18 +7,18 @@ use MVC::Neaf::Util qw(JSON encode_json decode_json);
 
 use MVC::Neaf;
 
-MVC::Neaf->route( '/foo/bar' => sub { +{} }
+neaf->route( '/foo/bar' => sub { +{} }
     , default => { lang => 'Perl' }
     , -view => 'JS'
     , -type => 'x-text/jason'
 );
 
-MVC::Neaf->set_path_defaults( '/foo' => { answer => 42 } );
-MVC::Neaf->set_path_defaults( '/foo' => { fine => 137 } );
-MVC::Neaf->set_path_defaults( '/f' => { rubbish => 314 } );
+neaf->set_path_defaults( { answer => 42 }, path => '/foo' );
+neaf->set_path_defaults( { fine => 137 }, path => '/foo' );
+neaf->set_path_defaults( { rubbish => 314 }, path => '/f' );
 
 my ($status, $head, $result)
-    = MVC::Neaf->run_test( { REQUEST_URI => '/foo/bar' } );
+    = neaf->run_test( { REQUEST_URI => '/foo/bar' } );
 
 is $status, 200, "Request ok";
 is_deeply( decode_json($result)

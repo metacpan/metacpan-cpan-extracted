@@ -2,6 +2,9 @@ use vars qw/$RIBBONCONTENT $PAGES $SQL %m_hUserRights $set $typId/;
 use utf8;
 no warnings 'redefine';
 no warnings 'uninitialized';
+use Search::Tools::UTF8;
+use Symbol;
+use POSIX 'floor';
 
 ChangeDb(
          {
@@ -192,7 +195,7 @@ sub ShowNewTable {
       <td class="forms"><input type="checkbox" name="$sUniqueFulltext" title="Fulltext" /></td>
       <td class="forms"><input type="checkbox" name="$sUniqueIndex" title="Index"/></td>
       <td class="forms right"><input type="checkbox" name="$sUniqueUnique" title="Unique"/></td></tr>};
-            push $vars{rows},
+            push @{$vars{rows}},
               {
                 Field    => $sUniqueField,
                 Type     => $sUniqueType,
@@ -468,7 +471,7 @@ sub searchHelpTopic {
     my $sContent = '';
     print '<div class="ShowTables marginTop">';
     for (my $j = 0 ; $j <= $#aoh ; $j++) {
-        print qq|<a onclick="\$('hid$j').scrollIntoView();">$aoh[$j]->{name}</a><br/>|;
+        print qq|<a onclick="document.getElementById('hid$j').scrollIntoView();">$aoh[$j]->{name}</a><br/>|;
         $sContent .=
           qq|<div class="ShowTables"><a id="hid$j" href="$aoh[$j]->{url}">$aoh[$j]->{name}</a><a onclick="hide('Example$j');visible('Description$j');">Description</a> |;
         $sContent .=
@@ -681,7 +684,7 @@ sub ExecSql {
     my $id2        = 0;
     $SQL .= $sql;
     my %types = (
-                 '1'   => 'CHAR',
+                 '1.07'   => 'CHAR',
                  '2'   => 'NUMERIC',
                  '3'   => 'DECIMAL',
                  '4'   => 'INTEGER',
@@ -740,12 +743,10 @@ sub ExecSql {
                             $TMPRIBBONCONTENT .= q|</tr><tr>|;
                             for (my $i = 0 ; $i <= $#rows ; $i++)
                             {
-				eval{
-				  use Search::Tools::UTF8;
-				  unless (is_valid_utf8($rows[$i])) {
-				      utf8::decode($rows[$i]);
-				  }
-                                };
+							  
+							  unless (is_valid_utf8($rows[$i])) {
+								  utf8::decode($rows[$i]);
+							  }
                                 $TMPRIBBONCONTENT .=
                                   q|<td class="values" >| . encode_entities($rows[$i]) . '</td>';
                             }
@@ -919,7 +920,7 @@ sub ShowTable {
             {
              class => 'toolbarButton',
              onclick =>
-               q|$('popupContent1').style.left='5%';$('popupContent1').style.width='90%';showPopup('NewEntry');|,
+               q|document.getElementById('popupContent1').style.left='5%';document.getElementById('popupContent1').style.width='90%';showPopup('NewEntry');|,
              onmouseover => q|window.status='| . translate('NewEntry') . q|'|,
              title       => translate('NewEntry')
             },
@@ -1043,7 +1044,7 @@ sub ShowTable {
                    "javascript:requestURI('$m_hrSettings->{cgi}{serverName}$ENV{SCRIPT_NAME}?action=ShowTable&table=$tbl&links_pro_page=$lpp&von=$m_nStart&orderBy=$caption[$i]->{'Field'}&desc="
                    . (
                       $field eq $caption[$i]->{'Field'}
-                      ? ($desc eq 'desc' ? '0' : '1')
+                      ? ($desc eq 'desc' ? '0' : '1.07')
                       : '0'
                      )
                    . q|','ShowTable','showTable')|,
@@ -1088,7 +1089,6 @@ sub ShowTable {
             for (my $j = 0 ; $j <= $rows ; $j++) {
                 my $headline;
                 eval{
-		  use Search::Tools::UTF8;
 		  utf8::encode( $a[$i]->{$caption[$j]->{Field}}) unless is_valid_utf8($a[$i]->{$caption[$j]->{Field}});
 		};
                 if ($caption[$j]->{Type} =~ /blob|longblob|mediumblob|tinyblob/) {
@@ -1420,7 +1420,6 @@ sub downLoadFile {
     closedir $dh;
     chdir($m_hrSettings->{uploads}{path});
     unlink(@files);
-    use Symbol;
     my $fh = gensym();
     open $fh, ">$m_hrSettings->{uploads}{path}/$pkeyValue.bak"
       or warn "tables::downLoadFile: $m_hrSettings->{uploads}{path}/$pkeyValue.bak $!";
@@ -1467,7 +1466,6 @@ sub ShowNewEntry {
     </tr>
     );
         for (my $j = 0 ; $j <= $#caption ; $j++) {
-            no warnings;
             $caption[$j]->{'Type'} = uc $caption[$j]->{'Type'};
           SWITCH: {
                 if ($caption[$j]->{Type} eq 'TEXT') {
@@ -1665,7 +1663,6 @@ sub DeleteEntry {
     }
 }
 
-use POSIX 'floor';
 
 =head2 round
   
@@ -1676,7 +1673,7 @@ private
 sub round {
     my $x = shift;
     $x = $x ? $x : 0;
-    no warnings 'numeric';
+    #no warnings 'numeric';
     floor($x + 0.5) if ($x =~ /\d+/);
     return $x;
 }
@@ -1712,7 +1709,7 @@ sub ShowTables {
         $PAGES = '';
         $end   = $#a;
     }
-    no warnings;    #don't want flood the eror.log with "non numeric" warnings .
+ #   no warnings;    #don't want flood the eror.log with "non numeric" warnings .
     @a = sort { round($a->{$orderby}) <=> round($b->{$orderby}) } @a;
     @a = reverse @a if $state;
 
@@ -1961,7 +1958,7 @@ sub ShowTableDetails {
   <td class="caption3">Value</td>
   </tr>);
 
-    no warnings;
+    # no warnings;
     my $name = param('table');
     for (my $i = 0 ; $i <= $#a ; $i++) {
         if ($a[$i]->{Name} eq $name) {
@@ -2412,7 +2409,7 @@ sub EditTable {
            <td class="caption"></td>
            <td class="caption captionRight"></td>
        </tr>';
-            no warnings;
+            # no warnings;
             print qq|
        <tr>
        <td class="values">$_->{'Non_unique'}</td>
@@ -3110,7 +3107,7 @@ sub ShowDbHeader {
     </div> 
     <div id="ChangeCurrentDb" style="display:none;">
     <form name="CurrentDb" class="ChangeCurrentDb" method="get"  onsubmit="submitForm(this,'ChangeCurrentDb','ChangeCurrentDb');return false;"  accept-charset="UTF-8" >
-    <input type="hidden" name="m_ChangeCurrentDb" value="$m_sCurrentDb"/>
+    <input type="hidden" name="ChangeCurrentDb" value="$m_sCurrentDb"/>
     <label for="m_shost" class="caption">| . translate('host') . qq|</label>
     <input type="text" name="m_shost" value="$m_sCurrentHost"/>
     <label for="m_suser" class="caption">| . translate('user') . qq|</label>
@@ -3933,12 +3930,17 @@ sub ShowDatabases {
     my $createDatabase = translate('CreateDatabase');
     my $execSql        = translate('sql');
     my $sqlSearch      = translate('SqlSearch');
+    my $changeDB      = translate('ChangeCurrentDb');
     print qq(
               <form onsubmit="submitForm(this,'ShowDatabases','ShowDatabases');return false;" method="get" enctype="multipart/form-data">
               <input type="hidden" name="action" value="MultipleDbAction"/>
               <table class="ShowTables" id="toolbarTable"> 
               <tr><td colspan="7" class="captionRadius"">$m_sCurrentHost</td></tr>
-              <tr><td colspan="7" id="toolbar" class="toolbar"><div id="toolbarcontent" class="toolbarcontent"><a class="toolbarButton" onclick="showPopup('CreateDatabase')" class="link"  title="$createDatabase">$createDatabase</a><a id ="test" class="toolbarButton" onclick="showPopup('SqlSearch')" class="link"  title="$sqlSearch">$sqlSearch</a>
+              <tr><td colspan="7" id="toolbar" class="toolbar">
+              <div id="toolbarcontent" class="toolbarcontent">
+               <a class="toolbarButton" onclick="showPopup('ChangeCurrentDb')" class="link"  title="$changeDB">$changeDB</a>
+              <a class="toolbarButton" onclick="showPopup('CreateDatabase')" class="link"  title="$createDatabase">$createDatabase</a>
+              <a class="toolbarButton" onclick="showPopup('SqlSearch')" class="link"  title="$sqlSearch">$sqlSearch</a>
               <a class="toolbarButton" onclick="showSQLEditor()" class="link"  title="$execSql">$execSql</a>
               </div>
               </tr>);
@@ -4083,7 +4085,7 @@ sub ShowProcesslist {
     }
     my $reload = param('reload');
     $reload = defined $reload ? $reload : 0;
-    no warnings;
+    # no warnings;
     print q(
       <div class="overflow">
       <table class="ShowTables">

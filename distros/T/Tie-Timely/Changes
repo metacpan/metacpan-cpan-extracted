@@ -1,7 +1,12 @@
-1.01 - Tue Aug 27 14:10:50 2013
-	* Initial release of an example module I created for 
-	Mastering Perl
+Revision history for Perl module Time::Timely
 
-1.02 - Sat Aug 16 17:39:09 2014
-	Adjust docs
+1.022 2018-06-04T00:25:16Z
+	* A small fix to the MANIFEST file
+
+1.002 2018-05-08T02:29:40Z
+	* Clarify that it's the Artistic License 2.0
+
+1.01 - 2013-08-27
+	* Initial release of an example module I created for
+	Mastering Perl
 

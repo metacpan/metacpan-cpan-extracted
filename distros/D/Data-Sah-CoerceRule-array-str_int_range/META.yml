@@ -3,7 +3,7 @@ abstract: 'Coerce array of ints from string in the form of "INT1-INT2"'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
-  Data::Sah::Coerce: '0.011'
+  Data::Sah::Coerce: '0.025'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
@@ -25,7 +25,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-CoerceRule-array-str_int_range
   homepage: https://metacpan.org/release/Data-Sah-CoerceRule-array-str_int_range
   repository: git://github.com/perlancar/perl-Data-Sah-CoerceRule-array-str_int_range.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

@@ -1,12 +1,12 @@
-# $Id: 10-keyset.t 1668 2018-04-23 13:36:44Z willem $	-*-perl-*-
+# $Id: 10-keyset.t 1677 2018-05-22 11:59:10Z willem $	-*-perl-*-
 #
 
 use strict;
 use Test::More;
 
 my %prerequisite = (
-	'Net::DNS'     => 1.01,
-	'MIME::Base64' => 2.13,
+	'Net::DNS::SEC' => 1.01,
+	'MIME::Base64'	=> 2.13,
 	);
 
 foreach my $package ( sort keys %prerequisite ) {
@@ -16,13 +16,10 @@ foreach my $package ( sort keys %prerequisite ) {
 	exit;
 }
 
-plan tests => 32;
+plan tests => 29;
 
 
-use_ok('Net::DNS::SEC');
 use_ok('Net::DNS::SEC::Keyset');
-use_ok('Net::DNS::SEC::Private');
-use_ok('Net::DNS::SEC::RSA');
 
 
 my %filename = (
@@ -42,11 +39,10 @@ END {
 # RSA keypair 1
 #
 my $keyrr1 = new Net::DNS::RR <<'END';
-test.tld.	IN	DNSKEY	256 3 5 (
+test.tld.	IN	DNSKEY	( 256 3 5
 	AQO1gY5UFltQ4f0ZHnXPFQZfcQQNpXK5r0Rk05rLLmY0XeA1lu8ek7W1VHsBjkge9WU7efdp3U4a
 	mxULRMQj7F0ByOK318agap2sIWYN13jV1RLxF5GPyLq+tp2ihEyI8x0P8c9RzgVn1ix4Xcoq+vKm
-	WqDT1jHE4oBY/DzI8gyuJw== )
-	; Key ID = 15791
+	WqDT1jHE4oBY/DzI8gyuJw== ) ; Key ID = 15791
 END
 
 ok( $keyrr1, join ' ', algorithm( $keyrr1->algorithm ), 'public key created' );
@@ -73,10 +69,11 @@ close(KEY1);
 #
 my $keyrr2 = new Net::DNS::RR <<'END';
 test.tld.	IN	DNSKEY	( 256 3 8
-	AwEAAZRSF/5NLnExp5n4M6ynF2Yok3N2aG9AWu8/vKQrZGFQcbL+WPGYbWUtMpiNXmvzTr2j86kN
-	QU4wBawm589mjzXgVQRfXYDMMFhHMtagzEKOiNy2ojhhFyS7r2O2vUbo4hGbnM54ynSM1al+ygKU
-	Gy1TNzHuYMiwh+gsQCsC5hfJ )
-	; Key ID = 35418
+	AwEAAcXr1phQtnOdThOrgcwRplS/btblbtLGeHQoba55Gr8Scbx7AAw+LjwtFmbPlDhklC8+4BAf
+	QB+6Jv7hOFT45J/RqDV3W5p0qDYcLYJObNbiFxQ64ogMYHx62w4oUeTS5CvpHNzSoiyhhFlf71RL
+	EVeBK798h+hdPeEWvHdzbwwMxZGIXP/eNN5u5tkNExuuqq3e6BeguCLsuLgMzHdfpl7W20z3BExD
+	c28DgPRWHJtJcB+iUd5oQdrw+G9qSq4kb7vk3OZUGrgkZskicT1A5rQsOgc4SrT4d25Qd6fthmi2
+	hZ86Y/2DP/NfR1mwWaN8ty7daqdcNpFQmKwQ+qpIV5c= ) ; Key ID = 63427
 END
 
 ok( $keyrr2, join ' ', algorithm( $keyrr2->algorithm ), 'public key created' );
@@ -86,14 +83,14 @@ open( KEY2, ">$keyfile2" ) or die "Could not open $keyfile2";
 print KEY2 << 'END';
 Private-key-format: v1.2
 Algorithm: 8 (RSASHA256)
-Modulus: lFIX/k0ucTGnmfgzrKcXZiiTc3Zob0Ba7z+8pCtkYVBxsv5Y8ZhtZS0ymI1ea/NOvaPzqQ1BTjAFrCbnz2aPNeBVBF9dgMwwWEcy1qDMQo6I3LaiOGEXJLuvY7a9RujiEZucznjKdIzVqX7KApQbLVM3Me5gyLCH6CxAKwLmF8k=
+Modulus: xevWmFC2c51OE6uBzBGmVL9u1uVu0sZ4dChtrnkavxJxvHsADD4uPC0WZs+UOGSULz7gEB9AH7om/uE4VPjkn9GoNXdbmnSoNhwtgk5s1uIXFDriiAxgfHrbDihR5NLkK+kc3NKiLKGEWV/vVEsRV4Erv3yH6F094Ra8d3NvDAzFkYhc/9403m7m2Q0TG66qrd7oF6C4Iuy4uAzMd1+mXtbbTPcETENzbwOA9FYcm0lwH6JR3mhB2vD4b2pKriRvu+Tc5lQauCRmySJxPUDmtCw6BzhKtPh3blB3p+2GaLaFnzpj/YM/819HWbBZo3y3Lt1qp1w2kVCYrBD6qkhXlw==
 PublicExponent: AQAB
-PrivateExponent: c74UZyhHo6GCDs73VDYYNmpXlnTCTn7D94ufY+VQsfgaofmF4xJ128yHfTBkjI0T1z1H+ZYUbjVfV9YMc3avLcXAb4YOEuNw0CSZrtTFc/oTvAyM9tKoa7hB9MSlYtmYvaWiEatHzKL0wYvo71jtfoTyDLQTISzrBWsA+K1a3hk=
-Prime1: wvw2lVu+kepiu0fasCrA3BlemVJ3XvWdd/y0sB5+egVGIJCn1bgkaSL/IP+683K28tN7hQYzMGiDBPymu3FeAw==
-Prime2: wruzE41ctH5D2SLhW4pi/pz+WSyeBUSvsmUe5kr4c9mlIqYUK1k72kmsjjZtD4eJsjq3xb/VGi+pcMuK2t1/Qw==
-Exponent1: lgk3AxTWfjcqA8wVpesv/ezzku0W95Xtto9YhhDg54m5XYOR8e1A7znDsaO2OnAyAIXlDQYpS32QG71Bmwhv+w==
-Exponent2: KyNVekFYhgtqkFFvxs2TPIAewDZoExayLTzFaZK2E0PllxVfZnLwFV04wpA//K6zzC3BxCbI2HIygPA2JGHo7Q==
-Coefficient: R3pSnerhKwfAHrH3iyojUzKzhM+AQ+97CWavx36eyKT3Yr/SIDANeeXGlT9U7RdxbkZzyeWbFNCnT+b89UX1RQ==
+PrivateExponent: S3dyet+Dwi+/3pYtxr8QGg5oV/5htHLC6R+lOrqorSR+Q6zuxrxK6t0SRp9t19bZ/e3Oh7cyvyY+yj7cOOIyYpIRvllFj25d2UwDOkVnEMRiom8Vg2ScwboinpJXL5YONIQNYlHaToRDr8R5wD1jXmc9ZCU6uSocdyAxOqbEN+ZWNnzGHjs4onoGMLyc7f2NbMhSHVW9tp7zilCQ1W3OF6coWI/L/vGk1xBQZ+OtkRRbJCTca3qflLm/1vPq8/H3gS5adrJcO+/mUlhPoKxEqekZZp+FQJVHTYp3MyGTVXVl2M8sozf9lU/malzlqve5snMLfCOWH8MOdsx7eo0N+Q==
+Prime1: +ajh2Bbk8r2DBvCw3u3ipji7zeD1LLMRdYlSuCpyIWGGoiCJrqX34zFCdDOO1gKa2QQG3OAGk3hZ1ddcgr+bnVNIEuVxJXe0Wg4e0ZPNMCe1333Hyt7ws2U+zosYNfrxOdPkj/S5XZkVyRE1Ixa79WCBJms+zgDPx30AUQXblw0=
+Prime2: yvKWeFcJhIleHVNwEkNtq+aOgcIhS2ex7zc/zKFGSGYXdWIl17oM3ohiPgmLVznJtIkCIcYoxbfxuLW0NDe2OJC7PUjOB3lAmtHAH3ZafNbr/PdlAZzHUZiLsiHF/m5wd+pN37rCj7emjASwsGjcx3rRsJQvqVZARj/TXe9eQDM=
+Exponent1: nMBIbKCTR0VtyyG8K3w43hyo7e7cgSA9SgragP9FgWf2XD0JtTpHlcIL82GbwQsJplA87tlJx7W80eLSFtWvIuxzSEn+7INoHVLYTsX6As4sBxK2Ks4nWruq34u9u8a/Rouf6jLBX98KKqA/OLTBdqMM885KNJWV367AUB7ZbNE=
+Exponent2: FyUHR/4VFcpcs1d6pnqOHVaT1fR/u4u93Rwd6IZT75nE/xwMWMfdA9vl6FFKVM5AVJhzZ8qjh7jsljYSsQnRfC31TI3rASsw1Pcqw+vJcgdIrnbATCjHCmUtOUlkvRl3NhXAf81atu0ozzsRs2yiERXOqCaeMN+nQNuyjTnpM8U=
+Coefficient: iUz9xrXzP2UaBruIps61HAbh6MV+OYDmliSnudXW5Ii1s3ANXMJodzgwqD+VesjC9dDE2nXMTCXKhpk46Qy8i3OYJ4T7vxoyHEYfID1PM0+whAwebRoKHBqQDEYgwTcqDX+qD4MMc1TaG/do/cgNc/1EyE03DP1plH6HhItECIo=
 END
 close(KEY2);
 
@@ -133,7 +130,7 @@ my $string0 = $ds[0]->string;
 my $string1 = $ds[1]->string;
 
 my $expect0 = new Net::DNS::RR('test.tld. IN DS 15791 5 1 C355F0F3F30C69BF2F7EA253ED82FBC280C2496B')->string;
-my $expect1 = new Net::DNS::RR('test.tld. IN DS 35418 8 1 6f3dd1c760c2a4971b3d44ce20e3cb8b60d7aff6')->string;
+my $expect1 = new Net::DNS::RR('test.tld. IN DS 63426 8 1 6173eae9bf79853e2c041b1cda02a3d70c86a20b')->string;
 
 my $alg0 = algorithm( $ds[0]->algorithm );
 my $dig0 = digtype( $ds[0]->digtype );
@@ -153,7 +150,8 @@ print KEYSET $keyrr1->string, "\n";
 print KEYSET $keyrr2->string, "\n";
 
 my $sigstr = lc $sigrr1->string;				# corrupt the base64 signature
-$sigstr =~ s/in.rrsig.dnskey/IN RRSIG DNSKEY/;			# fix collateral damage
+$sigstr =~ s/in.rrsig/IN RRSIG/;				# fix collateral damage
+$sigstr =~ s/dnskey/DNSKEY/;
 
 print KEYSET $sigstr . "\n";
 print KEYSET $sigrr2->string . "\n";

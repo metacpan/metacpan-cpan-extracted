@@ -1,5 +1,10 @@
 Revision history for Group-Git
 
+0.6.9   2018-06-04
+        Updating for release of version 0.6.9
+        Fixed bad switching of directories (Ivan Wills)
+        Added new --limit parameter to help with testing (Ivan Wills)
+
 0.6.8   2018-04-30
         Updating for release of version 0.6.8
         Expanding tag-list to show tags on a per repository basis (Ivan Wills)

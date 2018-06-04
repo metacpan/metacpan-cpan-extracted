@@ -9,7 +9,7 @@ my $t = Test::JSONAPI->new({ api_url => 'http://example.com/api', kebab_case_att
 
 my $post = $t->schema->resultset('Post')->find(1);
 is_deeply(
-    $t->resource_document($post, { with_relationships => 1, with_attributes => 1, includes => ['author'] }),
+    $t->resource_document($post, { with_attributes => 1, includes => ['author'] }),
     {
         id         => 1,
         type       => 'posts',
@@ -33,7 +33,7 @@ is_deeply(
 
 my $author = $t->schema->resultset('Author')->find(1);
 is_deeply(
-    $t->resource_document($author, { with_relationships => 1, includes => ['email_templates'] }),
+    $t->resource_document($author, { includes => ['email_templates'] }),
     {
         id         => 1,
         type       => 'authors',

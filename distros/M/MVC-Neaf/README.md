@@ -1,111 +1,76 @@
 # NAME
 
-MVC::Neaf [ni:f] stands for Not Even A Framework.
+MVC::Neaf `[ni:f]` stands for **Not Even A Framework**.
 
 # OVERVIEW
 
-Neaf offers a simple, yet powerful way to create simple web-applications.
-By the lazy, for the lazy.
+The following code can be run as a PSGI application or CGI script:
 
-It has a lot of similarities to
-[Dancer](https://metacpan.org/pod/Dancer2) and
-[Kelp](https://metacpan.org/pod/Kelp).
+        use strict;
+        use warnings;
+        use MVC::Neaf;
 
-**Model** is assumed to be a regular Perl module, and is totally out of scope.
+        get + post "/" => sub {
+            my $req = shift;
 
-**View** is assumed to have just one method, `render()`,
-which receives a hashref and returns a pair of (content, content-type).
+            return {
+                -view     => 'TT',
+                -template => \'Hello, [% name %]!',
+                -type     => 'text/plain',
+                name      => $req->param( name => qr/\w+/, "Stranger" ),
+            };
+        };
 
-**Controller** is reduced to just one function, which gets a request object
-and is expected to return a hashref.
+        neaf->run;
 
-A pre-defined set of dash-prefixed control keys allows to control the
-framework's behaviour while all other keys are just sent to the view.
+Just like many other frameworks, Neaf organises an application
+into a *prefix tree* of routes. Each *route* has a *handler* `sub`
+which receives one and only argument - a *request* object.
 
-**Request** object will depend on the underlying web-server.
-The same app, verbatim, should be able to run as PSGI app, CGI script, or
-Apache handler.
-Request knows all you need to know about the outside world.
+The *request* contains *everything* the application needs to know
+about the outside world.
 
-# EXAMPLE
+The *handler* must either *return* a hash for rendering, or *die*.
+A 3-digit exception is a valid way of returning a configurable error page.
 
-The following would produce a greeting message depending
-on the `?name=` parameter.
+The *return hash* may contain dash-prefixed keys to control Neaf itself.
+For instance, the default view is JSON-based but adding 
 
-    use strict;
-    use warnings;
-    use MVC::Neaf qw(:sugar);
+        -view => 'TT', -template => 'my.tpl'
 
-    get + post "/" => sub {
-		my $req = shift;
+to the hash would result in using `Template::Toolkit` instead.
 
-		return {
-			-template => \'Hello, [% name %]!',
-			-type     => 'text/plain',
-			name      => $req->param( name => qr/\w+/, "Stranger" ),
-		},
-    };
+# NOTABLE FEATURES
 
-    neaf->run;
+* **Mandatory validation** - parameters and cookies are always regex-checked.
 
-# FEATURES
+* **Forms** that validate a bunch of input parameters, additionally
+producing hashes of errors and raw values for resubmission.
 
-* GET, POST, and HEAD requests; uploads; redirects; and cookies
-are supported.
-Not quite impressive, but it's 95% of what's needed 95% of the time.
+* **Path-based defaults** that can be overridden in route definition or
+by controller itself:
 
-* Template::Toolkit view out of the box;
+        neaf default => { -view => 'JS', version => $VERSION }, path => '/api';
 
-* json/jsonp view out of the box (with sanitized callbacks);
+* **Hooks** that may be executed at different stages:
 
-* can serve raw content (e.g. generated images);
+        neaf pre_logic => sub {
+            my $req = shift;
+            die 403 unless $req->session->{is_admin};
+        }, path => '/admin';
 
-* can serve static files.
-No need for separate web server to test your CSS/images.
+* **Easy CLI debugging** - see `perl myapp.pl --help`
 
-* sanitized query parameters and cookies out of the box.
+See [examples](example/) for more.
 
-* Easy to develop RESTful web-services.
+# INSTALLATION
 
-# NOT SO BORING FEATURES
+To install this module, run the following commands:
 
-* Fine-grained hooks and path-based default values;
-
-* Delayed and/or unspecified length replies supported;
-
-* Form validation with resubmission ability.
-[Validator::LIVR](https://metacpan.org/pod/Validator::LIVR)
-supported, but not requires.
-
-* CLI-based debugging via `perl <your_app.pl> --help|--list|--method GET`
-
-* Sessions supported out of the box with cookie-based and SQL-based backends.
-
-* Fancy error templates supported.
-
-# MORE EXAMPLES
-
-See [example](example/).
-
-Neaf uses examples as an additional test suite.
-
-No feature is considered complete until half a page code snipped is written
-to demonstrate it.
-
-# PHILOSOPHY
-
-* Start out simple, then grow up.
-
-* Data in, data out. A *function* should receive and *argument* and return
-a *value* or *die*.
-
-* Sane defaults. Everything can be configured, nothing needs to be.
-
-* It's not software unless you can run it.
-
-* Trust nobody. Validate the data.
-
-* Force UTF8 where possible. It's 21st century.
+        perl Makefile.PL
+        make
+        make test
+        make install
 
 # BUGS
 
@@ -120,28 +85,12 @@ Bug reports, feature requests, and overall critique are welcome.
 
 # CONTRIBUTING TO THIS PROJECT
 
-Please see [STYLE.md](STYLE.md) for the style guide.
+See [STYLE.md](STYLE.md) for the style guide.
 
-Please see [CHECKLIST](CHECKLIST) if you plan to release a version.
+See [CHECKLIST](CHECKLIST) if you plan to release a version.
 
-# ACKNOWLEDGEMENTS
-
-[Eugene Ponizovsky](https://github.com/iph0)
-had great influence over my understanding of MVC.
-
-[Alexander Kuklev](https://github.com/akuklev)
-gave some great early feedback
-and also drove me towards functional programming and pure functions.
-
-[Akzhan Abdulin](https://github.com/akzhan)
-tricked me into making the hooks.
-
-[Cono](https://github.com/cono)
-made some early feedback and great feature proposals.
-
-Ideas were shamelessly stolen from PSGI, Dancer, and Catalyst.
-
-The CGI module was used heavily in the beginning of the project.
+See [TODO](TODO) for a rough development plan.
+It changes rapidly though.
 
 # LICENSE AND COPYRIGHT
 

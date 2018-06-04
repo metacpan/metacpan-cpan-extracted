@@ -26,7 +26,7 @@ use constant VALIDATE_HOSTNAME => eval 'require Data::Validate::Domain;1';
 use constant VALIDATE_IP       => eval 'require Data::Validate::IP;1';
 
 our $ERR;    # ugly hack to improve validation errors
-our $VERSION = '2.07';
+our $VERSION = '2.08';
 our @EXPORT_OK = qw(joi validate_json);
 
 my $BUNDLED_CACHE_DIR = path(path(__FILE__)->dirname, qw(Validator cache));
@@ -39,7 +39,8 @@ sub E { JSON::Validator::Error->new(@_) }
 sub S { Mojo::Util::md5_sum(Data::Dumper->new([@_])->Sortkeys(1)->Useqq(1)->Dump) }
 
 has cache_paths => sub { [split(/:/, $ENV{JSON_VALIDATOR_CACHE_PATH} || ''), $BUNDLED_CACHE_DIR] };
-has formats => sub { shift->_build_formats };
+has formats     => sub { shift->_build_formats };
+has version     => 4;
 
 has ua => sub {
   require Mojo::UserAgent;
@@ -171,8 +172,10 @@ sub joi {
 
 sub load_and_validate_schema {
   my ($self, $spec, $args) = @_;
+  my $schema = $args->{schema} || SPECIFICATION_URL;
+  $self->version($1) if !$self->{version} and $schema =~ /draft-0+(\w+)/;
   $spec = $self->_resolve($spec);
-  my @errors = $self->new(%$self)->schema($args->{schema} || SPECIFICATION_URL)->validate($spec);
+  my @errors = $self->new(%$self)->schema($schema)->validate($spec);
   confess join "\n", "Invalid JSON specification $spec:", map {"- $_"} @errors if @errors;
   $self->{schema} = Mojo::JSON::Pointer->new($spec);
   $self;
@@ -207,15 +210,18 @@ sub validate_json {
 
 sub _build_formats {
   return {
-    'date-time' => \&_is_date_time,
-    'email'     => \&_is_email,
-    'hostname'  => VALIDATE_HOSTNAME ? \&Data::Validate::Domain::is_domain : \&_is_domain,
-    'ipv4'      => VALIDATE_IP ? \&Data::Validate::IP::is_ipv4 : \&_is_ipv4,
-    'ipv6'      => VALIDATE_IP ? \&Data::Validate::IP::is_ipv6 : \&_is_ipv6,
-    'regex'     => \&_is_regex,
-    'uri'       => \&_is_uri,
+    'date-time'     => \&_is_date_time,
+    'email'         => \&_is_email,
+    'hostname'      => VALIDATE_HOSTNAME ? \&Data::Validate::Domain::is_domain : \&_is_domain,
+    'ipv4'          => VALIDATE_IP ? \&Data::Validate::IP::is_ipv4 : \&_is_ipv4,
+    'ipv6'          => VALIDATE_IP ? \&Data::Validate::IP::is_ipv6 : \&_is_ipv6,
+    'regex'         => \&_is_regex,
+    'uri'           => \&_is_uri,
+    'uri-reference' => \&_is_uri_reference,
   };
 }
+
+sub _id_key { $_[0]->version < 7 ? 'id' : '$id' }
 
 sub _load_schema {
   my ($self, $url) = @_;
@@ -293,7 +299,10 @@ sub _load_schema_from_url {
   confess "GET $url == $err" if DEBUG and $err;
   die "[JSON::Validator] GET $url == $err" if $err;
 
-  if ($cache_path and $cache_path ne $BUNDLED_CACHE_DIR and -w $cache_path) {
+  if (  $cache_path
+    and ($cache_path ne $BUNDLED_CACHE_DIR or $ENV{JSON_VALIDATOR_CACHE_ANYWAYS})
+    and -w $cache_path)
+  {
     $cache_file = path $cache_path, $cache_file;
     warn "[JSON::Validator] Caching $url to $cache_file\n" unless $ENV{HARNESS_ACTIVE};
     $cache_file->spurt($tx->res->body);
@@ -351,13 +360,14 @@ sub _report_schema {
 # resolve all the $ref's that we find inside JSON Schema specification.
 sub _resolve {
   my ($self, $schema) = @_;
+  my $id_key = $self->_id_key;
   my ($id, $resolved, @refs);
 
   local $self->{level} = $self->{level} || 0;
   delete $_[0]->{schemas}{''} unless $self->{level};
 
   if (ref $schema eq 'HASH') {
-    $id = $schema->{id} // '';
+    $id = $schema->{$id_key} // '';
     return $resolved if $resolved = $self->{schemas}{$id};
   }
   elsif ($resolved = $self->{schemas}{$schema // ''}) {
@@ -365,11 +375,11 @@ sub _resolve {
   }
   else {
     ($schema, $id) = $self->_load_schema($schema);
-    $id = $schema->{id} if $schema->{id};
+    $id = $schema->{$id_key} if $schema->{$id_key};
   }
 
   unless ($self->{level}) {
-    my $rid = $schema->{id} // $id;
+    my $rid = $schema->{$id_key} // $id;
     if ($rid) {
       confess "Root schema cannot have a fragment in the 'id'. ($rid)" if $rid =~ /\#./;
       confess "Root schema cannot have a relative 'id'. ($rid)"
@@ -394,8 +404,8 @@ sub _resolve {
     elsif (UNIVERSAL::isa($topic, 'HASH')) {
       push @refs, [$topic, $base] and next if $topic->{'$ref'} and !ref $topic->{'$ref'};
 
-      if ($topic->{id} and !ref $topic->{id}) {
-        my $fqn = Mojo::URL->new($topic->{id});
+      if ($topic->{$id_key} and !ref $topic->{$id_key}) {
+        my $fqn = Mojo::URL->new($topic->{$id_key});
         $fqn = $fqn->to_abs($base) unless $fqn->is_abs;
         $self->_register_schema($topic, $fqn->to_string);
       }
@@ -441,24 +451,21 @@ sub _resolve_ref {
   tie %$topic, 'JSON::Validator::Ref', $other, $topic->{'$ref'}, $fqn;
 }
 
-# This code is from Data::Dumper::format_refaddr()
-sub _seen {
-  my $self = shift;
-  my $key = join ':', shift, map { pack 'J', refaddr $_ } @_;
-  return $self->{seen}{$key}++;
-}
-
 sub _validate {
   my ($self, $data, $path, $schema) = @_;
-  my ($type, @errors);
+  my ($seen_addr, $type, @errors);
 
   $schema = $self->_ref_to_schema($schema) if $schema->{'$ref'};
+  $seen_addr = refaddr $schema;
+  $seen_addr .= ':' . (ref $data ? refaddr $data : "s:$data") if defined $data;
 
   # Avoid recursion
-  if (ref $data and !_is_blessed_boolean($data) and $self->_seen($schema, $data)) {
+  if ($self->{seen}{$seen_addr}) {
     $self->_report_schema($path || '/', 'seen', $schema) if REPORT;
-    return;
+    return @{$self->{seen}{$seen_addr}};
   }
+
+  $self->{seen}{$seen_addr} = \@errors;
 
   # Make sure we validate plain data and not a perl object
   $data = $data->TO_JSON if blessed $data and UNIVERSAL::can($data, 'TO_JSON');
@@ -766,16 +773,9 @@ sub _validate_type_object {
     $additional = {} unless UNIVERSAL::isa($additional, 'HASH');
     $rules{$_} ||= [$additional] for @dkeys;
   }
-  else {
-    # Special case used internally when validating schemas: This module adds "id"
-    # on the top level which might conflict with very strict schemas, so we have to
-    # remove it again unless there's a rule.
-    local $rules{id} = 1 if !$path and exists $data->{id};
-
-    if (my @k = grep { !$rules{$_} } @dkeys) {
-      local $" = ', ';
-      return E $path, "Properties not allowed: @k.";
-    }
+  elsif (my @k = grep { !$rules{$_} } @dkeys) {
+    local $" = ', ';
+    return E $path, "Properties not allowed: @k.";
   }
 
   for my $k (sort keys %required) {
@@ -786,18 +786,13 @@ sub _validate_type_object {
 
   for my $k (sort keys %rules) {
     for my $r (@{$rules{$k}}) {
-      if (!exists $data->{$k} and (UNIVERSAL::isa($r, 'HASH') and exists $r->{default})) {
-
-        #$data->{$k} = $r->{default}; # TODO: This seems to fail when using oneOf and friends
-      }
-      elsif (exists $data->{$k}) {
-        my @e = $self->_validate($data->{$k}, _path($path, $k), $r);
-        push @errors, @e;
-        push @errors, $self->_validate_type_enum($data->{$k}, _path($path, $k), $r)
-          if $r->{enum} and !@e;
-        push @errors, $self->_validate_type_const($data->{$k}, _path($path, $k), $r)
-          if $r->{const} and !@e;
-      }
+      next unless exists $data->{$k};
+      my @e = $self->_validate($data->{$k}, _path($path, $k), $r);
+      push @errors, @e;
+      push @errors, $self->_validate_type_enum($data->{$k}, _path($path, $k), $r)
+        if $r->{enum} and !@e;
+      push @errors, $self->_validate_type_const($data->{$k}, _path($path, $k), $r)
+        if $r->{const} and !@e;
     }
   }
 
@@ -975,6 +970,17 @@ sub _is_uri {
   return 1;
 }
 
+sub _is_uri_reference {
+  return unless defined $_[0];
+  return unless $_[0] =~ m!^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?!;
+
+  my ($scheme, $auth_host, $path, $query, $fragment) = map { $_ // '' } ($2, $4, $5, $7, $9);
+  return _invalid('Path cannot not start with //.') if $path =~ m!^//!;
+  return 1 if length $path;
+  return _is_uri($_[0]);
+  return 1;
+}
+
 sub _merge_errors {
   join ' ', map {
     my $e = $_;
@@ -1011,7 +1017,7 @@ JSON::Validator - Validate data against a JSON schema
 
 =head1 VERSION
 
-2.07
+2.08
 
 =head1 SYNOPSIS
 
@@ -1096,11 +1102,13 @@ Here is the list of the bundled specifications:
 
 =over 2
 
-=item * JSON schema, draft 4
+=item * JSON schema, draft 4, 6, 7
 
 Web page: L<http://json-schema.org>
 
-C<$ref>: L<http://json-schema.org/draft-04/schema#>
+C<$ref>: L<http://json-schema.org/draft-04/schema#>,
+L<http://json-schema.org/draft-06/schema#>,
+L<http://json-schema.org/draft-07/schema#>.
 
 =item * JSON schema for JSONPatch files
 
@@ -1276,6 +1284,16 @@ from remote location.
 Note that the default L<Mojo::UserAgent> will detect proxy settings and have
 L<Mojo::UserAgent/max_redirects> set to 3. (These settings are EXPERIMENTAL
 and might change without a warning)
+
+=head2 version
+
+  $int = $self->version;
+  $self = $self->version(7);
+
+Used to set the JSON Schema version to use. Will be set automatically when
+using L</load_and_validate_schema>, unless already set.
+
+Note that this attribute is EXPERIMENTAL and might change without a warning.
 
 =head1 METHODS
 

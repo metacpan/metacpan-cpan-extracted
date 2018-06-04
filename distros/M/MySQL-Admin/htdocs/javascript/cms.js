@@ -207,14 +207,26 @@ outId, tabId, title set L<requestURI>
 function loadPage(inXml, inXsl, outId, tabId, title) {
     xml = typeof inXml == 'object' ? inXml : loadXMLDoc(inXml);
     xsl = typeof inXsl == 'object' ? inXsl : loadXMLDoc(inXsl);
-    if (typeof XSLTProcessor == 'undefined') { //window.ActiveXObject
-        ex = xml.transformNode(xsl);
-        $(outId).innerHTML = ex;
+    if (typeof XSLTProcessor == 'undefined') {
+		var xslt = new ActiveXObject("Msxml2.XSLTemplate");
+		if (xslt) {
+			var xslDoc = new ActiveXObject("Msxml2.FreeThreadedDOMDocument");
+			var xmlstr = xsl.xml ? xsl.xml : (new XMLSerializer()).serializeToString(xsl);
+			xslDoc.loadXML(xmlstr);
+			xslt.stylesheet = xslDoc;
+			var xslProc = xslt.createProcessor();
+			xslProc.input = xslDoc;
+			xslProc.transform();
+			document.getElementById(outId).innerHTML =  xslProc.output;
+		}else{
+			ex = xml.transformNode(xsl);
+			document.getElementById(outId).innerHTML = ex;
+		}
     } else if (document.implementation && document.implementation.createDocument) {
         xsltProcessor = new XSLTProcessor();
         xsltProcessor.importStylesheet(xsl);
         resultDocument = xsltProcessor.transformToFragment(xml, document);
-        node = $(outId);
+        node = document.getElementById(outId);
         setText(outId, '');
         if (node.childNodes[0]) node.removeChild(node.childNodes[0]);
         if (node) node.appendChild(resultDocument);
@@ -237,8 +249,8 @@ function loadPage(inXml, inXsl, outId, tabId, title) {
 
 function intputMask(id, regexp) {
     var rxObj = regexp;
-    rxObj.exec($(id).value);
-    $(id).value = RegExp.$1;
+    rxObj.exec(document.getElementById(id).value);
+    document.getElementById(id).value = RegExp.$1;
 }
 var tmpTxt;
 var tmpID;
@@ -258,8 +270,8 @@ function showPopup(id, hideCloseButton) {
 function closePopup() {
     hide('popup');
     setText(tmpID, tmpTxt);
-    $('popupContent1').style.left = '25%';
-    $('popupContent1').style.width = '50%';
+    document.getElementById('popupContent1').style.left = '25%';
+    document.getElementById('popupContent1').style.width = '50%';
 }
 
 function setCurrentTab(id, title) {
@@ -271,8 +283,8 @@ function setCurrentTab(id, title) {
             nodes[i].firstChild.className = 'menuLink';
         }
     }
-    var entry = $(id);
-    var entryDynamic = $('dynamicTab');
+    var entry = document.getElementById(id);
+    var entryDynamic = document.getElementById('dynamicTab');
     if (entry) {
         var body = document.getElementsByTagName('body')[0];
         var nodes = body.getElementsByTagName("td");
@@ -362,6 +374,12 @@ function submitForm(node, tabId, tabTitle, bHistory, method, uri) {
 var http_request = false;
 var oldpage = 0;
 
+function GetEditorLines(){
+    var doc = editor.session.getDocument();
+    var lines = doc.getAllLines();
+    return lines;
+}
+
 //requestURI('cgi-bin/mysql.pl?action=loadSidebar',action,action,false,false,'GET',false)
 /*
 =head2 requestURI(url, id, txt, bHistory, formData, method, bWaid)
@@ -423,6 +441,7 @@ function requestURI(url, id, txt, bHistory, formData, method, bWaid) {
         http_request.send(null);
     } else {
         http_request.open('POST', url, true);
+        http_request.setRequestHeader("Accept-Encoding", "UTF-8");
         http_request.setRequestHeader("Content-Type", "multipart/form-data");
         http_request.send(formData);
     }
@@ -437,6 +456,7 @@ var xml = loadXMLDoc(filename);
 */
 
 function loadXMLDoc(filename) {
+
     if (window.ActiveXObject) {
         xhttp = new ActiveXObject("Msxml2.XMLHTTP");
     } else {
@@ -444,11 +464,13 @@ function loadXMLDoc(filename) {
     }
     xhttp.open("GET", filename, false);
     xhttp.overrideMimeType("text/xml");
-    try {
-        xhttp.responseType = "msxml-document"
-    } catch (err) {
-        alert(err);
-    }
+	if (window.ActiveXObject) {
+		try {
+			xhttp.responseType = "msxml-document"
+		} catch (err) {
+			alert(err);
+		}
+	}
     xhttp.send(null);
     return xhttp.responseXML;
 }
@@ -459,11 +481,27 @@ function setContent() {
             hide('load');
             response = http_request.responseXML;
             for (var i = 0; i < response.getElementsByTagName('output').length; i++) {
-                var outID = response.getElementsByTagName('output')[i].getAttribute('id');
+				var obj = response.getElementsByTagName('output')[i];
+                var outID = obj.getAttribute('id');
+				var typeName = obj.getAttribute('type');
+			
                 var txt = response.getElementsByTagName('output')[i].textContent;
-                if (navigator.userAgent.indexOf("Firefox") != -1) txt = txt.replace("<![CDATA[", "").replace("]]>", "");
-                setText(outID, txt);
-                evalId(outID);
+	            if (navigator.userAgent.indexOf("Firefox") != -1) 
+					txt = txt.replace("<![CDATA[", "").replace("]]>", "");
+				if(typeName === 'script'){
+					eval(txt);
+				}else if(typeName === 'xml'){
+					var xsl = obj.getAttribute('xsl');
+					var title = obj.getAttribute('title');
+					var tabId = obj.getAttribute('tabId');
+					var parser = new DOMParser(); 
+					var xmlDoc = parser.parseFromString(txt,"text/xml");
+					loadPage(xmlDoc, xsl, outID, tabId, title);
+					evalId(outID);
+				}else{
+					setText(outID, txt);
+					evalId(outID);
+				}
             }
             if (!m_blogin && (bAction == 'login' || bAction == 'logout')) loadMenu();
             setCurrentTab(cAction, m_txt);
@@ -477,64 +515,40 @@ function setContent() {
             return false;
         }
         if (m_sid == '123' && m_blogin && cAction != 'reg') {
-            showPopup('loginContent', true);
-            evalId('popupContent');
+           showPopup('loginContent', true);
+		   evalId('popupContent');
         } else {
-            var closeButton = $("closeButton");
+            var closeButton = document.getElementById("closeButton");
             closeButton.addEventListener('click', closePopup);
         }
     }
 }
 
-/*
-=head2 alert(txt)
-
-Styled replacment for alert
-
-=cut
-*/
-
 function alert(txt) {
     visible('popup');
     setText('popupContent', '<div align="center">' + txt + '<br/><input  type="submit" id="confirmButton" value="Ok"/></div>');
-    var node = $("confirmButton");
+    var node = document.getElementById("confirmButton");
     node.addEventListener('click', function(evt) {
         hide('popup');
     });
 }
-window.onerror = logError;
-
-function logError(message, file, line) {
-    console.log("Message: " + message + "file: " + file + "line: " + line);
-}
-
-/*
-=head2 confirm2(txt, sub, arg, arg2, arg3) 
-
-Styled replacment for confirm.
-
-confirm2( 'Foo ?',
-    function(a,b){
-      alert (a +" " +b);
-     },
-     "foo",
-     "bar"
-     );"
-
-=cut
-*/
+// window.onerror = logError;
+// 
+// function logError(message, file, line) {
+//     console.log("Message: " + message + "file: " + file + "line: " + line);
+// }
 
 function confirm2(txt, sub, arg, arg2, arg3) {
     visible('popup');
     setText('popupContent', '<b>' + txt +
         '</b><div align="right" style="padding:0.4em;"><input type="submit" name="cancelButton" id="cancelButton" value="Cancel"/>&#160;<input  type="submit" id="confirmButton" value="Ok"/></div>'
     );
-    var node = $("confirmButton");
+    var node = document.getElementById("confirmButton");
     node.addEventListener('click', function(evt) {
         hide('popup');
         sub(arg, arg2, arg3);
     });
-    var node2 = $("cancelButton");
+    var node2 = document.getElementById("cancelButton");
     node2.addEventListener('click', function(evt) {
         hide('popup');
     });
@@ -545,16 +559,18 @@ function moveHere(txt, sub, arg, arg2, arg3) {
     window.document.title = txt;
     setText('moveHere', '<div id="moveButton" class="moveButton" style="padding:0.4em;">' + translate('MoveHere') +
         '</div><div id="moveCancelButton" class="moveButton" style="padding:0.4em;">' + translate('Cancel') + '</div>');
-    var node = $("moveButton");
-    $('moveHere').style.position = "absolute";
-    $('moveHere').style.left = (posX - dragX) + "px";
-    $('moveHere').style.top = (posY - dragY) + "px";
+    var node = document.getElementById("moveButton");
+    document.getElementById('moveHere').style.position = "absolute";
+    document.getElementById('moveHere').style.left = (posX - dragX) + "px";
+    document.getElementById('moveHere').style.top = (posY - dragY) + "px";
+    document.getElementById('moveHere').style.zIndex = 4;
+
     node.addEventListener('click', function(evt) {
         stopDrop();
         evt.stopPropagation();
         sub(arg, arg2, arg3);
     });
-    var node2 = $("moveCancelButton");
+    var node2 = document.getElementById("moveCancelButton");
     node2.addEventListener('click', function(evt) {
         stopDrop();
         evt.stopPropagation();
@@ -571,29 +587,15 @@ function stopDrop() {
     m_bNoDrop = false;
 }
 
-/*
-=head2 prompt(txt, sub)
-
-Styled replacment for prompt.
-
-prompt('Enter Text',
-function(txt){
- alert(txt);
-}
-);
-
-=cut
-*/
-
 function prompt(txt, sub) {
     visible('popup');
     setText('popupContent', '<b>' + txt +'</b><br/><input  type="text" align="center" id="promptPopUp"/><br/><div align="right" style="padding:0.4em;"><input type="submit" name="cancelButton" id="cancelButton" value="Cancel"/>&#160;<input  type="submit" id="confirmButton" value="Ok"/></div>');
-    var node = $("confirmButton");
+    var node = document.getElementById("confirmButton");
     node.addEventListener('click', function(evt) {
         hide('popup');
-        sub($('promptPopUp').value);
+        sub(document.getElementById('promptPopUp').value);
     });
-    var node2 = $("cancelButton");
+    var node2 = document.getElementById("cancelButton");
     node2.addEventListener('click', function(evt) {
         hide('popup');
         evt.stopPropagation();
@@ -603,7 +605,7 @@ function prompt(txt, sub) {
 function errorPopUp(txt, sub, arg, arg2, arg3) {
     visible('popup');
     setText('popupContent', '<b>' + txt + '</b><div align="right" style="padding:0.4em;">&#160;<input type="submit" id="confirmButton" value="Ok"/></div>');
-    var node = $("confirmButton");
+    var node = document.getElementById("confirmButton");
     node.addEventListener('click', function(evt) {
         hide('popup');
         sub(arg, arg2, arg3);
@@ -645,11 +647,23 @@ eval <script></script> tags within given id
 */
 
 function evalId(id) {
-    var content = $(id);
+    var content = document.getElementById(id);
     if (content) {
         var node = content.getElementsByTagName("script");
         for (var i = 0, j = node.length; i < j; i++) {
             if (node[i] && node[i].childNodes[0]) eval(node[i].childNodes[0].nodeValue);
+        }
+    }
+}
+
+function showEditor(txt) {
+    if(document.getElementById('editor')){
+        ace.require("/ace/src-min/chromevox");
+        editor = ace.edit("editor");
+        editor.session.setMode("ace/mode/perl");
+        editor.setTheme("ace/theme/sqlserver");
+        if(txt){
+            editor.setValue(txt, 1);
         }
     }
 }
@@ -680,8 +694,8 @@ function translate(string) {
 }
 
 function traversTranslate(id, lng, l) {
-    if ($(id)) {
-        var node = $(id).getElementsByTagName("a");
+    if (document.getElementById(id)) {
+        var node = document.getElementById(id).getElementsByTagName("a");
         for (var i = 0, j = node.length; i < j; i++) {
             if (node[i] && node[i].childNodes[0]) {
                 var ret = eval('l.' + lng + node[i].childNodes[0].nodeValue.toLowerCase());
@@ -694,40 +708,16 @@ function traversTranslate(id, lng, l) {
     }
 }
 
-/*
-
-=head2 disableOutputEscaping(id) 
-
-
-=cut
-
-*/
-
 function disableOutputEscaping(id) {
-    if (navigator.userAgent.indexOf("Firefox") != -1) $(id).innerHTML = $(id).textContent;
+ //   if (navigator.userAgent.indexOf("Firefox") != -1) document.getElementById(id).innerHTML = document.getElementById(id).textContent;
 }
-
-/*
-=head2 $(id) 
-
- eq document.getElementById()
-
-=cut
-*/
-
-function $(id) {
-    return document.getElementById(id);
-}
-
-/*
-=head2  insertAtCursorPosition(txt)
-
-
-=cut
-*/
+// //cms
+// function document.getElementById(id) {
+//     return document.getElementById(id);
+// }
 
 function insertAtCursorPosition(txt) {
-    var textarea = $('sqlEdit');
+    var textarea = document.getElementById('sqlEdit');
     if (typeof document.selection != 'undefined') {
         range = document.selection.createRange();
         var txt = range.text;
@@ -759,32 +749,32 @@ function setAll() {
 }
 
 function editSet(input, select) {
-    $(input).value = select.options[select.options.selectedIndex].value;
+    document.getElementById(input).value = select.options[select.options.selectedIndex].value;
     nCurrentRow = select.options.selectedIndex;
 }
 
 function setEnter(input, select) {
-    if (!$(select).options[nCurrentRow]) {
+    if (!document.getElementById(select).options[nCurrentRow]) {
         addEntry(select, input.id);
     }
-    $(select).options[nCurrentRow].value = input.value;
-    $(select).options[nCurrentRow].text = input.value;
+    document.getElementById(select).options[nCurrentRow].value = input.value;
+    document.getElementById(select).options[nCurrentRow].text = input.value;
 }
 
 function deleteEntry(idSelect) {
-    $(idSelect).options[$(idSelect).options.selectedIndex] = null;
+    document.getElementById(idSelect).options[document.getElementById(idSelect).options.selectedIndex] = null;
 }
 
 function clearSelect(idSelect) {
-    $(idSelect).innerHTML = '';
+    document.getElementById(idSelect).innerHTML = '';
     nCurrentRow = 0;
 }
 
 function addEntry(idSelect, idEdit) {
     newEntry = new Option('', '', false, true);
-    var n = $(idSelect).length;
-    $(idSelect).options[n] = newEntry;
-    $(idSelect).options[n].className = 'set';
+    var n = document.getElementById(idSelect).length;
+    document.getElementById(idSelect).options[n] = newEntry;
+    document.getElementById(idSelect).options[n].className = 'set';
 }
 
 /*
@@ -796,7 +786,7 @@ function addEntry(idSelect, idEdit) {
 */
 
 function getElementPosition(id) {
-    var node = $(id);
+    var node = document.getElementById(id);
     var offsetLeft = 0;
     var offsetTop = 0;
     while (node) {
@@ -818,7 +808,7 @@ function getElementPosition(id) {
 */
 
 function move(id, x, y) {
-    Element = $(id);
+    Element = document.getElementById(id);
     Element.style.position = "absolute";
     Element.style.left = x + "px";
     Element.style.top = y + "px";
@@ -828,8 +818,8 @@ var openMenu;
 function showMenu(linkId, menuId) {
     if (menuId != openMenu) hide(openMenu);
     openMenu = menuId;
-    var oLink = $(linkId);
-    var oMenu = $(menuId);
+    var oLink = document.getElementById(linkId);
+    var oMenu = document.getElementById(menuId);
     var o = getElementPosition(linkId);
     var ao = getWindowSize();
     var c = ((o.x + oLink.offsetWidth) - oMenu.offsetWidth);
@@ -865,12 +855,12 @@ function getWindowSize() {
 }
 
 function ChangeToolTip(sId, sDataTyp) {
-    $(sId).title = translate(sDataTyp);
+    document.getElementById(sId).title = translate(sDataTyp);
 }
 var pnPageY = 0;
 
 window.onscroll = function () {
-    var topUp = $('topUp');
+    var topUp = document.getElementById('topUp');
     if(topUp && window.pageYOffset >= 250)
         visible('topUp');
     else
@@ -878,7 +868,7 @@ window.onscroll = function () {
 }
 function scrollToTop() {
     pnPageY = window.pageYOffset;
-    var node = $('topUp');
+    var node = document.getElementById('topUp');
     window.setTimeout(pageUp, 1);
 }
 
@@ -889,30 +879,30 @@ function pageUp() {
 }
 
 function maxMin(id) {
-    $(id).style.width = "";
-    if ($(id).style.position == "absolute") {
-        if ($(id).className == 'fmin' || $(id).className == 'min') {
-            $(id).className = 'fmax';
+    document.getElementById(id).style.width = "";
+    if (document.getElementById(id).style.position == "absolute") {
+        if (document.getElementById(id).className == 'fmin' || document.getElementById(id).className == 'min') {
+            document.getElementById(id).className = 'fmax';
             move(id, 0, window.pageYOffset);
-            $(id).style.width = wsize.x - ScrolBarWidth() + "px";
+            document.getElementById(id).style.width = wsize.x - ScrolBarWidth() + "px";
         } else {
-            $(id).className = 'fmin';
+            document.getElementById(id).className = 'fmin';
             move(id, (wsize.x / 100) * 10 - ScrolBarWidth(), window.pageYOffset + (wsize.x / 100) * 5);
-            $(id).style.width = "80%";
+            document.getElementById(id).style.width = "80%";
         }
     } else {
-        if ($(id).className == 'fmax' || $(id).className == 'max') {
-            $(id).className = 'min';
+        if (document.getElementById(id).className == 'fmax' || document.getElementById(id).className == 'max') {
+            document.getElementById(id).className = 'min';
         } else {
-            $(id).className = 'max';
+            document.getElementById(id).className = 'max';
         }
     }
 }
 
 function undock(id) {
     var wname = id;
-    var element = $(wname);
-    var caption = $("tr" + id);
+    var element = document.getElementById(wname);
+    var caption = document.getElementById("tr" + id);
     var pos = element.style.position;
     var o = getElementPosition(wname);
     if (pos == "absolute") {
@@ -927,18 +917,18 @@ function undock(id) {
 }
 
 function checkLength(max) {
-    var message = $("txt");
+    var message = document.getElementById("txt");
     var m = message.value;
     var tmpMax = maxLength;
     if (typeof max != undefined) maxLength = max;
     if (m.length >= maxLength) {
         message.value = m.substring(0, maxLength);
-        $("msglength").value = 0;
-        $("msglength").style.color = "red";
+        document.getElementById("msglength").value = 0;
+        document.getElementById("msglength").style.color = "red";
     } else {
         var no = (maxLength - m.length);
-        $("msglength").value = no;
-        $("msglength").style.color = "green";
+        document.getElementById("msglength").value = no;
+        document.getElementById("msglength").style.color = "green";
     }
     maxLength = tmpMax;
 }
@@ -978,39 +968,57 @@ function markTables(bool) {
     hide(bool ? 'markAll2' : 'umarkAll2');
 }
 var html = 0;
+markDownEditor = null;
 
-function enableHtml() {
-    if (html == false) {
-        html = true;
-        $('htmlButton').checked = true;
-        if ($('enlarged')) {
-            $('enlarged').style.display = 'none';
+function enableHtml(enable){
+    if(typeof enable === 'boolean')
+       html = enable;
+    else
+        html = !html;
+
+    if (html) {
+        document.getElementById('htmlButton').checked = true;
+        if (document.getElementById('enlarged')) {
+            document.getElementById('enlarged').style.display = 'none';
         }
+        ace.require("/ace/src-min/chromevox");
+        editor = ace.edit("edit");
+        editor.session.setMode("ace/mode/perl");
+        editor.setTheme("ace/theme/chromevox");
+        editor.setValue($('#txt').val(), 1);
+        hide('txt');
+        visible('edit');
+        visible('editorRim');
+        $('.md-container').hide();
     } else {
-        html = false;
-        $('htmlButton').checked = false;
-        if ($('enlarged')) {
-            $('enlarged').style.display = '';
+        document.getElementById('htmlButton').checked = false;
+        if (document.getElementById('enlarged')) {
+            document.getElementById('enlarged').style.display = '';
         }
+        if(!markDownEditor){
+            markDownEditor = $('#txt').markdownEditor(
+            {
+                theme:'theme/tomorrow_night_eighties',
+                uploadPath:false,
+                preview:false
+            }
+            );
+        }
+        visible('txt');
+        hide('edit');
+        hide('editorRim');
+        $('.md-container').show();
     }
 }
 
 function put(t) {
     addText(t);
 }
-//<< bbcode buttons
+//<< markdown buttons
 function addText(text) {
-    var element = $("txt");
+    var element = document.getElementById("txt");
     element.value += text;
     element.focus();
-}
-
-function align(a) {
-    if (html) {
-        insertT("div align=\"" + a + "\"", "div");
-    } else {
-        insertT(a, a);
-    }
 }
 
 function left() {
@@ -1030,31 +1038,23 @@ function justify() {
 }
 
 function strike() {
-    insertT("s");
+    insertT("~~");
 }
 
 function underline() {
-    insertT("u");
+    insertT("__");
 }
 
 function bold() {
-    insertT("b");
+    insertT("**");
 }
 
 function italicize() {
-    insertT("i");
-}
-
-function sub() {
-    insertT("sub");
-}
-
-function sup() {
-    insertT("sup");
+    insertT("*");
 }
 
 function img() {
-    var textarea = $('txt');
+    var textarea = document.getElementById('txt');
     if (typeof document.selection != 'undefined') {
         var range = document.selection.createRange();
         var txt = range.text;
@@ -1066,7 +1066,7 @@ function img() {
                 if (html) {
                     o = "<img src='" + txt + "'/>";
                 } else {
-                    o = "[img]" + txt + "[/img]";
+                    o = "![]("  + txt + ")";
                 }
                 textarea.value += o;
             });
@@ -1074,7 +1074,7 @@ function img() {
             if (html) {
                 range.text = "<img src='" + txt + "'/>";
             } else {
-                range.text = "[img]" + txt + "[/img]";
+                range.text = "![]("  + txt + ")";
             }
             range.moveStart('character', txt.length + 11);
         }
@@ -1087,7 +1087,7 @@ function img() {
         if (html) {
             textarea.value = o.splice(i, (n - i), "<img src='" + img + "'/>");
         } else {
-            textarea.value = o.splice(i, (n - i), "[img]" + img + "[/img]");
+            textarea.value = o.splice(i, (n - i), "![]("  + img + ")");
         }
     } else if (textarea.selectionStart && (textarea.selectionEnd == textarea.selectionStart)) { //insert at gecko
         var ia = textarea.selectionStart;
@@ -1097,7 +1097,7 @@ function img() {
             if (html) {
                 textarea.value = a + "<img src='" + txta + "'/>" + b;
             } else {
-                textarea.value = a + "[img]" + txta + "[/img]" + b;
+                textarea.value = a + "![](" + txta + ")" + b;
             }
         });
     } else {
@@ -1108,37 +1108,11 @@ function img() {
                 }
             } else {
                 if (img) {
-                    textarea.value += "[img]" + imga + "[/img]";
+                    textarea.value += "![](" + imga + ")";
                 }
             }
         });
     }
-}
-var color = "red";
-
-function setCColor(c) {
-    color = c;
-    $("showColor").style.backgroundColor = color;
-}
-
-function ShowColor() {
-    var e = $("coloor");
-    e.style.color = color;
-    if (html) {
-        insertT("span style=\"color:" + color + "\"", "span");
-    } else {
-        insertT("color=" + color + "", "color");
-    }
-}
-
-function email() {
-    prompt("Insert Email Address:", function(link) {
-        if (html) {
-            insertT("a href='mailto:" + link + "'", "a");
-        } else {
-            insertT("email=" + link, "email");
-        }
-    });
 }
 
 function link() {
@@ -1146,14 +1120,14 @@ function link() {
         if (html) {
             insertT("a href=\"" + link + "\"", "a");
         } else {
-            insertT("url=" + link + "", "url");
+            insertT("[","]("+ link + ")");
         }
     });
 }
 
 function insertT(tag, tag2) {
     if (!tag2) tag2 = tag;
-    var textarea = $('txt');
+    var textarea = document.getElementById('txt');
     if (typeof document.selection != 'undefined') { //IE6
         range = document.selection.createRange();
         var txt = range.text;
@@ -1164,7 +1138,7 @@ function insertT(tag, tag2) {
                     if (html) {
                         o = "<" + tag + ">" + txt + "</" + tag2 + ">";
                     } else {
-                        o = "[" + tag + "]" + txt + "[/" + tag2 + "]";
+                        o = tag + txt + tag2;
                     }
                     textarea.value += o;
                 }
@@ -1173,7 +1147,7 @@ function insertT(tag, tag2) {
             if (html) {
                 range.text = "<" + tag + ">" + txt + "</" + tag2 + ">";
             } else {
-                range.text = "[" + tag + "]" + txt + "[/" + tag2 + "]";
+                range.text = tag + txt + tag2;
             }
             range.moveStart('character', tag.length + txt.length + tag2.length);
         }
@@ -1186,7 +1160,7 @@ function insertT(tag, tag2) {
         if (html) {
             textarea.value = o.splice(i, (n - i), "<" + tag + ">" + txtb + "</" + tag2 + ">");
         } else {
-            textarea.value = o.splice(i, (n - i), "[" + tag + "]" + txtb + "[/" + tag2 + "]");
+            textarea.value = o.splice(i, (n - i), tag + txtb + tag2 );
         }
     } else if (textarea.selectionStart && (textarea.selectionEnd == textarea.selectionStart)) { //insert at gecko
         var ia = textarea.selectionStart;
@@ -1196,7 +1170,7 @@ function insertT(tag, tag2) {
             if (html) {
                 textarea.value = a + "<" + tag + ">" + txta + "</" + tag2 + ">" + b;
             } else {
-                textarea.value = a + "[" + tag + "]" + txta + "[/" + tag2 + "]" + b;
+                textarea.value = a + tag + txta + tag2 + b;
             }
         });
     } else {
@@ -1204,33 +1178,25 @@ function insertT(tag, tag2) {
             if (html) {
                 textarea.value += "<" + tag + ">" + bol + "</" + tag2 + ">";
             } else {
-                textarea.value += "[" + tag + "]" + bol + "[/" + tag2 + "]";
+                textarea.value += tag + bol + tag2 ;
             }
         });
     }
 }
 
 function clearIt() {
-    var element = $("txt");
+    var element = document.getElementById("txt");
     element.value = "";
     element.focus();
 }
-var lang = 'Perl';
 
-function setlang(stext) {
-    lang = stext;
-}
-
-function getLang() {
-    return lang;
-}
 
 function getValue(id) {
-    return $(id).value;
+    return document.getElementById(id).value;
 }
 
 function setValue(id, txt) {
-    $(id).value = txt;
+    document.getElementById(id).value = txt;
 }
 //editor.pm>>
 //<<drag&drop
@@ -1251,7 +1217,7 @@ var offsetLeft = 0;
 
 function startdrag(element) {
     dropid = element;
-    dragobjekt = $(element);
+    dragobjekt = document.getElementById(element);
     dragX = posX - dragobjekt.offsetLeft;
     dragY = posY - dragobjekt.offsetTop;
 }
@@ -1259,7 +1225,7 @@ function startdrag(element) {
 function drop() {
     if (dropenabled && dragobjekt && !m_bNoDrop) {
         m_bOver = true;
-        //     dragobjekt.style.cursor = "";
+        dragobjekt.style.cursor = "";
         dragobjekt.style.position = "";
     }
     if (!m_bNoDrop) dragobjekt = null;
@@ -1275,7 +1241,7 @@ function drag(EVENT) {
 }
 //drag&drop>>
 function displayTree(id) {
-    var e = $(id);
+    var e = document.getElementById(id);
     if (!e) return;
     var display = e.style.display;
     if (display == "none") {
@@ -1313,8 +1279,8 @@ function blogThis() {
     var q = param("quote");
     if (referer && headline && q) {
         var t = "[blog=" + unescape(referer) + "]\n" + unescape(q) + "\n[/blog]";
-        $('title').value = unescape(headline);
-        $('txt').value = t;
+        document.getElementById('title').value = unescape(headline);
+        document.getElementById('txt').value = t;
     }
 }
 
@@ -1336,7 +1302,7 @@ function datum() {
 */
 
 function setText(id, string) {
-    var element = $(id);
+    var element = document.getElementById(id);
     if (element) element.innerHTML = string;
     else window.status = id + string;
 }
@@ -1349,7 +1315,7 @@ function setText(id, string) {
 */
 
 function getText(id) {
-    var element = $(id);
+    var element = document.getElementById(id);
     if (element) return element.innerHTML;
 }
 
@@ -1361,7 +1327,7 @@ function getText(id) {
 */
 
 function hide(id) {
-    if ($(id)) $(id).style.display = "none";
+    if (document.getElementById(id)) document.getElementById(id).style.display = "none";
 }
 
 /*
@@ -1372,7 +1338,7 @@ function hide(id) {
 */
 
 function visible(id) {
-    if ($(id)) $(id).style.display = "";
+    if (document.getElementById(id)) document.getElementById(id).style.display = "";
 }
 
 /*
@@ -1423,14 +1389,14 @@ function prepareMove(id) {
             }
         }
     }
-    dragobjekt = $(id);
+    dragobjekt = document.getElementById(id);
     dragX = posX - dragobjekt.offsetLeft;
     dragY = posY - dragobjekt.offsetTop;
     dropenabled = true;
     m_bOver = false;
     var o = getElementPosition(id);
     move(id, o.x + 25, o.y + 25);
-    $(id)
+    document.getElementById(id)
     startdrag(id);
 }
 
@@ -1444,18 +1410,18 @@ function prepareMove(id) {
 function enableDropZone(id) {
     if (!dragobjekt) return;
     dropzone = id;
-    if (dragobjekt.id != dropzone) $(id).className = "dropzone" + size;
+    if (dragobjekt.id != dropzone) document.getElementById(id).className = "dropzone" + size;
 }
 
 function disableDropZone(id) {
-    $(id).className = "treeviewLink" + size;
+    document.getElementById(id).className = "treeviewLink" + size;
 }
 
 function confirmMove() {
     m_bNoDrop = true;
     if (dropzone && dragobjekt.id != dropzone) {
-        moveHere(translate('move') + " " + dragobjekt.innerHTML + " " + translate('before') + " " + $(dropzone).innerHTML + " ?", function() {
-            requestURI('cgi-bin/mysql.pl?action=MoveTreeViewEntry&dump=' + m_sDump + '&from=' + $(dropid).id + "&to=" + $(dropzone).id + "#" + $(
+        moveHere(translate('move') + " " + dragobjekt.innerHTML + " " + translate('before') + " " + document.getElementById(dropzone).innerHTML + " ?", function() {
+            requestURI('cgi-bin/mysql.pl?action=MoveTreeViewEntry&dump=' + m_sDump + '&from=' + document.getElementById(dropid).id + "&to=" + document.getElementById(dropzone).id + "#" + document.getElementById(
                 dropzone).id);
         });
     }
@@ -1480,13 +1446,19 @@ function showCatList() {
 }
 
 function showTab(id) {
-    $(id).classList.remove('closed');
-    if ($(id).firstChild) $(id).firstChild.style.display = '';
+	if(document.getElementById(id).classList)
+		document.getElementById(id).classList.remove('closed');
+	else
+		document.getElementById(id).className -= 'closed';
+    if (document.getElementById(id).firstChild) document.getElementById(id).firstChild.style.display = '';
     var elements = document.getElementsByClassName('cnt');
     for (var i = 0; i < elements.length; i++) {
         if (elements[i].id != id && elements[i].style.display == '') {
             if (elements[i].firstChild) elements[i].firstChild.style.display = 'none';
-            elements[i].classList.add('closed');
+            if(elements[i].classList)
+				elements[i].classList.add('closed');
+			else
+				elements[i].className -= 'closed';
         }
     }
 }
@@ -1539,18 +1511,18 @@ function hideForeign(bHide) {
 
 function DisplayKeyWords(b) {
     if (b) {
-        $('akeywods').className = 'currentLink';
-        $('afieldNames').className = 'link';
+        document.getElementById('akeywods').className = 'currentLink';
+        document.getElementById('afieldNames').className = 'link';
         hide('divTables');
         hide(nCurrentShown);
         visible('selKeyword');
-        $('selKeyword').focus();
+        document.getElementById('selKeyword').focus();
     } else {
-        $('akeywods').className = 'link';
-        $('afieldNames').className = 'currentLink';
+        document.getElementById('akeywods').className = 'link';
+        document.getElementById('afieldNames').className = 'currentLink';
         hide('selKeyword');
         visible('divTables');
-        $('divTables').focus();
+        document.getElementById('divTables').focus();
     }
 }
 var action;
@@ -1629,27 +1601,27 @@ insert vales from an  <select></select> into autocomplete
 */
 
 function selKeyword(id) {
-    for (var i = 0; i < $(id).options.length; i++) autocomplete.push($(id).options[i].value);
+    for (var i = 0; i < document.getElementById(id).options.length; i++) autocomplete.push(document.getElementById(id).options[i].value);
 }
 var uno = true;
 
 function showSQLEditor() {
-    $('popupContent1').style.left = '5%';
-    $('popupContent1').style.width = '90%';
+    document.getElementById('popupContent1').style.left = '5%';
+    document.getElementById('popupContent1').style.width = '90%';
     showPopup('SqlEditor');
-    oAutocomplete = $("sqlEdit");
+    oAutocomplete = document.getElementById("sqlEdit");
     oAutocomplete.addEventListener('keyup', Autocomplete);
     if (uno) {
         selKeyword('selKeyword');
         selKeyword('tablelist');
-        for (var i = 0; i < $('tablelist').options.length; i++) selKeyword($('tablelist').options[i].value);
+        for (var i = 0; i < document.getElementById('tablelist').options.length; i++) selKeyword(document.getElementById('tablelist').options[i].value);
     }
     uno = false;
 }
 
 function ShowNewRow() {
-    $('popupContent1').style.left = '2%';
-    $('popupContent1').style.width = '96%';
+    document.getElementById('popupContent1').style.left = '2%';
+    document.getElementById('popupContent1').style.width = '96%';
     showPopup('ShowNewRow');
 }
 /*
@@ -1662,17 +1634,17 @@ fake (styled) checkbox for HTML::Editor
 
 function checkButton(id,parent){
     if(parent.className == 'htmlButton' ){
-         $(id).checked = "checked" 
+         document.getElementById(id).checked = "checked" 
          parent.className = 'htmlButtonChecked'
     }else{
        parent.className = 'htmlButton'
-       $(id).checked = "" 
+       document.getElementById(id).checked = "" 
     }
 }
 /*
 =head2 COPYRIGHT
 
-    Copyright (C) 2006-2016 by Hr. Dirk Lindner
+    Copyright (C) 2006-2018 by Hr. Dirk Lindner
 
     perl -e'sub lze_Rocks{print/(...)/ for shift;}sub{&{"@_"}}->("lze_Rocks")'
 

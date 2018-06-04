@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::array::str_comma_sep;
 
-our $DATE = '2018-04-17'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2018-06-04'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,7 +9,7 @@ use warnings;
 
 sub meta {
     +{
-        v => 2,
+        v => 3,
         enable_by_default => 0,
         prio => 60, # a bit lower than normal
     };
@@ -44,7 +44,7 @@ Data::Sah::Coerce::perl::array::str_comma_sep - Coerce array from a comma-separa
 
 =head1 VERSION
 
-This document describes version 0.006 of Data::Sah::Coerce::perl::array::str_comma_sep (from Perl distribution Data-Sah-CoerceRule-array-str_comma_sep), released on 2018-04-17.
+This document describes version 0.007 of Data::Sah::Coerce::perl::array::str_comma_sep (from Perl distribution Data-Sah-CoerceRule-array-str_comma_sep), released on 2018-06-04.
 
 =head1 DESCRIPTION
 
@@ -60,7 +60,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-Sah-C
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com///github.com/perlancar/perl-Data-Sah-CoerceRule-array-str_comma_sep>.
+Source repository is at L<https://github.com/perlancar/perl-Data-Sah-CoerceRule-array-str_comma_sep>.
 
 =head1 BUGS
 

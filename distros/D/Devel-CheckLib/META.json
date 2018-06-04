@@ -1,9 +1,11 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "check that a library is available",
    "author" : [
-      "unknown"
+      "David Cantrell",
+      "David Golden",
+      "Yasuhiro Matsumoto"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
@@ -22,6 +24,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "ExtUtils::MakeMaker" : "0",
             "IO::CaptureOutput" : "1.0801",
             "Mock::Config" : "0.02",
             "Test::More" : "0.62"
@@ -47,5 +50,5 @@
          "url" : "http://github.com/mattn/p5-Devel-CheckLib"
       }
    },
-   "version" : "1.12"
+   "version" : "1.13"
 }

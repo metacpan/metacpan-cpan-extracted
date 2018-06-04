@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use MVC::Neaf qw(:sugar);
+use MVC::Neaf;
 
 get '/foo' => sub {};
 get '/bar' => sub {}, public => 1, description => "Bar";

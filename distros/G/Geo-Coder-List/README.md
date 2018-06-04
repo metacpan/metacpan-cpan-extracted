@@ -10,7 +10,7 @@ Call many geocoders
 
 # VERSION
 
-Version 0.21
+Version 0.22
 
 # SYNOPSIS
 
@@ -40,28 +40,28 @@ Different encoders can be preferred for different locations.
 For example this code uses geocode.ca for Canada and US addresses,
 and OpenStreetMap for other places:
 
-    my $geocoderlist = Geo::Coder::List->new()
+    my $geo_coderlist = Geo::Coder::List->new()
         ->push({ regex => qr/(Canada|USA|United States)$/, geocoder => Geo::Coder::CA->new() })
         ->push(Geo::Coder::OSM->new());
 
     # Uses Geo::Coder::CA, and if that fails uses Geo::Coder::OSM
-    my $location = $geocoderlist->geocode(location => '1600 Pennsylvania Ave NW, Washington DC, USA');
+    my $location = $geo_coderlist->geocode(location => '1600 Pennsylvania Ave NW, Washington DC, USA');
     # Only uses Geo::Coder::OSM
-    if($location = $geocoderlist->geocode('10 Downing St, London, UK')) {
+    if($location = $geo_coderlist->geocode('10 Downing St, London, UK')) {
         print 'The prime minister lives at co-ordinates ',
             $location->{geometry}{location}{lat}, ',',
             $location->{geometry}{location}{lng}, "\n";
     }
 
     # It is also possible to limit the number of enquires used by a particular encoder
-    $geocoderlist->push({ geocoder => Geo::Coder::GooglePlaces->new(key => '1234', limit => 100) });
+    $geo_coderlist->push({ geocoder => Geo::Coder::GooglePlaces->new(key => '1234', limit => 100) });
 
 ## geocode
 
 Runs geocode on all of the loaded drivers.
 See [Geo::Coder::GooglePlaces::V3](https://metacpan.org/pod/Geo::Coder::GooglePlaces::V3) for an explanation
 
-The name of the geocoder that gave the result is put into the geocode element of the
+The name of the Geo-Coder that gave the result is put into the geocode element of the
 return value, if the value was retrieved from the cache the value will be undefined.
 
     if(defined($location->{'geocoder'})) {
@@ -70,14 +70,14 @@ return value, if the value was retrieved from the cache the value will be undefi
 
 ## ua
 
-Accessor method to set the UserAgent object used internally by each of the geocoders. You
+Accessor method to set the UserAgent object used internally by each of the Geo-Coders. You
 can call _env\_proxy_ for example, to get the proxy information from
 environment variables:
 
-    my $geocoderlist = Geo::Coder::List->new();
+    my $geocoder_list = Geo::Coder::List->new();
     my $ua = LWP::UserAgent->new();
     $ua->env_proxy(1);
-    $geocoderlist->ua($ua);
+    $geocoder_list->ua($ua);
 
 Note that unlike Geo::Coders, there is no read method, since that would be pointless.
 

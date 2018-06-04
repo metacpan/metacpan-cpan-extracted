@@ -1,11 +1,11 @@
 package Net::DNS::SEC;
 
 #
-# $Id: SEC.pm 1676 2018-05-11 11:56:04Z willem $
+# $Id: SEC.pm 1684 2018-06-04 09:03:04Z willem $
 #
 our $VERSION;
-$VERSION = '1.08';
-our $SVNVERSION = (qw$LastChangedRevision: 1676 $)[1];
+$VERSION = '1.09';
+our $SVNVERSION = (qw$LastChangedRevision: 1684 $)[1];
 our $XS_VERSION = $VERSION;
 $VERSION = eval($VERSION);
 
@@ -49,15 +49,6 @@ our @EXPORT = ( @Net::DNS::EXPORT, qw(algorithm digtype key_difference) );
 use integer;
 use warnings;
 use Carp;
-
-eval{ Net::DNS::SEC->bootstrap($XS_VERSION) } || warn;
-
-
-require Net::DNS::RR::CDS;
-require Net::DNS::RR::DLV;
-require Net::DNS::RR::DS;
-require Net::DNS::RR::RRSIG;
-require Net::DNS::RR::SIG;
 
 
 =head1 UTILITY FUNCTIONS
@@ -118,6 +109,16 @@ sub key_difference {
 	};
 
 	return wantarray ? (@$r) : $@;
+}
+
+
+########################################
+
+eval { Net::DNS::SEC->bootstrap($XS_VERSION) } || warn;
+
+
+foreach (qw(CDS DS DLV RRSIG SIG)) {
+	new Net::DNS::RR( type => $_ );				# pre-load to access class methods
 }
 
 

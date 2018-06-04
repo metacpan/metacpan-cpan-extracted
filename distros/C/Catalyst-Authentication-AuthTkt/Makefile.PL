@@ -21,6 +21,7 @@ test_requires 'Catalyst::Plugin::Session'                => 0;
 test_requires 'Catalyst::Plugin::Session::Store::Dummy'  => 0;
 test_requires 'Catalyst::Plugin::Session::State::Cookie' => 0;
 test_requires 'HTTP::Cookies'                            => 0;
+test_requires 'HTTP::Request::AsCGI'                     => 0;
 
 license 'perl_5';
 homepage 'https://github.com/karpet/catalyst-authentication-authtkt';

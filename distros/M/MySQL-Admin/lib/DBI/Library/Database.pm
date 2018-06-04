@@ -36,7 +36,7 @@ use DBI::Library qw(:all $m_dbh $m_dsn);
         qw(getIndex CurrentPass CurrentUser CurrentHost CurrentDb Driver addUser hasAcount isMember right checkPass checkSession setSid getName checkFlood GetColumns GetAttrs GetCollation GetColumnCollation GetExtra GetNull GetEngineForRow GetEngines GetCharacterSet GetDataBases GetAutoIncrement GetPrimaryKey GetAutoIncrementValue)
     ],
 );
-$DBI::Library::Database::VERSION = '1.12';
+$DBI::Library::Database::VERSION = '1.13';
 $m_nSecs                         = 10;
 
 =head1 NAME
@@ -861,7 +861,7 @@ sub addMessage {
         my $cat       = defined $p[0]->{cat}    ? $p[0]->{cat}    : 'news';
         my $rght      = $self->catright($cat);
         my $attach    = defined $p[0]->{attach} ? $p[0]->{attach} : 0;
-        my $format    = defined $p[0]->{format} ? $p[0]->{format} : 'bbcode';
+        my $format    = defined $p[0]->{format} ? $p[0]->{format} : 'markdown';
         my $m_sAction = defined $p[0]->{action} ? $p[0]->{action} : 'news';
         my $sql =
           "insert into $thread (`title`,`body`,`attach`,`cat`,`right`,`user`,`action`,`format`) values(?,?,?,?,?,?,?,?)";
@@ -920,7 +920,7 @@ sub editMessage {
         my $sUser  = defined $p[0]->{user}   ? $p[0]->{user}   : 'guest';
         my $body   = defined $p[0]->{body}   ? $p[0]->{body}   : 'Body';
         my $attach = defined $p[0]->{attach} ? $p[0]->{attach} : 0;
-        my $format = defined $p[0]->{format} ? $p[0]->{format} : 'bbcode';
+        my $format = defined $p[0]->{format} ? $p[0]->{format} : 'markdown';
         my $cat    = defined $p[0]->{cat}    ? $p[0]->{cat}    : 'news';
         my $up =
           defined $p[0]->{uploadpath}
@@ -979,7 +979,7 @@ sub reply {
         my $sUser  = defined $p[0]->{user}   ? $p[0]->{user}   : 'guest';
         my $body   = defined $p[0]->{body}   ? $p[0]->{body}   : 'Body';
         my $attach = defined $p[0]->{attach} ? $p[0]->{attach} : 0;
-        my $format = defined $p[0]->{format} ? $p[0]->{format} : 'bbcode';
+        my $format = defined $p[0]->{format} ? $p[0]->{format} : 'markdown';
         my $refid  = defined $p[0]->{id}     ? $p[0]->{id}     : 1;
         my $sql =
           "insert into replies (`title`,`body`,`attach`,`right`,`user`,`refererId`,`format`) values(?,?,?,?,?,?,?)";

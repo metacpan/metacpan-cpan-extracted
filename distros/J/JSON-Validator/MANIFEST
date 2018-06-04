@@ -5,7 +5,9 @@ Changes
 cpanfile
 lib/JSON/Validator.pm
 lib/JSON/Validator/cache/36d1bd12eeed51e86c8695bd8876a9df
+lib/JSON/Validator/cache/3d35aac549d951f4cf9182ff47bff0b4
 lib/JSON/Validator/cache/49c95b866e40f788892a7fb3c816b0e8
+lib/JSON/Validator/cache/4a31fe43be9e23ca9eb8d9e9faba8892
 lib/JSON/Validator/cache/630949337805585c8e52deea27d11419
 lib/JSON/Validator/cache/a0f5b4b4e75ea17fc09e88ec0343d148
 lib/JSON/Validator/cache/ea34d47d4e060a1c3b12d2287aff89a7
@@ -62,8 +64,10 @@ t/draft4-tests/type.json
 t/draft4-tests/uniqueItems.json
 t/get.t
 t/Helper.pm
-t/id-keyword.t
+t/id-keyword-draft4.t
+t/id-keyword-draft7.t
 t/invalid-ref.t
+t/issue-103-one-of.t
 t/issue-22-duplicate-error-messages.t
 t/issue-42-cache-control.t
 t/issue-59-oneof-blessed-booleans.t

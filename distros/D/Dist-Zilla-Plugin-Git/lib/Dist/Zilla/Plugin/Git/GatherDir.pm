@@ -9,7 +9,7 @@
 package Dist::Zilla::Plugin::Git::GatherDir;
 # ABSTRACT: Gather all tracked files in a Git working directory
 
-our $VERSION = '2.044';
+our $VERSION = '2.045';
 
 use Moose;
 extends 'Dist::Zilla::Plugin::GatherDir' => { -version => 4.200016 }; # exclude_match
@@ -156,8 +156,7 @@ override gather_files => sub {
   # Convert ~ portion to real directory:
   $root =~ s{^(~[^\\/]*)([\\/])}{$self->_homedir($1) . $2}e;
 
-  $root = Path::Tiny::path($root);
-  $root = $root->absolute($self->zilla->root->absolute);
+  $root = Path::Tiny::path($root)->absolute($self->zilla->root);
 
   # Prepare to gather files
   my $git = Git::Wrapper->new($root->stringify);
@@ -239,7 +238,7 @@ Dist::Zilla::Plugin::Git::GatherDir - Gather all tracked files in a Git working 
 
 =head1 VERSION
 
-version 2.044
+version 2.045
 
 =head1 SYNOPSIS
 

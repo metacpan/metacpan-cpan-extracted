@@ -3,6 +3,7 @@ MANIFEST
 Makefile.PL
 README.md
 README.pod
+bin/jsonschema2json
 emulators/cpanfile
 emulators/generic.pl
 lib/JSON/Schema/ToJSON.pm

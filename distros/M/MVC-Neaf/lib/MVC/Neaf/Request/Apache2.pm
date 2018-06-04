@@ -3,20 +3,21 @@ package MVC::Neaf::Request::Apache2;
 use strict;
 use warnings;
 
-our $VERSION = 0.2203;
+our $VERSION = 0.2501;
 
 =head1 NAME
 
 MVC::Neaf::Request::Apache2 - Apache2 (mod_perl) driver for Not Even A Framework.
 
-=head1 DESCRIPTION
+=head1 WARNING
 
-Apache2 request that will invoke MVC::Neaf core functions from under mod_perl.
+B<This module is DEPRECATED and will be removed in Neaf 0.30.>
 
-Much to the author's disgrace, this module currently uses
-BOTH Apache2::RequestRec and Apache2::Request from libapreq.
+Use L<Plack::Handler::Apache2> instead.
 
 =head1 SYNOPSIS
+
+Apache2 request that will invoke MVC::Neaf core functions from under mod_perl.
 
 The following apache configuration should work with this module:
 
@@ -67,6 +68,10 @@ BEGIN {
         Apache2::Const->import( -compile => 'OK' );
     };
 };
+
+# TODO 0.30 remove the whole module
+carp __PACKAGE__." is DEPRECATED and will be REMOVED in 0.30. Use Plack::Handler::Apache2 instead."
+    if $ENV{MOD_PERL};
 
 use MVC::Neaf;
 use parent qw(MVC::Neaf::Request);
@@ -270,8 +275,6 @@ sub do_write {
     return $self->{driver_raw}->print( $data );
 };
 
-# TODO implement do_close, too!
-
 =head2 handler( $apache_request )
 
 A valid Apache2/mod_perl handler.
@@ -293,7 +296,7 @@ sub handler : method {
     if (!$MVC::Neaf::Request::query_allowed{ $r->method }) {
         $r->args('');
     };
-    my $reply = MVC::Neaf->handle_request( $self );
+    my $reply = MVC::Neaf::neaf()->handle_request( $self );
 
     return Apache2::Const::OK();
 };
@@ -312,5 +315,19 @@ Ideally, this module should be mover out of the repository altogether.
 sub failed_startup {
        return %fail_apache ? \%fail_apache : ();
 };
+
+=head1 LICENSE AND COPYRIGHT
+
+This module is part of L<MVC::Neaf> suite.
+
+Copyright 2016-2018 Konstantin S. Uvarin C<khedin@cpan.org>.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+=cut
 
 1;

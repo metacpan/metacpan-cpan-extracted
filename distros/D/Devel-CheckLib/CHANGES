@@ -1,3 +1,6 @@
+1.13    2018-06-23      Improve Makefile.PL
+                        update compatibility code from App-EUMM-Upgrade-1.0
+
 1.12    2018-05-23      Fix order of flags for gcc
                         Fix problems with executable binaries
 

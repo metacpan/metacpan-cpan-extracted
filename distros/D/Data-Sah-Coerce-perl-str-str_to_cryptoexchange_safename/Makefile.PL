@@ -22,14 +22,14 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "CryptoExchange::Catalog" => 0,
-    "Data::Sah::Coerce" => "0.011",
+    "Data::Sah::Coerce" => "0.025",
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "CryptoExchange::Catalog" => 0,
-  "Data::Sah::Coerce" => "0.011",
+  "Data::Sah::Coerce" => "0.025",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

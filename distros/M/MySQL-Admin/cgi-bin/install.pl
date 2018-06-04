@@ -1,12 +1,13 @@
-#!/usr/bin/perl -w
+#!perl -w
 use strict;
 use utf8;
-use lib qw(%PATH%lib);
+use lib qw(F:/software/Apache24/cgi-bin/lib);
 use MySQL::Admin::Settings;
 use vars qw($m_hrS $m_bReturn $m_bError $m_nSkipCaptch);
+use Authen::Captcha;
 $m_bError = 0;
 use CGI qw(param header);
-loadSettings('%PATH%config/settings.pl');
+loadSettings('F:/software/Apache24/cgi-bin/config/settings.pl');
 *m_hrS= \$MySQL::Admin::Settings::m_hrSettings;
 my $m_sAction = defined param('action') ? param('action') :'settings';
 
@@ -34,20 +35,15 @@ if( $m_hrS->{login} || ( param('username') eq $m_hrS->{admin}{name}  &&  param('
 
 print header(
     -type    => 'text/xml',
-#     -access_control_allow_origin => '*',
-#     -access_control_allow_credentials => 'true',
     -charset => 'UTF-8'
 );
 print qq(<?xml version="1.0" encoding="UTF-8"?><xml>\n\n);
 
 SWITCH:{
   if($m_sAction eq 'save'){
-    eval{
-      use Authen::Captcha;
-      my $captcha = Authen::Captcha->new(data_folder   => "$m_hrS->{cgi}{bin}/config/",
+    my $captcha = Authen::Captcha->new(data_folder   => "$m_hrS->{cgi}{bin}/config/",
 					  output_folder => "$m_hrS->{cgi}{DocumentRoot}/images");
-      $m_nSkipCaptch = $captcha->check_code(param("captcha"), param("md5"));
-    };
+    $m_nSkipCaptch = $captcha->check_code(param("captcha"), param("md5"));
     $m_nSkipCaptch = 1 if $@;
     if($m_nSkipCaptch <= 0){
       &install();
@@ -63,13 +59,13 @@ SWITCH:{
 	);
 	$conf{password} = $m_hrS->{database}{password};
 	use DBI::Library;
-	my $dDatabase = new DBI::Library();
-	$dDatabase->initDB(\%conf);
+	my $oDatabase = new DBI::Library();
+	$oDatabase->initDB(\%conf);
 	open(IN, "config/install.sql") or warn $!;
 	local $/;
 	$m_sFile = <IN>;
 	foreach my $sql (split /;\n/, $m_sFile){
-	    $dDatabase->void($sql);
+	    $oDatabase->void($sql);
 	}
 	close(IN);
 	eval 'use MD5';
@@ -78,10 +74,10 @@ SWITCH:{
 	    $md5->add($m_hrS->{admin}{name});
 	    $md5->add($m_hrS->{admin}{password});
 	    my $fingerprint = $md5->hexdigest();
-	    $dDatabase->void(qq/insert into users (`user`,`pass`,`right`,`id`) values(?,?,5,?)/, 'admin', $fingerprint,'2');
+	    $oDatabase->void(qq/insert into users (`user`,`pass`,`right`,`id`) values(?,?,5,?)/, 'admin', $fingerprint,'2');
 	} else {
 	    warn $@;
-	    $dDatabase->void(qq/insert into users (`user`,`pass`,`right`,`id`) values('admin','0008e525bc0894a780297b7f3aed6f58','5','2')/);
+	    $oDatabase->void(qq/insert into users (`user`,`pass`,`right`,`id`) values('admin','0008e525bc0894a780297b7f3aed6f58','5','2')/);
 	}
       };
       if( $@ ){
@@ -103,7 +99,6 @@ sub install{
     eval{
       my $right_captcha_text = 'Right';
       my $wrong_captcha_text = 'Wrong';
-      use Authen::Captcha;
       my $captcha = Authen::Captcha->new(
       data_folder   => "$m_hrS->{cgi}{bin}/config/",
       output_folder => "$m_hrS->{cgi}{DocumentRoot}/images",

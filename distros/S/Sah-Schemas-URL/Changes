@@ -1,3 +1,9 @@
+0.005   2018-06-04 (PERLANCAR)
+
+	- Update to Data::Sah::Coerce 0.025 (coerce rule module metadata
+	  version 3).
+
+
 0.004   2017-03-09 (PERLANCAR)
 
 	- [Bugfix] obj::str_url coercion rule must not be enabled by

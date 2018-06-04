@@ -32,7 +32,7 @@ recommends:
 requires:
   Data::Dmp: '0.21'
   Data::Dump: '0'
-  Data::Sah::Coerce: '0.014'
+  Data::Sah::Coerce: '0.025'
   Data::Sah::CoerceCommon: '0'
   Data::Sah::Normalize: '0.03'
   Data::Sah::Resolve: '0.003'
@@ -66,7 +66,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah
   homepage: https://metacpan.org/release/Data-Sah
   repository: git://github.com/perlancar/perl-Data-Sah.git
-version: '0.890'
+version: '0.891'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

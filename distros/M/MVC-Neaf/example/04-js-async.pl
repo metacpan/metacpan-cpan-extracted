@@ -13,7 +13,7 @@
 use strict;
 use warnings;
 use MVC::Neaf::Util qw(decode_json); # Just 'use JSON' in real code
-use MVC::Neaf qw(:sugar);
+use MVC::Neaf;
 
 # Finally an example where not everything is in one file.
 neaf static => '/04/main.js' => __FILE__.'.data/main.js';
@@ -52,9 +52,9 @@ post '/04/backend' => sub {
     my $regex   = $payload->{regex};
     my $sample  = $payload->{sample};
 
-    # The -serial tells JS to render the contained structure instead of
+    # The -payload tells JS to render the contained structure instead of
     # the return hash itself.
-    return { -serial => [] } unless $regex and $sample;
+    return { -payload => [] } unless $regex and $sample;
 
     # Try to compile regular expression before using it
     $regex   = eval{ qr($payload->{regex}) } or die 400;
@@ -72,7 +72,7 @@ post '/04/backend' => sub {
         push @res, [ @parts, $line ];
     };
 
-    return { -serial => \@res };
+    return { -payload => \@res };
 };
 
 # Run as always

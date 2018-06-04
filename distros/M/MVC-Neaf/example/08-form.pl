@@ -12,7 +12,7 @@
 use strict;
 use warnings;
 
-use MVC::Neaf qw(:sugar);
+use MVC::Neaf;
 
 # Some inline html
 my $tpl = <<'TT';

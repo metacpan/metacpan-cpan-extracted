@@ -4,11 +4,10 @@ author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
   CryptoCurrency::Catalog: '20180308'
-  Data::Sah::Coerce: '0.011'
+  Data::Sah::Coerce: '0.025'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Test::Exception: '0'
   Test::More: '0.98'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -27,7 +26,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-Coerce-perl-str-str_to_cryptocurrency_code
   homepage: https://metacpan.org/release/Data-Sah-Coerce-perl-str-str_to_cryptocurrency_code
   repository: git://github.com/perlancar/perl-Data-Sah-Coerce-perl-str-str_to_cryptocurrency_code.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

@@ -13,7 +13,7 @@ use warnings;
 package Dist::Zilla::Role::Git::DirtyFiles;
 # ABSTRACT: Provide the allow_dirty & changelog attributes
 
-our $VERSION = '2.044';
+our $VERSION = '2.045';
 
 use Moose::Role;
 use MooseX::Types::Moose qw{ Any ArrayRef Str RegexpRef };
@@ -171,7 +171,7 @@ Dist::Zilla::Role::Git::DirtyFiles - Provide the allow_dirty & changelog attribu
 
 =head1 VERSION
 
-version 2.044
+version 2.045
 
 =head1 DESCRIPTION
 

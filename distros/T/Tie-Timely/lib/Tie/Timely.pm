@@ -3,7 +3,7 @@ use strict;
 
 use Carp qw(croak);
 
-our $VERSION = '1.002';
+our $VERSION = '1.022';
 
 sub TIESCALAR {
 	my $class      = shift;
@@ -29,22 +29,33 @@ __END__
 
 =head1 NAME
 
-Tie::Timely - scalar values with time-limited values
+Tie::Timely - Time out scalar values
 
 =head1 SYNOPSIS
 
 	use Tie::Timely;
 
+	my $interval = 5;
+	tie my $scalar, 'Amelia', $interval;
+	# now $scalar is 'Amelia'
+
+	sleep 6;
+	# now the interval has elapsed and the value is forgotten
+
+	# set the value again and it starts a new interval
+	$scalar = 'Llama';
+
 =head1 DESCRIPTION
 
-Self-destructing values go away after a time that you specify.
-
+This module creates a tied scalar that forgets its value after the
+interval that you specify. The next time you set the value it resets
+the interval;
 
 =head1 SOURCE AVAILABILITY
 
 This source is in Github:
 
-	http://github.com/briandfoy/tie-timely/
+	https://github.com/briandfoy/tie-timely/
 
 =head1 AUTHOR
 
@@ -52,8 +63,8 @@ brian d foy, C<< <brian.d.foy@gmail.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2014, brian d foy, All Rights Reserved.
+Copyright © 2005-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+You may redistribute this under the terms of the Artistic License 2.0.
 
 =cut

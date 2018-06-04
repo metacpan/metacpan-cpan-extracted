@@ -7,14 +7,14 @@ use Test::More;
 use MVC::Neaf;
 
 # Test view loading by alias
-MVC::Neaf->load_view( foo => TT => EVAL_PERL => 1 );
-my $v = MVC::Neaf->get_view("foo");
+neaf->load_view( foo => TT => EVAL_PERL => 1 );
+my $v = neaf->get_view("foo");
 is (ref $v, "MVC::Neaf::View::TT", "Good view created");
 is_deeply ([$v->render({ -template => \'[% PERL %]print 42;[% END %]' })],
     [42, "text/html"], "Template args round trip");
 
 # first, prepare some test subs
-MVC::Neaf->route( foo => sub {
+neaf->route( foo => sub {
     my $req = shift;
 
     my $bar = $req->param( "bar" ); # this dies
@@ -24,7 +24,7 @@ MVC::Neaf->route( foo => sub {
     };
 });
 
-MVC::Neaf->route( bar => sub {
+neaf->route( bar => sub {
     my $req = shift;
 
     my $bar = $req->param( bar => qr/.*/ );
@@ -34,7 +34,7 @@ MVC::Neaf->route( bar => sub {
     };
 }, -template => \"[% data %]", -view => 'foo' );
 
-my $code = MVC::Neaf->run;
+my $code = neaf->run;
 
 is (ref $code, 'CODE', "run returns sub in scalar context");
 
@@ -75,17 +75,17 @@ is_deeply ($bar->[2], [137], "Content is fine");
 
 note "INTROSPECTION";
 
-is_deeply (MVC::Neaf->get_routes( sub { 1 } ), {
+is_deeply (neaf->get_routes( sub { 1 } ), {
     '/foo' => { GET => 1, POST => 1, HEAD => 1 },
     '/bar' => { GET => 1, POST => 1, HEAD => 1 },
 }, "Callback that returns true reveals tree");
 
-is_deeply (MVC::Neaf->get_routes( sub { $_[2] eq 'GET' } ), {
+is_deeply (neaf->get_routes( sub { $_[2] eq 'GET' } ), {
     '/foo' => { GET => 1 },
     '/bar' => { GET => 1 },
 }, "Callback acts as filter");
 
-my $map = MVC::Neaf->get_routes;
+my $map = neaf->get_routes;
 is $map->{'/bar'}{GET}{path_info_regex}, qr(^$), "No callback => everything";
 is $map->{'/foo'}{GET}{path_info_regex}, qr(^$), "No callback => everything (2)";
 

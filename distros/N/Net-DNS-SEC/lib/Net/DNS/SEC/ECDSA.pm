@@ -1,9 +1,9 @@
 package Net::DNS::SEC::ECDSA;
 
 #
-# $Id: ECDSA.pm 1672 2018-05-02 07:14:35Z willem $
+# $Id: ECDSA.pm 1677 2018-05-22 11:59:10Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1672 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1677 $)[1];
 
 
 =head1 NAME
@@ -47,7 +47,7 @@ use warnings;
 use MIME::Base64;
 
 
-my %ECDSA = (
+my %parameters = (
 	13 => [415, 32, sub { Net::DNS::SEC::libcrypto::EVP_sha256() }],
 	14 => [715, 48, sub { Net::DNS::SEC::libcrypto::EVP_sha384() }],
 	);
@@ -57,7 +57,7 @@ sub sign {
 	my ( $class, $sigdata, $private ) = @_;
 
 	my $algorithm = $private->algorithm;
-	my ( $nid, $keylen, $evpmd ) = @{$ECDSA{$algorithm} || []};
+	my ( $nid, $keylen, $evpmd ) = @{$parameters{$algorithm} || []};
 	die 'private key not ECDSA' unless $nid;
 
 	my $rawkey = pack "a$keylen", decode_base64( $private->PrivateKey );
@@ -77,7 +77,7 @@ sub verify {
 	my ( $class, $sigdata, $keyrr, $sigbin ) = @_;
 
 	my $algorithm = $keyrr->algorithm;
-	my ( $nid, $keylen, $evpmd ) = @{$ECDSA{$algorithm} || []};
+	my ( $nid, $keylen, $evpmd ) = @{$parameters{$algorithm} || []};
 	die 'private key not ECDSA' unless $nid;
 
 	return unless $sigbin;

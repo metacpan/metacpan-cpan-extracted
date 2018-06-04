@@ -1,3 +1,11 @@
+0.004   2018-06-04 (PERLANCAR)
+
+	- Update to Data::Sah::Coerce 0.025 (coerce rule module metadata
+	  version 3).
+
+        - [test] Add some tests.
+
+
 0.003   2018-01-17 (PERLANCAR)
 
         - Add schemas: net::hostname, net::port.

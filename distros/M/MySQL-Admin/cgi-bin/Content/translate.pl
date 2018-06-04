@@ -1,6 +1,11 @@
 use warnings;
 no warnings 'redefine';
 use vars qw($m_hrLng @l);
+use CGI::QuickForm;
+use utf8;
+no warnings 'redefine';
+no warnings 'uninitialized';
+use Search::Tools::UTF8;
 loadTranslate($m_hrSettings->{translate});
 *m_hrLng = \$MySQL::Admin::Translate::lang;
 my $title = translate('editTranslation');
@@ -73,7 +78,7 @@ sub on_valid_form {
     my %parameter = (
                      path   => $m_hrSettings->{cgi}{bin} . '/templates',
                      style  => $m_sStyle,
-                     title  => $sveTranslate,
+                     title  => $savetranslate,
                      server => $m_hrSettings->{serverName},
                      id     => 'savetranslate',
                      class  => 'max',
@@ -87,16 +92,18 @@ sub on_valid_form {
     for (my $i = 0 ; $i <= $#entrys ; $i++) {
         my $rkey = lc $entrys[$i];
         delete $m_hrLng->{$lg}{$entrys[$i]};
-        print "$rkey: " . param($entrys[$i]) . '<br/>'
+        my $txt = param($entrys[$i]) ;
+        utf8::encode( $txt);
+        print "$rkey: " . $txt . '<br/>'
           unless $rkey eq 'sid'
           or $rkey eq 'action'
           or $rkey eq 'checkFormsddfsds';
-        $m_hrLng->{$lg}{$rkey} = param($entrys[$i])
+        $m_hrLng->{$lg}{$rkey} =$txt 
           unless $rkey eq 'sid'
           or $rkey eq 'action'
           or $rkey eq 'checkFormsddfsds';
     }
-    saveTranslate($m_hrSettings->{translate});
+   saveTranslate($m_hrSettings->{translate});
     print '</div></div>';
 }
 1;

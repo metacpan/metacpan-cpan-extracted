@@ -10,6 +10,7 @@ build_requires:
   Catalyst::Plugin::Static::Simple: 0
   ExtUtils::MakeMaker: 6.59
   HTTP::Cookies: 0
+  HTTP::Request::AsCGI: 0
   Test::More: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.59
@@ -38,4 +39,4 @@ resources:
   homepage: https://github.com/karpet/catalyst-authentication-authtkt
   license: http://dev.perl.org/licenses/
   repository: http://github.com/karpet/catalyst-authentication-authtkt
-version: '0.16'
+version: '0.17'

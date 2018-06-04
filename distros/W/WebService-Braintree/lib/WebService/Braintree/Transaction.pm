@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::Transaction;
-$WebService::Braintree::Transaction::VERSION = '1.4';
+$WebService::Braintree::Transaction::VERSION = '1.5';
 use 5.010_001;
 use strictures 1;
 
@@ -85,16 +85,14 @@ sub void {
 
 =head2 submit_for_settlement()
 
-This takes an id and an optional amount and submits the transaction (if it
-exists) for settlement.
+This takes an id, an optional amount, amount, and optional parameters and submits the transaction
+for settlement.
 
 =cut
 
 sub submit_for_settlement {
-    my ($class, $id, $amount) = @_;
-    my $params = {};
-    $params->{'amount'} = $amount if $amount;
-    $class->gateway->transaction->submit_for_settlement($id, $params);
+    my ($class, $id, $amount, $params) = @_;
+    $class->gateway->transaction->submit_for_settlement($id, $amount, ($params // {}));
 }
 
 =head2 refund()

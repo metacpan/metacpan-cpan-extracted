@@ -21,7 +21,7 @@ print start_form(
   . hidden(
            {
             -name    => 'do',
-            -default => '1'
+            -default => '1.07'
            },
            'true'
           )

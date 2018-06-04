@@ -1,0 +1,32 @@
+requires 'Local::Alpha';
+requires 'Local::Alpha::DoesNotExist';
+recommends 'Local::Beta', '1.12';
+recommends 'Local::Beta::DoesNotExist';
+suggests 'Local::Gamma';
+suggests 'Local::Gamma::DoesNotExist';
+conflicts 'Local::Delta';
+conflicts 'Local::Delta::DoesNotExist';
+requires 'perl', '5.006';
+
+on build => sub {
+    requires 'Local::Epsilon';
+    requires 'Local::Epsilon::DoesNotExist';
+    requires 'perl', '5.006';
+};
+
+on configure => sub {
+    requires 'Local::Zeta';
+    requires 'Local::Zeta::DoesNotExist';
+    requires 'perl', '5.006';
+};
+
+on test => sub {
+    requires 'Local::Eta';
+    requires 'Local::Eta::DoesNotExist';
+    requires 'perl', '5.006';
+};
+
+on develop => sub {
+    requires 'Local::Theta';
+    requires 'Local::Theta::DoesNotExist';
+};

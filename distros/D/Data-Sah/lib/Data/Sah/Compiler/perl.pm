@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::perl;
 
-our $DATE = '2018-05-29'; # DATE
-our $VERSION = '0.890'; # VERSION
+our $DATE = '2018-06-03'; # DATE
+our $VERSION = '0.891'; # VERSION
 
 use 5.010;
 use strict;
@@ -225,6 +225,14 @@ sub add_sun_module {
     $self->add_runtime_module($cd, $cd->{_sun_module});
 }
 
+# evaluate all terms, then return the last term. user has to make sure all the
+# terms are properly parenthesized if it contains operator with precedence less
+# than the list operator.
+sub expr_list {
+    my ($self, @t) = @_;
+    "(".join(", ", @t).")";
+}
+
 sub expr_defined {
     my ($self, $t) = @_;
     "defined($t)";
@@ -444,7 +452,7 @@ Data::Sah::Compiler::perl - Compile Sah schema to Perl code
 
 =head1 VERSION
 
-This document describes version 0.890 of Data::Sah::Compiler::perl (from Perl distribution Data-Sah), released on 2018-05-29.
+This document describes version 0.891 of Data::Sah::Compiler::perl (from Perl distribution Data-Sah), released on 2018-06-03.
 
 =head1 SYNOPSIS
 

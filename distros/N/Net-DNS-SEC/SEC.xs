@@ -1,5 +1,5 @@
 
-#define XS_Id "$Id: SEC.xs 1675 2018-05-11 11:54:03Z willem $"
+#define XS_Id "$Id: SEC.xs 1683 2018-06-04 09:02:09Z willem $"
 
 
 =head1 NAME
@@ -67,6 +67,7 @@ extern "C" {
 #endif
 
 #ifdef OPENSSL_NO_EC
+#define NO_ECCGOST
 #define NO_ECDSA
 #define NO_EdDSA
 #endif
@@ -89,7 +90,12 @@ extern "C" {
 
 #ifdef LIBRESSL_VERSION_NUMBER
 #undef  OPENSSL_VERSION_NUMBER
-#define OPENSSL_VERSION_NUMBER 0x10001080L
+#if (LIBRESSL_VERSION_NUMBER < 0x20700000L)
+#define OPENSSL_VERSION_NUMBER 0x10001000L
+#endif
+#ifndef OPENSSL_VERSION_NUMBER
+#define OPENSSL_VERSION_NUMBER 0x10100000L
+#endif
 #define LIB_VERSION LIBRESSL_VERSION_NUMBER
 #endif
 
@@ -98,14 +104,14 @@ extern "C" {
 #endif
 
 
-#if (OPENSSL_VERSION_NUMBER < 0x10101003L)
+#if (OPENSSL_VERSION_NUMBER < 0x10101000L)
 #define NO_EdDSA
 
 int EVP_DigestSign(EVP_MD_CTX *ctx,
 		unsigned char *sigret, size_t *siglen,
 		unsigned char *tbs, size_t tbslen)
 {
-	EVP_DigestSignUpdate( ctx, tbs, tbslen );
+	EVP_DigestUpdate( ctx, tbs, tbslen );
 	return EVP_DigestSignFinal( ctx, sigret, siglen );
 }
 
@@ -113,17 +119,16 @@ int EVP_DigestVerify(EVP_MD_CTX *ctx,
 		unsigned char *sigret, size_t siglen,
 		unsigned char *tbs, size_t tbslen)
 {
-	EVP_DigestVerifyUpdate( ctx, tbs, tbslen );
+	EVP_DigestUpdate( ctx, tbs, tbslen );
 	return EVP_DigestVerifyFinal( ctx, sigret, siglen );
 }
-
 #endif
 
 
 #if (OPENSSL_VERSION_NUMBER < 0x10100000L)
-
 #define EVP_MD_CTX_new()	EVP_MD_CTX_create()
 #define EVP_MD_CTX_free(ctx)	EVP_MD_CTX_destroy((ctx))
+#define EVP_MD_CTX_reset(ctx)	EVP_MD_CTX_init((ctx))
 
 #ifndef NO_DSA
 int DSA_set0_pqg(DSA *d, BIGNUM *p, BIGNUM *q, BIGNUM *g)
@@ -188,9 +193,23 @@ int RSA_set0_factors(RSA *r, BIGNUM *p, BIGNUM *q)
 	r->q = q;
 	return 1;
 }
+#endif
 
-#ifndef NO_ECDSA
-int BN_bn2binpad(const BIGNUM *a, unsigned char *to, int tolen)
+
+#if (OPENSSL_VERSION_NUMBER < 0x10001000L)
+#define NO_ECCGOST
+#define NO_ECDSA
+#endif
+
+
+BIGNUM *bn_new_hex(const char *hex)
+{
+	BIGNUM *bn = BN_new();
+	BN_hex2bn( &bn, hex );
+	return bn;
+}
+
+void bn_bn2binpad(const BIGNUM *a, unsigned char *to, int tolen)
 {
 	unsigned char *p = to;
 	int i = BN_bn2bin(a, p);
@@ -200,59 +219,7 @@ int BN_bn2binpad(const BIGNUM *a, unsigned char *to, int tolen)
 		p += tolen - i;
 		BN_bn2bin(a, p);
 	}
-	return i;
-}
-
-int ECDSA_SIG_set0(ECDSA_SIG *sig, BIGNUM *r, BIGNUM *s)
-{
-        if (sig->r != NULL) BN_free(sig->r);
-        sig->r = r;
-        if (sig->s != NULL) BN_free(sig->s);
-        sig->s = s;
-        return 1;
-}
-#endif
-
-#endif
-
-
-#if (OPENSSL_VERSION_NUMBER < 0x10001000L)
-
-#ifndef NO_ECDSA
-int EC_KEY_set_public_key_affine_coordinates(EC_KEY *eckey, BIGNUM *x, BIGNUM *y)
-{
-	const EC_GROUP *group;
-	EC_POINT *key = NULL;
-	BIGNUM *tx, *ty;
-	BN_CTX *ctx = NULL;
-	int retval = 0;
-
-	if (!(group = EC_KEY_get0_group(eckey))) goto cleanup;
-	if (!(key = EC_POINT_new(group))) goto cleanup;
-	if (!(ctx = BN_CTX_new())) goto cleanup;
-	tx = BN_CTX_get(ctx);
-	ty = BN_CTX_get(ctx);
-	if (!EC_POINT_set_affine_coordinates_GFp(group, key, x, y, ctx)) goto cleanup;
-	if (!EC_POINT_get_affine_coordinates_GFp(group, key, tx, ty, ctx)) goto cleanup;
-	if (BN_cmp(x, tx) || BN_cmp(y, ty)) goto cleanup;
-	if (!EC_KEY_set_public_key(eckey, key)) goto cleanup;
-	retval = EC_KEY_check_key(eckey);
-
-	cleanup:
-	if (key) EC_POINT_free(key);
-	if (ctx) BN_CTX_free(ctx);
-	return retval;
-}
-#endif
-
-#endif
-
-
-BIGNUM *BN_new_hex(const char *hex)
-{
-	BIGNUM *bn = BN_new();
-	BN_hex2bn( &bn, hex );
-	return bn;
+	return;
 }
 
 
@@ -313,7 +280,7 @@ EVP_sign(SV *message, EVP_PKEY *pkey, const EVP_MD *md=NULL)
 	int r;
     CODE:
 	m = (unsigned char*) SvPV( message, mlen );
-	EVP_MD_CTX_init(ctx);
+	EVP_MD_CTX_reset(ctx);
 	checkerr( EVP_DigestSignInit( ctx, NULL, md, NULL, pkey ) );
 	r = EVP_DigestSign( ctx, sigbuf, &slen, m, mlen );
 	EVP_MD_CTX_free(ctx);
@@ -334,7 +301,7 @@ EVP_verify(SV *message, SV *signature, EVP_PKEY *pkey, const EVP_MD *md=NULL)
     CODE:
 	m = (unsigned char*) SvPV( message, mlen );
 	s = (unsigned char*) SvPV( signature, slen );
-	EVP_MD_CTX_init(ctx);
+	EVP_MD_CTX_reset(ctx);
 	checkerr( EVP_DigestVerifyInit( ctx, NULL, md, NULL, pkey ) );
 	RETVAL = EVP_DigestVerify( ctx, s, slen, m, mlen );
 	EVP_MD_CTX_free(ctx);
@@ -384,14 +351,10 @@ DSA_set0_key(DSA *dsa, SV *y_SV, SV *x_SV)
 	unsigned char *bin;
 	STRLEN len;
     CODE:
-	if (x_SV) {
-		bin = (unsigned char*) SvPV( x_SV, len );
-		x = BN_bin2bn( bin, len, NULL );
-	}
-	if (y_SV) {
-		bin = (unsigned char*) SvPV( y_SV, len );
-		y = BN_bin2bn( bin, len, NULL );
-	}
+	bin = (unsigned char*) SvPV( x_SV, len );
+	x = BN_bin2bn( bin, len, NULL );
+	bin = (unsigned char*) SvPV( y_SV, len );
+	y = BN_bin2bn( bin, len, NULL );
 	RETVAL = checkerr( DSA_set0_key( dsa, y, x ) );
     OUTPUT:
 	RETVAL
@@ -532,30 +495,26 @@ EVP_PKEY_new_raw_public_key(int nid, SV *public_key)
 
 ####	Verify-only support for obsolete ECC-GOST	####
 
-#ifndef NO_ECDSA
+#ifndef NO_ECCGOST
 
 EC_KEY*
 EC_KEY_new_ECCGOST()
     PREINIT:
 	# GOST_R_34_10_2001_CryptoPro_A
-	BIGNUM *a = BN_new_hex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD94");
-	BIGNUM *b = BN_new_hex("00A6");
-	BIGNUM *p = BN_new_hex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD97");
-	BIGNUM *q = BN_new_hex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF6C611070995AD10045841B09B761B893");
-	BIGNUM *x = BN_new_hex("01");
-	BIGNUM *y = BN_new_hex("8D91E471E0989CDA27DF505A453F2B7635294F2DDF23E3B122ACC99C9E9F1E14");
-	BIGNUM *h = BN_new_hex("01");
-	const EC_METHOD *method = EC_GFp_mont_method();
-	EC_GROUP *group = EC_GROUP_new(method);
-	EC_POINT *G = EC_POINT_new(group);
+	BIGNUM *a = bn_new_hex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD94");
+	BIGNUM *b = bn_new_hex("00A6");
+	BIGNUM *p = bn_new_hex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD97");
+	BIGNUM *q = bn_new_hex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF6C611070995AD10045841B09B761B893");
+	BIGNUM *x = bn_new_hex("01");
+	BIGNUM *y = bn_new_hex("8D91E471E0989CDA27DF505A453F2B7635294F2DDF23E3B122ACC99C9E9F1E14");
+	BIGNUM *h = bn_new_hex("01");
 	BN_CTX *ctx = BN_CTX_new();
+	EC_GROUP *group = EC_GROUP_new_curve_GFp(p, a, b, ctx);
+	EC_POINT *G = EC_POINT_new(group);
     CODE:
-	checkerr( EC_GROUP_set_curve_GFp(group, p, a, b, ctx) );
 	checkerr( EC_POINT_set_affine_coordinates_GFp(group, G, x, y, ctx) );
 	checkerr( EC_GROUP_set_generator(group, G, q, h) );
-	checkerr( EC_GROUP_check(group, ctx) );
-	RETVAL = EC_KEY_new();
-	checkerr( EC_KEY_set_group(RETVAL, group) );
+	EC_POINT_free(G);
 	BN_free(a);
 	BN_free(b);
 	BN_free(p);
@@ -563,9 +522,11 @@ EC_KEY_new_ECCGOST()
 	BN_free(x);
 	BN_free(y);
 	BN_free(h);
-	EC_GROUP_free(group);
-	EC_POINT_free(G);
+	checkerr( EC_GROUP_check(group, ctx) );
 	BN_CTX_free(ctx);
+	RETVAL = EC_KEY_new();
+	checkerr( EC_KEY_set_group(RETVAL, group) );
+	EC_GROUP_free(group);
     OUTPUT:
 	RETVAL
 
@@ -595,21 +556,26 @@ ECCGOST_verify(SV *H, SV *r_SV, SV *s_SV, EC_KEY *eckey)
 	checkerr( EC_GROUP_get_order(group, q, ctx) );
 	checkerr( BN_mod(e, alpha, q, ctx) );
 	if ( BN_is_zero(e) ) checkerr( BN_one(e) );
+	BN_free(alpha);
 
 	# algebraic transformation of ECC-GOST into equivalent ECDSA problem
 	checkerr( BN_mod_sub(m, q, s, q, ctx) );
 	checkerr( BN_mod_sub(s, q, e, q, ctx) );
+	BN_CTX_free(ctx);
+	BN_free(e);
+	BN_free(q);
 
 	ecsig = ECDSA_SIG_new();
+#if (OPENSSL_VERSION_NUMBER < 0x10100000L)
+	ecsig->r = r;
+	ecsig->s = s;
+#else
 	checkerr( ECDSA_SIG_set0(ecsig, r, s) );
-	BN_bn2binpad(m, bin, len);
-	RETVAL = ECDSA_do_verify( bin, len, ecsig, eckey );
+#endif
 
-	BN_CTX_free(ctx);
-	BN_free(alpha);
-	BN_free(e);
+	bn_bn2binpad(m, bin, len);
 	BN_free(m);
-	BN_free(q);
+	RETVAL = ECDSA_do_verify( bin, len, ecsig, eckey );
 	EC_KEY_free(eckey);
 	ECDSA_SIG_free(ecsig);
     OUTPUT:

@@ -12,7 +12,7 @@ use warnings;
 package Dist::Zilla::Plugin::Git::NextVersion;
 # ABSTRACT: Provide a version number by bumping the last git release tag
 
-our $VERSION = '2.044';
+our $VERSION = '2.045';
 
 use Dist::Zilla 4 ();
 use version 0.80 ();
@@ -88,7 +88,7 @@ sub _last_version {
 
   if ($by_branch) {
     my $head;
-    my $cachefile = $self->zilla->root->child(_cache_fn);
+    my $cachefile = path($self->zilla->root)->child(_cache_fn);
     if (-f $cachefile) {
       ($head) = $git->rev_parse('HEAD');
       return $1 if $cachefile->slurp =~ /^\Q$head\E (.+)/;
@@ -208,7 +208,7 @@ Dist::Zilla::Plugin::Git::NextVersion - Provide a version number by bumping the 
 
 =head1 VERSION
 
-version 2.044
+version 2.045
 
 =head1 SYNOPSIS
 

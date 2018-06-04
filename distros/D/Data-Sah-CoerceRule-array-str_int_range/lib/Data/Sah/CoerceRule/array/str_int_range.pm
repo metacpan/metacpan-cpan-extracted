@@ -1,7 +1,7 @@
 package Data::Sah::CoerceRule::array::str_int_range;
 
-our $DATE = '2018-04-17'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-06-04'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Coerce array of ints from string in the form of "INT1-INT2"
@@ -18,7 +18,7 @@ Data::Sah::CoerceRule::array::str_int_range - Coerce array of ints from string i
 
 =head1 VERSION
 
-This document describes version 0.001 of Data::Sah::CoerceRule::array::str_int_range (from Perl distribution Data-Sah-CoerceRule-array-str_int_range), released on 2018-04-17.
+This document describes version 0.002 of Data::Sah::CoerceRule::array::str_int_range (from Perl distribution Data-Sah-CoerceRule-array-str_int_range), released on 2018-06-04.
 
 =head1 DESCRIPTION
 

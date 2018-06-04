@@ -1,5 +1,8 @@
 Revision history for Geo-Coder-List
 
+0.22	Sun Jun  3 10:36:51 EDT 2018
+	Fix call on unblessed instance
+
 0.21	Sun Apr 22 19:53:36 EDT 2018
 	Improved support for Geo::GeoNames error handling
 	Remove HTML entities from locations, it confuses the URLs and breaks Geo::GeoNames

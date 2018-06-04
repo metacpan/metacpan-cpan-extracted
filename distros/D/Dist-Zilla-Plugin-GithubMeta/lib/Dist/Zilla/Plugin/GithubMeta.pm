@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::GithubMeta;
-$Dist::Zilla::Plugin::GithubMeta::VERSION = '0.56';
+$Dist::Zilla::Plugin::GithubMeta::VERSION = '0.58';
 # ABSTRACT: Automatically include GitHub meta information in META.yml
 
 use strict;
@@ -49,6 +49,8 @@ sub mvp_multivalue_args { qw(remote) }
 sub _acquire_repo_info {
   my ($self) = @_;
 
+  my $wd = pushd $self->zilla->root;
+
   return if $self->_has_user and $self->_has_repo;
 
   return unless _under_git();
@@ -56,7 +58,6 @@ sub _acquire_repo_info {
   require IPC::Cmd;
   return unless IPC::Cmd::can_run('git');
 
-  my $wd = pushd $self->zilla->root;
   {
     my $gitver = `git version`;
     my ($ver) = $gitver =~ m!git version ([0-9.]+(\.msysgit)?[0-9.]+)!;
@@ -192,7 +193,7 @@ Dist::Zilla::Plugin::GithubMeta - Automatically include GitHub meta information 
 
 =head1 VERSION
 
-version 0.56
+version 0.58
 
 =head1 SYNOPSIS
 
@@ -212,7 +213,7 @@ version 0.56
 =head1 DESCRIPTION
 
 Dist::Zilla::Plugin::GithubMeta is a L<Dist::Zilla> plugin to include GitHub L<https://github.com> meta
-information in C<META.yml>.
+information in C<META.yml> and C<META.json>.
 
 It automatically detects if the distribution directory is under C<git> version control and whether the
 C<origin> is a GitHub repository and will set the C<repository> and C<homepage> meta in C<META.yml> to the

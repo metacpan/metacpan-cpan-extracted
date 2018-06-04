@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::js::duration::str_iso8601;
 
-our $DATE = '2018-06-02'; # DATE
-our $VERSION = '0.025'; # VERSION
+our $DATE = '2018-06-03'; # DATE
+our $VERSION = '0.026'; # VERSION
 
 use 5.010001;
 use strict;
@@ -56,7 +56,7 @@ Data::Sah::Coerce::js::duration::str_iso8601 - Coerce duration from (subset of) 
 
 =head1 VERSION
 
-This document describes version 0.025 of Data::Sah::Coerce::js::duration::str_iso8601 (from Perl distribution Data-Sah-Coerce), released on 2018-06-02.
+This document describes version 0.026 of Data::Sah::Coerce::js::duration::str_iso8601 (from Perl distribution Data-Sah-Coerce), released on 2018-06-03.
 
 =head1 DESCRIPTION
 

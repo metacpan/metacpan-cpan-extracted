@@ -29,6 +29,7 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => 6.64, # for TEST_REQUIRES
         'HTTP::Headers::Fast' => 0.21, # psgi_flatten_without_sort
         'JSON::MaybeXS'       => 0,    # also by Plack via HTTP::Entity::Parser
+        'MIME::Base64'        => 3.11, # encode_base64url
         'Plack::Request'      => 0,
         'Template'            => 0,
         'URI::Escape'         => 0,

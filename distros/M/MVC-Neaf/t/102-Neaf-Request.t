@@ -9,11 +9,19 @@ use Encode;
 use HTTP::Headers::Fast;
 
 use MVC::Neaf::Request;
+use MVC::Neaf::Route;
 
 warnings_like {
 
 my $copy = uri_unescape( "%C2%A9" ); # a single (c) symbol
 $copy = decode_utf8($copy);
+
+my $route = MVC::Neaf::Route->new(
+    parent => bless( {}, 'MVC::Neaf' ),
+    code   => sub {},
+    path   => '/',
+    method => 'GET',
+);
 
 my $req = MVC::Neaf::Request->new(
     cached_params => { x => 42 },
@@ -22,7 +30,7 @@ my $req = MVC::Neaf::Request->new(
         Referer => 'http://google.com',
         User_Agent => 'test bot',
     ),
-    endpoint => {}, # this one to avoid warnings
+    route => $route, # this one to avoid warnings
                  # - normally script_name is unavailable before routing occurs
 );
 $req->set_path("/foo/bar");

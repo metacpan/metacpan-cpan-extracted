@@ -1,3 +1,9 @@
+0.012   2018-06-04 (PERLANCAR)
+
+	- Update to Data::Sah::Coerce 0.025 (coerce rule module metadata
+	  version 3).
+
+
 0.011   2018-04-03 (PERLANCAR)
 
 	- Add schema: perl::modargs.

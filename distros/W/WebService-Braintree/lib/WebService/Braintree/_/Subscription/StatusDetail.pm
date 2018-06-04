@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::_::Subscription::StatusDetail;
-$WebService::Braintree::_::Subscription::StatusDetail::VERSION = '1.4';
+$WebService::Braintree::_::Subscription::StatusDetail::VERSION = '1.5';
 use 5.010_001;
 use strictures 1;
 

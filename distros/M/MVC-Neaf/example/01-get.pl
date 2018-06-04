@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use MVC::Neaf qw(:sugar);
+use MVC::Neaf;
 
 # Some HTML boilerplate
 # This is going to be a separate file in a real world app
@@ -27,8 +27,9 @@ HTML
 # Set up some application-wide defaults
 # These will be merged into every controller response,
 #     provided that the URI path starts with /01
-neaf default => '/01' =>
-    { -view => 'TT', file => 'example/01 NEAF '.MVC::Neaf->VERSION };
+neaf default =>
+    { -view => 'TT', file => 'example/01 NEAF '.MVC::Neaf->VERSION },
+    path => '/01';
 
 # Define some routes
 get '/01/get' => sub {

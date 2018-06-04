@@ -2,7 +2,7 @@ package MVC::Neaf::X::Files;
 
 use strict;
 use warnings;
-our $VERSION = 0.2203;
+our $VERSION = 0.2501;
 
 =head1 NAME
 
@@ -10,7 +10,7 @@ MVC::Neaf::X::Files - serve static content for Not Even A Framework.
 
 =head1 SYNOPSIS
 
-     use MVC::Neaf qw(:sugar);
+     use MVC::Neaf;
 
      neaf static "/path/in/url" => "/local/path", %options;
 
@@ -427,13 +427,15 @@ sub make_handler {
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016-2017 Konstantin S. Uvarin C<khedin@cpan.org>.
+This module is part of L<MVC::Neaf> suite.
+
+Copyright 2016-2018 Konstantin S. Uvarin C<khedin@cpan.org>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
-See http://dev.perl.org/licenses/ for more information.
+See L<http://dev.perl.org/licenses/> for more information.
 
 =cut
 

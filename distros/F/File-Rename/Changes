@@ -1,5 +1,11 @@
 Revision history for Perl extension File::Rename.
 
+0.30	Robin Barker 2018-06-02
+	(tidied configure_requires)
+	removed typo from rename POD
+	options do not need to before code / files
+	allow null separated file names reading from STDIN
+
 0.20	Robin Barker 2013-04-30
 	Added option -E (statement): alternative to -e
 

@@ -15,7 +15,7 @@ BEGIN {
     }
 }
 use warnings;
-our $VERSION = '0.000014';
+our $VERSION = '0.000015';
 use utf8;
 
 # Class for $PPR::X::ERROR objects...
@@ -78,44 +78,11 @@ our $GRAMMAR = qr{
             (?>
                 (?&PerlKeyword)
             |
-                # Inlined (?&PerlSubroutineDeclaration)...
-                (?>
-                    sub \b                             (?>(?&PerlOWS))
-                    (?>(?&PerlOldQualifiedIdentifier))    (?&PerlOWS)
-                |
-                    AUTOLOAD                              (?&PerlOWS)
-                |
-                    DESTROY                               (?&PerlOWS)
-                )
-                (?:
-                    (?>
-                        (?&PerlParenthesesList)              # Parameter list
-                    |
-                        \( [^)]*+ \)                         # Prototype (
-                    )                          (?&PerlOWS)
-                )?+
-                (?: (?>(?&PerlAttributes))     (?&PerlOWS)  )?+
-                (?> ; | (?&PerlBlock) )
+                (?&PerlSubroutineDeclaration)
             |
-                # Inlined (?&PerlUseStatement)...
-                (?: use | no ) (?>(?&PerlNWS))
-                (?>
-                    (?&PerlVersionNumber)
-                |
-                    (?>(?&PerlQualifiedIdentifier))
-                    (?: (?>(?&PerlNWS)) (?&PerlVersionNumber)
-                        (?! (?>(?&PerlOWS)) (?> (?&PerlInfixBinaryOperator) | (?&PerlComma) | \? ) )
-                    )?+
-                    (?: (?>(?&PerlNWS)) (?&PerlPod) )?+
-                    (?: (?>(?&PerlOWS)) (?&PerlExpression) )?+
-                )
-                (?>(?&PerlOWS)) (?> ; | (?= \} | \z ))
+                (?&PerlUseStatement)
             |
-                # Inlined (?&PerlPackageDeclaration)...
-                package
-                    (?>(?&PerlNWS)) (?>(?&PerlQualifiedIdentifier))
-                (?: (?>(?&PerlNWS)) (?&PerlVersionNumber) )?+
-                    (?>(?&PerlOWS)) (?> ; | (?&PerlBlock) | (?= \} | \z ))
+                (?&PerlPackageDeclaration)
             |
                 (?&PerlControlBlock)
             |
@@ -186,6 +153,10 @@ our $GRAMMAR = qr{
            (?: (?>(?&PerlOWS)) (?&PerlExpression) )?+
        )
        (?>(?&PerlOWS)) (?> ; | (?= \} | \z ))
+    )) # End of rule
+
+    (?<PerlReturnExpression>   (?<PerlStdReturnExpression>
+       return \b (?>(?&PerlOWS)) (?&PerlExpression)
     )) # End of rule
 
     (?<PerlReturnStatement>   (?<PerlStdReturnStatement>
@@ -299,14 +270,9 @@ our $GRAMMAR = qr{
 
     (?<PerlTerm>   (?<PerlStdTerm>
         (?>
-            # Inlined (?&PerlReturnStatement)...
-            return \b (?>(?&PerlOWS)) (?&PerlExpression)
+            (?&PerlReturnExpression)
         |
-            # Inlined (?&PerlVariableDeclaration)...
-            (?> my | state | our ) \b           (?>(?&PerlOWS))
-            (?: (?&PerlQualifiedIdentifier)        (?&PerlOWS)  )?+
-            (?>(?&PerlLvalue))                  (?>(?&PerlOWS))
-            (?&PerlAttributes)?+
+            (?&PerlVariableDeclaration)
         |
             (?&PerlAnonymousSubroutine)
         |
@@ -314,8 +280,7 @@ our $GRAMMAR = qr{
         |
             (?>(?&PerlNullaryBuiltinFunction))  (?! (?>(?&PerlOWS)) \( )
         |
-            # Inlined (?&PerlDoBlock) and (?&PerlEvalBlock)...
-            (?> do | eval ) (?>(?&PerlOWS)) (?&PerlBlock)
+            (?&PerlDoBlock) | (?&PerlEvalBlock)
         |
             (?&PerlCall)
         |
@@ -1746,7 +1711,7 @@ PPR::X - Pattern-based Perl Recognizer
 
 =head1 VERSION
 
-This document describes PPR::X version 0.000014
+This document describes PPR::X version 0.000015
 
 
 =head1 SYNOPSIS
@@ -2119,6 +2084,12 @@ Matches a C<< use <module name> ...; >> or C<< use <version number>; >> statemen
 =head3 C<< (?<PerlReturnStatement> >>
 
 Matches a C<< return <expression>; >> or C<< return; >> statement.
+
+
+=head3 C<< (?<PerlReturnExpression> >>
+
+Matches a C<< return <expression> >>
+as an expression without trailing end-of-statement markers.
 
 
 =head3 C<< (?&PerlControlBlock) >>

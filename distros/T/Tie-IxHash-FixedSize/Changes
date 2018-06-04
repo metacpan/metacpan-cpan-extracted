@@ -1,14 +1,19 @@
 Revision history for Tie::IxHash::FixedSize.
 
-1.01  Fri Nov 13 2009
+1.02  2018-06-03
+    - Use Dist::Zilla to build the dist.
+    - Use parent.pm rather than base.pm
+    - Make signature test an AUTHOR test
+
+1.01  2009-11-13
     - disable signature test unless TEST_SIGNATURE is enabled, otherwise test
       fails if keyserver is unreachable.
 
-1.00  Tue Nov 03 2009
+1.00  2009-11-03
     - sign dist with Module::Signature
     - add signature, signature test
     - fix MANIFEST, add MANIFEST.SKIP
     - use my CPAN email address as author
 
-0.01  Wed Sep 03 2008
+0.01  2008-09-03
     - First version

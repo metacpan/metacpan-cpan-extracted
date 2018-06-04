@@ -9,7 +9,7 @@
 use strict;
 use warnings;
 
-use MVC::Neaf qw(:sugar);
+use MVC::Neaf;
 
 my $tpl = <<'TT';
 <h1>Multi-value checkbox - [% file %]</h1>

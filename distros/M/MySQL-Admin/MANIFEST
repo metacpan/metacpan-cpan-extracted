@@ -117,7 +117,6 @@ htdocs/xsl/menu.xsl
 lib/DBI/Library.pm
 lib/DBI/Library/Database.pm
 lib/HTML/Editor.pm
-lib/HTML/Editor/BBCODE.pm
 lib/HTML/Menu/Pages.pm
 lib/MySQL/Admin.pm
 lib/MySQL/Admin/Actions.pm

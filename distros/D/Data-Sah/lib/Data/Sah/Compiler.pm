@@ -1,7 +1,7 @@
 package Data::Sah::Compiler;
 
-our $DATE = '2018-05-29'; # DATE
-our $VERSION = '0.890'; # VERSION
+our $DATE = '2018-06-03'; # DATE
+our $VERSION = '0.891'; # VERSION
 
 use 5.010;
 use strict;
@@ -383,7 +383,6 @@ sub _process_clause {
     # coerce clause value (with default coerce rules & x.perl.coerce_to). XXX it
     # should be validate + coerce but for now we do coerce to reduce compilation
     # overhead.
-    local $cd->{cl_value_coerced_from};
     {
         last if $ie;
         my $coerce_type = $meta->{schema}[0] or last;
@@ -402,23 +401,27 @@ sub _process_clause {
             require Data::Sah::Coerce;
             $coercer = Data::Sah::Coerce::gen_coercer(
                 type => $coerce_type,
-                return_type=>'str+val',
+                return_type=>'status+err+val',
                 (coerce_to => $cd->{coerce_to}) x !!$cd->{coerce_to},
             );
             $coercer_cache{$coerce_type} = $coercer;
         }
+        my ($cstatus, $cerr);
         if ($op && ($op eq 'or' || $op eq 'and')) {
             for my $cv2 (@$cv) {
-                my $cf;
                 if ($value_is_array) {
                     $cv2 = [@$cv2]; # shallow copy
                     for (@$cv2) {
-                        ($cf, $_) = @{ $coercer->($_) };
-                        $cd->{cl_value_coerced_from} //= $cf;
+                        ($cstatus, $cerr, $_) = @{ $coercer->($_) };
+                        if ($cerr) {
+                            $self->_die($cd, "Can't coerce clause value $_: $cerr");
+                        }
                     }
                 } else {
-                    ($cf, $cv) = @{ $coercer->($cv) };
-                    $cd->{cl_value_coerced_from} //= $cf;
+                    ($cstatus, $cerr, $cv) = @{ $coercer->($cv) };
+                    if ($cerr) {
+                        $self->_die($cd, "Can't coerce clause value $cv: $cerr");
+                    }
                 }
             }
         } else {
@@ -426,11 +429,16 @@ sub _process_clause {
                 $cv = [@$cv]; # shallow copy
                 for (@$cv) {
                     my $cf;
-                    ($cf, $_) = @{ $coercer->($_) };
-                    $cd->{cl_value_coerced_from} //= $cf;
+                    ($cstatus, $cerr, $_) = @{ $coercer->($_) };
+                    if ($cerr) {
+                        $self->_die($cd, "Can't coerce clause value $_: $cerr");
+                    }
                 }
             } else {
-                ($cd->{cl_value_coerced_from}, $cv) = @{ $coercer->($cv) };
+                ($cstatus, $cerr, $cv) = @{ $coercer->($cv) };
+                if ($cerr) {
+                    $self->_die($cd, "Can't coerce clause value $cv: $cerr");
+                }
             }
         }
         #$log->tracef("Coerced clause value %s to %s (type=%s)",
@@ -781,7 +789,7 @@ Data::Sah::Compiler - Base class for Sah compilers (Data::Sah::Compiler::*)
 
 =head1 VERSION
 
-This document describes version 0.890 of Data::Sah::Compiler (from Perl distribution Data-Sah), released on 2018-05-29.
+This document describes version 0.891 of Data::Sah::Compiler (from Perl distribution Data-Sah), released on 2018-06-03.
 
 =for Pod::Coverage ^(check_compile_args|def|expr|init_cd|literal|name|add_module|add_compile_module|add_runtime_module)$
 
@@ -928,17 +936,6 @@ the raw/original value as the schema specifies it, see C<cl_raw_value>.
 =item * cl_raw_value => any
 
 Like C<cl_value>, but without any coercion/filtering done to the value.
-
-=item * cl_value_coerced_from => str
-
-If clause value is coerced from another value using a rule, the rule name will
-be provided here.
-
-XXX What if value is a complex data structure where only some items are coerced?
-For example, in schema: C<< [date => between=>["2016-01-01", 1464337542]] >>.
-Only the first element of the value is coerced from ISO8601 string. Currently we
-set C<cl_value_coerced_from> to the first rule being used during coercion of
-value items.
 
 =item * cl_term => STR
 

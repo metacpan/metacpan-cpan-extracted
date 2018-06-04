@@ -6,14 +6,14 @@ use Test::More;
 
 use MVC::Neaf;
 
-MVC::Neaf->route( "/" => sub {
+neaf->route( "/" => sub {
     my $req = shift;
     return {
         -content => $req->path_info(),
     };
 }, path_info_regex => '.*' );
 
-my $psgi = MVC::Neaf->run;
+my $psgi = neaf->run;
 
 my $reply = $psgi->( { REQUEST_URI => "/%C2%A9", } );
 

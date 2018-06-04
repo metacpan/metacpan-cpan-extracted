@@ -8,7 +8,7 @@
 use strict;
 use warnings;
 
-use MVC::Neaf qw(:sugar);
+use MVC::Neaf;
 
 my $tpl = <<'HTML';
 <html>

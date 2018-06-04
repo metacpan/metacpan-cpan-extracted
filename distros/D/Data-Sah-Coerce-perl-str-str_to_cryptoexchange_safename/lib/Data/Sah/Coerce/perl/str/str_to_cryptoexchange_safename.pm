@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::str::str_to_cryptoexchange_safename;
 
-our $DATE = '2018-05-29'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-06-04'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,9 +9,9 @@ use warnings;
 
 sub meta {
     +{
-        v => 2,
+        v => 3,
         enable_by_default => 0,
-        might_die => 1,
+        might_fail => 1,
         prio => 50,
         precludes => [qr/\Astr_to_cryptoexchange_(.+)?\z/],
     };
@@ -30,8 +30,8 @@ sub coerce {
         "",
         "do { my \$cat = CryptoExchange::Catalog->new; my \@data = \$cat->all_data; ",
         "my \$lc = lc($dt); my \$rec; for (\@data) { if (defined(\$_->{code}) && \$lc eq lc(\$_->{code}) || \$lc eq lc(\$_->{name}) || \$lc eq \$_->{safename}) { \$rec = \$_; last } } ",
-        "unless (\$rec) { die 'Unknown cryptoexchange code/name/safename: ' . \$lc } ",
-        "\$rec->{safename} }",
+        "if (!\$rec) { ['Unknown cryptoexchange code/name/safename: ' . \$lc] } else { [undef, \$rec->{safename}] } ",
+        "}",
     );
 
     $res;
@@ -52,7 +52,7 @@ Data::Sah::Coerce::perl::str::str_to_cryptoexchange_safename - Coerce string con
 
 =head1 VERSION
 
-This document describes version 0.001 of Data::Sah::Coerce::perl::str::str_to_cryptoexchange_safename (from Perl distribution Data-Sah-Coerce-perl-str-str_to_cryptoexchange_safename), released on 2018-05-29.
+This document describes version 0.003 of Data::Sah::Coerce::perl::str::str_to_cryptoexchange_safename (from Perl distribution Data-Sah-Coerce-perl-str-str_to_cryptoexchange_safename), released on 2018-06-04.
 
 =head1 DESCRIPTION
 

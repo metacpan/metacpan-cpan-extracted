@@ -1,9 +1,9 @@
 package Net::DNS::SEC::RSA;
 
 #
-# $Id: RSA.pm 1667 2018-04-20 10:01:29Z willem $
+# $Id: RSA.pm 1677 2018-05-22 11:59:10Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1667 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1677 $)[1];
 
 
 =head1 NAME
@@ -46,7 +46,7 @@ use integer;
 use warnings;
 use MIME::Base64;
 
-my %RSA = (
+my %parameters = (
 	1  => [sub { Net::DNS::SEC::libcrypto::EVP_md5() }],
 	5  => [sub { Net::DNS::SEC::libcrypto::EVP_sha1() }],
 	7  => [sub { Net::DNS::SEC::libcrypto::EVP_sha1() }],
@@ -59,7 +59,7 @@ sub sign {
 	my ( $class, $sigdata, $private ) = @_;
 
 	my $algorithm = $private->algorithm;
-	my ($evpmd) = @{$RSA{$algorithm} || []};
+	my ($evpmd) = @{$parameters{$algorithm} || []};
 	die 'private key not RSA' unless $evpmd;
 
 	my ( $n, $e, $d, $p, $q ) = map decode_base64( $private->$_ ),
@@ -80,7 +80,7 @@ sub verify {
 	my ( $class, $sigdata, $keyrr, $sigbin ) = @_;
 
 	my $algorithm = $keyrr->algorithm;
-	my ($evpmd) = @{$RSA{$algorithm} || []};
+	my ($evpmd) = @{$parameters{$algorithm} || []};
 	die 'public key not RSA' unless $evpmd;
 
 	return unless $sigbin;

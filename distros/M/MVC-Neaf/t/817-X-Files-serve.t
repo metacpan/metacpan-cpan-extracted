@@ -5,7 +5,7 @@ use warnings;
 use Test::More;
 use File::Basename;
 
-use MVC::Neaf qw(:sugar);
+use MVC::Neaf;
 use MVC::Neaf::X::Files;
 
 my $xfiles = MVC::Neaf::X::Files->new( root => dirname(__FILE__) );

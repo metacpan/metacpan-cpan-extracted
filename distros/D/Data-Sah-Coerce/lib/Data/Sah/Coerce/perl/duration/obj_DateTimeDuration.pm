@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::duration::obj_DateTimeDuration;
 
-our $DATE = '2018-06-02'; # DATE
-our $VERSION = '0.025'; # VERSION
+our $DATE = '2018-06-03'; # DATE
+our $VERSION = '0.026'; # VERSION
 
 use 5.010001;
 use strict;
@@ -59,7 +59,7 @@ Data::Sah::Coerce::perl::duration::obj_DateTimeDuration - Coerce date from DateT
 
 =head1 VERSION
 
-This document describes version 0.025 of Data::Sah::Coerce::perl::duration::obj_DateTimeDuration (from Perl distribution Data-Sah-Coerce), released on 2018-06-02.
+This document describes version 0.026 of Data::Sah::Coerce::perl::duration::obj_DateTimeDuration (from Perl distribution Data-Sah-Coerce), released on 2018-06-03.
 
 =for Pod::Coverage ^(meta|coerce)$
 

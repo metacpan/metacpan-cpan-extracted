@@ -10,12 +10,14 @@ use Getopt::Long ();
 eval{ Getopt::Long::Configure qw(
 	posix_default
 	no_ignore_case
+	no_require_order
 ); 1 } or warn $@;
 
 sub GetOptions {
     my @expression;
     Getopt::Long::GetOptions(
 	'-v|verbose'	=> \my $verbose,
+	'-0|null'	=> \my $null,
 	'-n|nono'	=> \my $nono,
 	'-f|force'	=> \my $force,
 	'-h|?|help'	=> \my $help,
@@ -32,6 +34,7 @@ sub GetOptions {
 
     my $options = {
 	verbose 	=> $verbose,
+	input_null	=> $null,
 	no_action	=> $nono,
 	over_write	=> $force,
 	show_help	=> $help,
@@ -56,7 +59,7 @@ use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 
 @EXPORT_OK = qw( rename );
-$VERSION = '0.20';
+$VERSION = '0.30';
 
 sub rename_files {
     my $code = shift;
@@ -67,7 +70,12 @@ sub rename_files {
 	$code->();
     	if( $was eq $_ ){ }		# ignore quietly
     	elsif( -e $_ and not $options->{over_write} ) { 
+	    if (/\s/ or $was =~ /\s/ ) {
+		warn  "'$was' not renamed: '$_' already exists\n"; 
+	    }
+	    else {
 		warn  "$was not renamed: $_ already exists\n"; 
+	    }
 	}
     	elsif( $options->{no_action} ) { 
 		print "rename($was, $_)\n";
@@ -89,7 +97,11 @@ sub rename_list {
 	:	 			"file handle ($fh)"
 	),
 	"\n" if $options->{verbose};
-    chop(my @file = <$fh>); 
+    my @file;
+    {
+	local $/ = "\0" if $options->{input_null};
+	chop(@file = <$fh>);
+    }	
     rename_files $code, $options,  @file;
 }
 
@@ -223,6 +235,10 @@ Other options are
 
 As VERBOSE above, provided by B<-v>.
 
+=item B<input_null>
+
+Input separator \0 when reading file names from stdin.
+
 =item B<no_action>
 
 Print names of files to be renamed, but do not rename
@@ -275,7 +291,7 @@ Errors from the code argument are not trapped.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2004, 2005, 2006, 2011 by Robin Barker
+Copyright (C) 2004, 2005, 2006, 2011, 2018 by Robin Barker
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,

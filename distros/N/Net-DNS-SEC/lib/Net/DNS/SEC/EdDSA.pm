@@ -1,9 +1,9 @@
 package Net::DNS::SEC::EdDSA;
 
 #
-# $Id: EdDSA.pm 1667 2018-04-20 10:01:29Z willem $
+# $Id: EdDSA.pm 1677 2018-05-22 11:59:10Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1667 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1677 $)[1];
 
 
 =head1 NAME
@@ -46,7 +46,7 @@ use integer;
 use warnings;
 use MIME::Base64;
 
-my %EdDSA = (
+my %parameters = (
 	15 => [1087, 32, 64],
 	16 => [1088, 57, 114],
 	);
@@ -56,7 +56,7 @@ sub sign {
 	my ( $class, $sigdata, $private ) = @_;
 
 	my $algorithm = $private->algorithm;
-	my ( $nid, $keylen ) = @{$EdDSA{$algorithm} || []};
+	my ( $nid, $keylen ) = @{$parameters{$algorithm} || []};
 	die 'private key not EdDSA' unless $keylen;
 
 	my $rawkey = pack "a$keylen", decode_base64( $private->PrivateKey );
@@ -70,7 +70,7 @@ sub verify {
 	my ( $class, $sigdata, $keyrr, $signature ) = @_;
 
 	my $algorithm = $keyrr->algorithm;
-	my ( $nid, $keylen, $siglen ) = @{$EdDSA{$algorithm} || []};
+	my ( $nid, $keylen, $siglen ) = @{$parameters{$algorithm} || []};
 	die 'public key not EdDSA' unless $keylen;
 
 	return unless $signature;

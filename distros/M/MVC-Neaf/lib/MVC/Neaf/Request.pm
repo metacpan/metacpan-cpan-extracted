@@ -3,7 +3,7 @@ package MVC::Neaf::Request;
 use strict;
 use warnings;
 
-our $VERSION = 0.2203;
+our $VERSION = 0.2501;
 
 =head1 NAME
 
@@ -29,8 +29,8 @@ Here's a brief overview of what a Neaf request returns:
     $req->hostname     = server.name
     $req->port         = 1337
     $req->path         = /mathing/route/some/more/slashes
-    $req->script_name  = /mathing/route
-    $req->path_info    = some/more/slashes
+    $req->prefix       = /mathing/route
+    $req->postfix      = some/more/slashes
 
     # params and cookies require a regex
     $req->param( foo => '\d+' ) = 1
@@ -49,11 +49,14 @@ use Encode;
 use HTTP::Headers::Fast;
 use Time::HiRes ();
 use Sys::Hostname ();
-use Digest::MD5 qw(md5_base64);
+use Digest::MD5 qw(md5);
 
-use MVC::Neaf::Util qw(http_date run_all_nodie canonize_path);
+use MVC::Neaf::Util qw( http_date run_all_nodie canonize_path encode_b64 );
 use MVC::Neaf::Upload;
 use MVC::Neaf::Exception;
+use MVC::Neaf::Route::Null;
+
+our %allow_helper;
 
 =head2 new()
 
@@ -70,7 +73,7 @@ Restrictions MAY BE added in the future though.
 sub new {
     my ($class, %args) = @_;
 
-    # TODO 0.20 restrict params
+    # TODO 0.30 restrict params
     return bless \%args, $class;
 };
 
@@ -205,6 +208,20 @@ sub path {
     return $self->{path} ||= $self->do_get_path;
 };
 
+=head2 route()
+
+A L<MVC::Neaf::Route> object that this request is being dispatched to.
+
+If request is not inside an application, returns a L<MVC::Neaf::Route::Null>
+instead.
+
+=cut
+
+sub route {
+    my $self = shift;
+    return $self->{route} || MVC::Neaf::Route::Null->new;
+};
+
 =head2 set_path()
 
     $req->set_path( $new_path )
@@ -230,7 +247,7 @@ sub set_path {
     $self;
 };
 
-=head2 script_name()
+=head2 prefix()
 
 The part of the request that matched the route to the
 application being executed.
@@ -242,13 +259,14 @@ Not available before routing was applied to request.
 
 =cut
 
-sub script_name {
+sub prefix {
     my $self = shift;
 
-    carp "NEAF: script_name call before routing was applied is DEPRECATED"
-        unless $self->{endpoint};
+    # TODO kill in 0.30
+    carp "NEAF: prefix() call before routing was applied is DEPRECATED: "
+        unless $self->{route} && $self->{route}->path =~ m,^(?:/|$),;
 
-    return $self->{script_name} ||= $self->path;
+    return $self->{prefix} ||= $self->path;
 };
 
 =head2 get_url_base()
@@ -324,7 +342,7 @@ sub get_url_full {
     return $self->get_url_base . $self->get_url_rel(@_);
 };
 
-=head2 path_info()
+=head2 postfix()
 
 Returns the part of URI path beyond what matched the application's path.
 
@@ -339,34 +357,36 @@ B<[EXPERIMENTAL]> This part of API is undergoing changes.
 
 =cut
 
-sub path_info {
+sub postfix {
     my ($self) = @_;
 
-    return $self->{path_info};
+    return $self->{postfix};
 };
 
-=head2 path_info_split()
+=head2 splat()
 
 Return a list of matched capture groups found in path_info_regex, if any.
 
-B<[EXPERIMENTAL]> Name and meaning subject to change.
-
 =cut
 
-sub path_info_split {
+sub splat {
     my $self = shift;
 
     return @{ $self->{path_info_split} || [] };
 };
 
-
+# This is somewhat ugly.
+# When a route is matched, we'll store it
+#    and _also_ the leftovers of regex splitting that happens around that moment
 sub _import_route {
     my ($self, $route, $path, $path_info, $tail) = @_;
 
-    $self->{endpoint}        = $route;
-    $self->{script_name}  = $path;
-    $self->{path_info}    = $path_info;
-    $self->{path_info_split}   = $tail;
+    $self->{route}        = $route;
+    if (defined $path) {
+        $self->{prefix}  = $path;
+        $self->{postfix}    = $path_info;
+        $self->{path_info_split}   = $tail;
+    };
 
     return $self;
 };
@@ -395,9 +415,9 @@ sub set_path_info {
     # CANONIZE
     $path_info =~ s#^/+##;
 
-    $self->{path_info} = $path_info;
+    $self->{postfix} = $path_info;
     $self->{path} = $self->script_name
-        .(length $self->{path_info} ? "/$self->{path_info}" : '');
+        .(length $self->{postfix} ? "/$self->{postfix}" : '');
 
     return $self;
 };
@@ -417,6 +437,8 @@ Return parameter, if it passes regex check, default value or C<undef> otherwise.
 The regular expression is applied to the WHOLE string,
 from beginning to end, not just the middle.
 Use '.*' if you really trust the data.
+
+Dies if regular expression didn't match and the route has the C<strict> flag.
 
 B<[EXPERIMENTAL]> If C<param_regex> hash was given during route definition,
 C<$regex> MAY be omitted for params that were listed there.
@@ -447,7 +469,7 @@ See L<MVC::Neaf::X::Form::Wildcard>.
 sub param {
     my ($self, $name, $regex, $default) = @_;
 
-    $regex ||= $self->{endpoint}{param_regex}{$name};
+    $regex ||= $self->{route}{param_regex}{$name};
 
     $self->_croak( "NEAF: param(): a validation regex is REQUIRED" )
         unless defined $regex;
@@ -458,7 +480,9 @@ sub param {
     return $default if !defined $value;
     return $value   if  $value =~ /^(?:$regex)$/s;
 
-    # TODO 0.30 die 422 if strict mode on
+    if ($self->route->strict) {
+        die 422; # TODO 0.30 configurable die message
+    };
     return $default;
 };
 
@@ -474,6 +498,8 @@ If method is GET or HEAD, identical to C<param>.
 
 Otherwise would return the parameter from query string,
 AS IF it was a GET request.
+
+Dies if regular expression didn't match and the route has the C<strict> flag.
 
 Multiple values are deliberately ignored.
 
@@ -505,9 +531,13 @@ sub url_param {
     my $value = $self->{url_param_hash}{$name};
 
     # this is copypaste from param(), do something (or don't)
-    return (defined $value and $value =~ /^(?:$regex)$/s)
-        ? $value
-        : $default;
+    return $default if !defined $value;
+    return $value   if  $value =~ /^(?:$regex)$/s;
+
+    if ($self->route->strict) {
+        die 422; # TODO 0.30 configurable die message
+    };
+    return $default;
 };
 
 =head2 multi_param( ... )
@@ -522,6 +552,7 @@ Get a multiple value GET/POST parameter as a C<@list>.
 The name generally follows that of newer L<CGI> (4.08+).
 
 ALL values must match the regex, or an empty list is returned.
+Dies if strict mode if enabled for route and there is a mismatch.
 
 B<[EXPERIMENTAL]> If C<param_regex> hash was given during route definition,
 C<$regex> MAY be omitted for params that were listed there.
@@ -538,7 +569,7 @@ Please be careful when upgrading.
 sub multi_param {
     my ($self, $name, $regex) = @_;
 
-    $regex ||= $self->{endpoint}{param_regex}{$name};
+    $regex ||= $self->{route}{param_regex}{$name};
     $self->_croak( "validation regex is REQUIRED" )
         unless defined $regex;
 
@@ -547,7 +578,12 @@ sub multi_param {
     ];
 
     # ANY mismatch = no go. Replace with simple grep if want filter EVER.
-    return (grep { !/^(?:$regex)$/s } @$ret) ? () : @$ret;
+    if (grep { !/^(?:$regex)$/s } @$ret) {
+        die 422 if $self->route->strict;
+        return ();
+    } else {
+        return @$ret;
+    };
 };
 
 =head2 set_param( ... )
@@ -609,15 +645,15 @@ sub form {
     my ($self, $validator) = @_;
 
     if (!ref $validator) {
-        $validator = $self->{_neaf} && $self->{_neaf}->get_form( $validator )
+        $validator = $self->{route}->get_form( $validator )
             || $self->_croak("Unknown form name $validator");
     };
 
-    if (ref $validator eq 'CODE') {
-        return $validator->( $self->_all_params );
-    } else {
-        return $validator->validate( $self->_all_params );
-    };
+    my $result = (ref $validator eq 'CODE')
+        ? $validator->( $self->_all_params )
+        : $validator->validate( $self->_all_params );
+
+    return $result;
 };
 
 =head2 get_form_as_list( ... )
@@ -771,6 +807,8 @@ The regular expression is applied to the WHOLE string,
 from beginning to end, not just the middle.
 Use '.*' if you really need none.
 
+Dies if regular expression didn't match and the route has the C<strict> flag.
+
 =cut
 
 sub get_cookie {
@@ -792,7 +830,12 @@ sub get_cookie {
     my $value = $self->{neaf_cookie_in}{ $name };
     return $default unless defined $value;
 
-    return $value =~ /^$regex$/ ? $value : $default;
+    return $value if $value =~ /^$regex$/;
+
+    if ($self->route->strict) {
+        die 422; # TODO 0.30 configurable die message
+    };
+    return $default;
 };
 
 =head2 set_cookie( ... )
@@ -1065,8 +1108,8 @@ sub dump {
     $raw{header_in} = $self->header_in->as_string;
     $self->get_cookie( noexist => '' ); # warm up cookie cache
     $raw{cookie_in} = $self->{neaf_cookie_in};
-    $raw{path_info} = $self->{path_info}
-        if defined $self->{path_info};
+    $raw{path_info} = $self->{postfix}
+        if defined $self->{postfix};
 
     return \%raw;
 };
@@ -1310,6 +1353,10 @@ sub reply {
 
 sub _set_reply {
     my ($self, $data) = @_;
+
+    croak "Bareword forbidden in reply"
+        unless ref $data and UNIVERSAL::isa($data, 'HASH');
+
     $self->{response}{ret} = $data;
     return $self;
 }
@@ -1467,32 +1514,23 @@ sub clear {
 
 =head2 id()
 
-Lazily fetch unique request id. These are guaranteed to be unique
-on a given machine within a reasonable timeframe.
+Fetch unique request id. If none has been set yet (see L</set_id>),
+use L</make_id> method to create one.
 
-Current id-generation mechanism involves URI-safe md5_base64 C<[-_]>,
-but this MAY change in the future.
+The request id is present in both log messages from Neaf
+and default error pages, making it easier to establish link
+between the two.
 
-B<[CAUTION]> Don't use this id for anything secure.
-Use L<MVC::Neaf::X::Session>'s ids instead.
-This one is just for information.
+Custom ids can be provided, see L</make_id> below.
 
 =cut
 
-# TODO 0.30 provide a configurable mechanism to generate ids
-my $host = Sys::Hostname::hostname();
-my $lastid = 0;
 sub id {
     my $self = shift;
 
     # We don't really need to protect anything here
     # Just avoid accidental matches for which md5 seems good enough
-    return $self->{id} ||= do {
-        my $str = md5_base64( join ".", $host, $$, Time::HiRes::time, ++$lastid );
-        $lastid = 0 unless $lastid < 4_000_000_000;
-        $str =~ tr/+\//-_/;
-        $str;
-    };
+    return $self->{id} ||= $self->make_id;
 };
 
 =head2 set_id( ... )
@@ -1551,7 +1589,7 @@ sub log_error {
 sub _where {
     my $self = shift;
 
-    return $self->{script_name} || "pre_route";
+    return $self->{prefix} || "pre_route";
 };
 
 sub _log_mark {
@@ -1609,6 +1647,79 @@ sub DESTROY {
     $self->execute_postponed
         if (exists $self->{response}{postponed});
 };
+
+=head1 METHODS THAT CAN BE OVERRIDDEN
+
+Generally Neaf allows to define custom Request methods restricted to certain
+path & method combinations.
+
+The following methods are available by default, but can be overridden
+via the helper mechanism.
+
+For instance,
+
+    use MVC::Neaf;
+
+    my $id;
+    neaf helper => make_id => sub { $$ . "_" . ++$id };
+    neaf helper => make_id => \&unique_secure_base64, path => '/admin';
+
+=cut
+
+sub _helper_fallback {
+    my ($name, $impl) = @_;
+
+    my $code = sub {
+        my $self = shift;
+        my $todo = $self->route && $self->route->helpers->{$name} || $impl;
+        $todo->( $self, @_ );
+    };
+
+    $allow_helper{$name}++;
+
+    no strict 'refs'; ## no critic
+    use warnings FATAL => qw(all);
+    *$name = $code;
+};
+
+=head2 make_id
+
+Create unique request id, e.g. for logging context.
+This is called by L</id> if the id has not yet been set.
+
+By default, generates MD5 checksum based on time, hostname, process id, and a
+sequential number and encodes as URL-friendly base64.
+
+B<[CAUTION]> This should be unique, but may not be secure.
+Use L<MVC::Neaf::X::Session> if you need something to rely upon.
+
+=cut
+
+my $host = Sys::Hostname::hostname();
+my $lastid = 0;
+_helper_fallback( make_id => sub {
+    $lastid = 0 if $lastid > 4_000_000_000;
+    encode_b64( md5( join "#", $host, $$, Time::HiRes::time, ++$lastid ) );
+} );
+
+=head2 log_message
+
+    $req->log_message( $level => $message );
+
+By default would print uppercased level, $request->id, route,
+and the message itself.
+
+Levels are not restricted whatsoever.
+Suggested values are "fatal", "error", "warn", "debug".
+
+=cut
+
+_helper_fallback( log_message => sub {
+    my ($req, $level, @mess) = @_;
+
+    warn sprintf "%s req_id=%s [%s]: %s"
+        , uc $level, $req->id, $req->_where, join " ", @mess;
+});
 
 =head1 DRIVER METHODS
 
@@ -1679,7 +1790,7 @@ sub do_close { return 1 };
 sub do_log_error {
     my ($self, $msg) = @_;
 
-    warn "ERROR $msg\n";
+    warn "NEAF: ERROR: $msg\n";
 };
 
 sub _croak {
@@ -1701,6 +1812,33 @@ Please keep an eye on C<Changes> though.
 
 Here are these methods, for the sake of completeness.
 
+=cut
+
+=head2 script_name
+
+See L</prefix>
+
+=head2 path_info
+
+See L</postfix>.
+
+=head2 path_info_split
+
+See L</prefix>
+
+These three will start warning in 0.30 and will be removed in 0.40
+
+=cut
+
+# TODO 0.30 start warning "deprecated"
+{
+    no warnings 'once'; ## no critic
+    use warnings FATAL => 'redefine';
+    *script_name = \&prefix;
+    *path_info = \&postfix;
+    *path_info_split = \&splat;
+}
+
 =head2 header_in_keys ()
 
 Return all keys in header_in object as a list.
@@ -1717,21 +1855,6 @@ sub header_in_keys {
     $head->header_field_names;
 };
 
-=head2 upload( ... )
-
-B<[DEPRECATED]> Same as upload_raw, but issues a warning.
-Use upload_utf8() for text files, or upload_raw() for binary ones.
-
-=cut
-
-# TODO 0.25 kill
-sub upload {
-    my ($self, $name) = @_;
-
-    carp "NEAF: req->upload() is DEPRECATED, use upload_utf8 or upload_raw instead";
-    return $self->_upload( id => $name, utf8 => 0 );
-};
-
 =head2 endpoint_origin
 
 Returns file:line where controller was defined.
@@ -1743,62 +1866,8 @@ B<[DEPRECATED]> This function was added prematurely and shall not be used.
 sub endpoint_origin {
     my $self = shift;
 
-    return '(unspecified file):0' unless $self->{endpoint}{caller};
-    return join " line ", @{ $self->{endpoint}{caller} }[1,2];
-};
-
-=head2 set_full_path( ... )
-
-=over
-
-=item * C<$req-E<gt>set_full_path( $path )>
-
-=item * C<$req-E<gt>set_full_path( $script_name, $path_info )>
-
-=back
-
-Set new path elements which will be returned from this point onward.
-
-Also updates path() value so that path = script_name + path_info
-still holds.
-
-C<set_full_path(undef)> resets C<script_name> to whatever returned
-by the underlying driver.
-
-Returns self.
-
-B<[DEPRECATED]> Use C<set_path()> and C<set_path_info()> instead.
-
-=cut
-
-# TODO 0.25 kill it
-sub set_full_path {
-    my ($self, $script_name, $path_info) = @_;
-
-    carp "NEAF: set_full_path() is DEPRECATED and will be removed in 0.25";
-
-    if (!defined $script_name) {
-        $script_name = $self->do_get_path;
-    };
-
-    # CANONIZE
-    $script_name =~ s#^/*#/#;
-    $self->{script_name} = $script_name;
-
-    if (defined $path_info) {
-        # Make sure path_info always has a slash if nonempty
-        $path_info =~ s#^/+##;
-        $self->{path_info} = Encode::is_utf8($path_info)
-                ? $path_info
-                : decode_utf8(uri_unescape($path_info));
-    } elsif (!defined $self->{path_info}) {
-        $self->{path_info} = '';
-    };
-    # assert $self->{path_info} is defined by now
-
-    $self->{path} = "$self->{script_name}"
-        .(length $self->{path_info} ? "/$self->{path_info}" : '');
-    return $self;
+    return '(unspecified file):0' unless $self->{route}{caller};
+    return join " line ", @{ $self->{route}{caller} }[1,2];
 };
 
 =head2 get_form_as_hash( ... )
@@ -1857,7 +1926,9 @@ sub get_default {
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016-2017 Konstantin S. Uvarin C<khedin@cpan.org>.
+This module is part of L<MVC::Neaf> suite.
+
+Copyright 2016-2018 Konstantin S. Uvarin C<khedin@cpan.org>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

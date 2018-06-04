@@ -7,13 +7,15 @@ README
 t/File-Rename.t
 t/File-Rename-E.t
 t/File-Rename-files.t
+t/File-Rename-no-order.t
 t/File-Rename-script.t
 t/File-Rename-list.t
+t/File-Rename-list-null.t
 t/File-Rename-V.t
 t/pod.t
 t/pod-coverage.t
 lib/File/Rename.pm
 rename.PL
 examples/rename.pl
-META.json		Module meta-data (added by Module::Build)
-META.yml		Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -5,7 +5,7 @@ use warnings;
 use Test::More;
 use Test::Warn;
 
-use MVC::Neaf qw(:sugar);
+use MVC::Neaf;
 
 # portable carp pointers
 my @line = map { __FILE__.' line '.(__LINE__ + $_) } 0..4;

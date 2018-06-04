@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use MVC::Neaf qw(:sugar);
+use MVC::Neaf;
 
 neaf form => fu => [ [ 'term\d+' => '\d+' ] ], engine => 'Wildcard';
 

@@ -13,7 +13,10 @@ BEGIN {
 
 LIST: {
 	SKIP: {
-		skip 'Test requires Internet access', 55 unless(-e 't/online.enabled');
+		if(!-e 't/online.enabled') {
+			diag('Online tests disabled');
+			skip('Online tests disabled', 55);
+		}
 
 		eval {
 			require Test::Number::Delta;

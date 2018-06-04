@@ -27,10 +27,10 @@ use vars qw(
 $style = 'mysql';
 require Exporter;
 @HTML::Editor::ISA         = qw( Exporter Template::Quick);
-@HTML::Editor::EXPORT_OK   = qw(initEditor show JsEnabled );
-%HTML::Editor::EXPORT_TAGS = ('all' => [qw(initEditor show JsEnabled)]);
+@HTML::Editor::EXPORT_OK   = qw(initEditor show );
+%HTML::Editor::EXPORT_TAGS = ('all' => [qw(initEditor show )]);
 
-$HTML::Editor::VERSION = '1.12';
+$HTML::Editor::VERSION = '1.13';
 
 $DefaultClass = 'HTML::Editor' unless defined $HTML::Editor::DefaultClass;
 
@@ -41,7 +41,7 @@ $right = 0;
 
 =head1 NAME
 
-HTML::Editor - BBCODE and HTML Editor
+HTML::Editor - Markdown and HTML Editor
 
 =head3 export_ok
 
@@ -107,7 +107,6 @@ sub initEditor {
     $server       = defined $hash->{server}     ? $hash->{server}     : 'http://localhost';
     $style        = defined $hash->{style}      ? $hash->{style}      : 'mysql';
     $title        = defined $hash->{title}      ? $hash->{title}      : 'Editor';
-    $m_bJsEnabled = defined $hash->{javascript} ? $hash->{javascript} : 1;
     $path =
       defined $hash->{path}
       ? $hash->{path}
@@ -152,7 +151,7 @@ sub show {
     my $cf = translate('choosefile');
     my $att =
       ($right >= 2)
-      ? qq|<div id="divInputFile" class="divInpuFile" onclick="document.getElementById('inputFile').click();"><a id="" class="label">$cf<input class="inputFile" name="file" type="file" id="inputFile" /></div>|
+      ? qq|<input type="file" id="customFile" title="$cf">|
       : $attach;
 
     my %editor = (
@@ -169,7 +168,7 @@ sub show {
                   attach   => $att,
                   html     => $html,
                   atemp    => $atemp,
-                  buttons  => $m_bJsEnabled ? buttons() : '',
+                  buttons  => buttons(),
                  );
     return $self->SUPER::appendHash(\%editor);
 
@@ -184,61 +183,18 @@ return the browser buttons
 sub buttons {
     $style = $_[0] ? shift : $style;
     $button  = $_[0] ? shift : 1;
-    my $buttons = qq|
-     <table class="batch">
-     <tr>
-     <td>
-     <a style ="cursor:pointer;" onclick="left();" class="editorButtons" title="left">&#xea77;</a>
-     
-     <a style ="cursor:pointer;" onclick="center();" class="editorButtons" title="center">&#xea78;</a>
-     
-     <a style ="cursor:pointer;" onclick="aright()" class="editorButtons" title="right">&#xea79;</a>
-     
-     <a style ="cursor:pointer;" onclick="bold();" class="editorButtons" title="bold">&#xea62;</a>
-          
-     <a style ="cursor:pointer;" onclick="italicize();" class="editorButtons" title="italic">&#xea64;</a>
-     
-     <a style ="cursor:pointer;" onclick="strike();" class="editorButtons" title="strike">&#xea65;</a>
-     
-     <a style ="cursor:pointer;" onclick="underline();" class="editorButtons" title="underline">&#xea63;</a>
-     
-     <a style ="cursor:pointer;" onclick="sub();" class="editorButtons" title="sub">&#xea6b;</a>
-     
-     <a style ="cursor:pointer;" onclick="sup();" class="editorButtons" title="sup">&#xea6c;</a>
-     
-     <a style ="cursor:pointer;" onclick="img();" class="editorButtons" title="image">&#xe90d;</a>
-     
-     <a style ="cursor:pointer;" onclick="link();" class="editorButtons" title="link">&#xe9cb;</a>
-     
-     <a style ="cursor:pointer;" onclick="email();" class="editorButtons" title="email">&#xea84;</a>
-     </td>|;
+    my $buttons = '';
 
     if ($right >= 2 && $button) {
         $buttons .=
-            '<td class="'
-          . ($html ? 'htmlButtonChecked' : 'htmlButton')
-          . q|" style ="cursor:pointer;" onclick="enableHtml();checkButton('htmlButton',this)"><input type="checkbox" onclick="enableHtml();" id="htmlButton" class="markBoxEditor" name="format"|
-          . ($html ? 'checked="checked"' : '')
-          . '/><a class="label">html</a></td>';
+            '<label>'
+          . q|<input type="checkbox" onclick="enableHtml();" id="htmlButton" style="font-size:2em;" name="format"|
+          . ($html ? ' checked="checked"' : '')
+          . '/>html</label>';
     }
-    $buttons .= '</tr></table>';
     return $buttons;
 }
 
-=head2 JsEnabled()
-
-default: 1;
-
-=cut
-
-sub JsEnabled {
-    my ($self, @p) = getSelf(@_);
-    if (defined $p[0] && $p[0] =~ /(\w+)/) {
-        $m_bJsEnabled = $1;
-    } else {
-        return $m_bJsEnabled;
-    }
-}
 
 =head2 getSelf()
 
@@ -259,11 +215,11 @@ sub getSelf {
 
 Dirk Lindner <lze@cpan.org>
 
-L<CGI> L<HTML::Editor::BBCODE> L<MySQL::Admin::GUI>
+L<CGI> L<HTML::Editor::Markdown> L<MySQL::Admin::GUI>
 
 =head1 LICENSE
 
-Copyright (C) 2005 - 201 by Hr. Dirk Lindner
+Copyright (C) 2005 - 2018 by Hr. Dirk Lindner
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public License

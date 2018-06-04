@@ -11,7 +11,7 @@ has 'aat'         => ( is => 'rw', isa => 'Apache::AuthTkt', required => 1, );
 has 'config'      => ( is => 'rw', isa => 'HashRef', required => 1, );
 has 'debug'       => ( is => 'rw', isa => 'Int', );
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 =head1 NAME
 
@@ -40,7 +40,7 @@ sub new {
 
     # init AuthTkt
     my @aat_args = ();
-    for my $param (qw( ignore_ip cookie_name domain timeout timeout_refresh ))
+    for my $param (qw( ignore_ip cookie_name domain timeout timeout_refresh digest_type ))
     {
         if ( exists $config->{$param} ) {
             push( @aat_args, $param => $config->{$param} );

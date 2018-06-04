@@ -1,11 +1,11 @@
 #!perl
 
-# Note: This script is a CLI  for Riap function /App/SahUtils/is_sah_collection_builtin_type
-# and generated automatically using Perinci::CmdLine::Gen version 0.483
+# Note: This script is a CLI for Riap function /App/SahUtils/is_sah_collection_builtin_type
+# and generated automatically using Perinci::CmdLine::Gen version 0.485
 
-our $DATE = '2018-01-14'; # DATE
+our $DATE = '2018-06-03'; # DATE
 our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.460'; # VERSION
+our $VERSION = '0.461'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,10 +13,12 @@ use warnings;
 
 use Perinci::CmdLine::Any;
 
-Perinci::CmdLine::Any->new(
+my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/SahUtils/is_sah_collection_builtin_type",
     program_name => "is-sah-collection-builtin-type",
-)->run;
+);
+
+$cmdline->run;
 
 # ABSTRACT: Check that a string or array schema is a Sah collection builtin type
 # PODNAME: is-sah-collection-builtin-type
@@ -33,7 +35,7 @@ is-sah-collection-builtin-type - Check that a string or array schema is a Sah co
 
 =head1 VERSION
 
-This document describes version 0.460 of is-sah-collection-builtin-type (from Perl distribution App-SahUtils), released on 2018-01-14.
+This document describes version 0.461 of is-sah-collection-builtin-type (from Perl distribution App-SahUtils), released on 2018-06-03.
 
 =head1 SYNOPSIS
 

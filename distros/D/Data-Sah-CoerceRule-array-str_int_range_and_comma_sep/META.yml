@@ -3,11 +3,10 @@ abstract: 'Coerce array of ints from comma-separated ints/int ranges'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
-  Data::Sah::Coerce: '0.011'
+  Data::Sah::Coerce: '0.025'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Test::Exception: '0'
   Test::More: '0.98'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -26,7 +25,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-CoerceRule-array-str_int_range_and_comma_sep
   homepage: https://metacpan.org/release/Data-Sah-CoerceRule-array-str_int_range_and_comma_sep
   repository: git://github.com/perlancar/perl-Data-Sah-CoerceRule-array-str_int_range_and_comma_sep.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

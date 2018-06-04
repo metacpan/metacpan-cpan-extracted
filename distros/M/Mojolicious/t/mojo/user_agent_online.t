@@ -10,7 +10,7 @@ use Mojo::IOLoop::TLS;
 
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
-plan skip_all => 'IO::Socket::SSL 1.94+ required for this test!'
+plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'
   unless Mojo::IOLoop::TLS->can_tls;
 plan skip_all => 'Mozilla::CA required for this test!'
   unless eval { require Mozilla::CA; 1 };
@@ -232,10 +232,5 @@ $tx = $ua->connect_timeout(0.5)->get('192.0.2.1');
 ok $tx->is_finished, 'transaction is finished';
 is $tx->error->{message}, 'Connect timeout', 'right error';
 $ua->connect_timeout(3);
-
-# Request timeout (non-routable address)
-$tx = $ua->request_timeout(0.5)->get('192.0.2.1');
-ok $tx->is_finished, 'transaction is finished';
-is $tx->error->{message}, 'Request timeout', 'right error';
 
 done_testing();

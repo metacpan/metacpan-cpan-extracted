@@ -3,10 +3,10 @@ NAME
     of ints from comma-separated ints/int ranges
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Data::Sah::CoerceRule::array::str_int_range_and_comma_sep (from Perl
     distribution Data-Sah-CoerceRule-array-str_int_range_and_comma_sep),
-    released on 2018-04-17.
+    released on 2018-06-04.
 
 DESCRIPTION
     This distribution contains Data::Sah coercion rule to coerce array of

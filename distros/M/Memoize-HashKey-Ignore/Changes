@@ -1,8 +1,12 @@
 Revision history for Memoize-HashKey-Ignore
 
-0.01    10/08/2014
-        First version
+0.04      2018-06-04 09:37:35+08:00 Asia/Manila
+        Fix typo in dist name (GH #7)
 
+0.03      2017-02-21 02:18:31+00:00 UTC
+        Switch to dzil
 0.02    09/09/2014
         Makefile fixes and testcase name consistency, remove unwanted module uses
 
+0.01    10/08/2014
+        First version

@@ -1,4 +1,4 @@
-# $Id: 51-ECDSA-P256.t 1668 2018-04-23 13:36:44Z willem $	-*-perl-*-
+# $Id: 51-ECDSA-P256.t 1677 2018-05-22 11:59:10Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -37,9 +37,9 @@ use_ok('Net::DNS::SEC::ECDSA');
 
 
 my $key = new Net::DNS::RR <<'END';
-ECDSAP256SHA256.example.	IN	DNSKEY	256 3 13 (
-	7Y4BZY1g9uzBwt3OZexWk7iWfkiOt0PZ5o7EMip0KBNxlBD+Z58uWutYZIMolsW8v/3rfgac45lO
-	IikBZK4KZg== ) ; Key ID = 44222
+ECDSAP256SHA256.example.	IN	DNSKEY	( 257 3 13
+	IYHbvpnqrhxM4i0SuOyAq9hk19tNXpjja7jCQnfAjZBFBfcLorJPnq4FWMVDg6QT2C4JeW0yCxK4
+	iEhb4w9KWQ== ) ; Key ID = 27566
 END
 
 ok( $key, 'set up ECDSA public key' );
@@ -51,10 +51,10 @@ open( KEY, ">$keyfile" ) or die "$keyfile $!";
 print KEY <<'END';
 Private-key-format: v1.3
 Algorithm: 13 (ECDSAP256SHA256)
-PrivateKey: m/dWhFblAGQnabJoKbs0vXoQidjNzlTcbPAqntUXWi0=
-Created: 20141209020038
-Publish: 20141209020038
-Activate: 20141209020038
+PrivateKey: w+AjPo650IA8DWeEq5QqZ2LWYpuC/oeEaYaGE1ZvKyA=
+Created: 20141209015301
+Publish: 20141209015301
+Activate: 20141209015301
 END
 close(KEY);
 
@@ -63,10 +63,10 @@ ok( $private, 'set up ECDSA private key' );
 
 
 my $wrongkey = new Net::DNS::RR <<'END';
-RSASHA1.example.	IN	DNSKEY	256 3 5 (
+RSASHA1.example.	IN	DNSKEY	( 256 3 5
 	AwEAAZHbngk6sMoFHN8fsYY6bmGR4B9UYJIqDp+mORLEH53Xg0f6RMDtfx+H3/x7bHTUikTr26bV
 	AqsxOs2KxyJ2Xx9RGG0DB9O4gpANljtTq2tLjvaQknhJpSq9vj4CqUtr6Wu152J2aQYITBoQLHDV
-	i8mIIunparIKDmhy8TclVXg9 ; Key ID = 1623
+	i8mIIunparIKDmhy8TclVXg9 ) ; Key ID = 1623
 END
 
 ok( $wrongkey, 'set up non-ECDSA public key' );

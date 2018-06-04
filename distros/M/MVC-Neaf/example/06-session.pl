@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 
-use MVC::Neaf qw(:sugar);
+use MVC::Neaf;
 use MVC::Neaf::X::Session::Cookie;
 
 # Instantiate session engine
@@ -27,11 +27,11 @@ neaf view => TT6 => TT =>
     PRE_PROCESS  => 'head.html',
     POST_PROCESS => 'foot.html';
 # As always, some default values
-neaf default => '/06' => {
+neaf default => {
     -view => 'TT6',
     file  => 'example/06 NEAF '.MVC::Neaf->VERSION,
     root  => '/06',
-};
+}, path => '/06';
 
 # pre_logic hooks are executed right before the controller,
 #    if the path matches.

@@ -3,7 +3,7 @@ abstract: 'Coerce string to upper case'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
-  Data::Sah::Coerce: '0.011'
+  Data::Sah::Coerce: '0.025'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
@@ -25,7 +25,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-Coerce-perl-str-str_toupper
   homepage: https://metacpan.org/release/Data-Sah-Coerce-perl-str-str_toupper
   repository: git://github.com/perlancar/perl-Data-Sah-Coerce-perl-str-str_toupper.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

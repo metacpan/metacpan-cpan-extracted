@@ -3,9 +3,9 @@ NAME
     comma-separated items in a string
 
 VERSION
-    This document describes version 0.006 of
+    This document describes version 0.007 of
     Data::Sah::CoerceRule::array::str_comma_sep (from Perl distribution
-    Data-Sah-CoerceRule-array-str_comma_sep), released on 2018-04-17.
+    Data-Sah-CoerceRule-array-str_comma_sep), released on 2018-06-04.
 
 DESCRIPTION
     This distribution contains Data::Sah coercion rule to coerce array from
@@ -20,8 +20,8 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com///github.com/perlancar/perl-Data-Sah-CoerceRule-arra
-    y-str_comma_sep>.
+    <https://github.com/perlancar/perl-Data-Sah-CoerceRule-array-str_comma_s
+    ep>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website

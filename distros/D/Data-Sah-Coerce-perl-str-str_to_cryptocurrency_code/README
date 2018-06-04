@@ -3,10 +3,10 @@ NAME
     containing cryptocurrency code/name/safename to code
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.003 of
     Data::Sah::Coerce::perl::str::str_to_cryptocurrency_code (from Perl
     distribution Data-Sah-Coerce-perl-str-str_to_cryptocurrency_code),
-    released on 2018-05-29.
+    released on 2018-06-04.
 
 DESCRIPTION
     The rule is not enabled by default. You can enable it in a schema using

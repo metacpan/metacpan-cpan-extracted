@@ -25,11 +25,10 @@ is_deeply(
     $t->resource_document(
         $post,
         {
-            fields             => [qw/title/],
-            with_relationships => 1,
-            with_attributes    => 1,
-            includes           => [qw/comments/],
-            related_fields     => {
+            fields          => [qw/title/],
+            with_attributes => 1,
+            includes        => [qw/comments/],
+            related_fields  => {
                 comments => [qw/likes/] } }
     ),
     {

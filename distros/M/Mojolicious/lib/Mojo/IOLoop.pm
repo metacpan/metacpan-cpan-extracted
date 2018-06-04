@@ -47,22 +47,24 @@ sub acceptor {
 
 sub client {
   my ($self, $cb) = (_instance(shift), pop);
+  my $args = ref $_[0] ? $_[0] : {@_};
 
   my $id = $self->_id;
   my $client = $self->{out}{$id}{client} = Mojo::IOLoop::Client->new;
   weaken $client->reactor($self->reactor)->{reactor};
+  my $class = delete $args->{stream_class} || 'Mojo::IOLoop::Stream';
 
   weaken $self;
   $client->on(
     connect => sub {
       delete $self->{out}{$id}{client};
-      my $stream = Mojo::IOLoop::Stream->new(pop);
+      my $stream = $class->new(pop);
       $self->_stream($stream => $id);
       $self->$cb(undef, $stream);
     }
   );
   $client->on(error => sub { $self->_remove($id); $self->$cb(pop, undef) });
-  $client->connect(@_);
+  $client->connect($args);
 
   return $id;
 }
@@ -105,12 +107,14 @@ sub reset {
 
 sub server {
   my ($self, $cb) = (_instance(shift), pop);
+  my $args = ref $_[0] ? $_[0] : {@_};
 
   my $server = Mojo::IOLoop::Server->new;
+  my $class = delete $args->{stream_class} || 'Mojo::IOLoop::Stream';
   weaken $self;
   $server->on(
     accept => sub {
-      my $stream = Mojo::IOLoop::Stream->new(pop);
+      my $stream = $class->new(pop);
       $self->$cb($stream, $self->_stream($stream, $self->_id, 1));
 
       # Enforce connection limit (randomize to improve load balancing)
@@ -123,7 +127,7 @@ sub server {
       $self->_not_accepting if $self->_limit;
     }
   );
-  $server->listen(@_);
+  $server->listen($args);
 
   return $self->acceptor($server);
 }
@@ -157,6 +161,13 @@ sub subprocess {
 }
 
 sub timer { shift->_timer(timer => @_) }
+
+sub transition {
+  my ($self, $id, $class) = (_instance(shift), @_);
+  my $new = $class->new($self->stream($id)->steal_handle);
+  $self->_stream($new, $id, !!$self->{in}{$id});
+  return $new;
+}
 
 sub _id {
   my $self = shift;
@@ -303,7 +314,7 @@ loaded.
 For better scalability (epoll, kqueue) and to provide non-blocking name
 resolution, SOCKS5 as well as TLS support, the optional modules L<EV> (4.0+),
 L<Net::DNS::Native> (0.15+), L<IO::Socket::Socks> (0.64+) and
-L<IO::Socket::SSL> (1.94+) will be used automatically if possible. Individual
+L<IO::Socket::SSL> (2.009+) will be used automatically if possible. Individual
 features can also be disabled with the C<MOJO_NO_NNR>, C<MOJO_NO_SOCKS> and
 C<MOJO_NO_TLS> environment variables.
 
@@ -391,11 +402,12 @@ Get L<Mojo::IOLoop::Server> object for id or turn object into an acceptor.
   my $id = $loop->client({address => '127.0.0.1', port => 3000} => sub {...});
 
 Open a TCP/IP or UNIX domain socket connection with L<Mojo::IOLoop::Client> and
-create a L<Mojo::IOLoop::Stream> object, takes the same arguments as
-L<Mojo::IOLoop::Client/"connect">.
+create a stream object (usually L<Mojo::IOLoop::Stream>), takes the same
+arguments as L<Mojo::IOLoop::Client/"connect"> in addition to C<stream_class>.
 
-  # Connect to 127.0.0.1 on port 3000
-  Mojo::IOLoop->client({port => 3000} => sub {
+  # Connect to 127.0.0.1 on port 3000 with a custom stream class
+  my $class = 'Mojo::IOLoop::Stream::HTTPClient';
+  Mojo::IOLoop->client({port => 3000, stream_class => $class} => sub {
     my ($loop, $err, $stream) = @_;
     ...
   });
@@ -531,11 +543,12 @@ Remove everything and stop the event loop.
   my $id = $loop->server({port => 3000} => sub {...});
 
 Accept TCP/IP and UNIX domain socket connections with L<Mojo::IOLoop::Server>
-and create L<Mojo::IOLoop::Stream> objects, takes the same arguments as
-L<Mojo::IOLoop::Server/"listen">.
+and create stream objects (usually L<Mojo::IOLoop::Stream>, takes the same
+arguments as L<Mojo::IOLoop::Server/"listen"> in addition to C<stream_class>.
 
-  # Listen on port 3000
-  Mojo::IOLoop->server({port => 3000} => sub {
+  # Listen on port 3000 with a custom stream class
+  my $class = 'Mojo::IOLoop::Stream::HTTPServer';
+  Mojo::IOLoop->server({port => 3000, stream_class => $class} => sub {
     my ($loop, $stream, $id) = @_;
     ...
   });
@@ -645,6 +658,14 @@ seconds.
     my $loop = shift;
     ...
   });
+
+=head2 transition
+
+  my $stream =
+    Mojo::IOLoop->transition($id => 'Mojo::IOLoop::Stream::HTTPClient');
+  my $stream = $loop->transition($id => 'Mojo::IOLoop::Stream::HTTPClient');
+
+Transition stream to a different class.
 
 =head1 DEBUGGING
 

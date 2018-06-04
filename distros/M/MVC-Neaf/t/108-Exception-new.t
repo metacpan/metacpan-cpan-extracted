@@ -26,4 +26,27 @@ like $ex->reason, qr/Foobared/, "Reason came through";
 is   $ex->file_and_line, " at /foo/bar line 137", "file:line as expected";
 unlike $ex, qr/^MVC::Neaf/, "MVC::Neaf not mentioned";
 
+$ex = MVC::Neaf::Exception->new( 405, -headers => [ Allow => 'GET, POST' ] );
+
+is_deeply $ex->make_reply(My::Fake::Request->new)->{-headers}, [
+         Allow => 'GET, POST',
+    ], "Header round trip";
+
+$ex = MVC::Neaf::Exception->new( 405, -location => '/', -headers => [ Allow => 'GET, POST' ] );
+is_deeply $ex->make_reply(My::Fake::Request->new)->{-headers}, [
+        Location => '/',
+        Allow    => 'GET, POST',
+    ], "Header round trip (redir)";
+
+
 done_testing;
+
+package My::Fake::Request;
+
+sub new {
+    return bless {}, shift;
+};
+
+sub id {
+    1;
+};

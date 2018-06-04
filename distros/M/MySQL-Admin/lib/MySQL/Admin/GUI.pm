@@ -12,22 +12,26 @@ use MySQL::Admin::Translate;
 use MySQL::Admin::Config;
 use MySQL::Admin::Session;
 use HTML::Menu::TreeView qw(:all);
-use HTML::Editor::BBCODE;
+use HTML::Editor::Markdown;
 use CGI::QuickForm;
 use HTML::Editor;
 use Encode;
 use Fcntl qw(:flock);
 use Symbol;
 use URI::Escape;
-# use diagnostics;
+#ise diagnostics;
+use Authen::Captcha;
+use JSON::XS;
+use XML::Simple;
+
 use CGI::Carp qw(fatalsToBrowser);
 require Exporter;
 use vars
-  qw( $m_bMainTemplate $DefaultClass $ACCEPT_LANGUAGE @EXPORT @ISA $m_bMod_perl %m_hUniq $m_hrParams $m_hrSettings $m_hrLng $m_nStart $m_nEnd $m_nRight $m_sAction $m_sSid $m_sStyle $m_sTitle $m_sUser $m_sCurrentDb $m_sCurrentHost  $m_sCurrentUser $m_sCurrentPass $m_nSkipCaptch );
+  qw( $m_outXML $m_sJson $m_bMainTemplate $DefaultClass $ACCEPT_LANGUAGE @EXPORT @ISA $m_bMod_perl %m_hUniq $m_hrParams $m_hrSettings $m_hrLng $m_nStart $m_nEnd $m_nRight $m_sAction $m_sSid $m_sStyle $m_sTitle $m_sUser $m_sCurrentDb $m_sCurrentHost  $m_sCurrentUser $m_sCurrentPass $m_nSkipCaptch );
 @MySQL::Admin::GUI::EXPORT =
   qw( ContentHeader Body ChangeDb Unique openFile action applyRights maxlength);
 @ISA                        = qw( Exporter MySQL::Admin );
-$MySQL::Admin::GUI::VERSION = '1.12';
+$MySQL::Admin::GUI::VERSION = '1.07';
 $m_bMod_perl                = ($ENV{MOD_PERL}) ? 1 : 0;
 local $^W = 0;
 our @m_processlist;
@@ -87,12 +91,20 @@ sub ContentHeader {
     $m_sAction = param('action') ? param('action') : $m_hrSettings->{defaultAction};
     translate($m_sAction);
     $m_sAction = ($m_sAction =~ /^(\w{3,50})$/) ? $1 : $m_hrSettings->{defaultAction};
+	$m_sJson = {
+			m_sCurrentAction => $m_sAction,
+			m_nSize => $m_hrSettings->{size},
+			m_nRight => $m_nRight,
+			htmlright => $m_hrSettings->{htmlright},
+			style  => $m_hrSettings->{cgi}{style},			
+	};
+	
     $m_sCurrentHost = param('m_shost') ? param('m_shost') : $m_hrSettings->{database}{CurrentHost};
     $m_sCurrentUser = param('m_suser') ? param('m_suser') : $m_hrSettings->{database}{CurrentUser};
     $m_sCurrentPass = param('m_spass') ? param('m_spass') : $m_hrSettings->{database}{CurrentPass};
 
-    if (param('m_ChangeCurrentDb')) {
-        $m_sCurrentDb                          = param('m_ChangeCurrentDb');
+    if (param('ChangeCurrentDb')) {
+        $m_sCurrentDb                          = param('ChangeCurrentDb');
         $m_hrSettings->{database}{CurrentDb}   = $m_sCurrentDb;
         $m_hrSettings->{database}{CurrentHost} = $m_sCurrentHost;
         $m_hrSettings->{database}{CurrentUser} = $m_sCurrentUser;
@@ -135,12 +147,11 @@ sub ContentHeader {
         my $u  = param('user');
         my $p  = param('pass');
         $m_nSkipCaptch = 0;
-        eval{
-	  use Authen::Captcha;
+         eval{
 	  my $captcha = Authen::Captcha->new(data_folder   => "$m_hrSettings->{cgi}{bin}/config/",output_folder => "$m_hrSettings->{cgi}{DocumentRoot}/images");
 	  $m_nSkipCaptch = $captcha->check_code(param("captcha"), param("md5"));
-        };
-        $m_nSkipCaptch = 1 if $@;
+         };
+        $m_nSkipCaptch = 1;# if $@;
         if (defined $u && defined $p && defined $ip && $m_nSkipCaptch > 0) {
             use MD5;
             my $md5 = new MD5;
@@ -149,6 +160,7 @@ sub ContentHeader {
             my $cyrptpass = $md5->hexdigest();
             my $result    = 1;
             if ($m_oDatabase->checkPass($u, $cyrptpass)) {
+			$m_nSkipCaptch = 2;
                 $m_sSid = $m_oDatabase->setSid($u, $p, $ip);
                 my $cookie = cookie(
                                     -name    => 'sid',
@@ -186,17 +198,24 @@ sub ContentHeader {
                      -charset                     => 'UTF-8'
                     );
     }
+	  my $ip = remote_addr();
     $m_nRight = $m_oDatabase->userright($m_sUser);
     print qq(<?xml version="1.0" encoding="UTF-8"?>\n<xml>\n\n);
+
+	$m_sJson->{m_sSid} = $m_sSid;
+	my $encode_json = encode_json $m_sJson;
     print qq|<output id="sid"><![CDATA[
     <script>
+	m_sJson   = '$encode_json';
     m_sid     = "$m_sSid";
     cAction   = "$m_sAction";
     size      = $m_hrSettings->{size};
     right     = $m_nRight;
     htmlright = $m_hrSettings->{htmlright};
     style     = "$m_hrSettings->{cgi}{style}";
+	m_oSettings = JSON.parse(m_sJson);
     </script>]]></output>|;
+
 }
 
 =head2 Body
@@ -219,7 +238,7 @@ sub Body {
     $m_nRight = defined $m_nRight ? $m_nRight : 0;
     my $exploit = 0;
     my $query =
-      "select actions.action,actions.file,actions.title,actions.right,actions.sub,actions_set.output_id from actions join actions_set on actions.action = actions_set.foreign_action where actions_set.action = ?";
+      "select * from actions join actions_set on actions.action = actions_set.foreign_action where actions_set.action = ?";
     $query .= " || actions_set.action = 'default'" if $m_bMainTemplate;
     my @action_set = $m_oDatabase->fetch_AoH($query, $m_sAction);
     $exploit = 1 if $@;
@@ -227,15 +246,24 @@ sub Body {
         my $action = $action_set[$i];
         $m_sTitle = $action->{title};
         if ($m_nRight >= $action->{right}) {
-            print qq|<output id="$action->{output_id}"><![CDATA[|;
-            do("$m_hrSettings->{cgi}{bin}/Content/$action->{file}")
-              if -e "$m_hrSettings->{cgi}{bin}/Content/$action->{file}";
-            eval($action->{sub}) if $action->{sub} ne 'main';
-            print q|]]></output>|;
-            if($@){
-	      print qq|<output id="errorMessage"><![CDATA[$@]]></output>|;
-	      warn "MySQL::Admin::Body $@  $/"; 
-            }
+	
+			if($action->{type} eq 'xml'){
+				print qq|<output id="$action->{output_id}" type="xml"  xsl="$action->{xsl}"><![CDATA[|;
+				do("$m_hrSettings->{cgi}{bin}/Content/$action->{file}") if -e "$m_hrSettings->{cgi}{bin}/Content/$action->{file}";
+				eval( $action->{sub}) if $action->{sub} ne 'main';
+				print XMLout($m_outXML ,NoAttr => 1,RootName => 'action' );
+				print q|]]></output>|;
+			}else{
+				print qq|<output id="$action->{output_id}" type="html"><![CDATA[|;
+				do("$m_hrSettings->{cgi}{bin}/Content/$action->{file}")
+				  if -e "$m_hrSettings->{cgi}{bin}/Content/$action->{file}";
+				eval($action->{sub}) if $action->{sub} ne 'main';
+				print q|]]></output>|;
+			}
+			if($@){
+				print qq|<output id="errorMessage"><![CDATA[$@]]></output>|;
+				warn "MySQL::Admin::Body $@  $/"; 
+			}
         } else {
             $exploit = 1;
         }
@@ -249,6 +277,15 @@ sub Body {
 	  warn "MySQL::Admin::Body $@  $/"; 
 	}
     }
+
+	my $encode_json = encode_json $m_sJson;
+	$encode_json=~s/\\/\\\\/g;
+	$encode_json =~s/'/\\'/g;
+
+    print qq|<output id="postScript" type="script"><![CDATA[
+	var oFile =  JSON.parse('$encode_json');
+	showEditor(oFile.m_sFile);
+    ]]></output>|;
 
     ChangeDb(
              {
@@ -318,7 +355,7 @@ sub openFile {
         use Fcntl qw(:flock);
         use Symbol;
         my $fh = gensym;
-        open $fh, $file or warn "$!: $file $/";
+        open $fh,  "<:encoding(UTF-8)", $file or warn "$!: $file $/";
         seek $fh, 0, 0;
         my $lines;
         while (my $line = <$fh>) {

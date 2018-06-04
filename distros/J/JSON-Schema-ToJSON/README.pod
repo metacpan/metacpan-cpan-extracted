@@ -9,7 +9,7 @@ use String::Random;
 use DateTime;
 use Hash::Merge qw/ merge /;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 has _validator  => sub {
 	$ENV{JSON_VALIDATOR_RECURSION_LIMIT} = shift->max_depth;
@@ -437,7 +437,7 @@ JSON::Schema::ToJSON - Generate example JSON structures from JSON Schema definit
 
 =head1 VERSION
 
-0.14
+0.15
 
 =head1 SYNOPSIS
 

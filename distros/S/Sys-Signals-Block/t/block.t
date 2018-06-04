@@ -1,27 +1,28 @@
+#!/usr/bin/env perl
+
 use strict;
-use Test::More tests => 5;
+use warnings;
+use lib 't/lib';
+use My::Test::SignalHandlers;
+use Sys::Signals::Block qw(SIGHUP SIGUSR1);
+use Test::More tests => 6;
 
-use_ok('Sys::Signals::Block') or exit 1;
-
-use POSIX qw(SIGHUP SIGUSR1);
-
-Sys::Signals::Block->import(SIGHUP, SIGUSR1);
-
-my $usr1 = 0;
-my $hup  = 0;
-
-$SIG{USR1} = sub { $usr1++ };
-$SIG{HUP}  = sub { $hup++ };
+cmp_ok $HUP, '==', 0;
+cmp_ok $USR1, '==', 0;
 
 Sys::Signals::Block->block;
 
-kill SIGHUP, $$;
-kill SIGUSR1, $$;
+kill HUP => $$;
+kill USR1 => $$;
 
-ok !$hup, 'SIGHUP was blocked';
-ok !$usr1, 'SIGUSR1 was blocked';
+# sleep 1s so that we wait to make sure the signals are blocked.
+sleep 1;
+
+ok !$HUP, 'SIGHUP was blocked';
+ok !$USR1, 'SIGUSR1 was blocked';
 
 Sys::Signals::Block->unblock;
-ok $hup, 'SIGHUP was delivered';
-ok $usr1, 'SIGUSR1 was delivered';
+# signals should be delivered here.
 
+ok $HUP, 'SIGHUP was delivered';
+ok $USR1, 'SIGUSR1 was delivered';

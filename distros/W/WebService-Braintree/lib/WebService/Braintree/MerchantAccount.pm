@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::MerchantAccount;
-$WebService::Braintree::MerchantAccount::VERSION = '1.4';
+$WebService::Braintree::MerchantAccount::VERSION = '1.5';
 use 5.010_001;
 use strictures 1;
 
@@ -69,7 +69,7 @@ sub update {
 
 {
     package WebService::Braintree::MerchantAccount::Status;
-$WebService::Braintree::MerchantAccount::Status::VERSION = '1.4';
+$WebService::Braintree::MerchantAccount::Status::VERSION = '1.5';
 use 5.010_001;
     use strictures 1;
 
@@ -80,7 +80,7 @@ use 5.010_001;
 
 {
     package WebService::Braintree::MerchantAccount::FundingDestination;
-$WebService::Braintree::MerchantAccount::FundingDestination::VERSION = '1.4';
+$WebService::Braintree::MerchantAccount::FundingDestination::VERSION = '1.5';
 use 5.010_001;
     use strictures 1;
 

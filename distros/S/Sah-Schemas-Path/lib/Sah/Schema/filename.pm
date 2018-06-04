@@ -1,7 +1,7 @@
 package Sah::Schema::filename;
 
-our $DATE = '2018-01-14'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2018-06-04'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 our $schema = [str => {
     summary => 'Filesystem file name',
@@ -26,7 +26,7 @@ Sah::Schema::filename - Filesystem file name
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::Schema::filename (from Perl distribution Sah-Schemas-Path), released on 2018-01-14.
+This document describes version 0.005 of Sah::Schema::filename (from Perl distribution Sah-Schemas-Path), released on 2018-06-04.
 
 =head1 HOMEPAGE
 

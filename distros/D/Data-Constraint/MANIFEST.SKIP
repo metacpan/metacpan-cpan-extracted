@@ -60,3 +60,5 @@
 
 ^Data-
 \.releaserc
+\.travis\.yml
+\.appveyor\.yml

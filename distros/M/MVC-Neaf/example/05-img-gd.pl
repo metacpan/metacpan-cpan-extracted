@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 
-use MVC::Neaf qw(:sugar);
+use MVC::Neaf;
 
 # We must check that GD library is actually there, but not die if it's not
 my $has_gd = eval {

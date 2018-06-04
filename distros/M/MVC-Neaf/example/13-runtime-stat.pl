@@ -11,7 +11,7 @@ use strict;
 use warnings;
 
 use Time::HiRes qw(time);
-use MVC::Neaf qw(:sugar);
+use MVC::Neaf;
 
 # This is only an example.
 # Insert your favorite database writer here!

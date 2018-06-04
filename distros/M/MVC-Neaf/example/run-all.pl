@@ -7,7 +7,7 @@ use warnings;
 use File::Basename qw(dirname basename);
 use lib dirname(__FILE__)."/../lib";
 
-use MVC::Neaf qw(:sugar);
+use MVC::Neaf;
 
 my $dir = dirname(__FILE__);
 $dir = "./$dir" unless $dir =~ m#^/#;

@@ -1,3 +1,8 @@
+0.008   2018-06-03 (PERLANCAR)
+
+	- Update to Data::Sah::Coerce 0.025.
+
+
 0.007   2017-01-09 (PERLANCAR)
 
 	- Split str_alami_{en,id} to their own dists.

@@ -37,11 +37,10 @@
       "test" : {
          "requires" : {
             "CryptoCurrency::Catalog" : "20180308",
-            "Data::Sah::Coerce" : "0.011",
+            "Data::Sah::Coerce" : "0.025",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::Exception" : "0",
             "Test::More" : "0.98"
          }
       }
@@ -58,7 +57,7 @@
          "web" : "https://github.com/perlancar/perl-Data-Sah-Coerce-perl-str-str_to_cryptocurrency_code"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

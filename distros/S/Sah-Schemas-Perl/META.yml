@@ -7,10 +7,8 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Module::Path::More: '0.32'
-  Test::Exception: '0'
   Test::More: '0.98'
   Test::Needs: '0'
-  Test::Warn: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -32,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Perl
   homepage: https://metacpan.org/release/Sah-Schemas-Perl
   repository: git://github.com/perlancar/perl-Sah-Schemas-Perl.git
-version: '0.011'
+version: '0.012'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -40,7 +38,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Sah::Schemas
       name: Sah::Schemas
-      version: '0.010'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:

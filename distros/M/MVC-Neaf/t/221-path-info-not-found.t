@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use MVC::Neaf qw(:sugar);
+use MVC::Neaf;
 
 get '/foo' => sub { +{-content => 1} };
 get '/bar' => sub { +{-content => 2} }, path_info_regex => '\d\d\d';

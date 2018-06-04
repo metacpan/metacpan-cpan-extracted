@@ -21,3 +21,8 @@
 
 \.swp$
 .gitignore
+
+^MYMETA\.
+^\.build$
+^\.travis\.yml$
+^dist\.ini$

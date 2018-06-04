@@ -4,7 +4,7 @@ JSON::Schema::ToJSON - Generate example JSON structures from JSON Schema definit
 
 # VERSION
 
-0.13
+0.15
 
 # SYNOPSIS
 

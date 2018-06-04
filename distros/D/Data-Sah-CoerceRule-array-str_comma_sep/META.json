@@ -36,7 +36,7 @@
       },
       "test" : {
          "requires" : {
-            "Data::Sah::Coerce" : "0.011",
+            "Data::Sah::Coerce" : "0.025",
             "Data::Sah::CoerceJS" : "0.011",
             "File::Spec" : "0",
             "IO::Handle" : "0",
@@ -54,11 +54,11 @@
       "homepage" : "https://metacpan.org/release/Data-Sah-CoerceRule-array-str_comma_sep",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com///github.com/perlancar/perl-Data-Sah-CoerceRule-array-str_comma_sep.git",
-         "web" : "https://github.com///github.com/perlancar/perl-Data-Sah-CoerceRule-array-str_comma_sep"
+         "url" : "git://github.com/perlancar/perl-Data-Sah-CoerceRule-array-str_comma_sep.git",
+         "web" : "https://github.com/perlancar/perl-Data-Sah-CoerceRule-array-str_comma_sep"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

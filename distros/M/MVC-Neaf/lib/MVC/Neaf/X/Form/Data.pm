@@ -2,7 +2,7 @@ package MVC::Neaf::X::Form::Data;
 
 use strict;
 use warnings;
-our $VERSION = 0.2203;
+our $VERSION = 0.2501;
 
 =head1 NAME
 
@@ -25,7 +25,8 @@ This class is not expected to be created and used directly.
 
 =cut
 
-use Digest::SHA qw(sha1_base64);
+use Digest::SHA qw(sha1);
+use MVC::Neaf::Util qw( encode_b64 );
 use URI::Escape;
 
 use parent qw(MVC::Neaf::X);
@@ -198,20 +199,20 @@ sub sign {
 # A weak ad-hoc HMAC. Use a better one...
 sub _default_sign {
     my ($data, $key) = @_;
-    return sha1_base64( join "?", $key, $data, $key );
+    return encode_b64( sha1( join "?", $key, $data, $key ) );
 };
 
 =head1 LICENSE AND COPYRIGHT
 
-This module is part of the L<MVC::Neaf> suite.
+This module is part of L<MVC::Neaf> suite.
 
-Copyright 2016-2017 Konstantin S. Uvarin.
+Copyright 2016-2018 Konstantin S. Uvarin C<khedin@cpan.org>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
-See http://dev.perl.org/licenses/ for more information.
+See L<http://dev.perl.org/licenses/> for more information.
 
 =cut
 

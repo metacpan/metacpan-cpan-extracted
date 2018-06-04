@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::str::str_strip_trailing_slash;
 
-our $DATE = '2018-01-14'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2018-06-04'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,9 +9,8 @@ use warnings;
 
 sub meta {
     +{
-        v => 2,
+        v => 3,
         enable_by_default => 0,
-        might_die => 0,
         prio => 50,
     };
 }
@@ -47,7 +46,7 @@ Data::Sah::Coerce::perl::str::str_strip_trailing_slash - Strip trailing slash fr
 
 =head1 VERSION
 
-This document describes version 0.004 of Data::Sah::Coerce::perl::str::str_strip_trailing_slash (from Perl distribution Sah-Schemas-Path), released on 2018-01-14.
+This document describes version 0.005 of Data::Sah::Coerce::perl::str::str_strip_trailing_slash (from Perl distribution Sah-Schemas-Path), released on 2018-06-04.
 
 =head1 DESCRIPTION
 

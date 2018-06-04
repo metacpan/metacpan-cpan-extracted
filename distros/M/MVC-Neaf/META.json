@@ -50,6 +50,7 @@
             "ExtUtils::MakeMaker" : "6.64",
             "HTTP::Headers::Fast" : "0.21",
             "JSON::MaybeXS" : "0",
+            "MIME::Base64" : "3.11",
             "Plack::Request" : "0",
             "Template" : "0",
             "URI::Escape" : "0",
@@ -75,6 +76,6 @@
          "web" : "https://github.com/dallaylaen/perl-mvc-neaf"
       }
    },
-   "version" : 0.2203,
+   "version" : 0.2501,
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

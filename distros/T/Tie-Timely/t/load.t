@@ -6,4 +6,4 @@ foreach my $class ( @classes ) {
 	BAILOUT() unless use_ok( $class );
 	}
 
-done_testing;
+done_testing();

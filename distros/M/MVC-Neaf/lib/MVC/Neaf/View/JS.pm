@@ -3,7 +3,7 @@ package MVC::Neaf::View::JS;
 use strict;
 use warnings;
 
-our $VERSION = 0.2203;
+our $VERSION = 0.2501;
 
 =head1 NAME
 
@@ -92,8 +92,8 @@ sub render {
     my $callback = $data->{-jsonp};
     my $type = $data->{-type};
 
-    if( exists $data->{-serial} ) {
-        $data = $data->{-serial};
+    if( exists $data->{-payload} || exists $data->{-serial} ) {
+        $data = $data->{-payload} || $data->{-serial};
     }
     elsif ( !$self->{preserve_dash} ) {
         # This is the default - get rid of control keys, but
@@ -114,13 +114,15 @@ sub render {
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016-2017 Konstantin S. Uvarin C<khedin@cpan.org>.
+This module is part of L<MVC::Neaf> suite.
+
+Copyright 2016-2018 Konstantin S. Uvarin C<khedin@cpan.org>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
-See http://dev.perl.org/licenses/ for more information.
+See L<http://dev.perl.org/licenses/> for more information.
 
 =cut
 

@@ -1,5 +1,37 @@
 Revision history for MVC-Neaf
 
+0.2501  Sun Jun 3 2018
+        - API BREAK Restrict characters for path, in particular ":" (a warning only)
+        - BUG Understand double slashes in URLs
+        - BUG Fix routing bug - was treating /pathogen as /path
+
+0.25    Sat Jun 2 2018
+        - API Add 'strict' flag that makes controller emit error 422 if params/cookies pass validation
+        - API Add overridable log_message, make_id to Request class
+        - API BREAK Remove deprecated error_template, set_default, server_stat
+        - API BREAK Remove Request->upload (use utf8/raw), Request->set_full_path (use set_path)
+        - REF Use base64url instead of base64 everywhere
+        - NET BREAK Deprecate Apache2 backend in favor of Plack::Handler::Apache2
+        - MOD BREAK Remove ServerStat
+
+0.24    Sat May 26 2018
+        - API Add 'helper' subs - user-defined, path-restricted $req methods 
+        - API BREAK Rename -serial => -payload in app response
+        - API set_path_defaults can be restricetd on path + method
+        - REF Rename MVC::Neaf::Route::{Recursive=>Main}
+        - REF Util::Container - path&method based container util
+        - REF Add Route::PreRoute stub class for hooks & helpers
+
+0.23    Wed May 23 2018
+        - API Add Route class, add $req->route() call for showing current route
+        - API add prefix(), postfix(), and splat() for URI path components
+        - API Make :sugar keyword optional, export get+post & neaf by default 
+        - API BREAK deprecate MVC::Neaf->something() (expect new() of course)
+        - API BREAK Kill deprecated neaf->pre_route for good
+        - API Add -headers support to exception
+        - REF A giant refactoring of the core
+        - BUG A lot of bugs introduced & then fixed
+
 0.2203  Thu Jan 25 2018
         - AUX Add github links to Makefile.PL
 

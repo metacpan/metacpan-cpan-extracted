@@ -7,13 +7,13 @@ use Test::More;
 use MVC::Neaf;
 
 my $capture_req;
-MVC::Neaf->route("/psgi" => sub {
+neaf->route("/psgi" => sub {
     $capture_req = shift;
     return { -content =>
         $capture_req->param( "roundtrip" => '.*', "(empty)" ) };
 }, path_info_regex => '.*');
 
-my $reply = MVC::Neaf->run->({ REQUEST_URI => '/psgi/foo/bar?roundtrip=42' });
+my $reply = neaf->run->({ REQUEST_URI => '/psgi/foo/bar?roundtrip=42' });
 
 is (scalar @$reply, 3, "PSGI return from run()");
 like( $MVC::Neaf::Request::PSGI::VERSION, qr/^\d+\.\d+$/, "Autoload ok");

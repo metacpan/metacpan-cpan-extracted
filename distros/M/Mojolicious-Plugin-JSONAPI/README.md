@@ -4,7 +4,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 # VERSION
 
-version 1.4
+version 1.5
 
 # SYNOPSIS
 
@@ -84,11 +84,6 @@ See [http://jsonapi.org/](http://jsonapi.org/) for the JSON API specification. A
     This is passed to the constructor of `JSONAPI::Document` which will kebab case the attribute keys of each
     record (i.e. '\_' to '-').
 
-- `attributes_via`
-
-    Also passed to the constructor of `JSONAPI::Document`. This is the method that will be used to get
-    the attributes for a resource document. Should return a hash (not a hashref).
-
 # HELPERS
 
 ## resource\_routes(_HashRef_ $spec)
@@ -142,10 +137,11 @@ Creates a set of routes for the given resource. `$spec` is a hash reference that
     schema management system. For example, if you have a resource called 'post' and it has many 'comments', make
     sure comments is passed in as a plural noun.
 
-## render\_error(_Str_ $status, _ArrayRef_ $errors, _HashRef_ $data. _HashRef_ $meta)
+## render\_error(_Str_ $status, _ArrayRef|Str_ $errors, _HashRef_ $data. _HashRef_ $meta)
 
-Renders a JSON response under the required top-level `errors` key. `errors` is an array reference of error objects
-as described in the specification. See [Error Objects](http://jsonapi.org/format/#error-objects).
+Renders a JSON response under the required top-level `errors` key. `errors` should be an array reference of error objects
+as described in the specification, or a string that will be the content of _title_.
+See [Error Objects](http://jsonapi.org/format/#error-objects).
 
 Can optionally provide a reference to the primary data for the route as well as meta information, which will be added
 to the response as-is. Use `resource_document` to generate the right structure for this argument.
@@ -157,6 +153,14 @@ response, and splits it by ',' to return an ArrayRef.
 
     GET /api/posts?include=comments,author
     my $include = $c->requested_resources(); # ['comments', 'author']
+
+Can also include nested relationships:
+
+    GET /api/posts?include=comments,author.notes
+    my $include = $c->requested_resources(); # ['comments', { author => ['notes'] }]
+
+**NOTE**: Only one level of nesting is supported at the moment, so requests like `author.notes.notes_relation` won't
+give back what you expect. Stick with `author.notes` and lazy loading `notes_relation`.
 
 ## requested\_fields
 

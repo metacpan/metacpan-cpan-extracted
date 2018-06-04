@@ -1,6 +1,52 @@
 ==================================================
-Changes from 2013-05-28 00:00:00 +0000 to present.
+Changes from 2013-06-04 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 0.58 at 2018-06-03 13:32:17 +0000
+-----------------------------------------
+
+  Change: 4cd155ac4c6c76dd9fa3b21eedd8d17f7758dc6b
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2018-06-03 14:32:17 +0000
+
+    Release 0.58 
+
+  Change: 0f8ebf8416d4c7a9e240efe5f710e002d22a16a6
+  Author: Karen Etheridge <ether@cpan.org>
+  Date : 2018-06-03 14:14:16 +0000
+
+    real fix for Dist::Zilla 7.000
+
+    Change directories before running any git commands.
+
+    This test was passing when run from the development repository
+    because that repo's config was being picked up, but then tests would
+    fail when running tests during a normal cpan installation, doh! 
+
+  Change: b0cf74e7318f4fed04a5e03f2d14d5b9c1755770
+  Author: Karen Etheridge <ether@cpan.org>
+  Date : 2018-06-03 14:14:16 +0000
+
+    ensure tests are done in a tempdir outside of any git repo 
+
+  Change: f6b4446c977d5ca73b2cf7ba0fac067f4e88df3f
+  Author: Karen Etheridge <ether@cpan.org>
+  Date : 2018-06-03 14:14:16 +0000
+
+    add missing test prereqs 
+
+  Change: eb47c162869fdd6443d57858a57cf614a1fb8923
+  Author: Karen Etheridge <ether@cpan.org>
+  Date : 2018-06-03 14:14:16 +0000
+
+    a META file is not needed for tests 
+
+  Change: cb5b90aab941ef50d617440f20ab67d4a2f7017b
+  Author: Karen Etheridge <ether@cpan.org>
+  Date : 2018-06-03 14:14:16 +0000
+
+    gather all log messages; print log messages when tests fail 
 
 -----------------------------------------
 version 0.56 at 2018-05-27 11:47:05 +0000
@@ -322,5 +368,5 @@ version 0.30 at 2013-07-17 22:50:24 +0000
     Lazy load IPC::Cmd 
 
 =================================================
-Plus 14 releases after 2013-05-28 00:00:00 +0000.
+Plus 14 releases after 2013-06-04 00:00:00 +0000.
 =================================================

@@ -45,7 +45,10 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0"
+            "Path::Tiny" : "0",
+            "Test::DZil" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0.88"
          }
       }
    },
@@ -58,7 +61,7 @@
          "web" : "https://github.com/bingos/dist-zilla-plugin-githubmeta"
       }
    },
-   "version" : "0.56",
+   "version" : "0.58",
    "x_generated_by_perl" : "v5.26.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }

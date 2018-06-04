@@ -19,7 +19,7 @@ my $val = MVC::Neaf::X::Form::LIVR->new({
     baz => { like => '^%\w+$' },
 });
 
-MVC::Neaf->route( "/" => sub {
+neaf->route( "/" => sub {
     my $req = shift;
 
 #    note " ########## ", explain $req;
@@ -33,7 +33,7 @@ MVC::Neaf->route( "/" => sub {
     };
 }, -view => 'JS' );
 
-my $app = MVC::Neaf->run;
+my $app = neaf->run;
 
 my $reply;
 

@@ -8,9 +8,9 @@ use MVC::Neaf;
 
 my $body;
 my $type;
-MVC::Neaf->route( "/" => sub {
+get+post "/" => sub {
     return { -content => $body, -type => $type };
-} );
+};
 
 my ($status, $head, $content);
 
@@ -32,7 +32,7 @@ done_testing;
 # This is begging to use run_test instead, but MAYBE it'd be wise
 #     to keep some plain old PSGI just in case
 sub do_run {
-    my $raw = MVC::Neaf->run->( {} );
+    my $raw = neaf->run->( {} );
     my ($status, $head, $content) = @$raw;
     my %head_hash = @$head;
     $content = join "", @$content;

@@ -1,5 +1,16 @@
 Revision history for Perl extension Sys::Signals::Block.
 
+0.11  2018-06-03
+    - Add object oriented interface, where signal names can be passed to new()
+      instead of on the import line.
+    - Kwalitee: Add META.json.
+    - Switch bug tracker to github issues.
+    - Use Dist::Zilla to build the dist.
+    - Make signature test an author test.
+    - Use Moo internally, drop Class::Accessor dependency
+    - Move compile test to the front of the test suite
+    - Add sanity test to make sure signal delivery works on the current platform
+
 0.10  Fri Nov 13 2009
     - disable signature test unless TEST_SIGNATURE is enabled, otherwise test
       fails if keyserver is unreachable.

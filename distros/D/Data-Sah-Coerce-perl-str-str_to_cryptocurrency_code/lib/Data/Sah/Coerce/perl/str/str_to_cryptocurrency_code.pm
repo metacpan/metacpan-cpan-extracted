@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::str::str_to_cryptocurrency_code;
 
-our $DATE = '2018-05-29'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-06-04'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,9 +9,9 @@ use warnings;
 
 sub meta {
     +{
-        v => 2,
+        v => 3,
         enable_by_default => 0,
-        might_die => 1,
+        might_fail => 1,
         prio => 50,
     };
 }
@@ -29,8 +29,8 @@ sub coerce {
         "",
         "do { my \$cat = CryptoCurrency::Catalog->new; ",
         "my \$rec; eval { \$rec = \$cat->by_code($dt) }; if (\$@) { eval { \$rec = \$cat->by_name($dt) } } if (\$@) { eval { \$rec = \$cat->by_safename($dt) } } ",
-        "if (\$@) { die 'Unknown cryptocurrency code/name/safename: ' . $dt } ",
-        "\$rec->{code} }",
+        "if (\$@) { ['Unknown cryptocurrency code/name/safename: ' . $dt] } else { [undef, \$rec->{code}] } ",
+        "}",
     );
 
     $res;
@@ -51,7 +51,7 @@ Data::Sah::Coerce::perl::str::str_to_cryptocurrency_code - Coerce string contain
 
 =head1 VERSION
 
-This document describes version 0.001 of Data::Sah::Coerce::perl::str::str_to_cryptocurrency_code (from Perl distribution Data-Sah-Coerce-perl-str-str_to_cryptocurrency_code), released on 2018-05-29.
+This document describes version 0.003 of Data::Sah::Coerce::perl::str::str_to_cryptocurrency_code (from Perl distribution Data-Sah-Coerce-perl-str-str_to_cryptocurrency_code), released on 2018-06-04.
 
 =head1 DESCRIPTION
 

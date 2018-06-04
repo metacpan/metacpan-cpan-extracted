@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.55.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,23 +12,41 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA256
 
-SHA1 549d21cac2010c5fc635750da1a2885fc9c6756b Changes
-SHA1 05fd49d77ec71eba534aac7c00c5fac14f82b2ce MANIFEST
-SHA1 417354a28da0ca06ef13e91a2bdfb614e2b7b5cb MANIFEST.SKIP
-SHA1 166107464797f6310e073a8f78dde17bf895cd49 META.yml
-SHA1 2fc6a40acf4cf504e3aec73d7dee4d2265da39dd Makefile.PL
-SHA1 1cd9cf552e825e5dcc82cd152483b554c8f5222a README
-SHA1 ac2716a279f9febcb600a82d60f7ce9d46405e81 lib/Sys/Signals/Block.pm
-SHA1 ae857a0f2f63d8b21fded08de181a20168e786a2 t/block.t
-SHA1 2f7ea4817fdbfea1c141924923d907c6d394f351 t/compile.t
-SHA1 5c8d1917fe9f9344522f1a4fda84e36f32280b9e t/signals.t
-SHA1 61cea839dd94aaaeb301ccac9b83cde4c5c91b42 t/signature.t
+SHA1 79311bcc4e5b2760a28aa2d150092f578d5a2014 Changes
+SHA1 e439d8cda67d9b8712c8b4933525de1fa79d5467 LICENSE
+SHA1 9508436c4a2c5d0bf23f2134093fb934d5d3b564 MANIFEST
+SHA1 175ca50a18617e3ddbc0e93b63c2d0fa42cc75db MANIFEST.SKIP
+SHA1 02ac5cce63b0b0fa4f0a165aedc0532bc3f05711 META.json
+SHA1 f8f76ae9b39762531a7513172201daa1b13ca3a8 META.yml
+SHA1 3b90b6a676bc77f3476e44c9fe30cbcef367ad42 Makefile.PL
+SHA1 dfd89e8734045861f6dc3779665b9c32d0a6c081 README
+SHA1 6f233ab8387cc575f3385044234701054cc496af lib/Sys/Signals/Block.pm
+SHA1 b5a01c2ca4c7799045078aef54b25cf2263af3a5 t/00-compile.t
+SHA1 32de73e1d39d0471c85dccaff80527da940a42ec t/01-signal-delivery.t
+SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
+SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
+SHA1 19cc343f8a85c6805bbeb02580487483a6283887 t/author-signature.t
+SHA1 66e5e8ec9bc566f3660eacb55917c67b43307786 t/block.t
+SHA1 447f694aa5eae96ee89c99b57a35654c0d0a372d t/lib/My/Test/SignalHandlers.pm
+SHA1 3f8a961b263824229a78e67c844d19ffcd84c398 t/object-interface.t
+SHA1 190f1915d4d3444689aeb8af945e016e6f887479 t/other-signals.t
+SHA1 2f73d4f6de1bb84f1e4a5884bcdc7dfe3b879e86 t/signals.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
 
-iEYEARECAAYFAkr9wwsACgkQ+CqvSzp9LOzT5ACfZMvkYomDeg+PVjkT5HnQLqwK
-IQwAnR4sS3rkmYGcWP2cTFItrtJa1K3f
-=63Hn
+iQJFBAEBCAAvFiEE2EtuRfhGgngE8PsARAzvLrlUzY4FAlsUSL0RHG1zY2hvdXRA
+Y3Bhbi5vcmcACgkQRAzvLrlUzY55Yg//W+OqbfoxFkhGO2JbgFla0ZZZgkKjkmMC
+O+nKy90p0rt7xXe9ZbAA8CYoQTZHFTHPK3W9KKMQqPARAV2H6v+uA4xlvMTctr1J
+VYh9vzCBJtWzj9/+LHUC96rDL7nRJI0OqN1jstcBdu7hK3y8hsmt1OiONr8FDGZw
+drjpOxoTfkAjp4WiK53Fw0Jf200rbnLXOennpFU5VtUgVStDe38OJ3dA6KR6OafN
++wicirTV5gagpefINiD8t7o1e7ri5/lZ6XEGGX8fbr7LhbxTfliRUTrDRuHL/Seb
+MTlTYDThJ6iLZ8Fgk1AZGTGl8e3Cr0EZX2py4PHhpntLmQ755a9vV/g5fXlhormT
+TkK7GIbyQk1yzfMT1yM+1RHTrM5so6z/evCCuJtehY+GSJkBMlJXMQHKLShOWFNI
+cudW9GG0sTgek/Ug8VztV5B7pTUFc9F6rR+7x9weD9+aTOnlVVPSDNzd8rjyiX+X
+gk43XB6B5k5BQYNhfTocnmmvRGIF7N/VXKk2xEga06ZGj1vQ5v9Pd2VenKMslumj
+y4+XFiyIgWAnhf3CaWW1NFzh4legd4FgJc4EVrSyvTYFsxhFD8+Nd8A/Y5zzuRF/
+yP5TWDyIdjAZuIRwBebdJyC2qSg2OkdGdoxNOhRmSTYtZT07eG7/58l2qP5g9zlq
+SqwIVz+MT8Q=
+=3Ev9
 -----END PGP SIGNATURE-----

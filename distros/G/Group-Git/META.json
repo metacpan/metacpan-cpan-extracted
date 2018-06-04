@@ -52,79 +52,79 @@
    "provides" : {
       "Group::Git" : {
          "file" : "lib/Group/Git.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       },
       "Group::Git::Bitbucket" : {
          "file" : "lib/Group/Git/Bitbucket.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       },
       "Group::Git::Cmd::Branch" : {
          "file" : "lib/Group/Git/Cmd/Branch.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       },
       "Group::Git::Cmd::Grep" : {
          "file" : "lib/Group/Git/Cmd/Grep.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       },
       "Group::Git::Cmd::Help" : {
          "file" : "lib/Group/Git/Cmd/Help.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       },
       "Group::Git::Cmd::List" : {
          "file" : "lib/Group/Git/Cmd/List.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       },
       "Group::Git::Cmd::Pull" : {
          "file" : "lib/Group/Git/Cmd/Pull.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       },
       "Group::Git::Cmd::Sh" : {
          "file" : "lib/Group/Git/Cmd/Sh.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       },
       "Group::Git::Cmd::State" : {
          "file" : "lib/Group/Git/Cmd/State.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       },
       "Group::Git::Cmd::Status" : {
          "file" : "lib/Group/Git/Cmd/Status.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       },
       "Group::Git::Cmd::TagList" : {
          "file" : "lib/Group/Git/Cmd/TagList.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       },
       "Group::Git::Cmd::Watch" : {
          "file" : "lib/Group/Git/Cmd/Watch.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       },
       "Group::Git::Github" : {
          "file" : "lib/Group/Git/Github.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       },
       "Group::Git::Gitosis" : {
          "file" : "lib/Group/Git/Gitosis.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       },
       "Group::Git::Repo" : {
          "file" : "lib/Group/Git/Repo.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       },
       "Group::Git::Stash" : {
          "file" : "lib/Group/Git/Stash.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       },
       "Group::Git::Taggers" : {
          "file" : "lib/Group/Git/Taggers.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       },
       "Group::Git::Taggers::Local" : {
          "file" : "lib/Group/Git/Taggers/Local.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       },
       "Group::Git::Taggers::Remote" : {
          "file" : "lib/Group/Git/Taggers/Remote.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       }
    },
    "release_status" : "stable",
@@ -139,6 +139,6 @@
          "url" : "git://github.com/ivanwills/Group-Git.git"
       }
    },
-   "version" : "v0.6.8",
+   "version" : "v0.6.9",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

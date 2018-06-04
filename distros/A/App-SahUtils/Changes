@@ -1,3 +1,8 @@
+0.461   2018-06-03 (PERLANCAR)
+
+	- Adjust to Data::Sah::Coerce 0.025.
+
+
 0.460   2018-01-14 (PERLANCAR)
 
         - No functional changes.

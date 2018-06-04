@@ -4,7 +4,7 @@ use namespace::autoclean;
 
 has 'config' => ( is => 'ro', isa => 'HashRef' );
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 =head1 NAME
 

@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::date::str_natural;
 
-our $DATE = '2016-07-01'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-06-04'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,9 +14,9 @@ our $time_zone = 'UTC';
 
 sub meta {
     +{
-        v => 2,
+        v => 3,
         enable_by_default => 0,
-        might_die => 1,
+        might_fail => 1,
         prio => 60, # a bit lower than normal
         precludes => [qr/\A(str_alami(_.+)?|str_flexible)\z/],
     };
@@ -34,14 +34,13 @@ sub coerce {
     $res->{modules}{"DateTime::Format::Natural"} //= 0;
     $res->{expr_coerce} = join(
         "",
-        "do { my \$p = DateTime::Format::Natural->new(time_zone => ".dmp($time_zone)."); my \$res = \$p->parse_datetime($dt); ",
-        # because DF:Natural doesn't die on parse failure
-        "die \"Can't parse date '\".$dt.\"': \".\$p->error unless \$p->success; ",
-        ($coerce_to eq 'float(epoch)' ? "\$res = \$res->epoch; " :
-             $coerce_to eq 'Time::Moment' ? "\$res = Time::Moment->from_object(\$res); " :
-             $coerce_to eq 'DateTime' ? "" :
+        "do { my \$p = DateTime::Format::Natural->new(time_zone => ".dmp($time_zone)."); my \$datetime = \$p->parse_datetime($dt); ",
+        "if (!\$p->success) { [\$p->error] } else { ",
+        ($coerce_to eq 'float(epoch)' ? "[undef, \$datetime->epoch] " :
+             $coerce_to eq 'Time::Moment' ? "[undef, Time::Moment->from_object(\$datetime)] " :
+             $coerce_to eq 'DateTime' ? "[undef, \$datetime] " :
              (die "BUG: Unknown coerce_to '$coerce_to'")),
-        "\$res }",
+        "} }",
     );
 
     $res;
@@ -62,7 +61,7 @@ Data::Sah::Coerce::perl::date::str_natural - Coerce date from string parsed by D
 
 =head1 VERSION
 
-This document describes version 0.005 of Data::Sah::Coerce::perl::date::str_natural (from Perl distribution Data-Sah-Coerce-perl-date-str_natural), released on 2016-07-01.
+This document describes version 0.006 of Data::Sah::Coerce::perl::date::str_natural (from Perl distribution Data-Sah-Coerce-perl-date-str_natural), released on 2018-06-04.
 
 =head1 DESCRIPTION
 
@@ -94,7 +93,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

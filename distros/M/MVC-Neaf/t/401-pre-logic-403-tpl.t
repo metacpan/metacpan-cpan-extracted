@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use MVC::Neaf qw(:sugar);
+use MVC::Neaf;
 
 neaf pre_logic => sub { die 403 };
 neaf 403 => sub { +{ -content => 'Forbidden' }; };

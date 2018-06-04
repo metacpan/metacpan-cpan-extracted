@@ -12,15 +12,25 @@ subtest "coerce_to=DateTime::Duration" => sub {
     test_needs "DateTime::Duration";
     test_needs "DateTime::Format::Alami::ID";
 
-    my $c = gen_coercer(type=>"duration", coerce_to=>"DateTime::Duration", coerce_rules=>["str_alami_id"]);
+    my $c = gen_coercer(
+        type=>"duration",
+        coerce_to=>"DateTime::Duration",
+        coerce_rules=>["str_alami_id"], return_type=>"status+err+val",
+    );
+
+    my $res;
 
     # uncoerced
-    is_deeply($c->({}), {}, "uncoerced");
+    $res = $c->({});
+    ok(!$res->[0]);
+    ok(!$res->[1]);
+    is_deeply($res->[2], {});
 
-    my $d = $c->("2jam, 3mnt");
-    is(ref($d), 'DateTime::Duration');
-    is($d->hours, 2);
-    is($d->minutes, 3);
+    # fail
+    $res = $c->("foo");
+    ok($res->[0]);
+    ok($res->[1]);
+    is_deeply($res->[2], undef);
 };
 
 subtest "coerce_to=float(secs)" => sub {
@@ -28,10 +38,7 @@ subtest "coerce_to=float(secs)" => sub {
 
     my $c = gen_coercer(type=>"duration", coerce_to=>"float(secs)", coerce_rules=>["str_alami_id"]);
 
-    # uncoerced
-    is_deeply($c->({}), {}, "uncoerced");
-
-    my $d = $c->("2jam, 3mnt");
+    my $d = $c->("2j, 3mnt");
     ok(!ref($d));
     is($d, 7380);
 };

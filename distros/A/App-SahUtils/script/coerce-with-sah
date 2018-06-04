@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-01-14'; # DATE
-our $VERSION = '0.460'; # VERSION
+our $DATE = '2018-06-03'; # DATE
+our $VERSION = '0.461'; # VERSION
 
 use 5.010;
 use strict;
@@ -55,7 +55,7 @@ $SPEC{coerce_with_sah} = {
             },
         },
         return_type => {
-            schema => ['str*', in=>[qw/val str+val/]],
+            schema => ['str*', in=>[qw/val status+val status+err+val/]],
             default => 'val',
             cmdline_aliases => {r=>{}},
             tags => ['category:coercer-specification'],
@@ -311,7 +311,7 @@ coerce-with-sah - Coerce data
 
 =head1 VERSION
 
-This document describes version 0.460 of coerce-with-sah (from Perl distribution App-SahUtils), released on 2018-01-14.
+This document describes version 0.461 of coerce-with-sah (from Perl distribution App-SahUtils), released on 2018-06-03.
 
 =head1 SYNOPSIS
 
@@ -349,24 +349,24 @@ Examples:
                                                              "EBhm"              => "E h:mm B",
                                                              "EBhms"             => "E h:mm:ss B",
                                                              "Ed"                => "d E",
-                                                             "Ehm"               => "E h:mm a",
                                                              "EHm"               => "E HH:mm",
+                                                             "Ehm"               => "E h:mm a",
                                                              "Ehms"              => "E h:mm:ss a",
                                                              "EHms"              => "E HH:mm:ss",
                                                              "Gy"                => "y G",
                                                              "GyMMM"             => "MMM y G",
                                                              "GyMMMd"            => "MMM d, y G",
                                                              "GyMMMEd"           => "E, MMM d, y G",
-                                                             "h"                 => "h a",
                                                              "H"                 => "HH",
+                                                             "h"                 => "h a",
                                                              "hm"                => "h:mm a",
                                                              "Hm"                => "HH:mm",
                                                              "hms"               => "h:mm:ss a",
                                                              "Hms"               => "HH:mm:ss",
                                                              "hmsv"              => "h:mm:ss a v",
                                                              "Hmsv"              => "HH:mm:ss v",
-                                                             "Hmv"               => "HH:mm v",
                                                              "hmv"               => "h:mm a v",
+                                                             "Hmv"               => "HH:mm v",
                                                              "M"                 => "L",
                                                              "Md"                => "M/d",
                                                              "MEd"               => "E, M/d",
@@ -601,8 +601,10 @@ Show source code:
  require Time::Duration::Parse::AsHash;
  sub {
      my $data = shift;
-     return undef unless defined($data);
-     (!ref($data) && $data =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? ((($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))) : ((Scalar::Util::blessed($data) && $data->isa('DateTime::Duration')) ? (($data->years * 365.25*86400 + $data->months * 30.4375*86400 + $data->weeks * 7*86400 + $data->days * 86400 + $data->hours * 3600 + $data->minutes * 60 + $data->seconds + $data->nanoseconds * 1e-9)) : ((!ref($data) && $data =~ /\A[0-9]+(?:.[0-9]+)\z/) ? ($data) : ((!ref($data) && $data =~ /\d.*[a-z]/) ? (do { my $p = Time::Duration::Parse::AsHash::parse_duration($data); ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0) }) : $data)));
+     unless (defined $data) {
+         return undef;
+     }
+     (!ref($data) && $data =~ /\A[0-9]+(?:.[0-9]+)\z/) ? ($data) : (Scalar::Util::blessed($data) && $data->isa('DateTime::Duration')) ? (($data->years * 365.25*86400 + $data->months * 30.4375*86400 + $data->weeks * 7*86400 + $data->days * 86400 + $data->hours * 3600 + $data->minutes * 60 + $data->seconds + $data->nanoseconds * 1e-9)) : (!ref($data) && $data =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? ((($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))) : do { if (!ref($data) && $data =~ /\d.*[a-z]/) { my $res = do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($data) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }; $res->[0] ? undef : $res->[1] } else { $data } };
  }
 
 Show source code, with line number:
@@ -613,16 +615,20 @@ Show source code, with line number:
     3|require Time::Duration::Parse::AsHash;
     4|sub {
     5|    my $data = shift;
-    6|    return undef unless defined($data);
-    7|    (!ref($data) && $data =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? (DateTime::Duration->new( (years=>$1) x !!defined($1), (months=>$2) x !!defined($2), (weeks=>$3) x !!defined($3), (days=>$4) x !!defined($4), (hours=>$5) x !!defined($5), (minutes=>$6) x !!defined($6), (seconds=>$7) x !!defined($7))) : ((Scalar::Util::blessed($data) && $data->isa('DateTime::Duration')) ? ($data) : ((!ref($data) && $data =~ /\A[0-9]+(?:.[0-9]+)\z/) ? (DateTime::Duration->new(seconds => $data)) : ((!ref($data) && $data =~ /\d.*[a-z]/) ? (do { my $p = Time::Duration::Parse::AsHash::parse_duration($data); DateTime::Duration->new( (years=>$p->{years}) x !!defined($p->{years}), (months=>$p->{months}) x !!defined($p->{months}), (weeks=>$p->{weeks}) x !!defined($p->{weeks}), (days=>$p->{days}) x !!defined($p->{days}), (hours=>$p->{hours}) x !!defined($p->{hours}), (minutes=>$p->{minutes}) x !!defined($p->{minutes}), (seconds=>$p->{seconds}) x !!defined($p->{seconds})) }) : $data)));
-    8|}
+    6|    unless (defined $data) {
+    7|        return undef;
+    8|    }
+    9|    (!ref($data) && $data =~ /\A[0-9]+(?:.[0-9]+)\z/) ? (DateTime::Duration->new(seconds => $data)) : (Scalar::Util::blessed($data) && $data->isa('DateTime::Duration')) ? ($data) : (!ref($data) && $data =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? (DateTime::Duration->new( (years=>$1) x !!defined($1), (months=>$2) x !!defined($2), (weeks=>$3) x !!defined($3), (days=>$4) x !!defined($4), (hours=>$5) x !!defined($5), (minutes=>$6) x !!defined($6), (seconds=>$7) x !!defined($7))) : do { if (!ref($data) && $data =~ /\d.*[a-z]/) { my $res = do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($data) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, DateTime::Duration->new( (years=>$p->{years}) x !!defined($p->{years}), (months=>$p->{months}) x !!defined($p->{months}), (weeks=>$p->{weeks}) x !!defined($p->{weeks}), (days=>$p->{days}) x !!defined($p->{days}), (hours=>$p->{hours}) x !!defined($p->{hours}), (minutes=>$p->{minutes}) x !!defined($p->{minutes}), (seconds=>$p->{seconds}) x !!defined($p->{seconds}))] } }; $res->[0] ? undef : $res->[1] } else { $data } };
+   10|}
 
 Show source code (JavaScript):
 
  % coerce-with-sah date -C js -c
  function (data) {
-     if (data === undefined || data === null) return null;
-     return (((data instanceof Date)) ? (isNaN(data) ? (function(){throw new Error('Invalid date')})() : data) : ((typeof(data)=='string') ? ((function (_m) { _m = new Date(data); if (isNaN(_m)) throw new Error('Invalid date'); return _m })()) : ((typeof(data)=='number' && data >= 100000000 && data <= 2147483648) ? ((new Date(data * 1000))) : data)));
+     if (data === undefined || data === null) {
+         return null;
+     }
+     return ((typeof(data)=='number' && data >= 100000000 && data <= 2147483648) ? ((new Date(data * 1000))) : (function() { if ((data instanceof Date)) { var _tmp1 = isNaN(data) ? ['Invalid date'] : [null, data]; if (_tmp1[0]) { return null } else { return _tmp1[1] } } else { return (function() { if (typeof(data)=='string') { var _tmp1 = (function (_m) { _m = new Date(data); if (isNaN(_m)) { return ['Invalid date'] } else { return [null, _m] } })(); if (_tmp1[0]) { return null } else { return _tmp1[1] } } else { return data } })() } })());
  }
 
 =head1 OPTIONS
@@ -677,7 +683,7 @@ Default value:
 
 Valid values:
 
- ["val","str+val"]
+ ["val","status+val","status+err+val"]
 
 =item B<--type>=I<sah>::type_name*
 

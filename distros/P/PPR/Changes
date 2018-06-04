@@ -133,3 +133,14 @@ Revision history for PPR
 
     * Fixed handling of ->$*, ->@*, and ->%*
       (Thanks, Curtis!)
+
+
+0.000016  Mon Jun  4 13:58:06 2018
+
+    * Uninlined optimizations in PPR::X to make redeclaration
+      of subrules easier and more reliable.
+      (Thanks, Matt!)
+
+    * Added (?&PerlReturnExpression) to distinguish
+      in-term usages from statement-level usages
+      requiring (?&PerlReturnStatement)

@@ -1,7 +1,7 @@
 package Sah::SchemaR::net::hostname;
 
-our $DATE = '2018-01-17'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-06-04'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 our $rschema = ["str",[{match=>"^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])\$",summary=>"Hostname"}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::net::hostname - Hostname
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::SchemaR::net::hostname (from Perl distribution Sah-Schemas-Net), released on 2018-01-17.
+This document describes version 0.004 of Sah::SchemaR::net::hostname (from Perl distribution Sah-Schemas-Net), released on 2018-06-04.
 
 =head1 DESCRIPTION
 

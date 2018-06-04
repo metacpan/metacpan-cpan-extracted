@@ -30,3 +30,4 @@ t/00-compile.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/basic.t
+t/lib/GitSetup.pm

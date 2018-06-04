@@ -3,9 +3,9 @@
 use 5.010001;
 use strict;
 use warnings;
+use Test::More 0.98;
 
 use Data::Sah::Coerce qw(gen_coercer);
-use Test::More 0.98;
 
 subtest "coerce_to=array" => sub {
     my $c = gen_coercer(type=>"array", coerce_rules=>["str_int_range"]);

@@ -3,27 +3,36 @@
 use 5.010001;
 use strict;
 use warnings;
-use Test::Exception;
 use Test::More 0.98;
 
 use Data::Sah::Coerce qw(gen_coercer);
 
 subtest "basics" => sub {
-    my $c = gen_coercer(type=>"float", coerce_rules=>["str_share"]);
+    my $c = gen_coercer(
+        type=>"float",
+        coerce_rules=>["str_share"],
+        return_type=>"status+err+val",
+    );
 
-    is($c->(-1), -1, "uncoerced: negative");
-    is($c->("a"), "a", "uncoerced: non-number");
-    is_deeply($c->([]), [], "uncoerced: array");
+    is_deeply($c->(-1), [undef, undef, -1], "uncoerced: negative");
+    is_deeply($c->("a"), [undef, undef, "a"], "uncoerced: non-number");
+    is_deeply($c->([]), [undef, undef, []], "uncoerced: array");
 
-    is($c->(0.3), 0.3);
-    is($c->(1), 1);
-    is($c->(2), 0.02);
-    is($c->(20), 0.2);
-    is($c->("20%"), 0.2);
-    is($c->("0.3%"), 0.003);
+    is_deeply($c->(0.3), [1, undef, 0.3]);
+    is_deeply($c->(1), [1, undef, 1]);
+    is_deeply($c->(2), [1, undef, 0.02]);
+    is_deeply($c->(20), [1, undef, 0.2]);
+    is_deeply($c->("20%"), [1, undef, 0.2]);
+    is_deeply($c->("0.3%"), [1, undef, 0.003]);
 
-    dies_ok { $c->(200) } "number > 100";
-    dies_ok { $c->("200%") } "percent > 100";
+    my $res;
+
+    $res = $c->(200);
+    ok($res->[1],  "number > 100");
+
+    $res = $c->("200%");
+    ok($res->[1], "percent > 100");
+
 };
 
 done_testing;

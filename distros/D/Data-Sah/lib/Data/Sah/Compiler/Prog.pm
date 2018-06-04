@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::Prog;
 
-our $DATE = '2018-05-29'; # DATE
-our $VERSION = '0.890'; # VERSION
+our $DATE = '2018-06-03'; # DATE
+our $VERSION = '0.891'; # VERSION
 
 use 5.010;
 use strict;
@@ -130,6 +130,59 @@ sub add_var {
 
 # naming convention: expr_NOUN(), stmt_VERB(_NOUN)?()
 
+# XXX requires: expr_list
+
+# XXX requires: expr_defined
+
+# XXX requires: expr_array
+
+# XXX requires: expr_array_subscript
+
+# XXX requires: expr_last_elem
+
+# XXX requires: expr_push
+
+# XXX requires: expr_pop
+
+# XXX requires: expr_push_and_pop_dpath_between_expr
+
+# XXX requires: expr_prefix_dpath
+
+# XXX requires: expr_set
+
+# XXX requires: expr_setif
+
+# XXX requires: expr_set_err_str
+
+# XXX requires: expr_set_err_full
+
+# XXX requires: expr_reset_err_str
+
+# XXX requires: expr_reset_err_full
+
+# XXX requires: expr_ternary
+
+# XXX requires: expr_log
+
+# XXX requires: expr_block
+
+# XXX requires: expr_anon_sub
+
+# XXX requires: expr_eval
+
+# XXX requires: stt_declare_local_var
+
+# TODO XXX requires: expr_declare_lexical_var
+
+# XXX requires: stmt_require_module
+
+# XXX requires: stmt_require_log_module
+
+# XXX requires: stmt_assign_hash_value
+
+# XXX requires: stmt_return
+
+# assign value to a variable
 sub expr_assign {
     my ($self, $v, $t) = @_;
     "$v = $t";
@@ -144,11 +197,13 @@ sub _xlt {
     $hc->_xlt($hcd, $text);
 }
 
+# concatenate strings
 sub expr_concat {
     my ($self, @t) = @_;
     join(" " . $self->concat_op . " ", @t);
 }
 
+# variable
 sub expr_var {
     my ($self, $v) = @_;
     $self->var_sigil. $v;
@@ -539,9 +594,13 @@ sub before_handle_type {
 sub before_all_clauses {
     my ($self, $cd) = @_;
 
+    my $rt = $cd->{args}{return_type};
+    my $rt_is_full = $rt =~ /\Afull/;
+    my $rt_is_str  = $rt =~ /\Astr/;
+
     $cd->{use_dpath} //= (
-        $cd->{args}{return_type} =~ /\Afull/ ||
-        ($cd->{args}{return_type} =~ /\Astr/ && $cd->{has_subschema})
+        $rt_is_full ||
+        ($rt_is_str && $cd->{has_subschema})
     );
 
     # handle ok/default/coercion/prefilters/req/forbidden clauses and type check
@@ -549,6 +608,7 @@ sub before_all_clauses {
     my $c      = $cd->{compiler};
     my $cname  = $c->name;
     my $dt     = $cd->{data_term};
+    my $et     = $cd->{args}{err_term};
     my $clsets = $cd->{clsets};
 
     # handle ok, this is very high priority because !ok=>1 should fail undef
@@ -582,7 +642,10 @@ sub before_all_clauses {
                 $self->expr($def) : $self->literal($def);
             $self->add_ccl(
                 $cd,
-                "(".$self->expr_setif($dt, $ct).", ".$self->true.")",
+                $self->expr_list(
+                    $self->expr_setif($dt, $ct),
+                    $self->true,
+                ),
                 {err_msg => ""},
             );
         }
@@ -660,13 +723,12 @@ sub before_all_clauses {
     }
 
     my $coerce_expr;
-    my $coerce_might_die;
+    my $coerce_might_fail;
     my $coerce_ccl_note;
   GEN_COERCE_EXPR:
     {
         last unless $cd->{args}{coerce};
 
-        use experimental 'smartmatch';
         require Data::Sah::CoerceCommon;
 
         my @coerce_rules;
@@ -686,6 +748,9 @@ sub before_all_clauses {
         );
         last unless @$rules;
 
+        $coerce_might_fail = 1 if grep { $_->{meta}{might_fail} } @$rules;
+
+        my $prev_term;
         for my $i (reverse 0..$#{$rules}) {
             my $rule = $rules->[$i];
 
@@ -701,21 +766,29 @@ sub before_all_clauses {
             }
 
             if ($i == $#{$rules}) {
-                $coerce_expr = $self->expr_ternary(
-                    "($rule->{expr_match})",
-                    "($rule->{expr_coerce})",
-                    $dt,
-                );
+                if ($coerce_might_fail) {
+                    $prev_term = $self->expr_array($self->literal(undef), $dt);
+                } else {
+                    $prev_term = $dt;
+                }
             } else {
-                $coerce_expr = $self->expr_ternary(
-                    "($rule->{expr_match})",
-                    "($rule->{expr_coerce})",
-                    "($coerce_expr)",
-                );
+                $prev_term = "($coerce_expr)";
             }
-            $coerce_might_die = 1 if $rule->{meta}{might_die};
+
+            my $ec;
+            if ($coerce_might_fail && !$rule->{meta}{might_fail}) {
+                $ec = $self->expr_array($self->literal(undef), $rule->{expr_coerce});
+            } else {
+                $ec = "($rule->{expr_coerce})";
+            }
+
+            $coerce_expr = $self->expr_ternary(
+                "($rule->{expr_match})",
+                $ec,
+                $prev_term,
+            );
         }
-        $coerce_ccl_note = "coerce from: ".
+        $coerce_ccl_note = "coerce rule(s): ".
             join(", ", map {$_->{name}} @$rules) .
             ($cd->{coerce_to} ? " # coerce to: $cd->{coerce_to}" : "");
     } # GEN_COERCE_EXPR
@@ -731,20 +804,58 @@ sub before_all_clauses {
         # handle coercion
         if ($coerce_expr) {
             $cd->{_debug_ccl_note} = $coerce_ccl_note;
-            if ($coerce_might_die) {
+            if ($coerce_might_fail) {
+                # XXX rather hackish: to avoid adding another temporary
+                # variable, we reuse data term to hold coercion result (which
+                # contains error message string as well coerced data) then set
+                # the data term to the coerced data again. this might fail in
+                # languages or setting that is stricter (e.g. data term must be
+                # of certain type).
+
+                my $expr_fail;
+                if ($rt_is_full) {
+                    $expr_fail = $self->expr_list(
+                        $self->expr_set_err_full($et, 'errors', $self->expr_array_subscript($dt, 0)),
+                        $self->expr_set($dt, $self->literal(undef)),
+                        $self->false,
+                    );
+                } elsif ($rt_is_str) {
+                    $expr_fail = $self->expr_list(
+                        $self->expr_set_err_str($et, $self->expr_array_subscript($dt, 0)),
+                        $self->false,
+                    );
+                } else {
+                    $expr_fail = $self->false;
+                }
+
                 $self->add_ccl(
                     $cd,
-                    $self->expr_eval($self->expr_set($dt, $coerce_expr)),
+                    $self->expr_list(
+                        $self->expr_set($dt, $coerce_expr),
+                        $self->expr_ternary(
+                            $self->expr_defined($self->expr_array_subscript($dt, 0)),
+                            $expr_fail,
+                            $self->expr_list(
+                                $self->expr_set($dt, $self->expr_array_subscript($dt, 1)),
+                                $self->true,
+                            )
+                        ),
+                    ),
                     {
-                        err_msg => "Cannot coerce data to $cd->{type}", # XXX include error message from coercion failure
+                        err_msg => "",
+                        err_level => "fatal",
                     },
                 );
             } else {
                 $self->add_ccl(
                     $cd,
-                    "(".$self->expr_set($dt, $coerce_expr).", ".$self->true.")",
+                    $self->expr_list(
+                        $self->expr_set($dt, $coerce_expr),
+                        $self->true,
+                    ),
                     {
                         err_msg => "",
+                        err_level => "fatal",
                     },
                 );
             }
@@ -870,7 +981,7 @@ Data::Sah::Compiler::Prog - Base class for programming language compilers
 
 =head1 VERSION
 
-This document describes version 0.890 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2018-05-29.
+This document describes version 0.891 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2018-06-03.
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,8 @@
 Revision history for Catalyst-Authentication-AuthTkt
 
+0.17 03 June 2018
+ - @bokutin added support for digest_type to constructor
+
 0.16 20 April 2018
  - @bokutin fixed a bug with renew_ticket not respecting use_req_address config.
    https://github.com/karpet/catalyst-authentication-authtkt/pull/1

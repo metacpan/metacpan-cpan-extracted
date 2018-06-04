@@ -6,7 +6,7 @@ use Test::More;
 
 use MVC::Neaf;
 
-MVC::Neaf->route( '/' => sub {
+neaf->route( '/' => sub {
     return {
         -content => 1,
         -continue => sub {
@@ -16,7 +16,7 @@ MVC::Neaf->route( '/' => sub {
     };
 } );
 
-my @data = MVC::Neaf->run_test( '/' );
+my @data = neaf->run_test( '/' );
 
 is ($data[2], 12, "all content made through");
 

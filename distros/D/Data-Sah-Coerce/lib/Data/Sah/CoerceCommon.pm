@@ -1,7 +1,7 @@
 package Data::Sah::CoerceCommon;
 
-our $DATE = '2018-06-02'; # DATE
-our $VERSION = '0.025'; # VERSION
+our $DATE = '2018-06-03'; # DATE
+our $VERSION = '0.026'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -37,9 +37,10 @@ specifically include a rule, or `!NAME` to exclude a rule, or `REGEX` or
 non-alphanumeric, non-underscore character are assumed to be a REGEX pattern.
 
 Without this setting, the default is to use all available coercion
-rules that have `enabled_by_default` set to 1 in their metadata.
+rules that have `enable_by_default` set to 1 in their metadata.
 
-To use all rules (even those that are not enabled by default):
+To use all available (installed) rules (even those that are not enabled by
+default):
 
     ['.']
 
@@ -181,7 +182,7 @@ sub get_coerce_rules {
             if ($is_re) {
                 # exclude rules matching pattern
                 my @r;
-                for my $r (@available_rule_names) {
+                for my $r (@used_rule_names) {
                     next if $r =~ $item;
                     push @r, $r;
                 }
@@ -189,7 +190,7 @@ sub get_coerce_rules {
             } else {
                 # exclude rules matching pattern
                 my @r;
-                for my $r (@available_rule_names) {
+                for my $r (@used_rule_names) {
                     next if $r eq $item;
                     push @r, $r;
                 }
@@ -226,9 +227,9 @@ sub get_coerce_rules {
         my $rule_meta = &{"$mod\::meta"};
         my $rule_v = ($rule_meta->{v} // 1);
         if ($rule_v != 3) {
-            warn "Only coercion rule module '$mod' following ".
-                "metadata version 3 is supported, this rule module follows ".
-                "metadata version $rule_v and will not be used";
+            warn "Only coercion rule module following metadata version 3 is ".
+                "supported, this rule module '$mod' follows metadata version ".
+                "$rule_v and will not be used";
             next;
         }
         next unless $explicitly_used_rule_names{$rule_name} ||
@@ -247,7 +248,7 @@ sub get_coerce_rules {
     # sort by priority (then name)
     @rules = sort {
         ($a->{meta}{prio}//50) <=> ($b->{meta}{prio}//50) ||
-            $a cmp $b
+            $a->{name} cmp $b->{name}
         } @rules;
 
     # precludes
@@ -294,7 +295,7 @@ Data::Sah::CoerceCommon - Common stuffs for Data::Sah::Coerce and Data::Sah::Coe
 
 =head1 VERSION
 
-This document describes version 0.025 of Data::Sah::CoerceCommon (from Perl distribution Data-Sah-Coerce), released on 2018-06-02.
+This document describes version 0.026 of Data::Sah::CoerceCommon (from Perl distribution Data-Sah-Coerce), released on 2018-06-03.
 
 =head1 FUNCTIONS
 
@@ -331,9 +332,10 @@ C<!REGEX> to include or exclude a pattern. All NAME's that contains a
 non-alphanumeric, non-underscore character are assumed to be a REGEX pattern.
 
 Without this setting, the default is to use all available coercion
-rules that have C<enabled_by_default> set to 1 in their metadata.
+rules that have C<enable_by_default> set to 1 in their metadata.
 
-To use all rules (even those that are not enabled by default):
+To use all available (installed) rules (even those that are not enabled by
+default):
 
  ['.']
 

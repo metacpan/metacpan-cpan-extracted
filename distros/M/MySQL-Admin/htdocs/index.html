@@ -6,13 +6,26 @@
 <!--[if lt IE 9]>
 <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 <![endif]-->
-<script type="text/javascript" src="cgi-bin/translate.pl" charset="utf-8"></script>
-<script type="text/javascript" src="style/treeview.js" charset="utf-8"></script>
-<script type="text/javascript" src="javascript/cms.js" charset="utf-8"></script>
-<script type="text/javascript" src="javascript/mysql_admin.js" charset="utf-8"></script>
-<script type="text/javascript" src="javascript/Crystal/preload.js" charset="utf-8"></script>
+<script type="text/javascript" src="javascript/jquery-3.3.1.min.js"></script>
+<script src="/src-min/ace.js"></script>
+<!-- load ace accessibility extension -->
+<script src="/src-min/ext-chromevox.js"></script>
+<script type="text/javascript" src="javascript/require.js"></script>
+<script type="text/javascript" src="cgi-bin/translate.pl"></script>
+<script type="text/javascript" src="style/treeview.js"></script>
+<script type="text/javascript" src="javascript/cms.js"></script>
+<script type="text/javascript" src="javascript/mysql_admin.js"></script>
+<script type="text/javascript" src="style/Crystal/preload.js"></script>
 <link href="style/mysql/mysql_admin.css" rel="stylesheet" type="text/css"/>
 <link href="style/mysql/Crystal.css" rel="stylesheet" type="text/css"/>
+<style type="text/css" media="screen">
+.ace_editor {
+	border:1px solid lightgray;
+	margin:auto;
+	height:600px;
+	width:100%;
+}
+</style>
 </head>
 <body onload="init()">
 <table cellpadding="0" cellspacing="0" width="100%" id="mainLayout">
@@ -36,6 +49,8 @@
 </div>
 <div id="errorMessage"></div>
 <div id="sid"></div>
+<div id="postScript"></div>
+
 <div id="moveHere" style="display:none;" class="moveHereContent" width="100px"></div>
 <noscript>
 This is the Website from Dirk Lindner

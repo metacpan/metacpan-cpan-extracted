@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::obj::str_url;
 
-our $DATE = '2017-03-09'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2018-06-04'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,9 +9,9 @@ use warnings;
 
 sub meta {
     +{
-        v => 2,
+        v => 3,
         enable_by_default => 0,
-        might_die => 1,
+        might_fail => 1,
         prio => 50,
     };
 }
@@ -31,8 +31,7 @@ sub coerce {
     } elsif ($coerce_to eq 'URI') {
         $res->{expr_coerce} = join(
             "",
-            "do { my \$url = URI->new($dt) or die 'Invalid URL: ' . $dt;",
-            " \$url }",
+            "do { my \$url = URI->new($dt); if (!\$url) { ['Invalid URL'] } else { [undef, \$url] } }",
         );
     }
     $res;
@@ -53,7 +52,7 @@ Data::Sah::Coerce::perl::obj::str_url - Coerce URL object (URI) from string
 
 =head1 VERSION
 
-This document describes version 0.004 of Data::Sah::Coerce::perl::obj::str_url (from Perl distribution Sah-Schemas-URL), released on 2017-03-09.
+This document describes version 0.005 of Data::Sah::Coerce::perl::obj::str_url (from Perl distribution Sah-Schemas-URL), released on 2018-06-04.
 
 =head1 DESCRIPTION
 
@@ -81,7 +80,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

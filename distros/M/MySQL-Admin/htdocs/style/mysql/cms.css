@@ -119,14 +119,11 @@ a.menuLink:hover{
   border-radius:15px;
   border-spacing: 0px;
   border:1px solid #000;
+  min-width:600px;
   -webkit-box-shadow:0px 0px 1px rgba(0,0,0,0.4);/*black */
   -moz-box-shadow:0px 0px 1px rgba(0,0,0,0.4);/*black */
   box-shadow:0px 0px 1px black;
   background-color:rgba(255, 255, 255,0.3);
-  min-width: -moz-max-content;
-  min-width: -webkit-max-content; 
-  min-width: max-content; 
-/*   width: intrinsic; */
 }
 tr.caption{
   text-align:left;
@@ -340,7 +337,7 @@ td.headerItem{
   padding-left:8px;
   padding-right:8px;
   white-space:nowrap;
-  min-width:10px;
+  width:100px;
 }
 td.headerItemHover{
   font-size:1.1em;
@@ -360,7 +357,7 @@ td.headerItemHover{
   padding:4px;
   padding-left:8px;
   padding-right:8px;
-  min-width:10px;
+  width:100px;
 }
 td.headerItemUnderline{
   border-bottom:2px solid;
@@ -587,9 +584,8 @@ color:black;
 background-color:rgba(255,255,255,0.8);
 }
 .text{
-border:1px solid black;
+/* border:1px solid black; */
 vertical-align:middle;
-border:1px solid black;
 color:black;
 height:1em;
 }
@@ -787,7 +783,7 @@ font-family:Batch;
 cursor:pointer;
 }
 #htmlButton{
-display:none;
+/* display:none; */
 }
 .htmlButtonChecked:before{
 content: "\ea52";
@@ -940,14 +936,13 @@ border-bottom: gray;
 border-bottom-style:dashed;
 border-bottom-width:1px;
 }
-pre{
-color: #000000;
-font-family: courier;
+pre { color: #000000;
+      font-family: courier;
 }
 #load{
 z-index:3;
-position: fixed;
+position: absolute;
 left: 40%;
 height: 10%;
 top: 45%;
-}
+}    

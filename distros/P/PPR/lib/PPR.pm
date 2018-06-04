@@ -15,7 +15,7 @@ BEGIN {
     }
 }
 use warnings;
-our $VERSION = '0.000015';
+our $VERSION = '0.000016';
 use utf8;
 
 # Class for $PPR::ERROR objects...
@@ -78,7 +78,7 @@ our $GRAMMAR = qr{
             (?>
                 (?&PerlKeyword)
             |
-                # Inlined (?&PerlSubroutineDeclaration)...
+                # Inlined (?&PerlSubroutineDeclaration)
                 (?>
                     sub \b                             (?>(?&PerlOWS))
                     (?>(?&PerlOldQualifiedIdentifier))    (?&PerlOWS)
@@ -96,8 +96,9 @@ our $GRAMMAR = qr{
                 )?+
                 (?: (?>(?&PerlAttributes))     (?&PerlOWS)  )?+
                 (?> ; | (?&PerlBlock) )
+                # End of inlining
             |
-                # Inlined (?&PerlUseStatement)...
+                # Inlined (?&PerlUseStatement)
                 (?: use | no ) (?>(?&PerlNWS))
                 (?>
                     (?&PerlVersionNumber)
@@ -110,12 +111,14 @@ our $GRAMMAR = qr{
                     (?: (?>(?&PerlOWS)) (?&PerlExpression) )?+
                 )
                 (?>(?&PerlOWS)) (?> ; | (?= \} | \z ))
+                # End of inlining
             |
-                # Inlined (?&PerlPackageDeclaration)...
+                # Inlined (?&PerlPackageDeclaration)
                 package
                     (?>(?&PerlNWS)) (?>(?&PerlQualifiedIdentifier))
                 (?: (?>(?&PerlNWS)) (?&PerlVersionNumber) )?+
                     (?>(?&PerlOWS)) (?> ; | (?&PerlBlock) | (?= \} | \z ))
+                # End of inlining
             |
                 (?&PerlControlBlock)
             |
@@ -186,6 +189,10 @@ our $GRAMMAR = qr{
            (?: (?>(?&PerlOWS)) (?&PerlExpression) )?+
        )
        (?>(?&PerlOWS)) (?> ; | (?= \} | \z ))
+    ) # End of rule
+
+    (?<PerlReturnExpression>
+       return \b (?>(?&PerlOWS)) (?&PerlExpression)
     ) # End of rule
 
     (?<PerlReturnStatement>
@@ -299,14 +306,16 @@ our $GRAMMAR = qr{
 
     (?<PerlTerm>
         (?>
-            # Inlined (?&PerlReturnStatement)...
+            # Inlined (?&PerlReturnExpression)
             return \b (?>(?&PerlOWS)) (?&PerlExpression)
+            # End of inlining
         |
-            # Inlined (?&PerlVariableDeclaration)...
+            # Inlined (?&PerlVariableDeclaration)
             (?> my | state | our ) \b           (?>(?&PerlOWS))
             (?: (?&PerlQualifiedIdentifier)        (?&PerlOWS)  )?+
             (?>(?&PerlLvalue))                  (?>(?&PerlOWS))
             (?&PerlAttributes)?+
+            # End of inlining
         |
             (?&PerlAnonymousSubroutine)
         |
@@ -314,8 +323,9 @@ our $GRAMMAR = qr{
         |
             (?>(?&PerlNullaryBuiltinFunction))  (?! (?>(?&PerlOWS)) \( )
         |
-            # Inlined (?&PerlDoBlock) and (?&PerlEvalBlock)...
+            # Inlined (?&PerlDoBlock) | (?&PerlEvalBlock)
             (?> do | eval ) (?>(?&PerlOWS)) (?&PerlBlock)
+            # End of inlining
         |
             (?&PerlCall)
         |
@@ -1746,7 +1756,7 @@ PPR - Pattern-based Perl Recognizer
 
 =head1 VERSION
 
-This document describes PPR version 0.000015
+This document describes PPR version 0.000016
 
 
 =head1 SYNOPSIS
@@ -2119,6 +2129,12 @@ Matches a C<< use <module name> ...; >> or C<< use <version number>; >> statemen
 =head3 C<< (?<PerlReturnStatement> >>
 
 Matches a C<< return <expression>; >> or C<< return; >> statement.
+
+
+=head3 C<< (?<PerlReturnExpression> >>
+
+Matches a C<< return <expression> >>
+as an expression without trailing end-of-statement markers.
 
 
 =head3 C<< (?&PerlControlBlock) >>

@@ -1,7 +1,7 @@
 package Sah::Schema::perl::pod_filename;
 
-our $DATE = '2018-04-03'; # DATE
-our $VERSION = '0.011'; # VERSION
+our $DATE = '2018-06-04'; # DATE
+our $VERSION = '0.012'; # VERSION
 
 our $schema = [str => {
     summary => 'Filename (.pod files)',
@@ -68,7 +68,7 @@ Sah::Schema::perl::pod_filename - Filename (.pod files)
 
 =head1 VERSION
 
-This document describes version 0.011 of Sah::Schema::perl::pod_filename (from Perl distribution Sah-Schemas-Perl), released on 2018-04-03.
+This document describes version 0.012 of Sah::Schema::perl::pod_filename (from Perl distribution Sah-Schemas-Perl), released on 2018-06-04.
 
 =head1 DESCRIPTION
 

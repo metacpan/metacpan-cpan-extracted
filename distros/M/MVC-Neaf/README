@@ -1,45 +1,100 @@
-MVC-Neaf
+# NAME
 
-MVC::Neaf [ni:f] stands for Not Even An (MVC) Framework.
+MVC::Neaf `[ni:f]` stands for **Not Even A Framework**.
 
-It allows to build simple web apps followin simple rules.
+# OVERVIEW
 
-See README.md
+The following code can be run as a PSGI application or CGI script:
 
-INSTALLATION
+        use strict;
+        use warnings;
+        use MVC::Neaf;
+
+        get + post "/" => sub {
+            my $req = shift;
+
+            return {
+                -view     => 'TT',
+                -template => \'Hello, [% name %]!',
+                -type     => 'text/plain',
+                name      => $req->param( name => qr/\w+/, "Stranger" ),
+            };
+        };
+
+        neaf->run;
+
+Just like many other frameworks, Neaf organises an application
+into a *prefix tree* of routes. Each *route* has a *handler* `sub`
+which receives one and only argument - a *request* object.
+
+The *request* contains *everything* the application needs to know
+about the outside world.
+
+The *handler* must either *return* a hash for rendering, or *die*.
+A 3-digit exception is a valid way of returning a configurable error page.
+
+The *return hash* may contain dash-prefixed keys to control Neaf itself.
+For instance, the default view is JSON-based but adding 
+
+        -view => 'TT', -template => 'my.tpl'
+
+to the hash would result in using `Template::Toolkit` instead.
+
+# NOTABLE FEATURES
+
+* **Mandatory validation** - parameters and cookies are always regex-checked.
+
+* **Forms** that validate a bunch of input parameters, additionally
+producing hashes of errors and raw values for resubmission.
+
+* **Path-based defaults** that can be overridden in route definition or
+by controller itself:
+
+        neaf default => { -view => 'JS', version => $VERSION }, path => '/api';
+
+* **Hooks** that may be executed at different stages:
+
+        neaf pre_logic => sub {
+            my $req = shift;
+            die 403 unless $req->session->{is_admin};
+        }, path => '/admin';
+
+* **Easy CLI debugging** - see `perl myapp.pl --help`
+
+See [examples](example/) for more.
+
+# INSTALLATION
 
 To install this module, run the following commands:
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+        perl Makefile.PL
+        make
+        make test
+        make install
 
-SUPPORT AND DOCUMENTATION
+# BUGS
 
-After installing, you can find documentation for this module with the
-perldoc command.
+This package is still under heavy development
+(with a test coverage of about 80% though).
 
-    perldoc MVC::Neaf
+Use [github](https://github.com/dallaylaen/perl-mvc-neaf/issues)
+or [CPAN RT](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MVC-Neaf)
+to report bugs and propose features.
 
-You can also look for information at:
+Bug reports, feature requests, and overall critique are welcome.
 
-    RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=MVC-Neaf
+# CONTRIBUTING TO THIS PROJECT
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/MVC-Neaf
+See [STYLE.md](STYLE.md) for the style guide.
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/MVC-Neaf
+See [CHECKLIST](CHECKLIST) if you plan to release a version.
 
-    Search CPAN
-        http://search.cpan.org/dist/MVC-Neaf/
+See [TODO](TODO) for a rough development plan.
+It changes rapidly though.
 
+# LICENSE AND COPYRIGHT
 
-LICENSE AND COPYRIGHT
-
-Copyright (C) 2016 Konstantin S. Uvarin
+Copyright 2016-2017 Konstantin S. Uvarin aka KHEDIN
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

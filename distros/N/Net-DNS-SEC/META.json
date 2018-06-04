@@ -32,6 +32,7 @@
          }
       },
       "runtime" : {
+         "recommends" : {},
          "requires" : {
             "DynaLoader" : "1.04",
             "File::Find" : "1.05",
@@ -45,9 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "resources" : {
-      "X_type" : "cpan"
-   },
-   "version" : "1.08",
+   "version" : "1.09",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

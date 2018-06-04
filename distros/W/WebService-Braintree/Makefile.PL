@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "WebService::Braintree",
   "PREREQ_PM" => {
     "Class::Load::XS" => 0,
+    "DDP" => 0,
     "Data::GUID" => 0,
     "DateTime" => 0,
     "DateTime::Format::Atom" => 0,
@@ -58,7 +59,7 @@ my %WriteMakefileArgs = (
     "Test::Warn" => 0,
     "Try::Tiny" => 0
   },
-  "VERSION" => "1.4",
+  "VERSION" => "1.5",
   "test" => {
     "TESTS" => "t/sandbox/*.t t/unit/*.t"
   }
@@ -67,6 +68,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Class::Load::XS" => 0,
+  "DDP" => 0,
   "Data::GUID" => 0,
   "Data::Printer" => 0,
   "DateTime" => 0,

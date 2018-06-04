@@ -1,0 +1,228 @@
+#!perl
+
+use 5.006;
+use strict;
+use warnings;
+
+our $VERSION = '0.001';
+
+package App::ReportPrereqs;
+
+use ExtUtils::MakeMaker ();
+use File::Basename qw(fileparse);
+use Getopt::Long qw(GetOptions);
+use List::Util qw(max);
+use Module::CPANfile ();
+use Module::Path qw(module_path);
+use version 0.81 ();
+
+if ( !caller ) {
+    my $rc = _main();
+    exit 0 if !defined $rc;
+    exit 2 if $rc == 2;
+    exit 1;
+}
+
+sub _main {
+    my $with_develop = 0;
+    if ( !GetOptions( 'with-develop' => \$with_develop ) ) {
+        my $basename = fileparse($0);
+
+        print {*STDERR} "usage: $basename [--with-develop]\n";
+        return 2;
+    }
+
+    my $prereqs;
+    if ( !eval { $prereqs = Module::CPANfile->load('cpanfile')->prereqs; 1; } ) {
+        my $error = $@;
+        print {*STDERR} "\n$error\n";
+        return 1;
+    }
+
+    my @full_reports;
+    my @dep_errors;
+
+  PHASE:
+    for my $phase (qw(configure build test runtime develop)) {
+        next PHASE if ( $phase eq 'develop' ) and ( !$with_develop );
+
+      TYPE:
+        for my $type (qw(requires recommends suggests conflicts)) {
+            my $req_ref = $prereqs->requirements_for( $phase, $type )->as_string_hash;
+            my @modules = grep { $_ ne 'perl' } keys %{$req_ref};
+            next TYPE if !@modules;
+
+            my $title = "\u$phase \u$type";
+            my @reports = ( [qw(Module Want Have)] );
+
+          MODULE:
+            for my $module ( sort @modules ) {
+                my $want = $req_ref->{$module};
+                if ( !defined $want ) {
+                    $want = 'undef';
+                }
+                elsif ( $want eq '0' ) {
+                    $want = 'any';
+                }
+
+                my $req_string = $want eq 'any' ? 'any version required' : "version '$want' required";
+
+                my $mod_path = module_path($module);
+
+                if ( defined $mod_path ) {
+                    my $have = MM->parse_version($mod_path);    ## no critic (Modules::RequireExplicitInclusion)
+                    if ( !defined $have ) {
+                        $have = 'undef';
+                    }
+
+                    push @reports, [ $module, $want, $have ];
+
+                    next MODULE if $type ne 'requires';
+
+                    if ( $have eq 'undef' ) {
+                        push @dep_errors, "$module version unknown ($req_string)";
+                        next MODULE;
+                    }
+
+                    if ( !version::is_lax($have) ) {
+                        push @dep_errors, "$module version '$have' cannot be parsed ($req_string)";
+                        next MODULE;
+                    }
+
+                    if ( !$prereqs->requirements_for( $phase, $type )->accepts_module( $module => $have ) ) {
+                        push @dep_errors, "$module version '$have' is not in required range '$want'";
+                        next MODULE;
+                    }
+
+                    next MODULE;
+                }
+
+                push @reports, [ $module, $want, 'missing' ];
+
+                next MODULE if $type ne 'requires';
+
+                push @dep_errors, "$module is not installed ($req_string)";
+            }
+
+            push @full_reports, "=== $title ===\n\n";
+
+            my $ml = max( map { length $_->[0] } @reports );
+            my $wl = max( map { length $_->[1] } @reports );
+            my $hl = max( map { length $_->[2] } @reports );
+
+            splice @reports, 1, 0, [ q{-} x $ml, q{-} x $wl, q{-} x $hl ];
+            push @full_reports, map { sprintf "    %*s %*s %*s\n", -$ml, $_->[0], $wl, $_->[1], $hl, $_->[2] } @reports;
+
+            push @full_reports, "\n";
+        }
+    }
+
+    if (@full_reports) {
+        print "Versions for all modules listed in cpanfile:\n\n", @full_reports;
+    }
+
+    if (@dep_errors) {
+        print "\n*** WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING ***\n\n";
+        print "The following REQUIRED prerequisites were not satisfied:\n\n";
+
+        for my $error (@dep_errors) {
+            print $error, "\n";
+        }
+    }
+
+    return;
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+report-prereqs - report prerequisite versions
+
+=head1 VERSION
+
+Version 0.001
+
+=head1 SYNOPSIS
+
+=over
+
+=item B<report-prereqs> [B<--with-develop>]
+
+=back
+
+=head1 DESCRIPTION
+
+The C<report-prereqs> utility will examine F<cpanfile> for prerequisites with
+L<Module::CPANfile|Module::CPANfile>. It reports the version of all modules
+listed as prerequisites (including 'recommends', 'suggests', etc.). However,
+any 'develop' prerequisites are not reported, unless they show up in another
+category or the C<--with-develop> option is used.
+
+Versions are reported based on the result of C<parse_version> from
+L<ExtUtils::MakeMaker|ExtUtils::MakeMaker>, which means prerequisite modules
+are not actually loaded. Parse errors are reported as "undef". If a module is
+not installed, "missing" is reported instead of a version string.
+
+Additionally, unfulfilled required prerequisites are reported after the list
+of all versions.
+
+=head1 OPTIONS
+
+=over
+
+=item B<--with-develop>
+
+Also report develop prerequisites.
+
+=back
+
+=head1 EXIT STATUS
+
+The report-prereqs utility exits 0 on success, 1 if an error occurs, and 2 if
+invalid command line options were specified.
+
+The state of the prerequisites does have no effect on the exist status.
+
+=head1 SEE ALSO
+
+L<Dist::Zilla::Plugin::Test::ReportPrereqs|Dist::Zilla::Plugin::Test::ReportPrereqs>
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/skirmess/App-ReportPrereqs/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software. The code repository is available for
+public review and contribution under the terms of the license.
+
+L<https://github.com/skirmess/App-ReportPrereqs>
+
+  git clone https://github.com/skirmess/App-ReportPrereqs.git
+
+=head1 AUTHOR
+
+Sven Kirmess <sven.kirmess@kzone.ch>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Sven Kirmess.
+
+This is free software, licensed under:
+
+  The (two-clause) FreeBSD License
+
+=cut
+
+# vim: ts=4 sts=4 sw=4 et: syntax=perl

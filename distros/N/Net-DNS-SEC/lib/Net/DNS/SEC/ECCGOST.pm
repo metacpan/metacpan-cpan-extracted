@@ -1,10 +1,10 @@
 package Net::DNS::SEC::ECCGOST;
 
 #
-# $Id: ECCGOST.pm 1668 2018-04-23 13:36:44Z willem $
+# $Id: ECCGOST.pm 1677 2018-05-22 11:59:10Z willem $
 #
 use vars qw($VERSION);
-$VERSION = (qw$LastChangedRevision: 1668 $)[1];
+$VERSION = (qw$LastChangedRevision: 1677 $)[1];
 
 
 =head1 NAME
@@ -47,7 +47,7 @@ use Digest::GOST 0.06;
 use Digest::GOST::CryptoPro;
 
 
-my %GOST = ( 12 => [840, 'Digest::GOST::CryptoPro'] );
+my %parameters = ( 12 => [840, 'Digest::GOST::CryptoPro'] );
 
 
 sub sign {
@@ -59,9 +59,9 @@ sub verify {
 	my ( $class, $sigdata, $keyrr, $sigbin ) = @_;
 
 	my $algorithm = $keyrr->algorithm;
-	my ( $nid, $object, @param ) = @{$GOST{$algorithm} || []};
-	croak 'public key not GOST' unless $nid;
-	my $hash = $object->new(@param);
+	my ( $nid, $object ) = @{$parameters{$algorithm} || []};
+	croak 'public key not ECC-GOST' unless $nid;
+	my $hash = $object->new();
 	$hash->add($sigdata);
 	my $H = reverse $hash->digest;
 

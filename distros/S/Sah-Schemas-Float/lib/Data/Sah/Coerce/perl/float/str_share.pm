@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::float::str_share;
 
-our $DATE = '2017-08-10'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-06-04'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,9 +9,9 @@ use warnings;
 
 sub meta {
     +{
-        v => 2,
+        v => 3,
         enable_by_default => 0,
-        might_die => 1,
+        might_fail => 1,
         prio => 50,
     };
 }
@@ -30,10 +30,10 @@ sub coerce {
 
     $res->{expr_coerce} = join(
         '',
-        '$2 ? ($1 >= 0 && $1 <= 100 ? $1/100 : die "Percentage must be between 0%-100%") :',
-        '$1 >= 0 && $1 <= 1 ? $1 :',
-        '$1 > 1 && $1 <= 100 ? $1/100 : ',
-        'die "Number must be 0 <= x <= 1, or 1 < x <= 100 (as percent)"',
+        '$2 ? ($1 >= 0 && $1 <= 100 ? [undef, $1/100] : ["Percentage must be between 0%-100%"]) : ',
+        '$1 >= 0 && $1 <= 1 ? [undef, $1] : ',
+        '$1 > 1 && $1 <= 100 ? [undef, $1/100] : ',
+        '["Number must be 0 <= x <= 1, or 1 < x <= 100 (as percent)"]',
     );
     $res;
 }
@@ -53,7 +53,7 @@ Data::Sah::Coerce::perl::float::str_share - Coerce float from share string
 
 =head1 VERSION
 
-This document describes version 0.001 of Data::Sah::Coerce::perl::float::str_share (from Perl distribution Sah-Schemas-Float), released on 2017-08-10.
+This document describes version 0.002 of Data::Sah::Coerce::perl::float::str_share (from Perl distribution Sah-Schemas-Float), released on 2018-06-04.
 
 =head1 DESCRIPTION
 
@@ -88,7 +88,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -14,7 +14,7 @@ my $app = MVC::Neaf->new;
 
 $app->route( foo => sub { +{}} );
 $app->route( bar => sub { +{}} );
-MVC::Neaf->route( noexist => sub { +{} } );
+neaf->route( noexist => sub { +{} } ); # this should NOT affect the new() routes
 
 my $data;
 {

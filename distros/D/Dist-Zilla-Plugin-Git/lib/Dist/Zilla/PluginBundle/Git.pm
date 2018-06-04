@@ -13,7 +13,7 @@ use warnings;
 package Dist::Zilla::PluginBundle::Git;
 # ABSTRACT: All git plugins in one bundle
 
-our $VERSION = '2.044';
+our $VERSION = '2.045';
 
 use Moose;
 use Module::Runtime 'use_module';
@@ -69,7 +69,7 @@ Dist::Zilla::PluginBundle::Git - All git plugins in one bundle
 
 =head1 VERSION
 
-version 2.044
+version 2.045
 
 =head1 SYNOPSIS
 

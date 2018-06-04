@@ -14,7 +14,7 @@ L<MVC::Neaf::Request> object.
 
 =cut
 
-our $VERSION = 0.2203;
+our $VERSION = 0.2501;
 use Carp;
 use Encode;
 use PerlIO::encoding;
@@ -39,7 +39,7 @@ use PerlIO::encoding;
 
 =cut
 
-# TODO 0.25 figure out if GLOBs are worth the hassle
+# TODO 0.30 figure out if GLOBs are worth the hassle
 # We use GLOB objects so that <$upload> works as expected.
 # This may turn out to be not worth it, so it's not even in the docs yet.
 # See also t/*diamond*.t
@@ -50,7 +50,7 @@ $new_opt{$_}++ for @copy_fields, "handle";
 sub new {
     my ($class, %args) = @_;
 
-    # TODO 0.19 add "unicode" flag to open & slurp in utf8 mode
+    # TODO 0.30 add "unicode" flag to open & slurp in utf8 mode
 
     my @extra = grep { !$new_opt{$_} } keys %args;
     croak( "$class->new(): unknown options @extra" )
@@ -186,5 +186,19 @@ sub rewind {
 
 # TODO 0.30 kill the tempfile, if any?
 # sub DESTROY { };
+
+=head1 LICENSE AND COPYRIGHT
+
+This module is part of L<MVC::Neaf> suite.
+
+Copyright 2016-2018 Konstantin S. Uvarin C<khedin@cpan.org>.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+=cut
 
 1;

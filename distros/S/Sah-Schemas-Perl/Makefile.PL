@@ -29,12 +29,10 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Module::Path::More" => "0.32",
-    "Test::Exception" => 0,
     "Test::More" => "0.98",
-    "Test::Needs" => 0,
-    "Test::Warn" => 0
+    "Test::Needs" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,10 +49,8 @@ my %FallbackPrereqs = (
   "Module::Path::More" => "0.32",
   "Perinci::Sub::XCompletion::perl_distname" => 0,
   "Perinci::Sub::XCompletion::perl_modname" => 0,
-  "Test::Exception" => 0,
   "Test::More" => "0.98",
   "Test::Needs" => 0,
-  "Test::Warn" => 0,
   "strict" => 0,
   "warnings" => 0
 );

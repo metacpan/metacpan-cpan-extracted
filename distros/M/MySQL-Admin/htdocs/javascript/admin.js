@@ -5,11 +5,11 @@ m_blogin = false;
 cAction = defaultAction;
 function initCms()
 {
-  var closeButton = $("closeButton");
+  var closeButton = document.getElementById("closeButton");
   closeButton.addEventListener ('click',closePopup);
   loadMenu();
   loadHistory();
-  $('menu').addEventListener ('click', function (evt) {
+  document.getElementById('menu').addEventListener ('click', function (evt) {
      menu();
     evt.stopPropagation();
   });

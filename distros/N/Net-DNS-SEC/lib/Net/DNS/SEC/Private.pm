@@ -1,9 +1,9 @@
 package Net::DNS::SEC::Private;
 
 #
-# $Id: Private.pm 1667 2018-04-20 10:01:29Z willem $
+# $Id: Private.pm 1677 2018-05-22 11:59:10Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1667 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1677 $)[1];
 
 
 =head1 NAME
@@ -38,7 +38,6 @@ with any other system.
 use strict;
 use integer;
 use warnings;
-use Carp;
 use File::Spec;
 use IO::File;
 
@@ -50,14 +49,14 @@ sub _new_keyfile {
 
 	my ( $vol, $dir, $keyname ) = File::Spec->splitpath($file);
 
-	# Format something like: /Kbla.foo.+001+60114.private'
-	# assuming proper file name.
+	# Format something like: /Kbla.foo.+001+12345.private'
+	# as created by BIND keygen.
 	# We determine the algorithm from the filename.
-	croak "$keyname does not appear to be a private key"
+	die "$keyname does not appear to be a BIND private key"
 			unless $keyname =~ /^K(.*\.)\+(\d+)\+(\d+)\.private$/;
-	my @identifier = ( signame => $1, algorithm => 0 + $2, keytag => $3 );
+	my @identifier = ( signame => $1, algorithm => 0 + $2, keytag => 0 + $3 );
 
-	my $handle = new IO::File($file) or croak qq(open: "$file" $!);
+	my $handle = new IO::File($file) or die qq(open: "$file" $!);
 
 	my @content;
 	local $_;
@@ -84,8 +83,8 @@ sub _new_params {
 	}
 
 	my $self = bless sub { $param->{shift()} }, $class;
-	croak 'no algorithm specified' unless $self->algorithm;
-	croak 'no signame specified'   unless $self->signame;
+	die 'no algorithm specified' unless $self->algorithm;
+	die 'no signame specified'   unless $self->signame;
 	return $self;
 }
 

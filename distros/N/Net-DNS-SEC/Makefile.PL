@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1668 2018-04-23 13:36:44Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1677 2018-05-22 11:59:10Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -64,18 +64,15 @@ WriteMakefile(
 	PREREQ_PM  => {%prerequisite},
 	INC	   => "$inc",
 	LIBS	   => [$lib],
-	META_MERGE => {
-		'meta-spec' => {version => 2},
-		resources   => {
-			type	   => 'cpan',
-			bugtracker => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Net-DNS-SEC',
-			repository => 'https://search.cpan.org/~nlnetlabs/Net-DNS-SEC/'
-			},
-		recommends => {%optional},
-		} );
+	META_MERGE => {recommends => {%optional}},
+	);
 
 
 package MY;				## customise generated Makefile
+
+sub special_targets {
+	return join "\n\n", '.NOTPARALLEL:', shift->SUPER::special_targets();
+}
 
 sub install {
 	my $self = shift;

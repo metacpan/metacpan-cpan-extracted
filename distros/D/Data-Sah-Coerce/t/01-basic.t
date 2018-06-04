@@ -121,7 +121,19 @@ subtest "opt:coerce_rules" => sub {
         );
         test_no_dupes($rules);
         ok(@$rules);
+        #diag explain $rules;
         ok(!grep { $_->{name} eq 'float_epoch' } @$rules);
+    };
+    subtest "default - R1 - R2" => sub {
+        my $rules = Data::Sah::CoerceCommon::get_coerce_rules(
+            compiler=>"perl", type=>"date", coerce_to=>"float(epoch)", data_term=>'$data',
+            coerce_rules=>['!str_iso8601', '!obj_DateTime'],
+        );
+        test_no_dupes($rules);
+        ok(@$rules);
+        #diag explain $rules;
+        ok(!grep { $_->{name} eq 'str_iso8601' } @$rules);
+        ok(!grep { $_->{name} eq 'obj_DateTime' } @$rules);
     };
     subtest "default - /^R/" => sub {
         my $rules = Data::Sah::CoerceCommon::get_coerce_rules(
