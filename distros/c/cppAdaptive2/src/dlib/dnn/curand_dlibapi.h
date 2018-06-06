@@ -7,7 +7,6 @@
 
 #include "tensor.h"
 #include "cuda_errors.h"
-#include "cuda_data_ptr.h"
 
 namespace dlib
 {
@@ -26,14 +25,6 @@ namespace dlib
             curand_generator() : curand_generator(0) {}
             curand_generator(unsigned long long seed);
             ~curand_generator();
-
-            void fill (
-                cuda_data_ptr<unsigned int>& data
-            );
-            /*!
-                ensures
-                    - Fills data with random 32-bit unsigned integers.
-            !*/
 
             void fill_gaussian (
                 tensor& data,

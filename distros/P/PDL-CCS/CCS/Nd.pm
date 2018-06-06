@@ -19,7 +19,7 @@ BEGIN {
   *can = \&UNIVERSAL::can;
 }
 
-our $VERSION = '1.23.4'; ##-- update with perl-reversion from Perl::Version module
+our $VERSION = '1.23.7'; ##-- update with perl-reversion from Perl::Version module
 our @ISA = qw();
 our %EXPORT_TAGS =
   (
@@ -312,7 +312,7 @@ sub shadow  :lvalue {
 
 
 ##--------------------------------------------------------------
-## Maintainence
+## Maintenance
 
 ## $ccs = $ccs->recode()
 ##  + recodes object, removing any missing values from $nzvals
@@ -518,7 +518,7 @@ sub nelem_p { $_[0][$PDIMS]->dprod; }
 sub _ccs_nvperp { $_[0][$VDIMS]->where($_[0][$VDIMS]<0)->abs->dprod; }
 
 ## $nstored_p = $obj->nstored_p : actual number of physically stored elements
-## $nstored_v = $obj->nstored_v : actual number of phyiscally+virtually stored elements
+## $nstored_v = $obj->nstored_v : actual number of physically+virtually stored elements
 sub nstored_p { $_[0][$WHICH]->dim(1); }
 sub nstored_v { $_[0][$WHICH]->dim(1) * $_[0]->_ccs_nvperp; }
 *nstored = \&nstored_v;
@@ -2132,7 +2132,7 @@ PDL::CCS::Nd - N-dimensional sparse pseudo-PDLs
  $ccs = PDL::CCS:Nd->newFromWhich($whichND,$nzvals,%args); ##-- construct from index+value pairs
 
  $ccs = $dense->toccs();                ##-- ensure PDL::CCS::Nd-hood
- $ccs = $ccs->toccs();                  ##-- ... analagous to PDL::topdl()
+ $ccs = $ccs->toccs();                  ##-- ... analogous to PDL::topdl()
  $ccs = $dense->toccs($missing,$flags); ##-- ... with optional arguments
 
  $ccs2 = $ccs->copy();                  ##-- copy constructor
@@ -2140,7 +2140,7 @@ PDL::CCS::Nd - N-dimensional sparse pseudo-PDLs
  $ccs2 = $ccs->shadow(%args);           ##-- flexible copy method, for internal use
 
  ##---------------------------------------------------------------------
- ## Maintainence & Decoding
+ ## Maintenance & Decoding
 
  $ccs = $ccs->recode();                 ##-- remove missing values from stored VALS
  $ccs = $ccs->sortwhich();              ##-- internal use only
@@ -2148,7 +2148,7 @@ PDL::CCS::Nd - N-dimensional sparse pseudo-PDLs
  $dense2 = $ccs->decode();              ##-- extract to a (new) dense matrix
 
  $dense2 = $ccs->todense();             ##-- ensure dense storage
- $dense2 = $dense2->todense();          ##-- ... analagous to PDL::topdl()
+ $dense2 = $dense2->todense();          ##-- ... analogous to PDL::topdl()
 
  ##---------------------------------------------------------------------
  ## PDL API: Basic Properties
@@ -2335,7 +2335,7 @@ PDL::CCS::Nd - N-dimensional sparse pseudo-PDLs
  $nstored  = $ccs->nstored_p;        $nstored  = $ccs->nstored_v;   ##-- physical|virtual Nnz+1
  $nmissing = $ccs->nmissing_p;       $nmissing = $ccs->nmissing_v;  ##-- physical|virtual nelem-Nnz
 
- $ccs = $ccs->make_physically_indexed();        ##-- ensure all dimensions are phyiscally indexed
+ $ccs = $ccs->make_physically_indexed();        ##-- ensure all dimensions are physically indexed
 
  $bool = $ccs->allmissing();                    ##-- are all values missing?
 
@@ -2346,10 +2346,10 @@ PDL::CCS::Nd - N-dimensional sparse pseudo-PDLs
  $whichND_phys = $ccs->_whichND();              ##-- get/set physical indices
  $whichND_phys = $ccs->_whichND($whichND_phys);
 
- $nzvals_phys  = $ccs->_nzvals();               ##-- get/set phsically indexed values
+ $nzvals_phys  = $ccs->_nzvals();               ##-- get/set physically indexed values
  $nzvals_phys  = $ccs->_nzvals($vals_phys);
 
- $vals_phys    = $ccs->_vals();                 ##-- get/set phsically indexed values
+ $vals_phys    = $ccs->_vals();                 ##-- get/set physically indexed values
  $vals_phys    = $ccs->_vals($vals_phys);
 
  $bool         = $ccs->hasptr($pdimi);          ##-- check for cached Harwell-Boeing pointer
@@ -2453,7 +2453,7 @@ not correspond to any physically indexed dimension.
 
 Indexes a vector pdl($valType, $Nnz+1) of all values in the sparse matrix,
 where $Nnz is the number of non-missing values in the sparse matrix.  Non-final
-elements of the $VALS piddle are interpreted as the values of the corresponing
+elements of the $VALS piddle are interpreted as the values of the corresponding
 indices in the $WHICH piddle:
 
  all( $ccs->[$VALS]->slice("0:-2") == $dense->indexND($ccs->[$WHICH]) )
@@ -2653,11 +2653,11 @@ Known %args:
 
 
 ##======================================================================
-## Methods: Maintainence & Decoding
+## Methods: Maintenance & Decoding
 ##======================================================================
 =pod
 
-=head2 Maintainence & Decoding
+=head2 Maintenance & Decoding
 
 =over 4
 
@@ -2960,7 +2960,7 @@ Note also that unary operations may change the "missing" value associated
 with the sparse matrix.  This is easily seen to be the Right Way To Do It
 if you consider unary "not" over a very sparse (say 99% missing)
 binary-valued matrix: is is much easier and more efficient to alter only
-the 1% of phyiscally stored (non-missing) values as well as the missing value
+the 1% of physically stored (non-missing) values as well as the missing value
 than to generate a new matrix with 99% non-missing values, assuming $missing==0.
 
 =cut
@@ -3327,7 +3327,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head2 Copyright Policy
 
-Copyright (C) 2007-2015, Bryan Jurish. All rights reserved.
+Copyright (C) 2007-2018, Bryan Jurish. All rights reserved.
 
 This package is free software, and entirely without warranty.
 You may redistribute it and/or modify it under the same terms

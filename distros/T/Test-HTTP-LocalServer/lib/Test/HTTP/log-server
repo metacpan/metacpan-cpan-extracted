@@ -2,9 +2,9 @@
 use strict;
 use HTTP::Daemon;
 use CGI;
+use HTTP::Request::AsCGI;
 use Getopt::Long;
-use vars qw($VERSION);
-$VERSION = '0.55';
+our $VERSION = '0.63';
 
 $|++;
 
@@ -180,12 +180,11 @@ SERVERLOOP: {
             $res = HTTP::Response->new(200, "OK", $headers, $body);
 
         } else {
-            my $q = $r->content
-                    ? CGI->new($r->content )
-                    : CGI->new($r->uri->query);
+            my $context = HTTP::Request::AsCGI->new( $r )->setup;
+            my $q = CGI->new();
 
             # Make sticky form fields
-            my ($query,$botcheck_query,$query2,$session,%cat);
+            my ($filename, $filetype, $filecontent, $query,$botcheck_query,$query2,$session,%cat);
             $query = defined $q->param('query') ? $q->param('query') : "(empty)";
             $botcheck_query = defined $q->param('botcheck_query') ? $q->param('botcheck_query') : "(empty)";
             $query2 = defined $q->param('query2') ? $q->param('query2') : "(empty)";
@@ -194,8 +193,8 @@ SERVERLOOP: {
             %cat = map { $_ => 1 } ( @cats ? @cats : qw( cat_foo cat_bar ));
             my @categories = map { $cat{$_} ? "checked" : "" } qw( cat_foo cat_bar cat_baz );
             my $headers = CGI::escapeHTML( $r->headers->as_string );
-
             my $rbody = sprintf $body,$headers, $location,
+            $filename, $filetype, $filecontent,
 			                          $session,$query,$botcheck_query,$query2,@categories;
             $res = HTTP::Response->new(200, "OK", [
                   'Set-Cookie' => $q->cookie(-name => 'log-server-httponly',-value=>'supersecret', -discard => 1, -httponly=>1),

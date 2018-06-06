@@ -40,15 +40,25 @@ Mojolicious::Plugin::Cron - a Cron-like helper for Mojolicious and Mojolicious::
 
 [Mojolicious::Plugin::Cron](https://metacpan.org/pod/Mojolicious::Plugin::Cron) is a [Mojolicious](https://metacpan.org/pod/Mojolicious) plugin that allows to schedule tasks
  directly from inside a Mojolicious application.
+
 You should not consider it as a \*nix cron replacement, but as a method to make a proof of
-concept of a project.
+concept of a project. It helps also in the deployment phase because in the end it
+could mean less and simpler installation/removing tasks.
+
+As an extension to regular cron, seconds are supported in the form of a sixth space
+sepparated field (For more information on cron sintax please see [Algorithm::Cron](https://metacpan.org/pod/Algorithm::Cron)).
 
 # BASICS
 
 When using preforked servers (as applications running with hypnotoad), some coordination
 is needed so jobs are not executed several times.
+
 [Mojolicious::Plugin::Cron](https://metacpan.org/pod/Mojolicious::Plugin::Cron) uses standard Fcntl functions for that coordination, to assure
 a platform-independent behavior.
+
+Please take a look in the examples section, for a simple Mojo Application that you can
+run on hypnotoad, try hot restarts, adding / removing workers, etc, and
+check that scheduled jobs execute without interruptions or duplications.
 
 # EXTENDEND SYNTAX HASH
 
@@ -59,10 +69,12 @@ to more options
 
 ## Keys
 
-Keys are the names that identify each crontab line. They are used to form the locking semaphore
-to avoid multiple processes starting the same job. You can use the same name in different Mojolicious
-applications, and this will ensure that not more that one instance of the cron job will take place at
-a specific scheduled time.
+Keys are the names that identify each crontab line. They are used to form a locking 
+semaphore file to avoid multiple processes starting the same job. 
+
+You can use the same name in different Mojolicious applications that will run
+at the same time. This will ensure that not more that one instance of the cron job
+will take place at a specific scheduled time. 
 
 ## Crontab lines
 
@@ -70,7 +82,7 @@ Each crontab line consists of a hash with the following keys:
 
 - base => STRING
 
-    Gives the time base used for scheduling. Either `utc` or `local` (default `local`.
+    Gives the time base used for scheduling. Either `utc` or `local` (default `local`).
 
 - crontab => STRING
 
@@ -84,7 +96,7 @@ Each crontab line consists of a hash with the following keys:
     For more information on base, crontab and other time related keys,
      please refer to [Algorithm::Cron](https://metacpan.org/pod/Algorithm::Cron) Contstructor Attributes. 
 
-- code => sub {}
+- code => sub {...}
 
     Mandatory. Is the code that will be executed whenever the crontab rule fires.
     Note that this code \*MUST\* be non-blocking.

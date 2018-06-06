@@ -1,11 +1,11 @@
 #!perl
 
-# Note: This script is a CLI  for Riap function /Business/BankCard/Indonesia/list_id_bank_card_prefixes
-# and generated automatically using Perinci::CmdLine::Gen version 0.47
+# Note: This script is a CLI for Riap function /Business/BankCard/Indonesia/list_id_bank_card_prefixes
+# and generated automatically using Perinci::CmdLine::Gen version 0.485
 
-our $DATE = '2017-08-03'; # DATE
+our $DATE = '2018-06-04'; # DATE
 our $DIST = 'App-IndonesianBankingUtils'; # DIST
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.140'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,10 +13,12 @@ use warnings;
 
 use Perinci::CmdLine::Any;
 
-Perinci::CmdLine::Any->new(
+my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Business/BankCard/Indonesia/list_id_bank_card_prefixes",
     program_name => "list-id-bank-cards",
-)->run;
+);
+
+$cmdline->run;
 
 # ABSTRACT: Prefix of card numbers issued in Indonesia
 # PODNAME: list-id-bank-cards
@@ -33,7 +35,7 @@ list-id-bank-cards - Prefix of card numbers issued in Indonesia
 
 =head1 VERSION
 
-This document describes version 0.13 of list-id-bank-cards (from Perl distribution App-IndonesianBankingUtils), released on 2017-08-03.
+This document describes version 0.140 of list-id-bank-cards (from Perl distribution App-IndonesianBankingUtils), released on 2018-06-04.
 
 =head1 SYNOPSIS
 
@@ -194,25 +196,25 @@ Only return records where the 'issuer_id' field is in the specified values (JSON
 
 See C<--issuer-id-in>.
 
-=item B<--issuer-id-in>=I<i@>
+=item B<--issuer-id-in>=I<s@>
 
 Only return records where the 'issuer_id' field is in the specified values.
 
 Can be specified multiple times.
 
-=item B<--issuer-id-is>=I<i>
+=item B<--issuer-id-is>=I<s>
 
 Only return records where the 'issuer_id' field equals specified value.
 
-=item B<--issuer-id-isnt>=I<i>
+=item B<--issuer-id-isnt>=I<s>
 
 Only return records where the 'issuer_id' field does not equal specified value.
 
-=item B<--issuer-id-max>=I<i>
+=item B<--issuer-id-max>=I<s>
 
 Only return records where the 'issuer_id' field is less than or equal to specified value.
 
-=item B<--issuer-id-min>=I<i>
+=item B<--issuer-id-min>=I<s>
 
 Only return records where the 'issuer_id' field is greater than or equal to specified value.
 
@@ -222,21 +224,21 @@ Only return records where the 'issuer_id' field is not in the specified values (
 
 See C<--issuer-id-not-in>.
 
-=item B<--issuer-id-not-in>=I<i@>
+=item B<--issuer-id-not-in>=I<s@>
 
 Only return records where the 'issuer_id' field is not in the specified values.
 
 Can be specified multiple times.
 
-=item B<--issuer-id-xmax>=I<i>
+=item B<--issuer-id-xmax>=I<s>
 
 Only return records where the 'issuer_id' field is less than specified value.
 
-=item B<--issuer-id-xmin>=I<i>
+=item B<--issuer-id-xmin>=I<s>
 
 Only return records where the 'issuer_id' field is greater than specified value.
 
-=item B<--issuer-id>=I<i>
+=item B<--issuer-id>=I<s>
 
 Only return records where the 'issuer_id' field equals specified value.
 
@@ -387,11 +389,11 @@ you want to pipe the result for more post-processing. In this case you can use
 
 =over
 
-=item B<--result-limit>=I<i>
+=item B<--result-limit>=I<s>
 
 Only return a certain number of records.
 
-=item B<--result-start>=I<i>
+=item B<--result-start>=I<s>
 
 Only return starting from the n'th record.
 
@@ -545,7 +547,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,8 +2,9 @@ package Mojolicious::Plugin::Subprocess;
 
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::IOLoop;
+use Mojo::Promise;
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 sub register {
   my ($self, $app, $options) = @_;
@@ -19,14 +20,18 @@ sub register {
       grep { exists $subprocess_args{$_} } qw(deserialize ioloop serialize);
     $subprocess->with_roles('Mojo::IOLoop::Subprocess::Role::Sereal')
       ->with_sereal if $use_sereal;
-    
-    $c->delay(sub {
-      $subprocess->run($child, shift->begin);
-    }, sub {
-      my ($delay, $err, @results) = @_;
-      die $err if $err;
-      $c->$parent(@results);
+
+    my $tx = $c->render_later->tx;
+
+    my $p = Mojo::Promise->new;
+    $subprocess->run($child, sub {
+      my ($subprocess, $err, @results) = @_;
+      return $p->reject($err) if $err;
+      $p->resolve(@results);
     });
+
+    return $p->then(sub { $c->$parent(@_) })
+      ->catch(sub { $c->helpers->reply->exception(pop) and undef $tx });
   });
 }
 
@@ -91,12 +96,10 @@ L<Mojolicious::Plugin::Subprocess> implements the following helpers.
 
 Execute the first callback in a child process with
 L<Mojo::IOLoop::Subprocess/"run">, and execute the second callback in the
-parent process with the results. The callbacks are executed via
-L<Mojolicious::Plugin::DefaultHelpers/"delay">, which disables automatic
-rendering, keeps a reference to the transaction, and renders an exception
-response if an exception is thrown in either callback. This also means that the
-parent callback will not be called if an exception is thrown in the child
-callback.
+parent process with the results. Automatic rendering is disabled, and an
+exception response is rendered if an exception is thrown in either callback.
+This also means that the parent callback will not be called if an exception is
+thrown in the child callback.
 
 =head1 METHODS
 

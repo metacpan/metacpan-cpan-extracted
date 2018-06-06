@@ -17,7 +17,7 @@ use Time::HiRes qw( usleep );
 
 __PACKAGE__->create_accessors( qw( device ) );
 
-our $VERSION ='0.71';
+our $VERSION ='0.72';
 
 sub new {
     my ($class, %params) = @_;
@@ -35,6 +35,13 @@ sub delayMicroseconds {
     usleep( int($micros) );
 }
 
-sub DESTROY { $_[0]->device( undef ); } 
+*HiPi::Interface::sleep_milliseconds = \&delay;
+*HiPi::Interface::sleep_microseconds = \&delayMicroseconds;
+
+sub DESTROY {
+    my $self = shift;
+    $self->SUPER::DESTROY;
+    $self->device( undef );
+} 
 
 1;

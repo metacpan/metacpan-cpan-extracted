@@ -30,4 +30,4 @@ requires:
   perl: '5.01'
 resources:
   repository: https://github.com/ledgersmb/PGObject-Util-DBAdmin.git
-version: v0.130.0
+version: v0.130.1

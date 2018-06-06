@@ -1,9 +1,12 @@
-# Copyright (C) 1998-2006, David Muir Sharnoff <muir@idiom.org>
+# Copyright (C) 1998-2006 David Muir Sharnoff <muir@idiom.org>
+# Copyright (C) 2011-2013 Google, Inc.
+# Copyright (C) 2018 Joelle Maslak <jmaslak@antelope.net>
+
+use 5.006_001;
 
 package Net::Netmask;
-
-use vars qw($VERSION);
-$VERSION = 1.9022;
+$Net::Netmask::VERSION = '1.9101';
+# ABSTRACT: Understand and manipulate IP netmasks
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -11,7 +14,7 @@ require Exporter;
 	cidrs2contiglists range2cidrlist sort_by_ip_address
 	dumpNetworkTable sort_network_blocks cidrs2cidrs
 	cidrs2inverse);
-@EXPORT_OK = (@EXPORT, qw(int2quad quad2int %quadmask2bits 
+@EXPORT_OK = (@EXPORT, qw(int2quad quad2int %quadmask2bits
 	%quadhostmask2bits imask sameblock cmpblocks contains));
 
 my $remembered = {};
@@ -33,7 +36,7 @@ use overload
 	'""' => \&desc,
 	'<=>' => \&cmp_net_netmask_block,
 	'cmp' => \&cmp_net_netmask_block,
-	'fallback' => 1; 
+	'fallback' => 1;
 
 sub new
 {
@@ -65,7 +68,7 @@ sub new
 			$error = "illegal hostmask: $hostmask";
 		}
 	} elsif (($net =~ m,^\d+\.\d+\.\d+\.\d+$,)
-		&& ($mask =~ m,\d+\.\d+\.\d+\.\d+$,)) 
+		&& ($mask =~ m,\d+\.\d+\.\d+\.\d+$,))
 	{
 		$base = $net;
 		if (exists $quadmask2bits{$mask}) {
@@ -103,7 +106,7 @@ sub new
 		# whois format
 		$ibase = quad2int($1);
 		my $end = quad2int($2);
-		$error = "illegal dotted quad: $net" 
+		$error = "illegal dotted quad: $net"
 			unless defined($ibase) && defined($end);
 		my $diff = ($end || 0) - ($ibase || 0) + 1;
 		$bits = $size2bits{$diff};
@@ -119,7 +122,7 @@ sub new
 	carp $error if $error && $debug;
 
 	$bits = 0 unless $bits;
-	if ($bits > 32) { 
+	if ($bits > 32) {
 		$error = "illegal number of bits: $bits"
 			unless $error;
 		$bits = 32;
@@ -133,9 +136,9 @@ sub new
 	$ibase &= $imask[$bits]
 		if defined $ibase;
 
-	return bless { 
+	return bless {
 		'IBASE' => $ibase,
-		'BITS' => $bits, 
+		'BITS' => $bits,
 		( $error ? ( 'ERROR' => $error ) : () ),
 	};
 }
@@ -156,7 +159,7 @@ sub bits { my ($this) = @_; return $this->{'BITS'}; }
 sub size { my ($this) = @_; return 2**(32- $this->{'BITS'}); }
 sub next { my ($this) = @_; int2quad($this->{'IBASE'} + $this->size()); }
 
-sub broadcast 
+sub broadcast
 {
 	my($this) = @_;
 	int2quad($this->{'IBASE'} + $this->size() - 1);
@@ -165,17 +168,17 @@ sub broadcast
 *first = \&base;
 *last = \&broadcast;
 
-sub desc 
-{ 
+sub desc
+{
 	return int2quad($_[0]->{'IBASE'}).'/'.$_[0]->{'BITS'};
 }
 
-sub imask 
+sub imask
 {
 	return (2**32 -(2** (32- $_[0])));
 }
 
-sub mask 
+sub mask
 {
 	my ($this) = @_;
 
@@ -415,8 +418,8 @@ sub match
 	}
 }
 
-sub maxblock 
-{ 
+sub maxblock
+{
 	my ($this) = @_;
 	return imaxblock($this->{'IBASE'}, $this->{'BITS'});
 }
@@ -464,7 +467,7 @@ sub irange2cidrlist
 	my @result;
 	while ($end >= $start) {
 		my $maxsize = imaxblock($start, 32);
-		my $maxdiff = 32 - floor(log($end - $start + 1)/log(2));
+		my $maxdiff = 32 - _log2($end - $start + 1);
 		$maxsize = $maxdiff if $maxsize < $maxdiff;
 		push (@result, bless {
 			'IBASE' => $start,
@@ -569,7 +572,7 @@ sub contains
 
 sub cmp_net_netmask_block
 {
-	return ($_[0]->{IBASE} <=> $_[1]->{IBASE} 
+	return ($_[0]->{IBASE} <=> $_[1]->{IBASE}
 		|| $_[0]->{BITS} <=> $_[1]->{BITS});
 }
 
@@ -602,19 +605,31 @@ sub split
 		unless defined( $parts ) && $parts > 0;
 
 	confess "Netmask only contains $num_ips IPs. Cannot split into $parts."
-		unless $num_ips >= $parts; 
-      
+		unless $num_ips >= $parts;
+
 	my $log2 = log($parts) / log(2);
-      
+
 	confess "Parts count must be a number of base 2. Got: $parts"
 		unless floor($log2) == $log2;
 
 	my $new_mask = $self->bits + $log2;
-      
-	return 
+
+	return
 		map { Net::Netmask->new( $_ . "/" .  $new_mask ) }
-			map { $self->nth( ( $num_ips / $parts ) * $_ ) } 
+			map { $self->nth( ( $num_ips / $parts ) * $_ ) }
 				( 0 .. ( $parts - 1 ) );
+}
+
+# Implement log2 sub routine directly, to avoid precision problems with floor()
+# problems with perls built with uselongdouble defined.
+# Credit: xenu, on IRC
+sub _log2 {
+   my $n = shift;
+
+   my $ret = 0;
+   $ret++ while ($n >>= 1);
+
+   return $ret;
 }
 
 BEGIN {

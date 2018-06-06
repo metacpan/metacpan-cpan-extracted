@@ -67,9 +67,7 @@ SV* SPVM_XS_UTIL_create_sv_type_name(int32_t basic_type_id, int32_t dimension) {
   SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, basic_type_id);
   assert(basic_type);
 
-  SV* sv_type_name = sv_2mortal(newSVpv("SPVM::", 0));
-  
-  sv_catpv(sv_type_name, basic_type->name);
+  SV* sv_type_name = sv_2mortal(newSVpv(basic_type->name, 0));
   
   int32_t dim_index;
   for (dim_index = 0; dim_index < dimension; dim_index++) {
@@ -545,8 +543,7 @@ get_element(...)
     }
     
     if (element_dimension == 0) {
-      SV* sv_basic_type_name = sv_2mortal(newSVpv("SPVM::", 0));
-      sv_catpv(sv_basic_type_name, basic_type->name);
+      SV* sv_basic_type_name = sv_2mortal(newSVpv(basic_type->name, 0));
       
       sv_value = SPVM_XS_UTIL_new_sv_object(value, SvPV_nolen(sv_basic_type_name));
     }
@@ -804,13 +801,13 @@ get_sub_names(...)
 }
 
 SV*
-get_subs_from_package_id(...)
+get_subs_from_package_name(...)
   PPCODE:
 {
   (void)RETVAL;
   
-  SV* sv_package_id = ST(0);
-  int32_t package_id = SvIV(sv_package_id);
+  SV* sv_package_name = ST(0);
+  const char* package_name = SvPV_nolen(sv_package_name);
   
   // API
   SPVM_ENV* env = SPVM_XS_UTIL_get_env();
@@ -818,7 +815,7 @@ get_subs_from_package_id(...)
   SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
   SPVM_COMPILER* compiler = runtime->compiler;
 
-  SPVM_OP* op_package = SPVM_LIST_fetch(compiler->op_packages, package_id);
+  SPVM_OP* op_package = SPVM_HASH_search(compiler->op_package_symtable, package_name, strlen(package_name));
   SPVM_PACKAGE* package = op_package->uv.package;
   
   AV* av_subs = (AV*)sv_2mortal((SV*)newAV());
@@ -1165,31 +1162,31 @@ bind_sub(...)
 MODULE = SPVM::Build::Precompile		PACKAGE = SPVM::Build::Precompile
 
 SV*
-build_csource(...)
+build_package_csource(...)
   PPCODE:
 {
   SV* sv_self = ST(0);
-  SV* sv_sub_name = ST(1);
-  const char* sub_name = SvPV_nolen(sv_sub_name);
-
+  SV* sv_package_name = ST(1);
+  const char* package_name = SvPV_nolen(sv_package_name);
+  
   SPVM_ENV* env = SPVM_XS_UTIL_get_env();
   SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
   SPVM_COMPILER* compiler = runtime->compiler;
   
-  SPVM_OP* op_sub = SPVM_HASH_search(compiler->op_sub_symtable, sub_name, strlen(sub_name));
-  int32_t sub_id = op_sub->uv.sub->id;
+  SPVM_OP* op_package = SPVM_HASH_search(compiler->op_package_symtable, package_name, strlen(package_name));
+  int32_t package_id = op_package->uv.package->id;
   
   // String buffer for csource
   SPVM_STRING_BUFFER* string_buffer = SPVM_STRING_BUFFER_new(0);
   
-  // Build sub csource
-  SPVM_CSOURCE_BUILDER_build_sub_csource(string_buffer, sub_id);
+  // Build package csource
+  SPVM_CSOURCE_BUILDER_build_package_csource(string_buffer, package_id);
   
-  SV* sv_csource_source = sv_2mortal(newSVpv(string_buffer->buffer, string_buffer->length));
+  SV* sv_package_csource = sv_2mortal(newSVpv(string_buffer->buffer, string_buffer->length));
   
   SPVM_STRING_BUFFER_free(string_buffer);
   
-  XPUSHs(sv_csource_source);
+  XPUSHs(sv_package_csource);
   XSRETURN(1);
 }
 
@@ -1245,7 +1242,7 @@ call_sub(...)
   PPCODE:
 {
   (void)RETVAL;
-
+  
   int32_t stack_arg_start = 0;
   
   SV* sv_sub_abs_name = ST(0);

@@ -10,7 +10,6 @@
 #include "../matrix/matrix_la.h"
 #include "../optimization/optimization.h"
 #include "rectangle.h"
-#include "drectangle.h"
 #include <vector>
 
 namespace dlib

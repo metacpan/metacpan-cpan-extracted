@@ -4,6 +4,9 @@ use warnings;
 use X11::Xlib::Display;
 require Scalar::Util;
 
+# All modules in dist share a version
+BEGIN { our $VERSION= $X11::Xlib::VERSION; }
+
 =head1 NAME
 
 X11::Xlib::Screen - Convenience wrapper around Display+ScreenID

@@ -5,11 +5,6 @@
 
 #include "bayes_utils_abstract.h"
 
-#include <algorithm>
-#include <ctime>
-#include <memory>
-#include <vector>
-
 #include "../string.h"
 #include "../map.h"
 #include "../matrix.h"
@@ -18,7 +13,11 @@
 #include "../set.h"
 #include "../algs.h"
 #include "../noncopyable.h"
+#include "../smart_pointers.h"
 #include "../graph.h"
+#include <vector>
+#include <algorithm>
+#include <ctime>
 
 namespace dlib
 {
@@ -356,7 +355,7 @@ namespace dlib
             table.clear();
         }
 
-        size_t size () const { return table.size(); }
+        unsigned long size () const { return table.size(); }
         bool move_next() const { return table.move_next(); }
         void reset() const { table.reset(); }
         map_pair<assignment,double>& element() 
@@ -1660,7 +1659,7 @@ namespace dlib
 
     private:
 
-        std::unique_ptr<bayesian_network_join_tree_helpers::bnjt> impl;
+        scoped_ptr<bayesian_network_join_tree_helpers::bnjt> impl;
         unsigned long num_nodes;
 
     };

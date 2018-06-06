@@ -18,9 +18,9 @@ namespace dlib
         typename sample_type,
         typename label_type
         >
-    matrix<double,1,4>
+    matrix<double,1,2>
     test_regression_function (
-        reg_funct_type& reg_funct,
+        const reg_funct_type& reg_funct,
         const std::vector<sample_type>& x_test,
         const std::vector<label_type>& y_test
     )
@@ -33,7 +33,7 @@ namespace dlib
                     << "\n\t is_learning_problem(x_test,y_test): " 
                     << is_learning_problem(x_test,y_test));
 
-        running_stats<double> rs, rs_mae;
+        running_stats<double> rs;
         running_scalar_covariance<double> rc;
 
         for (unsigned long i = 0; i < x_test.size(); ++i)
@@ -42,13 +42,12 @@ namespace dlib
             const double output = reg_funct(x_test[i]);
             const double temp = output - y_test[i];
 
-            rs_mae.add(std::abs(temp));
             rs.add(temp*temp);
             rc.add(output, y_test[i]);
         }
 
-        matrix<double,1,4> result;
-        result = rs.mean(), rc.correlation(), rs_mae.mean(), rs_mae.stddev();
+        matrix<double,1,2> result;
+        result = rs.mean(), std::pow(rc.correlation(),2);
         return result;
     }
 
@@ -59,7 +58,7 @@ namespace dlib
         typename sample_type,
         typename label_type 
         >
-    matrix<double,1,4> 
+    matrix<double,1,2> 
     cross_validate_regression_trainer (
         const trainer_type& trainer,
         const std::vector<sample_type>& x,
@@ -83,7 +82,7 @@ namespace dlib
         const long num_in_test = x.size()/folds;
         const long num_in_train = x.size() - num_in_test;
 
-        running_stats<double> rs, rs_mae;
+        running_stats<double> rs;
         running_scalar_covariance<double> rc;
 
         std::vector<sample_type> x_test, x_train;
@@ -129,7 +128,6 @@ namespace dlib
                     const double output = df(x_test[j]);
                     const double temp = output - y_test[j];
 
-                    rs_mae.add(std::abs(temp));
                     rs.add(temp*temp);
                     rc.add(output, y_test[j]);
                 }
@@ -141,8 +139,8 @@ namespace dlib
 
         } // for (long i = 0; i < folds; ++i)
 
-        matrix<double,1,4> result;
-        result = rs.mean(), rc.correlation(), rs_mae.mean(), rs_mae.stddev();
+        matrix<double,1,2> result;
+        result = rs.mean(), std::pow(rc.correlation(),2);
         return result;
     }
 

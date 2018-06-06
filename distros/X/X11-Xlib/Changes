@@ -1,5 +1,9 @@
 Revision history for Perl extension X11::Xlib.
 
+0.18 - 2018-06-05
+    - In Display->get_cached_xobj, allow constructor args to be hashref
+    - Include version number on every object
+
 0.17 - 2018-04-10
     - If Xrender.h is not available, fall back to local definitions
       (allows XRenderPictFormat module even if header isn't installed)

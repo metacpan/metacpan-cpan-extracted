@@ -1,18 +1,29 @@
+use strict;
+
+use lib qw[inc];
 use ExtUtils::MakeMaker;
-my %options = %{ {
+use Inline::Module;
+
+my %WriteMakefileArgs = (
     NAME          => 'cppAdaptive2',
-    VERSION_FROM  => 'lib/cppAdaptive2.pm',
     ABSTRACT_FROM => 'lib/cppAdaptive2.pm',
-    'LIBS'        => ['-lstdc++'],
-    'TYPEMAPS'    => ['CPP.map'],
-    'INC'         => '-I./src/',
-    'CC'          => 'g++ -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -xc++',
+    VERSION_FROM  => 'lib/cppAdaptive2.pm',
+    INC           => '-Isrc',
+    postamble     => {
+        inline => {
+            module => 'cppAdaptive2',
+            stub   => 'cppAdaptive2::Inline',
+            ilsm   => 'Inline::CPP',
 
-    # 'CC'          => 'g++ -std=c++11 -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -xc++',
-    'CCFLAGS' => ' -std=c++14 -w',
-} };
+            # makestub => 1,
+        },
+    },
+);
 
-WriteMakefile(%options);
+if ( $^O eq 'MSWin32' ) {
+    $WriteMakefileArgs{PREREQ_PM}{'Win32::Mutex'} = '1.09';
+}
 
-# Remove the Makefile dependency. Causes problems on a few systems.
-sub MY::makefile {''}
+WriteMakefile(%WriteMakefileArgs);
+
+1;

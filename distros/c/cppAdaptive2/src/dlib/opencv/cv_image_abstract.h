@@ -127,7 +127,7 @@ namespace dlib
                 - returns the number of columns in this image
         !*/
 
-        size_t size (
+        unsigned long size (
         ) const; 
         /*!
             ensures
@@ -154,30 +154,6 @@ namespace dlib
                 - 0 <= row < nr()
             ensures
                 - returns a pointer to the first pixel in the given row
-                  of this image
-        !*/
-
-        inline const pixel_type& operator()(
-            const long row, const long column
-        ) const
-        /*!
-            requires
-                - 0 <= row < nr()
-                - 0 <= column < nc()
-            ensures
-                - returns a const reference to the pixel at coordinates (row, column)
-                  of this image
-        !*/
-
-        inline pixel_type& operator()(
-            const long row, const long column
-        )
-        /*!
-            requires
-                - 0 <= row < nr()
-                - 0 <= column < nc()
-            ensures
-                - returns a reference to the pixel at coordinates (row, column)
                   of this image
         !*/
 

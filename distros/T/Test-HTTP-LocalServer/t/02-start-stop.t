@@ -14,5 +14,7 @@ is $res, 1, "PID $pid is an existing process";
 
 $server->stop;
 
+sleep 5; # just give it more time to be really sure
+
 $res = kill 0, $pid;
 is $res, 0, "PID $pid doesn't exist anymore";

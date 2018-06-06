@@ -1,5 +1,5 @@
 ---
-abstract: 'frequently asked questions about Perl'
+abstract: 'Frequently asked questions about Perl'
 author:
   - 'Tom Christiansen <tchrist@perl.com>'
   - 'Nat Torkington <gnat@frii.com>'
@@ -14,10 +14,10 @@ build_requires:
   Test::More: '0'
   perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.133380'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,99 +33,89 @@ resources:
   bugtracker: https://github.com/perl-doc-cats/perlfaq/issues
   homepage: https://metacpan.org/release/perlfaq
   repository: https://github.com/perl-doc-cats/perlfaq.git
-version: '5.021011'
+version: '5.20180605'
 x_Dist_Zilla:
   perl:
-    version: '5.018002'
+    version: '5.027011'
   plugins:
     -
-      class: Dist::Zilla::Plugin::PruneCruft
-      name: '@Filter/PruneCruft'
-      version: '5.019'
-    -
-      class: Dist::Zilla::Plugin::ManifestSkip
-      name: '@Filter/ManifestSkip'
-      version: '5.019'
+      class: Dist::Zilla::Plugin::AutoVersion
+      name: AutoVersion
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaYAML
-      name: '@Filter/MetaYAML'
-      version: '5.019'
+      name: MetaYAML
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: MetaJSON
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::License
-      name: '@Filter/License'
-      version: '5.019'
+      name: License
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Readme
-      name: '@Filter/Readme'
-      version: '5.019'
-    -
-      class: Dist::Zilla::Plugin::ExecDir
-      name: '@Filter/ExecDir'
-      version: '5.019'
-    -
-      class: Dist::Zilla::Plugin::ShareDir
-      name: '@Filter/ShareDir'
-      version: '5.019'
+      name: Readme
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
-      name: '@Filter/MakeMaker'
-      version: '5.019'
+      name: MakeMaker
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Manifest
-      name: '@Filter/Manifest'
-      version: '5.019'
+      name: Manifest
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::TestRelease
-      name: '@Filter/TestRelease'
-      version: '5.019'
+      name: TestRelease
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
-      name: '@Filter/UploadToCPAN'
-      version: '5.019'
+      name: UploadToCPAN
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
+        Dist::Zilla::Plugin::GatherDir:
+          exclude_filename:
+            - LICENSE
+            - README.pod
+          exclude_match: []
+          follow_symlinks: 0
+          include_dotfiles: 0
+          prefix: ''
+          prune_directory: []
+          root: .
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: Git::GatherDir
-      version: '2.036'
+      version: '2.044'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: '9'
       name: RunExtraTests
-      version: '0.027'
-    -
-      class: Dist::Zilla::Plugin::Git::NextVersion
-      config:
-        Dist::Zilla::Plugin::Git::NextVersion:
-          first_version: '0.001'
-          version_by_branch: 0
-          version_regexp: (?^u:^([\d._]+)$)
-        Dist::Zilla::Role::Git::Repo:
-          repo_root: .
-      name: Git::NextVersion
-      version: '2.036'
-    -
-      class: Dist::Zilla::Plugin::PkgVersion
-      name: PkgVersion
-      version: '5.019'
+      version: '0.029'
     -
       class: Dist::Zilla::Plugin::DualLife
+      config:
+        Dist::Zilla::Plugin::DualLife:
+          entered_core: '5.015000'
+          eumm_bundled: 0
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000033'
+          version: '0.006'
       name: DualLife
-      version: '0.03'
+      version: '0.07'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: MetaConfig
-      version: '5.019'
-    -
-      class: Dist::Zilla::Plugin::MetaJSON
-      name: MetaJSON
-      version: '5.019'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MinimumPerl
       name: MinimumPerl
@@ -136,98 +126,107 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::Compile:
           bail_out_on_fail: '0'
           fail_on_warning: author
-          fake_home: '0'
+          fake_home: 0
           filename: t/00-compile.t
           module_finder:
             - ':InstallModules'
-          needs_display: '0'
+          needs_display: 0
           phase: test
           script_finder:
-            - ':ExecFiles'
+            - ':PerlExecFiles'
           skips: []
+          switch: []
       name: Test::Compile
-      version: '2.053'
+      version: '2.058'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: PodSyntaxTests
-      version: '5.019'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Test::NoTabs
       config:
         Dist::Zilla::Plugin::Test::NoTabs:
-          module_finder:
+          filename: xt/author/no-tabs.t
+          finder:
             - ':InstallModules'
-          script_finder:
             - ':ExecFiles'
+            - ':TestFiles'
       name: Test::NoTabs
-      version: '0.06'
+      version: '0.15'
     -
       class: Dist::Zilla::Plugin::Test::EOL
       config:
         Dist::Zilla::Plugin::Test::EOL:
           filename: xt/author/eol.t
           finder:
-            - ':InstallModules'
             - ':ExecFiles'
+            - ':InstallModules'
             - ':TestFiles'
-          trailing_whitespace: '1'
+          trailing_whitespace: 1
       name: Test::EOL
-      version: '0.18'
+      version: '0.19'
     -
       class: Dist::Zilla::Plugin::Test::ChangesHasContent
       name: Test::ChangesHasContent
-      version: '0.008'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::MojibakeTests
       name: MojibakeTests
       version: '0.8'
     -
       class: Dist::Zilla::Plugin::Test::Portability
+      config:
+        Dist::Zilla::Plugin::Test::Portability:
+          options: ''
       name: Test::Portability
-      version: '2.000006'
+      version: '2.001000'
     -
       class: Dist::Zilla::Plugin::Test::MinimumVersion
       name: Test::MinimumVersion
-      version: '2.000006'
+      version: '2.000008'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: MetaResources
-      version: '5.019'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
+          git_version: 2.17.0
           include_authors: 0
           include_releaser: 1
           order_by: name
-          paths:
-            - .
+          paths: []
       name: Git::Contributors
-      version: '0.013'
+      version: '0.034'
     -
       class: Dist::Zilla::Plugin::Authority
       name: Authority
-      version: '1.006'
+      version: '1.009'
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: MetaNoIndex
-      version: '5.019'
+      version: '6.012'
     -
-      class: inc::CreateQuestionList
-      name: =inc::CreateQuestionList
+      class: Dist::Zilla::Plugin::lib
+      config:
+        Dist::Zilla::Plugin::lib:
+          lib:
+            - inc
+      name: lib
+      version: '0.001002'
+    -
+      class: CreateQuestionList
+      name: =CreateQuestionList
       version: ~
     -
       class: Dist::Zilla::Plugin::FileFinder::Filter
       name: PodFiles
-      version: '5.019'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::PodVersion
       name: PodVersion
-      version: '5.019'
-    -
-      class: Dist::Zilla::Plugin::NextRelease
-      name: NextRelease
-      version: '5.019'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -238,23 +237,26 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.17.0
           repo_root: .
       name: Git::Check
-      version: '2.036'
+      version: '2.044'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.17.0
           repo_root: .
       name: Git::CheckFor::MergeConflicts
-      version: '0.013'
+      version: '0.014'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.17.0
           repo_root: .
       name: Git::CheckFor::CorrectBranch
-      version: '0.013'
+      version: '0.014'
     -
       class: Dist::Zilla::Plugin::Git::Remote::Check
       name: Git::Remote::Check
@@ -267,14 +269,47 @@ x_Dist_Zilla:
             - LICENSE
           match: []
       name: CopyFilesFromRelease
-      version: '0.006'
+      version: '0.007'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: recommends
+      name: '@Git::VersionManager/pluginbundle version'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::RewriteVersion::Transitional
+      config:
+        Dist::Zilla::Plugin::RewriteVersion:
+          add_tarball_name: 0
+          finders:
+            - ':ExecFiles'
+            - ':InstallModules'
+          global: 0
+          skip_version_provider: 1
+        Dist::Zilla::Plugin::RewriteVersion::Transitional: {}
+      name: '@Git::VersionManager/RewriteVersion::Transitional'
+      version: '0.009'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Update
+      name: '@Git::VersionManager/MetaProvides::Update'
+      version: '0.007'
+    -
+      class: Dist::Zilla::Plugin::CopyFilesFromRelease
+      config:
+        Dist::Zilla::Plugin::CopyFilesFromRelease:
+          filename:
+            - Changes
+          match: []
+      name: '@Git::VersionManager/CopyFilesFromRelease'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
         Dist::Zilla::Plugin::Git::Commit:
-          add_files_in:
-            - .
-          commit_msg: '%N-%v%t%n%n%c'
+          add_files_in: []
+          commit_msg: v%v%n%n%c
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -282,11 +317,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.17.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
-      name: Git::Commit
-      version: '2.036'
+      name: '@Git::VersionManager/release snapshot'
+      version: '2.044'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -294,67 +330,102 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '5.021011'
-          tag_format: '%v%t'
-          tag_message: v%v%t
+          tag: v5.20180605
+          tag_format: v%v
+          tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.17.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
-      name: Git::Tag
-      version: '2.036'
+      name: '@Git::VersionManager/Git::Tag'
+      version: '2.044'
     -
-      class: Dist::Zilla::Plugin::Git::Push
+      class: Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
       config:
-        Dist::Zilla::Plugin::Git::Push:
-          push_to:
-            - origin
-          remotes_must_exist: 1
+        Dist::Zilla::Plugin::BumpVersionAfterRelease:
+          finders:
+            - ':ExecFiles'
+            - ':InstallModules'
+          global: 0
+          munge_makefile_pl: 1
+        Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional: {}
+      name: '@Git::VersionManager/BumpVersionAfterRelease::Transitional'
+      version: '0.009'
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@Git::VersionManager/NextRelease'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      config:
+        Dist::Zilla::Plugin::Git::Commit:
+          add_files_in: []
+          commit_msg: 'increment $VERSION after %v release'
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Build.PL
+            - Changes
+            - Makefile.PL
+          allow_dirty_match:
+            - (?^:^lib/.*\.pm$)
+          changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.17.0
           repo_root: .
-      name: Git::Push
-      version: '2.036'
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@Git::VersionManager/post-release commit'
+      version: '2.044'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: ConfirmRelease
-      version: '5.019'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '5.019'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '5.019'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '5.019'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExtraTestFiles'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '5.019'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':PerlExecFiles'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '5.019'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '5.019'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '5.019'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '5.019'
+      version: '6.012'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '5.019'
+    version: '6.012'
 x_authority: cpan:LLAP
 x_contributors:
   - 'Alex Beamish <talexb@gmail.com>'
@@ -363,18 +434,22 @@ x_contributors:
   - 'Christian Walde <walde.christian@googlemail.com>'
   - 'Christopher J. Madsen <perl@cjmweb.net>'
   - 'darfich <bourbaki007@gmail.com>'
+  - 'Dave Cross <dave@dave.org.uk>'
   - 'David Precious <davidp@preshweb.co.uk>'
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'Denilson Sá Maia <denilsonsa@gmail.com>'
   - 'Douglas L. Jenkins <jenkinsd@ochin.org>'
   - 'Eric Johnson <eric.git@iijo.org>'
   - 'Father Chrysostomos <sprout@cpan.org>'
   - 'Florian Ragwitz <rafl@debian.org>'
   - 'Grzegorz Rożniecki <xaerxess@gmail.com>'
+  - 'hemanth.hm <hemanth.hm@gmail.com>'
   - 'Herbert Breunung <lichtkind@cpan.org>'
   - 'hurricup <hurricup@gmail.com>'
   - 'James E Keenan <jkeenan@cpan.org>'
   - 'Jeffrey Kegler <jeffreykegler@jeffreykegler.com>'
   - 'joaquinferrero <explorer+git@joaquinferrero.com>'
+  - 'Joel Maslak <jmaslak@antelope.net>'
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Laurent Dami <laurent.dami@free.fr>'
   - 'Leo Lapworth <leo@cuckoo.org>'
@@ -382,7 +457,8 @@ x_contributors:
   - 'Martin Becker <mhasch@cpan.org>'
   - 'Martin McGrath <mcgrath.martin@gmail.com>'
   - 'Matthew Horsfall <wolfsage@gmail.com>'
-  - 'mauke <l.mai@web.de>'
+  - 'Michael G. Schwern <schwern@pobox.com>'
+  - 'Michiel Beijen <michiel.beijen@gmail.com>'
   - 'Michiel Beijen <michiel.beijen@otrs.com>'
   - 'Michiel <michiel@limbs>'
   - 'Mike Doherty <doherty@cs.dal.ca>'
@@ -394,3 +470,6 @@ x_contributors:
   - 'Shlomi Fish <shlomif@iglu.org.il>'
   - 'Smylers <Smylers@stripey.com>'
   - 'tina <forum@s05.tinita.de>'
+  - 'Tom Molesworth <tom@binary.com>'
+x_generated_by_perl: v5.27.11
+x_serialization_backend: 'YAML::Tiny version 1.73'

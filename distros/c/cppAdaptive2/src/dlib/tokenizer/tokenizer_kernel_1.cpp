@@ -29,7 +29,7 @@ namespace dlib
         catch (...)
         {
             if (headset) delete [] headset;
-            if (bodyset) delete [] bodyset;
+            if (bodyset) delete [] headset;
             throw;
         }
     }

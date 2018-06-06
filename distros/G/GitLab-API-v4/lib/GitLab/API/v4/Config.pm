@@ -1,5 +1,5 @@
 package GitLab::API::v4::Config;
-$GitLab::API::v4::Config::VERSION = '0.09';
+$GitLab::API::v4::Config::VERSION = '0.10';
 =encoding utf8
 
 =head1 NAME
@@ -20,7 +20,7 @@ and/or CLI options.
 This module is used by L<gitlab-api-v4> to load configuration.
 
 If you are using L<GitLab::API::v4> directly then this module will not be
-automaticaly used, but you are welcome to explicitly use it as shown in the
+automatically used, but you are welcome to explicitly use it as shown in the
 L</SYNOPSIS>.
 
 =cut

@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "HTTP::Message"                  => 0,
     "HTTP::Request"                  => 0,
     "Mojolicious"                    => "7.52",
-    "Mojolicious::Plugin::MountPSGI" => 0,
+    "Mojolicious::Plugin::MountPSGI" => "0.13",
     "Plack"                          => 0,
     "Test2::Tools::HTTP"             => "0.05",
     "parent"                         => 0
@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
     "Test2::Tools::JSON::Pointer" => 0,
     "Test2::V0"                   => "0.000060"
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test"    => {
     "TESTS" => "t/*.t"
     }
@@ -51,7 +51,7 @@ my %FallbackPrereqs = (
   "HTTP::Message"                  => 0,
   "HTTP::Request"                  => 0,
   "Mojolicious"                    => "7.52",
-  "Mojolicious::Plugin::MountPSGI" => 0,
+  "Mojolicious::Plugin::MountPSGI" => "0.13",
   "Plack"                          => 0,
   "Test2::Require::Internet"       => 0,
   "Test2::Require::Module"         => "0.000060",

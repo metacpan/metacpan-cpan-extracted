@@ -1,20 +1,21 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2018 -- leonerd@leonerd.org.uk
 
 package Device::BusPirate;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Carp;
 
+use Fcntl qw( O_NOCTTY O_NDELAY );
 use Future::Mutex;
 use Future::Utils qw( repeat );
-use IO::Termios;
+use IO::Termios 0.06;
 use Time::HiRes qw( time );
 
 use Module::Pluggable
@@ -22,12 +23,6 @@ use Module::Pluggable
    require     => 1,
    sub_name    => "modes";
 my %MODEMAP = map { $_->MODE => $_ } __PACKAGE__->modes;
-
-use Module::Pluggable
-   search_path => "Device::BusPirate::Chip",
-   require     => 1,
-   sub_name    => "chips";
-my %CHIPMAP = map { $_->can( "CHIP" ) ? ( $_->CHIP => $_ ) : () } __PACKAGE__->chips;
 
 use Struct::Dumb qw( readonly_struct );
 
@@ -116,9 +111,10 @@ sub new
    my $serial = $args{serial} || BUS_PIRATE;
    my $baud   = $args{baud} || 115200;
 
-   my $fh = IO::Termios->open( $serial, "$baud,8,n,1" )
+   my $fh = IO::Termios->open( $serial, "$baud,8,n,1", O_NOCTTY|O_NDELAY )
       or croak "Cannot open serial port $serial - $!";
 
+   $fh->setflag_clocal( 1 );
    $fh->setflag_icanon( 0 );
    $fh->setflag_echo( 0 );
 
@@ -263,8 +259,6 @@ sub enter_mode
 
 =head2 mount_chip
 
-   $chip = $pirate->mount_chip( $chipname, %opts )->get
-
 B<Note>: this method is now deprecated in favour of the L<Device::Chip>
 interface. This distribution provides a class,
 L<Device::Chip::Adapter::BusPirate>, suitable to connect an instance of the
@@ -272,32 +266,11 @@ L<Device::Chip> interface to. Any previously-written Bus Pirate-specific
 chip driver classes should now be changed to target the generic
 L<Device::Chip> interface instead.
 
-Constructs a "chip" object; a helper designed to communicate with some
-particular hardware device (usually a specific chip) attached to the Bus
-Pirate. This will be a subclass of L<Device::BusPirate::Chip>, and will likely
-provide various methods specific to the operation of that particular device.
-
-C<$chipname> should match the name declared by the chip module, and other
-options passed in C<%opts> will be passed to its constructor.
-
 =cut
 
 sub mount_chip
 {
-   my $self = shift;
-   my ( $chipname, %opts ) = @_;
-
-   my $chipclass = $CHIPMAP{$chipname} or
-      croak "Unrecognised chip '$chipname'";
-
-   my $chip = $self->{chip} = $chipclass->new( $self, %opts );
-
-   $self->enter_mode( $chip->MODE )
-      ->then( sub {
-         my ( $mode ) = @_;
-         $chip->mount( $mode )
-      })
-      ->then_done( $chip );
+   croak "Device::BusPirate->mount_chip is now deprecated. Please use Device::Chip instead";
 }
 
 =head2 start

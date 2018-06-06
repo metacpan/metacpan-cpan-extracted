@@ -17,7 +17,7 @@ namespace dlib
     public:
 
         void clear (
-        ) noexcept
+        )
         {
             items.clear();
         }
@@ -34,22 +34,22 @@ namespace dlib
             }
         }
 
-        size_t size (
-        ) const noexcept
+        unsigned long size (
+        ) const
         {
             return items.size();
         }
 
         unsigned long find_set (
-            unsigned long item
+            unsigned long item 
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(item < size(),
+            DLIB_ASSERT(item < size(), 
                 "\t unsigned long disjoint_subsets::find_set()"
                 << "\n\t item must be less than size()"
-                << "\n\t item: " << item
-                << "\n\t size(): " << size()
+                << "\n\t item: " << item 
+                << "\n\t size(): " << size() 
                 << "\n\t this: " << this
                 );
 
@@ -88,16 +88,16 @@ namespace dlib
             // make sure requires clause is not broken
             DLIB_ASSERT(a != b &&
                         a < size() &&
-                        b < size() &&
+                        b < size() && 
                         find_set(a) == a &&
                         find_set(b) == b,
                 "\t unsigned long disjoint_subsets::merge_sets(a,b)"
                 << "\n\t invalid arguments were given to this function"
-                << "\n\t a: " << a
-                << "\n\t b: " << b
-                << "\n\t size(): " << size()
-                << "\n\t find_set(a): " << find_set(a)
-                << "\n\t find_set(b): " << find_set(b)
+                << "\n\t a: " << a 
+                << "\n\t b: " << b 
+                << "\n\t size(): " << size() 
+                << "\n\t find_set(a): " << find_set(a) 
+                << "\n\t find_set(b): " << find_set(b) 
                 << "\n\t this: " << this
                 );
 
@@ -139,3 +139,4 @@ namespace dlib
 }
 
 #endif // DLIB_DISJOINT_SUBsETS_Hh_
+

@@ -33,5 +33,5 @@ resources:
   homepage: https://code.google.com/p/perl-devel-nytprof/
   license: http://dev.perl.org/licenses/
   repository: git://github.com/timbunce/devel-nytprof.git
-version: '6.05'
+version: '6.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -608,25 +608,43 @@ sub test_kz : Test(5) {
     }
 }
 
-sub test_us : Test(3) {
+sub test_us : Test(6) {
     SKIP: {
         eval { require Date::Holidays::USFederal };
-        skip "Date::Holidays::USFederal not installed", 3 if $@;
+        skip "Date::Holidays::USFederal not installed", 6 if $@;
 
         ok( my $dh = Date::Holidays->new( countrycode => 'USFederal', nocheck => 1 ),
             'Testing Date::Holidays::USFederal' );
 
         dies_ok { $dh->holidays() }
-            'Testing holidays without argument for Date::Japanese::Holiday';
+            'Testing holidays without argument for Date::Holidays::USFederal';
 
         my $holidays_hashref = Date::Holidays->is_holiday(
-            year  => 2018,
-            month => 1,
-            day   => 1,
+            year      => 2018,
+            month     => 1,
+            day       => 1,
             countries => [ 'USFederal' ],
+            nocheck   => 1,
         );
 
         ok( $holidays_hashref->{USFederal}, 'Checking for US Federal New Year' );
+
+        ok( $dh = Date::Holidays->new( countrycode => 'US' ),
+            'Testing Date::Holidays::USFederal' );
+
+        dies_ok { $dh->holidays() }
+            'Testing holidays without argument for Date::Holidays::USFederal';
+
+        $holidays_hashref = Date::Holidays->is_holiday(
+            year      => 2018,
+            month     => 1,
+            day       => 1,
+            countries => [ 'US' ],
+        );
+
+        ok( $holidays_hashref->{US}, 'Checking for US Federal New Year' );
+
+
     }
 }
 

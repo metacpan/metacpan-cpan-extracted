@@ -1,105 +1,99 @@
 package WebService::Pokemon;
 
-use Mouse;
-use Types::Standard qw/Str/;
-
+use utf8;
 use strictures 2;
 use namespace::clean;
 
-with 'Web::API';
+use CHI;
+use Moo;
+use Types::Standard qw(Str);
 
-use constant DEFAULT_BASE_API_URL => 'http://pokeapi.co/api/';
-use constant DEFAULT_API_VERSION => 'v2';
+with 'Role::REST::Client';
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 
-has 'api_version' => (
-    is      => 'rw',
+has 'api_url' => (
     isa     => Str,
-    default => sub { DEFAULT_API_VERSION }
-);
-
-has 'v2_endpoints' => (
     is      => 'rw',
-    default => sub {
-        {
-            pokemons => {
-                method => 'GET',
-                path => 'pokemon/',
-                default_attributes => { limit => 20, offset => 0 }
-            },
-            pokemon => {
-                method => 'GET',
-                require_id => 1,
-                path => 'pokemon/:id/'
-            },
-            berries => {
-                method => 'GET',
-                path => 'berry/',
-                default_attributes => { limit => 20, offset => 0 }
-            },
-            berry => {
-                method => 'GET',
-                require_id => 1,
-                path => 'berry/:id/'
-            },
-            berry_firmness => {
-                method => 'GET',
-                require_id => 1,
-                path => 'berry-firmness/:id/'
-            },
-            berry_flavor => {
-                method => 'GET',
-                require_id => 1,
-                path => 'berry-flavor/:id/'
-            },
-        };
-    },
+    default => sub { 'https://pokeapi.co/api/v2' },
 );
 
-has 'v1_endpoints' => (
+has 'cache_path' => (
+    isa     => Str,
     is      => 'rw',
-    default => sub {
-        {
-        };
-    },
+    default => sub { '/tmp/cache/' },
 );
 
-around 'format_response' => sub {
-    my ($method, $self, $response, $ct, $error) = @_;
+has cache => (
+    is      => 'ro',
+    lazy    => 1,
+    builder => 1,
+);
 
-    my $answer = $self->$method($response, $ct, $error);
+sub _build_cache {
+    my $self = shift;
 
-    return ($answer->{code} == 200)
-        ? $answer->{content}
-        : undef;
-};
-
-sub commands {
-    my ($self) = @_;
-
-    my $api_version = $self->api_version;
-
-    return $self->v1_endpoints if ($api_version eq 'v1');
-    return $self->v2_endpoints if ($api_version eq 'v2');
+    return CHI->new(
+        driver => 'File',
+        namespace => 'pokemon',
+        root_dir => $self->cache_path
+    );
 }
 
 sub BUILD {
     my ($self, $args) = @_;
 
-    $self->api_version($args->{api_version}) if (defined $args->{api_version});
+    foreach my $arg (keys %$args) {
+        $self->$arg($args->{$arg}) if (defined $args->{$arg});
+    }
 
-    my $base_url = $args->{base_url} || DEFAULT_BASE_API_URL;
-    $base_url .= $self->api_version;
-
-    $self->user_agent(__PACKAGE__ . ' ' . $VERSION);
-    $self->base_url($base_url);
-    $self->content_type('application/json');
-
-    $self->debug(1) if ($ENV{LOGGING});
+    $self->set_persistent_header('User-Agent' => __PACKAGE__ . q| |
+          . ($WebService::Pokemon::VERSION || q||));
+    $self->server($self->api_url);
 
     return $self;
+}
+
+sub resource {
+    my ($self, $resource, $name, $limit, $offset) = @_;
+
+    my $queries;
+    if (!defined $name) {
+        $queries->{limit} = $limit || 20;
+        $queries->{offset} = $offset || 0;
+    }
+
+    return $self->_request($resource, $name, $queries);
+}
+
+sub _request {
+    my ($self, $resource, $name, $queries) = @_;
+
+    return if (!defined $resource || length $resource <= 0);
+
+    $queries ||= {};
+
+    # In case the api_url was updated.
+    $self->server($self->api_url);
+    $self->type(qq|application/json|);
+
+    my $endpoint = q||;
+    $endpoint .= "/" . $resource;
+    $endpoint .= "/" . $name if (defined $name);
+
+    my $cache_decoded_content = $self->cache->get($endpoint);
+    if (defined $cache_decoded_content) {
+        my $deserializer = $self->_serializer(qq|application/json|);
+
+        return $deserializer->deserialize($cache_decoded_content);
+    }
+    else {
+        my $response = $self->get($endpoint, $queries);
+        $self->cache->set($endpoint, $response->response->decoded_content);
+
+        return $response->data;
+    }
 }
 
 
@@ -141,7 +135,7 @@ project.
 
 Setting up the required packages.
 
-    $ cpanm Dist::Milla
+    $ milla authordeps --missing | cpanm
     $ milla listdeps --missing | cpanm
 
 Check you code coverage.
@@ -154,7 +148,6 @@ Several ways to run the test.
     $ milla test --author --release
     $ AUTHOR_TESTING=1 RELEASE_TESTING=1 milla test
     $ AUTHOR_TESTING=1 RELEASE_TESTING=1 milla run prove t/01_instantiation.t
-    $ LOGGING=1 milla run prove t/t/03_pokemon.t
 
 Release the module.
 
@@ -170,59 +163,29 @@ Construct a new WebService::Pokemon instance. Optionally takes a hash or hash re
     # Instantiate the class.
     my $pokemon_api = WebService::Pokemon->new;
 
-=head3 base_url
+=head3 api_url
 
 The URL of the API resource.
 
     # Instantiate the class by setting the URL of the API endpoints.
     my $pokemon_api = WebService::Pokemon->new({api_url => 'http://example.com/api/v2'});
 
-=head3 api_version
+    # Or after the object was created.
+    my $pokemon_api = WebService::Pokemon->new;
+    $pokemon_api->api_url('http://example.com/api/v2');
 
-The API version of the API endpoints. By default, the API version was set to
-'v2'.
+=head2 resource
 
-    # Instantiate the class by setting the API version.
-    my $pokemon_api = WebService::Pokemon->new({api_version => 'v1'});
+Get the details of a particular resource either by id or name.
 
-=head2 api_version
+    # Get paginated list of available berry resource.
+    my $berry = $pokemon_api->resource('berry');
 
-Get the current API version of the web service.
+    # Get by id.
+    my $berry_firmness = $pokemon_api->resource('berry-firmnesses', 1);
 
-    my $version = $pokemon_api->api_version();
-
-    # Change the API version.
-    $pokemon_api->api_version('v1');
-
-=head2 pokemon
-
-Get the details of a particular Pokémon either by id or name.
-
-    my $pokemon = $pokemon_api->pokemon(id => 1);
-    my $pokemon = $pokemon_api->pokemon(id => 'bulbasaur');
-
-=head2 berry
-
-Get the details of a particular berry either by id or name.
-
-    my $pokemon = $pokemon_api->berry(id => 1);
-    my $pokemon = $pokemon_api->berry(id => 'cheri');
-
-=head2 berry_firmness
-
-Get the details of a particular berry firmness either by id or name.
-
-    my $pokemon = $pokemon_api->berry_firmness(id => 1);
-    my $pokemon = $pokemon_api->berry_firmness(id => 'very-soft');
-
-=head2 berry_flavor
-
-Get the details of a particular berry flavor either by id or name.
-
-    my $pokemon = $pokemon_api->berry_firmness(id => 1);
-    my $pokemon = $pokemon_api->berry_firmness(id => 'spicy');
-
-=head2 commands
+    # Get by name.
+    my $berry_firmness = $pokemon_api->resource('berry-firmnesses', 'very-soft');
 
 =head1 COPYRIGHT AND LICENSE
 

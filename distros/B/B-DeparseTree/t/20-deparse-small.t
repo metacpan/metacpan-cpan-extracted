@@ -3,10 +3,18 @@
 
 use rlib '.'; use helper;
 use warnings; use strict;
+use File::Temp qw/ tempfile tempdir /;
 
 if ($] < 5.018 || $] > 5.0269) {
     plan skip_all => 'Customized to Perl 5.22 - 5.26 interpreters';
 }
+
+if ($ENV{'CIRCLECI'}) {
+    plan skip_all => 'Something is funky with CircleCI';
+}
+
+use Config;
+my $is_cperl = $Config::Config{usecperl};
 
 my $tests = 19; # not counting those in the __DATA__ section
 
@@ -17,9 +25,9 @@ my $eval_but_skip = $tests+1;
 
 my @test_files;
 if ($] >= 5.018 && $] <= 5.0249) {
-    @test_files = ('P524-short.pm');
+    @test_files = ('subst.pm', 'P524-short.pm');
 } else {
-    @test_files = ('P526-short.pm');
+    @test_files = ('subst.pm', 'P526-short.pm');
 }
 
 use constant MAX_ERROR_COUNT => 2;
@@ -27,26 +35,33 @@ my $error_count = 0;
 
 for my $file (@test_files) {
 
-    my ($data_fh, $line) = open_data($file);
+    my ($data_fh, $line_no) = open_data($file);
     while (<$data_fh>) {
 	# FIXME w need to count \n's in $_
-	# $line ++;
+	$line_no += (length split /\n/, $_);
 	chomp;
 	$tests ++;
-	# This code is pinched from the t/lib/common.pl for TODO.
-	# It's not clear how to avoid duplication
+
+	# This code was adapted from the t/lib/common.pl for TODO.
 	my %meta = (context => '');
+	my %orig_meta = ();
 	foreach my $what (qw(skip todo context options)) {
-	    s/^#\s*\U$what\E\s*(.*)\n//m and $meta{$what} = $1;
-	    # If the SKIP reason starts ? then it's taken as a code snippet to
-	    # evaluate. This provides the flexibility to have conditional SKIPs
-	    if ($meta{$what} && $meta{$what} =~ s/^\?//) {
-		my $temp = eval $meta{$what};
-		ok ! $@;
-		if ($@) {
-		    die "# In \U$what\E code reason:\n# $meta{$what}\n$@";
+	    if (s/^#\s*\U$what\E\s*(.*)\n//m) {
+		$orig_meta{$what} = $_;
+		$meta{$what} = $1;
+
+		# If the SKIP reason starts ? then it's taken as a code snippet to
+		# evaluate. This provides the flexibility to have conditional SKIPs
+		if ($meta{$what} =~ s/^\?//) {
+		    my $temp = eval $meta{$what};
+		    ok ! $@;
+		    if ($@) {
+			die "# In \U$what\E code reason:\n# $meta{$what}\n$@";
+		    }
+		    $meta{$what} = $temp;
 		}
-		$meta{$what} = $temp;
+		# We tolerate many "skip", "todo", and "context lines;
+		# last unless $what eq 'skip';
 	    }
 	}
 
@@ -74,7 +89,8 @@ for my $file (@test_files) {
 	    new B::DeparseTree split /,/, $meta{options}
 	: $deparse;
 
-	my $coderef = eval "$meta{context};\n" . <<'EOC' . "sub {$input}";
+	my $code_string = "$meta{context};\n" . <<'EOC' . "sub {$input}";
+
 # Tell B::Deparse about our ambient pragmas so it doesn't add pragmas to
 # its output.
 my ($hint_bits, $warning_bits, $hinthash);
@@ -88,6 +104,7 @@ $deparse->ambient_pragmas (
 );
 EOC
 
+	my $coderef = eval $code_string;
 	if ($@) {
 	    is($@, "", "compilation of $desc");
 	}
@@ -112,10 +129,21 @@ EOC
 
 	    local $::TODO = $meta{todo};
 	    unless(like($deparsed, qr/$regex/, $desc)) {
-		# ::diag "file $file, line $line\n";
 		::diag "\n", '-' x 30, "\n";
 		::diag diff \$deparsed, \$expected, { STYLE => "Context" };
 		::diag "\n", '=' x 30, "\n";
+		::diag "Data file $file\n";
+		my ($fh, $filename) = tempfile( "deparse-bug-XXXX",
+						TMPDIR => 1,
+						UNLINK => 0,
+						SUFFIX => '.pl');
+		foreach my $key (keys %orig_meta) {
+		    print $fh $orig_meta{$key};
+		}
+		print $fh "sub {$input\n}\n";
+		::diag "Wrote failed Perl program to $filename";
+		close($fh);
+
 		if (++$error_count >= MAX_ERROR_COUNT) {
 		    done_testing;
 		    exit $error_count;
@@ -171,8 +199,10 @@ $b &&= undef;
 
 $a = `$^X $path "-MO=Deparse" -e "use constant PI => 4" 2>&1`;
 $a =~ s/-e syntax OK\n//g;
-is($a, "use constant ('PI', 4);\n",
-   "Proxy Constant Subroutines must not show up as (incorrect) prototypes");
+if (!$is_cperl) {
+    is($a, "use constant ('PI', 4);\n",
+       "Proxy Constant Subroutines must not show up as (incorrect) prototypes");
+}
 
 #Re: perlbug #35857, patch #24505
 #handle warnings::register-ed packages properly.
@@ -255,7 +285,7 @@ EOCODE
 $a =
   `$^X $path "-MO=Deparse" -e "BEGIN{*CORE::GLOBAL::require=sub{1}}" 2>&1`;
 $a =~ s/-e syntax OK\n//g;
-is($a, <<'EOCODF', "CORE::GLOBAL::require override causing panick");
+is($a, <<'EOCODF', "CORE::GLOBAL::require override causing panic") if !$is_cperl;
 sub BEGIN {
     *CORE::GLOBAL::require = sub {
         1;
@@ -304,10 +334,11 @@ SKIP: {
    `;
 }
 
-# multiple statements on format lines
-$a = `$^X $path "-MO=Deparse" -e "format =" -e "\@" -e "x();z()" -e. 2>&1`;
-$a =~ s/-e syntax OK\n//g;
-is($a, <<'EOCODH', 'multiple statements on format lines');
+if (!$is_cperl) {
+    # multiple statements on format lines
+    $a = `$^X $path "-MO=Deparse" -e "format =" -e "\@" -e "x();z()" -e. 2>&1`;
+    $a =~ s/-e syntax OK\n//g;
+    is($a, <<'EOCODH', 'multiple statements on format lines');
 format STDOUT =
 @
 x(); z()
@@ -321,5 +352,6 @@ EOCODH
 #     /\x{20ac}/;
 # }',
 # "qr/euro/");
+};
 
 done_testing();

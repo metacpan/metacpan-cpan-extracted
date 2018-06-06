@@ -1,8 +1,7 @@
 package X11::GLX::DWIM;
-$X11::GLX::DWIM::VERSION = '0.03';
+$X11::GLX::DWIM::VERSION = '0.05';
 use Moo 2;
 use X11::GLX;
-use OpenGL ();
 use Carp;
 use Log::Any '$log';
 
@@ -243,9 +242,6 @@ sub target {
 		X11::GLX::glXMakeCurrent($self->display, $target->xid, $self->glx_context)
 			or croak "Can't set target to $target, glXMakeCurrent failed";
 		$self->_set_target($target);
-		my ($w, $h)= $target->get_w_h;
-		$log->tracef('Calling glViewport(0, 0, %d, %d)', $w, $h);
-		OpenGL::glViewport(0, 0, $w, $h);
 		$self->apply_gl_projection if $self->gl_projection;
 	}
 	return $self->_get_target;
@@ -267,9 +263,10 @@ sub _inflate_target {
 
 
 has gl_clear_bits     => ( is => 'rw', lazy => 1, builder => 1 );
-sub _build_gl_clear_bits {
-	return OpenGL::GL_COLOR_BUFFER_BIT()|OpenGL::GL_DEPTH_BUFFER_BIT();
-}
+# Defaults in XS:
+#sub _build_gl_clear_bits {
+#	return OpenGL::GL_COLOR_BUFFER_BIT()|OpenGL::GL_DEPTH_BUFFER_BIT();
+#}
 
 
 has gl_projection     => ( is => 'rw', trigger => \&_changed_gl_projection );
@@ -318,12 +315,12 @@ sub create_render_pixmap {
 	my $x_pixmap= $self->display->new_pixmap($self->screen, $args{width}, $args{height}, $args{depth});
 	$log->tracef("create GLX pixmap: %s %s", $self->visual_info, $x_pixmap) if $log->is_trace;
 	my $glx_pixmap_xid= X11::GLX::glXCreateGLXPixmap($self->display, $self->visual_info, $x_pixmap);
-	return $self->display->get_cached_xobj($glx_pixmap_xid, 'X11::GLX::Pixmap', {
+	return $self->display->get_cached_xobj($glx_pixmap_xid, 'X11::GLX::Pixmap',
 		width    => $args{width},
 		height   => $args{height},
 		x_pixmap => $x_pixmap,
 		autofree => 1
-	});
+	);
 }
 
 
@@ -331,7 +328,8 @@ sub begin_frame {
 	my $self= shift;
 	$self->target; # trigger lazy-build, connect, display window, etc
 	$log->trace('Calling glClear');
-	OpenGL::glClear($self->gl_clear_bits);
+	# export glClear ourselves to avoid depending on OpenGL module
+	X11::GLX::DWIM::_glClear($self->gl_clear_bits);
 }
 
 
@@ -354,7 +352,7 @@ sub swap_buffers {
 
 
 my %_gl_err_msg= (
-	map { eval { OpenGL->can($_)->() => $_ } } qw(
+	map { eval { X11::GLX->can($_)->() => $_ } } qw(
 		GL_INVALID_ENUM
 		GL_INVALID_VALUE
 		GL_INVALID_OPERATION
@@ -370,7 +368,8 @@ sub get_gl_errors {
 	my $self= shift;
 	my (%errors, $e);
 	$errors{$e}= $_gl_err_msg{$e} || "(unrecognized) ".$e
-		while (($e= OpenGL::glGetError()));
+		# export glGetError ourselves to avoid depending on OpenGL module
+		while (($e= X11::GLX::DWIM::_glGetError()));
 	return (keys %errors)? \%errors : undef;
 }
 
@@ -427,18 +426,23 @@ sub apply_gl_projection {
 	
 	$log->tracef('Setting projection matrix: l=%.4lf r=%.4lf b=%.4lf t=%.4lf near=%.4lf far=%.4lf; translate %.4lf,%.4lf,%.4lf',
 		$l, $r, $b, $t, $near, $far, -$x, -$y, -$z);
-	OpenGL::glMatrixMode(OpenGL::GL_PROJECTION());
-	OpenGL::glLoadIdentity();
-	
-	$ortho? OpenGL::glOrtho($l, $r, $b, $t, $near, $far)
-	      : OpenGL::glFrustum($l, $r, $b, $t, $near, $far);
-	
-	OpenGL::glTranslated(-$x, -$y, -$z)
-		if $x or $y or $z;
-	
-	# If mirror is in effect, need to tell OpenGL which way the camera is
-	OpenGL::glFrontFace(!$mirror_x eq !$mirror_y? OpenGL::GL_CCW() : OpenGL::GL_CW());
-	OpenGL::glMatrixMode(OpenGL::GL_MODELVIEW());
+	X11::GLX::DWIM::_set_projection_matrix(
+		$ortho? 0 : 1, $l, $r, $b, $t, $near, $far,
+		$x, $y, $z, $mirror_x? 1: 0, $mirror_y? 1 : 0
+	);
+	# XS Performs this, but without needing to load classic OpenGL perl module.
+	#OpenGL::glMatrixMode(OpenGL::GL_PROJECTION());
+	#OpenGL::glLoadIdentity();
+	#
+	#$ortho? OpenGL::glOrtho($l, $r, $b, $t, $near, $far)
+	#      : OpenGL::glFrustum($l, $r, $b, $t, $near, $far);
+	#
+	#OpenGL::glTranslated(-$x, -$y, -$z)
+	#	if $x or $y or $z;
+	#
+	## If mirror is in effect, need to tell OpenGL which way the camera is
+	#OpenGL::glFrontFace(!$mirror_x eq !$mirror_y? OpenGL::GL_CCW() : OpenGL::GL_CW());
+	#OpenGL::glMatrixMode(OpenGL::GL_MODELVIEW());
 }
 
 sub DESTROY {
@@ -465,7 +469,7 @@ X11::GLX::DWIM - Do What I Mean, with OpenGL on X11
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -707,7 +711,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Michael Conrad.
+This software is copyright (c) 2018 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

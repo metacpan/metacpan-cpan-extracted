@@ -1,7 +1,7 @@
-PSGRAPH is Copyright (C) 2013 - 2016, Ken Owen.
+PSGRAPH is Copyright (C) 2013 - 2018, Ken Owen.
 
 
-PSGRAPH version 0.04
+PSGRAPH version 0.05
 ====================
 
 PSGRAPH is a module that can convert data in delimited ASCII format into graphs either in batch or individual mode. It has been tested under Ubuntu and CentOS but should work under any system that supports perl. 

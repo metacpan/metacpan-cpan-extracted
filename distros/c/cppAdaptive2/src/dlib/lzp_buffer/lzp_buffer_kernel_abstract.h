@@ -100,7 +100,7 @@ namespace dlib
                     until clear() is called and succeeds            
         !*/
 
-        size_t size (
+        unsigned long size (
         ) const;
         /*!
             ensures

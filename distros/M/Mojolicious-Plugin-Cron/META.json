@@ -57,7 +57,7 @@
    "provides" : {
       "Mojolicious::Plugin::Cron" : {
          "file" : "lib/Mojolicious/Plugin/Cron.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       }
    },
    "release_status" : "stable",
@@ -71,7 +71,7 @@
          "web" : "https://github.com/dmanto/Mojolicious-Plugin-Cron"
       }
    },
-   "version" : "0.023",
+   "version" : "0.024",
    "x_contributors" : [
       "dmanto <dmanto@gmail.com>",
       "vagrant <vagrant@vagrant.vm>"

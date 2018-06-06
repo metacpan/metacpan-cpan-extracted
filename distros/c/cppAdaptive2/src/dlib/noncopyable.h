@@ -19,8 +19,8 @@ namespace dlib
         !*/
 
     protected:
-        noncopyable() = default;
-        ~noncopyable() = default;
+        noncopyable() {}
+        ~noncopyable() {}
     private:  // emphasize the following members are private
         noncopyable(const noncopyable&);
         const noncopyable& operator=(const noncopyable&);

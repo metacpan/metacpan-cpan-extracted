@@ -1,5 +1,6 @@
 sub five {
-    5;
+    5
 }
 my $x = "Something simple to demo 'deparse'";
-five();
+my $y = five();
+print $y;

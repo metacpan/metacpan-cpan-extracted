@@ -2,7 +2,11 @@ package X11::Xlib::Keymap;
 use strict;
 use warnings;
 use Carp;
+use X11::Xlib;
 use Scalar::Util 'weaken';
+
+# All modules in dist share a version
+BEGIN { our $VERSION= $X11::Xlib::VERSION; }
 
 =head1 NAME
 

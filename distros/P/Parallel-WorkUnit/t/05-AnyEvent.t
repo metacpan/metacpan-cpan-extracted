@@ -2,7 +2,7 @@
 # Yes, we want to make sure things work in taint mode
 
 #
-# Copyright (C) 2015-2017 Joelle Maslak
+# Copyright (C) 2015-2018 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -14,7 +14,7 @@ use warnings;
 use autodie;
 
 use Carp;
-use Test::More tests => 68;
+use Test::More;
 use Test::Exception;
 use Test2::Tools::Warnings;
 
@@ -167,6 +167,8 @@ SKIP: {
     pass("Unnecessary waitall() call exits properly");
     ok( !defined( $wu->waitone() ), 'Unnecessary waitone() call exits properly' );
 }
+
+done_testing();
 
 # The below subs are the callbacks
 

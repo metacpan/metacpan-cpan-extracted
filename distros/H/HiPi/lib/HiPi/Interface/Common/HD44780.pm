@@ -16,7 +16,7 @@ use parent qw( HiPi::Interface );
 use Carp;
 use HiPi qw( :lcd );
 
-our $VERSION ='0.71';
+our $VERSION ='0.72';
 
 __PACKAGE__->create_accessors( qw(
     width lines backlightcontrol positionmap devicename serialbuffermode

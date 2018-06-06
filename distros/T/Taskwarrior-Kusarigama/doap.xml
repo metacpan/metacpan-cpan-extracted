@@ -22,6 +22,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Chris Prather</foaf:name>
+      <foaf:mbox rdf:resource="mailto:chris@prather.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Paul Fenwick</foaf:name>
       <foaf:mbox rdf:resource="mailto:pjf@perltraining.com.au" />
     </foaf:Person>
@@ -30,6 +36,12 @@
     <foaf:Person>
       <foaf:name>Shawn Sorichetti</foaf:name>
       <foaf:mbox rdf:resource="mailto:shawn@coloredblocks.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Sweth Chandramouli</foaf:name>
+      <foaf:mbox rdf:resource="mailto:sweth.chandramouli@iinteractive.com" />
     </foaf:Person>
   </helper>
   <license rdf:resource="http://dev.perl.org/licenses/" />
@@ -99,6 +111,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.8.0</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2018-03-04</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.9.0</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2018-03-11</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

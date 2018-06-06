@@ -8,7 +8,7 @@ use Data::Dumper;
 
 use base 'Date::Holidays::Adapter';
 
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 # sub new {
 #     my $class = shift;
@@ -44,7 +44,7 @@ Date::Holidays::Adapter::USFederal - an adapter class for Date::Holidays::USFede
 
 =head1 VERSION
 
-This POD describes version 1.11 of Date::Holidays::Adapter::USFederal
+This POD describes version 1.12 of Date::Holidays::Adapter::USFederal
 
 =head1 DESCRIPTION
 
@@ -65,13 +65,7 @@ country referenced by B<countrycode> in the call to the constructor B<new>.
 
 =head2 holidays
 
-The B<holidays> method, takes a single named argument, B<year>
-
-Returns a reference to a hash holding the calendar of the country referenced by
-B<countrycode> in the call to the constructor B<new>.
-
-The calendar will spand for a year and the keys consist of B<month> and B<day>
-concatenated.
+Not supported by L<Date::Holidays::USFederal>
 
 =head1 DIAGNOSTICS
 

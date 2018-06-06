@@ -20,10 +20,10 @@ name: Dist-Zilla-PluginBundle-MSCHOUT
 provides:
   Dist::Zilla::PluginBundle::MSCHOUT:
     file: lib/Dist/Zilla/PluginBundle/MSCHOUT.pm
-    version: '0.37'
+    version: '0.38'
   Pod::Weaver::PluginBundle::MSCHOUT:
     file: lib/Pod/Weaver/PluginBundle/MSCHOUT.pm
-    version: '0.37'
+    version: '0.38'
 requires:
   Dist::Zilla: '4.102341'
   Dist::Zilla::Plugin::AuthorSignatureTest: '0'
@@ -55,6 +55,7 @@ requires:
   MooseX::AttributeShortcuts: '0'
   Pod::Elemental::Transformer::List: '0'
   Pod::Weaver::Config::Assembler: '0'
+  Pod::Weaver::Plugin::SingleEncoding: '0'
   Pod::Weaver::Section::AllowOverride: '0'
   Pod::Weaver::Section::Bugs: '0'
   Pod::Weaver::Section::SourceGitHub: '0'
@@ -64,5 +65,5 @@ resources:
   bugtracker: https://github.com/mschout/dist-zilla-pluginbundle-mschout/issues
   homepage: https://github.com/mschout/dist-zilla-pluginbundle-mschout
   repository: https://github.com/mschout/dist-zilla-pluginbundle-mschout.git
-version: '0.37'
+version: '0.38'
 x_serialization_backend: 'YAML::Tiny version 1.70'

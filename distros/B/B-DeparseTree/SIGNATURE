@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.81.
+signed via the Module::Signature module, version 0.79.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,72 +14,83 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 133b0063e27763fcc3657934f7f96ac5187d3312 Build.PL
-SHA1 b016675a3fdebf2fabff23dc245270c0f47f5cdd ChangeLog
-SHA1 f313e0341a76920e411b6c4cdc59217a78ca9d2f GNUmakefile
-SHA1 51dc06fa891c7bb9e2d08bf3b8a62efb91e6acf3 MANIFEST
-SHA1 dd6bc1d04fc78ae4654182a67def17718fbfdcf8 META.json
-SHA1 21924c1837d5089162133a313566b9a5a4611391 META.yml
-SHA1 d3d1e30ca851bed8503cf0b951651a840e6efaf7 Makefile.PL
-SHA1 58cc50feb4800093be833c648ec158b5391e3ccd NEWS
+SHA1 9d28892760d514e043374a1c11f8cd3619bcd8f1 Build.PL
+SHA1 330e5e5ce7336b2cb7e54dbcf3947384c995b3e0 ChangeLog
+SHA1 4da78d8c325056f1d88ce1d3022e48e1ab80bd2d MANIFEST
+SHA1 94fe58b7baeedac73bce41dbf4a767c4cd851a3d META.json
+SHA1 9d51e14a0ce852be51c8e779e1289ee50fd820d8 META.yml
+SHA1 bccc60eddc0f099052bbe56238929e1aba9190f6 Makefile.PL
+SHA1 c7d4666d0b0fb8fbe5d17df53333f65a0798d43f NEWS
 SHA1 cdb52caf7af6c49559a46fe32751f397c8e14fc9 README.md
 SHA1 84ac0838050be76f8603f5bb53c9607f832d7ffe TODO
+SHA1 71f15b3df285851ba0314cc99257f04e30f07b24 doc/OLD_CHANGES.md
+SHA1 e7d5cc0d2befb2be5f0b27e1ba2d76e38790eadf doc/notes.md
+SHA1 e46e5aa4f92b83244c3fc6e8f03dc6b3c3c33fcc doc/precedences.md
 SHA1 ae6956317767d3dda1873f2204ca9368746878d7 example/fib.pl
 SHA1 0973a5a713321739c0b8b1e592f615a827dc0a28 example/five.pl
 SHA1 a6b82a88e68d9e0bd337c784051000007c78b974 example/multiline.pl
-SHA1 6ebc6c90dad1913cab73b7bd40cc80fdecce02f5 lib/B/DeparseTree.pm
-SHA1 4580e75b06623b6862036dc9ee9904055b5361d2 lib/B/DeparseTree.pod
-SHA1 4a4742e552aeb0fa504368afd6702d7fb52e7f23 lib/B/DeparseTree/Common.pm
-SHA1 71eec771a41e3f00254662b3e2eea4a6cbb796c0 lib/B/DeparseTree/Fragment.pm
-SHA1 83185430cb5c9aba0071e4b1825ee8793f8c7cc9 lib/B/DeparseTree/Node.pm
-SHA1 62dae840ab2b8e7c4c178b8d3d4776c9ab489eba lib/B/DeparseTree/P518.pm
-SHA1 5c6a46d370bdd4781b5d3a112b04fe5deb120283 lib/B/DeparseTree/P520.pm
-SHA1 4d879e4711b7a2c09443679cc0e080da278340e2 lib/B/DeparseTree/P522.pm
-SHA1 26239ec22c3cee4f2969f35ec12cc26f61a5109c lib/B/DeparseTree/P524.pm
-SHA1 f2a92318532870c478a3fce52fd02c6fd69bf2b7 lib/B/DeparseTree/P526.pm
-SHA1 3da88d085e9c9b407c7df7136a8effbe7ddb1971 lib/B/DeparseTree/P526c.pm
-SHA1 61c9d34203fbcfd1e127eea05d54d734f569f349 lib/B/DeparseTree/PP.pm
-SHA1 5d818b7a600eef0bad245cda3f4a14708f5eb866 lib/B/DeparseTree/Printer.pm
+SHA1 e5def1066244c8ab09d7656c0e31a22521819481 lib/B/DeparseTree.pm
+SHA1 2bd7e0f3197bf82c4c1430e12b348b146de75dcc lib/B/DeparseTree.pod
+SHA1 6feaf857d577d3a25632617aa9c39a6787430875 lib/B/DeparseTree/Fragment.pm
+SHA1 9e5e2697e38737fd5d5915df51f5b233360c71bc lib/B/DeparseTree/Node.pm
+SHA1 bbfad9db971f8094efe86012dea6cb393250e9e3 lib/B/DeparseTree/P518.pm
+SHA1 37f97249dc3cfa477ebebdd54705589a4fa3efbe lib/B/DeparseTree/P520.pm
+SHA1 4e97acba861083a1dabe858729e8055f3ff339d2 lib/B/DeparseTree/P522.pm
+SHA1 94e9ad11ca7ed2090d93514fd97e6579f00af041 lib/B/DeparseTree/P524.pm
+SHA1 26a6823cfa42458519b73febb406a1d5c607787e lib/B/DeparseTree/P526.pm
+SHA1 44c90b1dc0743060691d55ef840be3208c0ff786 lib/B/DeparseTree/P526c.pm
+SHA1 c8ed981bab4ae1050b0d9e5f8dcdd7682a79b8ec lib/B/DeparseTree/PP.pm
+SHA1 a54d118496b94d10da816ebfa34995a7488e218f lib/B/DeparseTree/PP_OPtable.pm
+SHA1 05c230131c4a052400c80bcf55cf801e88287d6e lib/B/DeparseTree/PPfns.pm
+SHA1 af45b1cdea35198ecd8a652bfa92d1a3414cbfbf lib/B/DeparseTree/Printer.pm
+SHA1 1f5277ca487ffc8a98ce8858cf847ba5328cf9da lib/B/DeparseTree/SyntaxTree.pm
+SHA1 05d19ed8b805c6cfcc23df88636fa7b189e231ab lib/B/DeparseTree/TreeMain.pm
 SHA1 ad33729c0b3f51654755e9334b4ffc4fab7495d0 scripts/Makefile
-SHA1 1a9dc2929a78d3e81ae62ea312e0b49efc0d842c scripts/README.md
-SHA1 ea65bdf23e169973a040a42e8aec6342afe55217 scripts/base/cond.t
-SHA1 d8c83a4759d79455cee13326bd4671516fd39dc0 scripts/base/if.t
-SHA1 cf53cb292ce69348474c00f0aa6d68a9150d17a6 scripts/base/translate.t
-SHA1 7a0440c46d40fefecfab9e73fe19ba5e3c5fd799 scripts/base/while.t
-SHA1 1ffb4d3c985c6f717d6b07bbe8ffd7ffa97938e4 scripts/benchtests.pl
+SHA1 fe34a77c511e9e92ca70a23c0768348f6ee9f121 scripts/README.md
+SHA1 70a7b2faaec126c100f83692f3df434591d0ba69 scripts/benchtests.pl
 SHA1 8c8b02fc1fff96dec723f2d407c32d8d75640f39 scripts/bug-sample.pm
-SHA1 648248445a0a636e26ab092f19ad340823fe75c1 scripts/deparse.sh
+SHA1 3057ad0f1fe1324cd7a3327aae1c37f2bf76a127 scripts/deparse.sh
 SHA1 aa39a9798cec0f2db4ab28c490b0dfbc2b1148ca scripts/fib.pl
-SHA1 cedaeab8bc0df91843e2131b2f312d80e56aaf86 scripts/frag.pl
-SHA1 451bc0e3d41684d129bc72d7202e9bc972d48779 scripts/runtests.pl
-SHA1 978382ff7710411bd53c89a7e88b2d94072ae6ae t/10-core.t
-SHA1 af8abd3b5d4c5c952d21d8625ca3968a8adb9886 t/20-core-516.t
+SHA1 63ccd35794e80e3333fc6dea1ceff578d7d22540 scripts/frag.pl
+SHA1 731e90a4d460f2fae68c0b4ef4fe9aa4f517b45f t/10-core.t
 SHA1 ff3567076ae30b181d120662ff8f5c57e0fa9e36 t/20-deparse-526c.t
-SHA1 efe99c7924f388d97779410ac8627a92655390eb t/20-deparse-small.t
+SHA1 be6a9e0bc5581c666aa217aa5ad7b6acbcd3c517 t/20-deparse-small.t
 SHA1 438469d0699f07dfbf362aa45e0cbc907cfd3457 t/helper.pm
-SHA1 38bba8852706c56915970fc5022acecc870bad8e t/testdata/P516-core.pm
-SHA1 e2604ec51951815abeab17132bda590c6973a0ee t/testdata/P518-short.pm
-SHA1 1a917aee2ec99c83799f4133a6285ff45582e6bc t/testdata/P520-core.pm
+SHA1 bd67912b36e0e77592a37cc65a87b2067dde9efb t/roundtrip/Makefile
+SHA1 2136a8e7ac9bd37c52f6aaa974e54f1ce5e9459f t/roundtrip/README.md
+SHA1 ea65bdf23e169973a040a42e8aec6342afe55217 t/roundtrip/base/cond.t
+SHA1 d8c83a4759d79455cee13326bd4671516fd39dc0 t/roundtrip/base/if.t
+SHA1 23052d9ceac99f17b734ca71715589edf40b44d9 t/roundtrip/base/num.t
+SHA1 8586bae9ee20938c1d428686f2e890b48b76be65 t/roundtrip/base/pat.t
+SHA1 b9b0da6c80c023151cf804963a66f27886b03754 t/roundtrip/base/rs.t-notyet
+SHA1 9744f318150a318955869a81e1bd8e57ea69a7c5 t/roundtrip/base/term.t
+SHA1 cf53cb292ce69348474c00f0aa6d68a9150d17a6 t/roundtrip/base/translate.t
+SHA1 7a0440c46d40fefecfab9e73fe19ba5e3c5fd799 t/roundtrip/base/while.t
+SHA1 3057ad0f1fe1324cd7a3327aae1c37f2bf76a127 t/roundtrip/deparse.sh
+SHA1 54d26bad029370a582d0faabf64ac8c8f893cdfe t/roundtrip/runtests.pl
+SHA1 3971857d1391de2f1552333beecd6643e025d746 t/testdata/P518-short.pm
 SHA1 d9162f66fc48478cce435e8ec86b3691a8085b3b t/testdata/P520.pm
-SHA1 07c9b9832465dbc03c25c1dc01d305802912dfca t/testdata/P522-short.pm
-SHA1 cb745cfea171db2c368a683327265eaf4f775b0c t/testdata/P522.pm
-SHA1 0565d3999a47be73ec871719b7a62bd480e52920 t/testdata/P524-short.pm
-SHA1 6526094ba55ae5e3a6292308266f22dd275b72e2 t/testdata/P524.pm
-SHA1 b4fbb5a2ef9e4f92c37ebd0879555c7c6ffee546 t/testdata/P526-core.pm
-SHA1 ab8caf096cb094667d1b7ef2e958b5539d528dd8 t/testdata/P526-short.pm
-SHA1 52a33d7959d086209cb88a00bacb44c19dc89f58 t/testdata/P526.pm
+SHA1 56ee999c3a2640545b27b2c0b5876aa5e48a289c t/testdata/P522-short.pm
+SHA1 27273d438e96c5a0fd3937713d0f59c61b6ca4c2 t/testdata/P522.pm
+SHA1 817a239c21d9482c53953b76fe34022a2ae4ecc5 t/testdata/P524-short.pm
+SHA1 3a3bd5f492d785e4153ea1cc6c909faf041f8d88 t/testdata/P524.pm
+SHA1 07814438c1b7ce2264a7e81f861fc59ad5bdbe28 t/testdata/P526-short.pm
+SHA1 8d505812cff0f11ebff732b7b9004fab925cbabe t/testdata/P526.pm
 SHA1 3f79bff634bf24b8b58688e68c1823075696d8de t/testdata/README.md
 SHA1 b4042ff0c90d54a811028590aa64d2fca585efbe t/testdata/README.pod
 SHA1 4690fb94f45914ea2345f8e5c8e51ea317c94dc8 t/testdata/bug-sample.pm
-SHA1 f6efe6111e9137f1df4c7ff6b2e77105634e4d5b t/testdata/core-base.pm
+SHA1 181dd83b4c28e5a7b46d6a159c271d65675051de t/testdata/core-ops.pm
+SHA1 a14094a9f6cafd2ee8667191b3feb27f0e7ba002 t/testdata/subst.pm
 SHA1 8df64e1b9bafe4e4b795fe69ffbc74a82e69a5d0 t/unit/01-test-pod.t
 SHA1 a5966ec6442f5201ef980e63ce5d598148d27a1a t/unit/02-node.t
-SHA1 e7148c011af94d5b99a229123e845e35cb77954c t/unit/03-common.t
-SHA1 6b7559435defb6db081e870fb7e6adf90c6ebc7f t/unit/03-fragment.t
-SHA1 ce32bcca7a9ae449421b925bf4a9d3e9a7c8107c t/unit/04-load.t
+SHA1 6ff8b3d552ae1eaceaf589aa09ec4412c25731fb t/unit/03-ppfns.t
+SHA1 cff8baf6f7066358243bfd235c95dc153725309a t/unit/03-treemain.t
+SHA1 6b7559435defb6db081e870fb7e6adf90c6ebc7f t/unit/04-fragment.t
+SHA1 85370074ebc28c5bede6192ec64bcd0de4ab8cdf t/unit/05-load.t
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
 
-iEYEARECAAYFAlsAxa0ACgkQGo3lAIJ17CGfkQCdE1zI6j8jy6LwcNT3pt8gsoRM
-QcwAnR3ScsNz8bmr0pqXp39p3QkX8exE
-=G8RQ
+iEYEARECAAYFAlsVvUkACgkQGo3lAIJ17CH/GgCfRx7ZpaVMg/wgWzP5z8Ydimal
+J+kAnRmCJMkOA0qjfP5Fw7Cq1/HuB7YM
+=v7pq
 -----END PGP SIGNATURE-----

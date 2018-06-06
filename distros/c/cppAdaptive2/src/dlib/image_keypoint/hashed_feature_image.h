@@ -56,7 +56,7 @@ namespace dlib
             const image_type& img
         );
 
-        inline size_t size (
+        inline unsigned long size (
         ) const;
 
         inline long nr (
@@ -325,7 +325,7 @@ namespace dlib
         typename feature_extractor,
         typename hash_function_type
         >
-    size_t hashed_feature_image<feature_extractor,hash_function_type>::
+    unsigned long hashed_feature_image<feature_extractor,hash_function_type>::
     size (
     ) const
     {

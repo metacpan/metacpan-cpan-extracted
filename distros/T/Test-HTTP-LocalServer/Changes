@@ -1,3 +1,7 @@
+0.63 20180604
+    + Fix the form parameters getting lost
+      This was since we changed the form from GET to POST ...
+
 0.62 20180520
     + Fix the ->redirect URL to honor the specified host
       This prevents breakage due to localhost vs. 127.0.0.1 mixups

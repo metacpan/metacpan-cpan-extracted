@@ -4,6 +4,9 @@ use warnings;
 use X11::Xlib ();
 use Carp ();
 
+# All modules in dist share a version
+BEGIN { our $VERSION= $X11::Xlib::VERSION; }
+
 =head1 NAME
 
 X11::Xlib::Struct - Base class for X11 packed structures

@@ -1,29 +1,60 @@
---- #YAML:1.0
-name:         Sys-Virt
-abstract:     Extension for the libvirt library
-version:      4.2.0
+---
+abstract: 'libvirt Perl API'
 author:
-  - Daniel P. Berrange <dan@berrange.com>
-license: perl
-generated_by: ExtUtils::MakeMaker version 6.30
+  - 'Daniel Berrange <dan@berrange.com>'
 build_requires:
-   Test::More:                    0
-   Test::Pod:                     0
-   Test::Pod::Coverage:           0
-   Test::CPAN::Changes:           0
-   XML::XPath:                    0
-   XML::XPath::XMLParser:         0
-   Sys::Hostname:                 0
-   Time::HiRes:                   0
-
-resources:
-  license: http://dev.perl.org/licenses/
-  homepage: http://libvirt.org/
-  repository: http://libvirt.org/git/?p=libvirt-perl.git;a=summary
-  MailingList: http://www.redhat.com/mailman/listinfo/libvir-list
-
-distribution_type: module
-
+  ExtUtils::CBuilder: '0'
+  Sys::Hostname: '0'
+  Test::CPAN::Changes: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
+  Time::HiRes: '0'
+  XML::XPath: '0'
+  XML::XPath::XMLParser: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: gpl
 meta-spec:
-   version: 1.3
-   url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sys-Virt
+provides:
+  Sys::Virt:
+    file: lib/Sys/Virt.pm
+    version: v4.4.0
+  Sys::Virt::Domain:
+    file: lib/Sys/Virt/Domain.pm
+  Sys::Virt::DomainSnapshot:
+    file: lib/Sys/Virt/DomainSnapshot.pm
+  Sys::Virt::Error:
+    file: lib/Sys/Virt/Error.pm
+  Sys::Virt::Event:
+    file: lib/Sys/Virt/Event.pm
+  Sys::Virt::Interface:
+    file: lib/Sys/Virt/Interface.pm
+  Sys::Virt::NWFilter:
+    file: lib/Sys/Virt/NWFilter.pm
+  Sys::Virt::Network:
+    file: lib/Sys/Virt/Network.pm
+  Sys::Virt::NodeDevice:
+    file: lib/Sys/Virt/NodeDevice.pm
+  Sys::Virt::Secret:
+    file: lib/Sys/Virt/Secret.pm
+  Sys::Virt::StoragePool:
+    file: lib/Sys/Virt/StoragePool.pm
+  Sys::Virt::StorageVol:
+    file: lib/Sys/Virt/StorageVol.pm
+  Sys::Virt::Stream:
+    file: lib/Sys/Virt/Stream.pm
+requires:
+  perl: v5.8.0
+resources:
+  MailingList: http://www.redhat.com/mailman/listinfo/libvir-list
+  homepage: http://libvirt.org/
+  license: http://www.gnu.org/licenses/gpl.html
+  repository: https://libvirt.org/git/?p=libvirt-perl.git;a=summary
+version: v4.4.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

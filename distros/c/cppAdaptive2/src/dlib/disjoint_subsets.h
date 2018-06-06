@@ -5,7 +5,6 @@
 
 
 #include "disjoint_subsets/disjoint_subsets.h"
-#include "disjoint_subsets/disjoint_subsets_sized.h"
 
 #endif // DLIB_DISJOINt_SUBSETS_
 

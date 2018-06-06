@@ -13,7 +13,7 @@ use DynaLoader;
 
 
 
-   $PDL::CCS::MatrixOps::VERSION = 1.23.4;
+   $PDL::CCS::MatrixOps::VERSION = 1.23.7;
    @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::CCS::MatrixOps $VERSION;
@@ -208,7 +208,7 @@ Computes the vector cosine similarity of a dense row-vector $b(N) with respect t
 of a sparse index-encoded PDL $a() of logical dimensions (M,N), with output to a dense piddle
 $vcos(M).
 "Missing" values in $a() are treated as zero,
-and magnitudes for $a() are passed in the optional paramter $anorm(), which will be implicitly
+and magnitudes for $a() are passed in the optional parameter $anorm(), which will be implicitly
 computed using L<ccs_vnorm|/ccs_vnorm> if the $anorm() parameter is omitted or empty.
 This is basically the same thing as:
 
@@ -314,7 +314,7 @@ Computes the vector cosine similarity of a sparse index-encoded row-vector $b() 
 with respect to each column $a(i,*) a sparse Harwell-Boeing row-encoded PDL $a() of logical dimensions (M,N),
 with output to a dense piddle $vcos(M).
 "Missing" values in $a() are treated as zero,
-and magnitudes for $a() are passed in the obligatory paramter $anorm().
+and magnitudes for $a() are passed in the obligatory parameter $anorm().
 Usually much faster than L<ccs_vcos_zdd()|/ccs_vcos_zdd> if a CRS pointer over logical dimension (N) is available
 for $a().
 

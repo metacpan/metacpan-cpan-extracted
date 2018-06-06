@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin::Command::Github;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: sync tickets of a Github project
-$Taskwarrior::Kusarigama::Plugin::Command::Github::VERSION = '0.9.0';
+$Taskwarrior::Kusarigama::Plugin::Command::Github::VERSION = '0.9.1';
 
 use 5.10.0;
 
@@ -26,7 +26,7 @@ has projects => (
     lazy => 1,
     default => sub {
         my $self = shift;
-        
+
         require List::MoreUtils;
         return [ List::MoreUtils::after( sub { $_ eq 'github' }, split ' ', $self->args ) ]
     },
@@ -37,7 +37,7 @@ has github => (
     lazy => 1,
     default => sub {
         my $self = shift;
-        
+
         require Net::GitHub;
         Net::GitHub->new(
             access_token => $self->tw->config->{github}{oauth_token}
@@ -66,12 +66,14 @@ sub update_project {
     );
 
     require JSON;
-    my %filter = ( state => 'open' );    
+    my %filter = ( state => 'open' );
     $filter{assignee} = $self->tw->config->{github}{user} unless $self->tw->config->{github}{user} eq $org;
 
-    %filter = ( %filter, eval {
-        JSON::from_from $self->tw->{config}{project}{$project}{filter} 
-    });
+    my $user_filter = eval {
+        JSON::from_json $self->tw->{config}{project}{$project}{filter}
+    };
+
+    %filter = ( %filter, %$user_filter ) if $user_filter;
 
     say "syncing tickets for $org/$repo...";
 
@@ -130,7 +132,7 @@ Taskwarrior::Kusarigama::Plugin::Command::Github - sync tickets of a Github proj
 
 =head1 VERSION
 
-version 0.9.0
+version 0.9.1
 
 =head1 SYNOPSIS
 
@@ -169,7 +171,7 @@ those assigned to C<github.user>. In all cases, the filter
 can be set explicitly via C<project.PROJECT.filter>, which takes a
 JSON structure.
 
-    $ task config project.List-Lazy.filter '{"asignee":"yenzie"}'
+    $ task config project.List-Lazy.filter '{"assignee":"yenzie"}'
 
 =head1 AUTHOR
 

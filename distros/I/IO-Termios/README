@@ -67,13 +67,25 @@ CONSTRUCTORS
 
  open
 
-       $term = IO::Termios->open( $path, $modestr )
+       $term = IO::Termios->open( $path, $modestr, $flags )
 
     Open the given path, and return a new IO::Termios object around the
     filehandle. If the open call fails, undef is returned.
 
     If $modestr is provided, the constructor will pass it to the set_mode
     method before returning.
+
+    If $flags is provided, it will be passed on to the underlying sysopen()
+    call used to open the filehandle. It should contain a bitwise-or
+    combination of O_* flags from the Fcntl module - for example O_NOCTTY
+    or O_NDELAY. The value O_RDWR will be added to this; the caller does
+    not need to specify it directly. For example:
+
+       use Fcntl qw( O_NOCTTY O_NDELAY );
+    
+       $term = IO::Termios->open( "/dev/ttyS0", O_NOCTTY|O_NDELAY );
+       $term->setflag_clocal( 1 );
+       $term->blocking( 1 );
 
 METHODS
 

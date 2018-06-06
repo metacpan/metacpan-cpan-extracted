@@ -1,4 +1,4 @@
 FROM perl:latest
 
-RUN cpanm App::perlbrew
+RUN cpanm --notest Dist::Milla
 WORKDIR /root

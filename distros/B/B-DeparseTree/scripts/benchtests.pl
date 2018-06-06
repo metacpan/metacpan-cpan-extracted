@@ -9,7 +9,7 @@ use English;
 #my $pt = 'DeparseTree';
 my $pt = 'Deparse';
 
-my $base_dir = '/home/rocky/perl5/perlbrew/build/perl-5.18.2/';
+my $base_dir = "%s/$s", $ENV{'HOME'}, '/perl5/perlbrew/build/perl-5.18.2/';
 chdir  $base_dir || die "can't cd to ${base_dir}: $!";
 foreach my $dir (glob 't/*') {
     next if $dir eq 'tmp';

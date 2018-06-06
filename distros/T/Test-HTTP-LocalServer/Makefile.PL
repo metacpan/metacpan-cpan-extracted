@@ -40,6 +40,7 @@ my %module = (
     'VERSION_FROM'  => $main_file, # finds $VERSION
     'PREREQ_PM'     => {
                         'Carp' => 0,
+                        'Getopt::Long' => 0,
                         'File::Spec' => 0,
                         'File::Temp' => 0,
                         'Cwd' => 0,
@@ -48,6 +49,7 @@ my %module = (
                         'HTTP::Daemon' => 0,
                         'IO::Socket::INET' => 0, # For port probing
                         'CGI' => 0,
+                        'HTTP::Request::AsCGI' => 0,
                         'LWP::Simple' => 0, # just for testing
                         'URI::URL' => 0,
                       }, # e.g., Module::Name => 1.1
@@ -148,7 +150,7 @@ INSTALL
         $parser->parse_from_file($_[0]);
         my $readme_mkdn = <<STATUS . $parser->as_markdown;
 
-[![Build Status](https://travis-ci.org/Corion/Test-HTTP-LocalServer.svg?branch=master)](https://github.com/Corion/Test-HTTP-LocalServer)
+[![Build Status](https://travis-ci.org/Corion/Test-HTTP-LocalServer.svg?branch=master)](https://travis-ci.org/Corion/Test-HTTP-LocalServer)
 
 STATUS
         update_file( 'README.mkdn', $readme_mkdn );

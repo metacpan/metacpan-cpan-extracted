@@ -1,6 +1,6 @@
 package Apache2_4::AuthCookieMultiDBI;
 
-$VERSION = 0.01;
+$VERSION = 0.02;
 $DATE = "01 June 2018";
 
 use strict;
@@ -856,17 +856,17 @@ sub get_client_name {
     return $metching[$c{'DBI_URIClientPos'}];
 }
 
-sub get_cookie_path {
-    my $self = shift;
-    my $r = shift || Apache->request;
+# sub get_cookie_path {
+#     my $self = shift;
+#     my $r = shift || Apache->request;
 
-    my $auth_name = $r->auth_name;
+#     my $auth_name = $r->auth_name;
 
-    my $client = $self->get_client_name($r);
+#     my $client = $self->get_client_name($r);
 
-    return $r->dir_config("${auth_name}Path") . "$client/";
+#     return $r->dir_config("${auth_name}Path") . "$client/";
 
-}
+# }
 
 sub extra_session_info {
     my ( $self, $r, $user, $password, @extra_data ) = @_;

@@ -1,7 +1,7 @@
 package Data::Sah::Type::any;
 
-our $DATE = '2018-06-03'; # DATE
-our $VERSION = '0.891'; # VERSION
+our $DATE = '2018-06-05'; # DATE
+our $VERSION = '0.892'; # VERSION
 
 use Data::Sah::Util::Role 'has_clause';
 use Role::Tiny;
@@ -32,7 +32,7 @@ Data::Sah::Type::any - any type
 
 =head1 VERSION
 
-This document describes version 0.891 of Data::Sah::Type::any (from Perl distribution Data-Sah), released on 2018-06-03.
+This document describes version 0.892 of Data::Sah::Type::any (from Perl distribution Data-Sah), released on 2018-06-05.
 
 =for Pod::Coverage ^(clause_.+|clausemeta_.+)$
 

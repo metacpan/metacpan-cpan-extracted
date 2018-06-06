@@ -76,7 +76,7 @@ my $regressions = 0;
 my @regressions;
 
 for my $pkg_info (@$json) {
-    next unless $wanted_packages{ $pkg_info->{package} };
+    next unless exists $wanted_packages{ $pkg_info->{package} };
 
     $tested++;
 

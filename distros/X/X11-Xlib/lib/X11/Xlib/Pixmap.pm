@@ -4,6 +4,9 @@ use warnings;
 use Carp;
 use parent 'X11::Xlib::XID';
 
+# All modules in dist share a version
+BEGIN { our $VERSION= $X11::Xlib::VERSION; }
+
 sub width  { croak "read-only" if @_ > 1; $_[0]{width} }
 sub height { croak "read-only" if @_ > 1; $_[0]{height} }
 sub depth  { croak "read-only" if @_ > 1; $_[0]{depth} }

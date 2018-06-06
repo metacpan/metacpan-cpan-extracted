@@ -15,5 +15,5 @@ WriteMakefile(
 				     'PDL'=>0,
 				     'ExtUtils::MakeMaker'=>0,
 				    },
-	      clean => { FILES => "t/ccs.* t/dense.*" },
+	      clean => { FILES => "t/ccs.* t/ccs3.* t/dense.* t/dense3.*" },
 	     );

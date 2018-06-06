@@ -16,7 +16,6 @@
 #include "optimization/find_max_factor_graph_nmplp.h"
 #include "optimization/find_max_factor_graph_viterbi.h"
 #include "optimization/find_max_parse_cky.h"
-#include "optimization/isotonic_regression.h"
 
 #endif // DLIB_OPTIMIZATIOn_HEADER
 

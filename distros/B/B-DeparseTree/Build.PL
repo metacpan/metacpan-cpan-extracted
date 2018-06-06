@@ -36,13 +36,15 @@ my $builder = Module::Build->new(
     },
     test_requires  => {
         'Test::Simple' => '0.81',
-        'Data::Printer' => '0.40',
-	'Text::Diff' => 0,
+	    'Text::Diff' => 0,
     },
     requires => {
 	'perl'                              => '5.016000',
-        'rlib'                              => '0.02',
+	'rlib'                              => '0.02',
         'version'                           => 0,
+	# Data::Printer could be optional, but it's
+	# useful, so we'll force including it.
+        'Data::Printer'                     => '0.40',
     },
     sign                => ($ENV{PERL_MB_NOSIGN} ? 0 : 1),
     );

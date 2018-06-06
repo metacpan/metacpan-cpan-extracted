@@ -6,17 +6,17 @@
 
 use Net::Netmask;
 
- $block = new Net::Netmask (network block)
- $block = new Net::Netmask (network block, netmask)
- $block = new2 Net::Netmask (network block)
- $block = new2 Net::Netmask (network block, netmask)
+ $block = Net::Netmask->new(network block)
+ $block = Net::Netmask->new(network block, netmask)
+ $block = Net::Netmask->new2(network block)
+ $block = Net::Netmask->new2(network block, netmask)
 
  print $block;			# a.b.c.d/bits
- print $block->base() 
- print $block->mask() 
- print $block->hostmask() 
- print $block->bits() 
- print $block->size() 
+ print $block->base()
+ print $block->mask()
+ print $block->hostmask()
+ print $block->bits()
+ print $block->size()
  print $block->maxblock()
  print $block->broadcast()
  print $block->next()
@@ -57,7 +57,7 @@ use Net::Netmask;
 =head1 DESCRIPTION
 
 Net::Netmask parses and understands IPv4 CIDR blocks.  It's built
-with an object-oriented interface.  Nearly all functions are 
+with an object-oriented interface.  Nearly all functions are
 methods that operate on a Net::Netmask object.
 
 There are methods that provide the nearly all bits of information
@@ -128,8 +128,7 @@ return a netmask object even if the constructor could not figure out
 what the network block should be.
 
 With C<new>, the error string can be found as $block->{'ERROR'}.  With
-C<new2> the error can be found as Net::Netmask::errstr or 
-$Net::Netmask::error.
+C<new2> the error can be found as Net::Netmask::errstr or $Net::Netmask::error.
 
 =head1 METHODS
 
@@ -142,16 +141,16 @@ This is also available as overloaded stringification.
 
 =item ->B<base>()
 
-Returns base address of the network block as a string.  Eg: 216.240.32.0.  
+Returns base address of the network block as a string.  Eg: 216.240.32.0.
 B<Base> does not give an indication of the size of the network block.
 
 =item ->B<mask>()
 
-Returns the netmask as a string. Eg: 255.255.255.0. 
+Returns the netmask as a string. Eg: 255.255.255.0.
 
 =item ->B<hostmask>()
 
-Returns the host mask which is the opposite of the netmask. 
+Returns the host mask which is the opposite of the netmask.
 Eg: 0.0.0.255.
 
 =item ->B<bits>()
@@ -206,13 +205,13 @@ of a network block just from it's base address.  For example,
 with the network block '216.240.32.0/27', if you only had the
 '216.240.32.0' portion you wouldn't be able to tell for certain
 the size of the block.  '216.240.32.0' could be anything from a
-'/23' to a '/32'.  The B<maxblock>() method gives the size of 
+'/23' to a '/32'.  The B<maxblock>() method gives the size of
 the largest block that the current block's address would allow it
 to be.  The size is given in bits.  Eg: 23.
 
 =item ->B<enumerate>([$bitstep)
 
-Returns a list of all the IP addresses in the block.  Be very 
+Returns a list of all the IP addresses in the block.  Be very
 careful not to use this function of large blocks.  The IP
 addresses are returned as strings.  Eg: '216.240.32.0', '216.240.32.1',
 ... '216.240.32.255'.
@@ -231,21 +230,21 @@ get the last usable address, use B<nth>(-2).
 =item ->B<inaddr>()
 
 Returns an inline list of tuples.  There is a tuple for each
-DNS zone name in the block.  If the block is smaller than a /24, 
-then the zone of the enclosing /24 is returned. 
+DNS zone name in the block.  If the block is smaller than a /24,
+then the zone of the enclosing /24 is returned.
 
 Each tuple contains: the DNS zone name, the last component of
 the first IP address in the block in that zone, the last component
-of the last IP address in the block in that zone.  
+of the last IP address in the block in that zone.
 
 Examples: the list returned for the block '216.240.32.0/23' would
 be: '32.240.216.in-addr.arpa', 0, 255, '33.240.216.in-addr.arpa', 0, 255.
-The list returned for the block '216.240.32.64/27' would be: 
+The list returned for the block '216.240.32.64/27' would be:
 '32.240.216.in-addr.arpa', 64, 95.
 
 =item ->B<nextblock>([$count])
 
-Without a $count, return the next block of the same size after the 
+Without a $count, return the next block of the same size after the
 current one.  With a count, return the Nth block after the current one.
 A count of -1 returns the previous block.  Undef will be returned if
 out of legal address space.
@@ -271,13 +270,13 @@ if the second block fits inside the first block.  Returns 0 otherwise.
 
 =item ->B<storeNetblock>([$t])
 
-Adds the current block to an table of network blocks.  The 
+Adds the current block to an table of network blocks.  The
 table can be used to query which network block a given IP address
-is in.  
+is in.
 
 The optional argument allows there to be more than one table.
 By default, an internal table is used.   If more than one table
-is needed, then supply a reference to a HASH to store the 
+is needed, then supply a reference to a HASH to store the
 data in.
 
 =item ->B<deleteNetblock>([$t])
@@ -286,7 +285,7 @@ Deletes the current block from a table of network blocks.
 
 The optional argument allows there to be more than one table.
 By default, an internal table is used.   If more than one table
-is needed, then supply a reference to a HASH to store the 
+is needed, then supply a reference to a HASH to store the
 data in.
 
 =item ->B<checkNetblock>([$t])
@@ -301,12 +300,17 @@ the new value.  The old value is returned.
 
 =item ->B<split>($parts)
 
-Splits a netmask into a number of sub netblocks. This number must be 
+Splits a netmask into a number of sub netblocks. This number must be
 a base 2 number (2,4,8,16,etc.) and the number must not exceed the
 number of IPs within this netmask.
 
-e.g Net::Netmask->new( '10.0.0.0/24' )->split(2)
-=> ( Net::Netmask( '10.0.0.0/25') , Net::Netmask( '10.0.0.128/25' ) )
+For instance,
+
+  Net::Netmask->new( '10.0.0.0/24' )->split(2)
+
+is equivilent to
+
+  ( Net::Netmask( '10.0.0.0/25'), Net::Netmask( '10.0.0.128/25' ) )
 
 =back
 
@@ -340,10 +344,6 @@ The return value is a list of Net::Netmask objects.
 
 =head1 OVERLOADING
 
-Overloading doesn't seem to work completely on perl before version
-5.6.1.  The test suite doesn't test overloading before that.  At
-least for sort.
-
 =over 25
 
 =item B<"">
@@ -352,7 +352,7 @@ Strinification is overloaded to be the ->B<desc>() method.
 
 =item B<cmp>
 
-Numerical and string comparisons have been overloaded to 
+Numerical and string comparisons have been overloaded to
 the ->B<cmpblocks>() method.  This allows blocks to be sorted
 without specifying a sort function.
 
@@ -364,7 +364,7 @@ without specifying a sort function.
 
 =item B<sort_by_ip_address>
 
-This function is included in C<Net::Netmask> simply because 
+This function is included in C<Net::Netmask> simply because
 there doesn't seem to be a better place to put it on CPAN.
 It turns out that there is one method for sorting dotted-quads
 ("a.b.c.d") that is faster than all the rest.  This is that
@@ -381,7 +381,7 @@ faster than the simpler C<sort @blocks> that also works.
 Search the table of network blocks (created with B<storeNetBlock>) to
 find if any of them contain the given IP address.  The IP address
 is expected to be a string.  If more than one block in the table
-contains the IP address, the smallest network block will be the 
+contains the IP address, the smallest network block will be the
 one returned.
 
 The return value is either a Net::Netmask object or undef.
@@ -397,7 +397,7 @@ The return value is a list of Net::Netmask objects.
 
 =item B<dumpNetworkTable>([$t])
 
-Returns a list of the networks in a network table (as 
+Returns a list of the networks in a network table (as
 created by ->B<storeNetblock>()).
 
 =item B<range2cidrlist>($startip, $endip)
@@ -443,11 +443,21 @@ blocks will be collapsed.
 
 =back
 
-=head1 LICENSE  
+=head1 AUTHORS
 
-Copyright (C) 1998-2006 David Muir Sharnoff.  
+Joelle Maslak <jmaslak@antelope.net> (current maintainer)
+
+David Muir Sharnoff (original creator/author)
+
+=head1 LICENSE
+
+Copyright (C) 1998-2006 David Muir Sharnoff.
 
 Copyright (C) 2011-2013 Google, Inc.
 
+Copyright (C) 2018 Joelle Maslak
+
 This module may be used, modified and redistributed on the same
 terms as Perl itself.
+
+=cut

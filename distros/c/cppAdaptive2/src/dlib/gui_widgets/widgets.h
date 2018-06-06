@@ -4,18 +4,13 @@
 #ifndef DLIB_WIDGETs_
 #define DLIB_WIDGETs_
 
-#include <cctype>
-#include <memory>
-#include <set>
-#include <sstream>
-#include <string>
-#include <vector>
-
 #include "../algs.h"
 #include "widgets_abstract.h"
 #include "drawable.h"
 #include "../gui_core.h"
 #include "fonts.h"
+#include <string>
+#include <sstream>
 #include "../timer.h"
 #include "base_widgets.h"
 #include "../member_function_pointer.h"
@@ -24,10 +19,14 @@
 #include "../sequence.h"
 #include "../dir_nav.h"
 #include "../queue.h"
+#include "../smart_pointers.h"
 #include "style.h"
 #include "../string.h"
 #include "../misc_api.h"
+#include <cctype>
+#include <vector>
 #include "../any.h"
+#include <set>
 #include "../image_processing/full_object_detection.h"
 
 #ifdef _MSC_VER
@@ -94,7 +93,7 @@ namespace dlib
         ) const;
 
         void set_main_font (
-            const std::shared_ptr<font>& f
+            const shared_ptr_thread_safe<font>& f
         );
 
     private:
@@ -214,7 +213,7 @@ namespace dlib
         );
 
         void set_main_font (
-            const std::shared_ptr<font>& f
+            const shared_ptr_thread_safe<font>& f
         );
 
         void set_pos (
@@ -292,7 +291,7 @@ namespace dlib
         any_function<void()> event_handler;
         any_function<void(toggle_button&)> event_handler_self;
 
-        std::unique_ptr<toggle_button_style> style;
+        scoped_ptr<toggle_button_style> style;
 
     protected:
 
@@ -479,7 +478,7 @@ namespace dlib
         );
 
         void set_main_font (
-            const std::shared_ptr<font>& f
+            const shared_ptr_thread_safe<font>& f
         );
 
         int next_free_user_event_number (
@@ -655,7 +654,7 @@ namespace dlib
         any_function<void()> enter_key_handler;
         any_function<void()> focus_lost_handler;
 
-        std::unique_ptr<text_field_style> style;
+        scoped_ptr<text_field_style> style;
 
         timer<text_field> t;
 
@@ -867,7 +866,7 @@ namespace dlib
         );
 
         void set_main_font (
-            const std::shared_ptr<font>& f
+            const shared_ptr_thread_safe<font>& f
         );
 
         int next_free_user_event_number (
@@ -1051,7 +1050,7 @@ namespace dlib
         any_function<void()> enter_key_handler;
         any_function<void()> focus_lost_handler;
 
-        std::unique_ptr<text_box_style> style;
+        scoped_ptr<text_box_style> style;
 
         timer<text_box> t;
 
@@ -1190,9 +1189,6 @@ namespace dlib
             unsigned long num
         );
 
-        unsigned long selected_tab (
-        ) const;
-
         unsigned long number_of_tabs (
         ) const;
 
@@ -1266,7 +1262,7 @@ namespace dlib
         );
 
         void set_main_font (
-            const std::shared_ptr<font>& f
+            const shared_ptr_thread_safe<font>& f
         );
 
         void fit_to_contents (
@@ -1385,7 +1381,7 @@ namespace dlib
         );
 
         void set_main_font (
-            const std::shared_ptr<font>& f
+            const shared_ptr_thread_safe<font>& f
         );
 
     protected:
@@ -1444,7 +1440,7 @@ namespace dlib
         );
 
         void set_main_font (
-            const std::shared_ptr<font>& f
+            const shared_ptr_thread_safe<font>& f
         );
 
     protected:
@@ -1792,14 +1788,14 @@ namespace dlib
         bool move_next (
         ) const;
 
-        size_t size (
+        unsigned long size (
         ) const;
 
         unsigned long get_selected (
         ) const;
 
         void set_main_font (
-            const std::shared_ptr<font>& f
+            const shared_ptr_thread_safe<font>& f
         );
 
     private:
@@ -1831,7 +1827,7 @@ namespace dlib
         any_function<void(unsigned long)> single_click_event_handler;
         unsigned long last_selected;
 
-        std::unique_ptr<list_box_style> style;
+        scoped_ptr<list_box_style> style;
 
         // restricted functions
         list_box(list_box&);        // copy constructor
@@ -1930,7 +1926,7 @@ namespace dlib
             int cur_dir;
 
             any_function<void(const std::string&)> event_handler;
-            sequence<std::unique_ptr<toggle_button> >::kernel_2a_c sob;
+            sequence<scoped_ptr<toggle_button> >::kernel_2a_c sob;
         };
     }
 
@@ -2045,7 +2041,7 @@ namespace dlib
         void set_pos(long,long){}
 
         void set_main_font (
-            const std::shared_ptr<font>& f
+            const shared_ptr_thread_safe<font>& f
         );
 
         void set_number_of_menus (
@@ -3592,7 +3588,7 @@ namespace dlib
         any_function<void(const point& p, bool is_double_click, unsigned long btn)> image_clicked_handler;
         popup_menu_region parts_menu;
         point last_right_click_pos;
-        const double part_width;
+        const int part_width;
         std::set<std::string> part_names;
         bool overlay_editing_enabled;
         timer<image_display> highlight_timer;

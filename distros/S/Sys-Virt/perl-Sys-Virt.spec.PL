@@ -6,15 +6,19 @@ use strict;
 
 die unless (scalar @ARGV == 1);
 
-unless (do './lib/Sys/Virt.pm')
-  {
-    if ($@) { die $@ };
-    die "lib/Sys/Virt.pm: $!";
-  }
+open PM, './lib/Sys/Virt.pm' or die "lib/Sys/Virt.pm: $!";
+my $ver;
+while (<PM>) {
+    if (/our \$VERSION = '(.*)'/) {
+        $ver = $1;
+	last;
+    }
+}
+die "cannot find version" unless $ver;
 
 local $/ = undef;
 $_ = <DATA>;
-s/\@VERSION\@/$Sys::Virt::VERSION/g;
+s/\@VERSION\@/$ver/g;
 
 open SPEC, ">$ARGV[0]" or die "$!";
 print SPEC $_;
@@ -24,14 +28,15 @@ __DATA__
 
 Name:           perl-Sys-Virt
 Version:        @VERSION@
-Release:        1%{?dist}%{?extra_release}
+Release:        1%{?dist}
 Summary:        Represent and manage a libvirt hypervisor connection
 License:        GPLv2+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/Sys-Virt/
-Source0:        http://www.cpan.org/authors/id/D/DA/DANBERR/Sys-Virt-%{version}.tar.gz
+Source0:        http://www.cpan.org/authors/id/D/DA/DANBERR/Sys-Virt-v%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(ExtUtils::CBuilder)
+BuildRequires:  perl(Module::Build)
 BuildRequires:  perl(Test::Pod)
 BuildRequires:  perl(Test::Pod::Coverage)
 BuildRequires:  perl(Test::CPAN::Changes)
@@ -46,32 +51,24 @@ machine management APIs. This allows machines running within arbitrary
 virtualization containers to be managed with a consistent API.
 
 %prep
-%setup -q -n Sys-Virt-%{version}
+%setup -q -n Sys-Virt-v%{version}
 
-sed -i -e '/Sys-Virt\.spec/d' Makefile.PL
-sed -i -e '/\.spec\.PL$/d' MANIFEST
-rm -f *.spec.PL
 
 %build
-%{__perl} Makefile.PL INSTALLDIRS=vendor OPTIMIZE="$RPM_OPT_FLAGS"
-make %{?_smp_mflags}
+%{__perl} Build.PL installdirs=vendor
+./Build
 
 %install
-rm -rf $RPM_BUILD_ROOT
+./Build install destdir=$RPM_BUILD_ROOT create_packlist=0
 
-make pure_install PERL_INSTALL_ROOT=$RPM_BUILD_ROOT
-
-find $RPM_BUILD_ROOT -type f \( -name .packlist -o -name '*.bs' -empty \) |
-	xargs rm -f
-find $RPM_BUILD_ROOT -depth -type d -empty -exec rmdir {} \;
+#find $RPM_BUILD_ROOT -type f \( -name .packlist -o -name '*.bs' -empty \) |
+#	xargs rm -f
+#find $RPM_BUILD_ROOT -depth -type d -empty -exec rmdir {} \;
 
 %{_fixperms} $RPM_BUILD_ROOT/*
 
 %check
-make test
-
-%clean
-rm -rf $RPM_BUILD_ROOT
+./Build test
 
 %files
 %defattr(-,root,root,-)

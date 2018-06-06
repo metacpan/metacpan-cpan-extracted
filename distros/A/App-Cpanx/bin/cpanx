@@ -7,11 +7,14 @@ use POSIX ();
 use Cwd;
 use ExtUtils::MakeMaker;
 
+our $VERSION = "0.08";
+
 my $cpan = "www.cpan.org";
 my $action = "install";
 my $main_module = {};
 my %download_hash;
 my %modules_hash;
+my $download_count = 0;
 my $got_package_details;
 my @install;
 my $cdir0 = "~/.cpanx";
@@ -48,6 +51,9 @@ sub do_action {
     elsif ($action eq "clean") {
         clean_module_cache();
     }
+    elsif ($action eq "version") {
+        display_version();
+    }
     elsif ($action eq "install") {
         install_module();
     }
@@ -64,6 +70,30 @@ sub setup_program {
         unlink "$cdir/output.$$";
         unlink "$cdir/headers.$$";
         unlink "$cdir/content.$$";
+    }
+}
+
+sub display_version {
+    print "cpanx version $VERSION location $0\n";
+    print "perl version $] location $^X\n\n";
+
+    print "%Config:\n";
+    for my $key ("installarchlib", "installprivlib", "installbin",
+                 "installsitearch", "installsitelib", "installsitebin") {
+        my $value = $Config{$key} || "";
+        print "$key $value\n";
+    }
+
+    print "\n%ENV:\n";
+    for my $key (sort keys %ENV) {
+        next if $key !~ /^PERL/;
+        my $value = $ENV{$key} || "";
+        print "$key $value\n";
+    }
+
+    print "\n\@INC:\n";
+    for my $dir (@INC) {
+        print "$dir\n";
     }
 }
 
@@ -251,7 +281,7 @@ sub display_info2 {
             }
         }
         elsif (-e "Build") {
-            my $output = `perl Build fakeinstall 2>/dev/null`;
+            my $output = `$^X Build fakeinstall 2>/dev/null`;
             while ($output =~ /(Installing|Writing) (.*)/gim) {
                 my $file = $2;
                 print "$file\n";
@@ -272,7 +302,7 @@ sub run_make {
         }
     }
     elsif (-e "Build") {
-        my $cmd = "perl Build$cmd2";
+        my $cmd = "$^X Build$cmd2";
         print "$cmd\n" if !$quiet;
         system "$cmd";
         if ($? != 0) {
@@ -292,7 +322,7 @@ sub run_tests {
         }
     }
     elsif (-e "Build") {
-        my $cmd = "perl Build test";
+        my $cmd = "$^X Build test";
         print "$cmd\n";
         system "$cmd";
         if ($? != 0) {
@@ -318,7 +348,7 @@ sub run_make_install {
         }
     }
     elsif (-e "Build") {
-        my $cmd = "perl Build install";
+        my $cmd = "$^X Build install";
         if ($sudo) {
             $cmd = "sudo $cmd";
         }
@@ -528,7 +558,7 @@ sub run_configure {
     my $cmd2 = $quiet ? " >/dev/null 2>&1 </dev/null" : "";
     $module->{configured} = 1;
     if (-e "Makefile.PL") {
-        my $cmd = "perl Makefile.PL$mm_opt$cmd2";
+        my $cmd = "$^X Makefile.PL$mm_opt$cmd2";
         print "$cmd\n" if !$quiet;
         system $cmd;
         if ($? != 0) {
@@ -536,7 +566,7 @@ sub run_configure {
         }
     }
     elsif (-e "Build.PL") {
-        my $cmd = "perl Build.PL$mb_opt$cmd2";
+        my $cmd = "$^X Build.PL$mb_opt$cmd2";
         print "$cmd\n" if !$quiet;
         system $cmd;
         if ($? != 0) {
@@ -647,7 +677,7 @@ sub init_main_module {
 sub download_module_named {
     my ($module) = @_;
     if ($module->{name} =~ /^(perl|Config|Errno)$/i) {
-        die "Skipping module in Perl source.\n";
+        die "Skipping $module->{name} module.\n";
     }
     get_packages_details();
     my $file = "$cdir/02packages.details.txt";
@@ -658,7 +688,6 @@ sub download_module_named {
         if ($line =~ /^$module->{name}\s+(\S+)\s+(\S+)$/i) {
             $version = $1;
             $path = $2;
-            print "$module->{name} is in /modules/by-authors/id/$path\n";
             last;
         }
     }
@@ -667,7 +696,7 @@ sub download_module_named {
         die "Can't find $module->{name} module.\n";
     }
     if ($path =~ m{/perl-[^/]+$}) {
-        die "Skipping module in Perl source.\n";
+        die "Skipping $module->{name} module in Perl source.\n";
     }
     $path = "/modules/by-authors/id/$path";
     my $dir = download_module($path);
@@ -811,27 +840,25 @@ sub download {
         return 0;
     }
     $download_hash{$path} = 1;
+    $download_count++;
     $path =~ m{/([^/]+)$};
     my $file = $1;
     my $file2 = "$cdir/$file";
-    my $cmd2 = "";
+    my $newer = "";
 
     if (-e $file2) {
         if ($file_doesnt_change) {
-            print "Using cached $path\n";
+            print "Using cached $cpan$path\n";
             return 0;
         }
-        print "Updating $path\n";
-        $cmd2 .= "-z $file2 ";
-    }
-    else {
-        print "Downloading $path\n";
+        $newer .= "-z $file2 ";
     }
 
     my $ofile = "$cdir/output.$$";
     my $hfile = "$cdir/headers.$$";
     my $cfile = "$cdir/content.$$";
-    my $cmd = "curl $cpan$path $cmd2-o $cfile -D $hfile -R 2>&1 | tee $ofile";
+    print "curl $cpan$path $newer-R\n";
+    my $cmd = "curl $cpan$path $newer-R -o $cfile -D $hfile 2>&1 | tee $ofile";
     system $cmd;
     open my $fh, "<", $ofile or die "Can't open $ofile: $!";
     my $output = do {local $/; <$fh>};
@@ -1166,6 +1193,9 @@ sub get_opts {
         elsif ($arg =~ /^-c$/) {
             $action = "clean";
         }
+        elsif ($arg =~ /^-v$/) {
+            $action = "version";
+        }
         elsif ($arg =~ /^-u$/) {
             $action = "uninstall";
         }
@@ -1223,9 +1253,10 @@ Usage: cpanx [<options>] <module>
 -r         reinstall even if module is installed
 -T         do not run tests
 -d         dependencies only
--m=<url>   sets the cpan mirror
--M         choose a cpan mirror. default www.cpan.org
+-m=<url>   sets the cpan mirror. default www.cpan.org
+-M         choose a cpan mirror
 -c         clean module cache
+-v         displays version
 
 -I=<loc>   sets install base path. e.g. /usr/local
 -L=<loc>   sets library install path. e.g. /Library/Perl/5.18
@@ -1263,9 +1294,10 @@ cpanx - A CPAN downloader script
     -r         reinstall even if module is installed
     -T         do not run tests
     -d         dependencies only
-    -m=<url>   sets the cpan mirror
-    -M         choose a cpan mirror. default www.cpan.org
+    -m=<url>   sets the cpan mirror. default www.cpan.org
+    -M         choose a cpan mirror
     -c         clean module cache
+    -v         displays version
 
     -I=<loc>   sets install base path. e.g. /usr/local
     -L=<loc>   sets library install path. e.g. /Library/Perl/5.18

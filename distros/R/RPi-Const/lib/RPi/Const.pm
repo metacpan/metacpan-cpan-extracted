@@ -3,7 +3,7 @@ package RPi::Const;
 use strict;
 use warnings;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 require Exporter;
 use base qw( Exporter );
@@ -169,6 +169,67 @@ use constant {
     $EXPORT_TAGS{mode} = \@const;
 }
 
+use constant {
+    MCP23017_IODIRA     => 0x00,
+    MCP23017_IODIRB     => 0x01,
+    MCP23017_IPOLA      => 0x02,
+    MCP23017_IPOLB      => 0x03,
+    MCP23017_GPINTENA   => 0x04,
+    MCP23017_GPINTENB   => 0x05,
+    MCP23017_DEFVALA    => 0x06,
+    MCP23017_DEFVALB    => 0x07,
+    MCP23017_INTCONA    => 0x08,
+    MCP23017_INTCONB    => 0x09,
+    MCP23017_IOCONA     => 0x0A,
+    MCP23017_IOCONB     => 0x0B,
+    MCP23017_GPPUA      => 0x0C,
+    MCP23017_GPPUB      => 0x0D,
+    MCP23017_INTFA      => 0x0E,
+    MCP23017_INTFB      => 0x0F,
+    MCP23017_INTCAPA    => 0x10,
+    MCP23017_INTCAPB    => 0x11,
+    MCP23017_GPIOA      => 0x12,
+    MCP23017_GPIOB      => 0x13,
+    MCP23017_OLATA      => 0x14,
+    MCP23017_OLATB      => 0x15,
+
+    MCP23017_INPUT      => 1,
+    MCP23017_OUTPUT     => 0,
+};
+
+{ # MCP23017 GPIO Expander Registers
+
+    my @const = qw(
+        MCP23017_IODIRA
+        MCP23017_IODIRB
+        MCP23017_IPOLA
+        MCP23017_IPOLB
+        MCP23017_GPINTENA
+        MCP23017_GPINTENB
+        MCP23017_DEFVALA
+        MCP23017_DEFVALB
+        MCP23017_INTCONA
+        MCP23017_INTCONB
+        MCP23017_IOCONA
+        MCP23017_IOCONB
+        MCP23017_GPPUA
+        MCP23017_GPPUB
+        MCP23017_INTFA
+        MCP23017_INTFB
+        MCP23017_INTCAPA
+        MCP23017_INTCAPB
+        MCP23017_GPIOA
+        MCP23017_GPIOB
+        MCP23017_OLATA
+        MCP23017_OLATB
+        MCP23017_INPUT
+        MCP23017_OUTPUT
+    );
+
+    push @EXPORT_OK, @const;
+    $EXPORT_TAGS{mcp23017_registers} = \@const;
+}
+
 sub _vim{1;};
 1;
 __END__
@@ -270,7 +331,37 @@ Edge detection states for interrupts.
     EDGE_FALLING => 1,
     EDGE_RISING  => 2,
     EDGE_BOTH    => 3,
+
+=head2 :mcp23017_registers
+
+Hardware register locations and related info for the MCP23107 GPIO Expander
+
+    MCP23017_IODIRA     => 0x00,
+    MCP23017_IODIRB     => 0x01,
+    MCP23017_IPOLA      => 0x02,
+    MCP23017_IPOLB      => 0x03,
+    MCP23017_GPINTENA   => 0x04,
+    MCP23017_GPINTENB   => 0x05,
+    MCP23017_DEFVALA    => 0x06,
+    MCP23017_DEFVALB    => 0x07,
+    MCP23017_INTCONA    => 0x08,
+    MCP23017_INTCONB    => 0x09,
+    MCP23017_IOCONA     => 0x0A,
+    MCP23017_IOCONB     => 0x0B,
+    MCP23017_GPPUA      => 0x0C,
+    MCP23017_GPPUB      => 0x0D,
+    MCP23017_INTFA      => 0x0E,
+    MCP23017_INTFB      => 0x0F,
+    MCP23017_INTCAPA    => 0x10,
+    MCP23017_INTCAPB    => 0x11,
+    MCP23017_GPIOA      => 0x12,
+    MCP23017_GPIOB      => 0x13,
+    MCP23017_OLATA      => 0x14,
+    MCP23017_OLATB      => 0x15,
     
+    MCP23017_INPUT      => 1,
+    MCP23017_OUTPUT     => 0
+
 =head1 AUTHOR
 
 Steve Bertrand, E<lt>steveb@cpan.orgE<gt>

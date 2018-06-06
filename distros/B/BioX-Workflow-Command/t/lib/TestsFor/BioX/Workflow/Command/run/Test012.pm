@@ -111,6 +111,8 @@ sub test_001 {
         _init_rule( $test, $rule );
     }
 
+    my $attr = dclone($test->local_attr);
+    my $text = $test->eval_process($attr);
     $test->post_process_rules;
 
     is_deeply( $test->exclude_samples, ['Sample_03'] );
@@ -119,8 +121,7 @@ sub test_001 {
     ok( ( -d 'data/processed/Sample_01/jellyfish' ) );
     ok( ( -d 'data/processed/Sample_02/jellyfish' ) );
 
-    is_deeply( $test->process_obj->{jellyfish}->{text},
-        [ 'HELLO FROM JELLYFISH!', 'HELLO FROM JELLYFISH!' ] );
+    is( $text, 'HELLO FROM JELLYFISH!' );
 }
 
 sub test_002 {
@@ -129,11 +130,14 @@ sub test_002 {
     _init_rule( $test, $rule );
 
     # $test->sample('Sample_01');
-    my $attr = $test->walk_attr;
+    my $attr = dclone($test->local_attr);
+    $attr->sample('Sample_01');
+    $test->sample('Sample_01');
+    $test->eval_process($attr);
 
     my $text = $attr->render_mustache( $attr->template_mustache, 0 );
     my $expect = <<EOF;
-__DUMMYSAMPLE123456789__
+Sample_01
 List: 1
 List: 2
 List: 3
@@ -142,16 +146,15 @@ Basename: some_input_rule1
 EOF
     is( $text, $expect, 'Mustache template matches' );
 }
-
+#
 sub test_003 {
     my ( $test, $test_dir, $rules ) = construct_tests;
     my $rule = $rules->[0];
     _init_rule( $test, $rule );
 
-    my $attr = $test->walk_attr;
-
+    my $attr = dclone($test->local_attr);
+    $test->eval_process($attr);
     my $json = $attr->serialize_to_json;
-
     ok(1);
 }
 

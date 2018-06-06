@@ -1,5 +1,5 @@
 package Selenium::Remote::Driver;
-$Selenium::Remote::Driver::VERSION = '1.27';
+$Selenium::Remote::Driver::VERSION = '1.28';
 use strict;
 use warnings;
 
@@ -1104,7 +1104,10 @@ sub set_window_size {
 sub maximize_window {
     my ( $self, $window ) = @_;
     if ($self->{is_wd3} && $self->browser_name eq 'chrome') {
-        return $self->execute_script(qq{window.resizeTo(screen.availWidth,screen.availHeight); return 1;});
+        my $h = $self->execute_script(q{return screen.availHeight});
+        my $w = $self->execute_script(q{return screen.availWidth});
+
+        return $self->set_window_size($h,$w);
     }
     $window = ( defined $window ) ? $window : 'current';
     my $res = { 'command' => 'maximizeWindow', 'window_handle' => $window };
@@ -1740,7 +1743,7 @@ Selenium::Remote::Driver - Perl Client for Selenium Remote Driver
 
 =head1 VERSION
 
-version 1.27
+version 1.28
 
 =head1 SYNOPSIS
 
@@ -1965,8 +1968,6 @@ Desired capabilities - HASH - Following options are accepted:
 
 =item B<firefox_profile>    - Profile    - Use Selenium::Firefox::Profile to create a Firefox profile for the browser to use.  Optionally can pass a base64'd zip data of a profile directory if you don't like Selenium::Firefox::Profile.
 
-=item B<proxy>              - HASH       - Proxy configuration with the following keys:
-
 =item B<javascript>         - <boolean> - Whether or not to use Javascript.  You probably won't disable this, as you would be using L<WWW::Mechanize> instead.  Default: True
 
 =item B<auto_close>         - <boolean> - Whether to automatically close the browser session on the server when the object goes out of scope. Default: False.
@@ -1974,32 +1975,6 @@ Desired capabilities - HASH - Following options are accepted:
 =item B<default_finder>     - <string> - Default method by which to evaluate selectors.  Default: 'xpath'
 
 =item B<session_id>         - <string> - Provide a Session ID to highjack a browser session on the remote server.  Useful for micro-optimizers.  Default: undef
-
-=over 4
-
-=item B<proxyType> - <string> - REQUIRED, Possible values are:
-
-    direct     - A direct connection - no proxy in use,
-    manual     - Manual proxy settings configured, e.g. setting a proxy for HTTP, a proxy for FTP, etc,
-    pac        - Proxy autoconfiguration from a URL,
-    autodetect - proxy autodetection, probably with WPAD,
-    system     - Use system settings
-
-=item B<proxyAutoconfigUrl> - <string> - REQUIRED if proxyType is 'pac', ignored otherwise. Expected format: http://hostname.com:1234/pacfile or file:///path/to/pacfile
-
-=item B<ftpProxy>           - <string> - OPTIONAL, ignored if proxyType is not 'manual'. Expected format: hostname.com:1234
-
-=item B<httpProxy>          - <string> - OPTIONAL, ignored if proxyType is not 'manual'. Expected format: hostname.com:1234
-
-=item B<sslProxy>           - <string> - OPTIONAL, ignored if proxyType is not 'manual'. Expected format: hostname.com:1234
-
-=item B<socksProxy>         - <string> - OPTIONAL, ignored if proxyType is not 'manual'. Expected format: hostname.com:1234.  WebDriver 3 only.
-
-=item B<socksVersion>       - <int>    - OPTIONAL, ignored if proxyType is not 'manual'. WebDriver 3 only.
-
-=item B<noProxy>            - <ARRAY>  - OPTIONAL, list of URLs to bypass the proxy for. WebDriver3 only.
-
-=back
 
 =item B<pageLoadStrategy>   - STRING   - OPTIONAL, 'normal|eager|none'. default 'normal'. WebDriver3 only.
 
@@ -2028,6 +2003,34 @@ not part of the browser-related desired capabilities.
 =item B<webelement_class>  - <string>    - sub-class of Selenium::Remote::WebElement if you wish to use an alternate WebElement class.
 
 =item B<ua>                - LWP::UserAgent instance - if you wish to use a specific $ua, like from Test::LWP::UserAgent
+
+=item B<proxy>              - HASH       - Proxy configuration with the following keys:
+
+=over 4
+
+=item B<proxyType> - <string> - REQUIRED, Possible values are:
+
+    direct     - A direct connection - no proxy in use,
+    manual     - Manual proxy settings configured, e.g. setting a proxy for HTTP, a proxy for FTP, etc,
+    pac        - Proxy autoconfiguration from a URL,
+    autodetect - proxy autodetection, probably with WPAD,
+    system     - Use system settings
+
+=item B<proxyAutoconfigUrl> - <string> - REQUIRED if proxyType is 'pac', ignored otherwise. Expected format: http://hostname.com:1234/pacfile or file:///path/to/pacfile
+
+=item B<ftpProxy>           - <string> - OPTIONAL, ignored if proxyType is not 'manual'. Expected format: hostname.com:1234
+
+=item B<httpProxy>          - <string> - OPTIONAL, ignored if proxyType is not 'manual'. Expected format: hostname.com:1234
+
+=item B<sslProxy>           - <string> - OPTIONAL, ignored if proxyType is not 'manual'. Expected format: hostname.com:1234
+
+=item B<socksProxy>         - <string> - OPTIONAL, ignored if proxyType is not 'manual'. Expected format: hostname.com:1234.  WebDriver 3 only.
+
+=item B<socksVersion>       - <int>    - OPTIONAL, ignored if proxyType is not 'manual'. WebDriver 3 only.
+
+=item B<noProxy>            - <ARRAY>  - OPTIONAL, list of URLs to bypass the proxy for. WebDriver3 only.
+
+=back
 
 =back
 
@@ -2884,6 +2887,9 @@ This is actually called in that case, supposing you are using WD3 capable server
  Compatibility:
     In webDriver 3 enabled selenium servers, you may only operate on the focused window.
     As such, the window handle argument below will be ignored in this context.
+
+    Also, on chromedriver maximize is actually just setting the window size to the screen's
+    available height and width.
 
  Input:
     STRING - <optional> - window handle (default is 'current' window)

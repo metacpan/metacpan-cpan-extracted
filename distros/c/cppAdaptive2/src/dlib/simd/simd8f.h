@@ -42,11 +42,6 @@ namespace dlib
         inline void store(type* ptr)         const { _mm256_storeu_ps(ptr, x); }
 
         inline simd8f& operator=(const simd8i& rhs) { *this = simd8f(rhs); return *this; }
-        inline simd8f& operator=(const float& val)
-        {
-            x = simd8f(val);
-            return *this;
-        }
 
         inline unsigned int size() const { return 8; }
         inline float operator[](unsigned int idx) const 
@@ -125,8 +120,8 @@ namespace dlib
                 return _high[idx-4];
         }
 
-        inline const simd4f& low() const { return _low; }
-        inline const simd4f& high() const { return _high; }
+        inline simd4f low() const { return _low; }
+        inline simd4f high() const { return _high; }
 
     private:
         simd4f _low, _high;
@@ -141,8 +136,8 @@ namespace dlib
         inline simd8f_bool(const simd4f_bool& low_, const simd4f_bool& high_): _low(low_),_high(high_){}
 
 
-        inline const simd4f_bool& low() const { return _low; }
-        inline const simd4f_bool& high() const { return _high; }
+        inline simd4f_bool low() const { return _low; }
+        inline simd4f_bool high() const { return _high; }
     private:
         simd4f_bool _low,_high;
     };

@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 02f8c7efc6a564690d32ab5563f87df5112f1dcd Changes
+SHA1 e439d8cda67d9b8712c8b4933525de1fa79d5467 LICENSE
+SHA1 f474188592a17a91a128db3110a25222ad4f1cac MANIFEST
+SHA1 03f0711cff2a3a29d045348c31c79e1d82642230 MANIFEST.SKIP
+SHA1 da6f6443c242a55a99daa2fef9799f2ade2441db META.json
+SHA1 1efe9a39b3bc3d3347299f10531b0f1cfa35584e META.yml
+SHA1 76cf6b3988c26d2f0bd2f275d3a994a10fb0fe92 Makefile.PL
+SHA1 5f77591ca4faf790e3374b71b2f85638dc6e75c2 README
+SHA1 1d5fa53a2fd4d434560387f6ebf1d7b5ce127f2c lib/Template/Plugin/Filter/IDN.pm
+SHA1 55595374ae3d978a1a9a813395a6df6a4d8b7806 t/00-compile.t
+SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
+SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
+SHA1 19cc343f8a85c6805bbeb02580487483a6283887 t/author-signature.t
+SHA1 870ae23ed533147c51e24c6590635009d9b5f30d t/smoke.t
+-----BEGIN PGP SIGNATURE-----
+
+iQJFBAEBCAAvFiEE2EtuRfhGgngE8PsARAzvLrlUzY4FAlsVubQRHG1zY2hvdXRA
+Y3Bhbi5vcmcACgkQRAzvLrlUzY4Odg/+LyQu0CRgYQuryGMtpxYJdgnbThQbbQK1
+2fIdL8EVL/D1v4bRUy7GcYAwyfIZ2mHpOK10+Q6uBNf3MS4rV7OJl6x2yNXYNLS6
+W+X8CVOCMukyceBq30dDHdrMyxMvumEOwui/422BOtBlm9uoXXoSTZzwJb02QL7x
+lKp4H4NBTfgE3f/rQ1cFqRWJQHLz7V/8SkI0kIXrdicFYn5xiQFPKpEO4Zin6dg1
+EHZwFcDztNBEw9oZsIGEvxtCagNC0hIHXSJ0ak+U/s6hg0dsX4rsHOI8jtF3/9oS
+57xR8ahE4m5lWIXB+1VbzX18T7U8rG/fhS4gIxUG8Lb593ZgLiuknhLX8PW65LIX
+pcir46t2tbtTWJe/pnkRojGwkCjeq28G52FYJVJnN+8uXGH9jptSZs5j4xm/NpSU
+l1cJHE96yGlh9JK4jb9jW0kYw6atMKV2lJSg6CtLTiWn9UiXWgs6Pb/oI67iFXzJ
+utYgzIuxnBGzf4EZOv4imD8bCCr41huaPI6nVj7/Hbk5BD79Z4KalIJnOAQx4jMR
+Id/bLtbvTQJVx6Hhs7vPspKlPmN5dMZuQc/r8ypYV7x40CO+wJ+ZZNr+4Temtbv8
+ShJg3MzwUV913SmLsAmdzolx4f7XM7MczITnypSBWb5ODmHHyvkXjY5okUCYNmrA
+WJLq1pnZbsE=
+=n1y/
+-----END PGP SIGNATURE-----

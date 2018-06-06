@@ -1,5 +1,9 @@
 Revision history for Perl extension Minilla
 
+0.024 2018-06-06T00:31:19Z
+    - rm accidentally added file
+    - typos at pod
+    - update pod
 0.023 2018-05-29T00:17:22Z
     - using Mojo::Reactor::Poll in tests
 0.022 2018-05-28T19:15:55Z

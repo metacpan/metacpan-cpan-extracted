@@ -48,6 +48,19 @@ filename for the rcfile, the `rcfile` parameter can be passed to the constructor
 
     rcfile => '.myapprc',
 
+- **agent**
+
+        my $shell = WWW::Mechanize::Shell->new(
+            agent => WWW::Mechanize::Chrome->new(),
+        );
+
+    Pass in a premade custom user agent. This object must be compatible to
+    [WWW::Mechanize](https://metacpan.org/pod/WWW::Mechanize). Use this feature from the command line as
+
+        perl -Ilib -MWWW::Mechanize::Chrome \
+                   -MWWW::Mechanize::Shell \
+                   -e"shell(agent => WWW::Mechanize::Chrome->new())"
+
 ## `$shell->release_agent`
 
 Since the shell stores a reference back to itself within the
@@ -193,6 +206,10 @@ Display all links on a page
 The links numbers displayed can used by `open` to directly
 select a link to follow.
 
+## images
+
+Display images on a page
+
 ## parse
 
 Dump the output of HTML::TokeParser of the current content
@@ -264,7 +281,7 @@ to click on it.
 
 ## open
 
-<open> accepts one argument, which can be a regular expression or the number
+&lt;open> accepts one argument, which can be a regular expression or the number
 of a link on the page, starting at zero. These numbers are displayed by the
 `links` function. It goes directly to the page if a number is used
 or if the RE has one match. Otherwise, a list of links matching

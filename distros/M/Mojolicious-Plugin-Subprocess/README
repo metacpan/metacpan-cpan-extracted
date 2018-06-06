@@ -59,12 +59,10 @@ HELPERS
 
     Execute the first callback in a child process with "run" in
     Mojo::IOLoop::Subprocess, and execute the second callback in the parent
-    process with the results. The callbacks are executed via "delay" in
-    Mojolicious::Plugin::DefaultHelpers, which disables automatic
-    rendering, keeps a reference to the transaction, and renders an
-    exception response if an exception is thrown in either callback. This
-    also means that the parent callback will not be called if an exception
-    is thrown in the child callback.
+    process with the results. Automatic rendering is disabled, and an
+    exception response is rendered if an exception is thrown in either
+    callback. This also means that the parent callback will not be called
+    if an exception is thrown in the child callback.
 
 METHODS
 

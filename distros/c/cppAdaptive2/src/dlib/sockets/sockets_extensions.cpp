@@ -294,14 +294,14 @@ namespace dlib
         unsigned long timeout 
     )
     {
-        std::unique_ptr<connection> ptr(con);
+        scoped_ptr<connection> ptr(con);
         close_gracefully(ptr,timeout);
     }
 
 // ----------------------------------------------------------------------------------------
 
     void close_gracefully (
-        std::unique_ptr<connection>& con,
+        scoped_ptr<connection>& con,
         unsigned long timeout 
     )
     {

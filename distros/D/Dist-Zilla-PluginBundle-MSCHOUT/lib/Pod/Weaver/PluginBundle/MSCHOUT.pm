@@ -8,7 +8,7 @@
 #
 
 package Pod::Weaver::PluginBundle::MSCHOUT;
-$Pod::Weaver::PluginBundle::MSCHOUT::VERSION = '0.37';
+$Pod::Weaver::PluginBundle::MSCHOUT::VERSION = '0.38';
 # ABSTRACT: Pod::Weaver configuration the way MSCHOUT does it
 
 # Dependencies
@@ -61,6 +61,7 @@ sub mvp_bundle_config {
         ],
         [ '@MSCHOUT/Legal',   _exp('Legal'),   {} ],
         [ '@MSCHOUT/List',    _exp('-Transformer'), { transformer => 'List' } ],
+        [ '@MSCHOUT/SingleEncoding', _exp('-SingleEncoding'), {} ],
     );
 }
 
@@ -70,13 +71,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Pod::Weaver::PluginBundle::MSCHOUT - Pod::Weaver configuration the way MSCHOUT does it
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 DESCRIPTION
 

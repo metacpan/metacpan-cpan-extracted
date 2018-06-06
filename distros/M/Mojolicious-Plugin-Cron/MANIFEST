@@ -6,7 +6,6 @@ LICENSE
 META.json
 README.md
 cpanfile
-examples/pepe
 examples/simple_cron.pl
 lib/Mojolicious/Plugin/Cron.pm
 minil.toml

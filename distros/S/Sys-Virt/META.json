@@ -1,0 +1,96 @@
+{
+   "abstract" : "libvirt Perl API",
+   "author" : [
+      "Daniel Berrange <dan@berrange.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "gpl_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Sys-Virt",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "Sys::Hostname" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Time::HiRes" : "0",
+            "XML::XPath" : "0",
+            "XML::XPath::XMLParser" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.8.0"
+         }
+      }
+   },
+   "provides" : {
+      "Sys::Virt" : {
+         "file" : "lib/Sys/Virt.pm",
+         "version" : "v4.4.0"
+      },
+      "Sys::Virt::Domain" : {
+         "file" : "lib/Sys/Virt/Domain.pm"
+      },
+      "Sys::Virt::DomainSnapshot" : {
+         "file" : "lib/Sys/Virt/DomainSnapshot.pm"
+      },
+      "Sys::Virt::Error" : {
+         "file" : "lib/Sys/Virt/Error.pm"
+      },
+      "Sys::Virt::Event" : {
+         "file" : "lib/Sys/Virt/Event.pm"
+      },
+      "Sys::Virt::Interface" : {
+         "file" : "lib/Sys/Virt/Interface.pm"
+      },
+      "Sys::Virt::NWFilter" : {
+         "file" : "lib/Sys/Virt/NWFilter.pm"
+      },
+      "Sys::Virt::Network" : {
+         "file" : "lib/Sys/Virt/Network.pm"
+      },
+      "Sys::Virt::NodeDevice" : {
+         "file" : "lib/Sys/Virt/NodeDevice.pm"
+      },
+      "Sys::Virt::Secret" : {
+         "file" : "lib/Sys/Virt/Secret.pm"
+      },
+      "Sys::Virt::StoragePool" : {
+         "file" : "lib/Sys/Virt/StoragePool.pm"
+      },
+      "Sys::Virt::StorageVol" : {
+         "file" : "lib/Sys/Virt/StorageVol.pm"
+      },
+      "Sys::Virt::Stream" : {
+         "file" : "lib/Sys/Virt/Stream.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://libvirt.org/",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl.html"
+      ],
+      "repository" : {
+         "url" : "https://libvirt.org/git/?p=libvirt-perl.git;a=summary"
+      },
+      "x_MailingList" : "http://www.redhat.com/mailman/listinfo/libvir-list"
+   },
+   "version" : "v4.4.0",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

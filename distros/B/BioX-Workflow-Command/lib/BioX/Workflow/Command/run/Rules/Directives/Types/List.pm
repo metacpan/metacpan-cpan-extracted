@@ -3,7 +3,11 @@ package BioX::Workflow::Command::run::Rules::Directives::Types::List;
 use Moose::Role;
 use namespace::autoclean;
 
+
 =head2 Iterables
+DEPRECATED
+
+Use data_loop instead!
 
 Lists to iterate by
 

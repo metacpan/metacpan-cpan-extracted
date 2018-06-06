@@ -1,5 +1,7 @@
 package TestsFor::BioX::Workflow::Command::run::Test010;
 
+use strict;
+use warnings FATAL => 'all';
 use Test::Class::Moose;
 use Cwd;
 use FindBin qw($Bin);
@@ -141,7 +143,8 @@ sub test_002 {
     _init_rule( $test, $rule );
 
     $test->sample('Sample_01');
-    my $attr = $test->walk_attr;
+    my $attr = dclone($test->local_attr);
+    $test->eval_process($attr);
 
     my $json = [
         {
@@ -175,6 +178,7 @@ sub test_002 {
         }
     };
     is_deeply( $attr->my_csv, $csv, 'CSV Structure Matches' );
+
 
     $test->post_process_rules;
     is_deeply( $test->samples, ['Sample_01'] );

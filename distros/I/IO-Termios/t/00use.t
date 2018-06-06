@@ -1,6 +1,10 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
-use Test::More tests => 1;
+use warnings;
+
+use Test::More;
 
 use_ok( "IO::Termios" );
+
+done_testing;

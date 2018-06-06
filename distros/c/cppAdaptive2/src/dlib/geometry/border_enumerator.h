@@ -125,7 +125,7 @@ namespace dlib
             return false;
         }
 
-        size_t size (
+        unsigned long size (
         ) const
         {
             return rect.area() - inner_rect.area();

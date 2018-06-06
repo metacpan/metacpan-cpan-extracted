@@ -47,7 +47,7 @@ sub assemble_args {
     $token =~ s/^\s*([\$\@\%])(\w+) (?:\s* => \s* ([^\r\n]+))?/
       my $argvar = ($1 eq '$') ? "\$ARGS{$2}" : "$1\{ \$ARGS{$2} }";
       "my $1$2 = exists \$ARGS{$2} ? $argvar : " . 
-	    ( defined($3) ? "($argvar = $3)" : 
+	    ( defined($3) ? "($argvar = $3\n)" : 
 	      qq{Carp::croak("no value sent for required parameter '$2'")} ) .
       ";"/gexm;
   return ( 'init' => '($#_ % 2) or Carp::croak("Odd number of parameters passed to sub expecting name/value pairs"); ' . "\n" . $token );

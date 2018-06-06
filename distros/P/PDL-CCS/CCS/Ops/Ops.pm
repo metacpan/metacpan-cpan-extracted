@@ -13,7 +13,7 @@ use DynaLoader;
 
 
 
-   $PDL::CCS::Ops::VERSION = 1.23.4;
+   $PDL::CCS::Ops::VERSION = 1.23.7;
    @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::CCS::Ops $VERSION;
@@ -86,7 +86,7 @@ has been exhausted.
 
 The parameters C<$istate()> and C<$ostate()> hold the state of the algorithm,
 for incremental block-wise computation at the perl level.  Each state PDL
-is a 7-element PDL containting the following values:
+is a 7-element PDL containing the following values:
 
  INDEX LABEL       DESCRIPTION
  -----------------------------------------------------------------------

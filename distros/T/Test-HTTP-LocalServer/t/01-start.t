@@ -22,5 +22,7 @@ cmp_ok 0+@log, '>', 0, "We have some lines in the log file";
 
 $server->stop;
 
+sleep 5; # just give it more time to be really sure
+
 $res = kill 0, $pid;
 is $res, 0, "PID $pid doesn't exist anymore";

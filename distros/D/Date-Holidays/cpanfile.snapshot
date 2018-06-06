@@ -148,6 +148,63 @@ DISTRIBUTIONS
       Sub::Install 0.921
       strict 0
       warnings 0
+  Date-Holidays-AT-v0.1.4
+    pathname: M/MD/MDIETRICH/Date-Holidays-AT-v0.1.4.tar.gz
+    provides:
+      Date::Holidays::AT v0.1.4
+    requirements:
+      Date::Calc 5.0
+      Module::Build 0.36
+      Test::More 0
+      version 0
+  Date-Holidays-AU-0.19
+    pathname: D/DD/DDICK/Date-Holidays-AU-0.19.tar.gz
+    provides:
+      Date::Holidays::AU 0.19
+    requirements:
+      Carp 0
+      Date::Easter 0
+      ExtUtils::MakeMaker 0
+      Test::More 0
+      Time::Local 0
+      perl 5.006
+  Date-Holidays-BR-0.01
+    pathname: G/GA/GARU/Date-Holidays-BR-0.01.tar.gz
+    provides:
+      Date::Holidays::BR 0.01
+    requirements:
+      Date::Easter 0
+      Date::Holidays::Super 0
+      Test::More 0
+      Time::JulianDay 0
+  Date-Holidays-BY-0.2018.0
+    pathname: B/BE/BESINT/Date-Holidays-BY-0.2018.0.tar.gz
+    provides:
+      Date::Holidays::BY 0.2018
+    requirements:
+      Carp 0
+      Exporter 0
+      List::Util 0
+      Module::Build 0.28
+      Time::Piece 0
+      base 0
+      strict 0
+      utf8 0
+      warnings 0
+  Date-Holidays-Super-0.04
+    pathname: J/JO/JONASBN/Date-Holidays-Super-0.04.tar.gz
+    provides:
+      Date::Holidays::Super 0.04
+    requirements:
+      Test::Harness 0
+      Test::More 0
+  Date-Holidays-USFederal-1.0
+    pathname: M/MO/MORRISNIH/Date-Holidays-USFederal-1.0.tar.gz
+    provides:
+      Date::Holidays::USFederal 1.0
+    requirements:
+      Test::More 0
+      perl 5.006
   DateTime-1.44
     pathname: D/DR/DROLSKY/DateTime-1.44.tar.gz
     provides:
@@ -1834,6 +1891,29 @@ DISTRIBUTIONS
       Scalar::Util 1.14
       Test::More 0.42
       perl 5.005
+  Test-Class-0.50
+    pathname: E/ET/ETHER/Test-Class-0.50.tar.gz
+    provides:
+      Test::Class 0.50
+      Test::Class::Load 0.50
+      Test::Class::MethodInfo 0.50
+    requirements:
+      Attribute::Handlers 0.77
+      Carp 0
+      ExtUtils::MakeMaker 0
+      File::Find 0
+      File::Spec 0
+      MRO::Compat 0.11
+      Module::Runtime 0
+      Storable 2.04
+      Test::Builder 0.78
+      Test::Builder::Tester 1.02
+      Test::Simple 0.78
+      Try::Tiny 0
+      constant 0
+      perl 5.008001
+      strict 0
+      warnings 0
   Test-Deep-1.127
     pathname: R/RJ/RJBS/Test-Deep-1.127.tar.gz
     provides:

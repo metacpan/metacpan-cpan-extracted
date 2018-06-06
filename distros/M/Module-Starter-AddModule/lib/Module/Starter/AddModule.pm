@@ -19,7 +19,7 @@ BEGIN {
 
 use Cwd;
 
-$VERSION = '1.005';
+$VERSION = '1.006';
 
 =encoding utf8
 
@@ -30,7 +30,7 @@ Module::Starter::AddModule - Add a new module to a distribution
 =head1 SYNOPSIS
 
 	# in the module-starter config
-	
+
 	plugins: Module::Starter::AddModule
 	make: /whatever/make/you/like/dmake
 
@@ -57,11 +57,11 @@ relationship for you automatically.
 =item create_MANIFEST
 
 Overrides the C<create_MANIFEST> in C<Module::Starter::Simple> to use
-the C<manifest> target of the build system instead of trying to create 
+the C<manifest> target of the build system instead of trying to create
 the C<MANIFEST> file directly. It automatically figures out the build
 system you use.
 
-This assumes that your C<make> program is called C<make>. If it's 
+This assumes that your C<make> program is called C<make>. If it's
 something else, such as C<dmake>, set the C<make> configuration. This
 only matters if you are using F<Makefile.PL>.
 
@@ -71,22 +71,22 @@ sub create_MANIFEST {
     my $self = shift;
 
 	require Distribution::Guess::BuildSystem;
-	
+
 	my $dist_dir = $self->basedir;
 	die "The base directory" unless -d $dist_dir;
-	
+
 	$self->progress( "Regenerating MANIFEST" );
-	
+
 	my $make = $self->{make} // 'make'; #/
-	
+
 	eval {
 		my $dir = cwd();
 		chdir $dist_dir or die "Could not change to $dist_dir: $!\n";
-		
+
 		my $guesser = Distribution::Guess::BuildSystem->new(
 			   dist_dir => '.'
 			   );
-		
+
 		# it doesn't matter who makes the MANIFEST
 		if( $guesser->uses_module_build ) {
 			$self->verbose( "Detected Module::Build" );
@@ -98,10 +98,10 @@ sub create_MANIFEST {
 			system( $^X, 'Makefile.PL' );
 			system( $make, 'manifest' );
 			}
-		
+
 		chdir $dir or die "Could not change back to $dir: $!\n";
 		} or die $@;
-	
+
 	return 1;
 	}
 
@@ -112,7 +112,7 @@ Return the top-level directory for the distribution.
 =cut
 
 sub basedir { $_[0]->{basedir} || '' }
-	
+
 =back
 
 =head1 SEE ALSO
@@ -123,7 +123,7 @@ L<Module::Starter::Smart>
 
 This source is in Github:
 
-	http://github.com/briandfoy/module-starter-addmodule/
+	https://github.com/briandfoy/module-starter-addmodule/
 
 =head1 AUTHOR
 
@@ -131,9 +131,9 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2010-2014, brian d foy, All Rights Reserved.
+Copyright © 2010-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+You may redistribute this under the terms of the Artistic License 2.0.
 
 =cut
 

@@ -56,9 +56,11 @@ my $builder = Module::Build->new(
     },
     requires => {
 	'perl'                              => '5.018000',
-	'Devel::Trepan'                     => '0.71',
+        'Devel::Callsite'                   => '0.08',
+	'Devel::Trepan'                     => '0.73',
         'rlib'                              => '0.02',
-        'B::DeparseTree'                    => '2.1.0',
+        'B::DeparseTree'                    => '3.2.0',
+        'Data::Printer'                     => '0.40',
     },
     sign                => ($ENV{PERL_MB_NOSIGN} ? 0 : 1),
     );

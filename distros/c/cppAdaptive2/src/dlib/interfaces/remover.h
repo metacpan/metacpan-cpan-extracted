@@ -54,7 +54,7 @@ namespace dlib
                         - #at_start() == true
             !*/
 
-            virtual size_t size (
+            virtual unsigned long size (
             ) const = 0;
             /*!
                 ensures
@@ -152,7 +152,7 @@ namespace dlib
                         - #at_start() == true
             !*/
 
-            virtual size_t size (
+            virtual unsigned long size (
             ) const = 0;
             /*!
                 ensures

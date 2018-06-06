@@ -3,7 +3,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = "0.06";
+our $VERSION = "0.08";
 
 1;
 
@@ -30,9 +30,10 @@ cpanx - A CPAN downloader script
     -r         reinstall even if module is installed
     -T         do not run tests
     -d         dependencies only
-    -m=<url>   sets the cpan mirror
-    -M         choose a cpan mirror. default www.cpan.org
+    -m=<url>   sets the cpan mirror. default www.cpan.org
+    -M         choose a cpan mirror
     -c         clean module cache
+    -v         displays version
 
     -I=<loc>   sets install base path. e.g. /usr/local
     -L=<loc>   sets library install path. e.g. /Library/Perl/5.18

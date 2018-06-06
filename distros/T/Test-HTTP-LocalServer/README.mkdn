@@ -1,5 +1,5 @@
 
-[![Build Status](https://travis-ci.org/Corion/Test-HTTP-LocalServer.svg?branch=master)](https://github.com/Corion/Test-HTTP-LocalServer)
+[![Build Status](https://travis-ci.org/Corion/Test-HTTP-LocalServer.svg?branch=master)](https://travis-ci.org/Corion/Test-HTTP-LocalServer)
 
 # NAME
 

@@ -27,10 +27,10 @@ has 'before_meta' => (
     },
 );
 
-after 'BUILD' => sub {
+sub apply_interpolate_role {
     my $self = shift;
 
-    return if $self->can('interpol_directive');
+#    return if $self->can('interpol_directive');
 
     my $role = 'BioX::Workflow::Command::run::Rules::Directives::Interpolate::'.$self->template_type;
     try {
@@ -40,7 +40,7 @@ after 'BUILD' => sub {
         $self->app_log->warn( 'There was an error registering Template role ' . $role );
         $self->app_log->warn( $@ . "\n" );
     };
-};
+}
 
 # no Moose;
 

@@ -47,6 +47,7 @@ my %WriteMakefileArgs = (
     "MooseX::AttributeShortcuts" => 0,
     "Pod::Elemental::Transformer::List" => 0,
     "Pod::Weaver::Config::Assembler" => 0,
+    "Pod::Weaver::Plugin::SingleEncoding" => 0,
     "Pod::Weaver::Section::AllowOverride" => 0,
     "Pod::Weaver::Section::Bugs" => 0,
     "Pod::Weaver::Section::SourceGitHub" => 0,
@@ -57,7 +58,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.37",
+  "VERSION" => "0.38",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -95,6 +96,7 @@ my %FallbackPrereqs = (
   "MooseX::AttributeShortcuts" => 0,
   "Pod::Elemental::Transformer::List" => 0,
   "Pod::Weaver::Config::Assembler" => 0,
+  "Pod::Weaver::Plugin::SingleEncoding" => 0,
   "Pod::Weaver::Section::AllowOverride" => 0,
   "Pod::Weaver::Section::Bugs" => 0,
   "Pod::Weaver::Section::SourceGitHub" => 0,

@@ -22,5 +22,5 @@ requires:
 resources:
   bugtracker: https://github.com/stevieb9/rpi-const/issues
   repository: https://github.com/stevieb9/rpi-const.git
-version: '1.03'
+version: '1.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

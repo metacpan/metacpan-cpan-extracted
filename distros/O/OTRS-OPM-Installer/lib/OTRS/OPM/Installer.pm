@@ -1,5 +1,5 @@
 package OTRS::OPM::Installer;
-$OTRS::OPM::Installer::VERSION = '0.03';
+$OTRS::OPM::Installer::VERSION = '0.04';
 # ABSTRACT: Install OTRS add ons
 
 use v5.10;
@@ -10,7 +10,7 @@ use warnings;
 use Moo;
 use IO::All;
 use Capture::Tiny qw(:all);
-use Types::Standard qw(ArrayRef Str);
+use Types::Standard qw(ArrayRef Str Bool);
 
 use OTRS::OPM::Parser;
 
@@ -25,9 +25,10 @@ has prove        => ( is => 'ro', default => sub { 0 } );
 has manager      => ( is => 'ro', lazy => 1, default => \&_build_manager );
 has repositories => ( is => 'ro', isa => ArrayRef[Str] );
 has conf         => ( is => 'ro' );
-has sudo         => ( is => 'ro' );
+has force        => ( is => 'ro', isa => Bool );
+has sudo         => ( is => 'ro', isa => Bool );
 has utils_otrs   => ( is => 'ro', lazy => 1, default => sub{ OTRS::OPM::Installer::Utils::OTRS->new } );
-has verbose      => ( is => 'ro', default => sub { 0 } );
+has verbose      => ( is => 'ro', isa => Bool, default => sub { 0 } );
 has logger       => ( is => 'ro', lazy => 1, default => sub { OTRS::OPM::Installer::Logger->new } );
 
 sub list_available {
@@ -64,16 +65,38 @@ sub install {
     if ( $params{repositories} and ref $params{repositories} eq 'ARRAY' ) {
         $file_opts{repositories} = $params{repositories};
     }
+
+    my $version_string = "";
     if ( $params{version} and $params{version_exact} ) {
         $file_opts{version} = $params{version};
+        $version_string     = $params{version};
     }
 
-    say sprintf "Try to install %s...", $params{package} || $self->package if $self->verbose;
+    say sprintf "Try to install %s %s...", $params{package} || $self->package, $version_string if $self->verbose;
    
+    my $installed_version = $self->utils_otrs->is_installed( package => $params{package} || $self->package );
+    if ( $installed_version ) {
+        my $message = sprintf 'Addon %s is installed (%s)',
+            $params{package} || $self->package, $installed_version;
+
+        $self->logger->debug( message => $message );
+        say $message;
+
+        if ( $params{version} ) {
+            my $check = $self->utils_otrs->_check_version(
+                installed => $installed_version,
+                requested => $params{version},
+            );
+
+            return 1 if $check;
+        }
+    }
+
     my $package_utils = OTRS::OPM::Installer::Utils::File->new(
         %file_opts,
         package      => $params{package} || $self->package,
         otrs_version => $self->otrs_version,
+        verbose      => $self->verbose,
     );
 
     my $package_path = $package_utils->resolve_path;
@@ -85,7 +108,8 @@ sub install {
             $self->otrs_version;
 
         $self->logger->error( fatal => $message );
-        die $message;
+        say $message;
+        return;
     }
 
     my $parsed = OTRS::OPM::Parser->new(
@@ -97,7 +121,8 @@ sub install {
     if ( $parsed->error_string ) {
         my $message = sprintf "Cannot parse $package_path: %s", $parsed->error_string;
         $self->logger->error( fatal => $message );
-        die $message;
+        say $message;
+        return;
     }
 
     if ( !$self->_check_matching_versions( $parsed, $self->otrs_version ) ) {
@@ -107,7 +132,8 @@ sub install {
             $self->otrs_version;
 
         $self->logger->error( fatal => $message );
-        die $message;
+        say $message;
+        return;
     }
 
     if ( $self->utils_otrs->is_installed( package => $parsed->name, version => $parsed->version ) ) {
@@ -116,7 +142,7 @@ sub install {
 
         $self->logger->debug( message => $message );
         say $message;
-        return;
+        return 1;
     }
 
     say sprintf "Working on %s...", $parsed->name if $self->verbose;
@@ -145,7 +171,10 @@ sub install {
 
         $self->utils_otrs->is_installed( %{$otrs_dep} ) and next;
 
-        $self->install( package => $module, version => $version );
+        my $success = $self->install( package => $module, version => $version );
+        if ( !$success && !$self->force ) {
+            return;
+        }
     }
 
     if ( $self->prove ) {
@@ -229,7 +258,7 @@ OTRS::OPM::Installer - Install OTRS add ons
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -291,7 +320,7 @@ Renee Baecker <reneeb@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Renee Baecker.
+This software is Copyright (c) 2018 by Renee Baecker.
 
 This is free software, licensed under:
 

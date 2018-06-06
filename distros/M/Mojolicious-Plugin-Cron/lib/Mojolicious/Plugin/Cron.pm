@@ -8,7 +8,7 @@ use Algorithm::Cron;
 
 use Carp 'croak';
 
-our $VERSION = "0.023";
+our $VERSION = "0.024";
 use constant CRON_DIR => 'mojo_cron_dir';
 my $crondir;
 
@@ -129,15 +129,25 @@ Mojolicious::Plugin::Cron - a Cron-like helper for Mojolicious and Mojolicious::
 
 L<Mojolicious::Plugin::Cron> is a L<Mojolicious> plugin that allows to schedule tasks
  directly from inside a Mojolicious application.
+
 You should not consider it as a *nix cron replacement, but as a method to make a proof of
-concept of a project.
+concept of a project. It helps also in the deployment phase because in the end it
+could mean less and simpler installation/removing tasks.
+
+As an extension to regular cron, seconds are supported in the form of a sixth space
+sepparated field (For more information on cron sintax please see L<Algorithm::Cron>).
 
 =head1 BASICS
 
 When using preforked servers (as applications running with hypnotoad), some coordination
 is needed so jobs are not executed several times.
+
 L<Mojolicious::Plugin::Cron> uses standard Fcntl functions for that coordination, to assure
 a platform-independent behavior.
+
+Please take a look in the examples section, for a simple Mojo Application that you can
+run on hypnotoad, try hot restarts, adding / removing workers, etc, and
+check that scheduled jobs execute without interruptions or duplications.
 
 =head1 EXTENDEND SYNTAX HASH
 
@@ -148,10 +158,12 @@ to more options
 
 =head2 Keys
 
-Keys are the names that identify each crontab line. They are used to form the locking semaphore
-to avoid multiple processes starting the same job. You can use the same name in different Mojolicious
-applications, and this will ensure that not more that one instance of the cron job will take place at
-a specific scheduled time.
+Keys are the names that identify each crontab line. They are used to form a locking 
+semaphore file to avoid multiple processes starting the same job. 
+
+You can use the same name in different Mojolicious applications that will run
+at the same time. This will ensure that not more that one instance of the cron job
+will take place at a specific scheduled time. 
 
 =head2 Crontab lines
 
@@ -161,7 +173,7 @@ Each crontab line consists of a hash with the following keys:
  
 =item base => STRING
  
-Gives the time base used for scheduling. Either C<utc> or C<local> (default C<local>.
+Gives the time base used for scheduling. Either C<utc> or C<local> (default C<local>).
  
 =item crontab => STRING
  
@@ -175,7 +187,7 @@ field is not specified.
 For more information on base, crontab and other time related keys,
  please refer to L<Algorithm::Cron> Contstructor Attributes. 
 
-=item code => sub {}
+=item code => sub {...}
 
 Mandatory. Is the code that will be executed whenever the crontab rule fires.
 Note that this code *MUST* be non-blocking.

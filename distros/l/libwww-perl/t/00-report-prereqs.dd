@@ -1,19 +1,19 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
+                                        'CPAN::Meta::Requirements' => '2.120620',
                                         'ExtUtils::MakeMaker' => '0',
                                         'File::Copy' => '0',
-                                        'Getopt::Long' => '0'
-                                      },
-                        'suggests' => {
-                                        'JSON::PP' => '2.27300'
+                                        'Getopt::Long' => '0',
+                                        'Module::Metadata' => '0'
                                       }
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.005'
+                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
+                                      'Authen::NTLM' => '1.02',
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',

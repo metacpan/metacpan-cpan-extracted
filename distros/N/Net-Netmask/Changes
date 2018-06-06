@@ -1,6 +1,19 @@
 
 Revision history for Perl module Net::Netmask
 
+1.9101 2018-06-02
+
+ - fix precision issue on long-double platforms (BAYMAX)
+ - Convert to use Dist::Zilla
+ - Formatting changes
+
+1.9100 2018-06-02
+
+ - DEV release only
+ - fix precision issue on long-double platforms (BAYMAX)
+ - Convert to dist.zilla
+ - Minor formatting changes
+
 1.9022 2015-05-05
 
  - Changes from adamherzog: minor cleanups plus

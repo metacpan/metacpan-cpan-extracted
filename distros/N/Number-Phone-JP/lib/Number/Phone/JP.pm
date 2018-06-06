@@ -7,7 +7,7 @@ use parent qw(Number::Phone);
 use Carp;
 use UNIVERSAL::require;
 
-our $VERSION = '0.20180509';
+our $VERSION = '0.20180605';
 our %TEL_TABLE = ();
 
 sub import {
@@ -196,7 +196,7 @@ Number::Phone::JP - Validate Japanese phone numbers
 
 Number::Phone::JP is a simple module to validate Japanese phone
 number formats. The Japanese phone numbers are regulated by
-Ministry of Internal Afairs and Communications of Japan.
+Ministry of Internal Affairs and Communications of Japan.
 You can validate what a target number is valid from this
 regulation point of view.
 

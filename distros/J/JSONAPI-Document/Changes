@@ -1,4 +1,15 @@
+1.5       2018-06-04 22:36:07+01:00 Europe/London
+
 1.4       2018-06-03 14:55:21+01:00 Europe/London
+- REFACTOR
+Undergone an internal refactoring that cleans up how the document is built.
+
+- Deprecated option 'with_relationships', use 'includes' instead with subset of relationships
+or 'all_related' to include all direct relationships.
+
+- Deprecated argument and option 'attributes_via', a role is now available for more sophistication,
+JSONAPI::Document::Role::Attributes. Consume this role in your objects which implemented your custom
+attributes method, and return a hashref instead of a hash from it.
 
 1.3       2018-05-19 01:23:24+01:00 Europe/London
 - Implement sparse fieldsets

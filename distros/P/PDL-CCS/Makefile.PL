@@ -1,7 +1,5 @@
 use ExtUtils::MakeMaker;
-
-use lib '.'; ##-- fix RT bug #121661?
-require "pdlmaker.plm";
+require "./pdlmaker.plm";
 pdlmaker_init();
 
 ##-- preqrequistes (for PREREQ_PM)
@@ -13,13 +11,17 @@ my %prereq = (
 	     );
 
 ##-- read in user variables
-do "Config.PL";
-die "$0: reading 'Config.PL' failed: $@" if ($@);
+do "./Config.PL";
+die "$0: reading './Config.PL' failed: $@" if ($@);
 
 ##-- put 'realclean_files' in a variable: avoid MakeMaker puking with:
 ##     ERROR from evaluation of .../ccsutils/Makefile.PL:
 ##     Modification of a read-only value attempted at /usr/share/perl/5.8/Carp/Heavy.pm line 45.
-my $realclean_files = '*~ *.tmp README.txt README.html CCS/Config.pm';
+my $realclean_files = join(' ',
+			   qw(*~ *.tmp),
+			   (-e 'README.rpod' ? qw(README.txt README.html) : qw()),
+			   (-e 'Config.PL' ? qw(CCS/Config.pm) : qw()),
+			  );
 WriteMakefile(
 	      NAME   =>'PDL::CCS',
 	      AUTHOR => 'Bryan Jurish',

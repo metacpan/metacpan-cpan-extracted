@@ -4,17 +4,17 @@ NAME
 SYNOPSIS
     use Net::Netmask;
 
-     $block = new Net::Netmask (network block)
-     $block = new Net::Netmask (network block, netmask)
-     $block = new2 Net::Netmask (network block)
-     $block = new2 Net::Netmask (network block, netmask)
+     $block = Net::Netmask->new(network block)
+     $block = Net::Netmask->new(network block, netmask)
+     $block = Net::Netmask->new2(network block)
+     $block = Net::Netmask->new2(network block, netmask)
 
      print $block;                  # a.b.c.d/bits
-     print $block->base() 
-     print $block->mask() 
-     print $block->hostmask() 
-     print $block->bits() 
-     print $block->size() 
+     print $block->base()
+     print $block->mask()
+     print $block->hostmask()
+     print $block->bits()
+     print $block->size()
      print $block->maxblock()
      print $block->broadcast()
      print $block->next()
@@ -136,7 +136,7 @@ METHODS
 
     ->match($ip)             Returns a true if the IP number $ip matches the
                              given network. That is, a true value is
-                             returned if $ip is between base() amd
+                             returned if $ip is between base() and
                              broadcast(). For example, if we have the
                              network 192.168.1.0/24, then
 
@@ -263,9 +263,13 @@ METHODS
                              (2,4,8,16,etc.) and the number must not exceed
                              the number of IPs within this netmask.
 
-                             e.g Net::Netmask->new( '10.0.0.0/24'
-                             )->split(2) => ( Net::Netmask( '10.0.0.0/25') ,
-                             Net::Netmask( '10.0.0.128/25' ) )
+                             For instance,
+
+                               Net::Netmask->new( '10.0.0.0/24' )->split(2)
+
+                             is equivilent to
+
+                               ( Net::Netmask( '10.0.0.0/25'), Net::Netmask( '10.0.0.128/25' ) )
 
 METHOD/FUNCTION COMBOS
     findOuterNetblock(ip, [$t])
@@ -295,14 +299,10 @@ METHOD/FUNCTION COMBOS
                              objects.
 
 OVERLOADING
-    Overloading doesn't seem to work completeley on perl before version
-    5.6.1. The test suite doesn't test overloading before that. At least for
-    sort.
-
     ""                       Strinification is overloaded to be the ->desc()
                              method.
 
-    cmp                      Numerical and string comparisions have been
+    cmp                      Numerical and string comparisons have been
                              overloaded to the ->cmpblocks() method. This
                              allows blocks to be sorted without specifying a
                              sort function.
@@ -353,7 +353,7 @@ FUNCTIONS
 
                              For example, range2cidrlist('216.240.32.128',
                              '216.240.36.127'), will return a list of
-                             Net::Netmask objects that corrospond to:
+                             Net::Netmask objects that correspond to:
 
                                      216.240.32.128/25
                                      216.240.33.0/24
@@ -364,7 +364,7 @@ FUNCTIONS
                              "cidrs2contiglists" will rearrange a list of
                              Net::Netmask objects such that contiguous sets
                              are in sublists and each sublist is
-                             discontigeous with the next.
+                             discontiguous with the next.
 
                              For example, given a list of Net::Netmask
                              objects corresponding to the following blocks:
@@ -390,10 +390,17 @@ FUNCTIONS
                              blocks that covers exactly the same IP space.
                              Overlapping blocks will be collapsed.
 
+AUTHORS
+    Joelle Maslak <jmaslak@antelope.net> (current maintainer)
+
+    David Muir Sharnoff (original creator/author)
+
 LICENSE
     Copyright (C) 1998-2006 David Muir Sharnoff.
 
     Copyright (C) 2011-2013 Google, Inc.
+
+    Copyright (C) 2018 Joelle Maslak
 
     This module may be used, modified and redistributed on the same terms as
     Perl itself.

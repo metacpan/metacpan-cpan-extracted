@@ -1,5 +1,11 @@
 Revision history for Device-BusPirate
 
+0.15    2018-06-06 11:04:50
+        [BUGFIXES]
+         * Use O_NDELAY and set CLOCAL on serial port device as non-Linux OSes
+           may require it for strict POSIX conformance (RT#125409)
+         * Use O_NOCTTY when opening the serial port device
+
 0.14    2018-03-13 14:14:24
         [CHANGES]
          * Simplify the D:C:A SPI protocol implementation by using

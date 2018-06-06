@@ -1,10 +1,10 @@
 {
-   "abstract" : "Event Notifications for your Users",
+   "abstract" : "Frontend Event Notifications",
    "author" : [
       "Nils Diewald"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -47,6 +47,6 @@
          "url" : "https://github.com/Akron/Mojolicious-Plugin-Notifications"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

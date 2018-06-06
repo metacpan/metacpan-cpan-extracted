@@ -1,14 +1,31 @@
+0.005   2018-06-06 (PERLANCAR)
+
+	- Add restriction that account must not exceed 64 characters in
+	  length.
+
+
+0.004   2018-06-04 (PERLANCAR)
+
+        - [release] Re-release to resolve commit conflict between 0.002 and
+          0.003.
+
+
 0.003   2018-06-04 (PERLANCAR)
 
 	- No functional changes.
 
 	- [ux] Tweak coercion error message to include the failing string.
 
-
-0.002   2018-06-04 (PERLANCAR)
-
 	- Update to Data::Sah::Coerce 0.025 (coerce rule module metadata
 	  version 3).
+
+
+0.002   2018-05-31 (PERLANCAR)
+
+	- [dist] Require minimum version of CryptoExchange::Catalog that
+	  has introduced codes [RT#125424].
+
+	- Forgot to add lib/Data/Sah/CoerceBundle/App/cryp.pm.
 
 
 0.001   2018-05-29 (PERLANCAR)

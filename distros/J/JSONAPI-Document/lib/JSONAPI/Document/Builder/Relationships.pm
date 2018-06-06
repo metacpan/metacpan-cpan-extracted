@@ -1,12 +1,12 @@
 package JSONAPI::Document::Builder::Relationships;
-$JSONAPI::Document::Builder::Relationships::VERSION = '1.4';
+$JSONAPI::Document::Builder::Relationships::VERSION = '1.5';
 =head1 NAME
 
 JSONAPI::Document::Builder::Relationships - Related Resource Document builder
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 DESCRIPTION
 

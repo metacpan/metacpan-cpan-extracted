@@ -1,5 +1,5 @@
 package GitLab::API::v4::Constants;
-$GitLab::API::v4::Constants::VERSION = '0.09';
+$GitLab::API::v4::Constants::VERSION = '0.10';
 =encoding utf8
 
 =head1 NAME

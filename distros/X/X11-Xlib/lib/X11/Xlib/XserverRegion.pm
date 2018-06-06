@@ -4,6 +4,9 @@ use warnings;
 use Carp;
 use parent 'X11::Xlib::XID';
 
+# All modules in dist share a version
+BEGIN { our $VERSION= $X11::Xlib::VERSION; }
+
 sub DESTROY {
     my $self= shift;
     $self->display->XFixesDestroyRegion($self->xid)

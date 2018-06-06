@@ -3,10 +3,9 @@
 #undef DLIB_SOCKETS_EXTENSIONs_ABSTRACT_
 #ifdef DLIB_SOCKETS_EXTENSIONs_ABSTRACT_
 
-#include <memory>
 #include <string>
-
 #include "sockets_kernel_abstract.h"
+#include "../smart_pointers.h"
 #include "../error.h"
 
 namespace dlib
@@ -266,7 +265,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     void close_gracefully (
-        std::unique_ptr<connection>& con,
+        scoped_ptr<connection>& con,
         unsigned long timeout = 500
     );
     /*!

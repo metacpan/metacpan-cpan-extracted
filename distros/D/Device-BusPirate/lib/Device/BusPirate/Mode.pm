@@ -8,7 +8,7 @@ package Device::BusPirate::Mode;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use constant {
    CONF_CS     => 0x01,

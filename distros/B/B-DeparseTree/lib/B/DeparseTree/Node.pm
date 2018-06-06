@@ -4,6 +4,8 @@
 use strict; use warnings;
 package B::DeparseTree::Node;
 use Carp;
+use Config;
+my $is_cperl = $Config::Config{usecperl};
 
 use Hash::Util qw[ lock_hash ];
 
@@ -12,13 +14,21 @@ our %UNARY_PRECEDENCES = (
          4 => 1,  # right not
         16 => 'sub, %, @',   # "sub", "%", "@'
         21 => '~', # steal parens (see maybe_parens_unop)
-);
-lock_hash %UNARY_PRECEDENCES;
+    );
+
+unless ($is_cperl) {
+    lock_hash %UNARY_PRECEDENCES;
+}
 
 
-our $VERSION = '1.0.0';
+our $VERSION = '3.2.0';
 our @ISA = qw(Exporter);
-our @EXPORT = qw(new($$$$ parens_test($$$)) %UNARY_PRECEDENCES);
+our @EXPORT = qw(
+    new($$$$)
+    parens_test($$$)
+    %UNARY_PRECEDENCES
+    update_other_ops($$)
+);
 
 =head2 Node structure
 
@@ -34,21 +44,27 @@ left-hand side, the string operation name and a I<body> right-hand
 side. Right now the type names are a little funky, but over time I
 hope these will less so.
 
-* item B<sep>
+* item B<sep> (optional)
 
-A string indicating how to separate the the strings derived from
-the body. To indicate statement separation, the separator is ';' and the
-B<indent_type> is '{'. The indent program can also use the type
-to help out with statement boundaries.
+A string indicating how to separate the the strings extracted from the
+C<texts> field. The field is subject to format expansion. In particular
+tt can have '%;' in it to indicate we are separating statements.
+the body.
 
 * item B<texts>
 
-A reference to a list containing either strings, a Node references, or Hash references
-containing the keys I<sep> and a I<body>.
+A reference to a list containing either:
+
+=over
+
+* item a tuple with a strings, and a op address
+* a DeparseTreee::Node object
+
+=back
 
 * item B<text>
 
-Text representation of the node until. Eventually this will diasppear
+Text representation of the node. Eventually this will diasppear
 and, you'll use one of the node-to-string conversion routines.
 
 * item B<maybe_parens>
@@ -60,7 +76,8 @@ The keys is a hash ref hash reference
 
 =item B<context>
 
-A number passed from the parent indicating its precedence context
+A number passed from the parent indicating its precedence context that
+the expression is embedded it.
 
 =item B<precedence>
 
@@ -82,14 +99,14 @@ UNARY_OP_PRECEDENCE
 sub parens_test($$$)
 {
     my ($obj, $cx, $prec) = @_;
-    # Unary ops which nest just fine
-    return 1 if ($prec == $cx && !exists $UNARY_PRECEDENCES{$cx});
-    return ($prec < $cx || $obj->{'parens'});
+    return ($prec < $cx
+	    # Unary ops which nest just fine
+	    or ($prec == $cx && !exists $UNARY_PRECEDENCES{$cx}));
 }
 
 sub new($$$$$)
 {
-    my ($class, $op, $deparse, $texts, $sep, $type, $opts) = @_;
+    my ($class, $op, $deparse, $data, $sep, $type, $opts) = @_;
     my $addr = -1;
     if (ref($op)) {
 	if (ref($op) eq 'B::DeparseTree') {
@@ -104,23 +121,23 @@ sub new($$$$$)
 	addr => $addr,
 	op => $op,
 	deparse => $deparse,
-	texts => $texts,
 	type => $type,
-	sep => $sep,
     }, $class;
 
-    if (ref($texts)) {
+    $self->{sep} = $sep if defined $sep;
+    if (ref($data)) {
 	# Passed in a ref ARRAY
-	$self->{text} = $deparse->combine2str($sep, $texts) if defined $sep;
-    } elsif (defined $texts) {
+	$self->{texts} = $data;
+	$self->{text} = $deparse->combine2str($sep, $data) if defined $sep;
+    } elsif (defined $data) {
 	# Passed in a string
-	$self->{text} = $texts;
+	$self->{text} = $data;
     } else {
-	# Leave {texts} uninitialized
+	# Leave {text} and {texts} uninitialized
     }
 
     foreach my $optname (qw(other_ops parent_ops child_pos maybe_parens
-                            omit_next_semicolon)) {
+                            omit_next_semicolon position)) {
 	$self->{$optname} = $opts->{$optname} if $opts->{$optname};
     }
     if ($opts->{maybe_parens}) {
@@ -134,6 +151,9 @@ sub new($$$$$)
 	};
 	$self->{text} = "($self->{text})" if exists $self->{text} and $parens;
     }
+    if ($opts->{prev_expr}) {
+	$self->{prev_expr} = $opts->{prev_expr};
+    }
     return $self;
 }
 
@@ -146,7 +166,6 @@ sub maybe_parens($$$$)
 	$info->{text} = $self->combine('', "(", $info->{text}, ")");
 	# In a unop, let parent reuse our parens; see maybe_parens_unop
 	if ($cx == 16) {
-	    $info->{text} = "\cS" . $info->{text};
 	    $info->{parens} = 'reuse';
 	}  else {
 	    $info->{parens} = 'true';
@@ -158,6 +177,16 @@ sub maybe_parens($$$$)
     }
 }
 
+# Update $self->{other_ops} to add $info
+sub update_other_ops($$)
+{
+    my ($self, $info) = @_;
+    $self->{other_ops} ||= [];
+    my $other_ops = $self->{other_ops};
+    push @{$other_ops}, $info;
+    $self->{other_ops} = $other_ops;
+}
+
 # Demo code
 unless(caller) {
     my $old_pkg = __PACKAGE__;
@@ -167,8 +196,8 @@ unless(caller) {
 	bless {}, $class;
     }
     sub combine2str($$$) {
-	my ($self, $sep, $texts) = @_;
-	join($sep, @$texts);
+	my ($self, $sep, $data) = @_;
+	join($sep, @$data);
     }
     my $deparse = __PACKAGE__->new();
     my $node = $old_pkg->new('op', $deparse, ['X'], 'test', {});

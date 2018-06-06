@@ -1,0 +1,33 @@
+Wow, you want to help?  That's great!
+
+If you want to help:
+
+  * Don't change the public interface.  You can add to it, but don't
+    break code that already depends on this interface.
+  * I'll take bug reports however you want to send them (RT, Github
+    issue, email, etc).  My preference is for Github issues.
+  * I'll take code changes however you want to send them, but prefer
+    it via Github pull request.
+  * If you make suggestions/changes, I'll credit you unless you ask
+    specifically otherwise.  I'll use your email and PAUSE ID (if
+    applicable) if I can find it.  If I get this wrong or you change
+    either, just jot me a note or PR to change it.
+
+Some things you can do that would make me smile:
+
+  * Feel free to look at the TODO file - I've pointed out some things I
+    want to do with the module.  Feel free to do any of them (but if it
+    is a bigger item, you might jot me a note first so that I don't
+    accidentally duplicate your effort!)
+  * Write tests for things that are known to be broken.  Mark those as
+    "todo" tests so that the failures do not cause build failures.
+  * Improvements to documentation are always appreciated
+  * If the module is missing something you would find useful, or you're
+    confused about something, or if it doesn't seem to work the way you
+    want, email me or open a Github issue.  The module makes sense to me
+    and my way of working, but if it doesn't to you, you probably are
+    not the only person who it doesn't make sense to.
+  * "Meta" stuff is great too - I'm no expert on Dist::Zilla and all
+    that it can/should do.  So please feel free to send me suggestions
+    or PR for packaging, metafiles, etc
+

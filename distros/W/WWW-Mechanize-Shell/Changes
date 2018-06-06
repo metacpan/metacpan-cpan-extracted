@@ -13,6 +13,14 @@ Todo:
   + Add set-cookie and delete-cookie commands
   + Add (optional) HTTP::Cookies::Find support
 
+0.57 20180604
+  + Add "images" command to list all images
+  + Allow other user agent objects like WWW::Mechanize::Chrome
+    Use it from the command line as
+        perl -Ilib -MWWW::Mechanize::Chrome \
+                   -MWWW::Mechanize::Shell \
+                   -e"shell(agent => WWW::Mechanize::Chrome->new())"
+
 0.56 20170425
   + Send uncompressed output to the browser
     (contributed by weltonrodrigo)

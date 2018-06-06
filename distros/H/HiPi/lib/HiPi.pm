@@ -15,13 +15,24 @@ use warnings;
 use parent qw( Exporter );
 use HiPi::Constant qw( :hipi );
 use HiPi::RaspberryPi;
-
 use constant hipi_export_constants();
+use Scalar::Util qw( weaken isweak refaddr );
+use Carp;
 
-our $VERSION ='0.71';
+our $VERSION ='0.72';
 
 our @EXPORT_OK = hipi_export_ok();
 our %EXPORT_TAGS = hipi_export_tags();
+
+my $registered_exits = {};
+
+our $interrupt_verbose = 0;
+
+# who knows what we can catch
+$SIG{INT}  = \&_call_registered_and_exit;
+$SIG{TERM} = \&_call_registered_and_exit;
+$SIG{PIPE} = \&_call_registered_and_exit;
+$SIG{HUP}  = \&_call_registered_and_exit;
 
 sub is_raspberry_pi { return HiPi::RaspberryPi::is_raspberry() ; }
 
@@ -29,6 +40,45 @@ sub twos_compliment {
     my( $class, $value, $numbytes) = @_;
     my $onescomp = (~$value) & ( 2**(8 * $numbytes) -1 );
     return $onescomp + 1;
+}
+
+sub register_exit_method {
+    my($class, $obj, $method) = @_;
+    my $key = refaddr( $obj );
+    $registered_exits->{$key} = [ $obj, $method ];
+    weaken( $registered_exits->{$key}->[0] );
+}
+
+sub unregister_exit_method {
+    my($class, $obj) = @_;
+    my $key = refaddr( $obj );
+    delete($registered_exits->{$key}) if exists($registered_exits->{$key});
+}
+
+sub _call_registered_and_exit {
+    my $interrupt = shift;
+    for my $key ( keys %$registered_exits ) {
+        my $method = $registered_exits->{$key}->[1];
+        if( isweak( $registered_exits->{$key}->[0] ) && $registered_exits->{$key}->[0]->can($method) ) {
+            $registered_exits->{$key}->[0]->$method();
+        }
+    }
+    if($interrupt_verbose) {
+        Carp::confess(qq(\nInterrupt SIG$interrupt));
+    } else {
+        die qq(\nInterrupt SIG$interrupt);
+    }
+}
+
+sub call_registered_exit_method {
+    my($class, $instance) = @_;
+    my $key = refaddr( $instance );
+    if(exists($registered_exits->{$key})) {
+        my $method = $registered_exits->{$key}->[1];
+        if( isweak( $registered_exits->{$key}->[0] ) && $registered_exits->{$key}->[0]->can($method) ) {
+            $registered_exits->{$key}->[0]->$method();
+        }
+    }
 }
 
 1;
@@ -64,7 +114,7 @@ Mark Dootson, C<< mdootson@cpan.org >>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2013 - 2017 Mark Dootson
+Copyright (c) 2013 - 2018 Mark Dootson
 
 =cut
 

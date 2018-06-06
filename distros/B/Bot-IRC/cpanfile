@@ -31,7 +31,6 @@ on 'test' => sub {
   requires "Test::More" => "0";
   requires "Test::Most" => "0";
   requires "Test::Output" => "0";
-  requires "blib" => "1.01";
   requires "constant" => "0";
   requires "perl" => "5.014";
 };

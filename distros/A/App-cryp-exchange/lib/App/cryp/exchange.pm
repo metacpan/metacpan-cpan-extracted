@@ -1,7 +1,7 @@
 package App::cryp::exchange;
 
-our $DATE = '2018-05-10'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-06-06'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -243,6 +243,22 @@ sub get_order_book {
     [200, "OK", \@rows];
 }
 
+$SPEC{list_balances} = {
+    v => 1.1,
+    summary => 'List account balances',
+    args => {
+        %arg_req0_exchange,
+    },
+};
+sub list_balances {
+    my %args = @_;
+
+    my $r = $args{-cmdline_r};
+
+    my $xchg = _instantiate_exchange($r, $args{exchange});
+
+    $xchg->list_balances;
+}
 
 1;
 # ABSTRACT: Interact with cryptoexchanges
@@ -259,7 +275,7 @@ App::cryp::exchange - Interact with cryptoexchanges
 
 =head1 VERSION
 
-This document describes version 0.003 of App::cryp::exchange (from Perl distribution App-cryp-exchange), released on 2018-05-10.
+This document describes version 0.004 of App::cryp::exchange (from Perl distribution App-cryp-exchange), released on 2018-06-06.
 
 =head1 SYNOPSIS
 
@@ -317,6 +333,36 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<detail> => I<bool>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+=head2 list_balances
+
+Usage:
+
+ list_balances(%args) -> [status, msg, result, meta]
+
+List account balances.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<exchange>* => I<str>
 
 =back
 

@@ -53,12 +53,14 @@ my %module = (
         'WWW::Mechanize' => 1.20,
         'WWW::Mechanize::FormFiller' => 0.05,
         'Hook::LexWrap' => 0.20,
+        'HTTP::Cookies' => 0,
         'HTML::Display' => 0,
         'HTML::TokeParser::Simple' => 2.0,
     },
     TEST_REQUIRES => {
-        'Test::More' => 0,
-        'CGI'        => 0,
+        'Test::More'              => 0,
+        'CGI'                     => 0,
+        'Test::HTTP::LocalServer' => '0.63', # earlier has some bugs in request handling
     },
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
@@ -175,8 +177,8 @@ sub pod_section {
 
     my @section = 
         grep { /^=head1\s+$section/.../^=/ } <$fh>;
-    pop @section if $section[-1] =~ /^=/;
-    unshift @section if $remove_heading;
+    pop @section if @section and $section[-1] =~ /^=/;
+    shift @section if $remove_heading;
 
     # Trim the section
     if( @section ) {

@@ -1,3 +1,135 @@
+2018-06-04  rocky <rocky@cpan.org>
+
+	* Build.PL, t/data/deparse.right: Revise for current B::DeparseTree
+
+2018-05-25  rocky <rocky@cpan.org>
+
+	* t/data/deparse.right: Adjust for better results now
+
+2018-05-25  rocky <rocky@cpan.org>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm: Fixups to handle
+	more proper traceback reporting positions
+
+2018-05-15  rocky <rb@dustyfeet.com>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm: Use New refactor
+	api
+
+2018-05-12  rocky <rb@dustyfeet.com>
+
+	* .travis.yml: TravisCI: 5.26 should work now
+
+2018-05-11  rocky <rb@dustyfeet.com>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm: Small deparse -p
+	tweak
+
+2018-05-11  rocky <rb@dustyfeet.com>
+
+	* example/five.pl,
+	lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm,
+	t/data/deparse.right: Add deparse --debug
+
+2018-05-10  rocky <rb@dustyfeet.com>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm: Small change
+
+2018-05-10  rocky <rb@dustyfeet.com>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm: Add --offset and
+	--parent options
+
+2018-05-10  rocky <rb@dustyfeet.com>
+
+	* Build.PL, lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm,
+	lib/Devel/Trepan/Deparse.pm, t/20test-deparse.t,
+	t/data/deparse.right:  Start to improve options processing
+
+2018-05-09  rocky <rb@dustyfeet.com>
+
+	* Build.PL, MANIFEST, example/five.pl,
+	lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm,
+	lib/Devel/Trepan/Deparse.pm, t/20test-deparse.t,
+	t/data/deparse.right: Use new DeparseTree API
+
+2018-04-26  rocky <rb@dustyfeet.com>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm: "use" namescope
+	futzing
+
+2018-04-26  rocky <rb@dustyfeet.com>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm: Add help option
+
+2018-04-26  rocky <rb@dustyfeet.com>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm,
+	lib/Devel/Trepan/Deparse.pm: Move library routines our of command
+	module
+
+2018-04-26  rocky <rb@dustyfeet.com>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm,
+	lib/Devel/Trepan/Deparse.pm: expose deparse_offset ...  and add long options on deparse command
+
+2017-07-30  rocky <rocky@cpan.org>
+
+	* .travis.yml: Another travis try
+
+2017-07-30  rocky <rocky@cpan.org>
+
+	* .travis.yml: More verbose travis
+
+2017-07-30  rocky <rocky@cpan.org>
+
+	* .travis.yml: 3rd travis try
+
+2017-07-30  rocky <rocky@cpan.org>
+
+	* .travis.yml: Another attempt to fix up travis
+
+2017-07-30  rocky <rocky@cpan.org>
+
+	* .travis.yml, Build.PL: Try to fix travis
+
+2017-07-27  rocky <rocky@cpan.org>
+
+	* .travis.yml: Travis CI changes
+
+2017-07-27  rocky <rocky@cpan.org>
+
+	* .travis.yml, Build.PL: Make Devel::Callsite mandatory bump versions of software
+
+2017-07-26  rocky <rocky@cpan.org>
+
+	* .travis.yml: Change Perl versions tested in travis
+
+2017-07-26  rocky <rocky@cpan.org>
+
+	* MANIFEST.SKIP, git2cl: Administrivia
+
+2017-07-26  rocky <rocky@cpan.org>
+
+	* MANIFEST.SKIP, circle.yml: Try circle distcheck
+
+2015-11-28  rocky <rocky@cpan.org>
+
+	* lib/Devel/Trepan/Deparse.pm: Small grammar typo
+
+2015-11-22  rocky <rb@dustyfeet.com>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm: Fix POD help
+	format bug
+
+2015-11-22  rocky <rb@dustyfeet.com>
+
+	* README.md: More informative
+
+2015-11-22  rocky <rb@dustyfeet.com>
+
+	* NEWS: Get ready for release 2.2.0
+
 2015-11-20  rocky <rocky@cpan.org>
 
 	* MANIFEST,

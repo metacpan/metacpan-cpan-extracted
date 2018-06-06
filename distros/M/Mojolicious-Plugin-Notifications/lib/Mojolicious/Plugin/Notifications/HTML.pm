@@ -1,6 +1,17 @@
 package Mojolicious::Plugin::Notifications::HTML;
 use Mojo::Base 'Mojolicious::Plugin::Notifications::Engine';
+use Exporter 'import';
 use Mojo::Util qw/xml_escape/;
+
+our @EXPORT_OK = ('notify_html');
+
+# Exportable function
+sub notify_html {
+  my ($type, $msg) = @_;
+  return qq{<div class="notify notify-$type">} .
+    xml_escape($msg) .
+    "</div>\n"
+};
 
 # Notification method
 sub notifications {
@@ -8,9 +19,7 @@ sub notifications {
 
   my $html = '';
   foreach (@$notify_array) {
-    $html .= qq{<div class="notify notify-} . $_->[0] . '">' .
-      xml_escape($_->[-1]) .
-	"</div>\n";
+    $html .= notify_html($_->[0], $_->[-1]);
   };
 
   return $c->b($html);
@@ -71,6 +80,19 @@ with the class C<notify> and the class C<notify-$type>, where C<$type> is
 the notification type you passed.
 
 
+=head1 EXPORTABLE FUNCTIONS
+
+=head2 notify_html
+
+  use Mojolicious::Plugin::Notifications::HTML qw/notify_html/;
+
+  notify_html(warn => 'This is a warning')
+  # <div class="notify notify-warn">This is a warning</div>
+
+Returns the formatted string of a single HTML notification. This
+can be used by other engines as a fallback.
+
+
 =head1 AVAILABILITY
 
   https://github.com/Akron/Mojolicious-Plugin-Notifications
@@ -78,7 +100,7 @@ the notification type you passed.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2015, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2014-2018, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.

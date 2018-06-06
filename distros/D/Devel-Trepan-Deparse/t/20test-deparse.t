@@ -30,6 +30,8 @@ my $opts = {
 	for my $line (split(/\n/, $got_lines)) {
 	    $line =~ s/(^    [A-Z]+) \(0x[a-f0-9]+\)/$1 (0x1234567)/;
 	    $line =~ s/(^=>  [A-Z]+) \(0x[a-f0-9]+\)/$1 (0x1234567)/;
+	    $line =~ s/SCALAR\(0x[a-f0-9]+\)/SCALAR(0x1234567)/;
+	    $line =~ s/at address 0x[a-f0-9]+/code at address 0x1234567/;
 	    $line =~ s{^(..) main::\((.+) \@0x([a-f0-9]+)\)}
                       {$1 main::($2 \@0x1234567)};
             # use Enbugger; Enbugger->load_debugger('trepan');

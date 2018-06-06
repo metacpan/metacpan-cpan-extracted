@@ -18,8 +18,7 @@ use Carp qw(carp croak);
 use Cwd;
 use File::Basename;
 
-use vars qw($VERSION);
-$VERSION = '0.62';
+our $VERSION = '0.63';
 
 =head1 NAME
 

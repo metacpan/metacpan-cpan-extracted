@@ -124,7 +124,7 @@ Create a notification method.
 
 The C<notifications> method will be called whenever notifications are rendered.
 The first parameter passed is the plugin object, the second parameter is the current
-controller object and the third parameter is an array reference containing all
+controller object and the third parameter is a L<Mojo::Collection> object containing all
 notifications as array references.
 
 The first element of the notification is the
@@ -148,7 +148,7 @@ L<HTML|Mojolicious::Plugin::Notifications::HTML> engine.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2015, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2014-2018, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.

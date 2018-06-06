@@ -3,19 +3,20 @@
 #ifndef DLIB_STRUCTURAL_SVM_DISTRIBUTeD_Hh_
 #define DLIB_STRUCTURAL_SVM_DISTRIBUTeD_Hh_
 
-#include <memory>
-#include <iostream>
-#include <vector>
 
 #include "structural_svm_distributed_abstract.h"
 #include "structural_svm_problem.h"
 #include "../bridge.h"
+#include "../smart_pointers.h"
 #include "../misc_api.h"
 #include "../statistics.h"
+
+
 #include "../threads.h"
 #include "../pipe.h"
 #include "../type_safe_union.h"
-
+#include <iostream>
+#include <vector>
 
 namespace dlib
 {
@@ -332,7 +333,7 @@ namespace dlib
         };
 
 
-        std::unique_ptr<base> the_problem;
+        scoped_ptr<base> the_problem;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -677,9 +678,9 @@ namespace dlib
             typedef type_safe_union<impl::oracle_request<matrix_type> > tsu_out;
             typedef type_safe_union<impl::oracle_response<matrix_type>, long> tsu_in;
 
-            std::vector<std::shared_ptr<pipe<tsu_out> > > out_pipes;
+            std::vector<shared_ptr<pipe<tsu_out> > > out_pipes;
             mutable pipe<tsu_in> in;
-            std::vector<std::shared_ptr<bridge> > bridges;
+            std::vector<shared_ptr<bridge> > bridges;
             long num_dims;
         };
 

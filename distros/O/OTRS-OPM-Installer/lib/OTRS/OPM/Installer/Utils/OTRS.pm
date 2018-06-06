@@ -1,5 +1,5 @@
 package OTRS::OPM::Installer::Utils::OTRS;
-$OTRS::OPM::Installer::Utils::OTRS::VERSION = '0.03';
+$OTRS::OPM::Installer::Utils::OTRS::VERSION = '0.04';
 # ABSTRACT: class that provides helper functionality regarding the OTRS installation
 
 use strict;
@@ -43,12 +43,14 @@ sub is_installed {
 
     return if !%info;
 
+    return $info{version} if !$param{version};
+
     my $is_installed = $self->_check_version(
         installed => $info{version},
         requested => $param{version},
     );
 
-    return 1 if $is_installed;
+    return $is_installed if $is_installed;
     return;
 }
 
@@ -61,7 +63,8 @@ sub _check_version {
     my $installed = sprintf "%03d%03d%03d", map{ $i_parts[$_] && $i_parts[$_] =~ m{\A[0-9]+\z} ? $i_parts[$_] : 0 }( 0 .. 2);
     my $requested = sprintf "%03d%03d%03d", map{ $r_parts[$_] && $r_parts[$_] =~ m{\A[0-9]+\z} ? $r_parts[$_] : 0 }( 0 .. 2);
 
-    return $installed >= $requested;
+    return $installed if $installed >= $requested;
+    return;
 }
 
 sub _get_db {
@@ -157,7 +160,7 @@ OTRS::OPM::Installer::Utils::OTRS - class that provides helper functionality reg
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 
@@ -165,7 +168,7 @@ Renee Baecker <reneeb@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Renee Baecker.
+This software is Copyright (c) 2018 by Renee Baecker.
 
 This is free software, licensed under:
 

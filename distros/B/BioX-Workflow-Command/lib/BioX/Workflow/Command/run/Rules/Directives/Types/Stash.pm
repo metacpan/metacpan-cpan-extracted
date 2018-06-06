@@ -23,8 +23,10 @@ It uses Moose::Meta::Attribute::Native::Trait::Hash and supports all the methods
 has 'stash' => (
     is      => 'rw',
     isa     => 'HashRef',
-    traits  => ['Hash'],
-    default => sub { {} },
+    traits  => [ 'Hash' ],
+    default => sub {
+        return {}
+    },
     handles => {
         set_stash    => 'set',
         get_stash    => 'get',
@@ -36,14 +38,13 @@ has 'stash' => (
 );
 
 sub merge_stash {
-    my $self   = shift;
+    my $self = shift;
     my $target = shift;
 
-    my $merged_data = merger( $target, $self->stash );
+    my $merged_data = merger($target, $self->stash);
     $self->stash($merged_data);
 }
 
-# no Moose;
 no Moose::Role;
 
 1;

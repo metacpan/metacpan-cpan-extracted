@@ -1,6 +1,9 @@
 package X11::Xlib::Opaque;
 use X11::Xlib ();
 
+# All modules in dist share a version
+BEGIN { our $VERSION= $X11::Xlib::VERSION; }
+
 @X11::Xlib::Visual::ISA= ( __PACKAGE__ );
 @X11::Xlib::GC::ISA= ( __PACKAGE__ );
 

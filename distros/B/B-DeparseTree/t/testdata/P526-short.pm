@@ -8,7 +8,7 @@ __DATA__
 # Constants in a block
 # CONTEXT no warnings;
 {
-    '???';
+    '?unrecoverable constant?';
     2;
 }
 ####
@@ -18,7 +18,7 @@ __DATA__
 (1,2,3);
 0;
 >>>>
-'???', '???', '???';
+'?unrecoverable constant?', '?unrecoverable constant?', '?unrecoverable constant?';
 0;
 ####
 # Lexical and simple arithmetic
@@ -28,11 +28,11 @@ my $test;
 my $test;
 $test /= 2 if ++$test;
 ####
-# SKIP ?1
 # list x
 -((1, 2) x 2);
 ####
 ####
+# SKIP ?1
 # lexical and package scalars
 my $x;
 print $main::x;
@@ -61,12 +61,10 @@ glob $foo;
 glob $foo;
 ####
 # block
-# SKIP ?1
-{ my $x; }
+{ my $x }
 ####
-# SKIP ?1
 # while 1
-while (1) { my $k; }
+while (1) { my $k }
 ####
 # constants as method names
 'Foo'->bar('orz');
@@ -77,7 +75,7 @@ while (1) { my $k; }
 # SKIP ?$] < 5.010 && "say not implemented on this Perl version"
 # CONTEXT use feature ':5.10';
 # say
-say 'foo';
+say 'foo'
 ####
 # SKIP ?$] < 5.010 && "say not implemented on this Perl version"
 # CONTEXT use 5.10.0;
@@ -87,7 +85,7 @@ say 'foo';
 # SKIP ?$] < 5.010 && "say not implemented on this Perl version"
 # say with use 5.10.0
 use 5.10.0;
-say 'foo';
+say 'foo'
 >>>>
 no feature ':all';
 use feature ':5.10';
@@ -105,26 +103,26 @@ say 'foo';
 # CONTEXT use feature ':5.10';
 # say with use 5.10.0 in the context of use feature
 use 5.10.0;
-say 'foo';
+say 'foo'
 >>>>
 no feature ':all';
 use feature ':5.10';
-say 'foo';
+say 'foo'
 ####
-# SKIP ?$] < 5.010 && "say not implemented on this Perl version"
-# CONTEXT use 5.10.0;
+# SKIP ?1
+CONTEXT use 5.10.0;
 # say with use feature ':5.10' in the context of use 5.10.0
 use feature ':5.10';
 say 'foo';
 >>>>
-say 'foo';
+say 'foo'
 ####
-# SKIP ?$] < 5.015 && "__SUB__ not implemented on this Perl version"
+# SKIP ?($] < 5.015 || $is_cperl) && "__SUB__ not implemented on this Perl version"
 # CONTEXT use feature ':5.15';
 # __SUB__
 __SUB__;
 ####
-# SKIP ?$] < 5.015 && "__SUB__ not implemented on this Perl version"
+# SKIP ?($] < 5.015 || $is_cperl) && "__SUB__ not implemented on this Perl version"
 # CONTEXT use 5.15.0;
 # __SUB__ in the context of use 5.15.0
 __SUB__;
@@ -138,7 +136,7 @@ no feature ':all';
 use feature ':5.16';
 __SUB__;
 ####
-# SKIP ?$] < 5.015 && "__SUB__ not implemented on this Perl version"
+# SKIP ?($] < 5.015 || $is_cperl) && "__SUB__ not implemented on this Perl version"
 # __SUB__ with use feature ':5.15';
 use feature ':5.15';
 __SUB__;
@@ -146,7 +144,7 @@ __SUB__;
 use feature 'current_sub', 'evalbytes', 'fc', 'say', 'state', 'switch', 'unicode_strings', 'unicode_eval';
 __SUB__;
 ####
-# SKIP ?$] < 5.015 && "__SUB__ not implemented on this Perl version"
+# SKIP ?($] < 5.015 || $is_cperl) && "__SUB__ not implemented on this Perl version"
 # CONTEXT use feature ':5.15';
 # __SUB__ with use 5.15.0 in the context of use feature
 use 5.15.0;
@@ -156,7 +154,7 @@ no feature ':all';
 use feature ':5.16';
 __SUB__;
 ####
-# SKIP ?$] < 5.015 && "__SUB__ not implemented on this Perl version"
+# SKIP ?($] < 5.015 || $is_cperl) && "__SUB__ not implemented on this Perl version"
 # CONTEXT use 5.15.0;
 # __SUB__ with use feature ':5.15' in the context of use 5.15.0
 use feature ':5.15';
@@ -164,7 +162,7 @@ __SUB__;
 >>>>
 __SUB__;
 ####
-# SKIP ?$] < 5.010 && "state vars not implemented on this Perl version"
+# SKIP (?$] < 5.010 || $is_cperl) && "state vars not implemented on this Perl version"
 # CONTEXT use feature ':5.10';
 # state vars
 state $x = 42;
@@ -256,7 +254,6 @@ pop();
 # shift optimisation
 pop @_;
 ####
-# SKIP ?1
 #[perl #20444]
 "foo" =~ (1 ? /foo/ : /bar/);
 "foo" =~ (1 ? y/foo// : /bar/);
@@ -266,7 +263,7 @@ pop @_;
 'foo' =~ ($_ =~ /foo/);
 'foo' =~ ($_ =~ tr/fo//);
 'foo' =~ ($_ =~ tr/fo//r);
-'foo' =~ ($_ =~ s/foo//);
+'foo' =~ ($_ =~ s/foo//)
 # ####
 # # The fix for [perl #20444] broke this.
 # 'foo' =~ do { () };
@@ -299,13 +296,12 @@ $b::a[0] = 1;
 my @a;
 $a[0] = 1;
 ####
-# SKIP ?1
 # $#- $#+ $#{%} etc.
 my @x;
 @x = ($#{`}, $#{~}, $#{!}, $#{@}, $#{$}, $#{%}, $#{^}, $#{&}, $#{*});
 @x = ($#{(}, $#{)}, $#{[}, $#{{}, $#{]}, $#{}}, $#{'}, $#{"}, $#{,});
 @x = ($#{<}, $#{.}, $#{>}, $#{/}, $#{?}, $#{=}, $#+, $#{\}, $#{|}, $#-);
-@x = ($#{;}, $#{:}, $#{1}), $#_;
+@x = ($#{;}, $#{:}, $#{1}), $#_
 # ####
 # # [perl #86060] $( $| $) in regexps need braces
 # /${(}/;
@@ -361,7 +357,6 @@ $a++;
 # print $_;
 ####
 # Precedence conundrums with argument-less function calls
-# SKIP ?1
 () = (eof) + 1;
 () = (return) + 1;
 () = (return, 1);
@@ -377,7 +372,6 @@ pipe local *FH, local *FH;
 require 'a' . $1;
 ####
 # 'my' works with padrange op
-# SKIP ?1
 my($z, @z);
 my $m1;
 $m1 = 1;
@@ -392,7 +386,6 @@ my($m7, undef, $m8) = (1, 2, 3);
 ($m7, undef, $m8) = (1, 2, 3);
 ####
 # 'state' works with padrange op
-# SKIP ?1
 # CONTEXT no strict; use feature 'state';
 state($z, @z);
 state $s1;
@@ -459,5 +452,4 @@ tr/X//s;
 tr/X//r;
 ####
 use feature 'unicode_strings';
-# SKIP ?1
 s/X//d;

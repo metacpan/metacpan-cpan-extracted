@@ -1,3 +1,9 @@
+0.006   2018-06-05 (PERLANCAR)
+
+	- [Bugfix] Depend on newer version of Data::Sah (0.891)
+	  [RT#125477].
+
+
 0.005   2018-06-04 (PERLANCAR)
 
 	- Update to Data::Sah::Coerce 0.025 (coerce rule module metadata

@@ -4,8 +4,6 @@
 #define DLIB_KKMEANs_
 
 #include <cmath>
-#include <vector>
-
 #include "../matrix/matrix_abstract.h"
 #include "../algs.h"
 #include "../serialize.h"
@@ -14,6 +12,8 @@
 #include "kcentroid.h"
 #include "kkmeans_abstract.h"
 #include "../noncopyable.h"
+#include "../smart_pointers.h"
+#include <vector>
 
 namespace dlib
 {
@@ -176,7 +176,7 @@ namespace dlib
             item.centers.resize(num);
             for (unsigned long i = 0; i < item.centers.size(); ++i)
             {
-                std::unique_ptr<kcentroid<kernel_type> > temp(new kcentroid<kernel_type>(kernel_type()));
+                scoped_ptr<kcentroid<kernel_type> > temp(new kcentroid<kernel_type>(kernel_type()));
                 deserialize(*temp, in);
                 item.centers[i].swap(temp);
             }
@@ -270,7 +270,7 @@ namespace dlib
 
         }
 
-        array<std::unique_ptr<kcentroid<kernel_type> > > centers;
+        array<scoped_ptr<kcentroid<kernel_type> > > centers;
         kcentroid<kernel_type> kc;
         scalar_type min_change;
 

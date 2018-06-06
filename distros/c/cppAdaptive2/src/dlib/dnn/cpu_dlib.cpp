@@ -7,8 +7,6 @@
 
 #include "cpu_dlib.h"
 #include "tensor_tools.h"
-#include "../image_transforms/interpolation.h"
-#include "../threads.h"
 
 namespace dlib
 {
@@ -76,8 +74,6 @@ namespace dlib
                 }
             }
         }
-
-    // ------------------------------------------------------------------------------------
 
         void multiply_conv (
             bool add_to,
@@ -152,72 +148,6 @@ namespace dlib
                 }
             }
         }
-
-    // ------------------------------------------------------------------------------------
-
-        void scale_channels (
-            bool add_to,
-            tensor& dest,
-            const tensor& src,
-            const tensor& scales
-        )
-        {
-            DLIB_CASSERT(have_same_dimensions(dest,src) && 
-                         scales.num_samples() == src.num_samples() &&
-                         scales.k()           == src.k() &&
-                         scales.nr()          == 1 &&
-                         scales.nc()          == 1 );
-
-            if (dest.size() == 0)
-                return;
-
-            if (add_to)
-            {
-                auto d = dest.host();
-                auto s = src.host();
-                auto scal = scales.host();
-
-                for (long n = 0; n < src.num_samples(); ++n)
-                {
-                    for (long k = 0; k < src.k(); ++k)
-                    {
-                        const auto scale = scal[n*scales.k() + k];
-                        for (long r = 0; r < src.nr(); ++r)
-                        {
-                            for (long c = 0; c < src.nc(); ++c)
-                            {
-                                *d++ += (*s++) * scale;
-                            }
-                        }
-                    }
-                }
-
-
-            }
-            else
-            {
-                auto d = dest.host_write_only();
-                auto s = src.host();
-                auto scal = scales.host();
-
-                for (long n = 0; n < src.num_samples(); ++n)
-                {
-                    for (long k = 0; k < src.k(); ++k)
-                    {
-                        const auto scale = scal[n*scales.k() + k];
-                        for (long r = 0; r < src.nr(); ++r)
-                        {
-                            for (long c = 0; c < src.nc(); ++c)
-                            {
-                                *d++ = (*s++) * scale;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-    // ------------------------------------------------------------------------------------
 
         void add(
             float beta,
@@ -328,79 +258,6 @@ namespace dlib
                             }
 
                             *d = v1 + v2;
-                            ++d;
-                        }
-                    }
-                }
-            }
-        }
-
-    // ----------------------------------------------------------------------------------------
-
-        void multiply_zero_padded (
-            bool add_to,
-            tensor& dest,
-            const tensor& src1,
-            const tensor& src2
-        )
-        {
-            auto d = dest.host();
-            auto s1 = src1.host();
-            auto s2 = src2.host();
-
-            // Do the simple and fast version if everything has the same dimensions
-            if (have_same_dimensions(dest, src1) &&
-                have_same_dimensions(dest, src2))
-            {
-                if (add_to)
-                {
-                    for (size_t i = 0; i < dest.size(); ++i)
-                        d[i] += s1[i] * s2[i];
-                }
-                else
-                {
-                    for (size_t i = 0; i < dest.size(); ++i)
-                        d[i] = s1[i] * s2[i];
-                }
-                return;
-            }
-
-            // Otherwise, do the more complex version with bounds checking.
-            for (long n = 0; n < dest.num_samples(); ++n)
-            {
-                for (long k = 0; k < dest.k(); ++k)
-                {
-                    for (long r = 0; r < dest.nr(); ++r)
-                    {
-                        for (long c = 0; c < dest.nc(); ++c)
-                        {
-                            float v1 = 0;
-                            float v2 = 0;
-
-                            // if this index is inside src1
-                            if (n < src1.num_samples() && 
-                                k < src1.k() && 
-                                r < src1.nr() && 
-                                c < src1.nc() )
-                            {
-                                const auto s_idx = ((n*src1.k() + k)*src1.nr() + r)*src1.nc() + c;
-                                v1 = s1[s_idx];
-                            }
-
-                            // if this index is inside src2
-                            if (n < src2.num_samples() && 
-                                k < src2.k() && 
-                                r < src2.nr() && 
-                                c < src2.nc() )
-                            {
-                                const auto s_idx = ((n*src2.k() + k)*src2.nr() + r)*src2.nc() + c;
-                                v2 = s2[s_idx];
-                            }
-
-                            if (add_to)
-                                *d += v1 * v2;
-                            else
-                                *d = v1 * v2;
                             ++d;
                         }
                     }
@@ -627,46 +484,6 @@ namespace dlib
                     }
                 }
             }
-        }
-
-    // ----------------------------------------------------------------------------------------
-
-        void affine_transform(
-            const rectangle& rect,
-            tensor& dest, 
-            const tensor& src1, 
-            const tensor& src2, 
-            const tensor& src3, 
-            float A, 
-            float B,
-            float C
-        )
-        {
-            DLIB_CASSERT(dest.size() == src1.size());
-            DLIB_CASSERT(dest.size() == src2.size());
-            DLIB_CASSERT(dest.size() == src3.size());
-            DLIB_CASSERT(dest.num_samples() == src1.num_samples());
-            DLIB_CASSERT(dest.num_samples() == src2.num_samples());
-            DLIB_CASSERT(dest.num_samples() == src3.num_samples());
-            DLIB_CASSERT(rectangle(0,0, dest.size()/dest.num_samples()-1, dest.num_samples()-1).contains(rect));
-
-
-            auto d = dest.host();
-            auto s1 = src1.host();
-            auto s2 = src2.host();
-            auto s3 = src3.host();
-
-            const auto nc = dest.size()/dest.num_samples();
-
-            for (long r = rect.top(); r <= rect.bottom(); ++r)
-            {
-                for (long c = rect.left(); c <= rect.right(); ++c)
-                {
-                    auto idx = r*nc + c;
-                    d[idx] = s1[idx]*A + s2[idx]*B + s3[idx]*C;
-                }
-            }
-
         }
 
     // -----------------------------------------------------------------------------------
@@ -1291,36 +1108,32 @@ namespace dlib
     // -----------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------
 
-        namespace ttimpl
-        {
         void softmax (
-            const long num_locations,
-            const long num_channels,
             tensor& dest,
             const tensor& src
         )
         {
-            DLIB_ASSERT(num_channels*num_locations == src.nr()*src.nc()*src.k());
             DLIB_CASSERT(have_same_dimensions(dest,src));
             const auto d = dest.host();
             const auto s = src.host();
 
+            const long num = src.nr()*src.nc();
             // Note that we subtract out the max values in each channel before applying
             // exp() to avoid numeric overflow in the subsequent computations.  Doing this
             // doesn't change the resulting output, it just makes it more numerically
             // stable.
             for (long n = 0; n < src.num_samples(); ++n)
             {
-                auto ss = s + num_locations*num_channels*n;
-                auto dd = d + num_locations*num_channels*n;
-                for (long i = 0; i < num_locations; ++i)
+                auto ss = s + num*src.k()*n;
+                auto dd = d + num*src.k()*n;
+                for (long i = 0; i < num; ++i)
                 {
                     float max_val = -std::numeric_limits<float>::infinity();
-                    for (long k = 0; k < num_channels; ++k)
-                        max_val = std::max(max_val, ss[k*num_locations]);
+                    for (long k = 0; k < src.k(); ++k)
+                        max_val = std::max(max_val, ss[k*num]);
 
-                    for (long k = 0; k < num_channels; ++k)
-                        dd[k*num_locations] = std::exp(ss[k*num_locations]-max_val);
+                    for (long k = 0; k < src.k(); ++k)
+                        dd[k*num] = std::exp(ss[k*num]-max_val);
 
                     ++ss;
                     ++dd;
@@ -1330,107 +1143,66 @@ namespace dlib
             // Now normalize each channel so they sum to 1.
             for (long n = 0; n < src.num_samples(); ++n)
             {
-                const auto dd = d + num_locations*num_channels*n;
-                for (long i = 0; i < num_locations; ++i)
+                const auto dd = d + num*src.k()*n;
+                for (long r = 0; r < src.nr(); ++r)
                 {
-                    const auto ddd = dd+i;
+                    for (long c = 0; c < src.nc(); ++c)
+                    {
+                        const auto ddd = dd+r*src.nc()+c;
 
-                    float temp = 0;
-                    for (long k = 0; k < num_channels; ++k)
-                        temp += ddd[k*num_locations];
-                    for (long k = 0; k < num_channels; ++k)
-                        ddd[k*num_locations] /= temp;
+                        float temp = 0;
+                        for (long k = 0; k < src.k(); ++k)
+                            temp += ddd[k*num];
+                        for (long k = 0; k < src.k(); ++k)
+                            ddd[k*num] /= temp;
+                    }
                 }
             }
         }
 
         void softmax_gradient (
-            const long num_locations,
-            const long num_channels,
             tensor& grad,
             const tensor& dest,
             const tensor& gradient_input
         )
         {
-            DLIB_ASSERT(num_channels*num_locations == grad.nr()*grad.nc()*grad.k());
             DLIB_CASSERT(have_same_dimensions(grad,dest));
             DLIB_CASSERT(have_same_dimensions(grad,gradient_input));
             const auto d = dest.host();
             const auto g = grad.host();
             const auto in = gradient_input.host();
 
+            const long num = grad.nr()*grad.nc();
 
             for (long n = 0; n < grad.num_samples(); ++n)
             {
-                const auto d2 = d + num_locations*num_channels*n;
-                const auto g2 = g + num_locations*num_channels*n;
-                const auto in2 = in + num_locations*num_channels*n;
-                for (long i = 0; i < num_locations; ++i)
+                const auto d2 = d + num*grad.k()*n;
+                const auto g2 = g + num*grad.k()*n;
+                const auto in2 = in + num*grad.k()*n;
+                for (long r = 0; r < grad.nr(); ++r)
                 {
-                    const auto d3 = d2+i;
-                    const auto g3 = g2+i;
-                    const auto in3 = in2+i;
+                    for (long c = 0; c < grad.nc(); ++c)
+                    {
+                        const auto d3 = d2+r*grad.nc()+c;
+                        const auto g3 = g2+r*grad.nc()+c;
+                        const auto in3 = in2+r*grad.nc()+c;
 
-                    float temp = 0;
-                    for (long k = 0; k < num_channels; ++k)
-                        temp += -d3[k*num_locations]*in3[k*num_locations];
-                    if (is_same_object(gradient_input, grad))
-                    {
-                        for (long k = 0; k < num_channels; ++k)
-                            g3[k*num_locations] = d3[k*num_locations]*(temp+in3[k*num_locations]);
-                    }
-                    else
-                    {
-                        for (long k = 0; k < num_channels; ++k)
-                            g3[k*num_locations] += d3[k*num_locations]*(temp+in3[k*num_locations]);
+                        float temp = 0;
+                        for (long k = 0; k < grad.k(); ++k)
+                            temp += -d3[k*num]*in3[k*num];
+                        if (is_same_object(gradient_input, grad))
+                        {
+                            for (long k = 0; k < grad.k(); ++k)
+                                g3[k*num] = d3[k*num]*(temp+in3[k*num]);
+                        }
+                        else
+                        {
+                            for (long k = 0; k < grad.k(); ++k)
+                                g3[k*num] += d3[k*num]*(temp+in3[k*num]);
+                        }
                     }
                 }
             }
-        }
-        }
-
-    // ----------------------------------------------------------------------------------------
-
-        void softmax (
-            tensor& dest,
-            const tensor& src
-        )
-        {
-            DLIB_CASSERT(have_same_dimensions(dest,src));
-            ttimpl::softmax(src.nr()*src.nc(), src.k(), dest, src);
-        }
-
-        void softmax_gradient (
-            tensor& grad,
-            const tensor& dest,
-            const tensor& gradient_input
-        )
-        {
-            DLIB_CASSERT(have_same_dimensions(grad,dest));
-            DLIB_CASSERT(have_same_dimensions(grad,gradient_input));
-            ttimpl::softmax_gradient(grad.nr()*grad.nc(), grad.k(), grad, dest, gradient_input);
-        }
-
-    // ------------------------------------------------------------------------------------
-
-        void softmax_all (
-            tensor& dest,
-            const tensor& src
-        )
-        {
-            DLIB_CASSERT(have_same_dimensions(dest,src));
-            ttimpl::softmax(1, src.nr()*src.nc()*src.k(), dest, src);
-        }
-
-        void softmax_all_gradient (
-            tensor& grad,
-            const tensor& dest,
-            const tensor& gradient_input
-        )
-        {
-            DLIB_CASSERT(have_same_dimensions(grad,dest));
-            DLIB_CASSERT(have_same_dimensions(grad,gradient_input));
-            ttimpl::softmax_gradient(1, grad.nr()*grad.nc()*grad.k(), grad, dest, gradient_input);
         }
 
     // ------------------------------------------------------------------------------------
@@ -1586,88 +1358,6 @@ namespace dlib
             {
                 for (size_t i = 0; i < dest.size(); ++i)
                     g[i] += in[i]*(1-d[i]*d[i]);
-            }
-        }
-
-    // ----------------------------------------------------------------------------------------
-
-        void resize_bilinear (
-            tensor& dest,
-            long dest_row_stride,
-            long dest_channel_stride,
-            const tensor& src,
-            long src_row_stride,
-            long src_channel_stride
-        )
-        {
-            DLIB_CASSERT(is_same_object(dest, src)==false);
-            DLIB_CASSERT(dest.num_samples() == src.num_samples());
-            DLIB_CASSERT(dest.k() == src.k());
-
-            if (dest.size() == 0 || src.size() == 0)
-                return;
-
-            const float* s = src.host();
-            float* d = dest.host();
-
-            parallel_for(0, dest.k()*dest.num_samples(), [&](long i)
-            {
-                auto simg = sub_image(s+i*src_channel_stride, src.nr(), src.nc(), src_row_stride);
-                auto dimg = sub_image(d+i*dest_channel_stride, dest.nr(), dest.nc(), dest_row_stride);
-
-                resize_image(simg, dimg);
-            });
-        }
-
-        void resize_bilinear_gradient (
-            tensor& grad,
-            long grad_row_stride,
-            long grad_channel_stride,
-            const tensor& gradient_input,
-            long gradient_input_row_stride,
-            long gradient_input_channel_stride
-        )
-        {
-            DLIB_CASSERT(is_same_object(grad, gradient_input)==false);
-            DLIB_CASSERT(gradient_input.num_samples() == grad.num_samples());
-            DLIB_CASSERT(gradient_input.k() == grad.k());
-
-            if (gradient_input.size() == 0 || grad.size() == 0)
-                return;
-
-            const float* gi = gradient_input.host();
-            float* g = grad.host();
-            const float x_scale = (grad.nc()-1)/(float)std::max<long>((gradient_input.nc()-1),1);
-            const float y_scale = (grad.nr()-1)/(float)std::max<long>((gradient_input.nr()-1),1);
-            for (long long samp = 0; samp < gradient_input.num_samples(); ++samp)
-            {
-                for (long long k = 0; k < gradient_input.k(); ++k)
-                {
-                    for (long long r = 0; r < gradient_input.nr(); ++r)
-                    {
-                        const float y = r*y_scale;
-                        const long long top    = static_cast<long long>(std::floor(y));
-                        const long long bottom = std::min(top+1, grad.nr()-1);
-                        const float tb_frac = y - top;
-                        for (long long c = 0; c < gradient_input.nc(); ++c)
-                        {
-                            const float x = c*x_scale;
-                            const long long left   = static_cast<long long>(std::floor(x));
-                            const long long right  = std::min(left+1, grad.nc()-1);
-                            const float lr_frac = x - left;
-
-                            const float tmp = gi[r*gradient_input_row_stride+c];
-
-                            g[top*grad_row_stride+left]     += tmp*(1-tb_frac)*(1-lr_frac);
-                            g[top*grad_row_stride+right]    += tmp*(1-tb_frac)*(lr_frac);
-                            g[bottom*grad_row_stride+left]  += tmp*(tb_frac)*(1-lr_frac);
-                            g[bottom*grad_row_stride+right] += tmp*(tb_frac)*(lr_frac);
-                        }
-                    }
-
-                    g += grad_channel_stride;
-                    gi += gradient_input_channel_stride;
-                }
             }
         }
 
@@ -2010,67 +1700,54 @@ namespace dlib
         }
 
         void tensor_conv::operator() (
-            const bool add_to_output,
             resizable_tensor& output,
             const tensor& data,
-            const tensor& filters
-        )
-        {
-            DLIB_CASSERT(last_stride_y > 0 && last_stride_x > 0, "You must call setup() before calling this function.");
-            output.set_size(data.num_samples(),
-                            filters.num_samples(),
-                            1+(data.nr()+2*last_padding_y-filters.nr())/last_stride_y,
-                            1+(data.nc()+2*last_padding_x-filters.nc())/last_stride_x);
-            (*this)(add_to_output, static_cast<tensor&>(output),data,filters);
-        }
-
-        void tensor_conv::operator() (
-            const bool add_to_output,
-            tensor& output,
-            const tensor& data,
-            const tensor& filters
+            const tensor& filters,
+            int stride_y,
+            int stride_x,
+            int padding_y,
+            int padding_x
         )
         {
             DLIB_CASSERT(is_same_object(output,data) == false);
             DLIB_CASSERT(is_same_object(output,filters) == false);
             DLIB_CASSERT(filters.k() == data.k());
-            DLIB_CASSERT(last_stride_y > 0 && last_stride_x > 0, "You must call setup() before calling this function.");
-            DLIB_CASSERT(filters.nr() <= data.nr() + 2*last_padding_y,
+            DLIB_CASSERT(stride_y > 0 && stride_x > 0);
+            DLIB_CASSERT(0 <= padding_y && padding_y < filters.nr());
+            DLIB_CASSERT(0 <= padding_x && padding_x < filters.nc());
+            DLIB_CASSERT(filters.nr() <= data.nr() + 2*padding_y,
                 "Filter windows must be small enough to fit into the padded image.");
-            DLIB_CASSERT(filters.nc() <= data.nc() + 2*last_padding_x,
+            DLIB_CASSERT(filters.nc() <= data.nc() + 2*padding_x,
                 "Filter windows must be small enough to fit into the padded image.");
 
-            DLIB_CASSERT(output.num_samples() == data.num_samples());
-            DLIB_CASSERT(output.k() == filters.num_samples());
-            DLIB_CASSERT(output.nr() == 1+(data.nr()+2*last_padding_y-filters.nr())/last_stride_y);
-            DLIB_CASSERT(output.nc() == 1+(data.nc()+2*last_padding_x-filters.nc())/last_stride_x);
-
+            output.set_size(data.num_samples(),
+                            filters.num_samples(),
+                            1+(data.nr()+2*padding_y-filters.nr())/stride_y,
+                            1+(data.nc()+2*padding_x-filters.nc())/stride_x);
 
             matrix<float> temp;
             for (long n = 0; n < data.num_samples(); ++n)
             {
-                img2col(temp, data, n, filters.nr(), filters.nc(), last_stride_y, last_stride_x, last_padding_y, last_padding_x);
-
-                if (add_to_output)
-                    output.add_to_sample(n, mat(filters)*trans(temp));
-                else 
-                    output.set_sample(n, mat(filters)*trans(temp));
+                img2col(temp, data, n, filters.nr(), filters.nc(), stride_y, stride_x, padding_y, padding_x);
+                output.set_sample(n, mat(filters)*trans(temp));
             }
+
+            last_stride_y = stride_y;
+            last_stride_x = stride_x;
+            last_padding_y = padding_y;
+            last_padding_x = padding_x;
         }
 
     // ------------------------------------------------------------------------------------
 
         void tensor_conv::
         get_gradient_for_data (
-            const bool add_to_output,
             const tensor& gradient_input, 
             const tensor& filters,
             tensor& data_gradient
         )
         {
             matrix<float> temp;
-            if (!add_to_output)
-                data_gradient = 0;
             for (long n = 0; n < gradient_input.num_samples(); ++n)
             {
                 auto gi = mat(gradient_input.host()+gradient_input.k()*gradient_input.nr()*gradient_input.nc()*n,
@@ -2087,7 +1764,6 @@ namespace dlib
 
         void tensor_conv::
         get_gradient_for_filters (
-            const bool add_to_output,
             const tensor& gradient_input, 
             const tensor& data,
             tensor& filters_gradient
@@ -2103,59 +1779,41 @@ namespace dlib
 
                 img2col(temp, data, n, filters_gradient.nr(), filters_gradient.nc(), last_stride_y, last_stride_x, last_padding_y, last_padding_x);
                 if (n == 0)
-                {
-                    if (add_to_output)
-                        filters_gradient += gi*temp;
-                    else
-                        filters_gradient = gi*temp;
-                }
+                    filters_gradient = gi*temp;
                 else
-                {
                     filters_gradient += gi*temp;
-                }
             }
         }
-
-     // ------------------------------------------------------------------------------------
-
-        void copy_tensor(
-            bool add_to,
+    // ------------------------------------------------------------------------------------
+    void copy_tensor(
             tensor& dest,
             size_t dest_k_offset,
             const tensor& src,
             size_t src_k_offset,
             size_t count_k
-        )
+    )
+    {
+        const size_t dest_sample_size = static_cast<size_t>(dest.nc() * dest.nr() * dest.k());
+        const size_t src_sample_size = static_cast<size_t>(src.nc() * src.nr() * src.k());
+
+        const size_t block_size = count_k * dest.nc() * dest.nr();
+
+        DLIB_CASSERT(dest.num_samples() == src.num_samples() &&
+                     dest.nc() == src.nc() && dest.nr() == src.nr(), "All sources should fit into dest tensor size");
+        DLIB_CASSERT(dest.k() - dest_k_offset >= count_k, "Not enough space in dest tensor");
+        DLIB_CASSERT(src.k() - src_k_offset >= count_k, "Not enough space in src tensor");
+
+        float* dest_p = dest.host() + dest_k_offset * dest.nc() * dest.nr();
+        const float* src_p = src.host() + src_k_offset * src.nc() * src.nr();
+
+        for (long i = 0; i < src.num_samples(); ++i)
         {
-            const size_t dest_sample_size = static_cast<size_t>(dest.nc() * dest.nr() * dest.k());
-            const size_t src_sample_size = static_cast<size_t>(src.nc() * src.nr() * src.k());
+            ::memcpy(dest_p, src_p, block_size * sizeof(float));
 
-            const size_t block_size = count_k * dest.nc() * dest.nr();
-
-            DLIB_CASSERT(dest.num_samples() == src.num_samples() &&
-                dest.nc() == src.nc() && dest.nr() == src.nr(), "All sources should fit into dest tensor size");
-            DLIB_CASSERT(dest.k() - dest_k_offset >= count_k, "Not enough space in dest tensor");
-            DLIB_CASSERT(src.k() - src_k_offset >= count_k, "Not enough space in src tensor");
-
-            float* dest_p = dest.host() + dest_k_offset * dest.nc() * dest.nr();
-            const float* src_p = src.host() + src_k_offset * src.nc() * src.nr();
-
-            for (long i = 0; i < src.num_samples(); ++i)
-            {
-                if (add_to)
-                {
-                    for (size_t j = 0; j < block_size; ++j)
-                        dest_p[j] += src_p[j];
-                }
-                else
-                {
-                    ::memcpy(dest_p, src_p, block_size * sizeof(float));
-                }
-
-                dest_p += dest_sample_size;
-                src_p  += src_sample_size;
-            }
+            dest_p += dest_sample_size;
+            src_p  += src_sample_size;
         }
+    }
 
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------

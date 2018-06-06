@@ -3,29 +3,23 @@ package Locale::TextDomain::OO::Util;
 use strict;
 use warnings;
 
-our $VERSION = '3.008';
+our $VERSION = '4.001';
 
 1;
 
 __END__
 
 =head1 NAME
+
 Locale::TextDomain::OO::Util - Lexicon utils
-
-$Id: Util.pm 659 2017-07-16 09:20:52Z steffenw $
-
-$HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/Locale-TextDomain-OO-Util/trunk/lib/Locale/TextDomain/OO/Util.pm $
 
 =head1 VERSION
 
-3.008
+4.001
 
-=head1 DESCRIPTION
+$Id: Util.pm 673 2017-07-19 11:02:10Z steffenw $
 
-This modules provide methods
-for lexicon constants,
-to join and split lexicon keys
-and to extract the gettext file header.
+$HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/Locale-TextDomain-OO-Util/trunk/lib/Locale/TextDomain/OO/Util.pm $
 
 =head1 SYNOPSIS
 
@@ -41,6 +35,13 @@ L<Locale::TextDomain::OO::Util::ExtractHeader|Locale::TextDomain::OO::Util::Extr
 
 How to use the JavaScript framework see
 L<Locale::TextDomain::OO::Util::JavaScript|Locale::TextDomain::OO::Util::JavaScript>.
+
+=head1 DESCRIPTION
+
+This modules provide methods
+for lexicon constants,
+to join and split lexicon keys
+and to extract the gettext file header.
 
 =head1 SUBROUTINES/METHODS
 
@@ -81,7 +82,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2015 - 2017,
+Copyright (c) 2015 - 2018,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

@@ -22,6 +22,8 @@ $co->notify(success => q/That's <a success/);
 my $notes = $co->notifications('alertify');
 like($notes, qr/warn.+?error.+?succes/s, 'Notification is fine');
 like($notes, qr/noscript/s, 'Notification is fine');
+like($notes, qr/notify notify-error/, 'Notification is fine');
+like($notes, qr/That&#39;s an error/, 'Notification is fine');
 ok(!$co->notifications('alertify'), 'No notifications');
 
 # $c->include_notification_center

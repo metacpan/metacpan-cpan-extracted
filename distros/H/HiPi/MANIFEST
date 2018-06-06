@@ -1,5 +1,17 @@
 Build.PL
 Changes
+examples/microdotphat/advanced_scrolling.pl
+examples/microdotphat/clock.pl
+examples/microdotphat/fading_text.pl
+examples/microdotphat/flash.pl
+examples/microdotphat/graph.pl
+examples/microdotphat/scrolling_text.pl
+examples/microdotphat/scrolling_text_jp.pl
+examples/microdotphat/scrolling_word.pl
+examples/microdotphat/sine_wave.pl
+examples/microdotphat/thermal.pl
+examples/microdotphat/tiny_font.pl
+examples/microdotphat/vertical_text.pl
 examples/mihome.pl
 examples/pantilt.pl
 Exec.xs
@@ -124,6 +136,7 @@ lib/HiPi/Interface/HobbyTronicsBackpackV2.pm
 lib/HiPi/Interface/HopeRF69.pm
 lib/HiPi/Interface/HTADCI2C.pm
 lib/HiPi/Interface/HTBackpackV2.pm
+lib/HiPi/Interface/IS31FL3730.pm
 lib/HiPi/Interface/LCDBackpackPCF8574.pm
 lib/HiPi/Interface/MCP23017.pm
 lib/HiPi/Interface/MCP23S17.pm
@@ -132,6 +145,8 @@ lib/HiPi/Interface/MCP3008.pm
 lib/HiPi/Interface/MCP3ADC.pm
 lib/HiPi/Interface/MCP49XX.pm
 lib/HiPi/Interface/MCP4DAC.pm
+lib/HiPi/Interface/MicroDotPHAT.pm
+lib/HiPi/Interface/MicroDotPHAT/Font.pm
 lib/HiPi/Interface/MonoOLED.pm
 lib/HiPi/Interface/MonoOLED/DisplayBuffer.pm
 lib/HiPi/Interface/MPL3115A2.pm
@@ -147,6 +162,7 @@ lib/HiPi/RaspberryPi.pm
 lib/HiPi/RF/OpenThings.pm
 lib/HiPi/RF/OpenThings/Message.pm
 lib/HiPi/Utils.pm
+lib/HiPi/Utils/BitBuffer.pm
 lib/HiPi/Utils/Config.pm
 lib/HiPi/Utils/Exec.pm
 lib/HiPi/Utils/OLEDFont.pm

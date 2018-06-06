@@ -34,8 +34,8 @@ plan skip_all => 'All the modules we found were excluded from POD coverage test.
 plan tests => scalar @modules;
 
 my %trustme = (
-             'Webservice::Pokemon' => [
-                                        qr/^(?:commands|has_decoder|has_encoder|mapping|wrapper)$/
+             'WebService::Pokemon' => [
+                                        qr/^(?:BUILD|commands|has_decoder|has_encoder|mapping|wrapper)$/
                                       ]
            );
 

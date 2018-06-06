@@ -1,5 +1,7 @@
 package BioX::Workflow::Command::run::Utils::Attributes;
 
+use strict;
+use warnings FATAL => 'all';
 use MooseX::App::Role;
 use namespace::autoclean;
 
@@ -199,9 +201,9 @@ sub apply_global_attributes {
 
     $self->global_attr->create_attr( $self->workflow_data->{global} );
 
-    if ( exists $self->global_attr->chunks->{start} ) {
-        $self->global_attr->use_chunks(1);
-    }
+#    if ( exists $self->global_attr->chunks->{start} ) {
+#        $self->global_attr->use_chunks(1);
+#    }
 }
 
 1;

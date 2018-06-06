@@ -45,7 +45,7 @@
             "HTTP::Message" : "0",
             "HTTP::Request" : "0",
             "Mojolicious" : "7.52",
-            "Mojolicious::Plugin::MountPSGI" : "0",
+            "Mojolicious::Plugin::MountPSGI" : "0.13",
             "Plack" : "0",
             "Test2::Tools::HTTP" : "0.05",
             "parent" : "0",
@@ -78,7 +78,7 @@
          "web" : "https://github.com/plicease/Test2-Tools-HTTP-UA-Mojo"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
    "x_use_unsafe_inc" : 0
 }

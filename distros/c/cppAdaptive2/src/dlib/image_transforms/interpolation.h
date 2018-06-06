@@ -10,8 +10,6 @@
 #include "image_pyramid.h"
 #include "../simd.h"
 #include "../image_processing/full_object_detection.h"
-#include <limits>
-#include "../rand.h"
 
 namespace dlib
 {
@@ -21,8 +19,6 @@ namespace dlib
     template <typename T>
     struct sub_image_proxy
     {
-        sub_image_proxy() = default;
-
         sub_image_proxy (
             T& img,
             rectangle rect
@@ -37,17 +33,15 @@ namespace dlib
             _data = (char*)image_data(img) + sizeof(pixel_type)*rect.left() + rect.top()*_width_step;
         }
 
-        void* _data = 0;
-        long _width_step = 0;
-        long _nr = 0;
-        long _nc = 0;
+        void* _data;
+        long _width_step;
+        long _nr;
+        long _nc;
     };
 
     template <typename T>
     struct const_sub_image_proxy
     {
-        const_sub_image_proxy() = default;
-
         const_sub_image_proxy (
             const T& img,
             rectangle rect
@@ -62,10 +56,10 @@ namespace dlib
             _data = (const char*)image_data(img) + sizeof(pixel_type)*rect.left() + rect.top()*_width_step;
         }
 
-        const void* _data = 0;
-        long _width_step = 0;
-        long _nr = 0;
-        long _nc = 0;
+        const void* _data;
+        long _width_step;
+        long _nr;
+        long _nc;
     };
 
     template <typename T>
@@ -157,38 +151,6 @@ namespace dlib
     )
     {
         return const_sub_image_proxy<image_type>(img,rect);
-    }
-
-    template <typename T>
-    inline sub_image_proxy<matrix<T>> sub_image (
-        T* img,
-        long nr,
-        long nc,
-        long row_stride
-    )
-    {
-        sub_image_proxy<matrix<T>> tmp;
-        tmp._data = img;
-        tmp._nr = nr;
-        tmp._nc = nc;
-        tmp._width_step = row_stride*sizeof(T);
-        return tmp;
-    }
-
-    template <typename T>
-    inline const const_sub_image_proxy<matrix<T>> sub_image (
-        const T* img,
-        long nr,
-        long nc,
-        long row_stride
-    )
-    {
-        const_sub_image_proxy<matrix<T>> tmp;
-        tmp._data = img;
-        tmp._nr = nr;
-        tmp._nc = nc;
-        tmp._width_step = row_stride*sizeof(T);
-        return tmp;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -730,8 +692,11 @@ namespace dlib
         const_image_view<image_type1> in_img(in_img_);
         image_view<image_type2> out_img(out_img_);
 
-        if (out_img.size() == 0 || in_img.size() == 0)
+        if (out_img.nr() <= 1 || out_img.nc() <= 1)
+        {
+            assign_all_pixels(out_img, 0);
             return;
+        }
 
 
         typedef typename image_traits<image_type1>::pixel_type T;
@@ -796,24 +761,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type1,
-        typename image_type2
+        typename image_type
         >
-    struct images_have_same_pixel_types
-    {
-        typedef typename image_traits<image_type1>::pixel_type ptype1;
-        typedef typename image_traits<image_type2>::pixel_type ptype2;
-        const static bool value = is_same_type<ptype1, ptype2>::value;
-    };
-
-    template <
-        typename image_type,
-        typename image_type2
-        >
-    typename enable_if_c<is_grayscale_image<image_type>::value && is_grayscale_image<image_type2>::value && images_have_same_pixel_types<image_type,image_type2>::value>::type 
-    resize_image (
+    typename enable_if<is_grayscale_image<image_type> >::type resize_image (
         const image_type& in_img_,
-        image_type2& out_img_,
+        image_type& out_img_,
         interpolate_bilinear
     )
     {
@@ -825,10 +777,13 @@ namespace dlib
             );
 
         const_image_view<image_type> in_img(in_img_);
-        image_view<image_type2> out_img(out_img_);
+        image_view<image_type> out_img(out_img_);
 
-        if (out_img.size() == 0 || in_img.size() == 0)
+        if (out_img.nr() <= 1 || out_img.nc() <= 1)
+        {
+            assign_all_pixels(out_img, 0);
             return;
+        }
 
         typedef typename image_traits<image_type>::pixel_type T;
         const double x_scale = (in_img.nc()-1)/(double)std::max<long>((out_img.nc()-1),1);
@@ -873,8 +828,8 @@ namespace dlib
                 simd4f bl(in_img[bottom][fleft[0]],  in_img[bottom][fleft[1]],  in_img[bottom][fleft[2]],  in_img[bottom][fleft[3]]);
                 simd4f br(in_img[bottom][fright[0]], in_img[bottom][fright[1]], in_img[bottom][fright[2]], in_img[bottom][fright[3]]);
 
-                simd4f out = simd4f(tlf*tl + trf*tr + blf*bl + brf*br);
-                float fout[4];
+                simd4i out = simd4i(tlf*tl + trf*tr + blf*bl + brf*br);
+                int32 fout[4];
                 out.store(fout);
 
                 out_img[r][c]   = static_cast<T>(fout[0]);
@@ -926,8 +881,11 @@ namespace dlib
         const_image_view<image_type> in_img(in_img_);
         image_view<image_type> out_img(out_img_);
 
-        if (out_img.size() == 0 || in_img.size() == 0)
+        if (out_img.nr() <= 1 || out_img.nc() <= 1)
+        {
+            assign_all_pixels(out_img, 0);
             return;
+        }
 
 
         typedef typename image_traits<image_type>::pixel_type T;
@@ -1052,29 +1010,6 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type
-        >
-    void resize_image (
-        double size_scale,
-        image_type& img 
-    )
-    {
-        // make sure requires clause is not broken
-        DLIB_ASSERT( size_scale > 0 ,
-            "\t void resize_image()"
-            << "\n\t Invalid inputs were given to this function."
-            << "\n\t size_scale:  " << size_scale
-            );
-
-        image_type temp;
-        set_image_size(temp, std::round(size_scale*num_rows(img)), std::round(size_scale*num_columns(img)));
-        resize_image(img, temp);
-        swap(img, temp);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
         typename image_type1,
         typename image_type2
         >
@@ -1164,15 +1099,6 @@ namespace dlib
             return centered_rect(tran(center(rect)), rect.width(), rect.height());
         }
 
-        inline mmod_rect tform_object (
-            const point_transform_affine& tran,
-            mmod_rect rect
-        )
-        {
-            rect.rect = tform_object(tran, rect.rect);
-            return rect;
-        }
-
         inline full_object_detection tform_object(
             const point_transform_affine& tran,
             const full_object_detection& obj
@@ -1182,10 +1108,7 @@ namespace dlib
             parts.reserve(obj.num_parts());
             for (unsigned long i = 0; i < obj.num_parts(); ++i)
             {
-                if (obj.part(i) != OBJECT_PART_NOT_PRESENT)
-                    parts.push_back(tran(obj.part(i)));
-                else
-                    parts.push_back(OBJECT_PART_NOT_PRESENT);
+                parts.push_back(tran(obj.part(i)));
             }
             return full_object_detection(tform_object(tran,obj.get_rect()), parts);
         }
@@ -1222,7 +1145,7 @@ namespace dlib
             for (unsigned long i = 0; i < objects[j].size(); ++i)
                 rects.push_back(impl::tform_object(tran, objects[j][i]));
 
-            images.push_back(std::move(temp));
+            images.push_back(temp);
             objects.push_back(rects);
         }
     }
@@ -1258,7 +1181,7 @@ namespace dlib
         for (unsigned long j = 0; j < num; ++j)
         {
             const point_transform_affine tran = flip_image_left_right(images[j], temp);
-            images.push_back(std::move(temp));
+            images.push_back(temp);
 
             rects.clear();
             for (unsigned long i = 0; i < objects[j].size(); ++i)
@@ -1343,8 +1266,7 @@ namespace dlib
         >
     void upsample_image_dataset (
         image_array_type& images,
-        std::vector<std::vector<rectangle> >& objects,
-        unsigned long max_image_size = std::numeric_limits<unsigned long>::max()
+        std::vector<std::vector<rectangle> >& objects
     )
     {
         // make sure requires clause is not broken
@@ -1359,15 +1281,11 @@ namespace dlib
         pyramid_type pyr;
         for (unsigned long i = 0; i < images.size(); ++i)
         {
-            const unsigned long img_size = num_rows(images[i])*num_columns(images[i]);
-            if (img_size <= max_image_size)
+            pyramid_up(images[i], temp, pyr);
+            swap(temp, images[i]);
+            for (unsigned long j = 0; j < objects[i].size(); ++j)
             {
-                pyramid_up(images[i], temp, pyr);
-                swap(temp, images[i]);
-                for (unsigned long j = 0; j < objects[i].size(); ++j)
-                {
-                    objects[i][j] = pyr.rect_up(objects[i][j]);
-                }
+                objects[i][j] = pyr.rect_up(objects[i][j]);
             }
         }
     }
@@ -1378,8 +1296,7 @@ namespace dlib
         >
     void upsample_image_dataset (
         image_array_type& images,
-        std::vector<std::vector<mmod_rect>>& objects,
-        unsigned long max_image_size = std::numeric_limits<unsigned long>::max()
+        std::vector<std::vector<mmod_rect>>& objects
     )
     {
         // make sure requires clause is not broken
@@ -1394,15 +1311,11 @@ namespace dlib
         pyramid_type pyr;
         for (unsigned long i = 0; i < images.size(); ++i)
         {
-            const unsigned long img_size = num_rows(images[i])*num_columns(images[i]);
-            if (img_size <= max_image_size)
+            pyramid_up(images[i], temp, pyr);
+            swap(temp, images[i]);
+            for (unsigned long j = 0; j < objects[i].size(); ++j)
             {
-                pyramid_up(images[i], temp, pyr);
-                swap(temp, images[i]);
-                for (unsigned long j = 0; j < objects[i].size(); ++j)
-                {
-                    objects[i][j].rect = pyr.rect_up(objects[i][j].rect);
-                }
+                objects[i][j].rect = pyr.rect_up(objects[i][j].rect);
             }
         }
     }
@@ -1414,8 +1327,7 @@ namespace dlib
     void upsample_image_dataset (
         image_array_type& images,
         std::vector<std::vector<rectangle> >& objects,
-        std::vector<std::vector<rectangle> >& objects2,
-        unsigned long max_image_size = std::numeric_limits<unsigned long>::max()
+        std::vector<std::vector<rectangle> >& objects2 
     )
     {
         // make sure requires clause is not broken
@@ -1432,19 +1344,15 @@ namespace dlib
         pyramid_type pyr;
         for (unsigned long i = 0; i < images.size(); ++i)
         {
-            const unsigned long img_size = num_rows(images[i])*num_columns(images[i]);
-            if (img_size <= max_image_size)
+            pyramid_up(images[i], temp, pyr);
+            swap(temp, images[i]);
+            for (unsigned long j = 0; j < objects[i].size(); ++j)
             {
-                pyramid_up(images[i], temp, pyr);
-                swap(temp, images[i]);
-                for (unsigned long j = 0; j < objects[i].size(); ++j)
-                {
-                    objects[i][j] = pyr.rect_up(objects[i][j]);
-                }
-                for (unsigned long j = 0; j < objects2[i].size(); ++j)
-                {
-                    objects2[i][j] = pyr.rect_up(objects2[i][j]);
-                }
+                objects[i][j] = pyr.rect_up(objects[i][j]);
+            }
+            for (unsigned long j = 0; j < objects2[i].size(); ++j)
+            {
+                objects2[i][j] = pyr.rect_up(objects2[i][j]);
             }
         }
     }
@@ -1557,7 +1465,7 @@ namespace dlib
             for (unsigned long j = 0; j < images.size(); ++j)
             {
                 const point_transform_affine tran = rotate_image(images[j], temp, angles(i));
-                new_images.push_back(std::move(temp));
+                new_images.push_back(temp);
 
                 objtemp.clear();
                 for (unsigned long k = 0; k < objects[j].size(); ++k)
@@ -1801,12 +1709,7 @@ namespace dlib
         full_object_detection res(det);
         // map the parts
         for (unsigned long l = 0; l < det.num_parts(); ++l)
-        {
-            if (det.part(l) != OBJECT_PART_NOT_PRESENT)
-                res.part(l) = tform(det.part(l));
-            else
-                res.part(l) = OBJECT_PART_NOT_PRESENT;
-        }
+            res.part(l) = tform(det.part(l));
         // map the main rectangle
         rectangle rect;
         rect += tform(det.get_rect().tl_corner());
@@ -1864,14 +1767,12 @@ namespace dlib
 
     template <
         typename image_type1,
-        typename image_type2,
-        typename interpolation_type
+        typename image_type2
         >
     void extract_image_chips (
         const image_type1& img,
         const std::vector<chip_details>& chip_locations,
-        dlib::array<image_type2>& chips,
-        const interpolation_type& interp
+        dlib::array<image_type2>& chips
     )
     {
         // make sure requires clause is not broken
@@ -1967,56 +1868,10 @@ namespace dlib
 
                 // now extract the actual chip
                 if (level == -1)
-                    transform_image(sub_image(img,bounding_box),chips[i],interp,trns);
+                    transform_image(sub_image(img,bounding_box),chips[i],interpolate_bilinear(),trns);
                 else
-                    transform_image(levels[level],chips[i],interp,trns);
+                    transform_image(levels[level],chips[i],interpolate_bilinear(),trns);
             }
-        }
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename image_type1,
-        typename image_type2
-        >
-    void extract_image_chips(
-        const image_type1& img,
-        const std::vector<chip_details>& chip_locations,
-        dlib::array<image_type2>& chips
-    )
-    {
-        extract_image_chips(img, chip_locations, chips, interpolate_bilinear());
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename image_type1,
-        typename image_type2,
-        typename interpolation_type
-        >
-    void extract_image_chip (
-        const image_type1& img,
-        const chip_details& location,
-        image_type2& chip,
-        const interpolation_type& interp
-    )
-    {
-        // If the chip doesn't have any rotation or scaling then use the basic version of
-        // chip extraction that just does a fast copy.
-        if (location.angle == 0 && 
-            location.rows == location.rect.height() &&
-            location.cols == location.rect.width())
-        {
-            impl::basic_extract_image_chip(img, location.rect, chip);
-        }
-        else
-        {
-            std::vector<chip_details> chip_locations(1,location);
-            dlib::array<image_type2> chips;
-            extract_image_chips(img, chip_locations, chips, interp);
-            swap(chips[0], chip);
         }
     }
 
@@ -2032,7 +1887,21 @@ namespace dlib
         image_type2& chip
     )
     {
-        extract_image_chip(img, location, chip, interpolate_bilinear());
+        // If the chip doesn't have any rotation or scaling then use the basic version of
+        // chip extraction that just does a fast copy.
+        if (location.angle == 0 && 
+            location.rows == location.rect.height() &&
+            location.cols == location.rect.width())
+        {
+            impl::basic_extract_image_chip(img, location.rect, chip);
+        }
+        else
+        {
+            std::vector<chip_details> chip_locations(1,location);
+            dlib::array<image_type2> chips;
+            extract_image_chips(img, chip_locations, chips);
+            swap(chips[0], chip);
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -2043,9 +1912,9 @@ namespace dlib
         const double padding = 0.2
     )
     {
-        DLIB_CASSERT(det.num_parts() == 68 || det.num_parts() == 5,
+        DLIB_CASSERT(det.num_parts() == 68,
             "\t chip_details get_face_chip_details()"
-            << "\n\t You have to give either a 5 point or 68 point face landmarking output to this function. "
+            << "\n\t You must give a detection with exactly 68 parts in it."
             << "\n\t det.num_parts(): " << det.num_parts()
         );
         DLIB_CASSERT(padding >= 0 && size > 0,
@@ -2055,77 +1924,43 @@ namespace dlib
             << "\n\t size:    " << size 
             );
 
+        // Average positions of face points 17-67
+        const double mean_face_shape_x[] = {
+            0.000213256, 0.0752622, 0.18113, 0.29077, 0.393397, 0.586856, 0.689483, 0.799124,
+            0.904991, 0.98004, 0.490127, 0.490127, 0.490127, 0.490127, 0.36688, 0.426036,
+            0.490127, 0.554217, 0.613373, 0.121737, 0.187122, 0.265825, 0.334606, 0.260918,
+            0.182743, 0.645647, 0.714428, 0.793132, 0.858516, 0.79751, 0.719335, 0.254149,
+            0.340985, 0.428858, 0.490127, 0.551395, 0.639268, 0.726104, 0.642159, 0.556721,
+            0.490127, 0.423532, 0.338094, 0.290379, 0.428096, 0.490127, 0.552157, 0.689874,
+            0.553364, 0.490127, 0.42689
+        };
+        const double mean_face_shape_y[] = {
+            0.106454, 0.038915, 0.0187482, 0.0344891, 0.0773906, 0.0773906, 0.0344891,
+            0.0187482, 0.038915, 0.106454, 0.203352, 0.307009, 0.409805, 0.515625, 0.587326,
+            0.609345, 0.628106, 0.609345, 0.587326, 0.216423, 0.178758, 0.179852, 0.231733,
+            0.245099, 0.244077, 0.231733, 0.179852, 0.178758, 0.216423, 0.244077, 0.245099,
+            0.780233, 0.745405, 0.727388, 0.742578, 0.727388, 0.745405, 0.780233, 0.864805,
+            0.902192, 0.909281, 0.902192, 0.864805, 0.784792, 0.778746, 0.785343, 0.778746,
+            0.784792, 0.824182, 0.831803, 0.824182
+        };
 
-        std::vector<dpoint> from_points, to_points;
-        if (det.num_parts() == 5)
+        COMPILE_TIME_ASSERT(sizeof(mean_face_shape_x)/sizeof(double) == 68-17);
+
+        std::vector<dlib::vector<double,2> > from_points, to_points;
+        for (unsigned long i = 17; i < det.num_parts(); ++i)
         {
-            dpoint p0(0.8595674595992, 0.2134981538014);
-            dpoint p1(0.6460604764104, 0.2289674387677);
-            dpoint p2(0.1205750620789, 0.2137274526848);
-            dpoint p3(0.3340850613712, 0.2290642403242);
-            dpoint p4(0.4901123135679, 0.6277975316475);
+            // Ignore the lower lip
+            if ((55 <= i && i <= 59) || (65 <= i && i <= 67))
+                continue;
+            // Ignore the eyebrows 
+            if (17 <= i && i <= 26)
+                continue;
 
-
-            p0 = (padding+p0)/(2*padding+1);
-            p1 = (padding+p1)/(2*padding+1);
-            p2 = (padding+p2)/(2*padding+1);
-            p3 = (padding+p3)/(2*padding+1);
-            p4 = (padding+p4)/(2*padding+1);
-
-            from_points.push_back(p0*size);
-            to_points.push_back(det.part(0));
-
-            from_points.push_back(p1*size);
-            to_points.push_back(det.part(1));
-
-            from_points.push_back(p2*size);
-            to_points.push_back(det.part(2));
-
-            from_points.push_back(p3*size);
-            to_points.push_back(det.part(3));
-
-            from_points.push_back(p4*size);
-            to_points.push_back(det.part(4));
-        }
-        else
-        {
-            // Average positions of face points 17-67
-            const double mean_face_shape_x[] = {
-                0.000213256, 0.0752622, 0.18113, 0.29077, 0.393397, 0.586856, 0.689483, 0.799124,
-                0.904991, 0.98004, 0.490127, 0.490127, 0.490127, 0.490127, 0.36688, 0.426036,
-                0.490127, 0.554217, 0.613373, 0.121737, 0.187122, 0.265825, 0.334606, 0.260918,
-                0.182743, 0.645647, 0.714428, 0.793132, 0.858516, 0.79751, 0.719335, 0.254149,
-                0.340985, 0.428858, 0.490127, 0.551395, 0.639268, 0.726104, 0.642159, 0.556721,
-                0.490127, 0.423532, 0.338094, 0.290379, 0.428096, 0.490127, 0.552157, 0.689874,
-                0.553364, 0.490127, 0.42689
-            };
-            const double mean_face_shape_y[] = {
-                0.106454, 0.038915, 0.0187482, 0.0344891, 0.0773906, 0.0773906, 0.0344891,
-                0.0187482, 0.038915, 0.106454, 0.203352, 0.307009, 0.409805, 0.515625, 0.587326,
-                0.609345, 0.628106, 0.609345, 0.587326, 0.216423, 0.178758, 0.179852, 0.231733,
-                0.245099, 0.244077, 0.231733, 0.179852, 0.178758, 0.216423, 0.244077, 0.245099,
-                0.780233, 0.745405, 0.727388, 0.742578, 0.727388, 0.745405, 0.780233, 0.864805,
-                0.902192, 0.909281, 0.902192, 0.864805, 0.784792, 0.778746, 0.785343, 0.778746,
-                0.784792, 0.824182, 0.831803, 0.824182
-            };
-
-            COMPILE_TIME_ASSERT(sizeof(mean_face_shape_x)/sizeof(double) == 68-17);
-
-            for (unsigned long i = 17; i < det.num_parts(); ++i)
-            {
-                // Ignore the lower lip
-                if ((55 <= i && i <= 59) || (65 <= i && i <= 67))
-                    continue;
-                // Ignore the eyebrows 
-                if (17 <= i && i <= 26)
-                    continue;
-
-                dpoint p;
-                p.x() = (padding+mean_face_shape_x[i-17])/(2*padding+1);
-                p.y() = (padding+mean_face_shape_y[i-17])/(2*padding+1);
-                from_points.push_back(p*size);
-                to_points.push_back(det.part(i));
-            }
+            dlib::vector<double,2> p;
+            p.x() = (padding+mean_face_shape_x[i-17])/(2*padding+1);
+            p.y() = (padding+mean_face_shape_y[i-17])/(2*padding+1);
+            from_points.push_back(p*size);
+            to_points.push_back(det.part(i));
         }
 
         return chip_details(from_points, to_points, chip_dims(size,size));
@@ -2144,45 +1979,6 @@ namespace dlib
         for (unsigned long i = 0; i < dets.size(); ++i)
             res.push_back(get_face_chip_details(dets[i], size, padding));
         return res;
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename image_type
-        >
-    image_type jitter_image(
-        const image_type& img,
-        dlib::rand& rnd
-    )
-    {
-        DLIB_CASSERT(num_rows(img)*num_columns(img) != 0);
-        DLIB_CASSERT(num_rows(img)==num_columns(img));
-
-        const double max_rotation_degrees = 3;
-        const double min_object_height = 0.97; 
-        const double max_object_height = 0.99999; 
-        const double translate_amount = 0.02;
-
-
-        const auto rect = shrink_rect(get_rect(img),3);
-
-        // perturb the location of the crop by a small fraction of the object's size.
-        const point rand_translate = dpoint(rnd.get_double_in_range(-translate_amount,translate_amount)*rect.width(), 
-            rnd.get_double_in_range(-translate_amount,translate_amount)*rect.height());
-
-        // perturb the scale of the crop by a fraction of the object's size
-        const double rand_scale_perturb = rnd.get_double_in_range(min_object_height, max_object_height); 
-
-        const long box_size = rect.height()/rand_scale_perturb;
-        const auto crop_rect = centered_rect(center(rect)+rand_translate, box_size, box_size);
-        const double angle = rnd.get_double_in_range(-max_rotation_degrees, max_rotation_degrees)*pi/180;
-        image_type crop;
-        extract_image_chip(img, chip_details(crop_rect, chip_dims(img.nr(),img.nc()), angle), crop);
-        if (rnd.get_random_double() > 0.5)
-            flip_image_left_right(crop); 
-
-        return crop;
     }
 
 // ----------------------------------------------------------------------------------------

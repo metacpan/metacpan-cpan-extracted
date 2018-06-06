@@ -417,28 +417,6 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type
-        >
-    void resize_image (
-        double size_scale,
-        image_type& img 
-    );
-    /*!
-        requires
-            - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
-            - pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha == false
-        ensures
-            - Resizes img so that each of it's dimensions are size_scale times larger than img.
-              In particular, we will have:
-                - #img.nr() == std::round(size_scale*img.nr())
-                - #img.nc() == std::round(size_scale*img.nc())
-                - #img == a bilinearly interpolated copy of the input image.
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template <
         typename image_type1,
         typename image_type2
         >
@@ -499,7 +477,7 @@ namespace dlib
         requires
             - image_array_type == a dlib::array or std::vector of image objects that each
               implement the interface defined in dlib/image_processing/generic_image.h
-            - T == rectangle, full_object_detection, or mmod_rect
+            - T == rectangle or full_object_detection
             - images.size() == objects.size()
         ensures
             - This function computes all the left/right flips of the contents of images and
@@ -532,8 +510,8 @@ namespace dlib
               implement the interface defined in dlib/image_processing/generic_image.h
             - images.size() == objects.size()
             - images.size() == objects2.size()
-            - T == rectangle, full_object_detection, or mmod_rect
-            - U == rectangle, full_object_detection, or mmod_rect
+            - T == rectangle or full_object_detection
+            - U == rectangle or full_object_detection
         ensures
             - This function computes all the left/right flips of the contents of images and
               then appends them onto the end of the images array.  It also finds the
@@ -571,8 +549,8 @@ namespace dlib
             - angles.size() > 0
             - images.size() == objects.size()
             - images.size() == objects2.size()
-            - T == rectangle, full_object_detection, or mmod_rect
-            - U == rectangle, full_object_detection, or mmod_rect
+            - T == rectangle or full_object_detection
+            - U == rectangle or full_object_detection
         ensures
             - This function computes angles.size() different rotations of all the given
               images and then replaces the contents of images with those rotations of the
@@ -608,7 +586,7 @@ namespace dlib
             - is_vector(angles) == true
             - angles.size() > 0
             - images.size() == objects.size()
-            - T == rectangle, full_object_detection, or mmod_rect
+            - T == rectangle or full_object_detection
         ensures
             - This function is identical to the add_image_rotations() define above except
               that it doesn't have objects2 as an argument.  
@@ -677,8 +655,7 @@ namespace dlib
         >
     void upsample_image_dataset (
         image_array_type& images,
-        std::vector<std::vector<rectangle> >& objects,
-        unsigned long max_image_size = std::numeric_limits<unsigned long>::max()
+        std::vector<std::vector<rectangle> >& objects
     );
     /*!
         requires
@@ -691,7 +668,6 @@ namespace dlib
               pyramid_type.  Therefore, #images[i] will contain the larger upsampled
               version of images[i].  It also adjusts all the rectangles in objects so that
               they still bound the same visual objects in each image.
-            - Input images already containing more than max_image_size pixels are not upsampled.
             - #images.size() == image.size()
             - #objects.size() == objects.size()
             - for all valid i:
@@ -706,8 +682,7 @@ namespace dlib
         >
     void upsample_image_dataset (
         image_array_type& images,
-        std::vector<std::vector<mmod_rect>>& objects,
-        unsigned long max_image_size = std::numeric_limits<unsigned long>::max()
+        std::vector<std::vector<mmod_rect>>& objects
     );
     /*!
         requires
@@ -720,7 +695,6 @@ namespace dlib
               pyramid_type.  Therefore, #images[i] will contain the larger upsampled
               version of images[i].  It also adjusts all the rectangles in objects so that
               they still bound the same visual objects in each image.
-            - Input images already containing more than max_image_size pixels are not upsampled.
             - #images.size() == image.size()
             - #objects.size() == objects.size()
             - for all valid i:
@@ -736,8 +710,7 @@ namespace dlib
     void upsample_image_dataset (
         image_array_type& images,
         std::vector<std::vector<rectangle> >& objects,
-        std::vector<std::vector<rectangle> >& objects2,
-        unsigned long max_image_size = std::numeric_limits<unsigned long>::max()
+        std::vector<std::vector<rectangle> >& objects2 
     );
     /*!
         requires
@@ -751,7 +724,6 @@ namespace dlib
               pyramid_type.  Therefore, #images[i] will contain the larger upsampled
               version of images[i].  It also adjusts all the rectangles in objects and
               objects2 so that they still bound the same visual objects in each image.
-            - Input images already containing more than max_image_size pixels are not upsampled.
             - #images.size() == image.size()
             - #objects.size() == objects.size()
             - #objects2.size() == objects2.size()
@@ -1163,14 +1135,12 @@ namespace dlib
 
     template <
         typename image_type1,
-        typename image_type2,
-        typename interpolation_type
+        typename image_type2
         >
     void extract_image_chips (
         const image_type1& img,
         const std::vector<chip_details>& chip_locations,
-        dlib::array<image_type2>& chips,
-        const interpolation_type& interp
+        dlib::array<image_type2>& chips
     );
     /*!
         requires
@@ -1182,14 +1152,11 @@ namespace dlib
             - for all valid i: 
                 - chip_locations[i].rect.is_empty() == false
                 - chip_locations[i].size() != 0
-            - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear, 
-              interpolate_quadratic, or a type with a compatible interface.
         ensures
             - This function extracts "chips" from an image.  That is, it takes a list of
               rectangular sub-windows (i.e. chips) within an image and extracts those
               sub-windows, storing each into its own image.  It also scales and rotates the
               image chips according to the instructions inside each chip_details object.
-              It uses the interpolation method supplied as a parameter.
             - #chips == the extracted image chips
             - #chips.size() == chip_locations.size()
             - for all valid i:
@@ -1203,40 +1170,7 @@ namespace dlib
             - Any pixels in an image chip that go outside img are set to 0 (i.e. black).
     !*/
 
-    template <
-        typename image_type1,
-        typename image_type2
-        >
-    void extract_image_chips (
-        const image_type1& img,
-        const std::vector<chip_details>& chip_locations,
-        dlib::array<image_type2>& chips
-    );
-    /*!
-        ensures
-            - This function is a simple convenience / compatibility wrapper that calls the
-              above-defined extract_image_chips() function using bilinear interpolation.
-    !*/
-
 // ----------------------------------------------------------------------------------------
-
-    template <
-        typename image_type1,
-        typename image_type2,
-        typename interpolation_type
-        >
-    void extract_image_chip (
-        const image_type1& img,
-        const chip_details& chip_location,
-        image_type2& chip,
-        const interpolation_type& interp
-    );
-    /*!
-        ensures
-            - This function simply calls extract_image_chips() with a single chip location
-              and stores the single output chip into #chip.  It uses the provided
-              interpolation method.
-    !*/
 
     template <
         typename image_type1,
@@ -1249,8 +1183,8 @@ namespace dlib
     );
     /*!
         ensures
-            - This function is a simple convenience / compatibility wrapper that calls the
-              above-defined extract_image_chip() function using bilinear interpolation.
+            - This function simply calls extract_image_chips() with a single chip location
+              and stores the single output chip into #chip.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -1303,30 +1237,6 @@ namespace dlib
             - returns sub_image_proxy<image_type>(img,rect)
     !*/
 
-    template <typename T>
-    sub_image_proxy<some_appropriate_type> sub_image (
-        T* img,
-        long nr,
-        long nc,
-        long row_stride
-    );
-    /*!
-        requires
-            - img == a pointer to at least nr*row_stride T objects
-            - nr >= 0
-            - nc >= 0
-            - row_stride >= 0
-        ensures
-            - This function returns an image that is just a thin wrapper around the given
-              pointer.  It will have the dimensions defined by the supplied longs.  To be
-              precise, this function returns an image object IMG such that:
-                - image_data(IMG) == img
-                - num_rows(IMG) == nr
-                - num_columns(IMG) == nc
-                - width_step(IMG) == row_stride*sizeof(T)
-                - IMG contains pixels of type T.
-    !*/
-
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -1370,30 +1280,6 @@ namespace dlib
             - returns const_sub_image_proxy<image_type>(img,rect)
     !*/
 
-    template <typename T>
-    const const_sub_image_proxy<some_appropriate_type> sub_image (
-        const T* img,
-        long nr,
-        long nc,
-        long row_stride
-    );
-    /*!
-        requires
-            - img == a pointer to at least nr*row_stride T objects
-            - nr >= 0
-            - nc >= 0
-            - row_stride >= 0
-        ensures
-            - This function returns an image that is just a thin wrapper around the given
-              pointer.  It will have the dimensions defined by the supplied longs.  To be
-              precise, this function returns an image object IMG such that:
-                - image_data(IMG) == img
-                - num_rows(IMG) == nr
-                - num_columns(IMG) == nc
-                - width_step(IMG) == row_stride*sizeof(T)
-                - IMG contains pixels of type T.
-    !*/
-
 // ----------------------------------------------------------------------------------------
 
     chip_details get_face_chip_details (
@@ -1403,30 +1289,20 @@ namespace dlib
     );
     /*!
         requires
-            - det.num_parts() == 68 || det.num_parts() == 5
+            - det.num_parts() == 68
             - size > 0
             - padding >= 0
         ensures
             - This function assumes det contains a human face detection with face parts
               annotated using the annotation scheme from the iBUG 300-W face landmark
-              dataset or a 5 point face annotation.  Given these assumptions, it creates a
-              chip_details object that will extract a copy of the face that has been
-              rotated upright, centered, and scaled to a standard size when given to
-              extract_image_chip(). 
-            - This function is specifically calibrated to work with one of these models:
-                - http://dlib.net/files/shape_predictor_5_face_landmarks.dat.bz2
-                - http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2
+              dataset.  Given these assumptions, it creates a chip_details object that will
+              extract a copy of the face that has been rotated upright, centered, and
+              scaled to a standard size when given to extract_image_chip(). 
             - The extracted chips will have size rows and columns in them.
             - if padding == 0 then the chip will be closely cropped around the face.
               Setting larger padding values will result a looser cropping.  In particular,
               a padding of 0.5 would double the width of the cropped area, a value of 1
               would triple it, and so forth.
-            - The 5 point face annotation scheme is assumed to be:
-                - det part 0 == left eye corner, outside part of eye.
-                - det part 1 == left eye corner, inside part of eye.
-                - det part 2 == right eye corner, outside part of eye.
-                - det part 3 == right eye corner, inside part of eye.
-                - det part 4 == immediately under the nose, right at the top of the philtrum.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -1449,29 +1325,6 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
-
-    template <
-        typename image_type
-        >
-    image_type jitter_image(
-        const image_type& img,
-        dlib::rand& rnd
-    );
-    /*!
-        requires
-            - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
-            - pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha == false
-            - img.size() > 0
-            - img.nr() == img.nc()
-        ensures
-            - Randomly jitters the image a little bit and returns this new jittered image.
-              To be specific, the returned image has the same size as img and will look
-              generally similar.  The difference is that the returned image will have been
-              slightly rotated, zoomed, and translated.  There is also a 50% chance it will
-              be mirrored left to right.
-    !*/
-    
 // ----------------------------------------------------------------------------------------
 
 }

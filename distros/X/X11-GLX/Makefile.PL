@@ -54,7 +54,6 @@ my %WriteMakefileArgs = (
     "Exporter" => 0,
     "Log::Any" => 0,
     "Moo" => 2,
-    "OpenGL" => 0,
     "Scalar::Util" => 0,
     "X11::Xlib" => "0.11",
     "X11::Xlib::Opaque" => 0,
@@ -68,12 +67,13 @@ my %WriteMakefileArgs = (
     "FindBin" => 0,
     "Log::Any::Adapter" => 0,
     "Log::Any::Adapter::TAP" => 0,
+    "OpenGL" => 0,
     "POSIX" => 0,
     "Test::More" => 0,
     "Try::Tiny" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }

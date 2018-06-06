@@ -53,7 +53,7 @@ namespace dlib
             const image_type& img
         );
 
-        inline size_t size (
+        inline unsigned long size (
         ) const;
 
         inline long nr (
@@ -250,7 +250,7 @@ namespace dlib
     template <
         typename feature_extractor
         >
-    size_t nearest_neighbor_feature_image<feature_extractor>::
+    unsigned long nearest_neighbor_feature_image<feature_extractor>::
     size (
     ) const
     {

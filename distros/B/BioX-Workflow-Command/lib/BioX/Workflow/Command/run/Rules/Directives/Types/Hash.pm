@@ -10,17 +10,17 @@ sub create_HASH_attr {
 
     $meta->add_attribute(
         $k => (
-            traits  => ['Hash'],
+#            traits  => ['Hash'],
             isa     => 'HashRef',
             is      => 'rw',
             clearer => "clear_$k",
             default => sub { {} },
-            handles => {
-                "get_$k"        => 'get',
-                "has_no_$k"     => 'is_empty',
-                "num_$k"        => 'count',
-                "$k" . "_pairs" => 'kv',
-            },
+#            handles => {
+#                "get_$k"        => 'get',
+#                "has_no_$k"     => 'is_empty',
+#                "num_$k"        => 'count',
+#                "$k" . "_pairs" => 'kv',
+#            },
         )
     );
 }

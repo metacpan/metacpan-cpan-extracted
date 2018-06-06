@@ -14,7 +14,7 @@ tr/\x{345}/\x{370}/;
 # Constants in a block
 # CONTEXT no warnings;
 {
-    '???';
+    '?unrecoverable constant?';
     2;
 }
 ####
@@ -23,7 +23,7 @@ tr/\x{345}/\x{370}/;
 (1,2,3);
 0;
 >>>>
-'???', '???', '???';
+'?unrecoverable constant?', '?unrecoverable constant?', '?unrecoverable constant?';
 0;
 ####
 # Lexical and simple arithmetic
@@ -137,11 +137,6 @@ my $bar = "\x{100}";
 # TODO ? ord("A") != 65 && "EBCDIC"
 my $baz = "B\366\x{100}";
 my $bba = qr/B\366\x{100}/;
-####
-# s///e
-s/x/'y';/e;
-s/x/$a;/e;
-s/x/complex_expression();/e;
 ####
 # block
 { my $x; }
@@ -557,13 +552,13 @@ if (!GLIPP) { x() } elsif (!GLIPP) { z() } elsif (!GLIPP) { t() }
 >>>>
 x();
 x();
-'???';
+'?unrecoverable constant?';
 x();
 x();
 x();
 x();
 do {
-    '???'
+    '?unrecoverable constant?'
 };
 do {
     x()
@@ -580,11 +575,11 @@ do {
 do {
     x()
 };
-'???';
+'?unrecoverable constant?';
 do {
     t()
 };
-'???';
+'?unrecoverable constant?';
 !1;
 ####
 # TODO constant deparsing has been backed out for 5.12
@@ -829,21 +824,6 @@ $_ = qr/X/d;
 ####
 use feature 'unicode_strings';
 /X/d;
-####
-# all the flags (s///)
-s/X//m;
-s/X//s;
-s/X//i;
-s/X//x;
-s/X//p;
-s/X//o;
-s/X//u;
-s/X//a;
-s/X//l;
-s/X//n;
-s/X//g;
-s/X/'';/e;
-s/X//r;
 ####
 use feature 'unicode_strings';
 s/X//d;
@@ -1833,7 +1813,7 @@ my $foo;
 $_ = join $foo, pos
 >>>>
 my $foo;
-$_ = join('???', pos $_);
+$_ = join('?unrecoverable constant?', pos $_);
 ####
 # exists $a[0]
 our @a;

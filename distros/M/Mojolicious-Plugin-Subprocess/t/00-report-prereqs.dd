@@ -14,7 +14,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Mojolicious' => '7.59',
+                                      'Mojolicious' => '7.62',
                                       'perl' => '5.010001'
                                     },
                       'suggests' => {

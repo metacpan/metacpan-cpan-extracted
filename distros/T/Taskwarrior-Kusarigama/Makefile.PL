@@ -64,7 +64,7 @@ my %WriteMakefileArgs = (
     "Test::MockObject::Extends" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.9.0",
+  "VERSION" => "0.9.1",
   "test" => {
     "TESTS" => "t/*.t"
   }

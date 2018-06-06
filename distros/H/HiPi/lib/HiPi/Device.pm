@@ -19,7 +19,7 @@ use Carp;
 
 __PACKAGE__->create_accessors( qw( devicename ) );
 
-our $VERSION ='0.71';
+our $VERSION ='0.72';
 
 sub new {
     my ($class, %params) = @_;
@@ -36,6 +36,9 @@ sub delayMicroseconds {
     my($class, $micros) = @_;
     usleep( int($micros) );
 }
+
+*HiPi::Device::sleep_milliseconds = \&delay;
+*HiPi::Device::sleep_microseconds = \&delayMicroseconds;
 
 sub modules_are_loaded {
     my $class = shift;
@@ -70,7 +73,11 @@ sub get_required_module_options {
 
 sub close { 1; }
 
-sub DESTROY { $_[0]->close; }
+sub DESTROY {
+    my $self = shift;
+    $self->SUPER::DESTROY;
+    $self->close;
+}
 
 1;
 

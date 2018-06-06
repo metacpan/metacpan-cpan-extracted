@@ -50,7 +50,7 @@ namespace dlib
 
         cv_image() : _data(0), _widthStep(0), _nr(0), _nc(0) {}
 
-        size_t size () const { return static_cast<size_t>(_nr*_nc); }
+        unsigned long size () const { return static_cast<unsigned long>(_nr*_nc); }
 
         inline pixel_type* operator[](const long row ) 
         { 
@@ -78,32 +78,6 @@ namespace dlib
                 );
 
             return reinterpret_cast<const pixel_type*>( _data + _widthStep*row);
-        }
-
-        inline const pixel_type& operator()(const long row, const long column) const
-        {
-          DLIB_ASSERT(0<= column && column < nc(),
-              "\tcont pixel_type& cv_image::operator()(const long rown const long column)"
-              << "\n\t you have asked for an out of bounds column "
-              << "\n\t column: " << column
-              << "\n\t nc(): " << nc()
-              << "\n\t this:  " << this
-              );
-
-          return (*this)[row][column];
-        }
-
-        inline pixel_type& operator()(const long row, const long column)
-        {
-          DLIB_ASSERT(0<= column && column < nc(),
-              "\tcont pixel_type& cv_image::operator()(const long rown const long column)"
-              << "\n\t you have asked for an out of bounds column "
-              << "\n\t column: " << column
-              << "\n\t nc(): " << nc()
-              << "\n\t this:  " << this
-              );
-
-          return (*this)[row][column];
         }
 
         long nr() const { return _nr; }

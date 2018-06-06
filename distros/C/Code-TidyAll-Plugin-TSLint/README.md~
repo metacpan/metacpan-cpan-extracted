@@ -1,0 +1,31 @@
+# NAME
+
+Code::TidyAll::Plugin::TSLint - Use tslint with tidyall
+
+# SYNOPSIS
+
+    In configuration:
+
+    [TSLint]
+    select = static/**/*.js
+    argv = -c $ROOT/.tslintrc --color
+
+# DESCRIPTION
+
+Runs tslint, a pluggable linting utility for TypeScript.
+
+# INSTALLATION
+
+Install [npm](https://npmjs.org/), then run
+
+    npm install eslint
+
+# CONFIGURATION
+
+- argv
+
+    Arguments to pass to eslint. Use `--color` to force color output.
+
+- cmd
+
+    Full path to eslint

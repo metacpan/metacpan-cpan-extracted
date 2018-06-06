@@ -3,11 +3,12 @@ abstract: 'Schemas related to network (IP address, hostnames, etc)'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
-  Data::Sah: '0.84'
+  Data::Sah: '0.891'
   Data::Sah::Coerce: '0.025'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  NetAddr::IP: '0'
   Test::More: '0.98'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -25,7 +26,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Net
   homepage: https://metacpan.org/release/Sah-Schemas-Net
   repository: git://github.com/perlancar/perl-Sah-Schemas-Net.git
-version: '0.004'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

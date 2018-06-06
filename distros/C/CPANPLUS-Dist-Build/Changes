@@ -1,6 +1,18 @@
 ==================================================
-Changes from 2012-05-15 00:00:00 +0000 to present.
+Changes from 2013-06-07 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 0.90 at 2018-06-06 07:28:22 +0000
+-----------------------------------------
+
+  Change: a7453d1c1f63650f2c676e835e39518880786d70
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2018-06-06 08:28:22 +0000
+
+    Release 0.90
+
+    No updates, version bump to fix CPAN indexing issue 
 
 -----------------------------------------
 version 0.88 at 2017-05-14 15:07:07 +0000
@@ -165,102 +177,6 @@ version 0.72 at 2013-07-21 15:22:42 +0000
 
     svn.perl.org is being retired. Switch over to git and github. 
 
------------------------------------------
-version 0.70 at 2013-01-25 16:09:36 +0000
------------------------------------------
-
-  Change: 651cebdfb842548594bc5b18d28da5f479c99de3
-  Author: BINGOS <BINGOS@50811bd7-b8ce-0310-adc1-d9db26280581>
-  Date : 2013-01-25 16:09:36 +0000
-
-    CPAN release 0.70
-
-    git-svn-id:
-    https://svn.perl.org/modules/CPANPLUS-Dist-Build/tags/0.70@15567
-    50811bd7-b8ce-0310-adc1-d9db26280581 
-
-  Change: 40e0ac09bb4f7152edf64f697c9cc02e088aadbc
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2013-01-25 16:03:17 +0000
-
-    Core deprecation warnings added, prior to de-coring with v5.20.0
-
-    git-svn-id:
-    https://svn.perl.org/modules/CPANPLUS-Dist-Build/trunk@15566
-    50811bd7-b8ce-0310-adc1-d9db26280581 
-
------------------------------------------
-version 0.68 at 2012-12-05 00:19:04 +0000
------------------------------------------
-
-  Change: b1941dee38917a0e1174830a50707996a173aa9e
-  Author: BINGOS <BINGOS@50811bd7-b8ce-0310-adc1-d9db26280581>
-  Date : 2012-12-05 00:19:04 +0000
-
-    CPAN release 0.68
-
-    git-svn-id:
-    https://svn.perl.org/modules/CPANPLUS-Dist-Build/tags/0.68@15496
-    50811bd7-b8ce-0310-adc1-d9db26280581 
-
-  Change: 89300ed43246d33eb33885d089cc162cf6770c8d
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2012-12-05 00:18:30 +0000
-
-    Revert change to wrapper command-line
-
-    git-svn-id:
-    https://svn.perl.org/modules/CPANPLUS-Dist-Build/trunk@15495
-    50811bd7-b8ce-0310-adc1-d9db26280581 
-
------------------------------------------
-version 0.66 at 2012-12-04 23:12:59 +0000
------------------------------------------
-
-  Change: 12975d87a8d5438130c682fe57a0b04fb3093303
-  Author: BINGOS <BINGOS@50811bd7-b8ce-0310-adc1-d9db26280581>
-  Date : 2012-12-04 23:12:59 +0000
-
-    CPAN release 0.66
-
-    git-svn-id:
-    https://svn.perl.org/modules/CPANPLUS-Dist-Build/tags/0.66@15494
-    50811bd7-b8ce-0310-adc1-d9db26280581 
-
-  Change: 99eb62806d6ff5e0d2ea9e7e15546fe961282fdd
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2012-12-04 23:10:45 +0000
-
-    Resolve issue where Build.PL does not generate Build script
-
-    git-svn-id:
-    https://svn.perl.org/modules/CPANPLUS-Dist-Build/trunk@15493
-    50811bd7-b8ce-0310-adc1-d9db26280581 
-
------------------------------------------
-version 0.64 at 2012-10-20 22:28:51 +0000
------------------------------------------
-
-  Change: 6cdee172f685bd9a55f842b407febb005cdce644
-  Author: BINGOS <BINGOS@50811bd7-b8ce-0310-adc1-d9db26280581>
-  Date : 2012-10-20 22:28:51 +0000
-
-    CPAN release 0.64
-
-    git-svn-id:
-    https://svn.perl.org/modules/CPANPLUS-Dist-Build/tags/0.64@15446
-    50811bd7-b8ce-0310-adc1-d9db26280581 
-
-  Change: 5c42eccaa68b574298b3b3a52b15d9ee957e7d8f
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2012-10-20 22:27:00 +0000
-
-    Update Module::Install, no functional changes.
-
-    git-svn-id:
-    https://svn.perl.org/modules/CPANPLUS-Dist-Build/trunk@15445
-    50811bd7-b8ce-0310-adc1-d9db26280581 
-
 =================================================
-Plus 27 releases after 2012-05-15 00:00:00 +0000.
+Plus 31 releases after 2013-06-07 00:00:00 +0000.
 =================================================

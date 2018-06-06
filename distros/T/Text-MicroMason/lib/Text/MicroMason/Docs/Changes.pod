@@ -4,6 +4,17 @@ Text::MicroMason::Docs::Changes - Change History for the MicroMason Distribution
 
 =head1 VERSION 2 HISTORY
 
+=head2 Version 2.22
+
+=over 4
+
+=item 2018-06-04
+
+Add a newline in %args parsed output, to allow for comments in the %args block. 
+Thanks to Daniel J. Wright for this patch.
+
+=back
+
 =head2 Version 2.21
 
 =over 4

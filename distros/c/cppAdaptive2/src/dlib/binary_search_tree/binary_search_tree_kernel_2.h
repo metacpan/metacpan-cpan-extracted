@@ -169,7 +169,7 @@ namespace dlib
             );
 
             // functions from the enumerable interface
-            inline size_t size (
+            inline unsigned long size (
             ) const;
 
             bool at_start (
@@ -543,7 +543,7 @@ namespace dlib
         typename mem_manager,
         typename compare
         >
-    size_t binary_search_tree_kernel_2<domain,range,mem_manager,compare>::
+    unsigned long binary_search_tree_kernel_2<domain,range,mem_manager,compare>::
     size (
     ) const
     {

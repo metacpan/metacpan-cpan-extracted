@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::human;
 
-our $DATE = '2018-06-03'; # DATE
-our $VERSION = '0.891'; # VERSION
+our $DATE = '2018-06-05'; # DATE
+our $VERSION = '0.892'; # VERSION
 
 use 5.010;
 use strict;
@@ -544,7 +544,7 @@ Data::Sah::Compiler::human - Compile Sah schema to human language
 
 =head1 VERSION
 
-This document describes version 0.891 of Data::Sah::Compiler::human (from Perl distribution Data-Sah), released on 2018-06-03.
+This document describes version 0.892 of Data::Sah::Compiler::human (from Perl distribution Data-Sah), released on 2018-06-05.
 
 =head1 SYNOPSIS
 

@@ -5,7 +5,7 @@ use warnings;
 no warnings;
 
 use subs qw();
-use vars qw( $VERSION @ISA %AUTO_METHODS $AUTOLOAD );
+use vars qw( $AUTOLOAD );
 
 use AutoLoader;
 use Carp qw(carp);
@@ -13,11 +13,11 @@ use HTML::LinkExtor;
 use LWP::UserAgent;
 use URI;
 
-$VERSION = '1.27';
+our $VERSION = '1.271';
 
-@ISA = qw(HTML::LinkExtor);
+use parent qw(HTML::LinkExtor);
 
-%AUTO_METHODS = qw(
+our %AUTO_METHODS = qw(
     background attribute
 	href	attribute
 	src		attribute
@@ -96,7 +96,7 @@ sub _link_refs {
 		@link_refs = @{$self->{'_SimpleLinkExtor_links'}};
 		}
 	else {
-		@link_refs = map { 
+		@link_refs = map {
 			HTML::SimpleLinkExtor::LinkRef->new( $_ )
 			} $self->SUPER::links();
 		$self->_init_links( \@link_refs );
@@ -154,6 +154,8 @@ sub _add_base {
 		}
 	}
 
+=encoding utf8
+
 =head1 NAME
 
 HTML::SimpleLinkExtor - Extract links from HTML
@@ -190,7 +192,7 @@ HTML::SimpleLinkExtor - Extract links from HTML
 	@body_bg     = $extor->body;
 	@background  = $extor->background;
 
-	@links       = $extor->scheme( 'http' );
+	@links       = $extor->schemes( 'http' );
 
 =head1 DESCRIPTION
 
@@ -397,15 +399,15 @@ Return a list of the links.
 =cut
 
 sub links {
-	map  { $_->linkref } 
+	map  { $_->linkref }
 	grep { $_[0]->_is_an_allowed_tag( $_->tag ) }
-	$_[0]->_link_refs 
+	$_[0]->_link_refs
 	}
 
-sub _is_an_allowed_tag { 
-	exists $AUTO_METHODS{$_[1]} 
-		and 
-	$AUTO_METHODS{$_[1]} eq 'tag' 
+sub _is_an_allowed_tag {
+	exists $AUTO_METHODS{$_[1]}
+		and
+	$AUTO_METHODS{$_[1]} eq 'tag'
 	}
 
 =item $extor->img
@@ -568,15 +570,15 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2004-2014 brian d foy.  All rights reserved.
+Copyright © 2004-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the terms of the Artistic License 2.0.
 
 =cut
 
 BEGIN {
-package 
+package
 	HTML::SimpleLinkExtor::LinkRef;
 use Carp qw(croak);
 

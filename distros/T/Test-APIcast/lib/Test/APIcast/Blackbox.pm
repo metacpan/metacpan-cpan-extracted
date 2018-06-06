@@ -30,8 +30,28 @@ add_block_preprocessor(sub {
     my $configuration = $block->configuration;
     my $backend = $block->backend;
     my $upstream = $block->upstream;
+    my $test = $block->test;
     my $sites_d = $block->sites_d || '';
     my $ServerPort = $Test::Nginx::Util::ServerPort;
+
+    if (defined($test) && !defined($block->request) && !defined($block->raw_request) ) {
+        my $test_port = Test::APIcast::get_random_port();
+        $sites_d .= <<_EOC_;
+        server {
+            listen $test_port;
+
+            server_name test default_server;
+
+            set \$apicast_port $ServerPort;
+
+            location / {
+                $test
+            }
+        }
+_EOC_
+        $Test::Nginx::Util::ServerPortForClient = $test_port;
+        $block->set_value('raw_request', "GET / HTTP/1.1\r\nHost: test\r\nConnection: close\r\n\r\n")
+    }
 
     if (defined $backend) {
         $sites_d .= <<_EOC_;
@@ -130,21 +150,20 @@ my $write_nginx_config = sub {
         }
     }
 
-    my ($env, $env_file) = tempfile();
-
-    my $apicast_cmd = "APICAST_CONFIGURATION_LOADER='test' $apicast_cli start --test --environment $env_file";
-
-    if (defined $configuration_file) {
-        $apicast_cmd .= " --configuration $configuration_file"
-    } else {
-        $configuration_file = "";
-    }
-
     my %env = (%EnvToNginx, $block->env);
     my @env_list = ();
 
     for my $key (keys %env) {
         push @env_list, "$key='$env{$key}'";
+    }
+
+    my ($env, $env_file) = tempfile();
+    my $apicast_cmd = "${\(join(', ', @env_list))} APICAST_CONFIGURATION_LOADER='test' $apicast_cli start --test --environment $env_file";
+
+    if (defined $configuration_file) {
+        $apicast_cmd .= " --configuration $configuration_file"
+    } else {
+        $configuration_file = "";
     }
 
     if (defined $environment) {

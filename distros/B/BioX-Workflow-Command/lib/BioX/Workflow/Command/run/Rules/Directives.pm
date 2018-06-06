@@ -7,7 +7,7 @@ use Moose::Util qw/apply_all_roles/;
 
 with 'BioX::Workflow::Command::run::Rules::Directives::Types::HPC';
 with 'BioX::Workflow::Command::run::Rules::Directives::Types::Path';
-with 'BioX::Workflow::Command::run::Rules::Directives::Types::List';
+#with 'BioX::Workflow::Command::run::Rules::Directives::Types::List';
 with 'BioX::Workflow::Command::run::Rules::Directives::Types::Stash';
 with 'BioX::Workflow::Command::run::Rules::Directives::Types::Hash';
 with 'BioX::Workflow::Command::run::Rules::Directives::Types::Array';
@@ -33,10 +33,10 @@ has '_ERROR' => (
 );
 
 has 'register_types' => (
-    traits  => ['Hash'],
+    traits  => [ 'Hash' ],
     is      => 'rw',
     isa     => 'HashRef',
-    default => sub { return {} },
+    default => sub {return {}},
     handles => {
         'get_register_types' => 'get',
         'set_register_types' => 'set',
@@ -44,12 +44,12 @@ has 'register_types' => (
 );
 
 has 'register_process_directives' => (
-    traits  => ['Hash'],
+    traits  => [ 'Hash' ],
     is      => 'rw',
     isa     => 'HashRef',
-    default => sub { return {} },
+    default => sub {return {}},
     handles => {
-        'get_register_process_directives' => 'get',
+#        'get_register_process_directives' => 'get',
         'set_register_process_directives' => 'set',
     },
 );
@@ -61,10 +61,10 @@ A user can define their own custom types and processes.
 =cut
 
 has 'register_namespace' => (
-    traits  => ['Array'],
+    traits  => [ 'Array' ],
     is      => 'rw',
     isa     => 'ArrayRef',
-    default => sub { [] },
+    default => sub {[]},
     handles => {
         'all_register_namespace'    => 'elements',
         'count_register_namespace'  => 'count',
@@ -73,14 +73,14 @@ has 'register_namespace' => (
     },
     trigger => sub {
         my $self = shift;
-        foreach my $role ( $self->all_register_namespace ) {
+        foreach my $role ($self->all_register_namespace) {
             try {
-                apply_all_roles( $self, $role );
+                apply_all_roles($self, $role);
             }
             catch {
                 $self->app_log->warn(
-                    'There was an error registering role ' . $role );
-                $self->app_log->warn( $@ . "\n" );
+                    'There was an error registering role ' . $role);
+                $self->app_log->warn($@ . "\n");
             };
         }
     },
@@ -91,23 +91,42 @@ has 'template_type' => (
     isa           => 'Str',
     default       => 'Text',
     documentation => 'BioX supports two templating engines out of the box -'
-      . ' Text::Template and Template::Mustache. Default is Text.'
-      . 'You can register another type by registering the namespace of your templating engine.'
-      . 'It is not recommended to mix and match templating engines.'
+        . ' Text::Template and Template::Mustache. Default is Text.'
+        . 'You can register another type by registering the namespace of your templating engine.'
+        . 'It is not recommended to mix and match templating engines.'
 );
 
 has 'override_process' => (
-    traits    => ['Bool'],
-    is        => 'rw',
-    isa       => 'Bool',
-    default   => 0,
-    predicate => 'has_override_process',
+    traits        => [ 'Bool' ],
+    is            => 'rw',
+    isa           => 'Bool',
+    default       => 0,
+    predicate     => 'has_override_process',
     documentation =>
-      q(Instead of for my $sample (@sample){ DO STUFF } just DOSTUFF),
-    handles => {
+        q(Instead of for my $sample (@sample){ DO STUFF } just DOSTUFF),
+    handles       => {
         set_override_process   => 'set',
         clear_override_process => 'unset',
     },
+);
+
+=head2 data_loop
+
+This has always been a hard coded as
+
+for samples @samples
+
+But it should be configurable
+
+=cut
+
+has 'data_loop' => (
+    is      => 'rw',
+    isa     => 'ArrayRef',
+    documentation => 'Data Structure loop - Usually for samples @samples',
+    default => sub {
+        return [ {key => 'sample', value => 'samples'} ];
+    }
 );
 
 has 'run_stats' => (
@@ -136,7 +155,7 @@ sub create_attr {
     $meta->make_mutable;
     my $seen = {};
 
-    for my $attr ( $meta->get_all_attributes ) {
+    for my $attr ($meta->get_all_attributes) {
         next if $attr->name eq 'stash';
         $seen->{ $attr->name } = 1;
     }
@@ -144,37 +163,37 @@ sub create_attr {
     # Get workflow_data structure
     # Workflow is an array of hashes
 
-    foreach my $href ( @{$data} ) {
+    foreach my $href (@{$data}) {
 
-        if ( !ref($href) eq 'HASH' ) {
+        if (!ref($href) eq 'HASH') {
             ##TODO add more informative structure options here
             ##TODO Add app_log
             warn 'Your variable declarations should be key/value!';
             return;
         }
 
-        while ( my ( $k, $v ) = each( %{$href} ) ) {
+        while (my ($k, $v) = each(%{$href})) {
 
-            if ( !exists $seen->{$k} ) {
+            if (!exists $seen->{$k}) {
 
-                if ( $k eq 'stash' ) {
+                if ($k eq 'stash') {
                     $self->merge_stash($v);
                 }
-                elsif ( $self->can($k) ) {
+                elsif ($self->can($k)) {
                     next;
                 }
-                elsif ( $self->search_registered_types( $meta, $k, $v ) ) {
+                elsif ($self->search_registered_types($meta, $k, $v)) {
 
                     # next;
                 }
-                elsif ( ref($v) eq 'HASH' ) {
-                    $self->create_HASH_attr( $meta, $k );
+                elsif (ref($v) eq 'HASH') {
+                    $self->create_HASH_attr($meta, $k);
                 }
-                elsif ( ref($v) eq 'ARRAY' ) {
-                    $self->create_ARRAY_attr( $meta, $k );
+                elsif (ref($v) eq 'ARRAY') {
+                    $self->create_ARRAY_attr($meta, $k);
                 }
                 else {
-                    $self->create_reg_attr( $meta, $k );
+                    $self->create_reg_attr($meta, $k);
                 }
             }
 
@@ -182,7 +201,7 @@ sub create_attr {
                 $self->$k($v) if defined $v;
             }
             catch {
-                $self->app_log->warn( 'There was an assiging key. ' . $k );
+                $self->app_log->warn('There was an assiging key. ' . $k);
                 $self->app_log->warn("$_\n");
             }
         }
@@ -190,12 +209,13 @@ sub create_attr {
     }
 
     $meta->make_immutable;
+    $self->apply_interpolate_role;
 }
 
 sub create_reg_attr {
     my $self = shift;
     my $meta = shift;
-    my $k    = shift;
+    my $k = shift;
 
     $meta->add_attribute(
         $k => (
@@ -214,7 +234,7 @@ placeholder for some types
 sub create_blank_attr {
     my $self = shift;
     my $meta = shift;
-    my $k    = shift;
+    my $k = shift;
 
     $meta->add_attribute(
         $k => (
@@ -239,37 +259,37 @@ See BioX::Workflow::Command::run::Rules::Types::CSV for more information
 sub search_registered_types {
     my $self = shift;
     my $meta = shift;
-    my $k    = shift;
-    my $v    = shift;
+    my $k = shift;
+    my $v = shift;
 
-    foreach my $key ( keys %{ $self->register_types } ) {
+    foreach my $key (keys %{$self->register_types}) {
 
         next unless exists $self->register_types->{$key}->{lookup};
         next unless exists $self->register_types->{$key}->{builder};
         my $lookup_ref = $self->register_types->{$key}->{lookup};
-        my $builder    = $self->register_types->{$key}->{builder};
+        my $builder = $self->register_types->{$key}->{builder};
 
         ## We look for keys one of two ways - either they have a pattern match or a declared type
-        foreach my $lookup ( @{$lookup_ref} ) {
-            if ( $k =~ m/$lookup/ ) {
-                $self->$builder( $meta, $k, $v );
+        foreach my $lookup (@{$lookup_ref}) {
+            if ($k =~ m/$lookup/) {
+                $self->$builder($meta, $k, $v);
                 return 1;
             }
         }
 
         ##TODO This is kind of hacky....
-        if ( ref($v) eq 'HASH' ) {
-            if ( exists $v->{type} && !ref( $v->{type} ) ) {
+        if (ref($v) eq 'HASH') {
+            if (exists $v->{type} && !ref($v->{type})) {
                 next unless check_type($v);
-                $self->$builder( $meta, $k, $v );
+                $self->$builder($meta, $k, $v);
                 return 1;
             }
         }
-        elsif ( ref($v) eq 'ARRAY' ) {
+        elsif (ref($v) eq 'ARRAY') {
             my $first = $v->[0];
-            if ( ref($first) && ref($first) eq 'HASH' ) {
+            if (ref($first) && ref($first) eq 'HASH') {
                 next unless check_type($first);
-                $self->$builder( $meta, $k, $v );
+                $self->$builder($meta, $k, $v);
                 return 1;
             }
         }
@@ -290,11 +310,11 @@ sub check_type {
 
 }
 
-sub BUILD { }
+sub BUILD {}
 
 after 'BUILD' => sub {
     my $self = shift;
-    $self->interpol_directive_cache( {} );
+    $self->interpol_directive_cache({});
 };
 
 __PACKAGE__->meta->make_immutable;

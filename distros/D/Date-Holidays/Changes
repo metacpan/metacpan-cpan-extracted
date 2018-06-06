@@ -1,5 +1,13 @@
 Changes file for Date-Holidays
 
+1.12 2018-06-05 Feature release, update recommended
+
+- Added adapter for US, an implementation adapting Date::Holidays::USFederal 
+  but for the official and standard country code 
+
+  Ref: https://github.com/jonasbn/Date-Holidays/issues/27
+
+
 1.11 2018-06-01 Feature release, update recommended
 
 - Added adapter for:

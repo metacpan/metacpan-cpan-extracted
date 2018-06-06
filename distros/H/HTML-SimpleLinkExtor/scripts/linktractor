@@ -6,14 +6,12 @@ use HTML::SimpleLinkExtor;
 
 my $extor = HTML::SimpleLinkExtor->new( defined $b ? $b : () );
 
-if( defined $f )
-	{
+if( defined $f ) {
 	$extor->parse_url( $f );
 	}
-else 
-	{ 
+else {
 	my $html = do { local $/; <STDIN> };
-	$extor->parse( $html );	
+	$extor->parse( $html );
 	}
 
 {
@@ -22,7 +20,9 @@ local $, = "\n";
 print $extor->links, '';
 }
 
-=pod 
+=pod
+
+=encoding utf8
 
 =head1 NAME
 
@@ -31,14 +31,14 @@ linktractor - extract links from HTML
 =head1 SYNOPSIS
 
 	% linktractor fileA.html fileB.html
-	
+
 	% linktractor -f=http://www.perl.com
-	
+
 	% lwp-request http://www.example.com | linktractor
 
 	% lwp-request http://www.example.com | linktractor -b=http://www.example.com
-	
-	
+
+
 =head1 DESCRIPTION
 
 This is a small script that uses HTML::SimpleLinkExtractor to pull
@@ -64,13 +64,9 @@ standard input, fetch this URL and use it as input.
 
 =head1 SOURCE AVAILABILITY
 
-This source is part of a SourceForge project which always has the
-latest sources in CVS, as well as all of the previous releases.
+This module is in Github
 
-	http://sourceforge.net/projects/brian-d-foy/
-
-If, for some reason, I disappear from the world, one of the other
-members of the project can shepherd this module appropriately.
+	https://github.com/briandfoy/html-simplelinkextor
 
 =head1 AUTHORS
 
@@ -78,15 +74,15 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007 brian d foy.  All rights reserved.
+Copyright © 2007-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =head1 LICENSE
 
-You may use HTML::SimpleLinkExtor under the same terms as Perl
-itself.
+You may use HTML::SimpleLinkExtor under the terms of the Artistic
+License 2.0.
 
 =cut
 

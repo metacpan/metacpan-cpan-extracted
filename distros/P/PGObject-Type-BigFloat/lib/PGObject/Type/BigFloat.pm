@@ -13,12 +13,18 @@ PGObject::Type::BigFloat - Math::BigFloat wrappers for PGObject classes
 
 =head1 VERSION
 
-Version 2
+Version 2.001
 
 =cut
 
-our $VERSION = 2.000000;
+our $VERSION = 2.001000;
 
+our ($accuracy, $precision, $round_mode, $div_scale);
+
+# Globals
+$accuracy = $precision = undef;
+$round_mode = 'even';
+$div_scale = 40;
 
 =head1 SYNOPSIS
 

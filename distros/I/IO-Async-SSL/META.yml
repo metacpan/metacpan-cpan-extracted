@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,18 +18,18 @@ name: IO-Async-SSL
 provides:
   IO::Async::SSL:
     file: lib/IO/Async/SSL.pm
-    version: '0.21'
+    version: '0.22'
   IO::Async::SSLStream:
     file: lib/IO/Async/SSLStream.pm
-    version: '0.21'
+    version: '0.22'
 requires:
   Future: '0.33'
   IO::Async::Handle: '0.29'
   IO::Async::Loop: '0.66'
   IO::Async::Protocol::Stream: '0'
   IO::Async::Stream: '0.59'
-  IO::Socket::SSL: '1.968'
+  IO::Socket::SSL: '2.003'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.21'
+version: '0.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

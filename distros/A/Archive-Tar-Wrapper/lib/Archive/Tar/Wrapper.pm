@@ -18,8 +18,9 @@ use Cwd;
 use Config;
 use IPC::Open3;
 use Symbol 'gensym';
+use Carp;
 
-our $VERSION = "0.24";
+our $VERSION = "0.25";
 
 ###########################################
 sub new {
@@ -36,6 +37,8 @@ sub new {
         dirs                  => 0,
         max_cmd_line_args     => 512,
         ramdisk               => undef,
+        gzip_regex            => qr/\.t?gz$/i,
+        bzip2_regex           => qr/\.bz2$/i,
         %options,
     };
 
@@ -65,7 +68,7 @@ sub new {
     }
 
     $self->{tardir} = File::Spec->catfile( $self->{tmpdir}, "tar" );
-    mkpath [ $self->{tardir} ], 0, 0755
+    mkpath [ $self->{tardir} ], 0, oct(755)
       or LOGDIE "Cannot mkpath $self->{tardir} ($!)";
 
     $self->{objdir} = tempdir();
@@ -85,6 +88,7 @@ sub tardir {
 sub read {
 ###########################################
     my ( $self, $tarfile, @files ) = @_;
+
     my $cwd = getcwd();
 
     unless ( File::Spec::Functions::file_name_is_absolute($tarfile) ) {
@@ -130,7 +134,7 @@ sub read {
     unless ($error_code) {
         ERROR "@cmd failed: $err";
         chdir $cwd or LOGDIE "Cannot chdir to $cwd";
-        return undef;
+        return;
     }
 
     WARN $err if $err;
@@ -145,17 +149,18 @@ sub is_compressed {
 ###########################################
     my ( $self, $tarfile ) = @_;
 
-    return 'z' if $tarfile =~ /\.t?gz$/i;
-    return 'j' if $tarfile =~ /\.bz2$/i;
+    return 'z' if $tarfile =~ $self->{gzip_regex};
+    return 'j' if $tarfile =~ $self->{bzip2_regex};
 
     # Sloppy check for gzip files
-    open FILE, "<$tarfile" or die "Cannot open $tarfile";
-    binmode FILE;
-    my $read = sysread( FILE, my $two, 2, 0 ) or die "Cannot sysread";
-    close FILE;
+    open( my $fh, '<', $tarfile ) or croak("Cannot open $tarfile: $!");
+    binmode($fh);
+    my $read = sysread( $fh, my $two, 2, 0 )
+      or croak("Cannot sysread $tarfile: $!");
+    close($fh);
     return 'z'
-      if ord( substr( $two, 0, 1 ) ) eq 0x1F
-      and ord( substr( $two, 1, 1 ) ) eq 0x8B;
+      if (  ( ord( substr( $two, 0, 1 ) ) eq 0x1F )
+        and ( ord( substr( $two, 1, 1 ) ) eq 0x8B ) );
 
     return q{};
 }
@@ -174,7 +179,7 @@ sub locate {
     DEBUG "$real_path doesn't exist";
 
     WARN "$rel_path not found in tarball";
-    return undef;
+    return;
 }
 
 ###########################################
@@ -183,20 +188,21 @@ sub add {
     my ( $self, $rel_path, $path_or_stringref, $opts ) = @_;
 
     if ($opts) {
-        if ( !ref($opts) or ref($opts) ne 'HASH' ) {
+        unless ( ( ref($opts) ) and ( ref($opts) eq 'HASH' ) ) {
             LOGDIE "Option parameter given to add() not a hashref.";
         }
     }
 
-    my $perm    = $opts->{perm}    if defined $opts->{perm};
-    my $uid     = $opts->{uid}     if defined $opts->{uid};
-    my $gid     = $opts->{gid}     if defined $opts->{gid};
-    my $binmode = $opts->{binmode} if defined $opts->{binmode};
+    my ( $perm, $uid, $gid, $binmode );
+    $perm    = $opts->{perm}    if defined $opts->{perm};
+    $uid     = $opts->{uid}     if defined $opts->{uid};
+    $gid     = $opts->{gid}     if defined $opts->{gid};
+    $binmode = $opts->{binmode} if defined $opts->{binmode};
 
     my $target = File::Spec->catfile( $self->{tardir}, $rel_path );
     my $target_dir = dirname($target);
 
-    if ( !-d $target_dir ) {
+    unless ( -d $target_dir ) {
         if ( ref($path_or_stringref) ) {
             $self->add( dirname($rel_path), dirname($target_dir) );
         }
@@ -206,17 +212,17 @@ sub add {
     }
 
     if ( ref($path_or_stringref) ) {
-        open FILE, ">$target" or LOGDIE "Can't open $target ($!)";
+        open my $fh, '>', $target or LOGDIE "Can't open $target: $!";
         if ( defined $binmode ) {
-            binmode FILE, $binmode;
+            binmode $fh, $binmode;
         }
-        print FILE $$path_or_stringref;
-        close FILE;
+        print $fh $$path_or_stringref;
+        close $fh;
     }
     elsif ( -d $path_or_stringref ) {
 
         # perms will be fixed further down
-        mkpath( $target, 0, 0755 ) unless -d $target;
+        mkpath( $target, 0, oct(755) ) unless -d $target;
     }
     else {
         copy $path_or_stringref, $target
@@ -247,7 +253,7 @@ sub add {
           or LOGDIE "Can't perm_cp $path_or_stringref to $target ($!)";
     }
 
-    1;
+    return 1;
 }
 
 ######################################
@@ -260,6 +266,7 @@ sub perm_cp {
 
     my $perms = perm_get($source);
     perm_set( $target, $perms );
+    return 1;
 }
 
 ######################################
@@ -281,28 +288,25 @@ sub perm_set {
     # ignore errors here, as we can't change uid/gid unless we're
     # the superuser (see LIMITATIONS section)
     chown( $perms->[1], $perms->[2], $filename );
-
-    chmod( $perms->[0] & 07777, $filename )
+    chmod( $perms->[0] & oct(777), $filename )
       or LOGDIE "Cannot chmod $filename ($!)";
+    return 1;
 }
 
 ###########################################
 sub remove {
 ###########################################
     my ( $self, $rel_path ) = @_;
-
     my $target = File::Spec->catfile( $self->{tardir}, $rel_path );
-
     rmtree($target) or LOGDIE "Can't rmtree $target ($!)";
+    return 1;
 }
 
 ###########################################
 sub list_all {
 ###########################################
     my ($self) = @_;
-
     my @entries = ();
-
     $self->list_reset();
 
     while ( my $entry = $self->list_next() ) {
@@ -318,7 +322,7 @@ sub list_reset {
     my ($self) = @_;
 
     my $list_file = File::Spec->catfile( $self->{objdir}, "list" );
-    open FILE, ">$list_file" or LOGDIE "Can't open $list_file";
+    open my $fh, '>', $list_file or LOGDIE "Can't open $list_file: $!";
 
     my $cwd = getcwd();
     chdir $self->{tardir} or LOGDIE "Can't chdir to $self->{tardir} ($!)";
@@ -332,14 +336,14 @@ sub list_reset {
                 : -l $_ ? "l"
                 :         "f"
             );
-            print FILE "$type $entry\n";
+            print $fh "$type $entry\n";
         },
         "."
     );
 
     chdir $cwd or LOGDIE "Can't chdir to $cwd ($!)";
 
-    close FILE;
+    close $fh;
 
     $self->offset(0);
 }
@@ -352,18 +356,18 @@ sub list_next {
     my $offset = $self->offset();
 
     my $list_file = File::Spec->catfile( $self->{objdir}, "list" );
-    open FILE, "<$list_file" or LOGDIE "Can't open $list_file";
-    seek FILE, $offset, 0;
+    open my $fh, '<', $list_file or LOGDIE "Can't open $list_file: $!";
+    seek $fh, $offset, 0;
 
     {
-        my $line = <FILE>;
+        my $line = <$fh>;
 
         return undef unless defined $line;
 
         chomp $line;
         my ( $type, $entry ) = split / /, $line, 2;
         redo if $type eq "d" and !$self->{dirs};
-        $self->offset( tell FILE );
+        $self->offset( tell $fh );
         return [ $entry, File::Spec->catfile( $self->{tardir}, $entry ),
             $type ];
     }
@@ -377,18 +381,18 @@ sub offset {
     my $offset_file = File::Spec->catfile( $self->{objdir}, "offset" );
 
     if ( defined $new_offset ) {
-        open FILE, ">$offset_file" or LOGDIE "Can't open $offset_file";
-        print FILE "$new_offset\n";
-        close FILE;
+        open my $fh, '>', $offset_file or LOGDIE "Can't open $offset_file: $!";
+        print $fh "$new_offset\n";
+        close $fh;
     }
 
-    open FILE, "<$offset_file"
+    open my $fh, '<', $offset_file
       or LOGDIE
-"Can't open $offset_file (Did you call list_next() without a previous list_reset()?)";
-    my $offset = <FILE>;
+"Can't open $offset_file: $! (Did you call list_next() without a previous list_reset()?)";
+    my $offset = <$fh>;
     chomp $offset;
+    close $fh;
     return $offset;
-    close FILE;
 }
 
 ###########################################
@@ -731,7 +735,7 @@ physical path to the unpacked file or directory on disk.
 
 To iterate over the list, the following construct can be used:
 
-        # Get a huge list with all entries
+    # Get a huge list with all entries
     for my $entry (@{$arch->list_all()}) {
         my($tar_path, $real_path) = @$entry;
         print "Tarpath: $tar_path Tempfile: $real_path\n";

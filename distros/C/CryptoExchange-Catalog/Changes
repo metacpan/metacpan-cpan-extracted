@@ -1,3 +1,38 @@
+20180605.1.0  2018-06-05 (PERLANCAR)
+
+          - No functional changes.
+
+          - Fix Changes.
+
+
+20180605  2018-06-05 (PERLANCAR)
+
+          - Update catalog to CMC 2018-06-05.
+
+          - [doc] Add missing example in Synopsis for by_code() & all_codes().
+
+          - New exchanges:
+            + Altcoin Trader
+            + BitMart
+            + Coindeal
+            + Stellarport
+
+          - Removed exchanges:
+            + Abucoins
+            + Coinlink
+            + Counterparty DEX
+            + Cryptomate
+            + Paradex
+            + Stronghold
+            + Unocoin
+
+          - Changed exchanges:
+            + LBank changed name from Lbank
+            + OKCoin International changed name from OkCoin Intl.
+
+          - Total exchanges now 210 (from 213)
+
+
 20180510  2018-05-10 (PERLANCAR)
 
           - Exchanges are now given codes (unique 1-10 letters). Not all
@@ -41,7 +76,7 @@
           - Total exchanges now 213 (from 213)
 
 
-20180403  2018-01-30 (PERLANCAR)
+20180403  2018-04-03 (PERLANCAR)
 
           - Update to CMC 2018-04-03.
 

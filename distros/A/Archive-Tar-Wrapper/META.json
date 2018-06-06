@@ -1,7 +1,8 @@
 {
    "abstract" : "API wrapper around the 'tar' utility",
    "author" : [
-      "Mike Schilli <cpan@perlmeister.com>"
+      "Mike Schilli <cpan@perlmeister.com>",
+      "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
@@ -44,11 +45,14 @@
    "release_status" : "stable",
    "resources" : {
       "X_type" : "git",
-      "X_url" : "https://github.com/glasswalk3r/archive-tar-wrapper-perl.git",
+      "X_url" : "https://github.com/glasswalk3r/archive-tar-wrapper-perl",
+      "bugtracker" : {
+         "web" : "https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues"
+      },
       "repository" : {
-         "url" : "https://github.com/glasswalk3r/archive-tar-wrapper-perl"
+         "url" : "https://github.com/glasswalk3r/archive-tar-wrapper-perl.git"
       }
    },
-   "version" : "0.24",
+   "version" : "0.25",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -48,7 +48,7 @@ foreach my $n ($set->get_nodelist) {
     push @macros, $n->getData();
 }
 
-open XS, "<Virt.xs" or die "cannot read Virt.xs: $!";
+open XS, "<lib/Sys/Virt.xs" or die "cannot read lib/Sys/Virt.xs: $!";
 
 my $xs;
 {

@@ -4,10 +4,11 @@ my $meta_merge = {
     META_MERGE => {
         resources => {
             type => 'git',
-            url =>
-              'https://github.com/glasswalk3r/archive-tar-wrapper-perl.git',
+            url  => 'https://github.com/glasswalk3r/archive-tar-wrapper-perl',
             repository =>
-              'https://github.com/glasswalk3r/archive-tar-wrapper-perl',
+              'https://github.com/glasswalk3r/archive-tar-wrapper-perl.git',
+            bugtracker =>
+              'https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues'
         },
     }
 };
@@ -29,7 +30,10 @@ WriteMakefile(
         ?    ## Add these new keywords supported since 5.005
           (
             ABSTRACT_FROM => 'lib/Archive/Tar/Wrapper.pm',
-            AUTHOR        => 'Mike Schilli <cpan@perlmeister.com>',
+            AUTHOR        => [
+                'Mike Schilli <cpan@perlmeister.com>',
+                'Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>'
+            ]
           )
         : ()
     ),

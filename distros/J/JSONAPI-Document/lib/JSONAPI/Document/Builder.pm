@@ -1,12 +1,12 @@
 package JSONAPI::Document::Builder;
-$JSONAPI::Document::Builder::VERSION = '1.4';
+$JSONAPI::Document::Builder::VERSION = '1.5';
 =head1 NAME
 
 JSONAPI::Document::Builder - Resource Document builder
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 DESCRIPTION
 

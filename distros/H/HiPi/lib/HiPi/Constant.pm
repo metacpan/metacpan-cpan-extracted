@@ -15,7 +15,7 @@ use warnings;
 use parent qw( Exporter );
 use HiPi::RaspberryPi;
 
-our $VERSION ='0.71';
+our $VERSION ='0.72';
 
 our @EXPORT_OK = ( qw( hipi_export_ok  hipi_export_constants hipi_export_tags ) );
 our %EXPORT_TAGS = ( hipi => \@EXPORT_OK );
@@ -956,11 +956,56 @@ my $const = {
         
         EPD_BORDER_POR        => 0xFF,
     },
+    
+    fl3730 => {
+        # CONFIGURATION REG 0x00
+        FL3730_SSD_NORMAL     => 0b00000000,
+        FL3730_SSD_SHUTDOWN   => 0b10000000,
+        
+        FL3730_DM_MATRIX_1    =>    0b00000,
+        FL3730_DM_MATRIX_2    =>    0b01000,
+        FL3730_DM_MATRIX_BOTH =>    0b11000,
+        
+        FL3730_AEN_OFF        =>      0b000,
+        FL3730_AEN_ON         =>      0b100,
+        
+        FL3730_ADM_8X8        =>       0b00,
+        FL3730_ADM_7X9        =>       0b01,
+        FL3730_ADM_6X10       =>       0b10,
+        FL3730_ADM_5X11       =>       0b11,
+        
+        # LIGHTING EFFECT REG 0x0D
+        FL3730_AGS_0_DB       =>  0b0000000,
+        FL3730_AGS_3_DB       =>  0b0010000,
+        FL3730_AGS_6_DB       =>  0b0100000,
+        FL3730_AGS_9_DB       =>  0b0110000,
+        FL3730_AGS_12_DB      =>  0b1000000,
+        FL3730_AGS_15_DB      =>  0b1010000,
+        FL3730_AGS_18_DB      =>  0b1100000,
+        FL3730_AGS_M6_DB      =>  0b1110000,
+        
+        FL3730_CS_05_MA       =>     0b1000,
+        FL3730_CS_10_MA       =>     0b1001,
+        FL3730_CS_15_MA       =>     0b1010,
+        FL3730_CS_20_MA       =>     0b1011,
+        FL3730_CS_25_MA       =>     0b1100,
+        FL3730_CS_30_MA       =>     0b1101,
+        FL3730_CS_35_MA       =>     0b1110,
+        FL3730_CS_40_MA       =>     0b0000,
+        FL3730_CS_45_MA       =>     0b0001,
+        FL3730_CS_50_MA       =>     0b0010,
+        FL3730_CS_55_MA       =>     0b0011,
+        FL3730_CS_60_MA       =>     0b0100,
+        FL3730_CS_65_MA       =>     0b0101,
+        FL3730_CS_70_MA       =>     0b0110,
+        FL3730_CS_75_MA       =>     0b0111,       
+    },
 };
 
 my $tagaliases = {
     mcp23x17 => [ qw( mcp23017 mcp23S17 ) ],
     rpi      => [ qw( raspberry ) ],
+    fl3730   => [ qw( is31fl3730 )]
 };
 
 sub hipi_export_ok {

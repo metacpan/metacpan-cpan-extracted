@@ -38,7 +38,7 @@
       },
       "test" : {
          "requires" : {
-            "Data::Sah" : "0.84",
+            "Data::Sah" : "0.891",
             "Data::Sah::Coerce" : "0.025",
             "File::Spec" : "0",
             "IO::Handle" : "0",
@@ -59,7 +59,7 @@
          "web" : "https://github.com/perlancar/perl-Sah-Schemas-URL"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

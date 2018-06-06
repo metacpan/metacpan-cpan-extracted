@@ -25,8 +25,6 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IO::Pipe" => 0,
     "IO::Select" => 0,
-    "Moose" => 0,
-    "Moose::Util::TypeConstraints" => 0,
     "POSIX" => 0,
     "Scalar::Util" => 0,
     "Storable" => 0,
@@ -44,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::UseAllModules" => "0.17"
   },
-  "VERSION" => "1.118",
+  "VERSION" => "1.201",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,8 +55,6 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IO::Pipe" => 0,
   "IO::Select" => 0,
-  "Moose" => 0,
-  "Moose::Util::TypeConstraints" => 0,
   "POSIX" => 0,
   "Scalar::Util" => 0,
   "Storable" => 0,

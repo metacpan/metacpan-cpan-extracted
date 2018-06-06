@@ -5,7 +5,7 @@
 ##======================================================================
 
 use PDL::VectorValued::Dev;
-my $VERSION = '1.23.4'; ##-- update with perl-reversion from Perl::Version module
+my $VERSION = '1.23.7'; ##-- update with perl-reversion from Perl::Version module
 pp_setversion($VERSION);
 
 ##------------------------------------------------------
@@ -172,7 +172,7 @@ has been exhausted.
 
 The parameters C<$istate()> and C<$ostate()> hold the state of the algorithm,
 for incremental block-wise computation at the perl level.  Each state PDL
-is a 7-element PDL containting the following values:
+is a 7-element PDL containing the following values:
 
  INDEX LABEL       DESCRIPTION
  -----------------------------------------------------------------------

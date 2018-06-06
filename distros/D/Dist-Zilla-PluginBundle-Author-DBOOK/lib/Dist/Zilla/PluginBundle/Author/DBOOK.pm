@@ -8,7 +8,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy',
 use namespace::clean;
 use Data::Section -setup;
 
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 
 sub configure {
 	my $self = shift;
@@ -386,7 +386,7 @@ without an accompanying patch.
 # CREDITS
 
 This file was adapted from an initial `CONTRIBUTING.mkdn` file from David
-Golden under the terms of the Apache 2 license, with inspiration from the
+Golden under the terms of the [CC0](https://creativecommons.org/share-your-work/public-domain/cc0/), with inspiration from the
 contributing documents from [Dist::Zilla::Plugin::Author::KENTNL::CONTRIBUTING](https://metacpan.org/pod/Dist::Zilla::Plugin::Author::KENTNL::CONTRIBUTING)
 and [Dist::Zilla::PluginBundle::Author::ETHER](https://metacpan.org/pod/Dist::Zilla::PluginBundle::Author::ETHER).
 __END__

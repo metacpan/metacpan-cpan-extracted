@@ -4,7 +4,6 @@
 #define DLIB_BSP_CPph_
 
 #include "bsp.h"
-#include <memory>
 #include <stack>
 
 // ----------------------------------------------------------------------------------------
@@ -25,7 +24,7 @@ namespace dlib
             cons.clear();
             for (unsigned long i = 0; i < hosts.size(); ++i)
             {
-                std::unique_ptr<bsp_con> con(new bsp_con(hosts[i]));
+                scoped_ptr<bsp_con> con(new bsp_con(hosts[i]));
                 dlib::serialize(node_id, con->stream); // tell the other end our node_id
                 unsigned long id = i+1;
                 cons.add(id, con);
@@ -44,7 +43,7 @@ namespace dlib
             {
                 try
                 {
-                    std::unique_ptr<bsp_con> con(new bsp_con(hosts[i].addr));
+                    scoped_ptr<bsp_con> con(new bsp_con(hosts[i].addr));
                     dlib::serialize(node_id, con->stream); // tell the other end our node_id
                     con->stream.flush();
                     unsigned long id = hosts[i].node_id;
@@ -317,7 +316,7 @@ namespace dlib
         _cons.reset();
         while (_cons.move_next())
         {
-            std::unique_ptr<thread_function> ptr(new thread_function(&impl2::read_thread,
+            scoped_ptr<thread_function> ptr(new thread_function(&impl2::read_thread,
                                                                 _cons.element().value().get(),
                                                                 _node_id,
                                                                 _cons.element().key(),
@@ -331,7 +330,7 @@ namespace dlib
 
     bool bsp_context::
     receive_data (
-        std::shared_ptr<std::vector<char> >& item,
+        shared_ptr<std::vector<char> >& item,
         unsigned long& sending_node_id
     ) 
     {

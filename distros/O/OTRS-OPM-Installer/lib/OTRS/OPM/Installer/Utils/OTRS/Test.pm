@@ -1,5 +1,5 @@
 package OTRS::OPM::Installer::Utils::OTRS::Test;
-$OTRS::OPM::Installer::Utils::OTRS::Test::VERSION = '0.03';
+$OTRS::OPM::Installer::Utils::OTRS::Test::VERSION = '0.04';
 # ABSTRACT: helper functions for Unittests
 
 use strict;
@@ -37,7 +37,7 @@ OTRS::OPM::Installer::Utils::OTRS::Test - helper functions for Unittests
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 
@@ -45,7 +45,7 @@ Renee Baecker <reneeb@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Renee Baecker.
+This software is Copyright (c) 2018 by Renee Baecker.
 
 This is free software, licensed under:
 

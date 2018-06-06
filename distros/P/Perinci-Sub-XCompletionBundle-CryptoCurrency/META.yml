@@ -19,7 +19,8 @@ name: Perinci-Sub-XCompletionBundle-CryptoCurrency
 requires:
   Complete::Util: '0.57'
   CryptoCurrency::Catalog: '20180308'
-  CryptoExchange::Catalog: '0'
+  CryptoExchange::Catalog: '20180510'
+  Locale::Codes::Currency_Codes: '0'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -27,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-XCompletionBundle-CryptoCurrency
   homepage: https://metacpan.org/release/Perinci-Sub-XCompletionBundle-CryptoCurrency
   repository: git://github.com/perlancar/perl-Perinci-Sub-XCompletionBundle-CryptoCurrency.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

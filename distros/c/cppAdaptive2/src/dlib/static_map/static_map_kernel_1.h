@@ -157,7 +157,7 @@ namespace dlib
             );
     
             // functions from the enumerable interface
-            inline size_t size (
+            inline unsigned long size (
             ) const;
 
             inline bool at_start (
@@ -433,7 +433,7 @@ namespace dlib
         typename range,
         typename compare
         >
-    size_t static_map_kernel_1<domain,range,compare>::
+    unsigned long static_map_kernel_1<domain,range,compare>::
     size (
     ) const
     {

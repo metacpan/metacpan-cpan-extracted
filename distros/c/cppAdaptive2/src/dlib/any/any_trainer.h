@@ -4,6 +4,7 @@
 #define DLIB_AnY_TRAINER_H_
 
 #include "any.h"
+#include "../smart_pointers.h"
 
 #include "any_decision_function.h"
 
@@ -156,7 +157,7 @@ namespace dlib
             ) const = 0;
 
             virtual void copy_to (
-                std::unique_ptr<base>& dest
+                scoped_ptr<base>& dest
             ) const = 0;
         };
 
@@ -168,7 +169,7 @@ namespace dlib
             derived(const T& val) : item(val) {}
 
             virtual void copy_to (
-                std::unique_ptr<base>& dest
+                scoped_ptr<base>& dest
             ) const
             {
                 dest.reset(new derived<T>(item));
@@ -183,7 +184,7 @@ namespace dlib
             }
         };
 
-        std::unique_ptr<base> data;
+        scoped_ptr<base> data;
     };
 
 // ----------------------------------------------------------------------------------------

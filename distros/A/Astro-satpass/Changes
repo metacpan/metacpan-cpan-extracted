@@ -1,3 +1,31 @@
+0.097		2018-06-04	T. R. Wyant
+    Large canned status update;
+    
+    - Iridium 7 failed
+    - Iridium 11 spare
+    - Iridium 15 spare
+    - Iridium 18 spare
+    - Iridium 21 decayed
+    - Iridium 31 spare
+    - Iridium 37 decayed
+    - Iridium 39 failed
+    - Iridium 46 failed
+    - Iridium 47 spare
+    - Iridium 55 spare
+    - Iridium 58 spare
+    - Iridium 61 spare
+    - Iridium 62 spare
+    - Iridium 68 failed
+    - Iridium 81 spare
+    - Iridium 90 failed
+    - Iridium 96 failed
+    - Iridium 97 spare
+
+Decays are from Space Track. Other status changes are from Dr. T. S.
+Kelso's Celestrak web site. "Spare" conflates several Celestrak
+statuses; the above spares are typically "[B]" (backup) or "[P]" (partly
+operational).
+
 0.096		2018-05-23	T. R. Wyant
     Link to metacpan.org rather than search.cpan.org.
 

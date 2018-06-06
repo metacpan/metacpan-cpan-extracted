@@ -1,3 +1,17 @@
+3.2.0 2018 06 04 Wife of Rocket Scientist
+
+Major revision after the previous major revision...
+
+- Revise namespace and OO heirarchy, which facilitated...
+- A lot of code moved into common areas (more work is needed)
+- Use B::Deparse routines more pervasively when possible
+- Improve testing regime
+  - roundtip testing
+  - more unit testing
+  - write out Perl test failures to a file
+- Improve node tagging for fragment use
+- Numerous bug fixes
+
 3.1.0 2018 05 19 Rocket Scientist
 
 Add template formatting mechanism use that many places. (More work is

@@ -5,7 +5,7 @@ use warnings;
 use charnames qw(:full);
 use namespace::autoclean;
 
-our $VERSION = '3.004';
+our $VERSION = '4.001';
 
 sub instance {
     return __PACKAGE__;
@@ -42,25 +42,26 @@ sub plural_separator {
 __END__
 
 =head1 NAME
+
 Locale::TextDomain::OO::Util::Constants - Lexicon constants
+
+=head1 VERSION
+
+4.001
 
 $Id: Constants.pm 597 2015-06-29 18:27:08Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/Locale-TextDomain-OO-Util/trunk/lib/Locale/TextDomain/OO/Util/Constants.pm $
-
-=head1 VERSION
-
-3.004
-
-=head1 DESCRIPTION
-
-This module provides lexicon constants.
 
 =head1 SYNOPSIS
 
     use Locale::TextDomain::OO::Util::Constants;
 
     my $const = Locale::TextDomain::OO::Util::Constants->instance;
+
+=head1 DESCRIPTION
+
+This module provides lexicon constants.
 
 =head1 SUBROUTINES/METHODS
 
@@ -119,7 +120,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2014 - 2015,
+Copyright (c) 2014 - 2018,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

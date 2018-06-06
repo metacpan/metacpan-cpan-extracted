@@ -1,5 +1,7 @@
 package TestsFor::BioX::Workflow::Command::run::Test011;
 
+use strict;
+use warnings FATAL => 'all';
 use Test::Class::Moose;
 use Cwd;
 use FindBin qw($Bin);
@@ -103,7 +105,8 @@ sub test_002 {
     _init_rule( $test, $rule );
 
     $test->sample('Sample_01');
-    my $attr = $test->walk_attr;
+    my $attr = dclone($test->local_attr);
+    $test->eval_process($attr);
 
     is_deeply(
         $test->sample_files,

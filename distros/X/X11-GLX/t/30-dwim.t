@@ -18,6 +18,13 @@ ok( $dwim->display, 'open display' );
 ok( $dwim->glx_context, 'create gl context' ); $dwim->display->flush_sync;
 ok( $dwim->target, 'initialize gl target' ); $dwim->display->flush_sync;
 
+# Generate a GL error, and make sure error diags are working
+glEnable(-1);
+is_deeply( [sort values %{ $dwim->get_gl_errors }], ['GL_INVALID_ENUM'], 'detect error GL_INVALID_ENUM' );
+
+glPopMatrix();
+is_deeply( [sort values %{ $dwim->get_gl_errors }], ['GL_STACK_UNDERFLOW'], 'detect error GL_STACK_UNDERFLOW' );
+
 set_gl_options();
 
 for (1..60) {

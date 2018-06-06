@@ -1,5 +1,14 @@
 Revision history for BioX-Workflow-Command
 
+2.4.0  2018-06-06 14:47:12 GST
+	- Introduced Jinja templating, first example of using other languages with BioX
+	- Introduced MCE for parallel processing with large number of samples
+	- Introduced data_loop, is now possible to specify from the config nested loop structure
+	- for sample (@samples) { for split (@splits){ T =. "{$sample}.{$split}.fastq"} }
+        - Removed need for {$self->thing} in template, can instead just use {$thing}
+	- Deprecated iters/lists, instead of data_loop
+	- Removed __DUMMYSAMPLE__, introduced MCE for large data sets
+
 2.3.2  2018-01-10 13:14:25 GST
 	- Added inspect command
 	- Pinned some versions of modules (MooseX::App, Test::Exception)

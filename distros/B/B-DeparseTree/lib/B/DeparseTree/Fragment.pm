@@ -9,7 +9,7 @@ use vars qw(@ISA @EXPORT);
              extract_node_info
              get_addr_info
              get_parent_addr_info get_parent_op
-             get_prev_addr_info   get_prev_op
+             get_prev_addr_info
              trim_line_pair
              underline_parent
     );
@@ -62,22 +62,28 @@ sub get_parent_addr_info($)
     return $deparse->{optree}{$parent_addr};
 }
 
-sub get_prev_op($)
+sub get_prev_info($);
+sub get_prev_info($)
 {
     my ($op_info) = @_;
     return undef unless $op_info;
-    my $deparse = $op_info->{deparse};
-    my $ref = $deparse->{ops}{$op_info->{addr}};
-    return $ref->{prev_op} ? $ref : undef;
+    return $op_info->{prev_expr}
 }
 
+sub get_prev_addr_info($);
 sub get_prev_addr_info($)
 {
     my ($op_info) = @_;
-    my $deparse = $op_info->{deparse};
-    my $prev_op = get_prev_op($op_info);
-    return undef unless $prev_op;
-    return $deparse->{optree}{$$prev_op};
+    return undef unless $op_info;
+    if (!exists $op_info->{prev_expr}) {
+	my $parent_info = get_parent_addr_info($op_info);
+	if ($parent_info) {
+	    return get_prev_addr_info($parent_info);
+	} else {
+	    return undef;
+	}
+    }
+    return $op_info->{prev_expr}
 }
 
 sub underline_parent($$$) {
@@ -161,18 +167,98 @@ sub trim_line_pair($$$$) {
     return \@result;
 }
 
+# FIXME: this is a mess
+
+# return an ARRAY ref to strings that can be joined with "\n" to
+# give a position in the text. Here are some examples
+# after joining
+#
+#   my ($x, $y) = (1, 2)
+#                 ------
+#   my ($x, $y) = (1, 2)
+#                 ~~~~~
+#   my ($x, $y) = (1, 2)
+#                     -
+#  (1, 2)
+#
+#  if ($x) { ...
+#     my ($x, $y = (1, 2)
+#     -------------------
+#
+#  if ($x) { ...
+#     my ($x, $y = (1, 2)...
+#     -------------------
+
+# When we can, we text in the context of the surrounding
+# text which is obtained by going up levels of the tree
+# form the instruction. We might have to go a few levels
+# up the tree before we find a text that spans more than
+# a single line.  In the fourth case where we don't
+# have an underline but simply have "(1, 2)" that means
+# were unable to get the parent text.
+
+# We hope that in the normal case, using the place holders in the
+# format specifiers, we can know for sure where a child fits in as
+# that child's node is stored in the parent as some "texts"
+# entry. However this isn't always possible right now. So in the
+# second example where "~" was used instead of "-", to
+# indicate that the result was obtained the result by string matching
+# rather than by exact node matching inside the parent.
+# We can also use the "|" instead for instructions that really
+# don't have an equivalent concept in the source code, so we've
+# artificially tagged a location that is reasonable. "pushmark"
+# and "padrange" instructions would be in this category.
+#
+# In the last two examples, we show how we do elision. The ...
+# in the parent text means that we have only given the first line
+# of the parent text along with the line that the child fits in.
+# if there is an elision in the child text it means that that
+# spans more than one line.
+
 sub extract_node_info($)
 {
     my ($info) = @_;
+
     my $child_text = $info->{text};
+    my $parent_text = undef;
+    my $candidate_pair = undef;
+    my $marked_position = undef;
+
+    # Some opcodes like pushmark , padrange, and null,
+    # don't have an well-defined correspondence to a string in the
+    # source code, so we have made a somewhat arbitrary association fitting
+    # into the parent string. Examples of such artificial associations are
+    # the function name part of call, or an open brace of a scope.
+    # You can tell these nodes because they have a "position" field.
+    if (exists $info->{position}) {
+	my $found_pos = $info->{position};
+	$marked_position = $found_pos;
+	$parent_text = $child_text;
+	$child_text = substr($parent_text,
+			     $found_pos->[0], $found_pos->[1]);
+	my $parent_underline = ' ' x $found_pos->[0];
+	$parent_underline .= '|' x $found_pos->[1];
+	$candidate_pair = trim_line_pair($parent_text, $child_text,
+					 $parent_underline,
+					 $found_pos->[0]);
+
+    }
+
     my $parent = $info->{parent} ? $info->{parent} : undef;
-    return [$child_text] unless $parent;
+    unless ($parent) {
+	return $candidate_pair ? $candidate_pair : [$child_text];
+    }
+
     my $child_addr = $info->{addr};
     my $deparsed = $info->{deparse};
     my $parent_info = $deparsed->{optree}{$parent};
-    return [$child_text] unless $parent_info;
-    my $separator = $parent_info->{sep};
-    my @texts = @{$parent_info->{texts}};
+
+    unless ($parent_info) {
+	return $candidate_pair ? $candidate_pair : [$child_text];
+    }
+
+    my $separator = exists $parent_info->{sep} ? $parent_info->{sep} : '';
+    my @texts = exists $parent_info->{texts} ? @{$parent_info->{texts}} : ($parent_info->{text});
     my $parent_line = '';
     my $text_len = $#texts;
 	my $result = '';
@@ -182,7 +268,7 @@ sub extract_node_info($)
 	and eval{$texts[0]->isa("B::DeparseTree::Node")}) {
 	$parent_info = $texts[0];
     }
-    if (exists $parent_info->{fmt}) {
+    if (exists $parent_info->{fmt} || exists $parent_info->{position}) {
 	# If the child text is the same as the parent's, go up the parent
 	# chain until we find something different.
 	while ($parent_info->{text} eq $child_text
@@ -196,9 +282,41 @@ sub extract_node_info($)
 	my $args = $parent_info->{texts};
 	my ($str, $found_pos) = $deparsed->template_engine($fmt, $indexes, $args,
 							   $child_addr);
+
+	# Keep gathering parent text until we have at least one full line.
+	while (index($str, "\n") == -1 && $parent_info->{parent}) {
+	    $child_addr = $parent_info->{addr};
+	    $parent_info = $deparsed->{optree}{$parent_info->{parent}};
+	    $fmt = $parent_info->{fmt};
+	    $indexes = $parent_info->{indexes};
+	    $args = $parent_info->{texts};
+	    my ($next_str, $next_found_pos) = $deparsed->template_engine($fmt,
+									 $indexes, $args,
+									 $child_addr);
+	    last unless $next_found_pos;
+	    my $nl_pos = index($next_str, "\n");
+	    while ($nl_pos >= 0 and $nl_pos  < $next_found_pos->[0]) {
+		$next_str = substr($next_str, $nl_pos+1);
+		$next_found_pos->[0] -= ($nl_pos+1);
+		$nl_pos = index($next_str, "\n");
+	    }
+	    $str = $next_str;
+	    if ($found_pos) {
+		$found_pos->[0] += $next_found_pos->[0];
+	    } else {
+		$found_pos = $next_found_pos;
+	    }
+	}
+
 	if (defined($found_pos)) {
-	    my $parent_underline = ' ' x $found_pos->[0];
-	    $parent_underline .= '-' x $found_pos->[1];
+	    my $parent_underline;
+	    if ($marked_position) {
+		$parent_underline = ' ' x ($found_pos->[0] + $marked_position->[0]);
+		$parent_underline .= '|' x $marked_position->[1];
+	    } else {
+		$parent_underline = ' ' x $found_pos->[0];
+		$parent_underline .= '-' x $found_pos->[1];
+	    }
 	    return trim_line_pair($str, $child_text, $parent_underline, $found_pos->[0]);
 	}
 	$result = $str;
@@ -245,7 +363,7 @@ sub extract_node_info($)
     }
     # Can't find by node address info, so just try to find the string
     # inside of the parent.
-    my $parent_text = $parent_info->{text};
+    $parent_text = $parent_info->{text};
     my $start_index = index($parent_text, $child_text);
     if ($start_index >= 0) {
 	if (index($parent_text, $child_text, $start_index+1) < 0) {
@@ -256,7 +374,8 @@ sub extract_node_info($)
     }
 }
 
-# Dump out the entire list of texts
+# Dump out full information of a node in relation to its
+# parent
 sub dump($) {
     my ($deparse_tree) = @_;
     my @addrs = sort keys %{$deparse_tree->{optree}};
@@ -281,9 +400,59 @@ sub dump($) {
     }
 }
 
+# Dump out essention information of a node in relation to its
+# parent
+sub dump_relations($) {
+    my ($deparse_tree) = @_;
+    my @addrs = sort keys %{$deparse_tree->{optree}};
+    for (my $i=0; $i < $#addrs; $i++) {
+	my $info = get_addr_info($deparse_tree, $addrs[$i]);
+	next unless $info && $info->{parent};
+	my $parent = get_parent_addr_info($info);
+	next unless $parent;
+	print $i, '-' x 50, "\n";
+	print "Child info:\n";
+	printf "\taddr: 0x%0x, parent: 0x%0x\n", $addrs[$i], $parent->{addr};
+	printf "\top: %s\n", $info->{op}->can('name') ? $info->{op}->name : $info->{op} ;
+	printf "\ttext: %s\n\n", $info->{text};
+	# p $parent ;
+	my $texts = extract_node_info($info);
+	if ($texts) {
+	    print join("\n", @$texts), "\n";
+	}
+	print $i, '-' x 50, "\n";
+    }
+}
+
+sub dump_tree($$);
+
+# Dump out the entire texts in tree format
+sub dump_tree($$) {
+    my ($deparse_tree, $info) = @_;
+    if (ref($info) and (ref($info->{texts}) eq 'ARRAY')) {
+	foreach my $child_info (@{$info->{texts}}) {
+	    if (ref($child_info)) {
+		if (ref($child_info) eq 'ARRAY') {
+		    p $child_info;
+		} elsif (ref($child_info) eq 'B::DeparseTree::Node') {
+		    dump_tree($deparse_tree, $child_info)
+		} else {
+		    printf "Unknown child_info type %s\n", ref($child_info);
+		    p $child_info;
+		}
+	    }
+	}
+	print '-' x 50, "\n";
+    }
+    p $info ;
+    print '=' x 50, "\n";
+}
+
 unless (caller) {
     sub bug() {
-	return 5
+	my ($a, $b) = @_;
+	($a, $b) = ($b, $a) if ($a > $b);
+	# -((1, 2) x 2);
 	# no strict;
 	# for ( $i=0; $i;) {};
 	# my ($a, $b, $c);
@@ -300,9 +469,9 @@ unless (caller) {
 			       $start_pos);
     print join("\n", @$lines), "\n";
 
-    # my $deparse = B::DeparseTree->new();
-    # use B;
-    # $deparse->pessimise(B::main_root, B::main_start);
+    my $deparse = B::DeparseTree->new();
+    use B;
+    $deparse->pessimise(B::main_root, B::main_start);
     # my @addrs = sort keys %{$deparse->{ops}}, "\n";
     # use Data::Printer;
     # p @addrs;
@@ -314,7 +483,8 @@ unless (caller) {
     # $deparse->init();
     # my $svref = B::svref_2object(\&bug);
     # my $x =  $deparse->deparse_sub($svref, $addrs[9]);
-    # p $x;
+    # my $x =  $deparse->deparse_sub($svref);
+    # dump_tree($deparse, $x);
 
     # # my @info_addrs = sort keys %{$deparse->{optree}}, "\n";
     # # print '-' x 40, "\n";
@@ -324,37 +494,37 @@ unless (caller) {
     # # p $info;
     # exit 0;
 
-    # $deparse->coderef2info(\&bug);
-    # # $deparse->coderef2info(\&get_addr_info);
-    # my @addrs = sort keys %{$deparse->{optree}}, "\n";
-    # B::DeparseTree::Fragment::dump($deparse);
+    $deparse->coderef2info(\&bug);
+    # $deparse->coderef2info(\&get_addr_info);
+    my @addrs = sort keys %{$deparse->{optree}}, "\n";
+    B::DeparseTree::Fragment::dump($deparse);
 
-    my ($parent_text, $pu);
-    $parent_text = "now is the time";
-    $child_text = 'is';
-    $start_pos = index($parent_text, $child_text);
-    $pu = underline_parent($child_text, $parent_text, '-');
-    print join("\n", @{trim_line_pair($parent_text, $child_text,
-				    $pu, $start_pos)}), "\n";
-    $parent_text = "if (\$a) {\n\$b\n}";
-    $child_text = '$b';
-    $start_pos = index($parent_text, $child_text);
-    $pu = underline_parent($child_text, $parent_text, '-');
-    print join("\n", @{trim_line_pair($parent_text, $child_text,
-				    $pu, $start_pos)}), "\n";
+    # my ($parent_text, $pu);
+    # $parent_text = "now is the time";
+    # $child_text = 'is';
+    # $start_pos = index($parent_text, $child_text);
+    # $pu = underline_parent($child_text, $parent_text, '-');
+    # print join("\n", @{trim_line_pair($parent_text, $child_text,
+    # 				    $pu, $start_pos)}), "\n";
+    # $parent_text = "if (\$a) {\n\$b\n}";
+    # $child_text = '$b';
+    # $start_pos = index($parent_text, $child_text);
+    # $pu = underline_parent($child_text, $parent_text, '-');
+    # print join("\n", @{trim_line_pair($parent_text, $child_text,
+    # 				    $pu, $start_pos)}), "\n";
 
-    $parent_text = "if (\$a) {\n  \$b;\n  \$c}";
-    $child_text = '$b';
-    $start_pos = index($parent_text, $child_text);
-    $pu = underline_parent($child_text, $parent_text, '-');
-    print join("\n", @{trim_line_pair($parent_text, $child_text,
-     				    $pu, $start_pos)}), "\n";
-    $parent_text = "if (\$a) {\n  \$b;\n  \$c}";
-    $child_text = "\$b;\n  \$c";
-    $start_pos = index($parent_text, $child_text);
-    $pu = underline_parent($child_text, $parent_text, '-');
-    print join("\n", @{trim_line_pair($parent_text, $child_text,
-     				    $pu, $start_pos)}), "\n";
+    # $parent_text = "if (\$a) {\n  \$b;\n  \$c}";
+    # $child_text = '$b';
+    # $start_pos = index($parent_text, $child_text);
+    # $pu = underline_parent($child_text, $parent_text, '-');
+    # print join("\n", @{trim_line_pair($parent_text, $child_text,
+    #  				    $pu, $start_pos)}), "\n";
+    # $parent_text = "if (\$a) {\n  \$b;\n  \$c}";
+    # $child_text = "\$b;\n  \$c";
+    # $start_pos = index($parent_text, $child_text);
+    # $pu = underline_parent($child_text, $parent_text, '-');
+    # print join("\n", @{trim_line_pair($parent_text, $child_text,
+    #  				    $pu, $start_pos)}), "\n";
 }
 
 1;

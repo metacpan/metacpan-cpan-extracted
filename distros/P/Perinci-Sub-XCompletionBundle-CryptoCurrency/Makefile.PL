@@ -19,7 +19,8 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Complete::Util" => "0.57",
     "CryptoCurrency::Catalog" => 20180308,
-    "CryptoExchange::Catalog" => 0,
+    "CryptoExchange::Catalog" => 20180510,
+    "Locale::Codes::Currency_Codes" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -29,7 +30,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,10 +40,11 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Complete::Util" => "0.57",
   "CryptoCurrency::Catalog" => 20180308,
-  "CryptoExchange::Catalog" => 0,
+  "CryptoExchange::Catalog" => 20180510,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Locale::Codes::Currency_Codes" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

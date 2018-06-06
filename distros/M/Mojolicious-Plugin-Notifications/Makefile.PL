@@ -7,7 +7,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
   NAME         => 'Mojolicious::Plugin::Notifications',
   VERSION_FROM => 'lib/Mojolicious/Plugin/Notifications.pm',
-  ABSTRACT     => 'Event Notifications for your Users',
+  ABSTRACT     => 'Frontend Event Notifications',
   AUTHOR       => 'Nils Diewald',
   BUILD_REQUIRES => {
     'Test::More' => 0,

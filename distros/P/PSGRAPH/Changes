@@ -23,3 +23,6 @@ Revision history for Perl extension PSGRAPH.
 	- corrected chomp error in 2Dpie 3 and eliminated output comments
 0.04  Tuesday Sep 27 2016
 	- Finished debugging pie 31 (pie with percentages in the legend)
+0.05  Wed May 24 2018
+	- Added plain pie (subtype 6)
+	- Added pie with percentage callouts (subtype 41)

@@ -16,6 +16,6 @@ no_index:
     - inc
 resources:
   repository: git://github.com/Corion/WWW-Mechanize-Shell.git
-version: '0.56'
+version: '0.57'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

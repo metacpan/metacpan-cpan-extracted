@@ -28,7 +28,7 @@ my @tests = (
     {schema=>["date", min=>"2014-01-02"], input=>"2014-02-01", valid=>1},
 
     {schema=>["date", min=>"2014-01-02T02:10:10Z"],
-     input=>"2014-01-02", valid=>0},
+     input=>"2014-01-02T00:00:00Z", valid=>0},
     {schema=>["date", min=>"2014-01-02T02:10:10Z"],
      input=>"2014-02-01T03:00:00Z", valid=>1},
 

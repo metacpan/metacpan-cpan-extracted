@@ -49,15 +49,6 @@ namespace dlib
                 - this object is properly initialized
         !*/
 
-        explicit circular_buffer(
-            unsigned long s
-        );
-        /*!
-            ensures
-                - #size() == s
-                - this object is properly initialized
-        !*/
-
         void clear (
         );
         /*!

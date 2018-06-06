@@ -1,5 +1,5 @@
 package JSONAPI::Document;
-$JSONAPI::Document::VERSION = '1.4';
+$JSONAPI::Document::VERSION = '1.5';
 # ABSTRACT: Turn DBIx results into JSON API documents.
 
 use Moo;
@@ -17,7 +17,7 @@ has kebab_case_attrs => (
 has api_url => (
     is  => 'ro',
     isa => sub {
-        Carp::croak('api_url should be an absolute url') unless $_[0] =~ m/^http/;
+        Carp::croak('api_url should be an absolute url') unless $_[0] =~ m/^http/i;
     },
     required => 1,
 );
@@ -129,7 +129,7 @@ JSONAPI::Document - Turn DBIx results into JSON API documents.
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 SYNOPSIS
 

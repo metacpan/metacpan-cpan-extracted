@@ -142,5 +142,15 @@ subtest 'has_symbols' => sub {
 
 };
 
+subtest 'system_path' => sub {
+
+  @{ $FFI::CheckLib::system_path } = (qw( /foo /bar /baz ));
+
+  is(
+    FFI::CheckLib::system_path(),
+    [ qw( /foo /bar /baz ) ],
+  );
+
+};
 
 done_testing;

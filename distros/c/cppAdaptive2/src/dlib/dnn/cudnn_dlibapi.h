@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2015  Davis E. King (davis@dlib.net)
+// Copyright (C) 2015  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_DNN_CuDNN_H_
 #define DLIB_DNN_CuDNN_H_
@@ -6,8 +6,6 @@
 #ifdef DLIB_USE_CUDA
 
 #include "cuda_errors.h"
-#include <memory>
-#include "cuda_data_ptr.h"
 
 namespace dlib
 {
@@ -65,7 +63,7 @@ namespace dlib
             void* handle;
         };
 
-        // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
 
         void add(
             float beta,
@@ -205,34 +203,7 @@ namespace dlib
             );
 
             void operator() (
-                const bool add_to_output,
-                tensor& output,
-                const tensor& data,
-                const tensor& filters
-            );
-
-            void operator() (
-                const bool add_to_output,
                 resizable_tensor& output,
-                const tensor& data,
-                const tensor& filters
-            );
-
-            void get_gradient_for_data (
-                const bool add_to_output,
-                const tensor& gradient_input, 
-                const tensor& filters,
-                tensor& data_gradient
-            );
-
-            void get_gradient_for_filters (
-                const bool add_to_output,
-                const tensor& gradient_input, 
-                const tensor& data,
-                tensor& filters_gradient
-            );
-
-           void setup(
                 const tensor& data,
                 const tensor& filters,
                 int stride_y,
@@ -240,8 +211,83 @@ namespace dlib
                 int padding_y,
                 int padding_x
             );
+            /*!
+                requires
+                    - stride_y > 0
+                    - stride_x > 0
+                    - 0 <= padding_y < filters.nr()
+                    - 0 <= padding_x < filters.nc()
+                    - is_same_object(output,data) == false
+                    - is_same_object(output,filters) == false
+                ensures
+                    - convolves filters over data.  
+                    - filters contains filters.num_samples() filters. 
+                    - #output.num_samples() == data.num_samples()
+                    - #output.k() == filters.num_samples()
+                    - #output.nr() == 1+(data.nr()-filters.nr()%2)/stride_y
+                    - #output.nc() == 1+(data.nc()-filters.nc()%2)/stride_x
+            !*/
+
+            void get_gradient_for_data (
+                const tensor& gradient_input, 
+                const tensor& filters,
+                tensor& data_gradient
+            );
+            /*!
+                requires
+                    - filters has the same dimensions as the filters object give to the 
+                      last call to operator().
+                    - data_gradient has the same dimensions as the data object give to the
+                      last call to operator().
+                    - gradient_input has the same dimensions as the output of operator().
+                    - is_same_object(data_gradient,filters) == false
+                    - is_same_object(data_gradient,gradient_input) == false
+                ensures
+                    - let OUT be the output of (*this)(OUT,data,filters).
+                    - let f(data,filters) == dot(OUT, gradient_input)
+                    - This function finds the gradient of f() with respect to data
+                      and adds this gradient to data_gradient.
+            !*/
+
+            void get_gradient_for_filters (
+                const tensor& gradient_input, 
+                const tensor& data,
+                tensor& filters_gradient
+            );
+            /*!
+                requires
+                    - filters_gradient has the same dimensions as the filters object give
+                      to the last call to operator().
+                    - data has the same dimensions as the data object give to the last call
+                      to operator().
+                    - gradient_input has the same dimensions as the output of operator().
+                    - is_same_object(filters_gradient,data) == false
+                    - is_same_object(filters_gradient,gradient_input) == false
+                ensures
+                    - let OUT be the output of (*this)(OUT,data,filters).
+                    - let f(data,filters) == dot(OUT, gradient_input)
+                    - This function finds the gradient of f() with respect to filters 
+                      and assigns this gradient to filters_gradient.
+            !*/
 
         private:
+
+            void setup(
+                const tensor& data,
+                const tensor& filters,
+                int stride_y,
+                int stride_x,
+                int padding_y,
+                int padding_x
+            );
+            /*!
+                requires
+                    - filters.k() == data.k()
+                    - stride_y > 0
+                    - stride_x > 0
+                    - 0 <= padding_y < filters.nr()
+                    - 0 <= padding_x < filters.nc()
+            !*/
 
             // These variables record the type of data given to the last call to setup().
             int stride_y;
@@ -262,16 +308,16 @@ namespace dlib
             int out_nc;
 
             int forward_algo;
-            int backward_data_algo;
-            int backward_filters_algo;
-
             size_t forward_workspace_size_in_bytes;
+            void* forward_workspace;
+
+            int backward_data_algo;
             size_t backward_data_workspace_size_in_bytes;
+            void* backward_data_workspace;
+
+            int backward_filters_algo;
             size_t backward_filters_workspace_size_in_bytes;
-            std::shared_ptr<resizable_cuda_buffer> workspace;
-            cuda_data_void_ptr forward_workspace;
-            cuda_data_void_ptr backward_data_workspace;
-            cuda_data_void_ptr backward_filters_workspace;
+            void* backward_filters_workspace;
         };
 
     // ------------------------------------------------------------------------------------
@@ -389,19 +435,6 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        void softmax_all (
-            tensor& dest,
-            const tensor& src
-        );
-
-        void softmax_all_gradient (
-            tensor& grad,
-            const tensor& dest,
-            const tensor& gradient_input
-        );
-
-    // ------------------------------------------------------------------------------------
-
         void sigmoid (
             tensor& dest,
             const tensor& src
@@ -504,8 +537,6 @@ namespace dlib
                 - This function supports in-place operation, i.e. having
                   is_same_object(grad, gradient_input)==true
         !*/
-
-
 
     // ------------------------------------------------------------------------------------
 

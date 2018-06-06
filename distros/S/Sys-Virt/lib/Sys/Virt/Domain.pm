@@ -663,6 +663,12 @@ from the running guest. The optional <$flags> parameter defaults
 to 0, but can accept one of the device hotplug flags described
 later.
 
+=item $dom->detach_device_alias($alias[, $flags])
+
+Hotunplug an existing device which is identified by C<$alias>.
+The optional <$flags> parameter defaults to 0, but can accept one
+of the device hotplug flags described later.
+
 =item $dom->update_device($xml[, $flags])
 
 Update the configuration of an existing device. The new configuration

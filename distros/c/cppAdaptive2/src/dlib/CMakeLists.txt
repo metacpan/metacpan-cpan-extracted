@@ -7,92 +7,55 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(dlib)
 
-
-include(cmake_utils/set_compiler_specific_options.cmake)
-
-
-# Adhere to GNU filesystem layout conventions
-include(GNUInstallDirs)
-
 # default to a Release build (except if CMAKE_BUILD_TYPE is set)
 include(cmake_utils/release_build_by_default)
 include(cmake_utils/use_cpp_11.cmake)
 
 
 set(CPACK_PACKAGE_VERSION_MAJOR "19")
-set(CPACK_PACKAGE_VERSION_MINOR "10")
+set(CPACK_PACKAGE_VERSION_MINOR "4")
 set(CPACK_PACKAGE_VERSION_PATCH "0")
 set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 # Set DLIB_VERSION in the including CMake file so they can use it to do whatever they want. 
 get_directory_property(has_parent PARENT_DIRECTORY)
 if(has_parent)
    set(DLIB_VERSION ${VERSION} PARENT_SCOPE)
-   if (NOT DEFINED DLIB_IN_PROJECT_BUILD)
-      set(DLIB_IN_PROJECT_BUILD true)
-   endif()
 endif()
+
+# Set only because there are old target_link_libraries() statements in the
+# FindCUDA.cmake file that comes with CMake that error out if the new behavior
+# is used.
+cmake_policy(SET CMP0023 OLD)
+
+include(cmake_utils/add_global_compiler_switch.cmake)
 
 
 if (DLIB_IN_PROJECT_BUILD)
-   # DLIB_IN_PROJECT_BUILD==true means you are using dlib by invoking
-   # add_subdirectory(dlib) in the parent project. In this case, we always want
-   # to build dlib as a static library so the parent project doesn't need to
-   # deal with some random dlib shared library file.  It is much better to
-   # statically compile dlib into the parent project.  So the following bit of
-   # CMake ensures that happens.  However, we have to take care to compile dlib
-   # with position independent code if appropriate (i.e. if the parent project
-   # is a shared library).
-   if (BUILD_SHARED_LIBS)
-      if (CMAKE_COMPILER_IS_GNUCXX)
-         # Just setting CMAKE_POSITION_INDEPENDENT_CODE should be enough to set
-         # -fPIC for GCC but sometimes it still doesn't get set, so make sure it
-         # does.
-         add_definitions("-fPIC")
-      endif()
-      set(CMAKE_POSITION_INDEPENDENT_CODE true)
+   # Make sure ENABLE_ASSERTS is defined for debug builds, but only for uses
+   # who are building an application.  If they are just building dlib as a
+   # stand alone library then don't set this because it will conflict with the
+   # settings in config.h if we did.
+   if (NOT CMAKE_CXX_FLAGS_DEBUG MATCHES "-DENABLE_ASSERTS")
+      set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DENABLE_ASSERTS" 
+         CACHE STRING "Flags used by the compiler during C++ debug builds." 
+         FORCE)
    endif()
-
-   # Tell cmake to build dlib as a static library
-   set(BUILD_SHARED_LIBS false)
 endif()
-
-
-if (CMAKE_VERSION VERSION_LESS "3.9.0")
-   # Set only because there are old target_link_libraries() statements in the
-   # FindCUDA.cmake file that comes with CMake that error out if the new behavior
-   # is used.  In newer versions of CMake we can instead set CUDA_LINK_LIBRARIES_KEYWORD which fixes this issue.
-   cmake_policy(SET CMP0023 OLD)
-else()
-   set(CUDA_LINK_LIBRARIES_KEYWORD PUBLIC)
-endif()
-
-
-macro (enable_preprocessor_switch option_name)
-   list(APPEND active_preprocessor_switches "-D${option_name}")
-endmacro()
-
-macro (disable_preprocessor_switch option_name)
-   if (active_preprocessor_switches)
-      list(REMOVE_ITEM active_preprocessor_switches "-D${option_name}")
-   endif()
-endmacro()
 
 macro (toggle_preprocessor_switch option_name)
    if (${option_name})
-      enable_preprocessor_switch(${option_name})
+      add_global_define(${option_name})
    else()
-      disable_preprocessor_switch(${option_name})
+      remove_global_define(${option_name})
    endif()
 endmacro()
 
-
-
 # Suppress superfluous randlib warnings about libdlib.a having no symbols on MacOSX.
 if (APPLE)
-   set(CMAKE_C_ARCHIVE_CREATE   "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")
-   set(CMAKE_CXX_ARCHIVE_CREATE "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")
-   set(CMAKE_C_ARCHIVE_FINISH   "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
-   set(CMAKE_CXX_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
+    set(CMAKE_C_ARCHIVE_CREATE   "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")
+    set(CMAKE_CXX_ARCHIVE_CREATE "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")
+    set(CMAKE_C_ARCHIVE_FINISH   "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
+    set(CMAKE_CXX_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
 endif()
 
 # Don't try to call add_library(dlib) and setup dlib's stuff if it has already
@@ -104,33 +67,31 @@ endif()
 if (NOT TARGET dlib)
 
    set (DLIB_ISO_CPP_ONLY_STR 
-      "Enable this if you don't want to compile any non-ISO C++ code (i.e. you don't use any of the API Wrappers)" )
+   "Enable this if you don't want to compile any non-ISO C++ code (i.e. you don't use any of the API Wrappers)" )
    set (DLIB_NO_GUI_SUPPORT_STR 
-      "Enable this if you don't want to compile any of the dlib GUI code" )
+   "Enable this if you don't want to compile any of the dlib GUI code" )
    set (DLIB_ENABLE_STACK_TRACE_STR 
-      "Enable this if you want to turn on the DLIB_STACK_TRACE macros" )
+   "Enable this if you want to turn on the DLIB_STACK_TRACE macros" )
+   set (DLIB_ENABLE_ASSERTS_STR 
+   "Enable this if you want to turn on the DLIB_ASSERT macro" )
    set (DLIB_USE_BLAS_STR
-      "Disable this if you don't want to use a BLAS library" )
+   "Disable this if you don't want to use a BLAS library" )
    set (DLIB_USE_LAPACK_STR
-      "Disable this if you don't want to use a LAPACK library" )
+   "Disable this if you don't want to use a LAPACK library" )
    set (DLIB_USE_CUDA_STR
-      "Disable this if you don't want to use NVIDIA CUDA" )
+   "Disable this if you don't want to use NVIDIA CUDA" )
    set (DLIB_PNG_SUPPORT_STR
-      "Disable this if you don't want to link against libpng" )
+   "Disable this if you don't want to link against libpng" )
    set (DLIB_GIF_SUPPORT_STR
-      "Disable this if you don't want to link against libgif" )
+   "Disable this if you don't want to link against libgif" )
    set (DLIB_JPEG_SUPPORT_STR
-      "Disable this if you don't want to link against libjpeg" )
+   "Disable this if you don't want to link against libjpeg" )
    set (DLIB_LINK_WITH_SQLITE3_STR
-      "Disable this if you don't want to link against sqlite3" )
+   "Disable this if you don't want to link against sqlite3" )
    #set (DLIB_USE_FFTW_STR "Disable this if you don't want to link against fftw" )
    set (DLIB_USE_MKL_FFT_STR
-      "Disable this is you don't want to use the MKL DFTI FFT implementation" )
-   set (DLIB_ENABLE_ASSERTS_STR
-      "Enable this if you want to turn on the DLIB_ASSERT macro" )
+   "Disable this is you don't want to use the MKL DFTI FFT implementation" )
 
-
-   option(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
    option(DLIB_ISO_CPP_ONLY ${DLIB_ISO_CPP_ONLY_STR} OFF)
    toggle_preprocessor_switch(DLIB_ISO_CPP_ONLY)
    option(DLIB_NO_GUI_SUPPORT ${DLIB_NO_GUI_SUPPORT_STR} OFF)
@@ -138,32 +99,27 @@ if (NOT TARGET dlib)
    option(DLIB_ENABLE_STACK_TRACE ${DLIB_ENABLE_STACK_TRACE_STR} OFF)
    toggle_preprocessor_switch(DLIB_ENABLE_STACK_TRACE)
 
+   option(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
    if(DLIB_ENABLE_ASSERTS)
       # Set these variables so they are set in the config.h.in file when dlib
       # is installed.
       set (DLIB_DISABLE_ASSERTS false)
       set (ENABLE_ASSERTS true) 
-      enable_preprocessor_switch(ENABLE_ASSERTS)
-      disable_preprocessor_switch(DLIB_DISABLE_ASSERTS)
+      add_global_define(ENABLE_ASSERTS)
+      remove_global_define(DLIB_DISABLE_ASSERTS)
    else()
       # Set these variables so they are set in the config.h.in file when dlib
       # is installed.
       set (DLIB_DISABLE_ASSERTS true)
       set (ENABLE_ASSERTS false) 
-      disable_preprocessor_switch(ENABLE_ASSERTS)
-      # Never force the asserts off when doing an in project build.  The only
-      # time this matters is when using visual studio.  The visual studio IDE
-      # has a drop down that lets the user select either release or debug
-      # builds.  The DLIB_ASSERT macro is setup to enable/disable automatically
-      # based on this drop down (via preprocessor magic).  However, if
-      # DLIB_DISABLE_ASSERTS is defined it permanently disables asserts no
-      # matter what, which would defeat the visual studio drop down.  So here
-      # we make a point to not do that kind of severe disabling when in a
-      # project build.  It should also be pointed out that DLIB_DISABLE_ASSERTS
-      # is only needed when building and installing dlib as a separately
-      # installed library.  It doesn't matter when doing an in project build. 
+      remove_global_define(ENABLE_ASSERTS)
+      # Never force the asserts off when doing an in project build.  Instead,
+      # let the debug/release mode setting toggle asserts on or off (or the
+      # DLIB_ENABLE_ASSERTS option obviously).  That is, even if the
+      # DLIB_ENABLE_ASSERTS option is off debug mode can still cause the
+      # asserts to turn on when using an in project build. 
       if (NOT DLIB_IN_PROJECT_BUILD)
-         enable_preprocessor_switch(DLIB_DISABLE_ASSERTS)
+         add_global_define(DLIB_DISABLE_ASSERTS)
       endif()
    endif()
 
@@ -199,30 +155,30 @@ if (NOT TARGET dlib)
 
 
    set(source_files 
-      base64/base64_kernel_1.cpp
-      bigint/bigint_kernel_1.cpp
-      bigint/bigint_kernel_2.cpp
-      bit_stream/bit_stream_kernel_1.cpp
-      entropy_decoder/entropy_decoder_kernel_1.cpp
-      entropy_decoder/entropy_decoder_kernel_2.cpp
-      entropy_encoder/entropy_encoder_kernel_1.cpp
-      entropy_encoder/entropy_encoder_kernel_2.cpp
-      md5/md5_kernel_1.cpp
-      tokenizer/tokenizer_kernel_1.cpp
-      unicode/unicode.cpp
-      data_io/image_dataset_metadata.cpp
-      data_io/mnist.cpp
-      global_optimization/global_function_search.cpp
-      filtering/kalman_filter.cpp
-      test_for_odr_violations.cpp
-      )
+         base64/base64_kernel_1.cpp
+         bigint/bigint_kernel_1.cpp
+         bigint/bigint_kernel_2.cpp
+         bit_stream/bit_stream_kernel_1.cpp
+         entropy_decoder/entropy_decoder_kernel_1.cpp
+         entropy_decoder/entropy_decoder_kernel_2.cpp
+         entropy_encoder/entropy_encoder_kernel_1.cpp
+         entropy_encoder/entropy_encoder_kernel_2.cpp
+         md5/md5_kernel_1.cpp
+         tokenizer/tokenizer_kernel_1.cpp
+         unicode/unicode.cpp
+         data_io/image_dataset_metadata.cpp
+         data_io/mnist.cpp
+         dnn/cpu_dlib.cpp
+         dnn/tensor_tools.cpp
+   )
 
-
-   set(dlib_needed_libraries)
-   set(dlib_needed_includes)
 
    if (DLIB_ISO_CPP_ONLY)
-      add_library(dlib ${source_files} )
+       add_library(dlib STATIC ${source_files} )
+       if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
+           add_library(dlib_shared SHARED ${source_files} )
+           add_dependencies(dlib_shared dlib)
+       endif()
    else()
 
       set(source_files ${source_files}
@@ -253,10 +209,10 @@ if (NOT TARGET dlib)
          threads/async.cpp
          timer/timer.cpp
          stack_trace.cpp
-         dnn/cpu_dlib.cpp
-         dnn/tensor_tools.cpp
          )
 
+      set(dlib_needed_libraries)
+      set(dlib_needed_includes)
       if(UNIX)
          set(CMAKE_THREAD_PREFER_PTHREAD ON)
          find_package(Threads REQUIRED)
@@ -278,7 +234,7 @@ if (NOT TARGET dlib)
                # If both X11 and anaconda are installed, it's possible for the
                # anaconda path to appear before /opt/X11, so we remove anaconda.
                foreach (ITR ${X11_INCLUDE_DIR})
-                  if ("${ITR}" MATCHES "(.*)(Ana|ana|mini)conda(.*)")
+                  if ("${ITR}" MATCHES "(.*)anaconda(.*)")
                      list (REMOVE_ITEM X11_INCLUDE_DIR ${ITR})
                   endif ()
                endforeach(ITR)
@@ -306,10 +262,10 @@ if (NOT TARGET dlib)
                message(" *****************************************************************************")
                message(" *** DLIB GUI SUPPORT DISABLED BECAUSE X11 DEVELOPMENT LIBRARIES NOT FOUND ***")
                message(" *** Make sure XQuartz is installed if you want GUI support.               ***")
-               message(" *** You can download XQuartz from: https://www.xquartz.org/               ***")
+               message(" *** You can download XQuartz from: http://xquartz.macosforge.org/landing/ ***")
                message(" *****************************************************************************")
                set(DLIB_NO_GUI_SUPPORT ON CACHE STRING ${DLIB_NO_GUI_SUPPORT_STR} FORCE )
-               enable_preprocessor_switch(DLIB_NO_GUI_SUPPORT)
+               add_global_define(DLIB_NO_GUI_SUPPORT)
             endif()
          endif()
 
@@ -339,7 +295,7 @@ if (NOT TARGET dlib)
                message(" *** On Ubuntu run: sudo apt-get install libx11-dev                        ***")
                message(" *****************************************************************************")
                set(DLIB_NO_GUI_SUPPORT ON CACHE STRING ${DLIB_NO_GUI_SUPPORT_STR} FORCE )
-               enable_preprocessor_switch(DLIB_NO_GUI_SUPPORT)
+               add_global_define(DLIB_NO_GUI_SUPPORT)
             endif()
          endif()
 
@@ -378,12 +334,12 @@ if (NOT TARGET dlib)
          # Make sure there isn't something wrong with the version of LIBPNG
          # installed on this system.  
          if (PNG_FOUND)
-            set(CMAKE_REQUIRED_LIBRARIES ${PNG_LIBRARIES})
+            set(CMAKE_REQUIRED_LIBRARIES ${PNG_LIBRARY})
             CHECK_FUNCTION_EXISTS(png_create_read_struct LIBPNG_IS_GOOD)
          endif()
          if (PNG_FOUND AND LIBPNG_IS_GOOD)
             include_directories(${PNG_INCLUDE_DIR})
-            set (dlib_needed_libraries ${dlib_needed_libraries} ${PNG_LIBRARIES})
+            set (dlib_needed_libraries ${dlib_needed_libraries} ${PNG_LIBRARY})
             set(REQUIRES_LIBS " libpng")
          else()
             # If we can't find libpng then statically compile it in.
@@ -420,10 +376,7 @@ if (NOT TARGET dlib)
                external/zlib/uncompr.c
                external/zlib/zutil.c
                )
-
-            include(cmake_utils/check_if_neon_available.cmake)
-            if (ARM_NEON_IS_AVAILABLE)
-               message (STATUS "NEON instructions will be used for libpng.")
+            if (NEON)
                enable_language(ASM)
                set(source_files ${source_files}
                   external/libpng/arm/arm_init.c
@@ -446,7 +399,7 @@ if (NOT TARGET dlib)
          # Make sure there isn't something wrong with the version of libjpeg 
          # installed on this system.  Also don't use the installed libjpeg
          # if this is an APPLE system because apparently it's broken (as of 2015/01/01).
-         if (JPEG_FOUND AND NOT ("${JPEG_INCLUDE_DIR}" MATCHES "(.*)(Ana|ana|mini)conda(.*)"))
+         if (JPEG_FOUND)
             set(CMAKE_REQUIRED_LIBRARIES ${JPEG_LIBRARY})
             CHECK_FUNCTION_EXISTS(jpeg_read_header LIBJPEG_IS_GOOD)
          endif()
@@ -457,51 +410,51 @@ if (NOT TARGET dlib)
             # If we can't find libjpeg then statically compile it in.
             add_definitions(-DDLIB_JPEG_STATIC)
             set(source_files ${source_files}
-               external/libjpeg/jcomapi.cpp
-               external/libjpeg/jdapimin.cpp
-               external/libjpeg/jdapistd.cpp
-               external/libjpeg/jdatasrc.cpp
-               external/libjpeg/jdcoefct.cpp
-               external/libjpeg/jdcolor.cpp
-               external/libjpeg/jddctmgr.cpp
-               external/libjpeg/jdhuff.cpp
-               external/libjpeg/jdinput.cpp
-               external/libjpeg/jdmainct.cpp
-               external/libjpeg/jdmarker.cpp
-               external/libjpeg/jdmaster.cpp
-               external/libjpeg/jdmerge.cpp
-               external/libjpeg/jdphuff.cpp
-               external/libjpeg/jdpostct.cpp
-               external/libjpeg/jdsample.cpp
-               external/libjpeg/jerror.cpp
-               external/libjpeg/jidctflt.cpp
-               external/libjpeg/jidctfst.cpp
-               external/libjpeg/jidctint.cpp
-               external/libjpeg/jidctred.cpp
-               external/libjpeg/jmemmgr.cpp
-               external/libjpeg/jmemnobs.cpp
-               external/libjpeg/jquant1.cpp
-               external/libjpeg/jquant2.cpp
-               external/libjpeg/jutils.cpp  
-               external/libjpeg/jcapimin.cpp
-               external/libjpeg/jdatadst.cpp
-               external/libjpeg/jcparam.cpp
-               external/libjpeg/jcapistd.cpp
-               external/libjpeg/jcmarker.cpp
-               external/libjpeg/jcinit.cpp
-               external/libjpeg/jcmaster.cpp
-               external/libjpeg/jcdctmgr.cpp
-               external/libjpeg/jccoefct.cpp  
-               external/libjpeg/jccolor.cpp  
-               external/libjpeg/jchuff.cpp  
-               external/libjpeg/jcmainct.cpp  
-               external/libjpeg/jcphuff.cpp  
-               external/libjpeg/jcprepct.cpp  
-               external/libjpeg/jcsample.cpp
-               external/libjpeg/jfdctint.cpp
-               external/libjpeg/jfdctflt.cpp
-               external/libjpeg/jfdctfst.cpp
-               )
+                  external/libjpeg/jcomapi.cpp
+                  external/libjpeg/jdapimin.cpp
+                  external/libjpeg/jdapistd.cpp
+                  external/libjpeg/jdatasrc.cpp
+                  external/libjpeg/jdcoefct.cpp
+                  external/libjpeg/jdcolor.cpp
+                  external/libjpeg/jddctmgr.cpp
+                  external/libjpeg/jdhuff.cpp
+                  external/libjpeg/jdinput.cpp
+                  external/libjpeg/jdmainct.cpp
+                  external/libjpeg/jdmarker.cpp
+                  external/libjpeg/jdmaster.cpp
+                  external/libjpeg/jdmerge.cpp
+                  external/libjpeg/jdphuff.cpp
+                  external/libjpeg/jdpostct.cpp
+                  external/libjpeg/jdsample.cpp
+                  external/libjpeg/jerror.cpp
+                  external/libjpeg/jidctflt.cpp
+                  external/libjpeg/jidctfst.cpp
+                  external/libjpeg/jidctint.cpp
+                  external/libjpeg/jidctred.cpp
+                  external/libjpeg/jmemmgr.cpp
+                  external/libjpeg/jmemnobs.cpp
+                  external/libjpeg/jquant1.cpp
+                  external/libjpeg/jquant2.cpp
+                  external/libjpeg/jutils.cpp  
+                  external/libjpeg/jcapimin.cpp
+                  external/libjpeg/jdatadst.cpp
+                  external/libjpeg/jcparam.cpp
+                  external/libjpeg/jcapistd.cpp
+                  external/libjpeg/jcmarker.cpp
+                  external/libjpeg/jcinit.cpp
+                  external/libjpeg/jcmaster.cpp
+                  external/libjpeg/jcdctmgr.cpp
+                  external/libjpeg/jccoefct.cpp  
+                  external/libjpeg/jccolor.cpp  
+                  external/libjpeg/jchuff.cpp  
+                  external/libjpeg/jcmainct.cpp  
+                  external/libjpeg/jcphuff.cpp  
+                  external/libjpeg/jcprepct.cpp  
+                  external/libjpeg/jcsample.cpp
+                  external/libjpeg/jfdctint.cpp
+                  external/libjpeg/jfdctflt.cpp
+                  external/libjpeg/jfdctfst.cpp
+                  )
          endif()
          set(source_files ${source_files}
             image_loader/jpeg_loader.cpp
@@ -511,8 +464,8 @@ if (NOT TARGET dlib)
 
 
       if (DLIB_USE_BLAS OR DLIB_USE_LAPACK OR DLIB_USE_MKL_FFT)
-         # Try to find BLAS, LAPACK and MKL
-         include(cmake_utils/find_blas.cmake)
+          # Try to find BLAS, LAPACK and MKL
+         include(cmake_utils/cmake_find_blas.txt)
 
          if (DLIB_USE_BLAS)
             if (blas_found)
@@ -526,13 +479,6 @@ if (NOT TARGET dlib)
          if (DLIB_USE_LAPACK)
             if (lapack_found)
                set (dlib_needed_libraries ${dlib_needed_libraries} ${lapack_libraries})
-               if (lapack_with_underscore)
-                  set(LAPACK_FORCE_UNDERSCORE 1)
-                  enable_preprocessor_switch(LAPACK_FORCE_UNDERSCORE)
-               elseif (lapack_without_underscore)
-                  set(LAPACK_FORCE_NOUNDERSCORE 1)
-                  enable_preprocessor_switch(LAPACK_FORCE_NOUNDERSCORE)
-               endif ()
             else()
                set(DLIB_USE_LAPACK OFF CACHE STRING ${DLIB_USE_LAPACK_STR} FORCE )
                toggle_preprocessor_switch(DLIB_USE_LAPACK)
@@ -559,7 +505,7 @@ if (NOT TARGET dlib)
             set(CUDA_FOUND 0)
          endif()
 
-         if (CUDA_FOUND AND (NOT USING_OLD_VISUAL_STUDIO_COMPILER))
+         if (CUDA_FOUND AND COMPILER_CAN_DO_CPP_11)
 
             # There is some bug in cmake that causes it to mess up the
             # -std=c++11 option if you let it propagate it to nvcc in some
@@ -569,7 +515,7 @@ if (NOT TARGET dlib)
                set(CUDA_PROPAGATE_HOST_FLAGS OFF)
                # Grab all the -D flags from CMAKE_CXX_FLAGS so we can pass them
                # to nvcc.
-               string(REGEX MATCHALL "-D[^ ]*" FLAGS_FOR_NVCC "${CMAKE_CXX_FLAGS}")
+               string(REGEX MATCHALL "-D[^ ]*" FLAGS_FOR_NVCC ${CMAKE_CXX_FLAGS})
             endif()
 
 
@@ -578,7 +524,6 @@ if (NOT TARGET dlib)
             # magic in the standard C++ header files (since nvcc uses gcc headers on
             # linux).
             list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30;-D__STRICT_ANSI__;-D_MWAITXINTRIN_H_INCLUDED;-D_FORCE_INLINES;${FLAGS_FOR_NVCC}")
-            list(APPEND CUDA_NVCC_FLAGS ${active_preprocessor_switches})
             if (NOT MSVC)
                list(APPEND CUDA_NVCC_FLAGS "-std=c++11")
             endif()
@@ -592,112 +537,81 @@ if (NOT TARGET dlib)
 
             include(cmake_utils/test_for_cudnn/find_cudnn.txt)
 
-            if (cudnn AND cudnn_include AND NOT DEFINED cuda_test_compile_worked AND NOT DEFINED cudnn_test_compile_worked)
+            if (cudnn AND NOT DEFINED cuda_test_compile_worked AND NOT DEFINED cudnn_test_compile_worked)
                # make sure cuda is really working by doing a test compile
                message(STATUS "Building a CUDA test project to see if your compiler is compatible with CUDA...")
 
-               set(CUDA_TEST_CMAKE_FLAGS 
-                  "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
-                  "-DCMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}"
-                  "-DCMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH}")
+               set(CUDA_TEST_CMAKE_FLAGS "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
+                                         "-DCMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}"
+                                         "-DCMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH}")
 
                if (NOT MSVC) # see https://github.com/davisking/dlib/issues/363
                   list(APPEND CUDA_TEST_CMAKE_FLAGS "-DCUDA_HOST_COMPILER=${CUDA_HOST_COMPILER}")
                endif()
 
-               try_compile(cuda_test_compile_worked 
-                  ${PROJECT_BINARY_DIR}/cuda_test_build 
-                  ${PROJECT_SOURCE_DIR}/cmake_utils/test_for_cuda cuda_test
-                  CMAKE_FLAGS ${CUDA_TEST_CMAKE_FLAGS}
-                  OUTPUT_VARIABLE try_compile_output_message
-                  )
+               try_compile(cuda_test_compile_worked ${PROJECT_BINARY_DIR}/cuda_test_build 
+                           ${PROJECT_SOURCE_DIR}/cmake_utils/test_for_cuda cuda_test
+                           CMAKE_FLAGS ${CUDA_TEST_CMAKE_FLAGS}
+                           )
                if (NOT cuda_test_compile_worked)
-                  string(REPLACE "\n" "\n   ***   " try_compile_output_message "${try_compile_output_message}")
-                  message(STATUS "*****************************************************************************************************************")
-                  message(STATUS "*** CUDA was found but your compiler failed to compile a simple CUDA program so dlib isn't going to use CUDA. ")
-                  message(STATUS "*** The output of the failed CUDA test compile is shown below: ")
-                  message(STATUS "***   ${try_compile_output_message}")
-                  message(STATUS "*****************************************************************************************************************")
+                  message(STATUS "*** CUDA was found but your compiler failed to compile a simple CUDA program so dlib isn't going to use CUDA. ***")
                else()
                   message(STATUS "Checking if you have the right version of cuDNN installed.")
-                  try_compile(cudnn_test_compile_worked 
-                     ${PROJECT_BINARY_DIR}/cudnn_test_build 
-                     ${PROJECT_SOURCE_DIR}/cmake_utils/test_for_cudnn cudnn_test
-                     CMAKE_FLAGS ${CUDA_TEST_CMAKE_FLAGS}
-                     )
-                  if (NOT cudnn_test_compile_worked)
-                     message(STATUS "*** Found cuDNN, but it looks like the wrong version so dlib will not use it.              ***")
-                     message(STATUS "*** Dlib requires cuDNN V5.0 OR GREATER.  Since cuDNN is not found DLIB WILL NOT USE CUDA. ***")
-                     message(STATUS "*** If you have cuDNN then set CMAKE_PREFIX_PATH to include cuDNN's folder.                ***")
+                  try_compile(cudnn_test_compile_worked ${PROJECT_BINARY_DIR}/cudnn_test_build 
+                              ${PROJECT_SOURCE_DIR}/cmake_utils/test_for_cudnn cudnn_test
+                              CMAKE_FLAGS ${CUDA_TEST_CMAKE_FLAGS}
+                                          )
+                  if (cudnn_test_compile_worked)
+                     message(STATUS "Found cuDNN: " ${cudnn})
+                  else()
+                     message(STATUS "*** Found cuDNN, but it looks like the wrong version so dlib will not use it. ***")
                   endif()
-               endif()
-            endif()
-
-            # Find where cuSOLVER is since the FindCUDA cmake package doesn't
-            # bother to look for it.
-            get_filename_component(cuda_blas_path "${CUDA_CUBLAS_LIBRARIES}" DIRECTORY)
-            find_library(cusolver cusolver HINTS ${cuda_blas_path})
-            mark_as_advanced(cusolver)
-            # Also find OpenMP since cuSOLVER needs it.  Importantly, we only
-            # look for one to link to if our use of BLAS, specifically the
-            # Intel MKL, hasn't already decided what to use.  This is because
-            # it makes the MKL bug out if you link to another openmp lib other
-            # than Intel's when you use the MKL.
-            if (NOT openmp_libraries AND NOT MSVC AND NOT XCODE)
-               find_package(OpenMP)
-               if (OPENMP_FOUND)
-                  set(openmp_libraries ${OpenMP_CXX_FLAGS}) 
-               else()
-                  message(STATUS "*** Didn't find OpenMP, which is required to use CUDA. ***")
-                  set(CUDA_FOUND 0)
                endif()
             endif()
          endif()
 
-         if (CUDA_FOUND AND cudnn AND (NOT USING_OLD_VISUAL_STUDIO_COMPILER) AND cuda_test_compile_worked AND cudnn_test_compile_worked AND cudnn_include)
+
+         if (CUDA_FOUND AND cudnn AND cudnn_include AND COMPILER_CAN_DO_CPP_11 AND cuda_test_compile_worked AND cudnn_test_compile_worked)
             set(source_files ${source_files} 
                dnn/cuda_dlib.cu 
                dnn/cudnn_dlibapi.cpp
                dnn/cublas_dlibapi.cpp
-               dnn/cusolver_dlibapi.cu
                dnn/curand_dlibapi.cpp
-               dnn/cuda_data_ptr.cpp
                dnn/gpu_data.cpp
                )
             set(dlib_needed_libraries ${dlib_needed_libraries} 
-               ${CUDA_CUBLAS_LIBRARIES} 
-               ${cudnn}
-               ${CUDA_curand_LIBRARY}
-               ${cusolver}
-               )
-            if(openmp_libraries)
-               list(APPEND dlib_needed_libraries ${openmp_libraries})
-            endif()
-
+                                      ${CUDA_CUBLAS_LIBRARIES} 
+                                      ${cudnn}
+                                      ${CUDA_curand_LIBRARY}
+                                      )
             include_directories(${cudnn_include})
-            message(STATUS "Enabling CUDA support for dlib.  DLIB WILL USE CUDA")
          else()
             set(DLIB_USE_CUDA OFF CACHE STRING ${DLIB_USE_BLAS_STR} FORCE )
             toggle_preprocessor_switch(DLIB_USE_CUDA)
-            if (USING_OLD_VISUAL_STUDIO_COMPILER)
+            if (COMPILER_CAN_DO_CPP_11)
+               if (NOT cudnn OR NOT cudnn_include OR NOT cudnn_test_compile_worked)
+                  message(STATUS "*** cuDNN V5.0 OR GREATER NOT FOUND.  DLIB WILL NOT USE CUDA. ***")
+                  message(STATUS "*** If you have cuDNN then set CMAKE_PREFIX_PATH to include cuDNN's folder.")
+               endif()
+            else ()
                message(STATUS "*** Dlib CUDA support requires C++11 but your compiler doesn't support it. ***")
             endif()
-            message(STATUS "Disabling CUDA support for dlib.  DLIB WILL NOT USE CUDA")
          endif()
       endif()
-
+      
 
       if (DLIB_LINK_WITH_SQLITE3)
          find_library(sqlite sqlite3)
          # make sure sqlite3.h is in the include path
          find_path(sqlite_path sqlite3.h)
          if (sqlite AND sqlite_path)
-            set(dlib_needed_includes ${dlib_needed_includes} ${sqlite_path})
+            get_filename_component(sqlite_path2 ${sqlite_path} PATH CACHE)
+            set(dlib_needed_includes ${dlib_needed_includes} ${sqlite_path2})
             set(dlib_needed_libraries ${dlib_needed_libraries} ${sqlite} )
          else()
             set(DLIB_LINK_WITH_SQLITE3 OFF CACHE STRING ${DLIB_LINK_WITH_SQLITE3_STR} FORCE )
          endif()
-         mark_as_advanced(sqlite sqlite_path)
+         mark_as_advanced(sqlite sqlite_path sqlite_path2)
       endif()
 
 
@@ -723,119 +637,105 @@ if (NOT TARGET dlib)
          # The old cuda_add_library() command doesn't support CMake's newer dependency
          # stuff, so we have to set the include path manually still, which we do here.
          include_directories(${dlib_needed_includes})
-         cuda_add_library(dlib ${source_files} )
+         cuda_add_library(dlib STATIC ${source_files} )
       else()
-         add_library(dlib ${source_files} )
+         add_library(dlib STATIC ${source_files} )
+      endif()
+      target_include_directories(dlib
+                                 INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
+                                 INTERFACE $<INSTALL_INTERFACE:include>
+                                 PUBLIC ${dlib_needed_includes}
+                                 )
+      target_link_libraries(dlib PRIVATE ${dlib_needed_libraries})
+      if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
+         if (DLIB_USE_CUDA)
+            cuda_add_library(dlib_shared SHARED ${source_files} )
+            add_dependencies(dlib_shared dlib)
+         else()
+            add_library(dlib_shared SHARED ${source_files} )
+            add_dependencies(dlib_shared dlib)
+         endif()
+         target_include_directories(dlib_shared
+                                    INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
+                                    INTERFACE $<INSTALL_INTERFACE:include>
+                                    PUBLIC ${dlib_needed_includes}
+                                    )
+         target_link_libraries(dlib_shared PRIVATE ${dlib_needed_libraries})
       endif()
 
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
 
-
-   target_include_directories(dlib
-      INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
-      INTERFACE $<INSTALL_INTERFACE:include>
-      PUBLIC ${dlib_needed_includes}
-      )
-   target_link_libraries(dlib PUBLIC ${dlib_needed_libraries})
-   if (DLIB_IN_PROJECT_BUILD)
-      target_compile_options(dlib PUBLIC ${active_preprocessor_switches})
-   else()
-      # These are private in this case because they will be controlled by the
-      # contents of dlib/config.h once it's installed. But for in project
-      # builds, there is no real config.h so they are public in the above case.
-      target_compile_options(dlib PRIVATE ${active_preprocessor_switches})
-      # Do this so that dlib/config.h won't set DLIB_NOT_CONFIGURED. This will then allow
-      # the code in dlib/threads_kernel_shared.cpp to emit a linker error for users who
-      # don't use the configured config.h file generated by cmake.
-      target_compile_options(dlib PRIVATE -DDLIB__CMAKE_GENERATED_A_CONFIG_H_FILE)
-
-      # Do this so that dlib/config.h can record the version of dlib it's configured with
-      # and ultimately issue a linker error to people who try to use a binary dlib that is
-      # the wrong version.
-      set(DLIB_CHECK_FOR_VERSION_MISMATCH 
-         DLIB_VERSION_MISMATCH_CHECK__EXPECTED_VERSION_${CPACK_PACKAGE_VERSION_MAJOR}_${CPACK_PACKAGE_VERSION_MINOR}_${CPACK_PACKAGE_VERSION_PATCH})
-      target_compile_options(dlib PRIVATE "-DDLIB_CHECK_FOR_VERSION_MISMATCH=${DLIB_CHECK_FOR_VERSION_MISMATCH}")
-   endif()
-
-
    # Allow the unit tests to ask us to compile the all/source.cpp file just to make sure it compiles.
    if (DLIB_TEST_COMPILE_ALL_SOURCE_CPP)
-      add_library(dlib_all_source_cpp STATIC all/source.cpp) 
+      ADD_LIBRARY(dlib_all_source_cpp STATIC all/source.cpp) 
       target_link_libraries(dlib_all_source_cpp dlib)
-      target_compile_options(dlib_all_source_cpp PUBLIC ${active_preprocessor_switches})
-      enable_cpp11_for_target(dlib_all_source_cpp)
-   endif()
-
-   if (TARGET dlib)
-      enable_cpp11_for_target(dlib)
-      target_compile_options(dlib PUBLIC ${active_compile_opts})
    endif()
 
    # Install the library
    if (NOT DLIB_IN_PROJECT_BUILD)
-      set_target_properties(dlib PROPERTIES
-         VERSION ${VERSION})
-      install(TARGETS dlib
-         EXPORT dlib 
-         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # Windows considers .dll to be runtime artifacts
-         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+       set (LIB_INSTALL_DIR lib CACHE STRING "Install location of libraries (e.g. lib32 or lib64 for multilib installations)")
+       cmake_minimum_required(VERSION 2.8.8)
+       if(UNIX)
+           set_target_properties(dlib_shared PROPERTIES
+                                        OUTPUT_NAME dlib 
+                                        VERSION ${VERSION})
+           install(TARGETS dlib dlib_shared
+                   EXPORT dlib 
+                   RUNTIME DESTINATION bin # Windows (including cygwin) considers .dll to be runtime artifacts
+                   LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
+                   ARCHIVE DESTINATION "${LIB_INSTALL_DIR}")
+       else()
+           install(TARGETS dlib
+                   EXPORT dlib 
+                   RUNTIME DESTINATION bin # Windows considers .dll to be runtime artifacts
+                   LIBRARY DESTINATION lib
+                   ARCHIVE DESTINATION lib)
+       endif()
 
-      install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib
-         FILES_MATCHING PATTERN "*.h" PATTERN "*.cmake"
-         REGEX "${CMAKE_CURRENT_BINARY_DIR}" EXCLUDE)
+       install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION include/dlib
+               FILES_MATCHING PATTERN "*.h" PATTERN "*.cmake"
+               REGEX "${CMAKE_CURRENT_BINARY_DIR}" EXCLUDE)
 
 
-      configure_file(${PROJECT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
-      # overwrite config.h with the configured one
-      install(FILES ${CMAKE_CURRENT_BINARY_DIR}/config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib)
+       configure_file(${PROJECT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+       # overwrite config.h with the configured one
+       install(FILES ${CMAKE_CURRENT_BINARY_DIR}/config.h DESTINATION include/dlib)
 
-      configure_file(${PROJECT_SOURCE_DIR}/revision.h.in ${CMAKE_CURRENT_BINARY_DIR}/revision.h)
-      install(FILES ${CMAKE_CURRENT_BINARY_DIR}/revision.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib)
+       configure_file(${PROJECT_SOURCE_DIR}/revision.h.in ${CMAKE_CURRENT_BINARY_DIR}/revision.h)
+       install(FILES ${CMAKE_CURRENT_BINARY_DIR}/revision.h DESTINATION include/dlib)
 
-      ## Config.cmake generation and installation
+       install(FILES "LICENSE.txt" DESTINATION share/doc/dlib)
 
-      set(ConfigPackageLocation "${CMAKE_INSTALL_LIBDIR}/cmake/dlib")
-      install(EXPORT dlib
-         NAMESPACE dlib::
-         DESTINATION ${ConfigPackageLocation})
+       ## Config.cmake generation and installation
 
-      configure_file(cmake_utils/dlibConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" @ONLY)
+       set(ConfigPackageLocation "${LIB_INSTALL_DIR}/cmake/dlib")
+       install(EXPORT dlib
+            NAMESPACE dlib::
+            DESTINATION ${ConfigPackageLocation})
 
-      include(CMakePackageConfigHelpers)
-      write_basic_package_version_file(
-         "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake"
-         VERSION ${VERSION}
-         COMPATIBILITY AnyNewerVersion
-         )
+       set(CONF_INSTALL_PATH "\${dlib_CMAKE_DIR}/../../../")
+       configure_file(cmake_utils/dlibConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" @ONLY)
 
-      install(FILES 
-         "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" 
-         "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake" 
-         DESTINATION ${ConfigPackageLocation})
+       include(CMakePackageConfigHelpers)
+       write_basic_package_version_file(
+           "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake"
+           VERSION ${VERSION}
+           COMPATIBILITY AnyNewerVersion
+           )
 
-      ## dlib-1.pc generation and installation
+       install(FILES 
+                    "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" 
+                    "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake" 
+               DESTINATION ${ConfigPackageLocation})
 
-      configure_file("cmake_utils/dlib.pc.in" "dlib-1.pc" @ONLY)
-      install(FILES "${CMAKE_CURRENT_BINARY_DIR}/dlib-1.pc"
-         DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+       ## dlib-1.pc generation and installation
+
+       configure_file("cmake_utils/dlib.pc.in" "dlib-1.pc" @ONLY)
+       install(FILES "${CMAKE_CURRENT_BINARY_DIR}/dlib-1.pc"
+           DESTINATION "${LIB_INSTALL_DIR}/pkgconfig")
 
    endif()
 
-endif()
-
-if (MSVC)
-   # Give the output library files names that are unique functions of the
-   # visual studio mode that compiled them.  We do this so that people who
-   # compile dlib and then copy the .lib files around (which they shouldn't be
-   # doing in the first place!) will hopefully be slightly less confused by
-   # what happens since, at the very least, the filenames will indicate what
-   # visual studio runtime they go with.
-   math(EXPR numbits ${CMAKE_SIZEOF_VOID_P}*8)
-   set_target_properties(dlib PROPERTIES DEBUG_POSTFIX "${VERSION}_debug_${numbits}bit_msvc${MSVC_VERSION}")
-   set_target_properties(dlib PROPERTIES RELEASE_POSTFIX "${VERSION}_release_${numbits}bit_msvc${MSVC_VERSION}")
-   set_target_properties(dlib PROPERTIES MINSIZEREL_POSTFIX "${VERSION}_minsizerel_${numbits}bit_msvc${MSVC_VERSION}")
-   set_target_properties(dlib PROPERTIES RELWITHDEBINFO_POSTFIX "${VERSION}_relwithdebinfo_${numbits}bit_msvc${MSVC_VERSION}")
 endif()
 
 add_library(dlib::dlib ALIAS dlib)

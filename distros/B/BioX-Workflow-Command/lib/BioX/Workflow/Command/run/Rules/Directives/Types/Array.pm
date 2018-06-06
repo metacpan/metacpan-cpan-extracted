@@ -10,17 +10,17 @@ sub create_ARRAY_attr {
 
     $meta->add_attribute(
         $k => (
-            traits  => ['Array'],
+#            traits  => ['Array'],
             isa     => 'ArrayRef',
             is      => 'rw',
             clearer => "clear_$k",
             default => sub { [] },
-            handles => {
-                "all_$k" . "s" => 'elements',
-                "count_$k"     => 'count',
-                "has_$k"       => 'count',
-                "has_no_$k"    => 'is_empty',
-            },
+#            handles => {
+#                "all_$k" . "s" => 'elements',
+#                "count_$k"     => 'count',
+#                "has_$k"       => 'count',
+#                "has_no_$k"    => 'is_empty',
+#            },
         )
     );
 }

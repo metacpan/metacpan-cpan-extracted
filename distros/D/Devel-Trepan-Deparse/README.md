@@ -1,6 +1,8 @@
 [![Build Status Circle](https://circleci.com/gh/rocky/p5-Devel-Trepan-Deparse.svg?&style=shield)](https://circleci.com/gh/rocky/p5-Devel-Trepan-Deparse)
 
-Adds a "deparse" command to [`Devel::Trepan`](https://github.com/rocky/Perl-Devel-Trepan/wiki).
+Adds Perl code disassembly (de-parsing) in via commands [`deparse`](https://metacpan.org/pod/Devel::Trepan::CmdProcessor::Command::Deparse) and `deval` to the
+[`Devel::Trepan`](https://github.com/rocky/Perl-Devel-Trepan/wiki)
+debugger.
 
 This can tell you exactly where you are stopped. We rely on _B::DeparseTree_ and currently this works on Perl 5.18, 5.20 and 5.22.
 

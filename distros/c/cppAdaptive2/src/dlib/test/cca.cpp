@@ -3,7 +3,6 @@
 
 #include <dlib/statistics.h>
 #include <dlib/sparse_vector.h>
-#include <dlib/timing.h>
 #include <map>
 
 #include "tester.h"
@@ -108,7 +107,7 @@ namespace
 
         matrix<double> L = randm(m,rank, rnd)*randm(rank,n, rnd);
         //matrix<double> R = randm(m,rank, rnd)*randm(rank,n2, rnd);
-        matrix<double> R = L*randm(n,n2, rnd);
+        matrix<double> R = L*randm(n,n2);
         //matrix<double> L = randm(m,n, rnd);
         //matrix<double> R = randm(m,n2, rnd);
 
@@ -126,7 +125,7 @@ namespace
 
             const double trans_error = max(abs(L*Ltrans - R*Rtrans));
             dlog << LINFO << "trans_error: "<< trans_error;
-            DLIB_TEST_MSG(trans_error < 1e-9, trans_error);
+            DLIB_TEST(trans_error < 1e-9);
         }
         {
             correlations = cca(mat_to_sparse(L), mat_to_sparse(R), Ltrans, Rtrans, min(m,n), max(n,n2)+6, 4);
@@ -237,7 +236,7 @@ namespace
                 // non-matching pairs of projections.
                 const double corr_rot1_error = max(abs(compute_correlations(rm_zeros(L*rotate<0,1>(Ltrans)), rm_zeros(R*Rtrans))));
                 dlog << LINFO << "corr_rot1_error: "<< corr_rot1_error;
-                DLIB_TEST(std::abs(corr_rot1_error) < 2e-9);
+                DLIB_TEST(std::abs(corr_rot1_error) < 1e-10);
             }
             // Matching projection directions should be correlated with the amount of
             // correlation indicated by the return value of cca().
@@ -247,7 +246,7 @@ namespace
 
             const double trans_error = max(abs(L*Ltrans - R*Rtrans));
             dlog << LINFO << "trans_error: "<< trans_error;
-            DLIB_TEST(trans_error < 2e-9);
+            DLIB_TEST(trans_error < 1e-10);
 
             dlog << LINFO << "correlations: "<< trans(correlations);
         }
@@ -260,7 +259,7 @@ namespace
                 // non-matching pairs of projections.
                 const double corr_rot1_error = max(abs(compute_correlations(rm_zeros(L*rotate<0,1>(Ltrans)), rm_zeros(R*Rtrans))));
                 dlog << LINFO << "corr_rot1_error: "<< corr_rot1_error;
-                DLIB_TEST(std::abs(corr_rot1_error) < 2e-9);
+                DLIB_TEST(std::abs(corr_rot1_error) < 1e-10);
             }
             // Matching projection directions should be correlated with the amount of
             // correlation indicated by the return value of cca().
@@ -270,7 +269,7 @@ namespace
 
             const double trans_error = max(abs(L*Ltrans - R*Rtrans));
             dlog << LINFO << "trans_error: "<< trans_error;
-            DLIB_TEST(trans_error < 2e-9);
+            DLIB_TEST(trans_error < 1e-9);
 
             dlog << LINFO << "correlations: "<< trans(correlations);
         }
@@ -375,59 +374,6 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    /*
-    typedef std::vector<std::pair<unsigned int, float>> sv;
-    sv rand_sparse_vector()
-    {
-        static dlib::rand rnd;
-        sv v;
-        for (int i = 0; i < 50; ++i)
-            v.push_back(make_pair(rnd.get_integer(400000), rnd.get_random_gaussian()*100));
-
-        make_sparse_vector_inplace(v);
-        return v;
-    }
-
-    sv rand_basis_combo(const std::vector<sv>& basis)
-    {
-        static dlib::rand rnd;
-        sv result;
-
-        for (int i = 0; i < 5; ++i)
-        {
-            sv temp = basis[rnd.get_integer(basis.size())];
-            scale_by(temp, rnd.get_random_gaussian());
-            result = add(result,temp);
-        }
-        return result;
-    }
-
-    void big_sparse_speed_test()
-    {
-        cout << "making A" << endl;
-        std::vector<sv> basis;
-        for (int i = 0; i < 100; ++i)
-            basis.emplace_back(rand_sparse_vector());
-
-        std::vector<sv> A;
-        for (int i = 0; i < 500000; ++i)
-            A.emplace_back(rand_basis_combo(basis));
-
-        cout << "done making A" << endl;
-
-        matrix<float> u,v;
-        matrix<float,0,1> w;
-        {
-        timing::block aosijdf(0,"call it");
-        svd_fast(A, u,w,v, 100, 5);
-        }
-
-        timing::print();
-    }
-    */
-
-// ----------------------------------------------------------------------------------------
-
     class test_cca : public tester
     {
     public:
@@ -440,7 +386,6 @@ namespace
         void perform_test (
         )
         {
-            //big_sparse_speed_test();
             for (int i = 0; i < 200; ++i)
             {
                 test_cca1();

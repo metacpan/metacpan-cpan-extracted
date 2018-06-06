@@ -1,5 +1,5 @@
 package Text::MicroMason;
-$VERSION = '2.21';
+$VERSION = '2.22';
 
 # The #line directive requires Perl 5.6 to work correctly the way we use
 # it in Base.
@@ -556,7 +556,7 @@ MicroMason can't read from %s: %s
 
 One of the compile_file or execute_file functions was called but we were
 unable to read the requested file, because the file path is incorrect or
-we have insufficient priveleges to read that file.
+we have insufficient privileges to read that file.
 
 =back
 

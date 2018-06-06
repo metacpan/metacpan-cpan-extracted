@@ -44,7 +44,7 @@ namespace dlib
         inline simd4i low() const { return _mm256_castsi256_si128(x); }
         inline simd4i high() const { return _mm256_extractf128_si256(x,1); }
 
-        inline unsigned int size() const { return 8; }
+        inline unsigned int size() const { return 4; }
         inline int32 operator[](unsigned int idx) const 
         {
             int32 temp[8];
@@ -91,8 +91,8 @@ namespace dlib
                 return _high[idx-4];
         }
 
-        inline const simd4i& low() const { return _low; }
-        inline const simd4i& high() const { return _high; }
+        inline simd4i low() const { return _low; }
+        inline simd4i high() const { return _high; }
 
     private:
         simd4i _low, _high;

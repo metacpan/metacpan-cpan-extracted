@@ -1,6 +1,11 @@
-##-*- Mode: Change-Log; coding: utf-8; -*-
-##
-## Change log for perl distribution PDL::CCS
+v1.23.7 Wed, 06 Jun 2018 09:18:55 +0200 moocow
+	+ CCS/IO 'clean' target: remove test temporaries t/ccs3.* t/dense3.*
+
+v1.23.6 Tue, 05 Jun 2018 16:39:46 +0200 moocow
+	+ fixed "do 'Config.PL'" call in Makefile.PL
+
+v1.23.5 Tue, 05 Jun 2018 15:05:00 +0200 moocow
+	+ fixed typos reported by L. Baillet (RT bug #125493)
 
 v1.23.4 Tue, 06 Jun 2017 10:17:44 +0200 moocow
 	+ fixed bogus bareword pdl() call in CCS/Nd.pm (RT bug #121952)

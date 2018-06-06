@@ -2,8 +2,8 @@ NAME
     App::cryp::exchange - Interact with cryptoexchanges
 
 VERSION
-    This document describes version 0.003 of App::cryp::exchange (from Perl
-    distribution App-cryp-exchange), released on 2018-05-10.
+    This document describes version 0.004 of App::cryp::exchange (from Perl
+    distribution App-cryp-exchange), released on 2018-06-06.
 
 SYNOPSIS
     Please see included script cryp-exchange.
@@ -49,6 +49,30 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   detail => *bool*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_balances
+    Usage:
+
+     list_balances(%args) -> [status, msg, result, meta]
+
+    List account balances.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   exchange* => *str*
 
     Returns an enveloped result (an array).
 

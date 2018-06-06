@@ -131,6 +131,7 @@ SRC += serialize.cpp
 SRC += set.cpp
 SRC += sldf.cpp
 SRC += sliding_buffer.cpp
+SRC += smart_pointers.cpp
 SRC += sockets2.cpp
 SRC += sockets.cpp
 SRC += sockstreambuf.cpp

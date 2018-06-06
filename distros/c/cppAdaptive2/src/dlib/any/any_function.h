@@ -4,6 +4,7 @@
 #define DLIB_AnY_FUNCTION_Hh_
 
 #include "any.h"
+#include "../smart_pointers.h"
 
 #include "any_function_abstract.h"
 

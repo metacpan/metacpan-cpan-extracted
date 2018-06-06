@@ -967,7 +967,7 @@ namespace dlib
                       widgets in this group and the upper left corner of get_rect(). 
         !*/
 
-        size_t size (
+        unsigned long size (
         ) const;
         /*!
             ensures
@@ -1561,7 +1561,7 @@ namespace dlib
                 - the menu_item in this with the index idx has been disabled
         !*/
 
-        size_t size (
+        unsigned long size (
         ) const;
         /*!
             ensures

@@ -1,5 +1,9 @@
 Revision history for PGObject-Type-BigFloat
 
+2.1.0   2018-06-04
+    Add accuracy, precision, round_mode, div_scale globals,
+    so they have defaults and can be set properly.
+
 2.0.0	TBD
 	PGObject 2.x support
 	Registry may throw errors if type has been defined before.

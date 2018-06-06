@@ -24,4 +24,4 @@ requires:
   Safe: '0'
   Test::More: '0.48'
   perl: '5.006'
-version: '2.21'
+version: '2.22'

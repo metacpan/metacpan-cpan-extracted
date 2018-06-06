@@ -10,6 +10,7 @@
 
 namespace dlib
 {
+    using namespace dlib::relational_operators; // defined in algs.h
 
     class bigint 
     {
@@ -660,10 +661,6 @@ namespace dlib
         provides deserialization support 
     !*/
 
-    inline bool operator>  (const bigint& a, const bigint& b) { return b < a; } 
-    inline bool operator!= (const bigint& a, const bigint& b) { return !(a == b); }
-    inline bool operator<= (const bigint& a, const bigint& b) { return !(b < a); }
-    inline bool operator>= (const bigint& a, const bigint& b) { return !(a < b); }
 }
 
 #endif // DLIB_BIGINT_KERNEl_ABSTRACT_

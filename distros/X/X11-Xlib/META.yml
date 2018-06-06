@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::Depends: '0.405'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150001'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,4 +30,4 @@ requires:
 resources:
   bugtracker: https://github.com/nanardon/X11-Xlib/issues
   repository: https://github.com/nanardon/X11-Xlib.git
-version: '0.17'
+version: '0.18'

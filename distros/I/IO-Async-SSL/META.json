@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -26,7 +26,7 @@
             "IO::Async::Loop" : "0.66",
             "IO::Async::Protocol::Stream" : "0",
             "IO::Async::Stream" : "0.59",
-            "IO::Socket::SSL" : "1.968"
+            "IO::Socket::SSL" : "2.003"
          }
       },
       "test" : {
@@ -40,11 +40,11 @@
    "provides" : {
       "IO::Async::SSL" : {
          "file" : "lib/IO/Async/SSL.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "IO::Async::SSLStream" : {
          "file" : "lib/IO/Async/SSLStream.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.21",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.22",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

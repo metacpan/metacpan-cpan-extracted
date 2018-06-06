@@ -1,5 +1,9 @@
 Revision history for IO-Termios
 
+0.06    2018-06-04 23:04:40
+        [CHANGES]
+         * Support additional `sysopen()` flags to IO::Termios->open()
+
 0.05    2016/06/06 01:37:24
         [CHANGES]
          * Opportunistically use Linux::Termios2 if available for arbitrary

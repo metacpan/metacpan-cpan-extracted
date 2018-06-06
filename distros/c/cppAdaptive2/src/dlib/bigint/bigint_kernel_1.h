@@ -12,6 +12,7 @@
 namespace dlib
 {
     
+    using namespace dlib::relational_operators; // defined in algs.h
 
     class bigint_kernel_1 
     {
@@ -530,10 +531,6 @@ namespace dlib
         }
     }   
 
-    inline bool operator>  (const bigint_kernel_1& a, const bigint_kernel_1& b) { return b < a; } 
-    inline bool operator!= (const bigint_kernel_1& a, const bigint_kernel_1& b) { return !(a == b); }
-    inline bool operator<= (const bigint_kernel_1& a, const bigint_kernel_1& b) { return !(b < a); }
-    inline bool operator>= (const bigint_kernel_1& a, const bigint_kernel_1& b) { return !(a < b); }
 }
 
 #ifdef NO_MAKEFILE

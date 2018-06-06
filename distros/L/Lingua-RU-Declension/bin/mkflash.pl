@@ -22,7 +22,13 @@ sub cju {
     my ($type, $word) = @_;
     my $endpoint = $type eq "noun" ? "run" : "rua";
 
-    return "https://cooljugator.com/$endpoint/$word";
+    return qq|<a href="https://cooljugator.com/$endpoint/$word">$word</a>|;
+}
+
+sub forvo {
+    my ($word) = @_;
+
+    return qq|<a href="https://www.forvo.com/search/$word/">$word</a>|;
 }
 
 my $rus = Lingua::RU::Declension->new();
@@ -49,7 +55,8 @@ for (1..50) {
     my $front = "$np $na $nn ($case)";
     my $adj_url = cju("adj", $adj);
     my $noun_url = cju("noun", $noun);
-    my  $back = qq|$dp $da $dn<br>$np $arrow $dp ($pronoun)<br>$na $arrow $da (<a href="$adj_url">$adj</a>)<br>$nn $arrow $dn (<a href="$noun_url">$noun</a>)|;
+    my $answer = join " ", (map {; forvo($_) } ($dp, $da, $dn));
+    my $back = qq|$answer<br>$np $arrow $dp ($pronoun)<br>$na $arrow $da ($adj_url)<br>$nn $arrow $dn ($noun_url)|;
     push @out, [$front, $back];
 }
 
@@ -67,7 +74,7 @@ mkflash.pl - Generate comma seperated files for importing into Anki for flashcar
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

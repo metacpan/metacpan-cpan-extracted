@@ -3,13 +3,12 @@ abstract: 'Like B::Deparse, but keeps tree structure indexable by OP address.'
 author:
   - 'Rocky Bernstein <rocky@cpan.org>'
 build_requires:
-  Data::Printer: '0.40'
   Test::Simple: '0.81'
   Text::Diff: '0'
 configure_requires:
   Module::Build: '0.4214'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,46 +17,53 @@ name: B-DeparseTree
 provides:
   B::DeparseTree:
     file: lib/B/DeparseTree.pm
-    version: v3.1.0
-  B::DeparseTree::Common:
-    file: lib/B/DeparseTree/Common.pm
-    version: v3.0.0
+    version: v3.2.0
   B::DeparseTree::Fragment:
     file: lib/B/DeparseTree/Fragment.pm
   B::DeparseTree::Node:
     file: lib/B/DeparseTree/Node.pm
-    version: v1.0.0
+    version: v3.2.0
   B::DeparseTree::NodeDemo:
     file: lib/B/DeparseTree/Node.pm
   B::DeparseTree::P518:
     file: lib/B/DeparseTree/P518.pm
-    version: v3.0.0
+    version: v3.2.0
   B::DeparseTree::P520:
     file: lib/B/DeparseTree/P520.pm
-    version: v3.0.0
+    version: v3.2.0
   B::DeparseTree::P522:
     file: lib/B/DeparseTree/P522.pm
-    version: v3.0.0
+    version: v3.2.0
   B::DeparseTree::P524:
     file: lib/B/DeparseTree/P524.pm
-    version: v3.0.0
+    version: v3.2.0
   B::DeparseTree::P526:
     file: lib/B/DeparseTree/P526.pm
-    version: v3.0.0
+    version: v3.2.0
   B::DeparseTree::P526c:
     file: lib/B/DeparseTree/P526c.pm
-    version: '2.0'
+    version: v3.2.0
   B::DeparseTree::PP:
     file: lib/B/DeparseTree/PP.pm
-    version: v1.0.0
+    version: v3.2.0
+  B::DeparseTree::PP_OPtable:
+    file: lib/B/DeparseTree/PP_OPtable.pm
+    version: v3.2.0
+  B::DeparseTree::PPfns:
+    file: lib/B/DeparseTree/PPfns.pm
+    version: v3.2.0
   B::DeparseTree::Printer:
     file: lib/B/DeparseTree/Printer.pm
-    version: v1.0.0
+    version: v3.2.0
+  B::DeparseTree::SyntaxTree:
+    file: lib/B/DeparseTree/SyntaxTree.pm
+    version: v3.2.0
 requires:
+  Data::Printer: '0.40'
   perl: '5.016000'
   rlib: '0.02'
   version: '0'
 resources:
-  license: http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt
-version: v3.1.0
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  license: http://opensource.org/licenses/gpl-license.php
+version: v3.2.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

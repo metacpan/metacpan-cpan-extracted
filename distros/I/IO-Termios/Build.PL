@@ -5,18 +5,19 @@ use Module::Build;
 
 my $build = Module::Build->new(
    module_name => 'IO::Termios',
-   build_requires => {
-      'IO::Tty' => 0,
-      'IO::Pty' => 0,
-      'Test::LongString' => 0,
-      'Test::More' => 0,
+   configure_requires => {
+      'Module::Build' => '0.4004', # test_requires
    },
    requires => {
       'IO::Tty' => 0,
    },
-   auto_configure_requires => 0, # Don't add M::B to configure_requires
+   test_requires => {
+      'IO::Tty' => 0,
+      'IO::Pty' => 0,
+      'Test::LongString' => 0,
+      'Test::More' => '0.88', # done_testing
+   },
    license => 'perl',
-   create_makefile_pl => 'traditional',
    create_license => 1,
    create_readme  => 1,
 );

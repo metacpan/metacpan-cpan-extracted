@@ -8,8 +8,10 @@ META.yml
 Makefile.PL
 Makefile.header
 README
+README.md
 constants
 dist.ini
+dtest
 lib/X11/GLX.pm
 lib/X11/GLX/Context.pm
 lib/X11/GLX/Context/Imported.pm

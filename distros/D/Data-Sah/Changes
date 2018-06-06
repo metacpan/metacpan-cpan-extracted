@@ -1,3 +1,11 @@
+0.892   2018-06-05 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix][test] Fix test case that depends on local timezone to
+	  succeed/fail [RT#125478].
+
+
 0.891    2018-06-03 (PERLANCAR)
 
 	- Adjust to Data::Sah::Coerce 0.025 (bump metadata version to 3, coerce

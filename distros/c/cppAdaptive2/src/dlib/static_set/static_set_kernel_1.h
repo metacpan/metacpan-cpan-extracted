@@ -52,11 +52,11 @@ namespace dlib
             try
             {
                 item.clear();
-                size_t size;
+                unsigned long size;
                 deserialize(size,in);
                 item.set_size = size;
                 item.d = new T[size];
-                for (size_t i = 0; i < size; ++i)
+                for (unsigned long i = 0; i < size; ++i)
                 {
                     deserialize(item.d[i],in);
                 }
@@ -116,7 +116,7 @@ namespace dlib
             );
     
             // functions from the enumerable interface
-            inline size_t size (
+            inline unsigned long size (
             ) const;
 
             inline bool at_start (
@@ -142,7 +142,7 @@ namespace dlib
 
    
             // data members
-            size_t set_size;
+            unsigned long set_size;
             T* d;
             mutable T* cur;
             mutable bool at_start_;
@@ -231,7 +231,7 @@ namespace dlib
 
             set_size = source.size();
 
-            for (size_t i = 0; source.size() > 0; ++i)
+            for (unsigned long i = 0; source.size() > 0; ++i)
                 source.remove_any(d[i]);
             
             compare comp;
@@ -261,7 +261,7 @@ namespace dlib
 
             set_size = source.size();
 
-            for (size_t i = 0; source.size() > 0; ++i)
+            for (unsigned long i = 0; source.size() > 0; ++i)
                 source.remove_any(d[i]);
         }
         else
@@ -282,10 +282,10 @@ namespace dlib
         const T& item
     ) const
     {
-        size_t high = set_size;
-        size_t low = 0;
-        size_t p = set_size;
-        size_t idx;
+        unsigned long high = set_size;
+        unsigned long low = 0;
+        unsigned long p = set_size;
+        unsigned long idx;
         while (p > 0)
         {
             p = (high-low)>>1;
@@ -306,7 +306,7 @@ namespace dlib
         typename T,
         typename compare
         >
-    size_t static_set_kernel_1<T,compare>::
+    unsigned long static_set_kernel_1<T,compare>::
     size (
     ) const
     {
@@ -421,7 +421,7 @@ namespace dlib
         else if (cur != 0)
         {
             ++cur;
-            if (static_cast<size_t>(cur - d) < set_size)
+            if (static_cast<unsigned long>(cur - d) < set_size)
             {
                 return true;
             }

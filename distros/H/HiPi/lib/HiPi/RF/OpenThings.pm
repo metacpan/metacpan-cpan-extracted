@@ -18,7 +18,7 @@ use HiPi qw( :openthings :energenie );
 my $products = {};
 my $manufacturers = {};
 
-our $VERSION ='0.71';
+our $VERSION ='0.72';
 
 for my $manutemplate
 (

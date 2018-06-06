@@ -5,6 +5,9 @@ use parent 'X11::Xlib';
 use Scalar::Util;
 use Carp;
 
+# All modules in dist share a version
+BEGIN { our $VERSION= $X11::Xlib::VERSION; }
+
 require X11::Xlib::Screen;
 require X11::Xlib::Colormap;
 require X11::Xlib::Window;
@@ -685,17 +688,20 @@ If C<$class> is not given it defaults to L<X11::Xlib::XID>.
 
 sub _xid_cache { $_[0]{_xid_cache} }
 sub get_cached_xobj {
-    my ($self, $xid)= (shift, shift);
+    my ($self, $xid, $class)= (shift, shift, shift);
     my $obj;
     # In case an object is accidentally passed, prevent confusion by returning
     # the canonical version, or making the passed object the canonical one.
-    if (ref $xid and ref($xid)->isa($_[0])) {
+    if (ref $xid and ref($xid)->isa($class || 'X11::Xlib::XID')) {
         $obj= $xid;
         $xid= $obj->xid;
     }
     return $self->{_xid_cache}{$xid} || do {
-        my $class= shift || 'X11::Xlib::XID';
-        $obj ||= $class->new(display => $self, xid => $xid, @_);
+        $obj ||= ($class || 'X11::Xlib::XID')->new(
+            display => $self,
+            xid => $xid,
+            (@_==1 && ref $_[0] eq 'HASH'? %{$_[0]} : @_)
+        );
         Scalar::Util::weaken( $self->{_xid_cache}{$xid}= $obj );
         $obj;
     };

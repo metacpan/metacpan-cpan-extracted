@@ -2,11 +2,11 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.056
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
-plan tests => 17 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 23 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Sah/Schema/cryptocurrency.pm',
@@ -15,16 +15,22 @@ my @module_files = (
     'Sah/Schema/cryptocurrency/safename.pm',
     'Sah/Schema/cryptoexchange.pm',
     'Sah/Schema/cryptoexchange/code.pm',
+    'Sah/Schema/cryptoexchange/currency_pair.pm',
     'Sah/Schema/cryptoexchange/name.pm',
     'Sah/Schema/cryptoexchange/safename.pm',
+    'Sah/Schema/fiat_currency.pm',
+    'Sah/Schema/fiat_or_cryptocurrency.pm',
     'Sah/SchemaR/cryptocurrency.pm',
     'Sah/SchemaR/cryptocurrency/code.pm',
     'Sah/SchemaR/cryptocurrency/code_or_name.pm',
     'Sah/SchemaR/cryptocurrency/safename.pm',
     'Sah/SchemaR/cryptoexchange.pm',
     'Sah/SchemaR/cryptoexchange/code.pm',
+    'Sah/SchemaR/cryptoexchange/currency_pair.pm',
     'Sah/SchemaR/cryptoexchange/name.pm',
     'Sah/SchemaR/cryptoexchange/safename.pm',
+    'Sah/SchemaR/fiat_currency.pm',
+    'Sah/SchemaR/fiat_or_cryptocurrency.pm',
     'Sah/Schemas/CryptoCurrency.pm'
 );
 
@@ -59,7 +65,7 @@ for my $lib (@module_files)
     is($?, 0, "$lib loaded ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { require blib; blib->VERSION('1.01') };
+        and not eval { +require blib; blib->VERSION('1.01') };
 
     if (@_warnings)
     {

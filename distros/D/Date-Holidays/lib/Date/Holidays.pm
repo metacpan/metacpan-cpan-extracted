@@ -12,7 +12,7 @@ use Scalar::Util qw(blessed);
 
 use base 'Date::Holidays::Adapter';
 
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 sub new {
     my ( $class, %params ) = @_;
@@ -159,7 +159,7 @@ sub _check_countries {
         }
 
         try {
-            my $dh = $self->new( countrycode => $country );
+            my $dh = $self->new( countrycode => $country, nocheck => $params{nocheck} );
 
             if ( !$dh ) {
                 my $countryname = code2country($country);
@@ -313,7 +313,7 @@ Date::Holidays - Date::Holidays::* adapter and aggregator for all your holiday n
 
 =head1 VERSION
 
-The documentation describes version 1.11 of Date::Holidays
+The documentation describes version 1.12 of Date::Holidays
 
 =head1 FEATURES
 

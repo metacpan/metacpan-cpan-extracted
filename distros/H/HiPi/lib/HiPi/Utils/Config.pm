@@ -23,7 +23,7 @@ use Carp;
 __PACKAGE__->create_ro_accessors( qw( configclass filepath default ) );
 __PACKAGE__->create_accessors( qw( config _configkey ) );
 
-our $VERSION ='0.71';
+our $VERSION ='0.72';
 
 sub new {
     my( $class, %userparams ) = @_;
@@ -131,6 +131,7 @@ sub write_config {
 }
 
 sub DESTROY {
+    # don't call super
     my $self = shift;
     if( $threads::threads ) {
         if( threads->tid == 0 )  {

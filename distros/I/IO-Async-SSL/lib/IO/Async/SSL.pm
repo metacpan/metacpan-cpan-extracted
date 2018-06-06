@@ -8,13 +8,15 @@ package IO::Async::SSL;
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 $VERSION = eval $VERSION;
 
 use Carp;
 
-use IO::Socket::SSL 1.968 qw( $SSL_ERROR SSL_WANT_READ SSL_WANT_WRITE ); # default_ca
 use POSIX qw( EAGAIN EWOULDBLOCK );
+
+use IO::Socket::SSL 2.003 qw( $SSL_ERROR SSL_WANT_READ SSL_WANT_WRITE ); # default_ca
+   # require >= 2.003 for bugfixes - see RT#125220
 
 use Future 0.33; # ->catch_with_f
 use IO::Async::Handle 0.29;

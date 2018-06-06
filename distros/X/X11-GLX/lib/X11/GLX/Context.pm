@@ -1,5 +1,5 @@
 package X11::GLX::Context;
-$X11::GLX::Context::VERSION = '0.03';
+$X11::GLX::Context::VERSION = '0.05';
 use strict;
 use warnings;
 use X11::GLX;
@@ -43,15 +43,12 @@ X11::GLX::Context - Opaque wrapper for GLXContext pointer
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 DESCRIPTION
 
 GLXContext is an opaque object used by the GLX API to reference the collection
 of state used for OpenGL rendering, usually by one thread onto one X11 window.
-
-The only method you can call on this object is "xid", since that is the only
-GLX function that doesn't also require a handle to the display.
 
 See L<X11::GLX::DWIM> for a convenient object-oriented interface to GLX that
 performs the things you probably want it to do.
@@ -60,7 +57,8 @@ performs the things you probably want it to do.
 
 =head2 display
 
-X11 connection this Context was created from.
+X11 connection this Context was created from.  Note that this object holds a
+strong reference to the Display.
 
 =head2 autofree
 
@@ -82,7 +80,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Michael Conrad.
+This software is copyright (c) 2018 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

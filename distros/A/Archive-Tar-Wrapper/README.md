@@ -8,33 +8,33 @@ Archive::Tar::Wrapper - API wrapper around the 'tar' utility
 
     my $arch = Archive::Tar::Wrapper->new();
 
-        # Open a tarball, expand it into a temporary directory
+    # Open a tarball, expand it into a temporary directory
     $arch->read("archive.tgz");
 
-        # Iterate over all entries in the archive
+    # Iterate over all entries in the archive
     $arch->list_reset(); # Reset Iterator
-                         # Iterate through archive
+    # Iterate through archive
     while(my $entry = $arch->list_next()) {
         my($tar_path, $phys_path) = @$entry;
         print "$tar_path\n";
     }
 
-        # Get a huge list with all entries
+    # Get a huge list with all entries
     for my $entry (@{$arch->list_all()}) {
         my($tar_path, $real_path) = @$entry;
         print "Tarpath: $tar_path Tempfile: $real_path\n";
     }
 
-        # Add a new entry
+    # Add a new entry
     $arch->add($logic_path, $file_or_stringref);
 
-        # Remove an entry
+    # Remove an entry
     $arch->remove($logic_path);
 
-        # Find the physical location of a temporary file
+    # Find the physical location of a temporary file
     my($tmp_path) = $arch->locate($tar_path);
 
-        # Create a tarball
+    # Create a tarball
     $arch->write($tarfile, $compress);
 
 # DESCRIPTION
@@ -167,7 +167,7 @@ utility, because it uses it internally.
 
     To iterate over the list, the following construct can be used:
 
-            # Get a huge list with all entries
+        # Get a huge list with all entries
         for my $entry (@{$arch->list_all()}) {
             my($tar_path, $real_path) = @$entry;
             print "Tarpath: $tar_path Tempfile: $real_path\n";
@@ -255,13 +255,13 @@ to be performed as root, which often isn't desirable for security reasons.
 For this reason, Archive::Tar::Wrapper offers a utility functions that
 mounts the ramdisk and returns the temporary directory it's located in:
 
-      # Create new ramdisk (as root):
+    # Create new ramdisk (as root):
     my $tmpdir = Archive::Tar::Wrapper->ramdisk_mount(
         type => 'tmpfs',
         size => '20m',   # 20 MB
     );
 
-      # Delete a ramdisk (as root):
+    # Delete a ramdisk (as root):
     Archive::Tar::Wrapper->ramdisk_unmount();
 
 Optionally, the `ramdisk_mount()` command accepts a `tmpdir` parameter
@@ -285,23 +285,23 @@ iterators. To be fixed.
 a temporary directory and then calls the system tar to wrap up that directory
 into a tarball.
 
-    This approach has limitations when it comes to file permissions: If the file to
-    be added belongs to a different user/group, Archive::Tar::Wrapper will adjust
-    the uid/gid/permissions of the target file in the temporary directory to
-    reflect the original file's settings, to make sure the system tar will add it
-    like that to the tarball, just like a regular tar run on the original file
-    would. But this will fail of course if the original file's uid is different
-    from the current user's, unless the script is running with superuser rights.
-    The tar program by itself (without Archive::Tar::Wrapper) works differently:
-    It'll just make a note of a file's uid/gid/permissions in the tarball (which it
-    can do without superuser rights) and upon extraction, it'll adjust the
-    permissions of newly generated files if the -p option is given (default for
-    superuser).
+This approach has limitations when it comes to file permissions: if the file to
+be added belongs to a different user/group, Archive::Tar::Wrapper will adjust
+the uid/gid/permissions of the target file in the temporary directory to
+reflect the original file's settings, to make sure the system `tar` will add it
+like that to the tarball, just like a regular `tar` run on the original file
+would. But this will fail of course if the original file's uid is different
+from the current user's, unless the script is running with superuser rights.
+
+The `tar` program by itself (without Archive::Tar::Wrapper) works differently:
+it'll just make a note of a file's uid/gid/permissions in the tarball (which it
+can do without superuser rights) and upon extraction, it'll adjust the
+permissions of newly generated files if the `-p` option is given (default for
+superuser).
 
 # BUGS
 
-Archive::Tar::Wrapper doesn't currently handle filenames with embedded
-newlines.
+Archive::Tar::Wrapper doesn't currently handle filenames with embedded newlines.
 
 # LEGALESE
 

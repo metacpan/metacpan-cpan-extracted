@@ -160,9 +160,6 @@ namespace dlib
             set_size(rows,cols);
         }
 
-        array2d(const array2d&) = delete;        // copy constructor
-        array2d& operator=(const array2d&) = delete;    // assignment operator
-
 #ifdef DLIB_HAS_RVALUE_REFERENCES
         array2d(array2d&& item) : array2d()
         {
@@ -312,8 +309,8 @@ namespace dlib
             }
         }
 
-        size_t size (
-        ) const { return static_cast<size_t>(nc_) * static_cast<size_t>(nr_); }
+        unsigned long size (
+        ) const { return static_cast<unsigned long>(nc_ * nr_); }
 
         long width_step (
         ) const
@@ -332,6 +329,10 @@ namespace dlib
         mutable T* cur;
         T* last;
         mutable bool at_start_;
+
+        // restricted functions
+        array2d(array2d&);        // copy constructor
+        array2d& operator=(array2d&);    // assignment operator
 
     };
 

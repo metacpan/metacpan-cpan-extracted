@@ -11,10 +11,11 @@ use base qw( IO::Handle );
 
 use Carp;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Exporter 'import';
 
+use Fcntl qw( O_RDWR );
 use POSIX qw( TCSANOW );
 use IO::Tty;
 use IO::Tty::Constant qw(
@@ -119,7 +120,7 @@ sub new
 
 =head2 open
 
-   $term = IO::Termios->open( $path, $modestr )
+   $term = IO::Termios->open( $path, $modestr, $flags )
 
 Open the given path, and return a new C<IO::Termios> object around the
 filehandle. If the C<open> call fails, C<undef> is returned.
@@ -127,14 +128,28 @@ filehandle. If the C<open> call fails, C<undef> is returned.
 If C<$modestr> is provided, the constructor will pass it to the C<set_mode>
 method before returning.
 
+If C<$flags> is provided, it will be passed on to the underlying C<sysopen()>
+call used to open the filehandle. It should contain a bitwise-or combination
+of C<O_*> flags from the L<Fcntl> module - for example C<O_NOCTTY> or
+C<O_NDELAY>. The value C<O_RDWR> will be added to this; the caller does not
+need to specify it directly. For example:
+
+   use Fcntl qw( O_NOCTTY O_NDELAY );
+
+   $term = IO::Termios->open( "/dev/ttyS0", O_NOCTTY|O_NDELAY );
+   $term->setflag_clocal( 1 );
+   $term->blocking( 1 );
+
 =cut
 
 sub open
 {
    my $class = shift;
-   my ( $path, $modestr ) = @_;
+   my ( $path, $modestr, $flags ) = @_;
 
-   open my $tty, "+<", $path or return undef;
+   $flags //= 0;
+
+   sysopen my $tty, $path, O_RDWR | $flags, or return undef;
    my $self = $class->new( $tty ) or return undef;
 
    $self->set_mode( $modestr ) if defined $modestr;

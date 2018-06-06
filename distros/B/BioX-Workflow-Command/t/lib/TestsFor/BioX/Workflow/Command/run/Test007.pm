@@ -1,5 +1,7 @@
 package TestsFor::BioX::Workflow::Command::run::Test007;
 
+use strict;
+use warnings FATAL => 'all';
 use Test::Class::Moose;
 use Cwd;
 use FindBin qw($Bin);
@@ -28,8 +30,9 @@ sub write_test_file {
             { outdir            => 'data/processed' },
             { find_sample_bydir => 1 },
             { by_sample_outdir  => 1 },
-            { chroms_list => [1,2,3,4,5]},
             { samples => ['Sample_01']},
+            { chroms_list => [ 1 .. 22, 'X', 'Y', 'MT'] },
+            { data_loop => [{ key => 'sample', value => 'samples' }, { key => 'chrom', 'value' => 'chroms_list' } ]},
         ],
         rules => [
             {
@@ -38,10 +41,9 @@ sub write_test_file {
                         { root_dir => 'data/raw' },
                         {
                             INPUT =>
-'{$self->root_dir}/{$sample}/some_input_rule1.{$self->chunk}'
+'{$self->root_dir}/{$sample}/some_input_rule1.{$chrom}'
                         },
                         { OUTPUT => ['some_output_rule1'] },
-                        { use_chunks => 1 },
                     ],
                     process =>
 'R1: INDIR: {$self->indir} INPUT: {$self->INPUT} outdir: {$self->outdir} OUTPUT: {$self->OUTPUT->[0]}',
@@ -80,7 +82,6 @@ sub test_001 {
 
     $test->check_sample_exist;
     is_deeply($test->samples, ['Sample_01']);
-    is_deeply($test->global_attr->chroms_list, [1,2,3,4,5]);
 
     # $test->stdout(1);
     $test->set_rule_names;
@@ -92,13 +93,6 @@ sub test_001 {
 
     $test->post_process_rules;
     is_deeply($test->samples, ['Sample_01']);
-
-    diag Dumper ($test->global_attr->chroms_list);
-    diag Dumper ($test->global_attr->samples);
-    diag Dumper($test->global_attr->has_samples);
-
-
-    ok(1);
 }
 
 

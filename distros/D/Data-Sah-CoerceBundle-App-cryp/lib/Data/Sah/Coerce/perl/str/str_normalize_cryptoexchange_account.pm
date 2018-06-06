@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::str::str_normalize_cryptoexchange_account;
 
-our $DATE = '2018-06-04'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-06-06'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -29,6 +29,7 @@ sub coerce {
         "",
         "do { my (\$xch, \$acc); $dt =~ m!(.+)/(.+)! and (\$xch, \$acc) = (\$1, \$2) or (\$xch, \$acc) = ($dt, 'default'); ",
         "if (\$acc !~ /\\A[A-Za-z0-9_-]+\\z/) { [qq(Invalid account syntax (\$acc), please only use letters/numbers/underscores/dashes)] } ",
+        "elsif (length \$acc > 64) { [qq(Account name too long (\$acc), please do not exceed 64 characters)] } ",
         "else { my \$cat = CryptoExchange::Catalog->new; my \@data = \$cat->all_data; ",
         "  my \$lc = lc(\$xch); my \$rec; for (\@data) { if (defined(\$_->{code}) && \$lc eq lc(\$_->{code}) || \$lc eq lc(\$_->{name}) || \$lc eq \$_->{safename}) { \$rec = \$_; last } } ",
         "  if (!\$rec) { ['Unknown cryptoexchange code/name/safename: ' . \$lc] } else { [undef, qq(\$rec->{safename}/\$acc)] } ",
@@ -53,7 +54,7 @@ Data::Sah::Coerce::perl::str::str_normalize_cryptoexchange_account - Normalize c
 
 =head1 VERSION
 
-This document describes version 0.003 of Data::Sah::Coerce::perl::str::str_normalize_cryptoexchange_account (from Perl distribution Data-Sah-CoerceBundle-App-cryp), released on 2018-06-04.
+This document describes version 0.005 of Data::Sah::Coerce::perl::str::str_normalize_cryptoexchange_account (from Perl distribution Data-Sah-CoerceBundle-App-cryp), released on 2018-06-06.
 
 =head1 DESCRIPTION
 
@@ -65,7 +66,8 @@ where C<cryptoexchange> is the name/code/safename of cryptoexchange as listed in
 L<CryptoExchange::Catalog>. This coercion rule normalizes cryptoexchange into
 safename and will die if name/code/safename is not listed in the catalog module.
 
-C<account> must also be [A-Za-z0-9_-]+ only.
+C<account> must also be [A-Za-z0-9_-]+ only and not exceed 64 characters in
+length.
 
 The rule is not enabled by default. You can enable it in a schema using e.g.:
 

@@ -61,7 +61,7 @@
    "provides" : {
       "Test::APIcast" : {
          "file" : "lib/Test/APIcast.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "Test::APIcast::Blackbox" : {
          "file" : "lib/Test/APIcast/Blackbox.pm"
@@ -78,7 +78,7 @@
          "web" : "https://github.com/3scale/Test-APIcast"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_authority" : "cpan:MCICHRA",
    "x_contributors" : [
       "David Ortiz <z.david.ortiz@gmail.com>",

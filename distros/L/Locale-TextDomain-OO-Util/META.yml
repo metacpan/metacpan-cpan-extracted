@@ -18,30 +18,29 @@ name: Locale-TextDomain-OO-Util
 provides:
   Locale::TextDomain::OO::Util:
     file: lib/Locale/TextDomain/OO/Util.pm
-    version: '3.008'
+    version: '4.001'
   Locale::TextDomain::OO::Util::Constants:
     file: lib/Locale/TextDomain/OO/Util/Constants.pm
-    version: '3.004'
+    version: '4.001'
   Locale::TextDomain::OO::Util::ExtractHeader:
     file: lib/Locale/TextDomain/OO/Util/ExtractHeader.pm
-    version: '3.006'
+    version: '4.001'
   Locale::TextDomain::OO::Util::JavaScript:
     file: lib/Locale/TextDomain/OO/Util/JavaScript.pm
-    version: '3.004'
+    version: '4.001'
   Locale::TextDomain::OO::Util::JoinSplitLexiconKeys:
     file: lib/Locale/TextDomain/OO/Util/JoinSplitLexiconKeys.pm
-    version: '3.004'
+    version: '4.001'
 recommends:
   Test::Pod: '1.14'
   Test::Pod::Coverage: '1.04'
 requires:
   Carp: '0'
   English: '0'
-  Safe: '0'
   charnames: '0'
   namespace::autoclean: '0'
-  perl: '5.006'
+  perl: '5.010'
 resources:
   license: http://dev.perl.org/licenses/
-version: '3.008'
+version: '4.001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

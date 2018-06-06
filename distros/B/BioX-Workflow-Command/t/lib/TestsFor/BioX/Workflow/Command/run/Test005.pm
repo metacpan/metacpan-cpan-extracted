@@ -1,5 +1,7 @@
 package TestsFor::BioX::Workflow::Command::run::Test005;
 
+use strict;
+use warnings FATAL => 'all';
 use Test::Class::Moose;
 use Cwd;
 use FindBin qw($Bin);

@@ -16,7 +16,7 @@ use parent qw( HiPi::Interface );
 use HiPi::Device::OneWire;
 use Carp;
 
-our $VERSION ='0.71';
+our $VERSION ='0.72';
 
 __PACKAGE__->create_accessors( qw( id correction divider) );
 

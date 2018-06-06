@@ -1,6 +1,16 @@
 History for OTRS::OPM::Installer
 ================================
 
+0.04 2018-06-05 10:49:00
+
+     [BUGFIXES]
+     * re-added -p option to define package
+
+     [IMPROVEMENTS]
+     * added --force option to install package even when a dependency couldn't be installed
+     * added more output when --verbose is used
+     * check if a module is installed before it searches for the .opm 
+
 0.03 2017-12-11 15:19:00
 
      [BUGFIXES]

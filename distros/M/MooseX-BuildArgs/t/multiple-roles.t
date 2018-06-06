@@ -5,19 +5,18 @@ use warnings;
 # Reported at:
 # https://github.com/bluefeet/MooseX-BuildArgs/issues/1
 
-package WithBuildArgs {
+{
+    package WithBuildArgs;
     use Moose::Role;
     use MooseX::BuildArgs;
-};
 
-package AnotherRole {
+    package AnotherRole;
     use Moose::Role;
-};
 
-package Combined {
+    package Combined;
     use Moose;
     with qw(WithBuildArgs AnotherRole);
-};
+}
 
 use Test::More;
 

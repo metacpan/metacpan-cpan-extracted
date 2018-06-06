@@ -1,0 +1,10 @@
+Revision history for Template-Plugin-Filter-IDN
+
+0.03  2018-06-04
+    - Declare dependency on Syntax::Feature::Junction [github #1]
+
+0.02  2018-06-04
+    - Add Copyright notice to module source.
+
+0.01  2018-06-04
+    - Initial release

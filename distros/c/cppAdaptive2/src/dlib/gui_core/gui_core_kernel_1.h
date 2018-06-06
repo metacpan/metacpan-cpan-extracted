@@ -12,7 +12,6 @@
 #endif
 
 #include <string>
-
 #include "../windows_magic.h"
 
 
@@ -40,7 +39,8 @@
 #include "../queue.h"
 #include "../pixel.h"
 #include "../unicode.h"
-#include "../smart_pointers/shared_ptr_thread_safe.h"
+#include "../smart_pointers_thread_safe.h"
+
 
 namespace dlib
 {
@@ -169,7 +169,7 @@ namespace dlib
     class base_window
     {
         friend LRESULT CALLBACK gui_core_kernel_1_globals::WndProc (HWND, UINT, WPARAM, LPARAM);
-        dlib::shared_ptr_thread_safe<gui_core_kernel_1_globals::event_handler_thread> globals;
+        shared_ptr_thread_safe<gui_core_kernel_1_globals::event_handler_thread> globals;
 
         HWND hwnd;
         DWORD style;

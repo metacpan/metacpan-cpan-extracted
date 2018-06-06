@@ -2,8 +2,8 @@
 
 # FRAGMENT id=shcompgen-hint command=cryp-exchange
 
-our $DATE = '2018-05-10'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-06-06'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -27,6 +27,7 @@ Perinci::CmdLine::cryp->new(
 
         # private
         "get-order-book"    => { url => "${prefix}get_order_book", },
+        "ls-balances"       => { url => "${prefix}list_balances", },
     },
 )->run;
 
@@ -45,7 +46,7 @@ cryp-exchange - Interact with cryptoexchanges
 
 =head1 VERSION
 
-This document describes version 0.003 of cryp-exchange (from Perl distribution App-cryp-exchange), released on 2018-05-10.
+This document describes version 0.004 of cryp-exchange (from Perl distribution App-cryp-exchange), released on 2018-06-06.
 
 =head1 SYNOPSIS
 
@@ -106,6 +107,10 @@ Get order book on an exchange.
 =head2 B<ls-accounts>
 
 List exchange accounts.
+
+=head2 B<ls-balances>
+
+List account balances.
 
 =head2 B<ls-exchanges>
 
@@ -244,6 +249,14 @@ Valid values:
 
 =back
 
+=head2 Options for subcommand ls-balances
+
+=over
+
+=item B<--exchange>=I<s>*
+
+=back
+
 =head2 Options for subcommand ls-exchanges
 
 =over
@@ -333,6 +346,10 @@ List of available configuration parameters:
 =head2 Configuration for subcommand ls-accounts
 
  detail (see --detail)
+
+=head2 Configuration for subcommand ls-balances
+
+ exchange (see --exchange)
 
 =head2 Configuration for subcommand ls-exchanges
 

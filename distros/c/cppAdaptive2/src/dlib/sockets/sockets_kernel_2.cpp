@@ -527,7 +527,7 @@ namespace dlib
 
     int listener::
     accept (
-        std::unique_ptr<connection>& new_connection,
+        scoped_ptr<connection>& new_connection,
         unsigned long timeout
     )
     {
@@ -788,7 +788,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------    
 
     int create_listener (
-        std::unique_ptr<listener>& new_listener,
+        scoped_ptr<listener>& new_listener,
         unsigned short port,
         const std::string& ip
     )
@@ -907,7 +907,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     int create_connection (
-        std::unique_ptr<connection>& new_connection,
+        scoped_ptr<connection>& new_connection,
         unsigned short foreign_port, 
         const std::string& foreign_ip, 
         unsigned short local_port,

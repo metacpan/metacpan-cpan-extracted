@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin::ProjectDefaults;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: assign project-level defaults when creating tasks
-$Taskwarrior::Kusarigama::Plugin::ProjectDefaults::VERSION = '0.9.0';
+$Taskwarrior::Kusarigama::Plugin::ProjectDefaults::VERSION = '0.9.1';
 
 use 5.10.0;
 use strict;
@@ -60,7 +60,12 @@ Taskwarrior::Kusarigama::Plugin::ProjectDefaults - assign project-level defaults
 
 =head1 VERSION
 
-version 0.9.0
+version 0.9.1
+
+=head1 SYNOPSIS
+
+    $ task config project.dailies.defaults 'recur:1d +daily due:tomorrow'
+    $ task add water the plants project:dailies
 
 =head1 DESCRIPTION
 
@@ -76,11 +81,6 @@ The defaults of hierarchical projects are cumulative. So you can do things like
 
     $ task add ticket ABC-123 project:work.projectx
     # will get due:eom and priority:M
-
-=head SYNOPSIS
-
-    $ task config project.dailies.defaults 'recur:1d +daily due:tomorrow'
-    $ task add water the plants project:dailies
 
 =head1 AUTHOR
 

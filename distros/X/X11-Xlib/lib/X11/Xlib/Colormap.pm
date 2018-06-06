@@ -3,6 +3,9 @@ use strict;
 use warnings;
 use parent 'X11::Xlib::XID';
 
+# All modules in dist share a version
+BEGIN { our $VERSION= $X11::Xlib::VERSION; }
+
 sub DESTROY {
     my $self= shift;
     $self->display->XFreeColormap($self->xid)

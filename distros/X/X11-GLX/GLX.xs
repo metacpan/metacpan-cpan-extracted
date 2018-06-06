@@ -169,7 +169,6 @@ glXCreateNewContext(dpy, fbcfg, render_type, shared, direct)
 	GLXContextOrNull shared
 	Bool direct
 	INIT:
-	INIT:
 		SV *cx_obj;
 	PPCODE:
 		GLXContext cx= glXCreateNewContext(dpy, fbcfg, render_type, shared, direct);
@@ -300,6 +299,27 @@ _already_freed(cx)
 
 MODULE = X11::GLX                     PACKAGE = X11::GLX::DWIM
 
+int
+_build_gl_clear_bits(self)
+	SV *self
+	CODE:
+		RETVAL = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
+	OUTPUT:
+		RETVAL
+
+void
+_glClear(bits)
+	int bits
+	CODE:
+		glClear(bits);
+
+int
+_glGetError()
+	CODE:
+		RETVAL = glGetError();
+	OUTPUT:
+		RETVAL
+
 void
 _set_blank_cursor(dpy, wnd)
 	Display *dpy
@@ -325,6 +345,33 @@ void
 _const_unavailable()
 	PPCODE:
 		croak("Symbol not avilable on this version of GLX");
+
+void
+_set_projection_matrix(is_frustum, left, right, bottom, top, near, far, x, y, z, mirror_x, mirror_y)
+	int is_frustum
+	double left
+	double right
+	double bottom
+	double top
+	double near
+	double far
+	double x
+	double y
+	double z
+	int mirror_x
+	int mirror_y
+	CODE:
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		
+		if (is_frustum) glFrustum(left, right, bottom, top, near, far);
+		else glOrtho(left, right, bottom, top, near, far);
+		
+		if (x || y || z) glTranslated(-x, -y, -z);
+	
+		/* If mirror is in effect, need to tell OpenGL which way the camera is */
+		glFrontFace(mirror_x == mirror_y? GL_CCW : GL_CW);
+		glMatrixMode(GL_MODELVIEW);
 
 BOOT:
 # BEGIN GENERATED BOOT CONSTANTS
@@ -993,6 +1040,46 @@ BOOT:
   newCONSTSUB(stash, "GLX_FLOAT_COMPONENTS_NV", newSViv(GLX_FLOAT_COMPONENTS_NV));
 #else
   newXS("X11::GLX::GLX_FLOAT_COMPONENTS_NV", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GL_INVALID_ENUM
+  newCONSTSUB(stash, "GL_INVALID_ENUM", newSViv(GL_INVALID_ENUM));
+#else
+  newXS("X11::GLX::GL_INVALID_ENUM", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GL_INVALID_VALUE
+  newCONSTSUB(stash, "GL_INVALID_VALUE", newSViv(GL_INVALID_VALUE));
+#else
+  newXS("X11::GLX::GL_INVALID_VALUE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GL_INVALID_OPERATION
+  newCONSTSUB(stash, "GL_INVALID_OPERATION", newSViv(GL_INVALID_OPERATION));
+#else
+  newXS("X11::GLX::GL_INVALID_OPERATION", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GL_INVALID_FRAMEBUFFER_OPERATION
+  newCONSTSUB(stash, "GL_INVALID_FRAMEBUFFER_OPERATION", newSViv(GL_INVALID_FRAMEBUFFER_OPERATION));
+#else
+  newXS("X11::GLX::GL_INVALID_FRAMEBUFFER_OPERATION", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GL_OUT_OF_MEMORY
+  newCONSTSUB(stash, "GL_OUT_OF_MEMORY", newSViv(GL_OUT_OF_MEMORY));
+#else
+  newXS("X11::GLX::GL_OUT_OF_MEMORY", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GL_STACK_OVERFLOW
+  newCONSTSUB(stash, "GL_STACK_OVERFLOW", newSViv(GL_STACK_OVERFLOW));
+#else
+  newXS("X11::GLX::GL_STACK_OVERFLOW", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GL_STACK_UNDERFLOW
+  newCONSTSUB(stash, "GL_STACK_UNDERFLOW", newSViv(GL_STACK_UNDERFLOW));
+#else
+  newXS("X11::GLX::GL_STACK_UNDERFLOW", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GL_TABLE_TOO_LARGE
+  newCONSTSUB(stash, "GL_TABLE_TOO_LARGE", newSViv(GL_TABLE_TOO_LARGE));
+#else
+  newXS("X11::GLX::GL_TABLE_TOO_LARGE", XS_X11__GLX__const_unavailable, file);
 #endif
 # END GENERATED BOOT CONSTANTS
 # ----------------------------------------------------------------------------

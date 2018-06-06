@@ -29,7 +29,8 @@ my %xs_ctor= (
   newXS(\"X11::GLX::$sym\", XS_X11__GLX__const_unavailable, file);
 #endif
 @
-            push @{$constant_sets[-1]}, $sym;
+            push @{$constant_sets[-1]}, $sym
+              if $sym =~ /^GLX_/; # only publicly export GLX constants
         } else {
             die "parse error: $_\n" if $_ =~ /\S/;
         }

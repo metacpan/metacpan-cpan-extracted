@@ -1,12 +1,12 @@
 Changes
 examples/README
+INSTALL.SKIP
 lib/HTML/SimpleLinkExtor.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
-META.yml			Module meta-data (added by MakeMaker)
-README
+README.pod
 scripts/linktractor
 t/absolute_links.t
 t/autoload.t
@@ -21,4 +21,6 @@ t/rt87288.t
 t/schemes.t
 t/tags.t
 t/test_manifest
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

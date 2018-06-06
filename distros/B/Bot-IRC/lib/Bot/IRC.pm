@@ -14,7 +14,7 @@ use Date::Format 'time2str';
 use Encode 'encode';
 use Try::Tiny;
 
-our $VERSION = '1.19'; # VERSION
+our $VERSION = '1.20'; # VERSION
 
 sub new {
     my $class = shift;
@@ -643,7 +643,7 @@ Bot::IRC - Yet Another IRC Bot
 
 =head1 VERSION
 
-version 1.19
+version 1.20
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bot-IRC.svg)](https://travis-ci.org/gryphonshafer/Bot-IRC)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bot-IRC/badge.png)](https://coveralls.io/r/gryphonshafer/Bot-IRC)
@@ -865,6 +865,22 @@ distributed with L<Bot::IRC>.
 
 =item *
 
+L<Bot::IRC::Ping>
+
+=item *
+
+L<Bot::IRC::Join>
+
+=item *
+
+L<Bot::IRC::Seen>
+
+=item *
+
+L<Bot::IRC::Greeting>
+
+=item *
+
 L<Bot::IRC::Infobot>
 
 =item *
@@ -877,14 +893,6 @@ L<Bot::IRC::Convert>
 
 =item *
 
-L<Bot::IRC::Join>
-
-=item *
-
-L<Bot::IRC::Seen>
-
-=item *
-
 L<Bot::IRC::Karma>
 
 =item *
@@ -893,7 +901,7 @@ L<Bot::IRC::Math>
 
 =item *
 
-L<Bot::IRC::Greeting>
+L<Bot::IRC::History>
 
 =back
 
@@ -1318,7 +1326,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Gryphon Shafer.
+This software is copyright (c) 2018 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

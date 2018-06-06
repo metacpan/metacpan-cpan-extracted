@@ -1,8 +1,8 @@
 #include <iostream>
-#include <fstream>   
+//#include <fstream>   
 #include <chrono>
 #include "dlib/matrix.h"
-#include "omp.h"
+// #include "omp.h"
 #include <random>
 
 using namespace dlib;
@@ -29,7 +29,6 @@ const matrix <double, n_betas, n_betas> prior_tau = inv(prior_Sigma);
 const int n_rowsD        = n_tasks*n_alts;                       
 const int n_rowsX        = n_tasks*(n_alts-1);                   
 const int n_rowsXtask    = n_alts-1;                             
-
 
 struct {
     matrix <double, 1,n_betas>               beta;
@@ -67,7 +66,6 @@ const matrix <double, n_candidates*n_rowsXtask, 2> candidates = {
 1,-1,0,0,
 0,0,0,-1,
 0,0,1,-1};
-
 
 void str2beta(const string &input, matrix <double, n_betas, 1> &output)
 {
@@ -539,40 +537,37 @@ double NormCDFinverse(double p)
       return RationalApproximation( sqrt(-2.0*log(1-p)) );
 }
 
-
-void insertDraws(const matrix<double, n_betas, n_betas> &chol_covar, const matrix<double, n_betas, 1> b_optim) 
-{ 
-	matrix <double, n_draws, n_betas> lhs; 
-	
-	std::ifstream input("lhs_" + to_string(n_draws) + "_" + to_string(n_betas) + ".txt"); 	
-	if (input) {
-	  // The file exists, and is open for input	
-      for (int i=0; i<n_draws; i++)
-        for (int j=0; j<n_betas; j++)
-          input >> lhs(i,j); 	  	
-	} else { 
-	  createLHS(lhs); 
-      for (int i=0;i<n_draws;i++)
-        for (int j=0;j<n_betas;j++)
-          lhs(i,j) = NormCDFinverse(lhs(i,j));
-      std::ofstream output ("lhs_" + to_string(n_draws) + "_" + to_string(n_betas) + ".txt"); 
-      for (int i=0; i<n_draws; i++){
-        for (int j=0; j<n_betas; j++)
-          output << lhs(i,j) << " ";
-		output << "\n"; 
-      }
-      output.close();
-	} 	
-	
-    matrix <double> betas = lhs * chol_covar;
-    for (int i = 0; i < n_draws; i++ )
-      for (int j = 0; j < n_betas; j++)
-   	    betas(i,j) += b_optim(j);
-	for (int i = 0; i < n_draws; i++ )
-      draw[i].beta = rowm(betas,i);
-}
-
-
+// void insertDraws(const matrix<double, n_betas, n_betas> &chol_covar, const matrix<double, n_betas, 1> b_optim) 
+// { 
+// 	matrix <double, n_draws, n_betas> lhs; 
+// 	
+// 	std::ifstream input("lhs_" + to_string(n_draws) + "_" + to_string(n_betas) + ".txt"); 	
+// 	if (input) {
+// 	  // The file exists, and is open for input	
+//       for (int i=0; i<n_draws; i++)
+//         for (int j=0; j<n_betas; j++)
+//           input >> lhs(i,j); 	  	
+// 	} else { 
+// 	  createLHS(lhs); 
+//       for (int i=0;i<n_draws;i++)
+//         for (int j=0;j<n_betas;j++)
+//           lhs(i,j) = NormCDFinverse(lhs(i,j));
+//       std::ofstream output ("lhs_" + to_string(n_draws) + "_" + to_string(n_betas) + ".txt"); 
+//       for (int i=0; i<n_draws; i++){
+//         for (int j=0; j<n_betas; j++)
+//           output << lhs(i,j) << " ";
+// 		output << "\n"; 
+//       }
+//       output.close();
+// 	} 	
+// 	
+//     matrix <double> betas = lhs * chol_covar;
+//     for (int i = 0; i < n_draws; i++ )
+//       for (int j = 0; j < n_betas; j++)
+//    	    betas(i,j) += b_optim(j);
+// 	for (int i = 0; i < n_draws; i++ )
+//       draw[i].beta = rowm(betas,i);
+// }
 
 void FullEval_Pairwise(matrix<double, n_rowsX,n_betas> &X, double &efficiency)
 {
@@ -1069,7 +1064,7 @@ void cppAdaptive(const string &obsVector, string &futVector, string &betaVector,
   str2design( (obsVector + futVector), design);                                              
   design2X(design, X_overlap, X, X_likelihood, n_observed, beg_col, end_col);                
   calculatePosterior(b_optim, n_observed, X_likelihood, chol_covar);
-  insertDraws(chol_covar, b_optim); 
+  //insertDraws(chol_covar, b_optim); 
 
   // optimize all future tasks for 2 seconds 
   optimizeDesign_General(X, X_overlap, n_observed, beg_col, end_col); 
@@ -1100,8 +1095,8 @@ int main()
   
   cppAdaptive(obsVector, futVector, betaVector, n_observed);
 
-  cout << "betaVector: \n" << betaVector << endl;
-  cout << "futVector: \n" << futVector << endl;
+  // cout << "betaVector: \n" << betaVector << endl;
+  // cout << "futVector: \n" << futVector << endl;
 
   return 0;
 }

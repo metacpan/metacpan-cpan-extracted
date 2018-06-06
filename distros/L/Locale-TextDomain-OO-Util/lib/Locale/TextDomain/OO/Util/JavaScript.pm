@@ -3,26 +3,23 @@ package Locale::TextDomain::OO::Util::JavaScript; ## no critic (TidyCode)
 use strict;
 use warnings;
 
-our $VERSION = '3.004';
+our $VERSION = '4.001';
 
 1;
 
 __END__
 
 =head1 NAME
+
 Locale::TextDomain::OO::Util::JavaScript - How to use the JavaScript part
+
+=head1 VERSION
+
+4.001
 
 $Id: OO.pm 502 2014-05-12 20:19:51Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/module/trunk/lib/Locale/TextDomain/OO.pm $
-
-=head1 VERSION
-
-3.004
-
-=head1 DESCRIPTION
-
-This package also contais the utils as JavaScript.
 
 =head1 SYNOPSIS
 
@@ -31,6 +28,10 @@ For more information see:
 L<Locale::TextDomain::OO::JavaScript|Locale::TextDomain::OO::JavaScript>
 
 This script depends on L<http://jquery.com/>.
+
+=head1 DESCRIPTION
+
+This package also contais the utils as JavaScript.
 
 =head1 SUBROUTINES/METHODS
 
@@ -82,7 +83,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2014 - 2015,
+Copyright (c) 2014 - 2018,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

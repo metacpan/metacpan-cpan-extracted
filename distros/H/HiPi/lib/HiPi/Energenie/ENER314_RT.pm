@@ -24,7 +24,7 @@ __PACKAGE__->create_accessors( qw( device devicename led_green led_red
                               led_on _green_pin _red_pin ook_repeat
                               backend default_config ook_config gpiodev) );
 
-our $VERSION ='0.71';
+our $VERSION ='0.72';
 
 sub new {
     my( $class, %userparams ) = @_;
@@ -248,7 +248,9 @@ sub switch_ook_socket {
 }
 
 sub DESTROY {
-    $_[0]->device( undef );
+    my $self = shift;
+    $self->SUPER::DESTROY;
+    $self->device( undef );
 } 
 
 1;

@@ -2,11 +2,6 @@
 
 Here we have some more standalone tests to assist in deparsing.
 
-## runtests.pl
-
-`runtests.pl` will decompile all of the programs in the `base` and `opbasic` directories
-and decompile each file in there to the corresponding location in `tmp` under this directory.
-
 ## frag.pl
 
 `frag.pl` shows information about all B::DeparseTree nodes so you can check that the tree is build properly and what source-code fragments would be associated with each node.

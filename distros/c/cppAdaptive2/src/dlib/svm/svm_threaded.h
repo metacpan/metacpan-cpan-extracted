@@ -3,21 +3,21 @@
 #ifndef DLIB_SVm_THREADED_
 #define DLIB_SVm_THREADED_
 
-#include <cmath>
-#include <iostream>
-#include <limits>
-#include <sstream>
-#include <vector>
-
 #include "svm_threaded_abstract.h"
 #include "svm.h"
+#include <cmath>
+#include <limits>
+#include <sstream>
 #include "../matrix.h"
 #include "../algs.h"
 #include "../serialize.h"
 #include "function.h"
 #include "kernel.h"
 #include "../threads.h"
+#include <vector>
+#include "../smart_pointers.h"
 #include "../pipe.h"
+#include <iostream>
 
 namespace dlib
 {
@@ -47,12 +47,12 @@ namespace dlib
         {
             template <
                 typename trainer_type,
-                typename mem_manager_type,
+                typename matrix_type,
                 typename in_sample_vector_type
                 >
             void operator()(
                 job<trainer_type,in_sample_vector_type>& j,
-                matrix<double,1,2,mem_manager_type>& result
+                matrix_type& result
             )
             {
                 try
@@ -83,7 +83,7 @@ namespace dlib
         typename in_sample_vector_type,
         typename in_scalar_vector_type
         >
-    const matrix<double, 1, 2, typename trainer_type::mem_manager_type> 
+    const matrix<typename trainer_type::scalar_type, 1, 2, typename trainer_type::mem_manager_type> 
     cross_validate_trainer_threaded_impl (
         const trainer_type& trainer,
         const in_sample_vector_type& x,
@@ -93,6 +93,7 @@ namespace dlib
     )
     {
         using namespace dlib::cvtti_helpers;
+        typedef typename trainer_type::scalar_type scalar_type;
         typedef typename trainer_type::mem_manager_type mem_manager_type;
 
         // make sure requires clause is not broken
@@ -136,7 +137,7 @@ namespace dlib
 
 
         std::vector<future<job<trainer_type,in_sample_vector_type> > > jobs(folds);
-        std::vector<future<matrix<double, 1, 2, mem_manager_type> > > results(folds);
+        std::vector<future<matrix<scalar_type, 1, 2, mem_manager_type> > > results(folds);
 
 
         for (long i = 0; i < folds; ++i)
@@ -211,7 +212,7 @@ namespace dlib
 
         } // for (long i = 0; i < folds; ++i)
 
-        matrix<double, 1, 2, mem_manager_type> res;
+        matrix<scalar_type, 1, 2, mem_manager_type> res;
         set_all_elements(res,0);
 
         // now compute the total results
@@ -220,7 +221,7 @@ namespace dlib
             res += results[i].get();
         }
 
-        return res/(double)folds;
+        return res/(scalar_type)folds;
     }
 
     template <
@@ -228,7 +229,7 @@ namespace dlib
         typename in_sample_vector_type,
         typename in_scalar_vector_type
         >
-    const matrix<double, 1, 2, typename trainer_type::mem_manager_type> 
+    const matrix<typename trainer_type::scalar_type, 1, 2, typename trainer_type::mem_manager_type> 
     cross_validate_trainer_threaded (
         const trainer_type& trainer,
         const in_sample_vector_type& x,

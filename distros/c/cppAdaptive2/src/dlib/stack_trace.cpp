@@ -8,6 +8,7 @@
 #include <sstream>
 #include <cstring>
 #include "stack_trace.h"
+#include "threads.h"
 #include "stack.h"
 #include "memory_manager.h"
 
@@ -30,11 +31,9 @@ namespace dlib
             int line_number;
         };
 
-        using stack_tracer_stack_type = stack<stack_tracer_data,memory_manager<char>::kernel_2a>::kernel_1a;
-
-        stack_tracer_stack_type& get_dlib_stack_trace_stack()
+        thread_specific_data<stack<stack_tracer_data,memory_manager<char>::kernel_2a>::kernel_1a>& get_dlib_stack_trace_stack()
         {
-            thread_local stack_tracer_stack_type a;
+            static thread_specific_data<stack<stack_tracer_data,memory_manager<char>::kernel_2a>::kernel_1a> a;
             return a;
         }
     }
@@ -54,7 +53,7 @@ namespace dlib
         data.line_number = line_number;
 
         // pop the info onto the function stack trace
-        get_dlib_stack_trace_stack().push(data);
+        get_dlib_stack_trace_stack().data().push(data);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -63,7 +62,7 @@ namespace dlib
     ~stack_tracer()
     {
         stack_tracer_data temp;
-        get_dlib_stack_trace_stack().pop(temp);
+        get_dlib_stack_trace_stack().data().pop(temp);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -71,11 +70,10 @@ namespace dlib
     const std::string get_stack_trace()
     {
         std::ostringstream sout;
-        auto& stack = get_dlib_stack_trace_stack();
-        stack.reset();
-        while (stack.move_next())
+        get_dlib_stack_trace_stack().data().reset();
+        while (get_dlib_stack_trace_stack().data().move_next())
         {
-            stack_tracer_data data = stack.element();
+            stack_tracer_data data = get_dlib_stack_trace_stack().data().element();
             sout << data.file_name << ":" << data.line_number << "\n    " << data.funct_name << "\n";
         }
         return sout.str();

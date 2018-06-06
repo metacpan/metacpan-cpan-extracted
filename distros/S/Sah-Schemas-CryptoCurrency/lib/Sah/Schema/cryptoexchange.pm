@@ -1,7 +1,7 @@
 package Sah::Schema::cryptoexchange;
 
-our $DATE = '2018-05-31'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2018-06-06'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 our $schema = [str => {
     summary => 'Cryptoexchange code, name, or safename',
@@ -34,7 +34,7 @@ Sah::Schema::cryptoexchange - Cryptoexchange code, name, or safename
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::Schema::cryptoexchange (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-05-31.
+This document describes version 0.009 of Sah::Schema::cryptoexchange (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-06-06.
 
 =head1 DESCRIPTION
 

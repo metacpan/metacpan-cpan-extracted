@@ -22,8 +22,6 @@
 #include <future>
 #include <exception>
 #include <mutex>
-#include "../dir_nav.h"
-#include "../md5.h"
 
 namespace dlib
 {
@@ -55,10 +53,6 @@ namespace dlib
         }
     }
 
-    enum class force_flush_to_disk {
-        no = 0,
-        yes = 1
-    };
 
     template <
         typename net_type, 
@@ -139,11 +133,10 @@ namespace dlib
         }
 
         net_type& get_net (
-            force_flush_to_disk force_flush = force_flush_to_disk::yes
         )  
         { 
             wait_for_thread_to_pause();
-            sync_to_disk(force_flush == force_flush_to_disk::yes);
+            sync_to_disk(true);
             propagate_exception();
             return net; 
         }
@@ -269,7 +262,7 @@ namespace dlib
             sync_to_disk();
             send_job(true, dbegin, dend, lbegin);
 
-            ++test_one_step_calls;
+            ++train_one_step_calls;
         }
 
         void test_one_step (
@@ -291,7 +284,7 @@ namespace dlib
             print_periodic_verbose_status();
             sync_to_disk();
             send_job(true, dbegin, dend);
-            ++test_one_step_calls;
+            ++train_one_step_calls;
         }
 
         void train (
@@ -416,15 +409,9 @@ namespace dlib
             time_between_syncs = time_between_syncs_;
 
             // check if the sync file already exists, if it does we should load it.
-            std::ifstream fin(newest_syncfile(), std::ios::binary);
+            std::ifstream fin(sync_filename, std::ios::binary);
             if (fin)
                 deserialize(*this, fin);
-        }
-
-        const std::string& get_synchronization_file (
-        )
-        {
-            return sync_filename;
         }
 
         double get_average_loss (
@@ -438,7 +425,10 @@ namespace dlib
         ) const
         {
             wait_for_thread_to_pause();
-            return rs_test.mean();
+            running_stats<double> tmp;
+            for (auto& x : test_previous_loss_values)
+                tmp.add(x);
+            return tmp.mean();
         }
 
         void clear_average_loss (
@@ -573,19 +563,11 @@ namespace dlib
             return train_one_step_calls;
         }
 
-        unsigned long long get_test_one_step_calls (
-        ) const
-        {
-            return test_one_step_calls;
-        }
-
     private:
 
         void record_test_loss(double loss)
         {
             test_previous_loss_values.push_back(loss);
-            if (is_finite(loss))
-                rs_test.add(loss);
             // discard really old loss values.
             while (test_previous_loss_values.size() > test_iter_without_progress_thresh)
                 test_previous_loss_values.pop_front();
@@ -593,8 +575,11 @@ namespace dlib
 
         void record_loss(double loss)
         {
-            // This kind of budgeting causes our gradient checking to use a fixed amount of
-            // computational resources, regardless of the size of iter_without_progress_thresh.
+            // Say that we will check if the gradient is bad 200 times during each
+            // iter_without_progress_thresh interval of network updates.   This kind of
+            // budgeting causes our gradient checking to use a fixed amount of
+            // computational resources, regardless of the size of
+            // iter_without_progress_thresh.
             gradient_check_budget += 200;
 
             rs.add(loss);
@@ -700,10 +685,7 @@ namespace dlib
                                 // optimization has flattened out, so drop the learning rate. 
                                 learning_rate = learning_rate_shrink*learning_rate;
                                 test_steps_without_progress = 0;
-                                // Empty out some of the previous loss values so that test_steps_without_progress 
-                                // will decrease below test_iter_without_progress_thresh.  
-                                for (unsigned long cnt = 0; cnt < test_previous_loss_values_dump_amount+test_iter_without_progress_thresh/10 && test_previous_loss_values.size() > 0; ++cnt)
-                                    test_previous_loss_values.pop_front();
+                                test_previous_loss_values.clear();
                             }
                         }
                     }
@@ -731,7 +713,7 @@ namespace dlib
                     // We can't do this outside the loop because the tensors that get
                     // averaged need to be allocated to their devices before we call set()
                     // so that the averagers can determine how best to average them.
-                    if (averagers.size() == 0 || sync_file_reloaded)
+                    if (averagers.size() == 0)
                     {
                         averagers = std::vector<tt::multi_device_tensor_averager>(net_type::num_computational_layers);
                         // setup the averagers to point to the tensors in the networks.
@@ -754,8 +736,6 @@ namespace dlib
                             if (temp[0]->size() != 0)
                                 averagers[i].set(temp);
                         }
-
-                        sync_file_reloaded = false;
                     }
 
 
@@ -808,7 +788,7 @@ namespace dlib
                         // this because sometimes a mini-batch might be bad and cause the
                         // loss to suddenly jump up, making count_steps_without_decrease()
                         // return a large number.  But if we discard the top 10% of the
-                        // values in previous_loss_values then we are robust to that kind
+                        // values in previous_loss_values when we are robust to that kind
                         // of noise.  Another way of looking at it, if the reason
                         // count_steps_without_decrease() returns a large value is only
                         // because the most recent loss values have suddenly been large,
@@ -820,10 +800,7 @@ namespace dlib
                             // optimization has flattened out, so drop the learning rate. 
                             learning_rate = learning_rate_shrink*learning_rate;
                             steps_without_progress = 0;
-                            // Empty out some of the previous loss values so that steps_without_progress 
-                            // will decrease below iter_without_progress_thresh.  
-                            for (unsigned long cnt = 0; cnt < previous_loss_values_dump_amount+iter_without_progress_thresh/10 && previous_loss_values.size() > 0; ++cnt)
-                                previous_loss_values.pop_front();
+                            previous_loss_values.clear();
                         }
                     }
                 }
@@ -862,14 +839,13 @@ namespace dlib
             min_learning_rate = 1e-5;
             iter_without_progress_thresh = 2000;
             steps_without_progress = 0;
-            test_iter_without_progress_thresh = 500;
+            test_iter_without_progress_thresh = 200;
             test_steps_without_progress = 0;
 
             learning_rate_shrink = 0.1;
             epoch_iteration = 0;
             epoch_pos = 0;
             train_one_step_calls = 0;
-            test_one_step_calls = 0;
             gradient_check_budget = 0;
             lr_schedule_pos = 0;
 
@@ -879,12 +855,6 @@ namespace dlib
             prob_loss_increasing_thresh_max_value = 0.99999;
             prob_loss_increasing_thresh = prob_loss_increasing_thresh_default_value;
             updated_net_since_last_sync = false;
-            sync_file_reloaded = false;
-            previous_loss_values_dump_amount = 400;
-            test_previous_loss_values_dump_amount = 100;
-
-            rs_test = running_stats_decayed<double>(200);
-
             start();
         }
 
@@ -895,13 +865,12 @@ namespace dlib
         friend void serialize(const dnn_trainer& item, std::ostream& out)
         {
             item.wait_for_thread_to_pause();
-            int version = 12;
+            int version = 8;
             serialize(version, out);
 
             size_t nl = dnn_trainer::num_layers;
             serialize(nl, out);
             serialize(item.rs, out);
-            serialize(item.rs_test, out);
             serialize(item.previous_loss_values, out);
             serialize(item.max_num_epochs, out);
             serialize(item.mini_batch_size, out);
@@ -916,14 +885,11 @@ namespace dlib
             serialize(item.epoch_iteration, out);
             serialize(item.epoch_pos, out);
             serialize(item.train_one_step_calls, out);
-            serialize(item.test_one_step_calls, out);
             serialize(item.lr_schedule, out);
             serialize(item.lr_schedule_pos, out);
             serialize(item.test_iter_without_progress_thresh.load(), out);
             serialize(item.test_steps_without_progress.load(), out);
             serialize(item.test_previous_loss_values, out);
-            serialize(item.previous_loss_values_dump_amount, out);
-            serialize(item.test_previous_loss_values_dump_amount, out);
 
         }
         friend void deserialize(dnn_trainer& item, std::istream& in)
@@ -931,7 +897,7 @@ namespace dlib
             item.wait_for_thread_to_pause();
             int version = 0;
             deserialize(version, in);
-            if (version != 12)
+            if (version != 8)
                 throw serialization_error("Unexpected version found while deserializing dlib::dnn_trainer.");
 
             size_t num_layers = 0;
@@ -947,7 +913,6 @@ namespace dlib
 
             double dtemp; long ltemp;
             deserialize(item.rs, in);
-            deserialize(item.rs_test, in);
             deserialize(item.previous_loss_values, in);
             deserialize(item.max_num_epochs, in);
             deserialize(item.mini_batch_size, in);
@@ -962,14 +927,11 @@ namespace dlib
             deserialize(item.epoch_iteration, in);
             deserialize(item.epoch_pos, in);
             deserialize(item.train_one_step_calls, in);
-            deserialize(item.test_one_step_calls, in);
             deserialize(item.lr_schedule, in);
             deserialize(item.lr_schedule_pos, in);
             deserialize(ltemp, in); item.test_iter_without_progress_thresh = ltemp;
             deserialize(ltemp, in); item.test_steps_without_progress = ltemp;
             deserialize(item.test_previous_loss_values, in);
-            deserialize(item.previous_loss_values_dump_amount, in);
-            deserialize(item.test_previous_loss_values_dump_amount, in);
 
             if (item.devices.size() > 1)
             {
@@ -1015,20 +977,25 @@ namespace dlib
                 // previously saved state in the hopes that the problem won't reoccur.
                 if (loss_increased_since_last_disk_sync()) 
                 {
-                    std::ifstream fin(newest_syncfile(), std::ios::binary);
+                    std::ifstream fin(sync_filename, std::ios::binary);
                     deserialize(*this, fin);
-                    sync_file_reloaded = true;
                     if (verbose)
-                        std::cout << "Loss has been increasing, reloading saved state from " << newest_syncfile() << std::endl;
+                        std::cout << "Loss has been increasing, reloading saved state from " << sync_filename << std::endl;
                 }
                 else
                 {
 
-                    const std::string filename = oldest_syncfile();
-                    serialize(filename) << *this;
+                    // save our state to a temp file
+                    const std::string tempfile = sync_filename + ".tmp";
+                    serialize(tempfile) << *this;
+
+                    // Now that we know the state is safely saved to disk, delete the old sync
+                    // file and move the .tmp file to it.
+                    std::remove(sync_filename.c_str());
+                    std::rename(tempfile.c_str(), sync_filename.c_str());
 
                     if (verbose)
-                        std::cout << "Saved state to " << filename << std::endl;
+                        std::cout << "Saved state to " << sync_filename << std::endl;
                 }
 
                 last_sync_time = std::chrono::system_clock::now();
@@ -1037,24 +1004,12 @@ namespace dlib
             }
         }
 
-        std::string newest_syncfile (
-        )
-        {
-            return select_newest_file(sync_filename, sync_filename + "_");
-        }
-
-        std::string oldest_syncfile (
-        )
-        {
-            return select_oldest_file(sync_filename, sync_filename + "_");
-        }
-
         bool loss_increased_since_last_disk_sync() 
         {
             size_t gradient_updates_since_last_sync = main_iteration_counter - main_iteration_counter_at_last_disk_sync;
 
             // if we haven't synced anything to disk yet then return false.
-            if (!std::ifstream(newest_syncfile(), std::ios::binary))
+            if (!std::ifstream(sync_filename, std::ios::binary))
                 return false;
 
             for (auto x : previous_loss_values)
@@ -1232,7 +1187,6 @@ namespace dlib
 
 
         running_stats<double> rs;
-        running_stats_decayed<double> rs_test;
         std::deque<double> previous_loss_values;
         unsigned long max_num_epochs;
         size_t mini_batch_size;
@@ -1255,7 +1209,6 @@ namespace dlib
         size_t epoch_pos;
         std::chrono::time_point<std::chrono::system_clock> last_time;
         unsigned long long train_one_step_calls;
-        unsigned long long test_one_step_calls;
         matrix<double,0,1> lr_schedule;
         long lr_schedule_pos;
         unsigned long gradient_check_budget;
@@ -1277,53 +1230,7 @@ namespace dlib
         double prob_loss_increasing_thresh;
         std::atomic<bool> updated_net_since_last_sync;
 
-        bool sync_file_reloaded;
-        unsigned long previous_loss_values_dump_amount;
-        unsigned long test_previous_loss_values_dump_amount;
     };
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename net_type, 
-        typename solver_type 
-        >
-    std::ostream& operator<< (
-        std::ostream& out,
-        dnn_trainer<net_type,solver_type>& trainer
-    )
-    {
-        using std::endl;
-        out << "dnn_trainer details: \n";
-        out << "  net_type::num_layers:  " << net_type::num_layers << endl;
-        // figure out how big the net is in MB.
-        std::ostringstream sout;
-        net_type temp = trainer.get_net(); // make a copy so that we can clean it without mutating the trainer's net.
-        temp.clean();
-        serialize(temp, sout);
-        out << "  net size: " << sout.str().size()/1024.0/1024.0 << "MB" << endl;
-        // Don't include the loss params in the hash since we print them on the next line.
-        // They also aren't really part of the "architecture" of the network.
-        out << "  net architecture hash: " << md5(cast_to_string(trainer.get_net().subnet())) << endl;
-        out << "  loss: " << trainer.get_net().loss_details() << endl;
-
-        out << "  synchronization file:                       " << trainer.get_synchronization_file() << endl;
-        out << "  trainer.get_solvers()[0]:                   " << trainer.get_solvers()[0] << endl;
-        auto sched = trainer.get_learning_rate_schedule();
-        if (sched.size() != 0)
-        {
-            out << "  using explicit user-supplied learning rate schedule" << endl;
-        }
-        else
-        {
-            out << "  learning rate:                              "<< trainer.get_learning_rate() << endl;
-            out << "  learning rate shrink factor:                "<< trainer.get_learning_rate_shrink_factor() << endl;
-            out << "  min learning rate:                          "<< trainer.get_min_learning_rate() << endl;
-            out << "  iterations without progress threshold:      "<< trainer.get_iterations_without_progress_threshold() << endl;
-            out << "  test iterations without progress threshold: "<< trainer.get_test_iterations_without_progress_threshold() << endl;
-        }
-        return out;
-    }
 
 // ----------------------------------------------------------------------------------------
 

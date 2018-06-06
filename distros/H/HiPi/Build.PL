@@ -7,7 +7,7 @@ use strict;
 use lib 'inc';
 require Module::Build::HiPi;
 
-our $VERSION ='0.71';
+our $VERSION ='0.72';
 
 my $requires = {
         'Try::Tiny'             => '0',
@@ -16,11 +16,12 @@ my $requires = {
         'File::Copy::Recursive' => '0',
         'JSON'                  => '0',
         'Getopt::Long'          => '0',
-        'Image::Imlib2'         => '0',
+        'Bit::Vector'           => '0',
 };
 
 if( $^O =~ /^linux$/i ) {
     $requires->{'Device::SerialPort'} = '0';
+    $requires->{'Image::Imlib2'}      = '0';
 }
 
 my $build = Module::Build::HiPi->new(

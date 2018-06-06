@@ -1,5 +1,7 @@
 package TestsFor::BioX::Workflow::Command::run::Test009;
 
+use strict;
+use warnings FATAL => 'all';
 use Test::Class::Moose;
 use Cwd;
 use FindBin qw($Bin);
@@ -95,8 +97,8 @@ sub test_001 {
 
     $test->post_process_rules;
     is_deeply( $test->samples, ['Sample_01'] );
-
-    ok((-d 'data/analysis/Sample_01/jellyfish'));
+    # This gets done with the string interpolation now
+#    ok((-d 'data/analysis/Sample_01/jellyfish'));
 
     ok(1);
 }

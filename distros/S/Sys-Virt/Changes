@@ -1,5 +1,12 @@
 Revision history for perl module Sys::Virt
 
+4.4.0 2018-06-05
+
+ - Switch to Module::Build
+ - Add support for virDomainDetachDeviceAlias
+ - Add support for virConnectBaselineHypervisorCPU
+ - Add support for virConnectCompareHypervisorCPU
+
 4.2.0 2018-04-03
 
  - Add missing define_nwfilter and define_secret APIs in Sys::Virt

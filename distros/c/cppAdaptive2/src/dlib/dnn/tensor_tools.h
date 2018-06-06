@@ -6,14 +6,11 @@
 #include "tensor.h"
 #include "cudnn_dlibapi.h"
 #include "cublas_dlibapi.h"
-#include "cusolver_dlibapi.h"
 #include "curand_dlibapi.h"
 #include "cpu_dlib.h"
 #include "cuda_dlib.h"
 #include "../rand.h"
 #include <memory>
-#include "../geometry/rectangle.h"
-#include "../test_for_odr_violations.h"
 
 namespace dlib
 {
@@ -49,24 +46,6 @@ namespace dlib { namespace tt
             - #out.num_samples() == lhs.num_samples()
             - #out.k() == #out.nr() == #out.nc() == 1
             - #out == sum_cols(pointwise_multiply(mat(lhs), mat(rhs))); 
-    !*/
-
-    void dot_prods (
-        bool add_to,
-        tensor& out,
-        const tensor& lhs,
-        const tensor& rhs
-    );
-    /*!
-        requires
-            - have_same_dimensions(lhs,rhs) == true
-            - out.size() == lhs.num_samples()
-            - out.k() == out.nr() == out.nc() == 1
-        ensures
-            - if (add_to) then
-                - #out == mat(out) + sum_cols(pointwise_multiply(mat(lhs), mat(rhs))); 
-            - else
-                - #out == sum_cols(pointwise_multiply(mat(lhs), mat(rhs))); 
     !*/
 
     void scale_columns (
@@ -118,45 +97,6 @@ namespace dlib { namespace tt
     !*/
 
 // ----------------------------------------------------------------------------------------
-    
-    void exp (
-        tensor& dest,
-        const tensor& src
-    );
-    /*!
-        requires
-            - dest.size() == src.size()
-        ensures
-            - performs: dest = exp(mat(src))
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    void log (
-        tensor& dest,
-        const tensor& src
-    );
-    /*!
-        requires
-            - dest.size() == src.size()
-        ensures
-            - performs: dest = log(mat(src))
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    void log10 (
-        tensor& dest,
-        const tensor& src
-    );
-    /*!
-        requires
-            - dest.size() == src.size()
-        ensures
-            - performs: dest = log10(mat(src))
-    !*/
-
-// ----------------------------------------------------------------------------------------
 
     void gemm (
         float beta,
@@ -181,36 +121,6 @@ namespace dlib { namespace tt
         ensures
             - performs: dest = alpha*L*R + beta*mat(dest)
     !*/
-
-// ----------------------------------------------------------------------------------------
-
-    class inv
-    {
-        /*!
-            WHAT THIS OBJECT REPRESENTS
-                This is a functor for doing matrix inversion on the GPU.  The only
-                reason it's an object is to avoid the reallocation of some GPU memory
-                blocks if you want to do a bunch of matrix inversions in a row.
-        !*/
-    public:
-
-        void operator() (
-            const tensor& m,
-            resizable_tensor& out
-        );
-        /*!
-            requires
-                - m.size() == m.num_samples()*m.num_samples()
-                  (i.e. mat(m) must be a square matrix)
-            ensures
-                - out == inv(mat(m));
-        !*/
-
-    private:
-#ifdef DLIB_USE_CUDA
-        cuda::inv finv;
-#endif
-    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -294,27 +204,6 @@ namespace dlib { namespace tt
                 - Instead of assigning the result to dest, this function adds the result to dest.
     !*/
 
-    void scale_channels (
-        bool add_to,
-        tensor& dest,
-        const tensor& src,
-        const tensor& scales
-    );
-    /*!
-        requires
-            - have_same_dimensions(dest, src) == true
-            - scales.num_samples() == src.num_samples()
-            - scales.k()           == src.k()
-            - scales.nr()          == 1
-            - scales.nc()          == 1
-        ensures
-            - Scales each channel of src by the corresponding value in scales.  To be
-              precise, we will have:
-                - #dest(n,k,r,c) == src(n,k,r,c)*scales(n,k,1,1)
-            - if (add_to) then
-                - Instead of assigning the result to dest, this function adds the result to dest.
-    !*/
-
     void multiply_conv (
         bool add_to,
         tensor& dest,
@@ -344,23 +233,6 @@ namespace dlib { namespace tt
                     #dest(k) == sum over {n,r,c} of src1(n,k,r,c)*src2(n,k,r,c)
             - if (add_to) then
                 - Instead of assigning the result to dest, this function adds the result to dest.
-    !*/
-
-    void multiply_zero_padded (
-        bool add_to,
-        tensor& dest,
-        const tensor& src1,
-        const tensor& src2
-    );
-    /*!
-        ensures
-            - if (add_to) then
-                - performs: dest += src1 * src2
-            - else
-                - performs: dest = src1 * src2
-            - In either case, the multiplication happens pointwise according to 4D tensor
-              arithmetic.  If the dimensions don't match then missing elements are presumed
-              to be equal to 0.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -482,34 +354,6 @@ namespace dlib { namespace tt
               Specifically, it does this:
                 - for i in the range [begin, end):
                     - #dest.host()[i] == A*src1.host()[i] + B*src2.host()[i] + C*src3.host()[i]
-    !*/
-
-    void affine_transform(
-        const rectangle& rect,
-        tensor& dest, 
-        const tensor& src1, 
-        const tensor& src2, 
-        const tensor& src3, 
-        float A, 
-        float B,
-        float C
-    );
-    /*!
-        requires
-            - dest.size()==src1.size()
-            - dest.size()==src2.size()
-            - dest.size()==src3.size()
-            - dest.num_samples()==src1.num_samples()
-            - dest.num_samples()==src2.num_samples()
-            - dest.num_samples()==src3.num_samples()
-            - get_rect(mat(dest)).contains(rect) == true
-              (i.e. rect must be entirely contained within dest)
-        ensures
-            - This function operates much like
-              affine_transform(dest,src1,src2,src3,A,B,C,0), except that it runs over only
-              the sub-rectangle indicated by rect.  In particular, this function is equivalent
-              to:
-                set_subm(dest,rect) = A*subm(mat(src1),rect) + B*subm(mat(src2),rect) + C*subm(mat(src3),rect)
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -934,50 +778,27 @@ namespace dlib { namespace tt
         ) { impl.clear(); }
 
         void operator() (
-            const bool add_to_output,
-            tensor& output,
-            const tensor& data,
-            const tensor& filters
-        ) { impl(add_to_output,output,data,filters); }
-        /*!
-            requires
-                - setup() has been called.  Specifically, setup() has been called like this:
-                    this->setup(data, filters, stride_y, stride_x, padding_y, padding_x);
-                - is_same_object(output,data) == false
-                - is_same_object(output,filters) == false
-                - filters.k() == data.k()
-                - filters.nr() <= src.nr() + 2*padding_y
-                - filters.nc() <= src.nc() + 2*padding_x
-                - #output.num_samples() == data.num_samples()
-                - #output.k() == filters.num_samples()
-                - #output.nr() == 1+(data.nr() + 2*padding_y - filters.nr())/stride_y
-                - #output.nc() == 1+(data.nc() + 2*padding_x - filters.nc())/stride_x
-            ensures
-                - Convolves filters over data.  If add_to_output==true then we add the
-                  results to output, otherwise we assign to output, overwriting the
-                  previous values in output.
-                - filters contains filters.num_samples() filters. 
-        !*/
-
-        void operator() (
-            const bool add_to_output,
             resizable_tensor& output,
             const tensor& data,
-            const tensor& filters
-        ) { impl(add_to_output,output,data,filters); }
+            const tensor& filters,
+            int stride_y,
+            int stride_x,
+            int padding_y,
+            int padding_x
+        ) { impl(output,data,filters,stride_y,stride_x,padding_y,padding_x); }
         /*!
             requires
-                - setup() has been called.  Specifically, setup() has been called like this:
-                    this->setup(data, filters, stride_y, stride_x, padding_y, padding_x);
+                - stride_y > 0
+                - stride_x > 0
+                - 0 <= padding_y < filters.nr()
+                - 0 <= padding_x < filters.nc()
                 - is_same_object(output,data) == false
                 - is_same_object(output,filters) == false
                 - filters.k() == data.k()
                 - filters.nr() <= src.nr() + 2*padding_y
                 - filters.nc() <= src.nc() + 2*padding_x
             ensures
-                - Convolves filters over data.  If add_to_output==true then we add the
-                  results to output, otherwise we assign to output, overwriting the
-                  previous values in output.  
+                - convolves filters over data.  
                 - filters contains filters.num_samples() filters. 
                 - #output.num_samples() == data.num_samples()
                 - #output.k() == filters.num_samples()
@@ -986,105 +807,47 @@ namespace dlib { namespace tt
         !*/
 
         void get_gradient_for_data (
-            const bool add_to_output,
             const tensor& gradient_input, 
             const tensor& filters,
             tensor& data_gradient
-        ) { impl.get_gradient_for_data(add_to_output,gradient_input,filters,data_gradient); }
+        ) { impl.get_gradient_for_data(gradient_input,filters,data_gradient); }
         /*!
             requires
-                - One of the following must be true:
-                    - filters has the same dimensions as the filters object given to the
-                      last call to operator().  Also, data_gradient has the same dimensions
-                      as the data object given to the last call to operator().
-                    - setup() has been called.  Specifically, setup() has been called like this:
-                      this->setup(data_gradient, filters, stride_y, stride_x, padding_y, padding_x);
-                - gradient_input has the following dimensions:
-                    - gradient_input.num_samples() == data_gradient.num_samples()
-                    - gradient_input.k() == filters.num_samples()
-                    - gradient_input.nr() == 1+(data_gradient.nr() + 2*padding_y - filters.nr())/stride_y
-                    - gradient_input.nc() == 1+(data_gradient.nc() + 2*padding_x - filters.nc())/stride_x
-                    - NOTE, these dimensions are what you would obtain if gradient_input
-                      has the same dimensions as the last output of operator().  
+                - filters has the same dimensions as the filters object given to the last
+                  call to operator().
+                - data_gradient has the same dimensions as the data object given to the last
+                  call to operator().
+                - gradient_input has the same dimensions as the last output of operator().
                 - is_same_object(data_gradient,filters) == false
                 - is_same_object(data_gradient,gradient_input) == false
             ensures
                 - let OUT be the output of (*this)(OUT,data,filters,sx,sy).
                 - let f(data,filters) == dot(OUT, gradient_input)
-                - if (add_to_output) then
-                    - This function finds the gradient of f() with respect to data and adds
-                      this gradient to data_gradient.
-                - else
-                    - This function finds the gradient of f() with respect to data and
-                      assigns this gradient to data_gradient, overwriting the previous
-                      values in data_gradient.
+                - This function finds the gradient of f() with respect to data and adds
+                  this gradient to data_gradient.
         !*/
 
         void get_gradient_for_filters (
-            const bool add_to_output,
             const tensor& gradient_input, 
             const tensor& data,
             tensor& filters_gradient
-        ) { impl.get_gradient_for_filters(add_to_output,gradient_input,data,filters_gradient); }
+        ) { impl.get_gradient_for_filters(gradient_input,data,filters_gradient); }
         /*!
             requires
-                - One of the following must be true:
-                    - filters_gradient has the same dimensions as the filters object given
-                      to the last call to operator().  Also, data has the same dimensions
-                      as the data object given to the last call to operator().
-                    - setup() has been called.  Specifically, setup() has been called like this:
-                      this->setup(data, filters_gradient, stride_y, stride_x, padding_y, padding_x);
-                - gradient_input has the following dimensions:
-                    - gradient_input.num_samples() == data.num_samples()
-                    - gradient_input.k() == filters.num_samples()
-                    - gradient_input.nr() == 1+(data.nr() + 2*padding_y - filters.nr())/stride_y
-                    - gradient_input.nc() == 1+(data.nc() + 2*padding_x - filters.nc())/stride_x
-                    - NOTE, these dimensions are what you would obtain if gradient_input
-                      has the same dimensions as the last output of operator().  
+                - filters_gradient has the same dimensions as the filters object given to
+                  the last call to operator().
+                - data has the same dimensions as the data object given to the last call to
+                  operator().
+                - gradient_input has the same dimensions as the last output of operator().
                 - is_same_object(filters_gradient,data) == false
                 - is_same_object(filters_gradient,gradient_input) == false
             ensures
                 - let OUT be the output of (*this)(OUT,data,filters,sx,sy).
                 - let f(data,filters) == dot(OUT, gradient_input)
-                - if (add_to_output) then
-                    - This function finds the gradient of f() with respect to filters and
-                      adds this gradient to filters_gradient.
-                - else 
-                    - This function finds the gradient of f() with respect to filters and
-                      assigns this gradient to filters_gradient, overwriting the previous
-                      values in filters_gradient.
+                - This function finds the gradient of f() with respect to filters and assigns 
+                  this gradient to filters_gradient.
         !*/
 
- 
-        void setup(
-            const tensor& data,
-            const tensor& filters,
-            int stride_y,
-            int stride_x,
-            int padding_y,
-            int padding_x
-        ) {impl.setup(data,filters,stride_y,stride_x,padding_y,padding_x); }
-        /*!
-            requires
-                - filters.k() == data.k()
-                - stride_y > 0
-                - stride_x > 0
-                - 0 <= padding_y < filters.nr()
-                - 0 <= padding_x < filters.nc()
-            ensures
-                - When operator() is called, the output tensor will have these dimensions:
-                    - output.nr() == 1+(data.nr() + 2*padding_y - filters.nr())/stride_y
-                    - output.nc() == 1+(data.nc() + 2*padding_x - filters.nc())/stride_x
-                    - output.num_samples() == data.num_samples()
-                    - output.k() == filters.num_samples()
-                - The point of setup() is to allow this object to gather information about
-                  all the tensor sizes and filter layouts involved in the computation.  In
-                  particular, the reason the tensors are input into setup() is just to
-                  observe their sizes.  setup() doesn't do anything with the contents of
-                  the tensors, or store any kind of references to the data or filter
-                  tensors. 
-        !*/
-       
     private:
 #ifdef DLIB_USE_CUDA
         cuda::tensor_conv impl;
@@ -1258,44 +1021,6 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
-    void softmax_all (
-        tensor& dest,
-        const tensor& src
-    );
-    /*!
-        requires
-            - have_same_dimensions(dest, src) == true
-        ensures
-            - Note that the softmax function is a vector valued function: 
-              s(x) == exp(x)/sum(exp(x)) 
-            - Computes the softmax function on src and writes the results to dest.  The
-              softmax is computed over the entire tensor with one invocation of s().  So
-              unlike softmax() which computes many s() evaluations, one for each spatial
-              location, softmax_all() calls s() once for the entire tensor.
-            - This function supports in-place operation, i.e. having
-              is_same_object(dest, src)==true
-    !*/
-
-    void softmax_all_gradient (
-        tensor& grad,
-        const tensor& dest,
-        const tensor& gradient_input
-    );
-    /*!
-        requires
-            - have_same_dimensions(dest,gradient_input) == true 
-            - have_same_dimensions(dest,grad) == true 
-            - is_same_object(grad, dest)==false
-        ensures
-            - We interpret dest as the output of softmax_all(dest,SRC) for some SRC tensor.
-              Then let f(SRC) == dot(gradient_input,dest) Then this function computes the
-              gradient of f() with respect to SRC and assigns it to grad.
-            - This function supports in-place operation, i.e. having
-              is_same_object(grad, gradient_input)==true
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
     void sigmoid (
         tensor& dest,
         const tensor& src
@@ -1447,92 +1172,6 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
-    void resize_bilinear (
-        tensor& dest,
-        long dest_row_stride,
-        long dest_channel_stride,
-        const tensor& src,
-        long src_row_stride,
-        long src_channel_stride
-    );
-    /*!
-        requires
-            - is_same_object(dest, src)==false
-            - dest.num_samples() == src.num_samples()
-            - dest.k() == src.k()
-        ensures
-            - for all valid i,k:  image_plane(dest,i,k) is a copy of image_plane(src,i,k)
-              that has been bilinearly interpolated to fit into the shape of
-              image_plane(dest,i,k).
-            - Instead of supposing the row stride and channel stride in the tensors is
-              given by tensor::nc() and tensor::nr()*tensor::nc() respectively, we use the
-              provided stride values to transition from one row and channel to the next.
-              This is useful in combination with alias_tensor objects since it allows you
-              to operate on subwindows in an image.
-    !*/
-
-    void resize_bilinear_gradient (
-        tensor& grad,
-        long grad_row_stride,
-        long grad_channel_stride,
-        const tensor& gradient_input,
-        long gradient_input_row_stride,
-        long gradient_input_channel_stride
-    );
-    /*!
-        requires
-            - is_same_object(grad, gradient_input)==false
-            - gradient_input.num_samples() == grad.num_samples()
-            - gradient_input.k() == grad.k()
-        ensures
-            - Suppose that DEST is the output of resize_bilinear(DEST,SRC) for some SRC
-              tensor, let f(SRC) == dot(gradient_input,DEST).  Then this function computes
-              the gradient of f() with respect to SRC and adds it to grad.   It should be
-              noted that we don't need to know the contents of DEST to compute this
-              gradient.  All that matters is that gradient_input have the same dimensions
-              as DEST.
-            - Instead of supposing the row stride and channel stride in the tensors is
-              given by tensor::nc() and tensor::nr()*tensor::nc() respectively, we use the
-              provided stride values to transition from one row and channel to the next.
-              This is useful in combination with alias_tensor objects since it allows you
-              to operate on subwindows in an image.
-    !*/
-
-    inline void resize_bilinear (
-        tensor& dest,
-        const tensor& src
-    ) { resize_bilinear(dest, dest.nc(), dest.nr()*dest.nc(), src, src.nc(), src.nr()*src.nc()); }
-    /*!
-        requires
-            - is_same_object(dest, src)==false
-            - dest.num_samples() == src.num_samples()
-            - dest.k() == src.k()
-        ensures
-            - for all valid i,k:  image_plane(dest,i,k) is a copy of image_plane(src,i,k)
-              that has been bilinearly interpolated to fit into the shape of
-              image_plane(dest,i,k).
-    !*/
-
-    inline void resize_bilinear_gradient (
-        tensor& grad,
-        const tensor& gradient_input
-    ) { resize_bilinear_gradient(grad, grad.nc(), grad.nr()*grad.nc(), gradient_input, gradient_input.nc(), gradient_input.nr()*gradient_input.nc()); }
-    /*!
-        requires
-            - is_same_object(grad, gradient_input)==false
-            - gradient_input.num_samples() == grad.num_samples()
-            - gradient_input.k() == grad.k()
-        ensures
-            - Suppose that DEST is the output of resize_bilinear(DEST,SRC) for some SRC
-              tensor, let f(SRC) == dot(gradient_input,DEST).  Then this function computes
-              the gradient of f() with respect to SRC and adds it to grad.   It should be
-              noted that we don't need to know the contents of DEST to compute this
-              gradient.  All that matters is that gradient_input have the same dimensions
-              as DEST.
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
     class multi_device_tensor_averager
     {
         /*!
@@ -1669,34 +1308,27 @@ namespace dlib { namespace tt
 
         resizable_tensor accum_buffer;
     };
+    // ----------------------------------------------------------------------------------------
 
-// ----------------------------------------------------------------------------------------
-
-    void copy_tensor(
-            bool add_to,
-            tensor& dest,
-            size_t dest_k_offset,
-            const tensor& src,
-            size_t src_k_offset,
-            size_t count_k
-    );
-    /*!
-        requires
-            - dest.nc() == src.nc()
-            - dest.nr() == src.nr()
-            - dest.num_samples() == src.num_samples()
-            - dest.k() - dest_k_offset >= count_k
-            - src.k() - src_k_offset >= count_k
-            - is_same_object(dest,src) == false
-            - The memory areas of src and dest do not overlap.
-        ensures
-            - if (add_to) then
-                - performs: dest[i, k + dest_k_offset, r, c] += src[i, k + src_k_offset, r, c], where k in [0..count_k]
-                  i.e., adds content of each sample from src in to corresponding place of sample at dest.
-            - else
-                - performs: dest[i, k + dest_k_offset, r, c]  = src[i, k + src_k_offset, r, c], where k in [0..count_k]
-                  i.e., copies content of each sample from src in to corresponding place of sample at dest.
-    !*/
+        void copy_tensor(
+                tensor& dest,
+                size_t dest_k_offset,
+                const tensor& src,
+                size_t src_k_offset,
+                size_t count_k
+        );
+        /*!
+            requires
+                - dest.nc() == src.nc()
+                - dest.nr() == src.nr()
+                - dest.num_samples() == src.num_samples()
+                - dest.k() - dest_k_offset >= count_k
+                - src.k() - src_k_offset >= count_k
+                - is_same_object(dest,src) == false
+            ensures
+                - performs: dest[i, k + dest_k_offset, r, c] = src[i, k + src_k_offset, r, c], where k in [0..count_k]
+                  Copies content of each sample from src in to corresponding place of sample at dest.
+        !*/
 
 // ----------------------------------------------------------------------------------------
 

@@ -8,10 +8,7 @@ use Config;
 use Getopt::Long;
 use FindBin;
 use lib "$FindBin::Bin/lib";
-use SPVM::Build::Native;
 use SPVM::Build::Util;
-
-my $build_native= SPVM::Build::Native->new;
 
 my $ivsize = $Config{ivsize};
 if ($ivsize < 8) {
@@ -32,6 +29,7 @@ WriteMakefile(
     NAME              => 'SPVM',
     VERSION_FROM      => 'lib/SPVM.pm', # finds $VERSION
     PREREQ_PM         => {}, # e.g., Module::Name => 1.1
+    LICENSE           => 'perl_5',
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/SPVM.pm', # retrieve abstract from module
        AUTHOR         => 'A. U. Thor <kimoto@sakura.ne.jp>') : ()),
@@ -42,7 +40,7 @@ WriteMakefile(
     OBJECT            => '$(O_FILES)', # link all the C files too
     $debug ? (DEFINE => '-DDEBUG') : (),
     test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'},
-    clean => {FILES => "spvm_build/*.o spvm_build/*.c spvm_build/*.so t/spvm_build/*.o t/spvm_build/*.c t/spvm_build/*.so t/spvm_build/*.precompile t/spvm_build/*.native"},
+    clean => {FILES => "spvm_build/src spvm_build/work spvm_build/lib t/spvm_build/src t/spvm_build/work t/spvm_build/lib"},
 );
 
 
@@ -50,13 +48,12 @@ WriteMakefile(
 sub MY::postamble {
   
   my @module_names = qw(
-    SPVM::Math
-    SPVM::TypeUtil
+    SPVM::Example
   );
   
   my $make_rule = '';
   for my $module_name (@module_names) {
-    $make_rule .= $build_native->create_build_shared_lib_make_rule($module_name);
+    $make_rule .= SPVM::Build::Util::create_build_shared_lib_make_rule($module_name, 'native');
   }
   
   return $make_rule;

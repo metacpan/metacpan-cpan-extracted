@@ -1,5 +1,6 @@
 package Mojolicious::Plugin::Notifications::Alertify;
 use Mojo::Base 'Mojolicious::Plugin::Notifications::Engine';
+use Mojolicious::Plugin::Notifications::HTML qw/notify_html/;
 use Mojo::ByteStream 'b';
 use Mojo::Util qw/xml_escape quote/;
 use Mojo::JSON qw/decode_json encode_json/;
@@ -61,9 +62,7 @@ sub notifications {
     };
     $js .= ");\n";
 
-    $noscript .= qq{<div class="notify notify-} . $_->[0] . '">' .
-      xml_escape($_->[-1]) .
-	"</div>\n";
+    $noscript .= notify_html($_->[0], $_->[-1]);
   };
 
   return b($js . "//]]>\n</script>\n" . $noscript . '</noscript>');
@@ -195,7 +194,7 @@ L<Alertify.js|http://fabien-d.github.io/alertify.js/>.
 
 =head2 Mojolicious::Plugin::Notifications::Alertify
 
-Copyright (C) 2014-2015, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2014-2018, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.

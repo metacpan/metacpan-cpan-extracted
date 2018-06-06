@@ -1,7 +1,7 @@
 package Sah::SchemaR::net::port;
 
-our $DATE = '2018-06-04'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2018-06-05'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 our $rschema = ["int",[{between=>[1,65535],summary=>"Network port number"}],["int"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::net::port - Network port number
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::SchemaR::net::port (from Perl distribution Sah-Schemas-Net), released on 2018-06-04.
+This document describes version 0.006 of Sah::SchemaR::net::port (from Perl distribution Sah-Schemas-Net), released on 2018-06-05.
 
 =head1 DESCRIPTION
 

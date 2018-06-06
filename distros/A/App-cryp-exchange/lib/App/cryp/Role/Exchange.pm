@@ -1,7 +1,7 @@
 package App::cryp::Role::Exchange;
 
-our $DATE = '2018-05-10'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-06-06'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,9 +11,11 @@ use Role::Tiny;
 
 requires qw(
                new
-               list_pairs
-               data_native_pair_separator
+
                data_canonical_currencies
+               data_native_pair_separator
+               list_balances
+               list_pairs
        );
 
 sub data_reverse_canonical_currencies {
@@ -77,7 +79,7 @@ App::cryp::Role::Exchange - Role for interacting with an exchange
 
 =head1 VERSION
 
-This document describes version 0.003 of App::cryp::Role::Exchange (from Perl distribution App-cryp-exchange), released on 2018-05-10.
+This document describes version 0.004 of App::cryp::Role::Exchange (from Perl distribution App-cryp-exchange), released on 2018-06-06.
 
 =head1 DESCRIPTION
 
@@ -157,8 +159,8 @@ String. Required.
 
 =back
 
-Some specific exchanges might require more credentials or arguments; please
-check with the specific drivers.
+Some specific exchanges might require more credentials or arguments (e.g.
+C<api_passphrase> on GDAX); please check with the specific drivers.
 
 Method must return object.
 
@@ -174,9 +176,50 @@ canonical/standardized currency codes.
 =head2 data_reverse_canonical_currencies
 
 Returns hashref, a mapping of canonical/standardized currency codes to exchange
-native codes, which is produced by reversing the hash returned by
-C</"data_canonical_currencies"> and caching the result in the instance's
-C<_reverse_canonical_currencies> key. Driver can provide its own implementation.
+native codes. This role already provides an implementation, which calculates the
+hashref by reversing the hash returned by C</"data_canonical_currencies"> and
+caching the result in the instance's C<_reverse_canonical_currencies> key.
+Driver can provide its own implementation.
+
+=head2 list_balances
+
+Usage:
+
+ $xchg->list_balances(%args) => [$status, $reason, $payload, \%resmeta]
+
+List account balances.
+
+Method must return enveloped result. Payload must be an array of hashrefs. Each
+hashref must contain at least these keys:
+
+=over
+
+=item * currency
+
+fiat_or_crpytocurrency.
+
+=item * available
+
+num, balance available for trading i.e. buying.
+
+=item * hold
+
+num, balance that is currently held so not available for trading, e.g. balance
+currently tied on open buy orders.
+
+=item * total
+
+num, usually C<available> + C<hold> but can also be C<available> + C<hold> +
+C<pending_withdraw>. Generally not very useful.
+
+=back
+
+Hashref may also contain these keys: C<pending_withdraw> (balance that is in the
+process of withdrawn to another exchange, etc), C<unconfirmed> (balance that has
+recently been deposited but unconfirmed e.g. has not reached the minimum number
+of confirmations).
+
+Hashref may contain additional keys.
 
 =head2 list_pairs
 
@@ -190,9 +233,9 @@ Method must return enveloped result. Payload must be an array containing pair
 names (except when C<detail> argument is set to true, in which case method must
 return array of records/hashrefs).
 
-Pair names must be in the form of I<< <currency1>/<currency2> >> where I<<
-<currency2> >> is the base currency code. Currency codes must follow list in
-L<CryptoCurrency::Catalog>. Some example pair names: BTC/USD, ETH/BTC.
+Pair names must be in the form of I<< <currency1>/<currency2> >> where
+I<currency1> is cryptocurrency code and I<< <currency2> >> is the base currency
+code (fiat or crypto). Some example pair names: BTC/USD, ETH/BTC.
 
 Known arguments:
 

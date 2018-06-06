@@ -1,3 +1,10 @@
+1.02 2018-05-30
+        - Introduced notify_html() function.
+        - Use Mojo::Collection for notifications.
+        - Introduced "before_notifications" hook.
+        - Removed deprecated support of 'Mojolicious::Plugin'
+          based engines.
+
 1.01 2017-04-27
         - Fixed version to be compliant with perl/cpan
           versioning (Thanks to Slaven Rezić!).
@@ -6,7 +13,7 @@
         - Updated to Mojolicious 7.13.
 
 0.11 2016-09-10
-	      - Added test for lower path notifications in sessions.
+        - Added test for lower path notifications in sessions.
         - Kwalitee compliant.
 
 0.10 2015-06-18
@@ -23,17 +30,17 @@
 
 0.06 2014-11-04
         - Fix minor documentation error.
-	- Remove deprecated use of object-oriented Mojo::JSON.
+        - Remove deprecated use of object-oriented Mojo::JSON.
 
 0.05 2014-09-15
         - Changed tx->resume() method to hook for multiple redirect support.
-	- Flash and stash notifications will now be merged.
+        - Flash and stash notifications will now be merged.
 
 0.04 2014-09-07
         - Added experimental AssetPack support.
-	- Added abstract M::P::N::Engine package.
-	- Engines based on Mojolicious::Plugin are now DEPRECATED.
-	- Added M::P::N::Assets package.
+        - Added abstract M::P::N::Engine package.
+        - Engines based on Mojolicious::Plugin are now DEPRECATED.
+        - Added M::P::N::Assets package.
 
 0.03 2014-06-01
         - Documentation cleanup.
@@ -41,7 +48,7 @@
 
 0.02 2014-06-01
         - Initial submission to CPAN.
-	- Added <noscript /> tag to the Humane engine.
+        - Added <noscript /> tag to the Humane engine.
 
 0.01 2014-05-26
         - Initial submission to GitHub.

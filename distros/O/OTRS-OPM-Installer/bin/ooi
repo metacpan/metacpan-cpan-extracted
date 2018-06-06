@@ -12,6 +12,7 @@ use OTRS::OPM::Installer;
 use Getopt::Long;
 
 GetOptions(
+    'p=s'     => \my $package,
     'h'       => \my $help,
     'r=s'     => \my @repositories,
     'v=s'     => \my $version,
@@ -19,6 +20,7 @@ GetOptions(
     'version' => \my $print_version,
     'list'    => \my $list_available,
     'sudo'    => \my $sudo,
+    'force'   => \my $force,
 );
 
 unshift @ARGV, $package if $package;
@@ -49,6 +51,7 @@ $opts{version}      = $version       if $version;
 my %class_opts;
 $class_opts{verbose} = 1             if $verbose;
 $class_opts{sudo}    = 1             if $sudo;
+$class_opts{force}   = 1             if $force;
 
 my $installer = OTRS::OPM::Installer->new( %class_opts );
 
@@ -84,7 +87,7 @@ ooi - Commandline tool to install OTRS addons
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 
@@ -92,7 +95,7 @@ Renee Baecker <reneeb@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Renee Baecker.
+This software is Copyright (c) 2018 by Renee Baecker.
 
 This is free software, licensed under:
 

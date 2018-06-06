@@ -11,7 +11,7 @@ my $build = Module::Build->new(
       'IO::Async::Handle' => '0.29',
       'IO::Async::Protocol::Stream' => 0,
       'IO::Async::Stream' => '0.59',
-      'IO::Socket::SSL' => '1.968',
+      'IO::Socket::SSL' => '2.003',
    },
    test_requires => {
       'IO::Async::OS' => 0,
@@ -22,7 +22,6 @@ my $build = Module::Build->new(
       'Module::Build' => '0.4004', # test_requires
    },
    license => 'perl',
-   create_makefile_pl => 'traditional',
    create_license => 1,
    create_readme  => 1,
 );

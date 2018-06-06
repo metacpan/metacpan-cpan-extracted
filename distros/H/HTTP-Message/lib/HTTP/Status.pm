@@ -3,7 +3,7 @@ package HTTP::Status;
 use strict;
 use warnings;
 
-our $VERSION = '6.16';
+our $VERSION = '6.18';
 
 require 5.002;   # because we use prototypes
 
@@ -75,7 +75,7 @@ my %StatusCode = (
 #   430
     431 => 'Request Header Fields Too Large', # RFC 6585: Additional Codes
 #   432 .. 450
-    451 => 'Unavailable For Legal Reasons',   # RFC 7724: Legal Obstacels
+    451 => 'Unavailable For Legal Reasons',   # RFC 7724: Legal Obstacles
 #   452 .. 499
     500 => 'Internal Server Error',
     501 => 'Not Implemented',
@@ -135,19 +135,20 @@ sub is_redirect             ($) { $_[0] && $_[0] >= 300 && $_[0] < 400; }
 sub is_error                ($) { $_[0] && $_[0] >= 400 && $_[0] < 600; }
 sub is_client_error         ($) { $_[0] && $_[0] >= 400 && $_[0] < 500; }
 sub is_server_error         ($) { $_[0] && $_[0] >= 500 && $_[0] < 600; }
-sub is_cacheable_by_default ($) { $_[0] &&
-    (  $_[0] == 200 # OK
-    || $_[0] == 203 # Non-Authoritative Information
-    || $_[0] == 204 # No Content
-    || $_[0] == 206 # Not Acceptable
-    || $_[0] == 300 # Multiple Choices
-    || $_[0] == 301 # Moved Permanently
-    || $_[0] == 404 # Not Found
-    || $_[0] == 405 # Method Not Allowed
-    || $_[0] == 410 # Gone
-    || $_[0] == 414 # Request-URI Too Large
-    || $_[0] == 501 # Not Implemented
-    ); }
+sub is_cacheable_by_default ($) { $_[0] && ( $_[0] == 200 # OK
+                                          || $_[0] == 203 # Non-Authoritative Information
+                                          || $_[0] == 204 # No Content
+                                          || $_[0] == 206 # Not Acceptable
+                                          || $_[0] == 300 # Multiple Choices
+                                          || $_[0] == 301 # Moved Permanently
+                                          || $_[0] == 404 # Not Found
+                                          || $_[0] == 405 # Method Not Allowed
+                                          || $_[0] == 410 # Gone
+                                          || $_[0] == 414 # Request-URI Too Large
+                                          || $_[0] == 451 # Unavailable For Legal Reasons
+                                          || $_[0] == 501 # Not Implemented
+                                            );
+}
 
 1;
 
@@ -161,7 +162,7 @@ HTTP::Status - HTTP Status code processing
 
 =head1 VERSION
 
-version 6.16
+version 6.18
 
 =head1 SYNOPSIS
 
@@ -201,7 +202,9 @@ tag to import them all.
    HTTP_RESET_CONTENT                   (205)
    HTTP_PARTIAL_CONTENT                 (206)
    HTTP_MULTI_STATUS                    (207)
-   HTTP_ALREADY_REPORTED		(208)
+   HTTP_ALREADY_REPORTED                (208)
+
+   HTTP_IM_USED                         (226)
 
    HTTP_MULTIPLE_CHOICES                (300)
    HTTP_MOVED_PERMANENTLY               (301)
@@ -230,16 +233,15 @@ tag to import them all.
    HTTP_UNSUPPORTED_MEDIA_TYPE          (415)
    HTTP_REQUEST_RANGE_NOT_SATISFIABLE   (416)
    HTTP_EXPECTATION_FAILED              (417)
-   HTTP_I_AM_A_TEAPOT			(418)
+   HTTP_MISDIRECTED REQUEST             (421)
    HTTP_UNPROCESSABLE_ENTITY            (422)
    HTTP_LOCKED                          (423)
    HTTP_FAILED_DEPENDENCY               (424)
-   HTTP_NO_CODE                         (425)
    HTTP_UPGRADE_REQUIRED                (426)
-   HTTP_PRECONDITION_REQUIRED		(428)
-   HTTP_TOO_MANY_REQUESTS		(429)
+   HTTP_PRECONDITION_REQUIRED           (428)
+   HTTP_TOO_MANY_REQUESTS               (429)
    HTTP_REQUEST_HEADER_FIELDS_TOO_LARGE (431)
-   HTTP_RETRY_WITH                      (449)
+   HTTP_UNAVAILABLE_FOR_LEGAL_REASONS   (451)
 
    HTTP_INTERNAL_SERVER_ERROR           (500)
    HTTP_NOT_IMPLEMENTED                 (501)
@@ -249,7 +251,7 @@ tag to import them all.
    HTTP_HTTP_VERSION_NOT_SUPPORTED      (505)
    HTTP_VARIANT_ALSO_NEGOTIATES         (506)
    HTTP_INSUFFICIENT_STORAGE            (507)
-   HTTP_BANDWIDTH_LIMIT_EXCEEDED        (509)
+   HTTP_LOOP_DETECTED                   (508)
    HTTP_NOT_EXTENDED                    (510)
    HTTP_NETWORK_AUTHENTICATION_REQUIRED (511)
 
@@ -265,7 +267,9 @@ the classification functions.
 
 The status_message() function will translate status codes to human
 readable strings. The string is the same as found in the constant
-names above.  If the $code is unknown, then C<undef> is returned.
+names above. If the $code is not registered in the L<list of IANA HTTP Status
+Codes|https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml>
+then C<undef> is returned. 
 
 =item is_info( $code )
 
@@ -308,12 +312,16 @@ This function is B<not> exported by default.
 
 Return TRUE if C<$code> indicates that a response is cacheable by default, and
 it can be reused by a cache with heuristic expiration. All other status codes
-are not cacheable by default. See L<RFC 7231 - HTTP/1.1 Semantics and Content, 
+are not cacheable by default. See L<RFC 7231 - HTTP/1.1 Semantics and Content,
 Section 6.1. Overview of Status Codes|https://tools.ietf.org/html/rfc7231#section-6.1>.
 
 This function is B<not> exported by default.
 
 =back
+
+=head1 SEE ALSO
+
+L<IANA HTTP Status Codes|https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml>
 
 =head1 BUGS
 

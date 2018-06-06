@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin::Renew;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: create a follow-up task upon completion
-$Taskwarrior::Kusarigama::Plugin::Renew::VERSION = '0.9.0';
+$Taskwarrior::Kusarigama::Plugin::Renew::VERSION = '0.9.1';
 
 use 5.10.0;
 use strict;
@@ -95,7 +95,11 @@ Taskwarrior::Kusarigama::Plugin::Renew - create a follow-up task upon completion
 
 =head1 VERSION
 
-version 0.9.0
+version 0.9.1
+
+=head1 SYNOPSIS
+
+    $ task add water the plants rdue:now+5d rwait:now+4d
 
 =head1 DESCRIPTION
 
@@ -146,10 +150,6 @@ C<r*> attributes.
 In this example, we want to do the thing at least once a month,
 but if we do it in the last week of the month, we're satisfied
 and set the new deadline at the end of next month.
-
-=head SYNOPSIS
-
-    $ task add water the plants rdue:now+5d rwait:now+4d
 
 =head1 AUTHOR
 

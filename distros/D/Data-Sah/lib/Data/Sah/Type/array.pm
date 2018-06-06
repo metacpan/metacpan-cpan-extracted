@@ -1,7 +1,7 @@
 package Data::Sah::Type::array;
 
-our $DATE = '2018-06-03'; # DATE
-our $VERSION = '0.891'; # VERSION
+our $DATE = '2018-06-05'; # DATE
+our $VERSION = '0.892'; # VERSION
 
 use Data::Sah::Util::Role 'has_clause', 'has_clause_alias';
 use Role::Tiny;
@@ -42,7 +42,7 @@ Data::Sah::Type::array - array type
 
 =head1 VERSION
 
-This document describes version 0.891 of Data::Sah::Type::array (from Perl distribution Data-Sah), released on 2018-06-03.
+This document describes version 0.892 of Data::Sah::Type::array (from Perl distribution Data-Sah), released on 2018-06-05.
 
 =for Pod::Coverage ^(clause_.+|clausemeta_.+)$
 

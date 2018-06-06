@@ -19,6 +19,8 @@ Alex
 Alexandre
 Alexey
 Andreas
+Andrew
+Anirvan
 Asplund
 Atzberger
 Authen
@@ -41,6 +43,7 @@ Cardillo
 Ceccarelli
 Chamas
 Chase
+Chatterjee
 Christopher
 Chrysostomos
 Colin
@@ -48,6 +51,7 @@ ConnCache
 Coppit
 Couzins
 DAVIDRW
+Daignault
 Daina
 Dalgleish
 Daniel
@@ -55,6 +59,7 @@ David
 Debug
 DebugFile
 Denaxas
+Desmond
 Digest
 Doug
 Dubois
@@ -79,6 +84,7 @@ Gondwana
 Graaff
 Graeme
 Graham
+Grangaard
 Greab
 Gregoire
 Gregory
@@ -273,6 +279,7 @@ akiym
 amir
 amire80
 andreas
+anirvan
 asjo
 at
 bin
@@ -307,6 +314,7 @@ github
 gong
 gopher
 gpeters
+granny
 haarg
 hfroehlich
 http
@@ -333,6 +341,7 @@ michiel
 mmcleric
 murphy
 naveedm9
+nawglan
 nigelgregoire
 nntp
 nogo

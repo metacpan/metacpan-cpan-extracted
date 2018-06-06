@@ -1,5 +1,5 @@
 package MooseX::BuildArgs::Meta::ToRole;
-$MooseX::BuildArgs::Meta::ToRole::VERSION = '0.05';
+$MooseX::BuildArgs::Meta::ToRole::VERSION = '0.06';
 use Moose::Role;
 
 around apply => sub{

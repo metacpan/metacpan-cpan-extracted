@@ -15,7 +15,7 @@ use PDL::CCS::Nd;
 use PDL::CCS::IO::FastRaw;
 use strict;
 
-our $VERSION = '1.23.4'; ##-- update with perl-reversion from Perl::Version module
+our $VERSION = '1.23.7'; ##-- update with perl-reversion from Perl::Version module
 our @ISA = ('PDL::Exporter');
 our @EXPORT_OK =
   (
@@ -73,7 +73,7 @@ PDL::CCS - Sparse N-dimensional PDLs with compressed column storage
 =head1 DESCRIPTION
 
 PDL::CCS is now just a wrapper package which pulls in a number of
-submodules.  See the documentation for the individual modules for details.
+submodules.  See the documentation of the respective modules for details.
 
 =cut
 
@@ -94,7 +94,7 @@ Supports a subset of the perl-side PDL API.
 
 =item L<PDL::CCS::Compat|PDL::CCS::Compat>
 
-Backwards-compatibility module for Harwell-Boeing compressed column storage.
+Backwards-compatibility module for Harwell-Boeing compressed row- or column-storage.
 
 =item L<PDL::CCS::Functions|PDL::CCS::Functions>
 
@@ -158,12 +158,18 @@ by Michael Berry, Theresa Do, Gavin O'Brien, Vijay Krishna and Sowmini Varadhan.
 =item *
 
 PDL::CCS::Nd supports only a subset of the PDL API
-(e.g. is not really a PDL).
+(i.e. is not really a PDL).
 
 =item *
 
 Binary operations via alignment only work correctly when
 missing values are annihilators.
+
+=item *
+
+Misleading module name: PDL::CCS::Nd objects actually use a native COO (full coordinate list)
+format rather than CRS (compressed row storage) or CCS (compressed column storage);
+see L<https://en.wikipedia.org/wiki/Sparse_matrix#Coordinate_list_(COO)> for a discussion.
 
 =back
 
@@ -179,7 +185,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head2 Copyright Policy
 
-Copyright (C) 2005-2015 by Bryan Jurish. All rights reserved.
+Copyright (C) 2005-2018 by Bryan Jurish. All rights reserved.
 
 This package is free software, and entirely without warranty.
 You may redistribute it and/or modify it under the same terms
@@ -189,11 +195,8 @@ as Perl itself.
 
 perl(1),
 PDL(3perl),
-PDL::SVDLIBC(3perl),
 PDL::CCS::Nd(3perl),
-
-SVDLIBC: http://tedlab.mit.edu/~dr/SVDLIBC/
-
-SVDPACKC: http://www.netlib.org/svdpack/
+PDL::SVDLIBC(3perl),
+L<https://en.wikipedia.org/wiki/Sparse_matrix>.
 
 =cut

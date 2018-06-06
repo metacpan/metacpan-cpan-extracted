@@ -14,13 +14,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    enum class force_flush_to_disk {
-        no = 0,
-        yes = 1
-    };
-
-// ----------------------------------------------------------------------------------------
-
     template <
         typename net_type, 
         typename solver_type = sgd
@@ -83,12 +76,10 @@ namespace dlib
                 - #get_learning_rate() == 1e-2 
                 - #get_min_learning_rate() == 1e-5
                 - #get_iterations_without_progress_threshold() == 2000
-                - #get_test_iterations_without_progress_threshold() == 500
+                - #get_test_iterations_without_progress_threshold() == 200
                 - #get_learning_rate_shrink_factor() == 0.1
                 - #get_learning_rate_schedule().size() == 0
                 - #get_train_one_step_calls() == 0
-                - #get_test_one_step_calls() == 0
-                - #get_synchronization_file() == ""
                 - if (cuda_extra_devices.size() > 0) then
                     - This object will use multiple graphics cards to run the learning
                       algorithms.  In particular, it will always use whatever device is
@@ -99,7 +90,6 @@ namespace dlib
         !*/
 
         net_type& get_net (
-            force_flush_to_disk force_flush = force_flush_to_disk::yes
         ); 
         /*!
             ensures
@@ -110,9 +100,8 @@ namespace dlib
                   dnn_trainer's constructor.
                 - This function blocks until all threads inside the dnn_trainer have
                   stopped touching the net. 
-                - If force_flush is yes, then this function will sync the trainer state to
-                  disk if the current state hasn't already been synced to disk since the
-                  last network modification.
+                - This function will sync the trainer state to disk if the current state 
+                  hasn't already been synced to disk since the last network modification.
         !*/
 
         const std::vector<solver_type>& get_solvers (
@@ -241,15 +230,15 @@ namespace dlib
                     - This trainer will use an explicit learning rate schedule defined by
                       the learning rate values in get_learning_rate_schedule().  For
                       example, if get_learning_rate_schedule() returned {0.1, 0.09, 0.08,
-                      0.07, 0.06} then the first training mini-batch would use a learning
+                      0.07, 0.6} then the first training mini-batch would use a learning
                       rate of 0.1, then the next training mini-batch uses 0.09, and then
                       0.8, and so on until the end of the schedule is reached.  
                       
                       If you continue to run training after the end of the schedule has
                       been reached then the learning rate will be fixed to 0.99 times the
                       final value.  So in our example, eventually the learning rate would
-                      be fixed to 0.99*0.06.  This allows you to test if we have reached the
-                      end of the schedule by checking if get_learning_rate() >= 0.06.
+                      be fixed to 0.99*0.6.  This allows you to test if we have reached the
+                      end of the schedule by checking if get_learning_rate() >= 0.6.
         !*/
 
         unsigned long get_steps_without_progress (
@@ -322,13 +311,6 @@ namespace dlib
                 - returns the number of times train_one_step() has been called.
         !*/
 
-        unsigned long long get_test_one_step_calls (
-        ) const;
-        /*!
-            ensures
-                - returns the number of times test_one_step() has been called.
-        !*/
-
         void be_verbose (
         );
         /*!
@@ -350,30 +332,14 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_synchronization_file() == filename
                 - While training is running, either via train() or repeated calls to
                   train_one_step(), this object will save its entire state, including the
                   state of get_net(), to disk in the file named filename every
                   time_between_syncs seconds.
-                - If the filename file already exists then the state of this trainer will
+                - if the filename file already exists then the state of this trainer will
                   be loaded from that file by this call to set_synchronization_file().
                   This allows you to resume a training session which was previously
                   interrupted.
-                - It should be noted that when saving, the trainer will alternate between
-                  saving to a file called filename and another file called filename+"_".
-                  We do this because it's possible that your computer might crash (not
-                  because of dlib, just in general) before the data is safely saved to
-                  disk.  This way, you will always have a backup file if the write to disk
-                  gets corrupted or is incomplete.  Moreover, when loading, we will always
-                  load from the newest of the two possible files.
-        !*/
-
-        const std::string& get_synchronization_file (
-        );
-        /*!
-            ensures
-                - Returns the name of the file the dnn_trainer will periodically save it's
-                  state to.  If the return value is "" then synchronization is disabled.
         !*/
 
         void train (
@@ -607,7 +573,6 @@ namespace dlib
                   this function you should call get_net() before you touch the net object
                   from the calling thread to ensure no other threads are still accessing
                   the network.
-                - #get_test_one_step_calls() == get_test_one_step_calls() + 1.
         !*/
 
         template <
@@ -639,7 +604,6 @@ namespace dlib
                   this function you should call get_net() before you touch the net object
                   from the calling thread to ensure no other threads are still accessing
                   the network.
-                - #get_test_one_step_calls() == get_test_one_step_calls() + 1.
         !*/
 
         void test_one_step (
@@ -664,7 +628,6 @@ namespace dlib
                   this function you should call get_net() before you touch the net object
                   from the calling thread to ensure no other threads are still accessing
                   the network.
-                - #get_test_one_step_calls() == get_test_one_step_calls() + 1.
         !*/
 
         template <
@@ -693,7 +656,6 @@ namespace dlib
                   this function you should call get_net() before you touch the net object
                   from the calling thread to ensure no other threads are still accessing
                   the network.
-                - #get_test_one_step_calls() == get_test_one_step_calls() + 1.
         !*/
 
         void set_test_iterations_without_progress_threshold (
@@ -740,21 +702,6 @@ namespace dlib
         !*/
 
     };
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename net_type, 
-        typename solver_type 
-        >
-    std::ostream& operator<< (
-        std::ostream& out,
-        dnn_trainer<net_type,solver_type>& trainer
-    );
-    /*!
-        ensures
-            - Prints a log of the current parameters of trainer to out.
-    !*/
 
 // ----------------------------------------------------------------------------------------
 

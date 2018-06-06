@@ -296,7 +296,7 @@ namespace dlib
             temp.swap(item.temp);
         }
 
-        size_t size (
+        unsigned long size (
         ) const { return dictionary.size(); }
 
         const matrix<sample_type,0,1,mem_manager_type> get_dictionary (

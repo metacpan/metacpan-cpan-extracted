@@ -6,9 +6,8 @@
 #include "iosockstream_abstract.h"
 
 #include <iostream>
-#include <memory>
-
 #include "../sockstreambuf.h"
+#include "../smart_pointers_thread_safe.h"
 #include "../timeout.h"
 
 #ifdef _MSC_VER
@@ -148,16 +147,16 @@ namespace dlib
     private:
 
         void terminate_connection(
-            std::shared_ptr<connection> thecon
+            shared_ptr_thread_safe<connection> thecon
         )
         {
             thecon->shutdown();
         }
 
-        std::unique_ptr<timeout> con_timeout;
+        scoped_ptr<timeout> con_timeout;
         rmutex class_mutex; 
-        std::shared_ptr<connection> con;
-        std::unique_ptr<sockstreambuf> buf;
+        shared_ptr_thread_safe<connection> con;
+        scoped_ptr<sockstreambuf> buf;
 
     };
 

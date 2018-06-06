@@ -1,3 +1,9 @@
+0.006   2018-06-05 (PERLANCAR)
+
+	- [Incompatible change] Change _cryp key arbit_strategy to
+	  arbit_strategies to be more consistent with the other keys.
+
+
 0.005   2018-05-05 (PERLANCAR)
 
 	- Recognize arbit-strategy/* config sections.

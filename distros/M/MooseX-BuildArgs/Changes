@@ -1,21 +1,30 @@
 Revision history for Perl extension MooseX::BuildArgs.
 
+0.06 2018-06-05
+
+- Fix a test using package block syntax which was upping our required
+  Perl version.
+
 0.05 2018-05-17
 
- - Stop hiding packages from indexing.
+- Stop hiding packages from indexing.
 
-0.04      2012-04-16
- - Minor doc edits.
- - Use Moose's meta traits more effectively so that single args may be
-   declared in roles.
+0.04 2012-04-16
 
-0.03      2012-03-19
- - Rollback Moose prereq version a bit.
- - Fix 'use Moose` header.
+- Minor doc edits.
+- Use Moose's meta traits more effectively so that single args may be
+  declared in roles.
 
-0.02      2012-03-19
- - Switch to using Moose::Exporter.
+0.03 2012-03-19
 
-0.01      2012-03-19
- - First release.
+- Rollback Moose prereq version a bit.
+- Fix 'use Moose` header.
+
+0.02 2012-03-19
+
+- Switch to using Moose::Exporter.
+
+0.01 2012-03-19
+
+- First release.
 

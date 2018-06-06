@@ -13,14 +13,10 @@
 
 #define _BSD_SOCKLEN_T_
 
-#include <ctime>
-#include <memory>
-#include <string>
-
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <errno.h>
-
+#include <ctime>
 #ifndef HPUX
 #include <sys/select.h>
 #endif
@@ -30,12 +26,13 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <sys/param.h>
+#include <string>
 
 #include <netinet/in.h>
 
 #include "../threads.h"
 #include "../algs.h"
-
+#include "../smart_pointers.h"
 
 
 
@@ -315,7 +312,7 @@ namespace dlib
         );
 
         int accept (
-            std::unique_ptr<connection>& new_connection,
+            scoped_ptr<connection>& new_connection,
             unsigned long timeout = 0
         );
 
@@ -371,13 +368,13 @@ namespace dlib
     );
 
     int create_listener (
-        std::unique_ptr<listener>& new_listener,
+        scoped_ptr<listener>& new_listener,
         unsigned short port,
         const std::string& ip = ""
     );
 
     int create_connection ( 
-        std::unique_ptr<connection>& new_connection,
+        scoped_ptr<connection>& new_connection,
         unsigned short foreign_port, 
         const std::string& foreign_ip, 
         unsigned short local_port = 0,

@@ -1,5 +1,6 @@
 package Mojolicious::Plugin::Notifications::Humane;
 use Mojo::Base 'Mojolicious::Plugin::Notifications::Engine';
+use Mojolicious::Plugin::Notifications::HTML qw/notify_html/;
 use Mojo::ByteStream 'b';
 use Mojo::Util qw/xml_escape/;
 use Mojo::JSON qw/encode_json decode_json/;
@@ -62,9 +63,7 @@ sub notifications {
     $log .= ', ' . encode_json($_->[1]) if scalar @{$_} == 3;
     $log .= ')';
 
-    $noscript .= qq{<div class="notify notify-} . $_->[0] . '">' .
-      xml_escape($_->[-1]) .
-	"</div>\n";
+    $noscript .= notify_html($_->[0], $_->[-1]);
   };
   $log = "notify$log;\n" if $log;
 
@@ -215,7 +214,7 @@ L<Mojolicious::Plugin::Humane>.
 
 =head2 Mojolicious::Plugin::Notifications::Humane
 
-Copyright (C) 2014-2015, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2014-2018, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.

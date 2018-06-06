@@ -22,5 +22,5 @@ resources:
   bugtracker: https://github.com/bluefeet/MooseX-BuildArgs/issues
   homepage: https://github.com/bluefeet/MooseX-BuildArgs
   repository: https://github.com/bluefeet/MooseX-BuildArgs.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'YAML::Tiny version 1.69'

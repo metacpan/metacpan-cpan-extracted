@@ -1,12 +1,12 @@
 package X11::GLX::FBConfig;
-$X11::GLX::FBConfig::VERSION = '0.03';
+$X11::GLX::FBConfig::VERSION = '0.05';
 use strict;
 use warnings;
 use X11::GLX;
 require Scalar::Util;
 use parent 'X11::Xlib::Opaque';
 
-# ABSTRACT: Framebuffer config
+# ABSTRACT: Framebuffer configuration
 
 
 sub visual_info {
@@ -67,15 +67,15 @@ __END__
 
 =head1 NAME
 
-X11::GLX::FBConfig - Framebuffer config
+X11::GLX::FBConfig - Framebuffer configuration
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 DESCRIPTION
 
-This is a view of an opaque struct allocated by OpenGL which describes
+This is a view of the opaque GLXFBConfig struct used by OpenGL to describe
 a framebuffer format.  This is similar to an X11 Visual, but has more
 attributes specific to OpenGL.
 
@@ -97,36 +97,74 @@ Returns an L<XVisualInfo|X11::Xlib::XVisualInfo> for the FBConfig.
 
 Returns the X11 ID for this FBConfig.
 
-=head2 buffer_size
-=head2 level
-=head2 doublebuffer
-=head2 stereo
-=head2 aux_buffers
-=head2 red_size
-=head2 green_size
-=head2 blue_size
-=head2 alpha_size
-=head2 depth_size
-=head2 stencil_size
-=head2 accum_red_size
-=head2 accum_green_size
-=head2 accum_blue_size
-=head2 accum_alpha_size
-=head2 render_type
-=head2 drawable_type
-=head2 x_renderable
-=head2 visual_id
-=head2 x_visual_type
-=head2 config_caveat
-=head2 transparent_type
-=head2 transparent_index_value
-=head2 transparent_red_value
-=head2 transparent_green_value
-=head2 transparent_blue_value
-=head2 transparent_alpha_value
-=head2 max_pbuffer_width
-=head2 max_pbuffer_height
-=head2 max_pbuffer_pixels
+=head2 C API Attributes
+
+The following attributes have perl-ified names of the C API constants
+described in L<the Khronos documentation|https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/glXGetFBConfigAttrib.xml>.
+
+=over
+
+=item buffer_size
+
+=item level
+
+=item doublebuffer
+
+=item stereo
+
+=item aux_buffers
+
+=item red_size
+
+=item green_size
+
+=item blue_size
+
+=item alpha_size
+
+=item depth_size
+
+=item stencil_size
+
+=item accum_red_size
+
+=item accum_green_size
+
+=item accum_blue_size
+
+=item accum_alpha_size
+
+=item render_type
+
+=item drawable_type
+
+=item x_renderable
+
+=item visual_id
+
+=item x_visual_type
+
+=item config_caveat
+
+=item transparent_type
+
+=item transparent_index_value
+
+=item transparent_red_value
+
+=item transparent_green_value
+
+=item transparent_blue_value
+
+=item transparent_alpha_value
+
+=item max_pbuffer_width
+
+=item max_pbuffer_height
+
+=item max_pbuffer_pixels
+
+=back
 
 =head1 METHODS
 
@@ -145,7 +183,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Michael Conrad.
+This software is copyright (c) 2018 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

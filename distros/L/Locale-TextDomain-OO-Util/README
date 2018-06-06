@@ -1,4 +1,4 @@
-Locale-TextDomain-OO-Util version 3.008
+Locale-TextDomain-OO-Util version 4.001
 =======================================
 
 Utils for Perl OO Interface to Uniforum Message Translation
@@ -18,13 +18,12 @@ This module requires these other modules and libraries:
 
     Carp
     English
-    Safe
     charnames
     namespace::autoclean
 
 COPYRIGHT AND LICENCE
 
-Copyright (c) 2014 - 2017,
+Copyright (c) 2014 - 2018,
 Steffen Winkler
 steffenw at cpan.org.
 All rights reserved.

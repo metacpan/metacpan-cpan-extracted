@@ -1,5 +1,5 @@
 package CPANPLUS::Dist::Build::Constants;
-$CPANPLUS::Dist::Build::Constants::VERSION = '0.88';
+$CPANPLUS::Dist::Build::Constants::VERSION = '0.90';
 #ABSTRACT: Constants for CPANPLUS::Dist::Build
 
 use if $] > 5.017, 'deprecate';
@@ -58,7 +58,7 @@ CPANPLUS::Dist::Build::Constants - Constants for CPANPLUS::Dist::Build
 
 =head1 VERSION
 
-version 0.88
+version 0.90
 
 =head1 SYNOPSIS
 
@@ -79,7 +79,7 @@ Jos Boumans <kane[at]cpan.org>, Ken Williams <kwilliams@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Jos Boumans, Ken Williams, Chris Williams and David Golden.
+This software is copyright (c) 2018 by Jos Boumans, Ken Williams, Chris Williams and David Golden.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

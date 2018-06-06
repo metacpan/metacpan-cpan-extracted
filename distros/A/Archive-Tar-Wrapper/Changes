@@ -1,6 +1,10 @@
 ######################################################################
 Revision history for Perl extension Archive::Tar::Wrapper
 
+0.25 (2018/06/04)
+    Implemented refactoring due warnings from Perlcritic.
+    Merge pull request #3 from manwar/suggest-code-tidy
+
 0.24 (2018/06/02)
     Added a LICENSE file (GNU GPL v3).
     Removed MYMETA files (see https://rt.cpan.org/Ticket/Display.html?id=108171).

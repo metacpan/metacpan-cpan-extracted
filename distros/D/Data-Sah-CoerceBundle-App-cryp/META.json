@@ -36,7 +36,7 @@
       },
       "test" : {
          "requires" : {
-            "CryptoExchange::Catalog" : "0",
+            "CryptoExchange::Catalog" : "20180510",
             "Data::Sah::Coerce" : "0.025",
             "File::Spec" : "0",
             "IO::Handle" : "0",
@@ -57,7 +57,7 @@
          "web" : "https://github.com/perlancar/perl-Data-Sah-CoerceBundle-App-cryp"
       }
    },
-   "version" : "0.003",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

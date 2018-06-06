@@ -1,5 +1,5 @@
 package X11::GLX;
-$X11::GLX::VERSION = '0.03';
+$X11::GLX::VERSION = '0.05';
 use strict;
 use warnings;
 use X11::Xlib 0.11;
@@ -88,7 +88,7 @@ X11::GLX - GLX API (OpenGL on X11)
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 DESCRIPTION
 
@@ -138,7 +138,7 @@ This method is deprecated in GLX 1.3 in favor of glXChooseFBConfig.
 	my @configs= glXChooseFBConfig($display, $screen, \@attributes);
   }
 
-Return a list of compatible framebuffer configurations (L<GLXFBConfig|X11::GLX::GLXFBConfig>)
+Return a list of compatible framebuffer configurations (L<GLXFBConfig|X11::GLX::FBConfig>)
 matching the desired C<@attributes>.
 This method deals with lower level details than glXChooseVisual,
 needed for more advanced GL usage like rendering a fully transparent window.
@@ -158,7 +158,7 @@ Return all GLXFBConfig available on this screen.
 	or die "glXGetFBConfigAttrib failed";
 
 Yes you read that right.  Horribly awkward interface for accessing attributes
-of a struct.  Use the attributes of L<GLXFBConfig|X11::GLX::GLXFBConfig> instead.
+of a struct.  Use the attributes of L<GLXFBConfig|X11::GLX::FBConfig> instead.
 
 =head2 glXGetVisualFromFBConfig
 
@@ -168,7 +168,7 @@ of a struct.  Use the attributes of L<GLXFBConfig|X11::GLX::GLXFBConfig> instead
   }
 
 Return the L<XVisualInfo|X11::Xlib::XVisualInfo> associated with the
-L<FBConfig|X11::GLX::GLXFBConfig>.
+L<FBConfig|X11::GLX::FBConfig>.
 
 =head2 glXCreateContext
 
@@ -177,7 +177,7 @@ L<FBConfig|X11::GLX::GLXFBConfig>.
 C<$visual_info> is an instance of L<XVisualInfo|X11::Xlib::XVisualInfo>, most
 likely returned by L<glXChooseVisual>.
 
-C<$shared_with> is an optional L<X11::GLX::GLXContext> with which to share
+C<$shared_with> is an optional L<X11::GLX::Context> with which to share
 display lists, and possibly other objects like textures.  See L</Shared GL Contexts>.
 
 C<$direct> is a boolean indicating whether you would like a direct rendering
@@ -289,10 +289,10 @@ shared with the imported one, then frees the imported one.  To make a long
 story short, see test case C<03-import-context.t> for an example.
 
 Note that many distros have started disabling indirect mode (as of 2016) for
-OpenGL on Xorg, for security concerns.  You can enable it by passing "+iglx"
+OpenGL on Xorg, for security concerns.  You can enable it by passing C<+iglx>
 to the Xorg command line.  (finding where to specify the commandline for Xorg
 can be an exercise in frustration... good luck.  On Linux Mint it is found in
-/etc/X11/xinit/xserverrc.  The quick and dirty approach is to rename the Xorg
+C</etc/X11/xinit/xserverrc>.  The quick and dirty approach is to rename the Xorg
 binary and stick a script in its place that exec's the original with the
 desired command line.)
 
@@ -302,7 +302,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Michael Conrad.
+This software is copyright (c) 2018 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

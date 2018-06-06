@@ -38,7 +38,7 @@ namespace dlib
         typedef T type;
 
         explicit pipe (  
-            size_t maximum_size
+            unsigned long maximum_size
         );
         /*!
             ensures                
@@ -175,7 +175,7 @@ namespace dlib
                 - #is_dequeue_enabled() == true
         !*/
 
-        size_t max_size (
+        unsigned long max_size (
         ) const;
         /*!
             ensures
@@ -183,7 +183,7 @@ namespace dlib
                   pipe can contain.
         !*/
 
-        size_t size (
+        unsigned long size (
         ) const;
         /*!
             ensures

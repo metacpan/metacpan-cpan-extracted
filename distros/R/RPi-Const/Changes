@@ -1,5 +1,10 @@
 Revision history for RPi-Const
 
+1.04    2018-06-05
+        - added constants for MCP23017 GPIO expander register locations
+          (mcp23017_registers tag) for upcoming RPi::GPIOExpander::MCP23017
+          release
+
 1.03    2018-05-29
         - added pwm_defaults tag, constants for default PWM settings
           (closes #2)

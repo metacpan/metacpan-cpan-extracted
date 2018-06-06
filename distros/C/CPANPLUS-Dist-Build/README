@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.88
+    version 0.90
 
 SYNOPSIS
 
@@ -157,7 +157,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017 by Jos Boumans, Ken Williams, Chris
+    This software is copyright (c) 2018 by Jos Boumans, Ken Williams, Chris
     Williams and David Golden.
 
     This is free software; you can redistribute it and/or modify it under

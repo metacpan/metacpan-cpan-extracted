@@ -4,7 +4,7 @@
       "Rocky Bernstein <rocky@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "gpl_1"
    ],
@@ -21,8 +21,10 @@
       },
       "runtime" : {
          "requires" : {
-            "B::DeparseTree" : "v2.1.0",
-            "Devel::Trepan" : "0.71",
+            "B::DeparseTree" : "v3.2.0",
+            "Data::Printer" : "0.40",
+            "Devel::Callsite" : "0.08",
+            "Devel::Trepan" : "0.73",
             "perl" : "5.018000",
             "rlib" : "0.02"
          }
@@ -46,7 +48,7 @@
       },
       "Devel::Trepan::Deparse" : {
          "file" : "lib/Devel/Trepan/Deparse.pm",
-         "version" : "v2.2.0"
+         "version" : "v3.0.0"
       }
    },
    "release_status" : "stable",
@@ -61,6 +63,6 @@
          "url" : "http://github.com/rocky/p5-Devel-Trepan-Deparse"
       }
    },
-   "version" : "v2.2.0",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "v3.0.0",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

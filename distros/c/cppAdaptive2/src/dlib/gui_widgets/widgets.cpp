@@ -3,10 +3,8 @@
 #ifndef DLIB_WIDGETs_CPP_
 #define DLIB_WIDGETs_CPP_
 
-#include <algorithm>
-#include <memory>
-
 #include "widgets.h"
+#include <algorithm>
 #include "../string.h"
 
 namespace dlib
@@ -162,7 +160,7 @@ namespace dlib
 
     void toggle_button::
     set_main_font (
-        const std::shared_ptr<font>& f
+        const shared_ptr_thread_safe<font>& f
     )
     {
         auto_mutex M(m);
@@ -311,7 +309,7 @@ namespace dlib
 
     void label::
     set_main_font (
-        const std::shared_ptr<font>& f
+        const shared_ptr_thread_safe<font>& f
     )
     {
         auto_mutex M(m);
@@ -640,7 +638,7 @@ namespace dlib
 
     void text_field::
     set_main_font (
-        const std::shared_ptr<font>& f
+        const shared_ptr_thread_safe<font>& f
     )
     {
         auto_mutex M(m);
@@ -1466,14 +1464,6 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     unsigned long tabbed_display::
-    selected_tab (
-    ) const
-    {
-        auto_mutex M(m);
-        return selected_tab_;
-    }
-
-    unsigned long tabbed_display::
     number_of_tabs (
     ) const
     {
@@ -1755,7 +1745,7 @@ namespace dlib
 
     void tabbed_display::
     set_main_font (
-        const std::shared_ptr<font>& f
+        const shared_ptr_thread_safe<font>& f
     )
     {
         auto_mutex M(m);
@@ -1897,7 +1887,7 @@ namespace dlib
 
     void named_rectangle::
     set_main_font (
-        const std::shared_ptr<font>& f
+        const shared_ptr_thread_safe<font>& f
     )
     {
         auto_mutex M(m);
@@ -2075,7 +2065,7 @@ namespace dlib
 
     void mouse_tracker::
     set_main_font (
-        const std::shared_ptr<font>& f
+        const shared_ptr_thread_safe<font>& f
     )
     {
         auto_mutex M(m);
@@ -2280,7 +2270,7 @@ namespace dlib
     template <typename S>
     void list_box<S>::
     set_main_font (
-        const std::shared_ptr<font>& f
+        const shared_ptr_thread_safe<font>& f
     )
     {
         auto_mutex M(m);
@@ -2470,7 +2460,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename S>
-    size_t list_box<S>::
+    unsigned long list_box<S>::
     size (
     ) const
     {
@@ -3010,7 +3000,7 @@ namespace dlib
             const std::string old_path = path;
             const long old_cur_dir = cur_dir;
 
-            std::unique_ptr<toggle_button> new_btn(new toggle_button(*this));
+            scoped_ptr<toggle_button> new_btn(new toggle_button(*this));
             new_btn->set_name(folder_name);
             new_btn->set_click_handler(*this,&box_win::on_path_button_click);
 
@@ -3019,7 +3009,7 @@ namespace dlib
             {
                 while (sob.size() > (unsigned long)(cur_dir+1))
                 {
-                    std::unique_ptr<toggle_button> junk;
+                    scoped_ptr<toggle_button> junk;
                     sob.remove(cur_dir+1,junk);
                 }
             }
@@ -3310,7 +3300,7 @@ namespace dlib
 
     void menu_bar::
     set_main_font (
-        const std::shared_ptr<font>& f
+        const shared_ptr_thread_safe<font>& f
     )
     {
         auto_mutex M(m);
@@ -4926,7 +4916,7 @@ namespace dlib
 
     void text_box::
     set_main_font (
-        const std::shared_ptr<font>& f
+        const shared_ptr_thread_safe<font>& f
     )
     {
         auto_mutex M(m);
@@ -5636,6 +5626,9 @@ namespace dlib
 
         const unsigned long padding = style->get_padding(*mfont);
 
+        // find the delta between the cursor rect and the corner of the total rect 
+        point delta = point(cursor_rect.left(), cursor_rect.top()) - point(total_rect().left(), total_rect().top());
+
         // now scroll us so that we can see the current cursor 
         scroll_to_rect(centered_rect(cursor_rect, cursor_rect.width() + padding + 6, cursor_rect.height() + 1));
 
@@ -6016,7 +6009,7 @@ namespace dlib
         selected_rect(0),
         default_rect_color(255,0,0,255),
         parts_menu(w),
-        part_width(100), // "parts" circles are drawn 1.0/part_width size on the screen relative to the size of the bounding rectangle. 
+        part_width(15), // width part circles are drawn on the screen
         overlay_editing_enabled(true),
         highlight_timer(*this, &image_display::timer_event_unhighlight_rect),
         highlighted_rect(std::numeric_limits<unsigned long>::max()),
@@ -6282,14 +6275,10 @@ namespace dlib
         for (unsigned long i = 0; i < overlay_rects.size(); ++i)
         {
             const rectangle orect = get_rect_on_screen(i);
-            rgb_alpha_pixel color = overlay_rects[i].color;
-            // draw crossed out boxes slightly faded
-            if (overlay_rects[i].crossed_out)
-                color.alpha = 150;
 
             if (rect_is_selected && selected_rect == i)
             {
-                draw_rectangle(c, orect, invert_pixel(color), area);
+                draw_rectangle(c, orect, invert_pixel(overlay_rects[i].color), area);
             }
             else if (highlighted_rect < overlay_rects.size() && highlighted_rect == i)
             {
@@ -6317,14 +6306,14 @@ namespace dlib
             }
             else
             {
-                draw_rectangle(c, orect, color, area);
+                draw_rectangle(c, orect, overlay_rects[i].color, area);
             }
 
             if (overlay_rects[i].label.size() != 0)
             {
                 // make a rectangle that is at the spot we want to draw our string
                 rectangle r(orect.br_corner(),  c.br_corner());
-                mfont->draw_string(c, r, overlay_rects[i].label, color, 0, 
+                mfont->draw_string(c, r, overlay_rects[i].label, overlay_rects[i].color, 0, 
                                    std::string::npos, area);
             }
 
@@ -6336,23 +6325,22 @@ namespace dlib
                 if (itr->second == OBJECT_PART_NOT_PRESENT)
                     continue;
 
-                const long part_size = (long)std::max(1.0,std::round(std::sqrt(orect.area())/part_width));
-                rectangle temp = centered_rect(get_rect_on_screen(centered_rect(itr->second,1,1)), part_size, part_size);
+                rectangle temp = centered_rect(get_rect_on_screen(centered_rect(itr->second,1,1)), part_width, part_width);
 
                 if (rect_is_selected && selected_rect == i && 
                     selected_part_name.size() != 0 && selected_part_name == itr->first)
                 {
-                    draw_circle(c, center(temp), temp.width(), invert_pixel(color), area);
+                    draw_circle(c, center(temp), temp.width()/2, invert_pixel(overlay_rects[i].color), area);
                 }
                 else
                 {
-                    draw_circle(c, center(temp), temp.width(), color, area);
+                    draw_circle(c, center(temp), temp.width()/2, overlay_rects[i].color, area);
                 }
 
                 // make a rectangle that is at the spot we want to draw our string
                 rectangle r((temp.br_corner() + temp.bl_corner())/2,  
                             c.br_corner());
-                mfont->draw_string(c, r, itr->first, color, 0, 
+                mfont->draw_string(c, r, itr->first, overlay_rects[i].color, 0, 
                                    std::string::npos, area);
             }
 
@@ -6360,13 +6348,13 @@ namespace dlib
             {
                 if (rect_is_selected && selected_rect == i)
                 {
-                    draw_line(c, orect.tl_corner(), orect.br_corner(),invert_pixel(color), area);
-                    draw_line(c, orect.bl_corner(), orect.tr_corner(),invert_pixel(color), area);
+                    draw_line(c, orect.tl_corner(), orect.br_corner(),invert_pixel(overlay_rects[i].color), area);
+                    draw_line(c, orect.bl_corner(), orect.tr_corner(),invert_pixel(overlay_rects[i].color), area);
                 }
                 else
                 {
-                    draw_line(c, orect.tl_corner(), orect.br_corner(),color, area);
-                    draw_line(c, orect.bl_corner(), orect.tr_corner(),color, area);
+                    draw_line(c, orect.tl_corner(), orect.br_corner(),overlay_rects[i].color, area);
+                    draw_line(c, orect.bl_corner(), orect.tr_corner(),overlay_rects[i].color, area);
                 }
             }
         }
@@ -6446,8 +6434,7 @@ namespace dlib
                 event_handler();
         }
 
-        if (!hidden && enabled && rect_is_selected && 
-            ((is_printable && key == 'i') || (!is_printable && key==base_window::KEY_END)))
+        if (is_printable && !hidden && enabled && rect_is_selected && (key == 'i'))
         {
             overlay_rects[selected_rect].crossed_out = !overlay_rects[selected_rect].crossed_out;
             parent.invalidate_rectangle(rect);
@@ -6557,12 +6544,11 @@ namespace dlib
                     if (itr->second == OBJECT_PART_NOT_PRESENT)
                         continue;
 
-                    const long part_size = (long)std::max(1.0,std::round(std::sqrt(orect.area())/part_width));
-                    rectangle temp = centered_rect(get_rect_on_screen(centered_rect(itr->second,1,1)), part_size, part_size);
+                    rectangle temp = centered_rect(get_rect_on_screen(centered_rect(itr->second,1,1)), part_width, part_width);
                     point c = center(temp);
 
                     // distance from edge of part circle
-                    const long dist = static_cast<long>(std::abs(length(c - point(x,y)) + 0.5 - temp.width()));
+                    const long dist = static_cast<long>(std::abs(length(c - point(x,y)) + 0.5 - temp.width()/2));
                     if (dist < best_dist)
                     {
                         best_idx = i;
@@ -6705,12 +6691,11 @@ namespace dlib
                     if (itr->second == OBJECT_PART_NOT_PRESENT)
                         continue;
 
-                    const long part_size = (long)std::max(1.0,std::round(std::sqrt(orect.area())/part_width));
-                    rectangle temp = centered_rect(get_rect_on_screen(centered_rect(itr->second,1,1)), part_size, part_size);
+                    rectangle temp = centered_rect(get_rect_on_screen(centered_rect(itr->second,1,1)), part_width, part_width);
                     point c = center(temp);
 
                     // distance from edge of part circle
-                    const long dist = static_cast<long>(std::abs(length(c - point(x,y)) + 0.5 - temp.width()));
+                    const long dist = static_cast<long>(std::abs(length(c - point(x,y)) + 0.5 - temp.width()/2));
                     if (dist < best_dist)
                     {
                         best_idx = i;

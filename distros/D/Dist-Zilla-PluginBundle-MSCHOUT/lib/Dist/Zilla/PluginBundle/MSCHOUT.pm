@@ -8,7 +8,7 @@
 #
 
 package Dist::Zilla::PluginBundle::MSCHOUT;
-$Dist::Zilla::PluginBundle::MSCHOUT::VERSION = '0.37';
+$Dist::Zilla::PluginBundle::MSCHOUT::VERSION = '0.38';
 # ABSTRACT: Use L<Dist::Zilla> like MSCHOUT does
 
 use Moose;
@@ -42,6 +42,7 @@ use Dist::Zilla::Plugin::TravisYML;
 use Dist::Zilla::Plugin::Twitter;
 
 use Pod::Elemental::Transformer::List;
+use Pod::Weaver::Plugin::SingleEncoding;
 use Pod::Weaver::Section::AllowOverride;
 
 with qw(Dist::Zilla::Role::PluginBundle::Easy
@@ -200,13 +201,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Dist::Zilla::PluginBundle::MSCHOUT - Use L<Dist::Zilla> like MSCHOUT does
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 DESCRIPTION
 

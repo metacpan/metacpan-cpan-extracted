@@ -3,31 +3,33 @@ abstract: 'Generates a database upgrade instruction set'
 author:
   - 'Adam Spiers'
 build_requires:
-  Test::More: 0
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: MySQL-Diff
 requires:
-  Carp: 0
-  Data::Dumper: 0
-  Exporter: 0
-  File::Slurp: 0
-  FindBin: 0
-  Getopt::Long: 0
-  IO::File: 0
-  String::ShellQuote: 0
-  base: 0
-  lib: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Carp: '0'
+  Data::Dumper: '0'
+  Exporter: '0'
+  File::Slurp: '0'
+  FindBin: '0'
+  Getopt::Long: '0'
+  IO::File: '0'
+  String::ShellQuote: '0'
+  base: '0'
+  lib: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/aspiers/mysqldiff/issues
   repository: https://github.com/aspiers/mysqldiff
-version: 0.50
+version: '0.60'
+x_generated_by_perl: v5.26.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

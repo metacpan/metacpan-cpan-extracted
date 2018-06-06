@@ -1,0 +1,78 @@
+{
+   "abstract" : "Template Toolkit plugin for encoding and decoding International Domain Names.",
+   "author" : [
+      "Michael Schout <mschout@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Template-Plugin-Filter-IDN",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::PluginBundle::MSCHOUT" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Signature" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Net::IDN::Encode" : "0",
+            "Syntax::Feature::Junction" : "0",
+            "Template::Plugin::Filter" : "0",
+            "parent" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "syntax" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Template::Test" : "0",
+            "Test::More" : "0",
+            "perl" : "5.008",
+            "utf8" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Template::Plugin::Filter::IDN" : {
+         "file" : "lib/Template/Plugin/Filter/IDN.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mschout/perl-template-plugin-filter-idn/issues"
+      },
+      "homepage" : "https://github.com/mschout/perl-template-plugin-filter-idn",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mschout/perl-template-plugin-filter-idn.git",
+         "web" : "https://github.com/mschout/perl-template-plugin-filter-idn"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

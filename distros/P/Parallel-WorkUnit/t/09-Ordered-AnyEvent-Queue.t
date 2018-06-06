@@ -14,7 +14,7 @@ use warnings;
 use autodie;
 
 use Carp;
-use Test::More tests => 140;
+use Test::More;
 use Test::Exception;
 
 SKIP: {
@@ -212,4 +212,6 @@ SKIP: {
     pass("Unnecessary waitall() call exits properly");
     ok( !defined( $wu->waitone() ), 'Unnecessary waitone() call exits properly' );
 }
+
+done_testing();
 

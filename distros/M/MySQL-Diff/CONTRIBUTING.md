@@ -3,16 +3,22 @@
 - https://www.igvita.com/2011/12/19/dont-push-your-pull-requests/
 - http://blog.adamspiers.org/2012/11/10/7-principles-for-contributing-patches-to-software-projects/
 
+# NOTE: All changes must add/update tests (NO EXCEPTIONS)
+
+All new features should include new unit or integration tests to exercise them thoroughly.
+
+If fixing a bug, please add a regression test.
+
 # How to contribute
 
 Contributing is easy.
 
 First check your issue hasn't already been reported on
-(CPAN)[https://rt.cpan.org/Public/Dist/Display.html?Name=MySQL-Diff]
-or (GitHub)[https://github.com/aspiers/mysqldiff/issues].  Then
+[CPAN](https://rt.cpan.org/Public/Dist/Display.html?Name=MySQL-Diff)
+or [GitHub](https://github.com/aspiers/mysqldiff/issues).  Then
 proceed appropriately:
 
-1. (File a new issue)[https://github.com/aspiers/mysqldiff/issues/new]
+1. [File a new issue](https://github.com/aspiers/mysqldiff/issues/new)
 2. Fork the main repo
 3. Create an issue branch, e.g., "Issue-XX-blah-foo-derp"
 4. Make commits of logical units (see below).
@@ -40,22 +46,16 @@ For example,
     to ensure the inversion of time remained consistent in
     all past and future versions of this utility.
 
-# Please add/update tests
-
-All new features should include new tests to exercise them thoroughly.
-
-If fixing a bug, please add a regression test.
-
 # Using Dist::Zilla
 
-This module uses Dist::Zilla to manage releases. Please see ./dist.ini;
+This module uses Dist::Zilla to manage releases. Please see `./dist.ini`;
 
 To roll a build;
 
 1. Bump version number in dist.ini
 2. Bump $VERSION in all .pm files
-3. Run "dzil clean && dzil test && dzil build"
-4. To push a release to CPAN, "dzil release" (but please ask a committer first. 
+3. Run `dzil clean && dzil test && dzil build`
+4. To push a release to CPAN, `dzil release` (but please ask a committer first). 
 
 # Questions
 

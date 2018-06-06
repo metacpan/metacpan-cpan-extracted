@@ -9,7 +9,7 @@
 ###########################################################
 package Devel::NYTProf;
 
-our $VERSION = '6.05'; # also change in Devel::NYTProf::Core
+our $VERSION = '6.06'; # also change in Devel::NYTProf::Core
 
 package    # hide the package from the PAUSE indexer
     DB;
@@ -65,7 +65,7 @@ Devel::NYTProf - Powerful fast feature-rich Perl source code profiler
 
 I give talks on profiling perl code, including a detailed look at how to use
 NYTProf and how to optimize your code, every year. A video of my YAPC::NA 2014
-talk can be found at L<http://perltv.org/v/performance-profiling-with-develnytprof>
+talk can be found at L<https://youtu.be/T7EK6RZAnEA>
 
 
 =head1 DESCRIPTION

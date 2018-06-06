@@ -202,7 +202,7 @@ namespace dlib
         }
         else
         {
-            std::unique_ptr<T> temp (new T);
+            scoped_ptr<T> temp (new T);
             temp->val = c.val;
             assign_tables(*temp, last, val);
             c.table.add(first,temp);

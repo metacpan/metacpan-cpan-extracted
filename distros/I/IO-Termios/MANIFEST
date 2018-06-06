@@ -2,11 +2,10 @@ Build.PL
 Changes
 lib/IO/Termios.pm
 LICENSE
-Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml
 README
 t/00use.t
-t/01open.t
+t/01flags.t
 t/99pod.t

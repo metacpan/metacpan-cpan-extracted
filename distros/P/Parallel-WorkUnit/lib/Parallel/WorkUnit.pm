@@ -4,7 +4,7 @@
 #
 
 package Parallel::WorkUnit;
-$Parallel::WorkUnit::VERSION = '1.118';
+$Parallel::WorkUnit::VERSION = '1.201';
 use v5.8;
 
 # ABSTRACT: Provide multi-paradigm forking with ability to pass back data
@@ -39,8 +39,6 @@ use overload;
 use IO::Handle;
 use IO::Pipe;
 use IO::Select;
-use Moose;
-use Moose::Util::TypeConstraints;
 use POSIX ':sys_wait_h';
 use Storable;
 
@@ -52,105 +50,237 @@ my @ALL_WU;    # Holds all active work units so child processes can't
                # Note it holds a reference (strong) to a reference
                # (weak).
 
-subtype 'Parallel::WorkUnit::PositiveInt', as 'Int',
-  where { $_ > 0 },
-  message { "The number you provided, $_, was not a positive number" };
 
-subtype 'Parallel::WorkUnit::NonNegativeInt', as 'Int',
-  where { $_ >= 0 },
-  message { "The number you provided, $_, was not a non-negative number" };
+sub use_anyevent {
+    if ( $#_ == 0 ) {
+        return shift->{use_anyevent};
+    } elsif ( $#_ == 1 ) {
+        my ( $self, $val ) = @_;
+
+        my ($old_val) = $self->{use_anyevent};
+        $self->{use_anyevent} = $val;
+
+        # Trigger
+        $self->_set_anyevent( $val, $old_val );
+
+        return $val;
+    } else {
+        croak("Invalid call");
+    }
+}
+
+# XXX: Add validation that _cv is a Maybe[AnyEvent::CondVar]
+sub _cv {
+    if ( $#_ == 0 ) {
+        return shift->{_cv};
+    } elsif ( $#_ == 1 ) {
+        my ( $self, $val ) = @_;
+        $self->{_cv} = $val;
+        return $val;
+    } else {
+        croak("Invalid call");
+    }
+}
+
+# XXX: Add validation that _last_error is a Maybe[Str]
+sub _last_error {
+    if ( $#_ == 0 ) {
+        return shift->{_last_error};
+    } elsif ( $#_ == 1 ) {
+        my ( $self, $val ) = @_;
+        $self->{_last_error} = $val;
+        return $val;
+    } else {
+        croak("Invalid call");
+    }
+}
+
+# XXX: Add validation that _ordered_count is a non-negative integer
+sub _ordered_count {
+    if ( $#_ == 0 ) {
+        my $self = shift;
+
+        # Initialize
+        if ( !exists( $self->{_ordered_count} ) ) { $self->{_ordered_count} = 0; }
+
+        return $self->{_ordered_count};
+    } elsif ( $#_ == 1 ) {
+        my ( $self, $val ) = @_;
+        $self->{_ordered_count} = $val;
+        return $val;
+    } else {
+        croak("Invalid call");
+    }
+}
+
+# XXX: Add validation that _ordered_responses is an ArrayRef
+sub _ordered_responses {
+    if ( $#_ == 0 ) {
+        my $self = shift;
+
+        # Initialize
+        if ( !exists( $self->{_ordered_responses} ) ) { $self->{_ordered_responses} = []; }
+
+        return $self->{_ordered_responses};
+    } elsif ( $#_ == 1 ) {
+        my ( $self, $val ) = @_;
+        $self->{_ordered_responses} = $val;
+        return $val;
+    } else {
+        croak("Invalid call");
+    }
+}
 
 
-has use_anyevent => (
-    is      => 'rw',
-    isa     => 'Bool',
-    trigger => \&_set_anyevent,
-);
+sub max_children {
+    if ( $#_ == 0 ) {
+        my $self = shift;
 
-has _cv => (
-    is  => 'rw',
-    isa => 'Maybe[AnyEvent::CondVar]',
-);
+        if ( !exists( $self->{max_children} ) ) { $self->{max_children} = 5; }
 
-has _last_error => (
-    is  => 'rw',
-    isa => 'Maybe[Str]',
-);
+        return $self->{max_children};
+    } elsif ( $#_ == 1 ) {
+        my ( $self, $val ) = @_;
 
-has _ordered_count => (
-    is       => 'rw',
-    isa      => 'Parallel::WorkUnit::NonNegativeInt',
-    init_arg => undef,
-    default  => 0,
-);
+        # Validate
+        if ( defined($val) ) {
+            if ( $val !~ m/^[0-9]+$/s ) {
+                confess("max_children must be set to a positive integer");
+            }
+            if ( $val <= 0 ) {
+                confess("max_children must be set to a positive integer");
+            }
+        }
 
-has _ordered_responses => (
-    is       => 'rw',
-    isa      => 'ArrayRef',
-    init_arg => undef,
-    default  => sub { [] },
-);
+        $self->{max_children} = $val;
 
+        # Trigger
+        $self->_start_queued_children();
 
-has 'max_children' => (
-    is      => 'rw',
-    isa     => 'Maybe[Parallel::WorkUnit::PositiveInt]',
-    default => 5,
-    trigger => sub { $_[0]->_start_queued_children() },
-);
+        return $val;
+    } else {
+        croak("Invalid call");
+    }
+}
 
-has '_subprocs' => (
-    is       => 'rw',
-    isa      => 'HashRef',
-    init_arg => undef
-);
+# XXX: Add validation that _subprocs is a HashRef
+sub _subprocs {
+    if ( $#_ == 0 ) {
+        my $self = shift;
+
+        # Initial value
+        if ( !exists( $self->{_subprocs} ) ) { $self->{_subprocs} = {}; }
+
+        return $self->{_subprocs};
+    } elsif ( $#_ == 1 ) {
+        my ( $self, $val ) = @_;
+        $self->{_subprocs} = $val;
+        return $val;
+    } else {
+        croak("Invalid call");
+    }
+}
 
 # This only gets used on Win32.
-has '_queue' => (
-    is       => 'rw',
-    init_arg => undef
-);
-# This only gets used on Win32.
-#
-has '_child_queue' => (
-    is       => 'rw',
-    init_arg => undef
-);
+sub _queue {
+    if ( $#_ == 0 ) {
+        return shift->{_queue};
+    } elsif ( $#_ == 1 ) {
+        my ( $self, $val ) = @_;
+        $self->{_queue} = $val;
+        return $val;
+    } else {
+        croak("Invalid call");
+    }
+}
 
-# This only gets used on Win32
-has '_count' => (
-    is       => 'rw',
-    isa      => 'Int',
-    init_arg => undef,
-    default  => 1
-);
+# This only gets used on Win32.
+sub _child_queue {
+    if ( $#_ == 0 ) {
+        return shift->{_child_queue};
+    } elsif ( $#_ == 1 ) {
+        my ( $self, $val ) = @_;
+        $self->{_child_queue} = $val;
+        return $val;
+    } else {
+        croak("Invalid call");
+    }
+}
+
+# XXX: Add validation that _count is a positive integer
+# This only gets used on Win32.
+sub _count {
+    if ( $#_ == 0 ) {
+        my $self = shift;
+
+        # Initial value
+        if ( !exists( $self->{_count} ) ) { $self->{_count} = 1; }
+
+        return $self->{_count};
+    } elsif ( $#_ == 1 ) {
+        my ( $self, $val ) = @_;
+        $self->{_count} = $val;
+        return $val;
+    } else {
+        croak("Invalid call");
+    }
+}
+
+# XXX: Add validation that _parent_pid is a positive integer
+# We also need to initialize always in the parent process.
+sub _parent_pid {
+    if ( $#_ == 0 ) {
+        return shift->{_parent_pid};
+    } elsif ( $#_ == 1 ) {
+        my ( $self, $val ) = @_;
+        $self->{_parent_pid} = $val;
+        return $val;
+    } else {
+        croak("Invalid call");
+    }
+}
 
 # Children queued
-has '_queued_children' => (
-    is       => 'rw',
-    isa      => 'ArrayRef[ArrayRef[Coderef]]',
-    init_arg => undef,
-    default  => sub { [] },
-);
+# XXX: Add validation that _queued_cildren is an
+# ArrayRef[ArrayRef[CodeRef]]
+sub _queued_children {
+    if ( $#_ == 0 ) {
+        my $self = shift;
+
+        if ( !exists( $self->{_queued_children} ) ) { $self->{_queued_children} = []; }
+
+        return $self->{_queued_children};
+    } elsif ( $#_ == 1 ) {
+        my ( $self, $val ) = @_;
+        $self->{_queued_children} = $val;
+        return $val;
+    } else {
+        croak("Invalid call");
+    }
+}
 
 
-sub BUILD {
-    my $self = shift;
+sub new {
+    my $class = shift;
+    my $self  = {};
+    bless $self, $class;
 
-    $self->_subprocs( {} );
+    # Initialize parent PID
+    $self->_parent_pid($$);
 
     if ($use_thread_queue) {
         $self->_queue( Thread::Queue->new() );
     }
 
     # Make a weak reference and shove it into the ALL_WU array
-    weaken $self;
-    push @ALL_WU, \$self;
+    my $weakself = $self;
+    weaken $weakself;
+    push @ALL_WU, \$weakself;
 
     # Do some housekeeping on @ALL_WU, so it is somewhat bounded
     @ALL_WU = grep { defined $$_ } @ALL_WU;
 
-    return;
+    return $self;
 }
 
 
@@ -700,7 +830,7 @@ sub _clear_all {
     $self->_queued_children( [] );
 
     do {
-        # Don't warn on AnyEvent in child threads being DEMOLISHed
+        # Don't warn on AnyEvent in child threads being DESTROYed
         local $SIG{__WARN__} = sub { };
         $self->_subprocs( {} );
     };
@@ -731,7 +861,7 @@ sub _codelike {
 }
 
 # Destructor emits warning if sub processes are running
-sub DEMOLISH {
+sub DESTROY {
     my $self = shift;
 
     if ( scalar( keys %{ $self->_subprocs } ) ) {
@@ -740,8 +870,6 @@ sub DEMOLISH {
 
     return;
 }
-
-__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -757,7 +885,7 @@ Parallel::WorkUnit - Provide multi-paradigm forking with ability to pass back da
 
 =head1 VERSION
 
-version 1.118
+version 1.201
 
 =head1 SYNOPSIS
 
@@ -785,7 +913,6 @@ version 1.118
   $wu->async( sub { ... } );
 
   @results = $wu->waitall();
-
 
   #
   # Spawning off X number of workers

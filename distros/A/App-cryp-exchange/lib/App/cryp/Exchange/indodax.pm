@@ -1,7 +1,7 @@
 package App::cryp::Exchange::indodax;
 
-our $DATE = '2018-05-10'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-06-06'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -61,11 +61,11 @@ sub list_pairs {
     # XXX in the future, we will put the master data here instead of in
     # App::indodax
 
-    my $res = App::indodax::pairs();
-    return $res unless $res->[0] == 200;
+    my $apires = App::indodax::pairs();
+    return $apires unless $apires->[0] == 200;
 
     my @res;
-    for (@{ $res->[2] }) {
+    for (@{ $apires->[2] }) {
         if ($args{native}) {
             $_ = lc $self->to_native_pair($_);
         } else {
@@ -88,11 +88,34 @@ sub get_order_book {
 
     my $pair = lc $self->to_native_pair($args{pair});
 
-    my $res;
-    eval { $res = $self->{_client}->get_depth(pair => $pair) };
+    my $apires;
+    eval { $apires = $self->{_client}->get_depth(pair => $pair) };
     return [500, "Died: $@"] if $@;
 
-    [200, "OK", $res];
+    [200, "OK", $apires];
+}
+
+sub list_balances {
+    my ($self, %args) = @_;
+
+    my $apires;
+    eval { $apires = $self->{_client}->get_info };
+    return [500, "Died: $@"] if $@;
+
+    my @recs;
+    for my $currency0 (sort keys %{$apires->{return}{balance}}) {
+        my $avail = $apires->{return}{balance}{$currency0} // 0;
+        my $hold  = $apires->{return}{balance_hold}{$currency0} // 0;
+        my $rec = {
+            currency  => $self->to_canonical_currency($currency0),
+            available => $avail,
+            hold      => $hold,
+            total     => $avail + $hold,
+        };
+        push @recs, $rec;
+    }
+
+    [200, "OK", \@recs];
 }
 
 1;
@@ -110,7 +133,7 @@ App::cryp::Exchange::indodax - Interact with Indodax
 
 =head1 VERSION
 
-This document describes version 0.003 of App::cryp::Exchange::indodax (from Perl distribution App-cryp-exchange), released on 2018-05-10.
+This document describes version 0.004 of App::cryp::Exchange::indodax (from Perl distribution App-cryp-exchange), released on 2018-06-06.
 
 =for Pod::Coverage ^(.+)$
 

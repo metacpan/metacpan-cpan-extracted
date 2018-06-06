@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution MooseX-BuildArgs,
-version 0.05:
+version 0.06:
 
   Save the original constructor arguments for later use.
 

@@ -1,8 +1,42 @@
 #!/usr/bin/env perl
-# Copyright (C) 2015 Rocky Bernstein <rocky@cpan.org>
+# Copyright (C) 2015, 2018 Rocky Bernstein <rocky@cpan.org>
 package Devel::Trepan::Deparse;
-our $VERSION='2.2.0';
-"All of the real action is in Devel::Trepan::CmdProcessor::Command::Deparse.pm";
+our $VERSION='3.0.0';
+use Exporter;
+use warnings; use strict;
+
+use vars qw(@ISA @EXPORT);
+@ISA = ('Exporter');
+@EXPORT = qw(pmsg pmsg_info);
+
+# Print Perl text, possibly syntax highlighted.
+sub pmsg
+{
+    my ($proc, $text, $short) = @_;
+    $text = B::DeparseTree::Printer::short_str($text, $proc->{settings}{maxwidth}) if $short;
+    $text = Devel::Trepan::DB::LineCache::highlight_string($text)
+	if $proc->{settings}{highlight};
+    $proc->msg($text, {unlimited => 1});
+}
+
+# Print Perl text, possibly syntax highlighted.
+# We add leader info which may have op addresses
+# if desired
+sub pmsg_info
+{
+    my ($proc, $options, $leader, $info) = @_;
+    return unless $info;
+    my $text = $info->{text};
+    if ($options->{'address'}) {
+	$leader = sprintf "OP: 0x%0x $leader", ${$info->{op}};
+    }
+    $proc->msg("# ${leader}...") if $leader;
+    pmsg($proc, $text, 1);
+}
+
+
+1;
+
 __END__
 
 =pod
@@ -31,7 +65,7 @@ Perl at the current point in the Perl program that you are stopped at.
 
 =head1 DESCRIPTION
 
-Perl reports location only at the granularity of a line number. Sometime you would like better or more precise information. For example suppose I am stopped on this line taken from I<File::Basename::fileparse>:
+Perl reports location only at the granularity of a line number. Sometimes you would like better or more precise information. For example suppose I am stopped on this line taken from I<File::Basename::fileparse>:
 
      if (grep { $type eq $_ } qw(MSDOS DOS MSWin32 Epoc)) {  # ...
 
@@ -42,12 +76,60 @@ The first place is before the grep starts at all. Here, deparse will show:
 
 But also you might be stopped inside grep. Here deparse will show:
 
-    # code to be run next...
-    $type
-    # contained in...
-    $type eq $_
+    $ deparse
+    grepwhile, pushmark B::OP=SCALAR(0x563a8ab1c268)
+        at address 0x563a871c07d0:
+    if (grep { $type eq $_ } 'MSDOS', 'DOS', 'MSWin32', 'Epoc') {
+             |    # code to be run next...
 
-Knowing which of these two locations can be helpful. For example if you are stopped in the latter location, you can evaluate `$_` to see where in the loop you are at.
+The C<|> indicates that a "pushmark" really doesn't have an exact
+correspondence in the source text, but roughly here it is about where
+you would just before stepping into the block. In partular variable C<$_> has not
+been set.
+
+But notice that when we C<step> athough we are on the same line, we
+are at a different position in the statement:
+
+    $ step
+    $ deparse
+
+    (trepanpl): deparse
+    not my, padsv B::OP=SCALAR(0x563a8abd51a8)
+        at address 0x563a871c0a78:
+    $type eq $_
+    -----
+
+So now we are actually inside the block, and so C<$_> is now set. If
+the above wasn't enough context to indicate where you are the C<-p>
+option on deparse will show you parent levels in the tree:
+
+
+(trepanpl): deparse -p 3
+
+    00 not my:
+    $type
+     - - - - - - - - - - - - - - - - - - - -
+    01 binary operator eq:
+    $type eq $_
+     - - - - - - - - - - - - - - - - - - - -
+    02 statements:
+     $type eq $_
+     - - - - - - - - - - - - - - - - - - - -
+    03 map grep block:
+    grep { $type eq $_ } 'MSDOS', 'DOS', 'MSWin32', 'Epoc'
+    (trepanpl): 00 not my:
+    $type
+     - - - - - - - - - - - - - - - - - - - -
+    01 binary operator eq:
+    $type eq $_
+     - - - - - - - - - - - - - - - - - - - -
+    02 statements:
+    $type eq $_
+     - - - - - - - - - - - - - - - - - - - -
+    03 map grep block:
+    grep { $type eq $_ } 'MSDOS', 'DOS', 'MSWin32', 'Epoc'
+    (trepanpl):
+
 
 See L<Exact Perl location with B::Deparse (and Devel::Callsite)|http://blogs.perl.org/users/rockyb/2015/11/exact-perl-location-with-bdeparse-and-develcallsite.html>.
 
@@ -72,7 +154,7 @@ Rocky Bernstein
 
 =head1 COPYRIGHT
 
-Copyright (C) 2015 Rocky Bernstein <rocky@cpan.org>
+Copyright (C) 2015, 2018 Rocky Bernstein <rocky@cpan.org>
 
 This program is distributed WITHOUT ANY WARRANTY, including but not
 limited to the implied warranties of merchantability or fitness for a

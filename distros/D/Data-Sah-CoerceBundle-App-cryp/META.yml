@@ -3,7 +3,7 @@ abstract: "Coercion rules for the 'cryp' app family"
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
-  CryptoExchange::Catalog: '0'
+  CryptoExchange::Catalog: '20180510'
   Data::Sah::Coerce: '0.025'
   File::Spec: '0'
   IO::Handle: '0'
@@ -26,7 +26,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-CoerceBundle-App-cryp
   homepage: https://metacpan.org/release/Data-Sah-CoerceBundle-App-cryp
   repository: git://github.com/perlancar/perl-Data-Sah-CoerceBundle-App-cryp.git
-version: '0.003'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

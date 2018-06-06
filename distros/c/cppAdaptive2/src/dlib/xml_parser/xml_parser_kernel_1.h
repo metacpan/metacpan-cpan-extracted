@@ -49,7 +49,7 @@ namespace dlib
        
         public:
 
-            // These typedefs are here for backwards compatibly with previous versions of
+            // These typedefs are here for backwards compatibily with previous versions of
             // dlib.
             typedef xml_parser kernel_1a;
             typedef xml_parser kernel_1a_c;
@@ -103,10 +103,7 @@ namespace dlib
                     const std::string& key
                 ) const
                 {
-                    if (is_in_list(key))
-                        return list[key];
-                    else
-                        throw xml_attribute_list_error("No XML attribute named " + key + " is present in tag.");
+                    return list[key];
                 }
 
                 bool at_start (
@@ -127,7 +124,7 @@ namespace dlib
                 bool move_next (
                 ) const { return list.move_next(); }
 
-                size_t size (
+                unsigned long size (
                 ) const { return list.size(); }
             };
 
@@ -357,7 +354,6 @@ namespace dlib
 
 
                 case empty_element: is_empty = true;
-                                    // fall through
                 case element_start:
                     {
                         seen_root_tag = true;

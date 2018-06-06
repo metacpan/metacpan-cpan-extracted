@@ -3,6 +3,7 @@ package BioX::Workflow::Command::run::Rules::Directives::Walk;
 use Moose::Role;
 use namespace::autoclean;
 
+use Memoize;
 use Data::Walk 2.01;
 use Path::Tiny;
 
@@ -17,7 +18,6 @@ sub walk_process_data {
     my $keys = shift;
 
     foreach my $k ( @{$keys} ) {
-        $DB::single = 2;
         next if ref($k);
         my $v = $self->$k;
         ##Leftover of backwards compatibility
@@ -81,7 +81,6 @@ sub process_directive {
         $text = $self->interpol_directive($v) if $v;
         $self->$k($text);
     }
-
 }
 
 =head3 walk_directives

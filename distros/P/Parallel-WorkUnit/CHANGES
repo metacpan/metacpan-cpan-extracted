@@ -1,3 +1,18 @@
+1.201 - June 4, 2018
+Joelle Maslak <jmaslak@antelope.net>
+ * Remove Moose and replace with standard Perl object system to lower
+   the number of dependencies this pulls in
+ * Fix test failures if AnyEvent not present
+ * Released as DEV (TRIAL) version for CPAN Testers validation
+
+1.200 - June 3, 2018
+Joelle Maslak <jmaslak@antelope.net>
+ * Development release (this became 1.201 without any changes)
+
+1.118 - May 28, 2018
+Joelle Maslak <jmaslak@antelope.net>
+ * Full release version
+
 1.117 - May 28, 2018
 Joelle Maslak <jmaslak@antelope.net>
  * Added new asyncs() method to spawn a number of processes with one

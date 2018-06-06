@@ -7,7 +7,6 @@
 // and cudnn_dlibapi.h
 
 #include "tensor.h"
-#include "../geometry/rectangle.h"
 
 namespace dlib
 {
@@ -28,20 +27,6 @@ namespace dlib
             tensor& dest,
             const tensor& src1,
             const tensor& src2
-        );
-
-        void multiply_zero_padded (
-            bool add_to,
-            tensor& dest,
-            const tensor& src1,
-            const tensor& src2
-        );
-
-        void scale_channels (
-            bool add_to,
-            tensor& dest,
-            const tensor& src,
-            const tensor& scales
         );
 
         void add(
@@ -124,19 +109,6 @@ namespace dlib
             const tensor& src,
             const tensor& A,
             const tensor& B
-        );
-
-    // -----------------------------------------------------------------------------------
-
-        void affine_transform(
-            const rectangle& rect,
-            tensor& dest, 
-            const tensor& src1, 
-            const tensor& src2, 
-            const tensor& src3, 
-            float A, 
-            float B,
-            float C
         );
 
     // -----------------------------------------------------------------------------------
@@ -257,19 +229,6 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        void softmax_all (
-            tensor& dest,
-            const tensor& src
-        );
-
-        void softmax_all_gradient (
-            tensor& grad,
-            const tensor& dest,
-            const tensor& gradient_input
-        );
-
-    // ------------------------------------------------------------------------------------
-
         void sigmoid (
             tensor& dest,
             const tensor& src
@@ -322,36 +281,6 @@ namespace dlib
             const tensor& dest,
             const tensor& gradient_input
         );
-
-    // ----------------------------------------------------------------------------------------
-
-        void resize_bilinear (
-            tensor& dest,
-            long dest_row_stride,
-            long dest_channel_stride,
-            const tensor& src,
-            long src_row_stride,
-            long src_channel_stride
-        );
-
-        void resize_bilinear_gradient (
-            tensor& grad,
-            long grad_row_stride,
-            long grad_channel_stride,
-            const tensor& gradient_input,
-            long gradient_input_row_stride,
-            long gradient_input_channel_stride
-        );
-
-        inline void resize_bilinear (
-            tensor& dest,
-            const tensor& src
-        ) { resize_bilinear(dest, dest.nc(), dest.nr()*dest.nc(), src, src.nc(), src.nr()*src.nc()); }
-
-        inline void resize_bilinear_gradient (
-            tensor& grad,
-            const tensor& gradient_input
-        ) { resize_bilinear_gradient(grad, grad.nc(), grad.nr()*grad.nc(), gradient_input, gradient_input.nc(), gradient_input.nr()*gradient_input.nc()); }
 
     // -----------------------------------------------------------------------------------
 
@@ -425,48 +354,23 @@ namespace dlib
             void clear(
             ) {}
 
-            void setup(
-                const tensor& data,    /* not used but required for interface */
-                const tensor& filters, /* not used but required for interface */
+            void operator() (
+                resizable_tensor& output,
+                const tensor& data,
+                const tensor& filters,
                 int stride_y,
                 int stride_x,
                 int padding_y,
                 int padding_x
-            ) 
-            {
-                (void)data;    /* silence compiler */
-                DLIB_CASSERT(stride_y > 0 && stride_x > 0);
-                DLIB_CASSERT(0 <= padding_y && padding_y < filters.nr());
-                DLIB_CASSERT(0 <= padding_x && padding_x < filters.nc());
-                last_stride_y = stride_y;
-                last_stride_x = stride_x;
-                last_padding_y = padding_y;
-                last_padding_x = padding_x;            
-            }
-
-             void operator() (
-                const bool add_to_output,
-                resizable_tensor& output,
-                const tensor& data,
-                const tensor& filters
-            );
-
-             void operator() (
-                const bool add_to_output,
-                tensor& output,
-                const tensor& data,
-                const tensor& filters
             );
 
             void get_gradient_for_data (
-                const bool add_to_output,
                 const tensor& gradient_input, 
                 const tensor& filters,
                 tensor& data_gradient
             );
 
             void get_gradient_for_filters (
-                const bool add_to_output,
                 const tensor& gradient_input, 
                 const tensor& data,
                 tensor& filters_gradient
@@ -474,16 +378,15 @@ namespace dlib
 
         private:
 
-            long last_stride_y = 0;
-            long last_stride_x = 0;
-            long last_padding_y = 0;
-            long last_padding_x = 0;
+            long last_stride_y;
+            long last_stride_x;
+            long last_padding_y;
+            long last_padding_x;
         };
 
     // -----------------------------------------------------------------------------------
 
         void copy_tensor(
-            bool add_to,
             tensor& dest,
             size_t dest_k_offset,
             const tensor& src,

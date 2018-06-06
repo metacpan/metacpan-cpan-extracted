@@ -1,5 +1,9 @@
 Revision histories for Perl extension Number::Phone::JP
 
+0.20180605 Wed Jun  6 2018
+     - Update some table classes.
+     - Fixed a typo in the pod, it was patched by Mohammad S Anwar (MANWAR).
+
 0.20180509 Tue May 15 2018
      - Update some table classes.
 

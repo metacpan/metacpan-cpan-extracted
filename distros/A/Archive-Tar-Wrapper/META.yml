@@ -2,6 +2,7 @@
 abstract: "API wrapper around the 'tar' utility"
 author:
   - 'Mike Schilli <cpan@perlmeister.com>'
+  - 'Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -26,7 +27,8 @@ requires:
   perl: '5.008001'
 resources:
   X_type: git
-  X_url: https://github.com/glasswalk3r/archive-tar-wrapper-perl.git
-  repository: https://github.com/glasswalk3r/archive-tar-wrapper-perl
-version: '0.24'
+  X_url: https://github.com/glasswalk3r/archive-tar-wrapper-perl
+  bugtracker: https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues
+  repository: https://github.com/glasswalk3r/archive-tar-wrapper-perl.git
+version: '0.25'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

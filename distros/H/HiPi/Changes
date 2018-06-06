@@ -1,3 +1,7 @@
+Version 0.72  - 06 June 2018
+                Added HiPi::Interface::MicroDotPHAT - Pimoroni retro LED matrix Hat
+                Added HiPi::Interface::IS31FL3730 - LED matrix controller.
+
 Version 0.71  - 30 May 2018
                 Added HiPi::Interface::MS5611 - pressure / temp sensor
                 Added HiPi::Interface::TMP102 - temperature sensor

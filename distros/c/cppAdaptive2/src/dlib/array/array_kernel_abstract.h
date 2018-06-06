@@ -66,7 +66,7 @@ namespace dlib
             !*/
 
             explicit array (
-                size_t new_size
+                unsigned long new_size
             );
             /*!
                 ensures 
@@ -116,7 +116,7 @@ namespace dlib
             !*/
 
             const T& operator[] (
-                size_t pos
+                unsigned long pos
             ) const;
             /*!
                 requires
@@ -126,7 +126,7 @@ namespace dlib
             !*/
             
             T& operator[] (
-                size_t pos
+                unsigned long pos
             );
             /*!
                 requires
@@ -136,7 +136,7 @@ namespace dlib
             !*/
 
             void set_size (
-                size_t size
+                unsigned long size
             );
             /*!
                 requires
@@ -155,7 +155,7 @@ namespace dlib
                         if it does throw then the call to set_size() has no effect    
             !*/
 
-            size_t max_size(
+            unsigned long max_size(
             ) const;
             /*!
                 ensures
@@ -163,7 +163,7 @@ namespace dlib
             !*/
 
             void set_max_size(
-                size_t max
+                unsigned long max
             );
             /*!
                 ensures
@@ -198,7 +198,7 @@ namespace dlib
             !*/
 
             void resize (
-                size_t new_size
+                unsigned long new_size
             );
             /*!
                 ensures
@@ -272,11 +272,6 @@ namespace dlib
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor.
                        If an exception is thrown then it has no effect on *this.
-            !*/
-
-            void push_back (T&& item) { push_back(item); }
-            /*!
-                enable push_back from rvalues 
             !*/
 
             typedef T* iterator;

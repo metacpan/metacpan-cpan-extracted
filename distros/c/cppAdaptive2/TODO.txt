@@ -1,0 +1,16 @@
+cpanm Inline::Module
+
+MANIFEST.SKIP
+perl -MExtUtils::Manifest -e 'ExtUtils::Manifest::mkmanifest()'
+
+# how to generate stub file
+perl -MInline::Module=makestub,cppAdaptive2::Inline
+
+perl Makefile.PL
+gmake
+gmake test
+gmake dist
+
+gmake tardist
+
+cpanm --test-only -v cppAdaptive2-v0.2.0.tar.gz

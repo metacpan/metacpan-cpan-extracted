@@ -33,9 +33,9 @@ namespace dlib
                 Finally, the convention in dlib code is to interpret the tensor as a set of
                 num_samples() 3D arrays, each of dimension k() by nr() by nc().  Also,
                 while this class does not specify a memory layout, the convention is to
-                assume that indexing into an element at coordinates (sample,k,r,c) can be
+                assume that indexing into an element at coordinates (sample,k,nr,nc) can be
                 accomplished via:
-                    host()[((sample*t.k() + k)*t.nr() + r)*t.nc() + c]
+                    host()[((sample*t.k() + k)*t.nr() + nr)*t.nc() + nc]
 
             THREAD SAFETY
                 Instances of this object are not thread-safe.  So don't touch one from
@@ -46,7 +46,7 @@ namespace dlib
 
         virtual ~tensor();
 
-        long long num_samples(
+        long num_samples(
         ) const; 
         /*!
             ensures
@@ -54,7 +54,7 @@ namespace dlib
                   are in this object.  
         !*/
 
-        long long k(
+        long k(
         ) const; 
         /*!
             ensures
@@ -63,14 +63,14 @@ namespace dlib
                   with k() channels.
         !*/
 
-        long long nr(
+        long nr(
         ) const; 
         /*!
             ensures
                 - returns the number of rows in this tensor.
         !*/
 
-        long long nc(
+        long nc(
         ) const; 
         /*!
             ensures
@@ -134,7 +134,7 @@ namespace dlib
                   calling host().
         !*/
 
-        virtual float* host_write_only(
+        float float* host_write_only(
         ) = 0;
         /*!
             ensures
@@ -174,7 +174,7 @@ namespace dlib
                   host() will perform a device to host transfer.
         !*/
 
-        virtual float* device_write_only(
+        float float* device_write_only(
         ) = 0;
         /*!
             requires
@@ -288,7 +288,7 @@ namespace dlib
 
         template <typename EXP>
         void set_sample (
-            unsigned long long idx,
+            unsigned long idx,
             const matrix_exp<EXP>& item
         );
         /*!
@@ -304,7 +304,7 @@ namespace dlib
 
         template <typename EXP>
         void add_to_sample (
-            unsigned long long idx,
+            unsigned long idx,
             const matrix_exp<EXP>& item
         );
         /*!
@@ -363,8 +363,8 @@ namespace dlib
 
     const matrix_exp mat (
         const tensor& t,
-        long long nr,
-        long long nc
+        long nr,
+        long nc
     );
     /*!
         requires
@@ -394,8 +394,8 @@ namespace dlib
 
     const matrix_exp image_plane (
         const tensor& t,
-        long long sample = 0,
-        long long k = 0
+        long sample = 0,
+        long k = 0
     );
     /*!
         requires
@@ -446,7 +446,6 @@ namespace dlib
                 - #k() == 0
                 - #nr() == 0
                 - #nc() == 0
-                - #capacity() == 0
         !*/
 
         template <typename EXP>
@@ -463,11 +462,10 @@ namespace dlib
                 - #nc() == 1
                 - Assigns item to *this tensor by performing:
                   set_ptrm(host(), num_samples(), k()*nr()*nc()) = item;
-                - #capacity() == size()
         !*/
 
         explicit resizable_tensor(
-            long long n_, long long k_ = 1, long long nr_ = 1, long long nc_ = 1
+            long n_, long k_ = 1, long nr_ = 1, long nc_ = 1
         );
         /*!
             requires
@@ -481,7 +479,6 @@ namespace dlib
                 - #k() == k_
                 - #nr() == nr_
                 - #nc() == nc_
-                - #capacity() == size()
         !*/
 
         // This object is copyable and movable
@@ -489,18 +486,6 @@ namespace dlib
         resizable_tensor(resizable_tensor&&) = default;
         resizable_tensor& operator= (const resizable_tensor&) = default;
         resizable_tensor& operator= (resizable_tensor&&) = default;
-
-        size_t capacity (
-        ) const;
-        /*!
-            ensures
-                - returns the total number of floats allocated.  This might be different
-                  from the size() since calls to set_size() that make a tensor smaller
-                  don't trigger reallocations.  They simply adjust the nominal dimensions
-                  while keeping the same allocated memory block.  This makes calls to
-                  set_size() very fast.  If you need to deallocate a tensor then use
-                  clear().
-        !*/
 
         void clear(
         );
@@ -512,7 +497,6 @@ namespace dlib
                 - #nr() == 0
                 - #nc() == 0
                 - #annotation().is_empty() == true
-                - #capacity() == 0
         !*/
 
         void copy_size (
@@ -524,7 +508,7 @@ namespace dlib
         !*/
 
         void set_size(
-            long long n_, long long k_ = 1, long long nr_ = 1, long long nc_ = 1
+            long n_, long k_ = 1, long nr_ = 1, long nc_ = 1
         );
         /*!
             requires
@@ -538,8 +522,6 @@ namespace dlib
                 - #k() == k_
                 - #nr() == nr_
                 - #nc() == nc_
-                - #capacity() == max(#size(), capacity())
-                  (i.e. capacity() never goes down when calling set_size().)
         !*/
 
         template <typename EXP>
@@ -656,7 +638,7 @@ namespace dlib
         !*/
 
         alias_tensor (
-            long long n_, long long k_ = 1, long long nr_ = 1, long long nc_ = 1
+            long n_, long k_ = 1, long nr_ = 1, long nc_ = 1
         );
         /*!
             requires
@@ -672,15 +654,15 @@ namespace dlib
                 - #nc() == nc_
         !*/
 
-        long long num_samples() const;
-        long long k() const;
-        long long nr() const;
-        long long nc() const;
+        long num_samples() const; 
+        long k() const; 
+        long nr() const; 
+        long nc() const; 
         size_t size() const;
 
         alias_tensor_instance operator() (
             tensor& t,
-            size_t offset = 0
+            size_t offset
         ) const;
         /*!
             requires
@@ -701,7 +683,7 @@ namespace dlib
 
         alias_tensor_const_instance operator() (
             const tensor& t,
-            size_t offset = 0
+            size_t offset
         ) const;
         /*!
             requires

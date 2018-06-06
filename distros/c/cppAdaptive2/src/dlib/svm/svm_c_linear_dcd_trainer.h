@@ -9,7 +9,6 @@
 #include "../matrix.h"
 #include "../algs.h"
 #include "../rand.h"
-#include "svm.h"
 
 #include "function.h"
 #include "kernel.h"

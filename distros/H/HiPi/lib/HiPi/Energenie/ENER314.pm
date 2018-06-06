@@ -21,7 +21,7 @@ use Time::HiRes;
 __PACKAGE__->create_accessors( qw( device signal_d0_pin signal_d1_pin signal_d2_pin signal_d3_pin
                                    mode_select_pin mode_enable_pin ) );
 
-our $VERSION ='0.71';
+our $VERSION ='0.72';
 
 sub new {
     my( $class, %userparams ) = @_;
@@ -101,7 +101,9 @@ sub switch_ook_socket {
 }
 
 sub DESTROY {
-    $_[0]->device( undef );
+    my $self = shift;
+    $self->SUPER::DESTROY;
+    $self->device( undef );
 } 
 
 1;

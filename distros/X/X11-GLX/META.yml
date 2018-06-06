@@ -6,6 +6,7 @@ build_requires:
   FindBin: '0'
   Log::Any::Adapter: '0'
   Log::Any::Adapter::TAP: '0'
+  OpenGL: '0'
   POSIX: '0'
   Test::More: '0'
   Try::Tiny: '0'
@@ -27,7 +28,6 @@ requires:
   Exporter: '0'
   Log::Any: '0'
   Moo: '2'
-  OpenGL: '0'
   Scalar::Util: '0'
   X11::Xlib: '0.11'
   X11::Xlib::Opaque: '0'
@@ -39,4 +39,4 @@ requires:
 resources:
   bugtracker: https://github.com/nrdvana/perl-X11-GLX/issues
   repository: https://github.com/nrdvana/perl-X11-GLX.git
-version: '0.03'
+version: '0.05'

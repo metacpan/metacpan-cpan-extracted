@@ -12,6 +12,7 @@ use lib dirname( __FILE__ ) . '/lib';
 
 use MyManager;
 use MyUtils;
+use MyLogger;
 
 use_ok 'OTRS::OPM::Installer';
 
@@ -27,6 +28,7 @@ my $installer = OTRS::OPM::Installer->new(
     manager      => MyManager->new, 
     otrs_version => $version,
     utils_otrs   => MyUtils->new,
+    logger       => MyLogger->new,
 );
 
 # package already installed
@@ -35,7 +37,7 @@ eval {
     $installed = $installer->install( 'AccountedTimeInOverview' );
     1;
 } or $installed = $@;
-is $installed, undef;
+is $installed, 1, 'package already installed';
 
 # package has to be installed
 my $got_installed;
@@ -43,7 +45,7 @@ eval {
     $got_installed = $installer->install( 'ActionDynamicFieldSet' );
     1;
 } or $got_installed = $@;
-is $got_installed, 1;
+is $got_installed, 1, 'package got installed';
 
 # package opm is invalid
 my $error_msg;
@@ -52,7 +54,7 @@ eval {
     1;
 } or $error_msg = $@; 
 
-like $error_msg, qr/Cannot parse .*?:/;
+like $installer->logger->log, qr/Cannot parse .*?:/, 'OPM is invalid';
 
 # no package (.opm) found
 eval {
@@ -60,7 +62,7 @@ eval {
     1;
 } or $error_msg = $@; 
 
-like $error_msg, qr/Could not find a .opm file for NotFound \(OTRS version $version\)/;
+like $installer->logger->log, qr/Could not find a .opm file for NotFound \(OTRS version $version\)/, 'No opm found';
 
 # install from URL
 my $installed_from_url = 1;
@@ -68,6 +70,6 @@ eval {
     $installed_from_url = $installer->install( $repo . '/AccountedTimeInOverview-6.0.1.opm' );
     1;
 } or $installed_from_url = $@;
-is $installed_from_url, undef;
+is $installed_from_url, 1, 'installed from url';
 
 done_testing();

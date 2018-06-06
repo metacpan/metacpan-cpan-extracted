@@ -1,5 +1,10 @@
 Revision history for IO-Async-SSL
 
+0.22    2018-06-06 12:01:54
+        [BUGFIXES]
+         * Increase IO::Socket::SSL version dependency to 2.003 due to
+           important bugfixes (RT#125220)
+
 0.21    2017-11-01 11:46:00
         [BUGFIXES]
          * Detect early failures of IO::Socket::SSL->SSL_start such as bad

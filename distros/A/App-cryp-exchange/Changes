@@ -1,3 +1,20 @@
+0.004   2018-06-06 (PERLANCAR)
+
+	[REMOVED]
+
+        - Remove cryptopia for now because WebService::Cryptopia's
+	  api_private() doesn't seem to work.
+
+	[NEW FEATURES]
+
+        - Add exchange API function list_balances() and CLI subcommand
+	  ls-balances.
+
+	[ETC]
+
+        - [doc] Add note about extra arguments to new().
+
+
 0.003   2018-05-10 (PERLANCAR)
 
 	- Rename bitcoin_indonesia to indodax.

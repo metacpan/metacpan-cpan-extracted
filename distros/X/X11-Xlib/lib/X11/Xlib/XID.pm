@@ -4,6 +4,9 @@ use warnings;
 use Carp;
 use X11::Xlib;
 
+# All modules in dist share a version
+BEGIN { our $VERSION= $X11::Xlib::VERSION; }
+
 sub new {
     my $class= shift;
     my %args= (@_ == 1 && ref $_[0] eq 'HASH')? %{$_[0]} : @_;

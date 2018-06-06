@@ -9,11 +9,10 @@
 
 #include "sockets_kernel_abstract.h"
 
-#include <memory>
-#include <string>
-
 #include "../algs.h"
+#include <string>
 #include "../threads.h"
+#include "../smart_pointers.h"
 #include "../uintn.h"
 
 
@@ -270,7 +269,7 @@ namespace dlib
         );
 
         int accept (
-            std::unique_ptr<connection>& new_connection,
+            scoped_ptr<connection>& new_connection,
             unsigned long timeout = 0
         );
 
@@ -325,13 +324,13 @@ namespace dlib
     );
 
     int create_listener (
-        std::unique_ptr<listener>& new_listener,
+        scoped_ptr<listener>& new_listener,
         unsigned short port,
         const std::string& ip = ""
     );
 
     int create_connection ( 
-        std::unique_ptr<connection>& new_connection,
+        scoped_ptr<connection>& new_connection,
         unsigned short foreign_port, 
         const std::string& foreign_ip, 
         unsigned short local_port = 0,

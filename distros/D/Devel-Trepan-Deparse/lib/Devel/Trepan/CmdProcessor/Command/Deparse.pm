@@ -1,18 +1,26 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2014-2015 Rocky Bernstein <rocky@cpan.org>
+# Copyright (C) 2014-2015, 2018 Rocky Bernstein <rocky@cpan.org>
 
 use rlib '../../../..';
 
+
 use warnings; no warnings 'redefine';
-use English qw( -no_match_vars );
 use B;
 use B::DeparseTree;
 use B::DeparseTree::Printer; # qw(short_str);
+use Data::Printer;
 
 package Devel::Trepan::CmdProcessor::Command::Deparse;
+
+
+use Scalar::Util qw(looks_like_number);
 use English qw( -no_match_vars );
-use Devel::Trepan::DB::LineCache;
 use Getopt::Long qw(GetOptionsFromArray);
+Getopt::Long::Configure("pass_through");
+
+use B::DeparseTree::Fragment;
+use Devel::Trepan::Deparse;
+use Devel::Trepan::DB::LineCache;
 
 use constant CATEGORY   => 'data';
 use constant SHORT_HELP => 'Deparse source code via B::DeparseTree';
@@ -22,11 +30,10 @@ use constant NEED_STACK => 0;
 
 
 use Devel::Trepan::CmdProcessor::Command qw(@CMD_ISA @CMD_VARS set_name);
-use vars qw(@ISA);
 
 use strict;
 
-use vars qw(@ISA); @ISA = @CMD_ISA;
+use vars qw(@ISA @EXPORT);
 @ISA = qw(Devel::Trepan::CmdProcessor::Command);
 
 use vars @CMD_VARS;  # Value inherited from parent
@@ -38,7 +45,8 @@ our $NAME = set_name();
 our $HELP = <<'HELP';
 =pod
 
-B<deparse> [I<address options>] [0xOP-address | . ]  [dump | tree]
+B<deparse> [I<address options>] [0xOP-address | . ]
+
 B<deparse> [I<B::DeparseTree-options>] {I<filename> | I<subroutine>}
 
 In the first form with an OP address, "," or no arguments, deparse
@@ -52,14 +60,14 @@ shows information for that file or function.
 
 B::DeparseTree options:
 
-    -d  Output data values using Data::Dumper
-    -l  Add '# line' comment
-    -a  Add 'OP addresses in '# line' comment
-    -P  Disable prototype checking
-    -q  Expand double-quoted strings
-
-Options
-
+    -t  | --tree        Show full optree
+    -l  | --line        Add '# line' comment
+          --offsets     show all offsets
+    -a  | --address     Add 'OP addresses in '# line' comment
+    -p  | --parent <n>  Show parent text to level <n>
+    -q  | --quote       Expand double-quoted strings
+    -d  | --debug       Show debug information
+    -h  | --help        run 'help deparse' (this text)
 
 
 Deparse Perl source code using L<B::DeparseTree>.
@@ -99,16 +107,20 @@ sub complete($$)
 sub parse_options($$)
 {
     my ($self, $args) = @_;
-    my @opts = ();
+    $Getopt::Long::autoabbrev = 1;
+    my $opts = {};
     my $result =
 	&GetOptionsFromArray($args,
-			     '-d'  => sub {push(@opts, '-d') },
-			     '-l'  => sub {push(@opts, '-l') },
-			     '-P'  => sub {push(@opts, '-P') },
-			     '-a'  => sub {push(@opts, '-a') },
-			     '-q'  => sub {push(@opts, '-q') }
+			     'h|help'      => \$opts->{'help'},
+			     't|tree'      => \$opts->{'tree'},
+			     'l|line'      => \$opts->{'line'},
+			     'offsets'     => \$opts->{'offsets'},
+			     'p|parent:i'  => \$opts->{'parent'},
+			     'a|address'   => \$opts->{'address'},
+			     'q|quote'     => \$opts->{'quote'},
+			     'debug'       => \$opts->{'debug'}
         );
-    @opts;
+    $opts;
 }
 
 # Elide string with ... if it is too long, and
@@ -139,61 +151,19 @@ sub address_options($$$)
 
 }
 
-sub get_addr($$)
+# FIXME combine with Command::columnize_commands
+use Array::Columnize;
+sub columnize_addrs($$)
 {
-    my ($deparse, $addr) = @_;
-    return unless $addr;
-    my $op_info = $deparse->{optree}{$addr};
-    if ($op_info) {
-	# use Data::Printer; Data::Printer::p $op_info;
-	# my $text = $deparse->indent_info($op_info);
-	return $op_info;
-    }
-    return undef;
-}
-
-sub get_prev_addr($$);
-
-sub get_prev_addr($$) {
-    my ($deparse, $op_info) = @_;
-
-    return undef unless $op_info && $op_info->{parent};
-    my $parent_addr = $op_info->{parent};
-    my $parent_info = $deparse->{optree}{$parent_addr};
-    return undef unless $parent_info;
-    my @body = @{$parent_info->{body}};
-    return undef unless @body;
-    my $prev_info = shift @body;
-    while (@body) {
-	return $prev_info if ($body[0] == $op_info);
-	$prev_info = shift @body;
-    }
-    return undef;
-}
-
-# Print Perl text, possibly syntax highlighted.
-sub pmsg($$$)
-{
-    my ($proc, $text,$short) = @_;
-    $text = B::DeparseTree::Printer::short_str($text, $proc->{settings}{maxwidth}) if $short;
-    $text = Devel::Trepan::DB::LineCache::highlight_string($text)
-	if $proc->{settings}{highlight};
-    $proc->msg($text, {unlimited => 1});
-}
-
-# Print Perl text, possibly syntax highlighted.
-# We add leader info which may have op addresses
-# if desired
-sub pmsg_info($$$$)
-{
-    my ($proc, $options, $leader, $info) = @_;
-    return unless $info;
-    my $text = $info->{text};
-    if (grep($_ eq '-a', @{$options})) {
-	$leader = sprintf "OP: 0x%0x $leader", ${$info->{op}};
-    }
-    $proc->msg("# ${leader}...") if $leader;
-    pmsg($proc, $text, 1);
+    my ($proc, $commands) = @_;
+    my $width = $proc->{settings}->{maxwidth};
+    my $r = Array::Columnize::columnize($commands,
+                                       {displaywidth => $width,
+                                        colsep => '    ',
+                                        ljust => 1,
+                                        lineprefix => '  '});
+    chomp $r;
+    return $r;
 }
 
 # This method runs the command
@@ -202,8 +172,15 @@ sub run($$)
     my ($self, $args) = @_;
     my @args     = @$args;
     @args = splice(@args, 1, scalar(@args), -2);
-    my @options = parse_options($self, \@args);
+    my $options = parse_options($self, \@args);
+
     my $proc     = $self->{proc};
+    if ($options->{'help'}) {
+	my $help_cmd = $proc->{commands}{help};
+	$help_cmd->run( ['help', 'deparse'] );
+	return;
+    }
+
     my $filename = $proc->{list_filename};
     my $frame    = $proc->{frame};
     my $funcname = $proc->{frame}{fn};
@@ -244,32 +221,90 @@ sub run($$)
 	return;
     }
 
+    if ($options->{'tree'} || $options->{'offsets'}) {
+	my $deparse = B::DeparseTree->new();
+	if ($funcname eq "DB::DB") {
+	    $funcname = "main::main";
+	}
+	$deparse->coderef2info(\&$funcname);
+	if ($options->{'tree'}) {
+	    Data::Printer::p $deparse->{optree};
+	} elsif ($options->{'offsets'}) {
+	    my @addrs = sort keys %{$deparse->{optree}}, "\n";
+	    @addrs = map sprintf("0x%x", $_), @addrs;
+	    my $msg = columnize_addrs($proc, \@addrs);
+	    $proc->section("Addresses in $funcname");
+	    $proc->msg($msg);
+	}
+	return;
+    }
+
     my $text;
     # FIXME: we assume func below, add parse options like filename, and
     if ($want_runtime_position) {
+	# FIXME: ideally the variable $deparse would be internal only
+	# to deparse_offset However some branches need $deparse is
+	# used for other purposes rather than duplicate this code, it
+	# is here once, on the most likely branches it is not used.
 	my $deparse = B::DeparseTree->new();
+
 	if ($addr) {
-	    if ($funcname eq "DB::DB") {
-		$deparse->main2info;
-	    } else {
-		$deparse->coderef2info(\&$funcname);
+	    my $op_info = deparse_offset($funcname, $addr);
+	    if (!$op_info) {
+		$proc->errmsg(sprintf("Can't find info for op at 0x%x", $addr));
+		return;
 	    }
-	    my ($op_info) = get_addr($deparse, $addr);
+	    if ($want_prev_position) {
+		$op_info = get_prev_addr_info($op_info);
+	    }
 	    if ($op_info) {
-		my $parent_info = get_addr($deparse, $op_info->{parent});
-		if ($want_prev_position) {
-		    my $prev_info = get_prev_addr($deparse, $op_info);
-		    pmsg_info($proc, \@options, "called location", $prev_info);
-		    pmsg_info($proc, \@options, 'code to be run after function return',
-				$op_info);
-		    pmsg_info($proc, \@options, 'contained in', $parent_info);
+		my $parent_count = $options->{parent};
+		if (looks_like_number($options->{parent})) {
+		    my $maxwidth = $proc->{settings}->{maxwidth};
+		    my $sep = ' -' x ($maxwidth / 2 > 20 ? 20 : $maxwidth / 2);
+		    for (my $i=0; $i <= $parent_count && $op_info; $i++) {
+			$proc->msg($proc->bolden(sprintf("%02d %s:", $i, $op_info->{type})));
+			pmsg($proc, $op_info->{text});
+			$op_info = get_parent_addr_info($op_info);
+			$proc->msg($sep) if $i <= ($parent_count-1) && $op_info;
+		    }
+		    return;
+		}
+
+		my $parent_info = get_parent_addr_info($op_info);
+		if ($op_info->{parent}) {
+		    if ($options->{debug}) {
+			use Data::Printer;
+			p $op_info ;
+			$proc->msg('- -' x 20);
+			p $parent_info;
+		    }
+		    my $op = $op_info->{op};
+
+		    my $mess = '';
+		    if ($addr != $op_info->{addr}) {
+			$mess .= "a subchild of ";
+		    }
+
+		    $mess .= $op_info->{type};
+
+		    if ($op->can('name')) {
+			$mess .= sprintf(', %s ', $op->name);
+		    } else {
+			$mess .= ', '
+		    }
+		    if ($proc->{op_addr} and $addr == $proc->{op_addr}) {
+			$mess .= sprintf("%s\n\tat address 0x%x:", $op, $proc->{op_addr});
+		    }
+		    $proc->msg($mess);
+		    my $extract_texts = extract_node_info($op_info);
+		    if ($extract_texts) {
+			pmsg($proc, join("\n", @$extract_texts))
+		    } else {
+			pmsg($proc, $op_info->{text});
+		    }
 		} else {
-		    my $mess =
-			($proc->{op_addr} && $addr == $proc->{op_addr}) ?
-			'code to be run next' :
-			sprintf("code at address 0x%x", $addr);
-		    pmsg_info($proc, \@options, $mess, $op_info);
-		    pmsg_info($proc, \@options, 'contained in', $parent_info);
+		    pmsg($proc, $op_info->{text});
 		}
 		address_options($proc, $op_info, $args[1]) if $args[1];
 		return;
@@ -280,20 +315,18 @@ sub run($$)
 	    return;
 	} elsif (scalar @args >= 1 and ($args[0]) =~ /^@?(0x[0-9a-fA-F]+)/) {
 	    my $addr = hex($1);
-	    my $coderef = \&$funcname;
-	    my $info = $deparse->coderef2info($coderef);
-	    my ($op_info, $mess) = get_addr($deparse, hex($addr));
+	    my ($op_info) = deparse_offset($funcname, $addr);
 	    if ($op_info) {
 		if (scalar(@args) == 2 ) {
 		    address_options($proc, $op_info, $args[1])
 		} else {
-		    my $parent_info = get_addr($deparse, $op_info->{parent});
+		    my $parent_info = deparse_offset($funcname, $op_info->{parent});
 		    if ($parent_info) {
-			pmsg_info($proc, \@options, '', $op_info);
-			pmsg_info($proc, \@options, ' contained in', $parent_info);
+			pmsg_info($proc, $options, '', $op_info);
+			pmsg_info($proc, $options, ' contained in', $parent_info);
 			return;
 		    }
-		    pmsg_info($proc, \@options, 'code to run next', $op_info);
+		    pmsg_info($proc, $options, 'code to run next', $op_info);
 		}
 		address_options($proc, $op_info, $args[1]) if $args[1];
 	    } else {
@@ -310,7 +343,12 @@ sub run($$)
 	    return;
 	}
     } else  {
-	my $options = join(',', @options);
+	my $deparse_opts='';
+	foreach my $opt ('dumper', 'line', 'address') {
+	    if ($options->{$opt}) {
+		$deparse_opts .= ('-' . substr($deparse_opts, 0, 1))
+	    }
+	}
 	if (!-r $filename) {
 	    $proc->errmsg("No readable perl script: " . $filename)
 	} else {

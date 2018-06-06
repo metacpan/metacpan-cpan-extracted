@@ -20,13 +20,13 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object represents a set of integers which is partitioned into
                 a number of disjoint subsets.  It supports the two fundamental operations
-                of finding which subset a particular integer belongs to as well as
+                of finding which subset a particular integer belongs to as well as 
                 merging subsets.
         !*/
     public:
 
         void clear (
-        ) noexcept;
+        );
         /*!
             ensures
                 - #size() == 0
@@ -44,29 +44,29 @@ namespace dlib
                       (i.e. this object contains new_size subsets, each containing exactly one element)
         !*/
 
-        size_t size (
-        ) const noexcept;
+        unsigned long size (
+        ) const;
         /*!
             ensures
                 - returns the total number of integer elements represented
-                  by this object.
+                  by this object.  
         !*/
 
         unsigned long find_set (
-            unsigned long item
+            unsigned long item 
         ) const;
         /*!
             requires
                 - item < size()
             ensures
-                - Each disjoint subset can be represented by any of its elements (since
-                  the sets are all disjoint).  In particular, for each subset we define
-                  a special "representative element" which is used to represent it.
-                  Therefore, this function returns the representative element for the
+                - Each disjoint subset can be represented by any of its elements (since 
+                  the sets are all disjoint).  In particular, for each subset we define 
+                  a special "representative element" which is used to represent it.  
+                  Therefore, this function returns the representative element for the 
                   set which contains item.
                 - find_set(find_set(item)) == find_set(item)
                 - Note that if A and B are both elements of the same subset then we always
-                  have find_set(A) == find_set(B).
+                  have find_set(A) == find_set(B).  
         !*/
 
         unsigned long merge_sets (
@@ -87,6 +87,7 @@ namespace dlib
                   (i.e. merges the set's containing a and b)
                 - returns #find_set(a)
         !*/
+
     };
 
 // ----------------------------------------------------------------------------------------
@@ -94,3 +95,5 @@ namespace dlib
 }
 
 #endif // DLIB_DISJOINT_SUBsETS_ABSTRACT_Hh_
+
+

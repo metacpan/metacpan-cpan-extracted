@@ -19,7 +19,7 @@ use XSLoader;
 use Carp;
 use HiPi qw( :rpi :spi );
 
-our $VERSION ='0.71';
+our $VERSION ='0.72';
 
 __PACKAGE__->create_accessors( qw ( fh fno delay speed bitsperword ) );
 

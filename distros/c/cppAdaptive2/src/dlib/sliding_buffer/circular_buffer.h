@@ -26,11 +26,7 @@ namespace dlib
 
         circular_buffer()
         {
-        }
-
-        explicit circular_buffer(unsigned long s)
-        {
-            resize(s);
+            offset = 0;
         }
 
         void clear (
@@ -153,7 +149,7 @@ namespace dlib
     private:
         std::vector<T> data;
 
-        unsigned long offset = 0;
+        unsigned long offset;
     };
 
 // ----------------------------------------------------------------------------------------

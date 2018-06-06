@@ -2,7 +2,7 @@
 # Distribution : HiPi Modules for Raspberry Pi
 # File         : lib/HiPi/Class.pm
 # Description  : Base HiPi class module
-# Copyright    : Copyright (c) 2013-2017 Mark Dootson
+# Copyright    : Copyright (c) 2013-2018 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -14,8 +14,28 @@ package HiPi::Class;
 use strict;
 use warnings;
 use parent qw( Exporter );
+use HiPi;
 
-our $VERSION ='0.71';
+our $VERSION ='0.72';
+
+#-------------------------------------------------------------------
+# On Exit Handling
+#-------------------------------------------------------------------
+
+sub register_exit_method {
+    my($self, $method) = @_;
+    HiPi->register_exit_method($self, $method);
+}
+
+sub unregister_exit_method {
+    my ($self) = @_;
+    HiPi->unregister_exit_method( $self);
+}
+
+sub DESTROY {
+    my $self = shift;
+    HiPi->call_registered_exit_method( $self );
+}
 
 #-------------------------------------------------------------------
 # Object Constructor

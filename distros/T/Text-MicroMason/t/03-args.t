@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 use strict;
-use Test::More tests => 23;
+use Test::More tests => 24;
 
 use_ok 'Text::MicroMason';
 ok my $m = Text::MicroMason->new();
@@ -101,6 +101,24 @@ ENDSCRIPT
     is $m->execute( text => $scr_count, data => [] ), $res_count_0;
     is $m->execute( text => $scr_count, data => [ 1 ] ), $res_count_1;
     is $m->execute( text => $scr_count, data => [ 1 .. 2 ] ), $res_count_2;
+}
+
+######################################################################
+
+ARGS_BLOCK_WITH_COMMENT: {
+    my $scr_comment = <<'ENDSCRIPT';
+<%args>
+   $foo => 1  # A comment
+   $bar => 2  # Another comment
+</%args>
+<% $foo %> + <% $foo %> = <% $bar %>
+ENDSCRIPT
+    
+    my $res_comment = <<'ENSCRIPT';
+1 + 1 = 2
+ENSCRIPT
+
+    is $m->execute( text => $scr_comment ), $res_comment;
 }
 
 ######################################################################

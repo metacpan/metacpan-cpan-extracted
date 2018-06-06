@@ -260,6 +260,7 @@ sub _get_content {
         my $modbase = $self->module_base;
         
         my $content = get_template();
+        $content =~ s/REPLACE_PACKAGE_KEYWORK/package/g;
         $content =~ s/REPLACEMODULEBASE/$modbase/g;
         $content =~ s/REPLACENAME/$fontname/g;
         $content =~ s/REPLACEFONTCONTENT/$codeblock/;
@@ -325,7 +326,7 @@ sub get_template {
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
 
-package REPLACEMODULEBASE::REPLACENAME;
+REPLACE_PACKAGE_KEYWORK REPLACEMODULEBASE::REPLACENAME;
 
 #########################################################################################
 
@@ -334,7 +335,7 @@ use strict;
 use warnings;
 use parent qw( HiPi::Graphics::BitmapFont);
 
-our $VERSION ='0.71';
+our $VERSION ='0.72';
 
 REPLACEFONTCONTENT
 

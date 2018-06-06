@@ -1,4 +1,5 @@
 AUTHORS
+Build.PL
 Changes
 examples/auth.pl
 examples/devices.pl
@@ -33,6 +34,7 @@ examples/vol-upload.pl
 HACKING
 INSTALL
 lib/Sys/Virt.pm
+lib/Sys/Virt.xs
 lib/Sys/Virt/Domain.pm
 lib/Sys/Virt/DomainSnapshot.pm
 lib/Sys/Virt/Error.pm
@@ -46,15 +48,10 @@ lib/Sys/Virt/StoragePool.pm
 lib/Sys/Virt/StorageVol.pm
 lib/Sys/Virt/Stream.pm
 LICENSE
-Makefile.PL
-MANIFEST			This list of files
-MANIFEST.SKIP
-META.yml
-META.yml.PL
-MYMETA.json
-MYMETA.yml
+MANIFEST
 perl-Sys-Virt.spec
 perl-Sys-Virt.spec.PL
+prepare-release.sh
 README
 t/005-pod.t
 t/010-pod-coverage.t
@@ -69,4 +66,6 @@ t/500-storage-vols.t
 t/600-interfaces.t
 t/800-events.t
 typemap
-Virt.xs
+Makefile.PL
+META.yml
+META.json

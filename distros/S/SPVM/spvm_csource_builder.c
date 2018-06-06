@@ -467,23 +467,49 @@ char* SPVM_CSOURCE_BUILDER_get_type_name(int32_t basic_type_id, int32_t dimensio
   }
 }
 
-void SPVM_CSOURCE_BUILDER_build_sub_csource(SPVM_STRING_BUFFER* string_buffer, int32_t sub_id) {
+void SPVM_CSOURCE_BUILDER_build_package_csource(SPVM_STRING_BUFFER* string_buffer, int32_t package_id) {
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime();
-
   SPVM_COMPILER* compiler = runtime->compiler;
+  
+  SPVM_OP* op_package = SPVM_LIST_fetch(compiler->op_packages, package_id);
+  SPVM_PACKAGE* package = op_package->uv.package;
+  SPVM_LIST* op_subs = package->op_subs;
+  
+  // Head part - include and define
+  SPVM_CSOURCE_BUILDER_build_head(string_buffer);
+  
+  // Subroutine decrations
+  SPVM_STRING_BUFFER_add(string_buffer, "// Function Declarations\n");
+  {
+    int32_t sub_index;
+    for (sub_index = 0; sub_index < op_subs->length; sub_index++) {
+      SPVM_OP* op_sub = SPVM_LIST_fetch(op_subs, sub_index);
+      SPVM_SUB* sub = op_sub->uv.sub;
+      if (sub->have_compile_desc) {
+        SPVM_CSOURCE_BUILDER_build_sub_declaration(string_buffer, sub->id);
+        SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+      }
+    }
+  }
+  SPVM_STRING_BUFFER_add(string_buffer, "\n");
+  
+  // Subroutine implementations
+  SPVM_STRING_BUFFER_add(string_buffer, "// Function Implementations\n");
+  {
+    int32_t sub_index;
+    for (sub_index = 0; sub_index < op_subs->length; sub_index++) {
+      SPVM_OP* op_sub = SPVM_LIST_fetch(op_subs, sub_index);
+      SPVM_SUB* sub = op_sub->uv.sub;
+      if (sub->have_compile_desc) {
+        SPVM_CSOURCE_BUILDER_build_sub_implementation(string_buffer, sub->id);
+      }
+    }
+  }
+  SPVM_STRING_BUFFER_add(string_buffer, "\n");
+}
 
-  SPVM_OP* op_sub = SPVM_LIST_fetch(compiler->op_subs, sub_id);
-  SPVM_SUB* sub = op_sub->uv.sub;
+void SPVM_CSOURCE_BUILDER_build_head(SPVM_STRING_BUFFER* string_buffer) {
 
-  // Subroutine return type
-  SPVM_TYPE* sub_return_type = sub->op_return_type->uv.type;
-  
-  int32_t sub_return_basic_type_id = sub_return_type->basic_type->id;
-  
-  int32_t sub_return_type_dimension = sub_return_type->dimension;
-  
-  assert(sub->have_compile_desc);
-  
   // Include header
   SPVM_STRING_BUFFER_add(string_buffer, "#ifndef SPVM_CSOURCE_BUILDER_H\n");
   SPVM_STRING_BUFFER_add(string_buffer, "#define SPVM_CSOURCE_BUILDER_H\n");
@@ -534,6 +560,24 @@ void SPVM_CSOURCE_BUILDER_build_sub_csource(SPVM_STRING_BUFFER* string_buffer, i
   SPVM_STRING_BUFFER_add(string_buffer, "} while (0)\\\n");
   SPVM_STRING_BUFFER_add(string_buffer, "\n");
   SPVM_STRING_BUFFER_add(string_buffer, "#endif\n");
+}
+
+void SPVM_CSOURCE_BUILDER_build_sub_declaration(SPVM_STRING_BUFFER* string_buffer, int32_t sub_id) {
+  SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime();
+
+  SPVM_COMPILER* compiler = runtime->compiler;
+
+  SPVM_OP* op_sub = SPVM_LIST_fetch(compiler->op_subs, sub_id);
+  SPVM_SUB* sub = op_sub->uv.sub;
+
+  // Subroutine return type
+  SPVM_TYPE* sub_return_type = sub->op_return_type->uv.type;
+  
+  int32_t sub_return_basic_type_id = sub_return_type->basic_type->id;
+  
+  int32_t sub_return_type_dimension = sub_return_type->dimension;
+  
+  assert(sub->have_compile_desc);
   
   // Subroutine name
   const char* sub_abs_name = sub->abs_name;
@@ -586,6 +630,29 @@ void SPVM_CSOURCE_BUILDER_build_sub_csource(SPVM_STRING_BUFFER* string_buffer, i
 
   // Arguments
   SPVM_STRING_BUFFER_add(string_buffer, "(SPVM_ENV* env, SPVM_VALUE* args)");
+}
+
+void SPVM_CSOURCE_BUILDER_build_sub_implementation(SPVM_STRING_BUFFER* string_buffer, int32_t sub_id) {
+  SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime();
+
+  SPVM_COMPILER* compiler = runtime->compiler;
+
+  SPVM_OP* op_sub = SPVM_LIST_fetch(compiler->op_subs, sub_id);
+  SPVM_SUB* sub = op_sub->uv.sub;
+
+  // Subroutine return type
+  SPVM_TYPE* sub_return_type = sub->op_return_type->uv.type;
+  
+  int32_t sub_return_basic_type_id = sub_return_type->basic_type->id;
+  
+  int32_t sub_return_type_dimension = sub_return_type->dimension;
+  
+  assert(sub->have_compile_desc);
+  
+  // Subroutine name
+  const char* sub_abs_name = sub->abs_name;
+
+  SPVM_CSOURCE_BUILDER_build_sub_declaration(string_buffer, sub_id);
   
   // Block start
   SPVM_STRING_BUFFER_add(string_buffer, " {\n");
@@ -2108,16 +2175,44 @@ void SPVM_CSOURCE_BUILDER_build_sub_csource(SPVM_STRING_BUFFER* string_buffer, i
           SPVM_STRING_BUFFER_add(string_buffer, "  }\n");
         }
         else if (decl_sub_return_type_dimension == 0 && decl_sub_return_basic_type_id == SPVM_BASIC_TYPE_C_ID_INT) {
-          SPVM_STRING_BUFFER_add(string_buffer, "  {");
-          SPVM_STRING_BUFFER_add(string_buffer, "    SPVM_VALUE_int value = env->call_int_sub(env, call_sub_id");
-          SPVM_STRING_BUFFER_add(string_buffer, ", ");
-          if (decl_sub_args_length > 0) {
-            SPVM_STRING_BUFFER_add(string_buffer, "call_sub_args");
+          SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
+          // Subroutine inline expantion in same package
+          if (decl_sub->op_package->uv.package->id == sub->op_package->uv.package->id && decl_sub->have_compile_desc) {
+            SPVM_STRING_BUFFER_add(string_buffer, "    SPVM_VALUE_int value = ");
+            SPVM_STRING_BUFFER_add(string_buffer, "SPVM_BUILD_PRECOMPILE_");
+            SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_sub->abs_name);
+            {
+              int32_t index = string_buffer->length - strlen(decl_sub->abs_name);
+              
+              while (index < string_buffer->length) {
+                if (string_buffer->buffer[index] == ':') {
+                  string_buffer->buffer[index] = '_';
+                }
+                index++;
+              }
+            }
+            SPVM_STRING_BUFFER_add(string_buffer, "(env,");
+            if (decl_sub_args_length > 0) {
+              SPVM_STRING_BUFFER_add(string_buffer, "call_sub_args");
+            }
+            else {
+              SPVM_STRING_BUFFER_add(string_buffer, "NULL");
+            }
+            SPVM_STRING_BUFFER_add(string_buffer, ");\n");
           }
+          // Call subroutine
           else {
-            SPVM_STRING_BUFFER_add(string_buffer, "NULL");
+            SPVM_STRING_BUFFER_add(string_buffer, "    SPVM_VALUE_int value = env->call_int_sub(env, call_sub_id");
+            SPVM_STRING_BUFFER_add(string_buffer, ", ");
+            if (decl_sub_args_length > 0) {
+              SPVM_STRING_BUFFER_add(string_buffer, "call_sub_args");
+            }
+            else {
+              SPVM_STRING_BUFFER_add(string_buffer, "NULL");
+            }
+            SPVM_STRING_BUFFER_add(string_buffer, ");\n");
           }
-          SPVM_STRING_BUFFER_add(string_buffer, ");\n");
+          
           SPVM_STRING_BUFFER_add(string_buffer, "    if (env->get_exception(env)) {\n");
           SPVM_STRING_BUFFER_add(string_buffer, "      croak_flag = 1;\n");
           SPVM_STRING_BUFFER_add(string_buffer, "    }\n");

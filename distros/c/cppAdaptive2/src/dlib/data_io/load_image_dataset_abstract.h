@@ -51,9 +51,8 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns true if we are supposed to skip images that don't have any
-                  non-ignored boxes to load when loading an image dataset using
-                  load_image_dataset().
+                - returns true if we are supposed to skip images that don't have any boxes
+                  to load when loading an image dataset using load_image_dataset().
         !*/
 
         image_dataset_file boxes_match_label(
@@ -221,11 +220,10 @@ namespace dlib
               dlib/image_processing/generic_image.h.
         ensures
             - This function has essentially the same behavior as the above
-              load_image_dataset() routines, except here we output to a vector of
+              load_image_dataset() routines, except here we out put to a vector of
               mmod_rects instead of rectangles.  In this case, both ignore and non-ignore
               rectangles go into object_locations since mmod_rect has an ignore boolean
-              field that records the ignored/non-ignored state of each rectangle.  We also store 
-              a each box's string label into the mmod_rect::label field as well.
+              field that records the ignored/non-ignored state of each rectangle.
     !*/
 
 // ----------------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 package Perinci::CmdLine::cryp;
 
-our $DATE = '2018-05-05'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-06-05'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -48,9 +48,9 @@ sub hook_config_file_section {
 
     if ($section_name =~ m!\Aarbit-strategy\s*/\s*([^/]++)\z!) {
         my $strategy = $1;
-        $r->{_cryp}{arbit_strategy}{$strategy} //= {};
+        $r->{_cryp}{arbit_strategies}{$strategy} //= {};
         for (keys %$section_content) {
-            $r->{_cryp}{arbit_strategy}{$strategy}{$_} =
+            $r->{_cryp}{arbit_strategies}{$strategy}{$_} =
                 $section_content->{$_};
         }
         return [204];
@@ -74,7 +74,7 @@ Perinci::CmdLine::cryp - Perinci::CmdLine::Lite subclass to read entities from c
 
 =head1 VERSION
 
-This document describes version 0.005 of Perinci::CmdLine::cryp (from Perl distribution Perinci-CmdLine-cryp), released on 2018-05-05.
+This document describes version 0.006 of Perinci::CmdLine::cryp (from Perl distribution Perinci-CmdLine-cryp), released on 2018-06-05.
 
 =head1 HOMEPAGE
 

@@ -1,7 +1,7 @@
 package App::cryp::Exchange::gdax;
 
-our $DATE = '2018-05-10'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-06-06'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -45,11 +45,11 @@ sub data_reverse_canonical_currencies {
 sub list_pairs {
     my ($self, %args) = @_;
 
-    my $res = $self->{_client}->public_request(GET => "/products");
-    return $res unless $res->[0] == 200;
+    my $apires = $self->{_client}->public_request(GET => "/products");
+    return $apires unless $apires->[0] == 200;
 
     my @res;
-    for (@{ $res->[2] }) {
+    for (@{ $apires->[2] }) {
         my $pair;
         if ($args{native}) {
             $pair = $self->to_native_pair($_->{id});
@@ -75,13 +75,33 @@ sub get_order_book {
 
     my $pair = $self->to_native_pair($args{pair});
 
-    my $res = $self->{_client}->public_request(GET => "/products/$pair/book?level=2");
-    return $res unless $res->[0] == 200;
+    my $apires = $self->{_client}->public_request(GET => "/products/$pair/book?level=2");
+    return $apires unless $apires->[0] == 200;
 
-    $res->[2]{buy}  = delete $res->[2]{bids};
-    $res->[2]{sell} = delete $res->[2]{asks};
+    $apires->[2]{buy}  = delete $apires->[2]{bids};
+    $apires->[2]{sell} = delete $apires->[2]{asks};
 
-    [200, "OK", $res->[2]];
+    [200, "OK", $apires->[2]];
+}
+
+sub list_balances {
+    my ($self, %args) = @_;
+
+    my $apires = $self->{_client}->private_request(GET => "/accounts");
+    return $apires unless $apires->[0] == 200;
+
+    my @res;
+    for (@{ $apires->[2] }) {
+        my $rec = {
+            currency  => $self->to_canonical_currency($_->{currency}),
+            available => $_->{available},
+            hold      => $_->{hold},
+            total     => $_->{balance},
+        };
+        push @res, $rec;
+    }
+
+    [200, "OK", \@res];
 }
 
 1;
@@ -99,7 +119,7 @@ App::cryp::Exchange::gdax - Interact with Bitcoin Indonesia
 
 =head1 VERSION
 
-This document describes version 0.003 of App::cryp::Exchange::gdax (from Perl distribution App-cryp-exchange), released on 2018-05-10.
+This document describes version 0.004 of App::cryp::Exchange::gdax (from Perl distribution App-cryp-exchange), released on 2018-06-06.
 
 =for Pod::Coverage ^(.+)$
 

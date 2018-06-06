@@ -2,6 +2,12 @@
 use Test::Mojo::Session;
 use Test::More;
 use Mojolicious::Lite;
+use utf8;
+
+use_ok('Mojolicious::Plugin::Notifications::HTML', 'notify_html');
+
+is(notify_html('info','test'),qq!<div class="notify notify-info">test</div>\n!);
+is(notify_html('info',q!Das wär' "toll"!),qq!<div class="notify notify-info">Das wär&#39; &quot;toll&quot;</div>\n!);
 
 my $t = Test::Mojo::Session->new;
 

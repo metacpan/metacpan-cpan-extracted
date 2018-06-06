@@ -1,3 +1,13 @@
+0.009   2018-06-06 (PERLANCAR)
+
+	- Add schema: cryptoexchange::currency_pair.
+
+
+0.008   2018-06-06 (PERLANCAR)
+
+	- Add schemas: fiat_currency, fiat_or_cryptocurrency.
+
+
 0.007   2018-05-29 (PERLANCAR)
 
         - [build] Rebuild with update DZP:Sah::Schemas to add prereqs to coerce

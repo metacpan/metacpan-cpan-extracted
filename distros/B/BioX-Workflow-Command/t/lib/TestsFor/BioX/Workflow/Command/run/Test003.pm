@@ -1,5 +1,7 @@
 package TestsFor::BioX::Workflow::Command::run::Test003;
 
+use strict;
+use warnings FATAL => 'all';
 use Test::Class::Moose;
 use Cwd;
 use FindBin qw($Bin);
@@ -107,7 +109,7 @@ sub test_001 {
 
     $test->local_attr->sample( $test->samples->[0] );
     $test->sample( $test->samples->[0] );
-    $text = $test->eval_process;
+    $text = $test->eval_process($test->local_attr);
 
     is_deeply(
         $test->samples,
@@ -128,7 +130,7 @@ sub test_001 {
 
     $test->local_attr->sample( $test->samples->[0] );
     $test->sample( $test->samples->[0] );
-    $text = $test->eval_process;
+    $text = $test->eval_process($test->local_attr);
     is( $text,
             "R2: SAMPLE: Sample_01"
           . " INDIR: $test_dir/data/processed/Sample_01/t3_rule1"
@@ -144,7 +146,7 @@ sub test_001 {
 
     $test->local_attr->sample( $test->samples->[0] );
     $test->sample( $test->samples->[0] );
-    $text = $test->eval_process;
+    $text = $test->eval_process($test->local_attr);
     is( $text,
             "R3: SAMPLE: Sample_01 "
           . "INDIR: $test_dir/data/raw "

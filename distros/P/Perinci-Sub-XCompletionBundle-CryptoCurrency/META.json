@@ -35,7 +35,8 @@
          "requires" : {
             "Complete::Util" : "0.57",
             "CryptoCurrency::Catalog" : "20180308",
-            "CryptoExchange::Catalog" : "0",
+            "CryptoExchange::Catalog" : "20180510",
+            "Locale::Codes::Currency_Codes" : "0",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -62,7 +63,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Sub-XCompletionBundle-CryptoCurrency"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

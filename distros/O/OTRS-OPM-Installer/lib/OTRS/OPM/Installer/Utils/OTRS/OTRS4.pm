@@ -1,5 +1,5 @@
 package OTRS::OPM::Installer::Utils::OTRS::OTRS4;
-$OTRS::OPM::Installer::Utils::OTRS::OTRS4::VERSION = '0.03';
+$OTRS::OPM::Installer::Utils::OTRS::OTRS4::VERSION = '0.04';
 # ABSTRACT: helper functions for OTRS4 (and higher)
 
 use strict;
@@ -51,7 +51,7 @@ OTRS::OPM::Installer::Utils::OTRS::OTRS4 - helper functions for OTRS4 (and highe
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 
@@ -59,7 +59,7 @@ Renee Baecker <reneeb@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Renee Baecker.
+This software is Copyright (c) 2018 by Renee Baecker.
 
 This is free software, licensed under:
 

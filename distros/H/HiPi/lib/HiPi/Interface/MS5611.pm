@@ -17,7 +17,7 @@ use HiPi qw( :i2c :rpi :ms5611);
 use HiPi::RaspberryPi;
 use Carp;
 
-our $VERSION ='0.71';
+our $VERSION ='0.72';
 
 __PACKAGE__->create_accessors( qw( backend crc) );
 

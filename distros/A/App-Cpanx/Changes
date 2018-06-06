@@ -1,5 +1,12 @@
 Revision history for App::Cpanx
 
+0.08  Tue Jun  5 11:17:58 CDT 2018
+    - Display the actual curl command
+
+0.07  Tue Jun  5 02:14:19 CDT 2018
+    - Display version / %Config / %ENV / @INC
+    - Use same version of perl as the one that invoked the script
+
 0.06  Fri Jun  1 14:40:16 CDT 2018
     - Store $VERSION in the module
 

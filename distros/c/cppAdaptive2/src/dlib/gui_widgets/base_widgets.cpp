@@ -3,11 +3,10 @@
 #ifndef DLIB_BASE_WIDGETs_CPP_
 #define DLIB_BASE_WIDGETs_CPP_
 
-#include <iostream>
-#include <memory>
-
 #include "base_widgets.h"
 #include "../assert.h"
+#include <iostream>
+
 
 namespace dlib
 {
@@ -134,7 +133,7 @@ namespace dlib
 
     void button::
     set_main_font (
-        const std::shared_ptr<font>& f
+        const shared_ptr_thread_safe<font>& f
     )
     {
         auto_mutex M(m);
@@ -1399,7 +1398,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    size_t widget_group::
+    unsigned long widget_group::
     size (
     ) const 
     {  
@@ -1578,7 +1577,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    size_t popup_menu::
+    unsigned long popup_menu::
     size (
     ) const
     { 

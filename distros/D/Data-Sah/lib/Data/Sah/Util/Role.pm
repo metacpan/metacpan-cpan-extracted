@@ -1,7 +1,7 @@
 package Data::Sah::Util::Role;
 
-our $DATE = '2018-06-03'; # DATE
-our $VERSION = '0.891'; # VERSION
+our $DATE = '2018-06-05'; # DATE
+our $VERSION = '0.892'; # VERSION
 
 use 5.010;
 use strict 'subs', 'vars';
@@ -125,7 +125,7 @@ Data::Sah::Util::Role - Sah utility routines for roles
 
 =head1 VERSION
 
-This document describes version 0.891 of Data::Sah::Util::Role (from Perl distribution Data-Sah), released on 2018-06-03.
+This document describes version 0.892 of Data::Sah::Util::Role (from Perl distribution Data-Sah), released on 2018-06-05.
 
 =head1 DESCRIPTION
 

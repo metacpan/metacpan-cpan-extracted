@@ -43,8 +43,6 @@
             "IO::Handle" : "0",
             "IO::Pipe" : "0",
             "IO::Select" : "0",
-            "Moose" : "0",
-            "Moose::Util::TypeConstraints" : "0",
             "POSIX" : "0",
             "Scalar::Util" : "0",
             "Storable" : "0",
@@ -70,7 +68,7 @@
    "provides" : {
       "Parallel::WorkUnit" : {
          "file" : "lib/Parallel/WorkUnit.pm",
-         "version" : "1.118"
+         "version" : "1.201"
       }
    },
    "release_status" : "stable",
@@ -84,7 +82,7 @@
          "web" : "https://github.com/jmaslak/Parallel-WorkUnit"
       }
    },
-   "version" : "1.118",
+   "version" : "1.201",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

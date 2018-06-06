@@ -1,7 +1,7 @@
 package Sah::Schemas::CryptoCurrency;
 
-our $DATE = '2018-05-31'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2018-06-06'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 1;
 # ABSTRACT: Various Sah cryptocurrency schemas
@@ -18,7 +18,7 @@ Sah::Schemas::CryptoCurrency - Various Sah cryptocurrency schemas
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::Schemas::CryptoCurrency (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-05-31.
+This document describes version 0.009 of Sah::Schemas::CryptoCurrency (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-06-06.
 
 =head1 SAH SCHEMAS
 
@@ -46,6 +46,22 @@ L<CryptoExchange::Catalog>, e.g. GDAX, "BX Thailand", bx-thailand.
 Code/name/safename must be listed.
 
 Will be normalized to safename in lowercase.
+
+
+=item * L<fiat_currency|Sah::Schema::fiat_currency>
+
+Alias for currency::code.
+
+=item * L<fiat_or_cryptocurrency|Sah::Schema::fiat_or_cryptocurrency>
+
+Fiat currency code or cryptocurrency code, name, or safename.
+
+Either: a) a known fiat currency code (e.g. USD, GBP), or b) a known
+cryptocurrency code or name or safename (e.g. BTC, "Bitcoin Cash",
+ethereum-classic). Fiat currency code is checked against known codes in
+L<Locale::Codes::Currency_Codes>. Cryptocurrency code/name/safename is checked
+against catalog in L<CryptoCurrency::Catalog>. Cryptocurrency name/safename
+Will be normalized to code in uppercase.
 
 
 =back
