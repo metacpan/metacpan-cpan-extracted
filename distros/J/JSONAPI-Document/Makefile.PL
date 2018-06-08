@@ -27,10 +27,11 @@ my %WriteMakefileArgs = (
     "DBD::SQLite" => 0,
     "Test::DBIx::Class" => "0.52",
     "Test::MockModule" => 0,
+    "Test::MockObject" => 0,
     "Test::Most" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "1.5",
+  "VERSION" => "1.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,6 +47,7 @@ my %FallbackPrereqs = (
   "Moo" => 0,
   "Test::DBIx::Class" => "0.52",
   "Test::MockModule" => 0,
+  "Test::MockObject" => 0,
   "Test::Most" => 0,
   "Test::Pod" => 0
 );

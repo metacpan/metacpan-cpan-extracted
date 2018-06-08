@@ -1,18 +1,22 @@
 package Mojo::APNS;
-use feature 'state';
 use Mojo::Base 'Mojo::EventEmitter';
+
+use feature 'state';
 use Mojo::JSON 'encode_json';
 use Mojo::IOLoop;
+use Mojo::Promise;
+
 use constant FEEDBACK_RECONNECT_TIMEOUT => 5;
 use constant DEBUG => $ENV{MOJO_APNS_DEBUG} ? 1 : 0;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
-has key     => '';
-has cert    => '';
-has sandbox => 1;
+has key      => '';
+has cert     => '';
+has insecure => 0;
+has sandbox  => 1;
 
-has ioloop => sub { Mojo::IOLoop->singleton };
+has ioloop           => sub { Mojo::IOLoop->singleton };
 has _feedback_port   => 2196;
 has _gateway_port    => 2195;
 has _gateway_address => sub {
@@ -27,6 +31,77 @@ sub on {
   }
 
   $self->SUPER::on($event => @args);
+}
+
+sub send {
+  my $cb = ref $_[-1] eq 'CODE' ? pop : \&_default_handler;
+  my $self = shift;
+  $self->send_p(@_)->finally(sub { $self->$cb(shift || '') });
+  $self;
+}
+
+sub send_p {
+  my ($self, $device_token, $message, %args) = @_;
+  my $p    = Mojo::Promise->new;
+  my $data = {};
+
+  $data->{aps} = {alert => $message, badge => int(delete $args{badge} || 0)};
+
+  if (defined(my $sound = delete $args{sound})) {
+    $data->{aps}{sound} = $sound if length $sound;
+  }
+
+  if (defined(my $content_available = delete $args{content_available})) {
+    $data->{aps}{'content-available'} = $content_available if length $content_available;
+  }
+
+  $data->{custom} = \%args if %args;
+  $message = encode_json $data;
+
+  if (length $message > 256) {
+    my $length = length $message;
+    $p->reject("Too long message ($length)");
+    return $p;
+  }
+
+  $device_token =~ s/\s//g;
+  warn "[APNS:$device_token] <<< $message\n" if DEBUG;
+
+  $self->once(drain => sub { $p->resolve });
+  $self->_write([chr(0), pack('n', 32), pack('H*', $device_token), pack('n', length $message), $message]);
+
+  return $p;
+}
+
+sub _connect {
+  my ($self, $type, $cb) = @_;
+  my $port = $type eq 'gateway' ? $self->_gateway_port : $self->_feedback_port;
+
+  if (DEBUG) {
+    my $key = join ':', $self->_gateway_address, $port;
+    warn "[APNS:$key] <<< cert=@{[$self->cert]}\n" if DEBUG;
+    warn "[APNS:$key] <<< key=@{[$self->key]}\n"   if DEBUG;
+  }
+
+  Scalar::Util::weaken($self);
+  $self->{"${type}_stream_id"} ||= $self->ioloop->client(
+    address  => $self->_gateway_address,
+    port     => $port,
+    tls      => 1,
+    tls_cert => $self->cert,
+    tls_key  => $self->key,
+    $self->insecure ? (tls_verify => 0x00) : (),
+    sub {
+      my ($ioloop, $err, $stream) = @_;
+
+      $err and return $self->emit(error => "$type: $err");
+      $stream->on(close   => sub { delete $self->{"${type}_stream_id"} });
+      $stream->on(error   => sub { $self->emit(error => "$type: $_[1]") });
+      $stream->on(drain   => sub { $self->emit('drain'); });
+      $stream->on(timeout => sub { delete $self->{"${type}_stream_id"} });
+      $self->$cb($stream);
+    },
+  );
 }
 
 sub _connected_to_feedback_deamon_cb {
@@ -57,69 +132,6 @@ sub _connected_to_feedback_deamon_cb {
       }
     );
   };
-}
-
-sub send {
-  my $cb = ref $_[-1] eq 'CODE' ? pop : \&_default_handler;
-  my ($self, $device_token, $message, %args) = @_;
-  my $data = {};
-
-  $data->{aps} = {alert => $message, badge => int(delete $args{badge} || 0)};
-
-  if (defined(my $sound = delete $args{sound})) {
-    $data->{aps}{sound} = $sound if length $sound;
-  }
-
-  if (defined(my $content_available = delete $args{content_available})) {
-    $data->{aps}{'content-available'} = $content_available if length $content_available;
-  }
-
-  if (%args) {
-    $data->{custom} = \%args;
-  }
-
-  $message = encode_json $data;
-
-  if (length $message > 256) {
-    my $length = length $message;
-    return $self->$cb("Too long message ($length)");
-  }
-
-  $device_token =~ s/\s//g;
-  warn "[APNS:$device_token] <<< $message\n" if DEBUG;
-
-  $self->once(drain => sub { $self->$cb('') });
-  $self->_write([chr(0), pack('n', 32), pack('H*', $device_token), pack('n', length $message), $message]);
-}
-
-sub _connect {
-  my ($self, $type, $cb) = @_;
-  my $port = $type eq 'gateway' ? $self->_gateway_port : $self->_feedback_port;
-
-  if (DEBUG) {
-    my $key = join ':', $self->_gateway_address, $port;
-    warn "[APNS:$key] <<< cert=@{[$self->cert]}\n" if DEBUG;
-    warn "[APNS:$key] <<< key=@{[$self->key]}\n"   if DEBUG;
-  }
-
-  Scalar::Util::weaken($self);
-  $self->{"${type}_stream_id"} ||= $self->ioloop->client(
-    address  => $self->_gateway_address,
-    port     => $port,
-    tls      => 1,
-    tls_cert => $self->cert,
-    tls_key  => $self->key,
-    sub {
-      my ($ioloop, $err, $stream) = @_;
-
-      $err and return $self->emit(error => "$type: $err");
-      $stream->on(close   => sub { delete $self->{"${type}_stream_id"} });
-      $stream->on(error   => sub { $self->emit(error => "$type: $_[1]") });
-      $stream->on(drain   => sub { $self->emit('drain'); });
-      $stream->on(timeout => sub { delete $self->{"${type}_stream_id"} });
-      $self->$cb($stream);
-    },
-  );
 }
 
 sub _default_handler {
@@ -169,7 +181,7 @@ Mojo::APNS - Apple Push Notification Service for Mojolicious
 
 =head1 VERSION
 
-1.00
+1.01
 
 =head1 DESCRIPTION
 
@@ -217,17 +229,12 @@ NOTE! This module will segfault if you swap L</key> and L</cert> around.
     my $c         = shift;
     my $device_id = "c9d4a07c fbbc21d6 ef87a47d 53e16983 1096a5d5 faa15b75 56f59ddd a715dff4";
 
-    $c->delay(
-      sub {
-        my ($delay) = @_;
-        $c->apns->send($device_id, "hey there!", $delay->begin);
-      },
-      sub {
-        my ($delay, $err) = @_;
-        return $c->reply->exception($err) if $err;
-        return $c->render(text => "Message was sent!");
-      }
-    );
+    $c->apns
+      ->send_p($device_id, "hey there!", $delay->begin)
+      ->then(
+        sub { $c->render(text => "Message was sent!") },
+        sub { $c->reply->exception(shift); }
+      );
   };
 
   # listen for feedback events
@@ -285,6 +292,14 @@ Path to apple SSL certificate.
 
 Path to apple SSL key.
 
+=head2 insecure
+
+  $self = $self->insecure(1);
+  $bool = $self->insecure;
+
+Used if you want to send messages to an test server with an insecure TLS
+sertificate.
+
 =head2 sandbox
 
   $self = $self->sandbox(0);
@@ -330,6 +345,12 @@ Default is "default".
 =item * Custom arguments
 
 =back
+
+=head2 send_p
+
+  $promise = $self->send_p($device, $message, %args);
+
+L</send_p> takes the same arguments as L</send>, but returns a L<Mojo::Promise>.
 
 =head1 AUTHOR
 

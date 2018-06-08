@@ -832,17 +832,51 @@ OtherImageLength in everything else)</span></span></td></tr>
   <br>2 = Sony Compressed RAW
   <br>3 = Sony Lossless Compressed RAW</span></td></tr>
 <tr>
+<td title='0x7010 = 28688'>0x7010</td>
+<td>SonyToneCurve</td>
+<td class=c>no</td>
+<td class=c>-</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x7031 = 28721'>0x7031</td>
+<td>VignettingCorrection</td>
+<td class=c title=' ! = Unsafe'>int16s!</td>
+<td class=c>SubIFD</td>
+<td><span class=s><span class=n>(found in Sony ARW images)</span>
+  <br>256 = Off
+  <br>257 = Auto
+  <br>511 = No correction params available</span></td></tr>
+<tr>
 <td title='0x7032 = 28722'>0x7032</td>
 <td>VignettingCorrParams</td>
 <td class=c title=' ! = Unsafe'>int16s[17]!</td>
 <td class=c>SubIFD</td>
 <td><span class=s><span class=n>(found in Sony ARW images)</span></span></td></tr>
 <tr class=b>
+<td title='0x7034 = 28724'>0x7034</td>
+<td>ChromaticAberrationCorrection</td>
+<td class=c title=' ! = Unsafe'>int16s!</td>
+<td class=c>SubIFD</td>
+<td><span class=s><span class=n>(found in Sony ARW images)</span>
+  <br>0 = Off
+  <br>1 = Auto
+  <br>255 = No correction params available</span></td></tr>
+<tr>
 <td title='0x7035 = 28725'>0x7035</td>
 <td>ChromaticAberrationCorrParams</td>
 <td class=c title=' ! = Unsafe'>int16s[33]!</td>
 <td class=c>SubIFD</td>
 <td><span class=s><span class=n>(found in Sony ARW images)</span></span></td></tr>
+<tr class=b>
+<td title='0x7036 = 28726'>0x7036</td>
+<td>DistortionCorrection</td>
+<td class=c title=' ! = Unsafe'>int16s!</td>
+<td class=c>SubIFD</td>
+<td><span class=s><span class=n>(found in Sony ARW images)</span>
+  <br>0 = Off
+  <br>1 = Auto
+  <br>17 = Auto fixed by lens
+  <br>255 = No correction params available</span></td></tr>
 <tr>
 <td title='0x7037 = 28727'>0x7037</td>
 <td>DistortionCorrParams</td>
@@ -1810,6 +1844,7 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
   <br>MakerNoteKodak9
   <br>MakerNoteKodak10
   <br>MakerNoteKodak11
+  <br>MakerNoteKodak12
   <br>MakerNoteKodakUnknown
   <br>MakerNoteKyocera
   <br>MakerNoteMinolta
@@ -1832,6 +1867,7 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
   <br>MakerNoteLeica9
   <br>MakerNotePanasonic
   <br>MakerNotePanasonic2
+  <br>MakerNotePanasonic3
   <br>MakerNotePentax
   <br>MakerNotePentax2
   <br>MakerNotePentax3
@@ -1861,8 +1897,8 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
   <br>MakerNoteUnknownText
   <br>MakerNoteUnknownBinary
   <br><u>MakerNoteUnknown</u></td>
-<td class=c>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
-<td class=c>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD</td>
+<td class=c>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
+<td class=c>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD</td>
 <td>--&gt; <a href='Apple.html'>Apple Tags</a>
   <br>--&gt; <a href='Nikon.html'>Nikon Tags</a>
   <br>--&gt; <a href='Canon.html'>Canon Tags</a>
@@ -1896,6 +1932,7 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
   <br>--&gt; <a href='Kodak.html#Type9'>Kodak Type9 Tags</a>
   <br>--&gt; <a href='Kodak.html#Type10'>Kodak Type10 Tags</a>
   <br>--&gt; <a href='Kodak.html#Type11'>Kodak Type11 Tags</a>
+  <br>--&gt; <a href='Kodak.html#Type11'>Kodak Type11 Tags</a>
   <br>--&gt; <a href='Kodak.html#Unknown'>Kodak Unknown Tags</a>
   <br>--&gt; <a href='Unknown.html'>Unknown Tags</a>
   <br>--&gt; <a href='Minolta.html'>Minolta Tags</a>
@@ -1918,6 +1955,7 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
   <br>--&gt; <a href='Panasonic.html#Leica9'>Panasonic Leica9 Tags</a>
   <br>--&gt; <a href='Panasonic.html'>Panasonic Tags</a>
   <br>--&gt; <a href='Panasonic.html#Type2'>Panasonic Type2 Tags</a>
+  <br>--&gt; <a href='Panasonic.html'>Panasonic Tags</a>
   <br>--&gt; <a href='Pentax.html'>Pentax Tags</a>
   <br>--&gt; <a href='Pentax.html#Type2'>Pentax Type2 Tags</a>
   <br>--&gt; <a href='Casio.html#Type2'>Casio Type2 Tags</a>
@@ -1994,7 +2032,7 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
 <td>ImageSourceData</td>
 <td class=c title=' ! = Unsafe'>undef!</td>
 <td class=c>IFD0</td>
-<td>&nbsp;</td></tr>
+<td>--&gt; <a href='Photoshop.html#DocumentData'>Photoshop DocumentData Tags</a></td></tr>
 <tr>
 <td title='0x9400 = 37888'>0x9400</td>
 <td><u>AmbientTemperature</u></td>
@@ -3282,13 +3320,13 @@ one; 2. Pixel width of segments except last; 3. Pixel width of last segment)</sp
 <tr class=b>
 <td title='0xea1c = 59932'>0xea1c</td>
 <td>Padding</td>
-<td class=c>undef</td>
+<td class=c title=' ! = Unsafe'>undef!</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td title='0xea1d = 59933'>0xea1d</td>
 <td>OffsetSchema</td>
-<td class=c>int32s</td>
+<td class=c title=' ! = Unsafe'>int32s!</td>
 <td class=c>ExifIFD</td>
 <td><span class=s><span class=n>(Microsoft&#39;s ill-conceived maker note offset difference)</span></span></td></tr>
 <tr class=b>
@@ -3501,7 +3539,7 @@ these unless they already exist in the file)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 13, 2018</i>
+<br><i>Last revised May 30, 2018</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

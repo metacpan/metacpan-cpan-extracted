@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html><head><title>Can I pass in a cost value with each click?</title></head><body>
+<b>Can I pass in a cost value with each click?</b><br />
+<br />
+Absolutely. You can specify set costs (one-time, CPC, CPA, etc.) in the Advanced Settings for any link.<br />
+<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq33advanced.jpg" /><br />
+<br />
+<br />
+Just enter a value for Traffic Cost and check the appropriate box for the type of traffic that you&rsquo;re receiving.<br />
+<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq33trafficcost.jpg" /><br />
+<br />
+<br />
+If you enter a Traffic Cost but do not check any of the &ldquo;cost modifier&rdquo; boxes, it will be treated as a one-time cost and it will be averaged over the number of clicks the link receives.<br />
+<br />
+<br />
+<b>What if my cost-per-click varies for each click?</b><br />
+<br />
+If your CPC varies from click to click, you&rsquo;ll probably want to use the following method for the most accurate stats.<br />
+<br />
+To include a cost value for each click, you can simply add it to the end of any tracking link, after any sub-IDs you might have for the link:<br />
+<br />
+For example, here&rsquo;s a regular tracking link:<br />
+<br />
+<code>http://$linkdomain/mylink</code><br />
+<br />
+If you want to include a CPC amount of 0.50 for this click, just add it to the end like this:<br />
+<br />
+<code>http://$linkdomain/mylink/0.50</code><br />
+<br />
+If your ad networks allow the <code>{CPC}</code> &ldquo;token&rdquo; or &ldquo;placeholder&rdquo;, then you can use it, which will cause their system to pass a dynamic numerical value for the CPC to your link.<br />
+<br />
+For example, they may tell you to use the token <code>{CPC}</code> in your link:<br />
+<br />
+<code>http://$linkdomain/mylink/{CPC}</code><br />
+<br />
+Their system will then replace the&nbsp;<code>{CPC}</code> token with the actual cost-per-click value before it redirects to your link.<br />
+<br />
+<br />
+<b>Two important things to remember &hellip;</b><br />
+<br />
+First, if you want to pass in cost data through your tracking links, you MUST leave the cost data blank in your advanced link settings. Any cost data that you specify in your link settings will override what&rsquo;s passed in using the method above.<br />
+<br />
+Second, if you include cost data using the method above, it MUST come AFTER any optional sub-ID parameters.<br />
+<br />
+So if you want to include a sub-ID <em>and</em> cost data, the example above showing a CPC of 0.50 would need to look like this:<br />
+<br />
+<code>http://$linkdomain/mylink/subid/0.50</code><br />
+<br />
+Basically, the cost data must always be at the very end &hellip;<br />
+<br />
+For more information on sub-IDs, read this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=3"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=3">&nbsp;Can I use Sub-IDs with my tracking links?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</body></html>

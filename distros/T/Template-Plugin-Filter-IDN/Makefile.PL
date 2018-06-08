@@ -18,20 +18,22 @@ my %WriteMakefileArgs = (
   "NAME" => "Template::Plugin::Filter::IDN",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "List::Util" => "1.33",
     "Net::IDN::Encode" => 0,
-    "Syntax::Feature::Junction" => 0,
     "Template::Plugin::Filter" => 0,
     "parent" => 0,
     "strict" => 0,
-    "syntax" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "File::Spec" => 0,
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
     "Template::Test" => 0,
     "Test::More" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,14 +42,16 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "File::Spec" => 0,
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
+  "List::Util" => "1.33",
   "Net::IDN::Encode" => 0,
-  "Syntax::Feature::Junction" => 0,
   "Template::Plugin::Filter" => 0,
   "Template::Test" => 0,
   "Test::More" => 0,
   "parent" => 0,
   "strict" => 0,
-  "syntax" => 0,
   "utf8" => 0,
   "warnings" => 0
 );

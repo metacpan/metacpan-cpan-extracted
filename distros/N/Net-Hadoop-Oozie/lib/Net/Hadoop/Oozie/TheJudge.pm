@@ -1,5 +1,5 @@
 package Net::Hadoop::Oozie::TheJudge;
-$Net::Hadoop::Oozie::TheJudge::VERSION = '0.113';
+$Net::Hadoop::Oozie::TheJudge::VERSION = '0.114';
 use 5.010;
 use strict;
 use warnings;
@@ -171,7 +171,7 @@ Net::Hadoop::Oozie::TheJudge - Will tell you the verdict on coordinators
 
 =head1 VERSION
 
-version 0.113
+version 0.114
 
 =head1 SYNOPSIS
 

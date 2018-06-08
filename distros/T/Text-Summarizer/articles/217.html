@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html><head><title>What’s the best way to split-test email messages?</title></head><body>
+<strong>What&rsquo;s the best way to split-test email messages?</strong><br />
+<br />
+It&rsquo;s really easy to track an email split-test with ClickMagick, but before we get into the explanation, you should read our short guide on how to track the performance of individual email messages first:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=278"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=278">How can I track which email messages perform best?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+The rest of this explanation is going to assume that you&rsquo;ve just read the FAQ above and that you understand how you would use a tracking link with Sub-IDs like this ...<br />
+<br />
+<code>http://$linkdomain/email/Welcome/cta1</code><br />
+<br />
+In a tracking link like this, &ldquo;Welcome&rdquo;&nbsp;would be a short Sub-ID reminder of the Subject of the email, and &ldquo;cta1&rdquo;&nbsp;would be the first call-to-action (CTA) link in the message.<br />
+<br />
+So, to split test a message, the straightforward way is the copy the original message and change the first Sub-ID in all the CTA links in the message:<br />
+<br />
+<code>http://$linkdomain/email/Welcome2/cta1<br />
+http://$linkdomain/email/Welcome2/cta2<br />
+...</code><br />
+<br />
+Now that you have two version of the message&mdash;your split-test&mdash;you would use your autoresponder to send one message to part of your list, and the other message to the rest of your list.<br />
+<br />
+From there, once you send the messages, you would track the performance between the two split-test messages just like you would for any two messages&mdash;click on the number in the TC column:<br />
+<br />
+&nbsp;<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq279splitresults.jpg" /><br />
+&nbsp;<br />
+<br />
+With these stats, you can see the number of clicks that each call-to-action link is getting &hellip;<br />
+<br />
+&hellip;&nbsp;but that&rsquo;s NOT enough to determine which message is performing better.<br />
+<br />
+First of all, there&rsquo;s not nearly enough clicks in this example to determine a statistically valid winner. You would need hundreds of clicks before you could determine a true winner. Second, the numbers are totally meaningless unless you know the number of recipients each message was sent to.<br />
+<br />
+Of course, if you sent one message to half the list and the other message to the other half, you wouldn&rsquo;t need to know the number of recipients.<br />
+<br />
+But, if you had a proven message that you were trying to make even better, and you sent your proven message to 90% of your list and only 10% got your test message, that&rsquo;s critically important!<br />
+<br />
+To get an apples-to-apples comparison, you need to determine the &ldquo;click-through rate&rdquo; using this formula:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="width: 502px;">
+	<tbody>
+		<tr>
+			<td style="width: 193px;" valign="top">&nbsp;</td>
+			<td style="width: 10px;">&nbsp;&nbsp;</td>
+			<td style="text-align: center; width: 291px;"><em>Number of Unique Clicks</em></td>
+		</tr>
+		<tr>
+			<td style="width: 193px; text-align: right;" valign="top"><em>Click-Through Rate</em>&nbsp; =</td>
+			<td style="text-align: center; width: 10px;">&nbsp;</td>
+			<td style="text-align: center; width: 291px;">
+			<hr /></td>
+		</tr>
+		<tr>
+			<td style="text-align: center; width: 193px;" valign="top">&nbsp;</td>
+			<td style="text-align: center; width: 10px;">&nbsp;</td>
+			<td style="text-align: center; width: 291px;"><em>Total Number of Recipients</em></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+It&rsquo;s only by comparing the click-through rate for both messages that you can get a true idea of how each message is performing.<br />
+&nbsp;
+<div class="faq-note"><b>Note:</b> One side effect of using the same tracking link for all of your email messages is that the &ldquo;unique click&rdquo;&nbsp;can be less important than the &ldquo;total click&rdquo;&nbsp;value. For example, if you send out a message and a reader clicks on the call-to-action&nbsp;link, that first click is considered unique. However, for all future messages that use the same link, any clicks your reader makes will show up in the Total Clicks column, but not in the Unique Clicks column&nbsp;because the click isn&rsquo;t unique to that link any more&mdash;even if the Sub-IDs for the link are different. Just something to keep in mind ...</div>
+<br />
+<br />
+<br />
+<strong>Advanced Technique&mdash;Using Dynamic Content</strong><br />
+<br />
+All autoresponders allow you to customize your email messages by using what&rsquo;s called&nbsp;&ldquo;dynamic content&rdquo; to personalize your messages. Oftentimes, you can use dynamic content to simplify your split-testing efforts.<br />
+<br />
+Here&rsquo;s how, using GetResponse as an example ...<br />
+<br />
+When you create a new email in GetResponse, you have to enter a &ldquo;message name&rdquo;&nbsp;that is not included in the message being sent. (This is like the &ldquo;friendly name&rdquo; of a tracking link.) Although that name is not normally included anywhere in the message, you can insert it in the message if you want to by using a &ldquo;dynamic content token&rdquo; that looks like this:<br />
+<br />
+<code>{{CONTENT &quot;message_name&quot;}}</code><br />
+<br />
+If you use this token as part of your link, you can generate unique Sub-IDs for every call-to-action:<br />
+<br />
+<code>http://$linkdomain/emails/{{CONTENT &quot;message_name&quot;}}/cta1</code><br />
+<br />
+For example, let&rsquo;s suppose the Subject line of your email is &ldquo;Mason Bees Pollinate Like Crazy!&rdquo; Using GetResponse, you could set your message up like this:<br />
+&nbsp;<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq279getresponse.jpg" /><br />
+&nbsp;<br />
+That setup would dynamically create links like:<br />
+<br />
+<code>http://$linkdomain/emails/PollinateLikeCrazy/cta1</code><br />
+<br />
+You can use&nbsp;this technique with most most autoresponders, but it&rsquo;s done completely differently for each one.<br />
+<br />
+If you want to use this technique with your links and you&rsquo;re not using GetResponse, you&rsquo;ll need to review the documentation for your autoresponder or ask their support desk for help&mdash;remember, this is <em>their</em> area of expertise, not ours.<br />
+<br />
+You can always search online for the phrase &ldquo;dynamic content <em>autoresponder name</em>&rdquo;:<br />
+<br />
+<code>dynamic content AWeber<br />
+dynamic content MailChimp<br />
+...</code><br />
+<br />
+Look for search results that talk about how to &ldquo;personalize&rdquo; your messages.<br />
+&nbsp;<br />
+&nbsp;
+<div class="faq-caution"><b>Caution:</b> Be absolutely sure the &ldquo;message name&rdquo; part of the link&nbsp;contains only valid Sub-ID characters. To be super-safe, just stick to letters, numbers, dashes, and NO spaces. You might be tempted to use the dynamic content token for the message&rsquo;s Subject line&nbsp;(e.g., <code>*
+</body></html>

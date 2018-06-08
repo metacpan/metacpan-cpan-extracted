@@ -1,4 +1,4 @@
-package Pcore::PDF v0.4.7;
+package Pcore::PDF v0.4.8;
 
 use Pcore -dist, -class, -const, -res;
 use Config;
@@ -140,7 +140,7 @@ sub _generate_mswin ( $self ) {
 
     $self->{_threads}++;
 
-    P->pm->run_proc(
+    P->sys->run_proc(
         [ $self->bin, '-' ],
         stdin    => 1,
         stdout   => 1,
@@ -201,7 +201,7 @@ sub _get_proc ( $self, $cb ) {
 
     $self->{_threads}++;
 
-    P->pm->run_proc(
+    P->sys->run_proc(
         [ $self->bin, '--control' ],
         stdin    => 1,
         stdout   => 1,

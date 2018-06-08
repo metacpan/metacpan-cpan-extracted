@@ -13,31 +13,18 @@ BEGIN { use_ok('File::Rename') };
 # Insert your test code below, the Test::More module is use()ed here so read
 # its man page ( perldoc Test::More ) for help writing this test script.
 
-use File::Spec;
-use File::Path ();
+unshift @INC, 't' if -d 't';
+require 'testlib.pl';
 
-my $dir = 'temp';
-File::Path::rmtree $dir if -d $dir;
-File::Path::mkpath $dir; 
+my $dir = tempdir();
 
-sub create (@) {
-    for (@_) { 
-	local *FILE;
-        open  FILE, '>'. File::Spec->catfile($dir, $_) or die $!; 
-	print FILE "This is @_\n";
-        close FILE or die $!;
-    } 
-}
-
-create qw(bing.txt bong.txt);
+create(qw(bing.txt bong.txt));
 
 # test 2
 
 File::Rename::rename( [ glob File::Spec->catfile($dir,'b*') ], 's/i/a/' );
-opendir DIR, $dir or die $!;
-is_deeply( [ sort grep !/^\./, readdir DIR ], 
+is_deeply( [ sort (listdir($dir)) ], 
 		[qw(bang.txt bong.txt)], 'rename - files' );
-closedir DIR or die $!; 
 
 # test 3
 
@@ -64,10 +51,8 @@ close WRITE or die $!;
 wait;
 
 # diag "Waited: $pid";
-opendir DIR, $dir or die $!;
-is_deeply( [ sort grep !/^\./, readdir DIR ], 
+is_deeply( [ sort(listdir($dir)) ],
 		[qw(bang.txt bug.txt)], 'rename - list' );
-closedir DIR or die $!; 
 
-File::Path::rmtree $dir; 
+File::Path::rmtree($dir); 
 

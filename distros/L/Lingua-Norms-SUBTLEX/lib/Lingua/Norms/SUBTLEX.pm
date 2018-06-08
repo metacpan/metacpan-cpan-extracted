@@ -23,7 +23,7 @@ use Text::Unidecode;
 
 #use open ':encoding(utf8)';
 
-$Lingua::Norms::SUBTLEX::VERSION = '0.06';
+$Lingua::Norms::SUBTLEX::VERSION = '0.07';
 
 =pod
 
@@ -35,11 +35,11 @@ Lingua::Norms::SUBTLEX - Retrieve word frequencies and related values and lists 
 
 =head1 VERSION
 
-This is documentation for B<Version 0.06> of Lingua::Norms::SUBTLEX.
+This is documentation for B<Version 0.07> of Lingua::Norms::SUBTLEX.
 
 =head1 SYNOPSIS
 
- use Lingua::Norms::SUBTLEX 0.06;
+ use Lingua::Norms::SUBTLEX 0.07;
  my $subtlex = Lingua::Norms::SUBTLEX->new(lang => 'UK');
  
  # Is the string 'frog' in the subtitles corpus?
@@ -79,7 +79,7 @@ The SUBTLEX files need to be downloaded via the URLs shown in the table below (o
 
 The local directory location or actual pathname of these files can be given in class construction (by the arguments B<dir> and B<path>, respectively); or it will be sought from the default location--within the directory "SUBTLEX" alongside the module itself in the locally configured Perl sitelib--given the B<lang> argument to L<new()|Lingua::Norms:SUBTLEX/new>, or to L<set_lang()||Lingua::Norms:SUBTLEX/set_lang>. The filenames of the original files downloaded from the following sites should be found in this way, but it should uniquely include the "key" shown in the table. The module will attempt to identify the correct field separator for the file (which can be comma-separated or tab-delimited). Only the files specified in the table are likely to be reliably accessed at this time.
 
-=for html <p>&nbsp;&nbsp;<table style="font-size:x-small;" align="center">
+=for html <p>&nbsp;&nbsp;<table style="font-size:small;" align="center">
 <tr><th>Language</th><th>Key</th><th>URL</th><th>File</th></tr>
 <tr><td>Dutch</td><td>NL_all</td><td><a href="http://crr.ugent.be/programs-data/subtlex-nl">crr.ugent.be</a></td><td>SUBTLEX-NL.with-pos.txt</td></tr>
 <tr><td>&nbsp;</td><td>NL_min</td><td><a href="http://crr.ugent.be/programs-data/subtlex-nl">crr.ugent.be</a></td><td>SUBTLEX-NL.cd-above2.with-pos.txt</td></tr>
@@ -146,7 +146,6 @@ sub new {
     my $self = bless {}, ref($class) ? ref($class) : $class;
     $self->{'_MODULE_DIR'} =
       File::Spec->catdir( $Config{'sitelib'}, qw/Lingua Norms SUBTLEX/ );
-    $self->_set_spec_hash( $args{'fieldpath'} );
     $self->set_lang(%args);
     $self->set_eq( match_level => $args{'match_level'} );
 
@@ -822,6 +821,7 @@ sub set_lang {
     my ( $self, %args ) = @_;
     ## firstly, establish the language to use, and the directory in which this module lives:
     return if nocontent($args{'lang'});
+    $self->_set_spec_hash( $args{'fieldpath'} );
     #@ is the complete pathname actually given in args?
     croak 'Need a valid <lang> attribute' if not ref $self->{'_FIELDS'}->record( $args{'lang'} );
     
@@ -920,7 +920,7 @@ See L<Lingua::Orthon|Lingua::Orthon/set_eq>.
  $url = $subtlex->url2datafile(lang => STRING);
  %loc = $subtlex->url2datafile(lang => STRING);
 
-Returns the URL (complete path) where the SUBTLEX file for a given language is stored, and from which it should be downloadable. These are locations as specified (at the time of releasing this version of the module) at L<expsy.ugent.be/subtlexus/|http://expsy.ugent.be/subtlexus/> and/or L<crr.ugent.be|http://crr.ugent.be/>, and so as listed in the L<DOWNLOADS|Lingua::Norms::SUBTLEX/DOWNLOADS (mandatory)> section. This could include an archive from within which the file needs to be retrieved. Called in list context, this method returns a hash with keys for 'www_dir', 'archive' (if the file is within an archive) and 'filename'. (This module does not fetch the file off the WWW itself; it should be installed and available on the local machine/network--see L<new|Lingua::Norms::SUBTLEX/new>).
+Returns the URL (complete path) where the SUBTLEX file for a given language is stored, and from which it should be downloadable. These are locations as specified (at the time of releasing this version of the module) at L<expsy.ugent.be/subtlexus/|http://expsy.ugent.be/subtlexus/> and/or L<crr.ugent.be|http://crr.ugent.be/>, and so as listed in the L<DOWNLOADS|Lingua::Norms::SUBTLEX/DOWNLOADS (mandatory)> section. This could include an archive within which the file needs to be retrieved. Called in list context, this method returns a hash with keys for 'www_dir', 'archive' (if the file is within an archive) and 'filename'. (This module does not fetch the file off the WWW itself; it should be installed and available locally--see L<new|Lingua::Norms::SUBTLEX/new>).
 
 =cut
 
@@ -1252,8 +1252,8 @@ Roderick Garton, C<< <rgarton at cpan.org> >>
 
 =head1 BUGS AND LIMITATIONS
 
-Please report any bugs or feature requests to C<bug-lingua-norms-subtlfreq-0.06 at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Lingua-Norms-SUBTLEX-0.06>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to C<bug-lingua-norms-subtlfreq-0.07 at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Lingua-Norms-SUBTLEX-0.07>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
@@ -1267,19 +1267,19 @@ You can also look for information at:
 
 =item * RT: CPAN's request tracker (report bugs here)
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-Norms-SUBTLEX-0.06>
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-Norms-SUBTLEX-0.07>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
-L<http://annocpan.org/dist/Lingua-Norms-SUBTLEX-0.06>
+L<http://annocpan.org/dist/Lingua-Norms-SUBTLEX-0.07>
 
 =item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/Lingua-Norms-SUBTLEX-0.06>
+L<http://cpanratings.perl.org/d/Lingua-Norms-SUBTLEX-0.07>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Lingua-Norms-SUBTLEX-0.06/>
+L<http://search.cpan.org/dist/Lingua-Norms-SUBTLEX-0.07/>
 
 =back
 

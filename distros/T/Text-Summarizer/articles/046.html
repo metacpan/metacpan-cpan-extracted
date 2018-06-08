@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html><head><title>What does it mean if I have an endless redirect loop?</title></head><body>
+<b>What does it mean if I have an endless redirect loop?</b><br />
+<br />
+It means you have a flaw in the logic you&rsquo;ve used to set up and/or chain your links and/or rotators together, and you have an &ldquo;endless loop&rdquo; redirect situation.<br />
+<br />
+An example would be if you had 3 rotators chained together via the &ldquo;Last URL&rdquo; On Finish setting, and you put the URL of the 1st rotator as the Last URL of the 3rd.<br />
+<br />
+If you did something like this, once a person has seen all the URLs in all 3 rotators, the system will have nowhere to send them and the browser will be stuck in an endless loop&mdash;which will result in an error page.<br />
+<br />
+If this happens, you&rsquo;ll get an email alert and you should work on debugging and fixing it ASAP because ultimately it means these clicks are being wasted.<br />
+<br />
+Our system tries to detect and alert you to potential &ldquo;endless loop&rdquo; situations when you set up your links, and it gets smarter every day, but unfortunately, it&rsquo;s impossible to programmatically detect every possible scenario that could potentially result in an endless loop situation.<br />
+<br />
+If this happens to you, you need to just &ldquo;start at the top&rdquo; with whatever link or rotator URL you&rsquo;re having the problem with, and trace the &ldquo;logic&rdquo; and URL flow of whatever you&rsquo;ve set up and try to find the problem.<br />
+<br />
+The biggest tip we can give you is to repeatedly click on your tracking link or rotator link that&rsquo;s having the problem, and note which pages you&rsquo;re redirected to.<br />
+<br />
+If you continue clicking the link that&rsquo;s having the problem you should eventually see a &ldquo;redirect loop&rdquo; error page, and you should be able to figure out where the problem is based on the last page you saw before the error.<br />
+<br />
+If not&mdash;and everything seems perfectly normal to you&mdash;that means it&rsquo;s a rare issue affecting only a few people based on their location, etc. and your specific settings and you just haven&rsquo;t duplicated the problem yet.<br />
+<br />
+In fact, if it has to do with your geotargeting settings and you don&rsquo;t test using a proxy that makes it appear as if you&rsquo;re clicking from different countries you may NEVER be able to reproduce the problem on your own.<br />
+<br />
+In a case like this, we don&rsquo;t recommend spending much time trying to figure it out unless you&rsquo;re getting a lot of alerts. If you&rsquo;re only getting 1 alert a day, it could be happening to 1 out of 5,000 visitors and it&rsquo;s probably not worth spending much time on &hellip;<br />
+<br />
+We understand that this can sometimes be tough to track down, but because it can be such a labor-intensive process we ask that you try your very best and put the time in yourself to try to &ldquo;debug&rdquo; your links and rotators before asking us for help on this. Thanks!<br />
+<br />
+&nbsp;
+<div class="faq-note"><b>Note:</b> When debugging endless redirect loops, be sure to also check the global Backup URL that you&rsquo;ve entered into your <strong><a href="/user/profile.cgi?cat=traffic" target="_blank">User Profile</a></strong> under the Traffic tab. If your global Backup URL points to a ClickMagick link rather than to an external website, that could be the cause of your endless loop.</div>
+</body></html>

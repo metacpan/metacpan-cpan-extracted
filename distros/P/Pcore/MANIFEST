@@ -160,9 +160,6 @@ lib/Pcore/Util/Hash/RandKey.pm
 lib/Pcore/Util/IDN.pm
 lib/Pcore/Util/List.pm
 lib/Pcore/Util/Net.pm
-lib/Pcore/Util/PM.pm
-lib/Pcore/Util/PM/ForkTmpl.pm
-lib/Pcore/Util/PM/Proc.pm
 lib/Pcore/Util/Path.pm
 lib/Pcore/Util/Perl.pm
 lib/Pcore/Util/Perl/Module.pm
@@ -172,6 +169,8 @@ lib/Pcore/Util/Result.pm
 lib/Pcore/Util/Result/Status.pm
 lib/Pcore/Util/Scalar.pm
 lib/Pcore/Util/Sys.pm
+lib/Pcore/Util/Sys/ForkTmpl.pm
+lib/Pcore/Util/Sys/Proc.pm
 lib/Pcore/Util/Template.pm
 lib/Pcore/Util/Term.pm
 lib/Pcore/Util/Term/Progress.pm

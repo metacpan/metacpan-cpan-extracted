@@ -59,17 +59,17 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/plicease/Alt-FFI-libffi/issues"
+         "web" : "https://github.com/Perl5-FFI/Alt-FFI-libffi/issues"
       },
       "homepage" : "https://metacpan.org/pod/Alt::FFI::libffi",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/plicease/Alt-FFI-libffi.git",
-         "web" : "https://github.com/plicease/Alt-FFI-libffi"
+         "url" : "git://github.com/Perl5-FFI/Alt-FFI-libffi.git",
+         "web" : "https://github.com/Perl5-FFI/Alt-FFI-libffi"
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
    "x_use_unsafe_inc" : 0
 }

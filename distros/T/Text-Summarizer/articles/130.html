@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html><head><title>How do I open pop up links in a new window?</title></head><body>
+<b>How do I open pop up links in a new window?</b><br />
+<br />
+Depending on how you have things set up, you may not want opt-in forms or links within your pop ups to open in the existing pop up window because it&rsquo;s just too small.<br />
+<br />
+The solution is to have your forms and/or links open in a new window, by adding <code>target=&rdquo;_blank&rdquo;</code> to your forms and links where appropriate.<br />
+<br />
+For example, if you have a form tag that looks like this:<br />
+&nbsp;<br />
+<code>((form action=&rdquo;foo.php&rdquo; method=&rdquo;POST&rdquo;))</code><br />
+<br />
+You just change it to this:<br />
+<br />
+<code>((form action=&rdquo;foo.php&rdquo; method=&rdquo;POST&rdquo; target=&rdquo;_blank&rdquo;))</code><br />
+<br />
+Now when the form is submitted, the next page will open in a new full-size browser window for the best user experience.<br />
+<br />
+You may want to do the same thing with links as well. For example if you have a link that looks like this:<br />
+<br />
+<code>((a href=&rdquo;foo.php&rdquo;))click here((/a))</code><br />
+<br />
+You just change it to this:<br />
+<br />
+<code>((a href=&rdquo;foo.php&rdquo; <strong>target=&rdquo;_blank&rdquo;</strong>))click here((/a))</code><br />
+<br />
+Just like with the form, this will cause your links to open in a new full-size window.<br />
+<br />
+If you don&rsquo;t have access to the HTML code for your pop up page to do any of this, you&rsquo;ll have to rely on your content management system or page builder.<br />
+<br />
+Look for options to open a form and/or a link in a new window, which most decent platforms will support.<br />
+<br />
+If you can&rsquo;t figure it out you may want to consult their documentation or customer support as they are best able to help you with the specifics.
+</body></html>

@@ -54,7 +54,7 @@ resources:
   bugtracker: https://github.com/Perl-Hadoop/Net-Hadoop-Oozie/issues
   homepage: http://metacpan.org/release/Net-Hadoop-Oozie
   repository: git://github.com/Perl-Hadoop/Net-Hadoop-Oozie.git
-version: '0.113'
+version: '0.114'
 x_contributors:
   - 'Canran Gou <canrangou@cpan.org>'
   - 'Philippe Bruhat (BooK) <book@cpan.org>'

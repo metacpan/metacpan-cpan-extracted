@@ -1,4 +1,4 @@
-Lingua-Norms-SUBTLEX-0.06
+Lingua-Norms-SUBTLEX-0.07
 
 This Perl module provides programmatic access to the frequency-related statistics
 about words derived from video subtitles in various languages. It also calculates stats
@@ -32,21 +32,21 @@ perldoc command.
 You can also look for information at:
 
     RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-Norms-SUBTLEX-0.06
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-Norms-SUBTLEX-0.07
 
     AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Lingua-Norms-SUBTLEX-0.06
+        http://annocpan.org/dist/Lingua-Norms-SUBTLEX-0.07
 
     CPAN Ratings
-        http://cpanratings.perl.org/d/Lingua-Norms-SUBTLEX-0.06
+        http://cpanratings.perl.org/d/Lingua-Norms-SUBTLEX-0.07
 
     Search CPAN
-        http://search.cpan.org/dist/Lingua-Norms-SUBTLEX-0.06/
+        http://search.cpan.org/dist/Lingua-Norms-SUBTLEX-0.07/
 
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014-2015 Roderick Garton
+Copyright (C) 2014-2018 Roderick Garton
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

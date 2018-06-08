@@ -1,0 +1,128 @@
+
+
+
+docno="lists-003-2137010"
+received="Tue May 18 18:52:44 1993 EST" 
+sent="Tue, 18 May 1993 15:31:15 -0500 (CDT)" 
+name="Rick Troth" 
+email="TROTH@ricevm1.rice.edu" 
+subject="Re: CHARSET considerations" 
+id="01GYBXHRZVEA8Y5JAE@INNOSOFT.COM" 
+inreplyto="scs@adam.mit.edu" 
+
+To: scs@adam.mit.edu, pine-info@cac.washington.edu, ietf-charsets@INNOSOFT.COM
+Cc: dan@ees1a0.engr.ccny.cuny.edu
+
+
+
+
+On Fri, 14 May 93 17:29:24 -0400 Steve said:
+>In <9305121752.AA00650@dimacs.rutgers.edu>, Rick wrote:
+>>         Any user of Pine 3.05 (and as far as I can tell 3.07 or 2.x)
+>> can shoot themself in the foot  (head if you prefer)  by setting
+>> character-set = Zeldas_private_codepage.
+
+>This is almost certainly a bad idea,   ...
+
+        Although I used this to defend my action of having used an
+illegitimate CHARSET,  I do  NOT  think that all  "user can shoot
+themself in the foot"  features are bad.   Specifically,  I feel
+(quite strongly)  that the user should be able to specify any old
+charset and have display at least attempted at the other end.
+
+        The long term solution is,  of course,  to map between
+"character sets"  (which the use should have control over)  and
+"charsets"  (which the user should leave alone).
+
+        My only request of Pine from all this noise is that Pine
+NOT LABEL  messages of  Content-Type:  text/plain.
+(this may be counter to RFC 1341;  is it?)
+
+>> Should the Pine developers remove this feature?
+
+        No.
+
+>                  charset is an octet-based encoding used during
+>message transfer; it need bear no relation to the composing or
+>viewing character sets.
+
+        Right.   I maintain that CHARSET specification should be
+omitted when feasible.   This is because there are such things as
+gateways which translate the SMTP octet-stream into anything.
+
+        There are two goals:  1)  to be able to specify new and/or
+extended character sets  (and mark-ups and other extensions to plain text)
+and  2)  to use  "plain text"  (in mail)  as a transport medium.
+For the former,  use  Base64  encoding when needed.   For the latter,
+don't label the text  "ASCII"  or any other codepoint mapping if there's
+any way on earth that it might get translated by a gateway.
+
+        I don't think this is making sense and I can't find the words.
+Steve apparently has:   charset -vs- character_set.
+
+        Plain text  is defined differently from system to system.
+On UNIX,  plain text is ASCII (now ISO-8859-1) with lines delimited by
+NL (actually LF).   On NT,  plain text is 16 bits wide  (so I hear).
+That ain't ASCII,  though we could be the high-order 8 bits for much
+of plain text processing,  and that's fine by me.   (memory is cheap)
+On VM/CMS,  plain text is EBCDIC (now CodePage 1047) and records are
+handled by the filesystem out-of-band of the data,  so NL (and LF and CR)
+aren't sacred characters.   Now ... "mail is plain-text,  not ASCII".
+
+>                         In the most general case, a message will
+>be composed using some native character set, translated
+>automatically to a MIME-registered charset, and translated at the
+>other end into a native display character set.
+
+        Right!   99 times out of 100 you don't care,  but there's that
+1% of the time when you've called it  US-ASCII  and it's  NOT anymore,
+although it  *is*  still legitimate  "plain text".
+
+>           (You'll notice that I reinforce this distinction in my
+>own head and in this message by using the terms "character set"
+>and "charset" noninterchangeably.)
+
+        Thanks.   That helps.
+
+>The charset situation is much like the canonical CRLF situation:
+>the fact that the canonical representation is identical to some
+>but not all of the available local representations guarantees
+>misunderstandings.
+
+        Right!   And this thinking,  carried into MIME  (thus this
+should be kicked BACK TO the IETF-822 list,  but I refrain),  shows up
+in the use of  CHARSET=ISO-8859-1  rather than  CHARACTER_SET=Latin-1.
+If you specify  "Latin-1",  then you can  (must;  I'm arguing for a
+definition here,  not an explanation)  assume that  SMTP  will carry it
+as ISO-8859-1,  BUT THE RECEIVING  (or sending)  HOST MIGHT NOT.
+(and yes,  sad but true,  any SMTPs will strip the high bit)
+
+>To be sure, automated selection of and translation to a registered
+>MIME charset is a non-trivial task,   ...
+
+        Yes.   Which is why I want  routers, gateways,  and all  MTAs
+(mail transfer agents)  to stay out of it.   That's why I ask that
+(today,  1993)  we  NOT LABEL  true plain text as  US-ASCII/ISO-8859-1.
+Just leave it alone and let it default at the receiving end.
+
+>                                    and mailers which are trying
+>to adopt MIME right away cannot be faulted for deferring
+>development of such functionality for a while.
+
+        And let me reiterate that I'm not mad at the Pine developers
+(nor the MIME developers;  not mad at anyone,  just trying to push a
+point that I think is important and has been missed).   I'm very pleased
+with Pine.   It can almost replace RiceMAIL.
+
+        Steve,  it's obvious from your distinction between character set
+(set of characters)  and  charset  (encoding of characters)  that you
+understand this issue.   Thanks for making up and using those labels!
+
+>                                       Steve Summit
+>                                       scs@adam.mit.edu
+
+--
+Rick Troth <troth@rice.edu>,  Rice University,  Information Systems
+
+
+

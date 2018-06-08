@@ -4,18 +4,22 @@
 
 =head1 MySQL
 
+=head2 deploy
+
+    dnf -y install mariadb-devel
+    cpanm Devel::CheckLib DBI https://github.com/gooddata/DBD-MariaDB/archive/master.tar.gz
+
 =head2 connect
 
     my $dbh = DBI->connect(
-        qq[DBI:mysql:database=$self->{cfg}->{MYSQL}->{db};host=$self->{cfg}->{MYSQL}->{host};port=$self->{cfg}->{MYSQL}->{port}],
-        $self->{cfg}->{MYSQL}->{username},
-        $self->{cfg}->{MYSQL}->{password},
-        {   RaiseError             => 1,
-            PrintWarn              => 0,
-            ShowErrorStatement     => 1,
-            mysql_auto_reconnect   => 1,
-            mysql_enable_utf8mb4   => 1,
-            mysql_multi_statements => 1,
+        qq[DBI:MariaDB:database=$db;host=$host;port=$port],
+        $username,
+        $password,
+        {   RaiseError               => 1,
+            PrintWarn                => 0,
+            ShowErrorStatement       => 1,
+            mariadb_auto_reconnect   => 1,
+            mariadb_multi_statements => 1,
         }
     );
 

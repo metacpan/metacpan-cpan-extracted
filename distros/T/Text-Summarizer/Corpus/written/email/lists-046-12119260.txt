@@ -1,0 +1,36 @@
+
+
+docno="lists-046-12119260"
+name="T. V. Raman"
+email="raman@adobe.com"
+sent="Tue, 4 Jun 1996 08:19:04 -0700"
+inreplyto="199606040606.AA03032@drizzle.wri.com"
+id="199606041519.IAA15437@labrador.mv.us.adobe.com"
+* X-Fax: 1(415) 962-6063
+* X-Phone: 1 (415) 962-3945
+subject="Re: Comments on parsing steps:"
+To: Neil Soiffer <soiffer@wri.com>
+Cc: raman@mv.us.adobe.com, w3c-math-erb@w3.org
+
+
+     
+   
+Hi Neill,
+
+I did not see anything wrong in Bruce's description --all I was trying to do
+was to fill in the gaps in the description as I perceived --
+
+--
+Best Regards,
+--raman
+
+      Adobe Systems                 Tel: 1 (415) 962 3945   (B-1 115)
+      Advanced Technology Group     Fax: 1 (415) 962 6063
+      (E 1-160) 1585 Charleston Road       Email: raman@adobe.com
+      Mountain View, CA 94039 -7900  raman@cs.cornell.edu
+      http://www-atg/People/Raman.html (Internal To Adobe)
+      http://www.cs.cornell.edu/Info/People/raman/raman.html  (Cornell)
+Disclaimer: The opinions expressed are my own and in no way should be taken
+            as representative of my employer, Adobe Systems Inc.
+
+

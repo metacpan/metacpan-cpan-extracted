@@ -8,7 +8,13 @@ use WebService::RESTCountries;
 
 my $got;
 
-my $api = WebService::RESTCountries->new;
+my $api = WebService::RESTCountries->new(
+    cache => CHI->new(
+        driver => 'File',
+        namespace => 'restcountries',
+        root_dir => $ENV{PWD} . '/t/cache/',
+    )
+);
 
 my $test_data = {
     Malays => undef,

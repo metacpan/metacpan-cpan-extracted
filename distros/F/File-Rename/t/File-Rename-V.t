@@ -19,7 +19,8 @@ die $@ unless $require_ok;
 # Insert your test code below, the Test::More module is use()ed here so read
 # its man page ( perldoc Test::More ) for help writing this test script.
 
-sub main_argv { local @ARGV = @_; main (); } 
+unshift @INC, 't' if -d 't';
+require 'testlib.pl';
 
 # test 2
 

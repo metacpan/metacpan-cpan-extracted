@@ -1,7 +1,7 @@
 package Sah::SchemaR::fiat_or_cryptocurrency;
 
-our $DATE = '2018-06-06'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2018-06-07'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 our $rschema = ["str",[{description=>"\nEither: a) a known fiat currency code (e.g. USD, GBP), or b) a known\ncryptocurrency code or name or safename (e.g. BTC, \"Bitcoin Cash\",\nethereum-classic). Fiat currency code is checked against known codes in\n<pm:Locale::Codes::Currency_Codes>. Cryptocurrency code/name/safename is checked\nagainst catalog in <pm:CryptoCurrency::Catalog>. Cryptocurrency name/safename\nWill be normalized to code in uppercase.\n\n",summary=>"Fiat currency code or cryptocurrency code, name, or safename","x.completion"=>"fiat_or_cryptocurrency","x.perl.coerce_rules"=>["str_to_fiat_or_cryptocurrency_code"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::fiat_or_cryptocurrency - Fiat currency code or cryptocurrency code
 
 =head1 VERSION
 
-This document describes version 0.009 of Sah::SchemaR::fiat_or_cryptocurrency (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-06-06.
+This document describes version 0.010 of Sah::SchemaR::fiat_or_cryptocurrency (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-06-07.
 
 =head1 DESCRIPTION
 

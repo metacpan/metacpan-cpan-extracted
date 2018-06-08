@@ -34,14 +34,14 @@ sub _build_target_path ($self) {
 
 sub _build_tmpl_params ($self) {
     return {
-        dist_name               => $self->{dist_name},                                                         # Package-Name
-        dist_path               => lc $self->{dist_name},                                                      # package-name
-        module_name             => $self->{dist_namespace},                                                    # Package::Name
-        author                  => $ENV->user_cfg->{_}->{author},
-        author_email            => $ENV->user_cfg->{_}->{email},
+        dist_name               => $self->{dist_name},                                               # Package-Name
+        dist_path               => lc $self->{dist_name},                                            # package-name
+        module_name             => $self->{dist_namespace},                                          # Package::Name
+        author                  => $ENV->user_cfg->{author},
+        author_email            => $ENV->user_cfg->{email},
         copyright_year          => P->date->now->year,
-        copyright_holder        => $ENV->user_cfg->{_}->{copyright_holder} || $ENV->user_cfg->{_}->{author},
-        license                 => $ENV->user_cfg->{_}->{license},
+        copyright_holder        => $ENV->user_cfg->{copyright_holder} || $ENV->user_cfg->{author},
+        license                 => $ENV->user_cfg->{license},
         pcore_version           => $ENV->{pcore}->version->normal,
         cpan_distribution       => 0,
         dockerhub_pcore_repo_id => $ENV->{pcore}->docker->{repo_id},

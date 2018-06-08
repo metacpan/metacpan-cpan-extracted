@@ -17,10 +17,11 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Dist::Zilla::Plugin::Prereqs::EnsureVersion",
   "PREREQ_PM" => {
-    "Config::IOD::Reader" => "0.31",
+    "Config::IOD::Reader" => "0.340",
     "Dist::Zilla::Role::AfterBuild" => 0,
     "File::HomeDir" => 0,
     "Moose" => 0,
+    "PMVersions::Util" => 0,
     "namespace::autoclean" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.050",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,13 +40,14 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Config::IOD::Reader" => "0.31",
+  "Config::IOD::Reader" => "0.340",
   "Dist::Zilla::Role::AfterBuild" => 0,
   "File::HomeDir" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Moose" => 0,
+  "PMVersions::Util" => 0,
   "Test::More" => 0,
   "namespace::autoclean" => 0,
   "strict" => 0,

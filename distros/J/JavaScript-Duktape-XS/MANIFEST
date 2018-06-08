@@ -6,7 +6,6 @@ duktape.c
 duktape.h
 c_eventloop.c
 c_eventloop.h
-c_eventloop.js
 duk_console.c
 duk_console.h
 duk_module_node.c
@@ -17,16 +16,21 @@ pl_duk.c
 pl_duk.h
 pl_eventloop.c
 pl_eventloop.h
+pl_inlined.c
+pl_inlined.h
 pl_module.c
 pl_module.h
 pl_native.c
 pl_native.h
+pl_sandbox.c
+pl_sandbox.h
 pl_stats.c
 pl_stats.h
 pl_util.c
 pl_util.h
 lib/JavaScript/Duktape/XS.pm
 bin/duktape-repl
+bin/file2c.pl
 bin/release.sh
 LICENSE
 MANIFEST
@@ -48,6 +52,8 @@ t/10_run_gc.t
 t/11_typeof.t
 t/12_instanceof.t
 t/13_module.t
+t/14_cyclic.t
+t/15_sandbox.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

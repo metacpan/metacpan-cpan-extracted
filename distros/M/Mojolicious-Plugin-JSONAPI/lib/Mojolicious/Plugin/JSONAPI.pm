@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::JSONAPI;
-$Mojolicious::Plugin::JSONAPI::VERSION = '1.5';
+$Mojolicious::Plugin::JSONAPI::VERSION = '1.6';
 use Mojo::Base 'Mojolicious::Plugin';
 
 use JSONAPI::Document;
@@ -188,7 +188,7 @@ sub create_request_helpers {
             my $path          = $c->tx->req->url->path;
             my $main_resource = $path->parts->[0];
             if ($namespace) {
-                my $idx = length(split('/', $namespace)) - 1;
+                my $idx = split('/', $namespace) - 1;
                 $main_resource = $path->parts->[$idx + 1];
             }
 
@@ -215,7 +215,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 =head1 VERSION
 
-version 1.5
+version 1.6
 
 =head1 SYNOPSIS
 

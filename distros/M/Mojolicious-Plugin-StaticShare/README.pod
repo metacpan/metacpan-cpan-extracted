@@ -142,7 +142,7 @@ sub new {
 
 sub parse { my $self = shift; no strict 'refs'; ($self->{pkg}.'::markdown')->(@_); }
 
-our $VERSION = '0.061';
+our $VERSION = '0.062';
 =pod
 
 =encoding utf8
@@ -159,7 +159,7 @@ Mojolicious::Plugin::StaticShare - browse, upload, copy, move, delete, edit, ren
 
 =head1 VERSION
 
-0.061
+0.062
 
 =head1 SYNOPSIS
 

@@ -13,7 +13,7 @@ use Locale::Maketext::Simple    Class => 'CPANPLUS', Style => 'gettext';
 use version;
 
 use vars qw[$VERSION];
-$VERSION = "0.9174";
+$VERSION = "0.9176";
 
 local $Params::Check::VERBOSE = 1;
 

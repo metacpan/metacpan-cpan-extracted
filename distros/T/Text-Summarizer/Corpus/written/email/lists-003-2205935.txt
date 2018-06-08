@@ -1,0 +1,137 @@
+
+
+
+docno="lists-003-2205935"
+received="Fri Jul  9 09:47:54 1993 EST" 
+sent="Fri, 09 Jul 1993 18:25:04 +0200" 
+name="Andr'e PIRARD" 
+email="PIRARD@vm1.ulg.ac.be" 
+subject="Thoughts about characters transmission" 
+id="01H0C1LQB78Y8WWAUK@INNOSOFT.COM" 
+inreplyto="Tue, 6 Jul 93 20:10 GMT" 
+
+To: "Robert G. Moskowitz" <0003858921@mcimail.com>, ietf-charsets@INNOSOFT.COM,
+
+
+
+
+I have not much time to spend on this subject, but I would have felt bad
+not to express these opinions once.
+
+I have learned with much interest that people envision solutions for
+international characters data exchange with a wider point of view than
+usually heard in the networking sphere.
+I have been spending quite a time of my life with such problems.
+I thought I could contribute with a small text explaining the way
+I have finally come to think of the problem.
+Nothing totally new, probably, but a different shed of light, maybe.
+The text may sound theoretical at first. It is just terse. The ideas are
+based on experience. They have been put to use in the field of 8-bit
+characters. I participated to the design of Kermit multinational 8-bit
+characters support and the TCP/IP network I work for is well on the way
+towards the the same theory that every character on the communication
+line is ISO 8859-1. Any exception to this, like translating EBCDIC directly
+to PC code on one machine, is considered harmful to our internetworking,
+even if convenient.
+Every piece working towards a common well defined goal finally pays more
+when all parts start to clutch than wandering for immediate interest.
+And I hope that saying that my language is French will make the ideas
+in a difficult to write text even more convincing, despite being short.
+
+Networking has had for long the problem of a common representation of
+computer-specific data (numbers, bit strings...) on the wire (rather, on the
+connection), because different computers had different conventions for them.
+To solve this problem, rules like XDR (external data representation) have
+been devised, and, because it was so important, the rules have been adopted.
+
+Character data caused little problem because ASCII was assumed, full stop.
+There was hardly an expressed rule. It was tacit computer culture.
+
+Now that networking reaches its real dimension of an international mesh,
+the problem of national languages usage becomes very real, at least locally,
+but more and more internationally. Any computer has to exchange more
+than ASCII.
+Many generous people have spent much time to have system Si with character
+code Ci translate data for system Sj with code Cj under protocol Pk.
+With much respect for their work, this is not (no longer) the way to do it.
+Supposing that N character codes exist on different systems, the effort
+amounts to M*N**2 to reach a complete solution. Let us count the different
+character codes (IBM have their share) and protocols, the bill is amazing!
+
+The _most_important_point_ is that a single common representation code
+be defined _for_the_line_ (suiting the purpose, namely to cover all national
+languages in one single way) and that people be instructed that every bit
+of text should travel in that code on the wire, whatever_the_protocol_is.
+(Meaning that common tools be available to translate present local code).
+It is best for a computer to use the code of interchange internally,
+but all computers in the world cannot be modified overnight.
+What computer Si has to do to abide by the external representation is
+the sole matter of computer Si: to appear to others as if it were using
+it internally. On any protocol the same way, even during dialog with
+computer Ti using the same code ("One need not know which kind of system
+one is sending mail to"). No tagging of the data nor any need to know
+any character code other than one's own and the interchange code.
+The M*N**2 order of magnitude reduces to N.
+This is the extended "ASCII culture" of some future, no doubt.
+It is a very important goal just now.
+It is a fact that the choice of a character code has long lasting effects,
+because of the building software base. The impact of today's decisions
+is amplified by time. The sooner the better. The better the sooner.
+
+More theoretically said this time, this local-code to exchange-code
+translation works much a la OSI layer (or "a` la", if you don't mind :-)
+Data is encoded towards a lower layer, exchanged, and decoded back to
+same level, but possibly to a different local code.
+It probably belongs between level 6 and 7, as it could prove that the
+application layer provides all the textual data. But that's not sure,
+like for XDR which can be used from many levels to convert CPU data
+to line format.
+Should we merge "presentation" and "representation" layers, split level 6
+like level 2 or not assign it to any level, I'll leave the discussion to
+the theoricians.
+
+What seems clear in my mind is that the translation is not in several
+final protocols, but a protocol by itself -- like XDR -- that other
+protocols refer to.
+And this may be the most important point.
+It is a pity to see each protocol tackle the problem its own way.
+
+Note that the "level 6 or so" concept applied to text extends slightly beyond
+the representation of characters (and binary data) towards file structure.
+Think of the line separator problem of NFS for the basic case of text files.
+While file structure (including file name etc...) is clearly a specialized
+problem (as opposed to communication of streams of text), the impact on
+systems and protocols design is just as high.
+
+Clearly, it will take much time to stand in ASCII's shoes.
+But doing otherwise would take even longer to erase and redo.
+One cannot increase complication eternally.
+
+Some intermediate compromises will have to be used like additional
+encoding on pathes some insist to not even try to convert to 8-bit,
+asking the rest of the networks to convert to 7-bit instead and to
+rewrite all their programs to use a complicated method for sending
+plain text when the sole problem is that it contains 8-bit data.
+
+The important thing is that the new layer be known and used.
+It's the interest of both the software writer and buyer.
+It will get void when a system will use the interchange code for itself.
+
+Now that the international character code ISO 10646 is out, isn't it time
+for communication systems to be able to not only exchange pictures and sound
+but also plain text?  Will ISO 10646 be used by OSI 6?
+
+Thanks for your interest.
+I go away for holidays today. If you write anything you want me to read,
+please make a personal reply and allow for two weeks before I can read it.
+I have picked addresses from a BOF announcement and sent to mailing lists
+I am not on. Feel free to forward the text to anyone intersted.
+
+Andr'e PIRARD        SEGI, Univ. de Li`ege      | 139.165.0.0 IP (ULg)
+B26 - Sart Tilman    B-4000 Li`ege 1 (Belgium)  | Architecture & Adm.
+pirard@vm1.ulg.ac.be aka PIRARD@BLIULG11.BITNET   +32 (41) 564932
+
+What is an FAQ is a frequently asked question.
+
+
+

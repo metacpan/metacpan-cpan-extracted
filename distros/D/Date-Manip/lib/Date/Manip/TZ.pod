@@ -544,12 +544,12 @@ for a date. If a date contains no time zone information, it will
 default to the working time zone.
 
 The local time zone is determined using the methods described in the
-following section. The preferred way is to locate the time zone in
-some system file, or using some system command, or (in the case of
-a Windows operating system) to look it up in the registry. If all
-of these methods fail, the local time zone may be set using either
-the $::TZ or $ENV{TZ} variables. Please note that these should ONLY
-be used to set the actual local time zone.
+following section. Methods exist for locating the zone in one of the
+system configuration files, determining it by running a system
+command, or by looking it up in the registry (for Windows operating
+systems).  If all of these methods fail, the local time zone may be
+set using either the $::TZ or $ENV{TZ} variables. Please note that
+these should ONLY be used to set the actual local time zone.
 
 If you are running in one time zone, but you want to force dates to be
 specified in an alternate time zone by default, you need to set the

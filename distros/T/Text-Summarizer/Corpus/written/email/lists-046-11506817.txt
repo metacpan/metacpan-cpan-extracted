@@ -1,0 +1,36 @@
+
+
+
+docno="lists-046-11506817"
+name="Ron Whitney"
+email="RFW@math.ams.org"
+sent="Thu, 11 Apr 1996 08:46:25 -0400 (EDT)"
+* Mail-System-Version:
+subject="small questions regarding integrals"
+To: w3c-math-erb@w3.org
+
+
+
+In composing a longer piece about concerns here, I have a couple of
+smallish, focused questions.  I'll ask them in the context of integrals.
+
+Dave proposes something on the order of
+
+  integral from ... to ... of ... \d x
+
+for an "ordinary" integral.
+
+1. How will we handle the variants on this theme such as multiple
+integrals (to be rendered with multiple integral signs), path
+integrals, etc. ?
+
+2. Is there a specific reason we don't want to use the TeX-like
+notation: \int_{...}^{...} ... ?  (because the _ and ^ operators
+become "too" overloaded?)
+
+
+
+-Ron
+     
+
+

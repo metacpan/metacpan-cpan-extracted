@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html><head><title>How do I set up a custom domain with GoDaddy?</title></head><body>
+<strong>How do I set up a custom domain with GoDaddy? </strong><br />
+<br />
+First of all, before you try to set up a custom domain with GoDaddy, make sure that you understand the details of setting up a CNAME DNS record by reading this FAQ first:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=140"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=140">&nbsp;What is the recommended way to set up a custom domain? </a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+You should also watch our Setup Video even though it shows the setup process using the NameCheap registrar. The video explains many important details that are common to setting up a custom domain no matter what registrar or control panel you are using:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=cnamedns" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=cnamedns" id="video-link-new">How To Set Up A Custom Domain Using a CNAME DNS Record</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+<strong>Setting up your custom domain with GoDaddy &hellip;</strong><br />
+<br />
+These instructions show you how to set up your domain with GoDaddy provided that you haven&rsquo;t changed your domain&rsquo;s nameservers to point at a website hosted by a different company.<br />
+<br />
+For example, it&rsquo;s pretty common to buy a domain from GoDaddy then set up the website it points to at HostGator, 1&amp;1, or some other major hosting company. If that&rsquo;s what you&rsquo;ve done, then you&rsquo;ll need to use the control panel provided by the other company, and in most cases that control panel will either be called &ldquo;cPanel&rdquo; or &ldquo;Plesk&rdquo;. Look for our set up guides for those in the FAQ above.<br />
+<br />
+If you&rsquo;ve just bought your domain from GoDaddy specifically to use for tracking, this set up guide is for you!<br />
+<br />
+<br />
+<strong>Setting up your custom domain with GoDaddy &hellip;</strong><br />
+<br />
+<strong>Step 1:</strong>&nbsp;<strong>Create a CNAME record in the DNS Management editor</strong><br />
+<br />
+From the GoDaddy Domain Manager, click on your domain, go to the &ldquo;Additional Settings&rdquo; section, then click on the &ldquo;Manage DNS&rdquo; link:<br />
+<br />
+<br />
+<img alt="" src="//cdn.clickmagick.com/images/user/faqs/faq187panel.jpg" /><br />
+<br />
+<br />
+This should show you all of your existing DNS records&nbsp;and give you the option to add new DNS records by clicking on the word &ldquo;<span style="color:#27ae60;"><strong>ADD</strong></span>&rdquo; in the lower right corner.<br />
+<br />
+For example, if you want your custom tracking domain to be &ldquo;<strong>www</strong>.yourdomain.com&rdquo; , you&rsquo;d click on the <span style="color:#27ae60;"><strong>ADD</strong></span> link. Enter&nbsp;<strong>www</strong>&nbsp;in the &ldquo;Host&rdquo; section, set the TTL value to&nbsp;<strong>&frac12; hour</strong>, and set the &ldquo;Points to&rdquo; field to one of ClickMagick&rsquo;s domains. Use&nbsp;<code>www.clkmg.com</code>&nbsp;for tracking links and split tests or&nbsp;<code>www.clkmr.com</code>&nbsp;for rotators.<br />
+<br />
+Your entry should look like this:<br />
+<br />
+<br />
+<img alt="" src="//cdn.clickmagick.com/images/user/faqs/faq187cname.jpg" /><br />
+<br />
+<br />
+Click the &ldquo;Save&rdquo; button and you should see this entry in your list of DNS records:<br />
+<br />
+<img alt="" src="//cdn.clickmagick.com/images/user/faqs/faq187wwwent.jpg" style="width: 608px; height: 62px;" /><br />
+<br />
+GoDaddy won&rsquo;t let you create two CNAME entries with the same Host value. If you get an error, delete the original &ldquo;www&rdquo; CNAME entry and try again.<br />
+<br />
+If you don&rsquo;t want to use &ldquo;<strong>www</strong>.yourdomain.com&rdquo; for your tracking domain because it already points to another website, you&rsquo;ll want to set the Domain Name to something other than &ldquo;www&rdquo;.&nbsp;<br />
+<br />
+The word &ldquo;track&rdquo; is a good choice, giving you <code>track.yourdomain.com</code> as your tracking domain:<br />
+<br />
+<img alt="" src="//cdn.clickmagick.com/images/user/faqs/faq187trkent.jpg" style="width: 603px; height: 62px;" /><br />
+<br />
+<br />
+<b>Step 2: Add your custom domain to ClickMagick</b><br />
+<br />
+Once you complete Step 1 above, the only other thing you need to do is add your custom domain to your ClickMagick account using the&nbsp;<a href="/user/domains.cgi" target="_blank">Domain Manager</a>.<br />
+<br />
+Be sure to add your custom domain exactly as you&rsquo;ve set it up in Step 1 above e.g. either <code>www.yourdomain.com</code> or <code>track.yourdomain.com</code> in the examples above.<br />
+<br />
+ClickMagick&rsquo;s Domain Manager will thoroughly test your domain when you try to add it. If the Domain Manager accepts the domain, then you&rsquo;ve set it up correctly and it&rsquo;s working perfectly! Otherwise, read and follow any error messages you get.&nbsp;<br />
+<br />
+<br />
+<b>Step 3: Create your custom domain without &ldquo;www.&rdquo; &nbsp;<em>(optional)</em></b><br />
+<br />
+If you&rsquo;re using your custom domain <em>only</em> for tracking purposes, you&rsquo;ll probably want to also set up the non-&rdquo;www.&rdquo; version of your domain (i.e., &ldquo;yourdomain.com&rdquo;). This would typically be the case if you&rsquo;ve just bought your domain specifically for tracking purposes.<br />
+<br />
+For example, if you just set up a CNAME record with a hostname of &ldquo;www&rdquo; as in Step 1 above, your tracking links will look like this:<br />
+<br />
+<code>http://www.yourdomain.com/linkID</code><br />
+<br />
+However, if you leave off the &ldquo;www.&rdquo; like this&hellip;<br />
+<br />
+<code>http://yourdomain.com/linkID</code><br />
+<br />
+&hellip; the tracking domain will NOT work.<br />
+<br />
+You have to set the non-&rdquo;www.&rdquo; version up as well, and because the non-&rdquo;www.&rdquo; domain does not have a Host, you cannot use a CNAME record to properly set it up. Instead, you need to use an &ldquo;A&rdquo; record.<br />
+<br />
+<em><span style="background-color: rgb(255, 255, 224);">Caution: you cannot make this change if you have any existing content at &ldquo;yourdomain.com&rdquo;. The second you add the &ldquo;A&rdquo; record, your domain will point to ClickMagick and not to your original website. This will break your existing website if you have one, and that includes a WordPress blog.</span></em><br />
+<br />
+If you&rsquo;re unsure whether you have existing content, just enter your domain without the &ldquo;www.&rdquo; and see what pulls up. If it&rsquo;s a website you want to keep, then you can&rsquo;t add the &ldquo;A&rdquo; record or you will lose that website&hellip;<br />
+<br />
+To get started, first delete any &ldquo;A&rdquo; record that already has &ldquo;@&rdquo; as the Host setting, if there is one.&nbsp;<br />
+<br />
+Next, click the &ldquo;<span style="color:#27ae60;"><strong>ADD</strong></span>&rdquo; button and create a new &ldquo;A&rdquo; record. Set the Host to &ldquo;@&rdquo;, and the &ldquo;Points to&rdquo; setting must be one of our IP addresses. Use IP&nbsp;<strong>50.97.212.250</strong> for tracking domains or IP&nbsp;<strong>50.97.212.251</strong> for rotator domains. Set the TTL to &ldquo;1/2 Hour&rdquo;.<br />
+<br />
+Here&rsquo;s what this looks like in GoDaddy:<br />
+<br />
+<img alt="" src="//cdn.clickmagick.com/images/user/faqs/faq187arec.jpg" /><br />
+<br />
+<br />
+Click &ldquo;Save&rdquo; and your &ldquo;A&rdquo; record is all set up! Your final complete setup&mdash;without duplicates&mdash;should look like this:<br />
+<br />
+<img alt="" src="//cdn.clickmagick.com/images/user/faqs/faq187finalsetup.jpg" style="width: 600px; height: 235px;" /><br />
+<br />
+You will see other entries in your DNS records, but as long as you have only one entry for &ldquo;www&rdquo; and only one &ldquo;A&rdquo; record with &ldquo;@&rdquo; as the Name, then you&rsquo;ve set it up correctly.<br />
+<br />
+<br />
+<strong>Step 4:&nbsp;</strong><b>Add your custom domain (without &ldquo;www.&rdquo;) to ClickMagick</b><br />
+<br />
+Finally, you have to also add the non-www version of your domain to your <a href="/user/domains.cgi" target="_blank">Domain Manager</a><br />
+and you&rsquo;ll be all set.
+</body></html>

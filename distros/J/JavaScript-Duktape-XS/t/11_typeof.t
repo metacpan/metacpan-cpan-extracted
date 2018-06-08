@@ -13,7 +13,8 @@ sub test_typeof {
         'null'      => [ undef ],
         'number'    => [ 11, 3.1415 ],
         'string'    => [ '', 'gonzo' ],
-        'object'    => [ [], [1, 2, 3], {}, { foo => 1, bar => 2 } ],
+        'array'     => [ [], [1, 2, 3] ],
+        'object'    => [ { foo => 1, bar => 2 } ],
     );
     my $duk = JavaScript::Duktape::XS->new();
     ok($duk, "created JavaScript::Duktape::XS object");

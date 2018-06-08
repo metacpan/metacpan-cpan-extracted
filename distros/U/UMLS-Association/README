@@ -40,65 +40,12 @@ NAME
     However, it is highly recommended not messing around with other
     parameters, unless you know what you're doing.
 
-  DATABASE SETUP
-    UMLS-Association assumes that the CUI bigrams extracted from the
-    Metamapped Medline baseline is present as a mysql database. The names of
-    these databases can be passed as configuration options at
-    initialization. However, if the names of the database is not provided at
-    initialization, then default values are used -- the database is called
-    CUI_BIGRAMS and contains four tables: 1. N_11 2. N_1P 3. N_P1 4. N_PP
-
-    Direction on installing the CUI_BIGRAMS database is in the INSTALL file.
-
-    All other tables in the databases will be ignored, and any of these
-    tables missing would raise an error.
-
-    The mysql server can be on the same machine as the module or could be on
-    a remotely accessible machine. The location of the server can be
-    provided during initialization of the module.
-
   INITIALIZING THE MODULE
     To create an instance of the UMLS-Association object, using default
     values for all configuration options:
 
       use UMLS::Association;
       my $association = UMLS::Association->new();
-
-    The following configuration options are also provided though:
-
-        'driver'       -> Default value 'mysql'. This option specifies the 
-                          Perl DBD driver that should be used to access the
-                          database. This implies that the some other DBMS
-                          system (such as PostgresSQL) could also be used,
-                          as long as there exist Perl DBD drivers to
-                          access the database.
-        'database'     -> Default value 'CUI_BIGRAMS'. This option specifies 
-                          the name UMLS-Association database. 
-        'hostname'     -> Default value 'localhost'. The name or the IP 
-                          address of the machine on which the database 
-                          server is running.
-        'socket'       -> Default value '/tmp/mysql.sock'. The socket on 
-                          which the database server is using.
-        'port'         -> The port number on which the database server 
-                          accepts connections.
-        'username'     -> Username to use to connect to the database server. 
-                          If not provided, the module attempts to connect as 
-                          an anonymous user.
-        'password'     -> Password for access to the database server. If not
-                          provided, the module attempts to access the server
-                          without a password.
-
-    These are passed through a hash. For example:
-
-        my %options = ();
-        $options{'config'}   = $config;
-        $options{'database'} = 'CUI_BIGRAM_V1';
-
-        my $association = UMLS::Association->new(\%options);
-
-    Keep in mind that the database configuration options can be included in
-    the MySQL my.cnf file. This is preferable. The directions for this are
-    in the INSTALL file.
 
   CONTENTS
         All the modules that will be installed in the Perl system directory are
@@ -108,9 +55,13 @@ NAME
         programs. These utilities use the modules or provide some supporting
         functionality.
 
-          umls-association.pl         -- returns the association score of two 
+         umls-association.pl         -- returns the association score of two 
                                         terms or UMLS CUIs given a specified 
                                         measure (and view of the UMLS).
+
+         umls-association-runDataSet.pl -- outputs the association scores of
+                                           an entire dataset (such as minimayo
+                                           UMNSRS, etc.)
 
          CUICollector.pl            -- script to create the CUI_BIGRAM database
                                        from the Metamapped Medline Baseline 
@@ -136,10 +87,11 @@ NAME
 
     You may also contact us directly if you prefer :
 
+        Sam Henry: henryst at vcu.edu
         Bridget T. McInnes: btmcinnes at vcu.edu
 
   SOFTWARE COPYRIGHT AND LICENSE
-    Copyright (C) 2015 Bridget T McInnes
+    Copyright (C) 2018 Sam Henry
 
     This suite of programs is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as published

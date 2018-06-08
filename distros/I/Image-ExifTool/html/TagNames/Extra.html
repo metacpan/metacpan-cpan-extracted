@@ -168,10 +168,11 @@ option is set)</span></span></td></tr>
 <td>FileCreateDate</td>
 <td class=c title=' ! = Unsafe'>yes!</td>
 <td class=c>System</td>
-<td><span class=s><span class=n>(the filesystem creation date/time.  Windows only.  This tag is writable and
-is preserved by default when writing if Win32API::File and Win32::API are
-available.  See <a href="MacOS.html#MDItem">MDItemFSCreationDate</a> for the Mac OS X
-equivalent)</span></span></td></tr>
+<td><span class=s><span class=n>(the filesystem creation date/time.  Windows/Mac only.  In Windows, the file
+creation date/time is preserved by default when writing if Win32API::File
+and Win32::API are available.  On Mac, this tag is extracted only if it or
+the MacOS group is specifically requested or the RequestAll API option is
+set to 2 or higher.  Requires &quot;setfile&quot; for writing on Mac)</span></span></td></tr>
 <tr>
 <td>FileDeviceID</td>
 <td class=c>no</td>
@@ -395,10 +396,20 @@ unless specifically requested or the RequestAll API option is set)</span></span>
 <code>&quot;-modifydate&lt;now&quot;</code>.  Not generated unless specifically requested or the
 RequestAll API option is set)</span></span></td></tr>
 <tr class=b>
+<td>OtherImage</td>
+<td class=c>no</td>
+<td class=c>File</td>
+<td><span class=s><span class=n>(other JPEG-format embedded image)</span></span></td></tr>
+<tr>
 <td>PreviewImage</td>
 <td class=c>yes</td>
 <td class=c>File</td>
 <td><span class=s><span class=n>(JPEG-format embedded preview image)</span></span></td></tr>
+<tr class=b>
+<td>PreviewPDF</td>
+<td class=c>no</td>
+<td class=c>File</td>
+<td><span class=s><span class=n>(PDF-format embedded preview image)</span></span></td></tr>
 <tr>
 <td>PreviewPNG</td>
 <td class=c>no</td>
@@ -443,15 +454,20 @@ the command line)</span></span></td></tr>
 file renaming feature.  Writing this tag prints the old and new file names
 to the console, but does not affect the file itself)</span></span></td></tr>
 <tr class=b>
+<td>ThumbnailImage</td>
+<td class=c>no</td>
+<td class=c>File</td>
+<td><span class=s><span class=n>(JPEG-format embedded thumbnail image)</span></span></td></tr>
+<tr>
 <td>Validate</td>
 <td class=c>no</td>
 <td class=c>ExifTool</td>
-<td><span class=s><span class=n>([experimental] generated only if specifically requested.  Requesting this
-tag automatically enables the <a href="../ExifTool.html#Validate">API Validate option</a>,
-imposing additional validation checks when extracting metadata.  Returns the
-number of errors, warnings and minor warnings encountered)</span>
+<td><span class=s><span class=n>(generated only if specifically requested.  Requesting this tag automatically
+enables the <a href="../ExifTool.html#Validate">API Validate option</a>, imposing
+additional validation checks when extracting metadata.  Returns the number
+of errors, warnings and minor warnings encountered)</span>
   <br>&#39;0 0 0&#39; = OK</span></td></tr>
-<tr>
+<tr class=b>
 <td>Warning</td>
 <td class=c>no</td>
 <td class=c>ExifTool</td>
@@ -460,18 +476,18 @@ Use the -a or Duplicates option to see all warnings if more than one
 occurred. Minor warnings may be ignored with the -m or IgnoreMinorErrors
 option.  Minor warnings with a capital &quot;M&quot; in the &quot;[Minor]&quot; designation
 indicate that the processing is affected by ignoring the warning)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>XMP</td>
 <td class=c title=' ! = Unsafe'>yes!</td>
 <td class=c>XMP</td>
 <td><span class=s><span class=n>(the XMP data block, but note that extended XMP in JPEG images may be split
 into multiple blocks.  This tag is generated only if specifically requested)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>XResolution</td>
 <td class=c>no</td>
 <td class=c>File</td>
 <td><span class=s><span class=n>(the horizontal pixel resolution)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>YResolution</td>
 <td class=c>no</td>
 <td class=c>File</td>
@@ -480,7 +496,7 @@ into multiple blocks.  This tag is generated only if specifically requested)</sp
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 20, 2018</i>
+<br><i>Last revised May 16, 2018</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

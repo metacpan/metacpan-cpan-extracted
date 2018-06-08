@@ -1,4 +1,8 @@
+1.6       2018-06-08 00:48:57+01:00 Europe/London
+
 1.5       2018-06-03 15:24:37+01:00 Europe/London
+- Support nested relationships in requested_resources
+- Minimum dependency of 1.4 for JSONAPI::Document due to major refactoring
 
 1.4       2018-05-19 13:23:34+01:00 Europe/London
 - Implement requested_fields helper

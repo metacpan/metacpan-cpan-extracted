@@ -28,6 +28,7 @@ requires:
   Dist::Zilla::Role::FileMunger: '0'
   Dist::Zilla::Role::PrereqSource: '0'
   Moose: '0'
+  PMVersions::Util: '0'
   Require::Hook::DzilBuild: '0'
   Text::Diff: '0'
   namespace::autoclean: '0'
@@ -38,7 +39,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Sah-Schemas
   homepage: https://metacpan.org/release/Dist-Zilla-Plugin-Sah-Schemas
   repository: git://github.com/perlancar/perl-Dist-Zilla-Plugin-Sah-Schemas.git
-version: '0.012'
+version: '0.013'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -354,7 +355,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prereqs::EnsureVersion
       name: '@Author::PERLANCAR/Prereqs::EnsureVersion'
-      version: '0.04'
+      version: '0.050'
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'

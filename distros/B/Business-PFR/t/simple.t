@@ -18,6 +18,7 @@ sub check_get_check_digit {
         '100' => '00',
         '101' => '00',
         '102' => '01',
+        '201' => '00',
     );
 
     foreach my $sum (keys %tests) {
@@ -33,6 +34,7 @@ sub check_get_check_digit {
 sub check_valid_pfrs {
     my @valid = (
         '112-233-445 95',
+        '700-925-999 00',
     );
 
     foreach my $pfr (@valid) {

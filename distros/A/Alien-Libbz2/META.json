@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -16,18 +16,17 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Build" : "0.19",
-            "Alien::Build::MM" : "0.19",
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "1.25",
             "ExtUtils::MakeMaker" : "6.52"
          }
       },
       "configure" : {
          "requires" : {
-            "Alien::Build" : "0.19",
-            "Alien::Build::MM" : "0.19",
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "1.25",
             "ExtUtils::CBuilder" : "0",
             "ExtUtils::MakeMaker" : "6.52",
-            "IPC::Cmd" : "0",
             "perl" : "5.008001"
          }
       },
@@ -41,7 +40,6 @@
             "Test::More" : "0.94",
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
-            "Test::Pod::Coverage" : "0",
             "Test::Pod::Spelling::CommonMistakes" : "0",
             "Test::Spelling" : "0",
             "Test::Strict" : "0",
@@ -50,15 +48,14 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::Base" : "0.036",
+            "Alien::Base" : "1.25",
             "perl" : "5.008001"
          }
       },
       "test" : {
          "requires" : {
-            "Test2::Suite" : "0.000060",
+            "Test2::V0" : "0.000060",
             "Test::Alien" : "0.12",
-            "Test::More" : "0.94",
             "perl" : "5.008001"
          }
       }
@@ -76,7 +73,25 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.22",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+   "version" : "0.23",
+   "x_alienfile" : {
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.24",
+      "requires" : {
+         "share" : {
+            "Alien::patch" : "0.09",
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Zlib" : "0",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
+   "x_use_unsafe_inc" : 0
 }
 

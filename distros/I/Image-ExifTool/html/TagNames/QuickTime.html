@@ -8,13 +8,16 @@
 <body>
 <h2 class=top>QuickTime Tags</h2>
 <p>The QuickTime format is used for many different types of audio, video and
-image files (most commonly, MOV and MP4 videos).  Exiftool extracts standard
-meta information a variety of audio, video and image parameters, as well as
-proprietary information written by many camera models.  Tags with a question
-mark after their name are not extracted unless the Unknown option is set.</p>
+image files (most notably, MOV/MP4 videos and HEIC/CR3 images).  Exiftool
+extracts standard meta information a variety of audio, video and image
+parameters, as well as proprietary information written by many camera
+models.  Tags with a question mark after their name are not extracted unless
+the Unknown option is set.</p>
 
-<p>ExifTool has the ability to write/create XMP, and edit some date/time tags
-in QuickTime-format files.</p>
+<p>ExifTool currently has a very limited ability to write metadata in
+QuickTime-format videos.  It can edit/create/delete any XMP tags, but may
+only be used to edit certain date/time tags and the video orientation in
+native QuickTime metadata.</p>
 
 <p>According to the specification, many QuickTime date/time tags should be
 stored as UTC.  Unfortunately, digital cameras often store local time values
@@ -122,21 +125,27 @@ roll, yaw, speed, altitude)</span></span></td></tr>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>'udat'</td>
+<td>GPSLog</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>'udta'</td>
 <td>UserData</td>
 <td class=c>-</td>
 <td>--&gt; <a href='FLIR.html#UserData'>FLIR UserData Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'uuid'</td>
 <td>XMP
   <br>UUID-PROF
   <br>UUID-Flip
+  <br>PreviewImage
   <br>UUID-Unknown?</td>
-<td class=c>-<br>-<br>-<br>no</td>
+<td class=c>-<br>-<br>-<br>no<br>no</td>
 <td>--&gt; <a href='XMP.html'>XMP Tags</a>
   <br>--&gt; <a href='QuickTime.html#Profile'>QuickTime Profile Tags</a>
   <br>--&gt; <a href='QuickTime.html#Flip'>QuickTime Flip Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'wide'</td>
 <td>Wide?</td>
 <td class=c>no</td>
@@ -213,6 +222,7 @@ roll, yaw, speed, altitude)</span></span></td></tr>
   <br>&#39;aax &#39; = Audible Enhanced Audiobook (.AAX)
   <br>&#39;avc1&#39; = MP4 Base w/ AVC ext [ISO 14496-12:2005]
   <br>&#39;caqv&#39; = Casio Digital Camera
+  <br>&#39;crx &#39; = Canon Raw (.CRX)
   <br>&#39;da0a&#39; = DMB MAF w/ MPEG Layer II aud, MOT slides, DLS, JPG/PNG/MNG images
   <br>&#39;da0b&#39; = DMB MAF, extending DA0A, with 3GPP timed text, DID, TVA, REL, IPMP
   <br>&#39;da1a&#39; = DMB MAF audio with ER-BSAC audio, JPG/PNG/MNG images
@@ -366,6 +376,7 @@ roll, yaw, speed, altitude)</span></span></td></tr>
 <td class=c>no</td>
 <td><table class=cols><tr>
   <td>&#39;alis&#39; = Alias Data
+  <br>&#39;camm&#39; = Camera Metadata
   <br>&#39;crsm&#39; = Clock Reference
   <br>&#39;hint&#39; = Hint Track
   <br>&#39;ipsm&#39; = IPMP
@@ -374,9 +385,9 @@ roll, yaw, speed, altitude)</span></span></td></tr>
   <br>&#39;mdta&#39; = Metadata Tags
   <br>&#39;meta&#39; = NRT Metadata
   <br>&#39;mjsm&#39; = MPEG-J
-  <br>&#39;nrtm&#39; = Non-Real Time Metadata
-  <br>&#39;ocsm&#39; = Object Content</td><td>&nbsp;&nbsp;</td>
-  <td>&#39;odsm&#39; = Object Descriptor
+  <br>&#39;nrtm&#39; = Non-Real Time Metadata</td><td>&nbsp;&nbsp;</td>
+  <td>&#39;ocsm&#39; = Object Content
+  <br>&#39;odsm&#39; = Object Descriptor
   <br>&#39;pict&#39; = Picture
   <br>&#39;priv&#39; = Private
   <br>&#39;sdsm&#39; = Scene Description
@@ -737,16 +748,17 @@ added dynamically to this table after processing the Meta Keys information.</p>
 <td>MediaType</td>
 <td class=c>no</td>
 <td><table class=cols><tr>
-  <td>0 = Movie
+  <td>0 = Movie (old)
   <br>1 = Normal (Music)
   <br>2 = Audiobook
   <br>5 = Whacked Bookmark
-  <br>6 = Music Video</td><td>&nbsp;&nbsp;</td>
-  <td>9 = Short Film
-  <br>10 = TV Show
+  <br>6 = Music Video
+  <br>9 = Movie</td><td>&nbsp;&nbsp;</td>
+  <td>10 = TV Show
   <br>11 = Booklet
   <br>14 = Ringtone
-  <br>21 = Podcast</td></tr></table>
+  <br>21 = Podcast
+  <br>23 = iTunes U</td></tr></table>
 </td></tr>
 <tr>
 <td>'titl'</td>
@@ -5095,6 +5107,16 @@ spherical coordinates left/right degrees, down/up degrees, distance)</span></spa
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>'CDI1'</td>
+<td>CDI1</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#CDI1'>Canon CDI1 Tags</a></td></tr>
+<tr class=b>
+<td>'JPEG'</td>
+<td>JPEGInfo?</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>'avcC'</td>
 <td>AVCConfiguration?</td>
 <td class=c>no</td>
@@ -5476,8 +5498,8 @@ https://github.com/google/spatial-media/blob/master/docs/spherical-video-v2-rfc.
 <tr class=b>
 <td class=r title='10 = 0xa'>10</td>
 <td>MatrixStructure</td>
-<td class=c>no</td>
-<td>&nbsp;</td></tr>
+<td class=c>fixed32s[9]</td>
+<td><span class=s><span class=n>(writable for the video track via the Composite Rotation tag)</span></span></td></tr>
 <tr>
 <td class=r title='19 = 0x13'>19</td>
 <td>ImageWidth</td>
@@ -5620,36 +5642,41 @@ multi-language user data tags found, even if they don&#39;t exist in this table.
 <td><span class=s>1 = Normal
   <br>2 = Palindromic</span></td></tr>
 <tr>
+<td>'Lvlm'</td>
+<td>LevelMeter?</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>'MMA0'</td>
 <td>MinoltaMMA0</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Minolta.html#MMA'>Minolta MMA Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'MMA1'</td>
 <td>MinoltaMMA1</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Minolta.html#MMA'>Minolta MMA Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'MVTG'</td>
 <td>FujiFilmMVTG</td>
 <td class=c>-</td>
 <td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'NCDT'</td>
 <td>NikonNCDT</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Nikon.html#NCDT'>Nikon NCDT Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'PANA'</td>
 <td>PanasonicPANA</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Panasonic.html#PANA'>Panasonic PANA Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'PENT'</td>
 <td>PentaxPENT</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#PENT'>Pentax PENT Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'PXMN'</td>
 <td>MakerNotePentax5b
   <br>MakerNotePentax5c
@@ -5657,29 +5684,34 @@ multi-language user data tags found, even if they don&#39;t exist in this table.
 <td class=c>-<br>-<br>no</td>
 <td>--&gt; <a href='Pentax.html'>Pentax Tags</a>
   <br>--&gt; <a href='Pentax.html'>Pentax Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'PXTH'</td>
 <td>PentaxPreview</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#PXTH'>Pentax PXTH Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'QVMI'</td>
 <td>CasioQVMI</td>
 <td class=c>-</td>
 <td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'RMKN'</td>
 <td>RicohRMKN</td>
 <td class=c>-</td>
 <td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'RTHU'</td>
 <td>PreviewImage</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'SDLN'</td>
 <td>PlayMode</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'SNum'</td>
+<td>SerialNumber</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
 <tr>
@@ -5733,153 +5765,173 @@ multi-language user data tags found, even if they don&#39;t exist in this table.
 <td class=c>-</td>
 <td>--&gt; <a href='Microsoft.html#Xtra'>Microsoft Xtra Tags</a></td></tr>
 <tr class=b>
+<td>'_cx_'</td>
+<td>CX?</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'_cy_'</td>
+<td>CY?</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'_yaw'</td>
+<td>Yaw</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>'albm'</td>
 <td>Album</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'albr'</td>
 <td>AlbumArtist</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'angl'</td>
 <td>CameraAngle</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'apmd'</td>
 <td>ApertureMode</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'auth'</td>
 <td>Author</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'ccid'</td>
 <td>ContentID</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'cdis'</td>
 <td>ContentDistributorID</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'chpl'</td>
 <td>ChapterList</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'clfn'</td>
 <td>ClipFileName</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'clid'</td>
 <td>ClipID</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'clsf'</td>
 <td>Classification</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'cmid'</td>
 <td>CameraID</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'cmnm'</td>
 <td>Model</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'coll'</td>
 <td>CollectionName</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'cprt'</td>
 <td>Copyright</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'cver'</td>
 <td>CodeVersion</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'cvru'</td>
 <td>CoverURI</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'date'</td>
 <td>DateTimeOriginal</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'dscp'</td>
 <td>Description</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'gnre'</td>
 <td>Genre</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'hinf'</td>
 <td>HintTrackInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#HintTrackInfo'>QuickTime HintTrackInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'hinv'</td>
 <td>HintVersion</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'hnti'</td>
 <td>HintInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#HintInfo'>QuickTime HintInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'htcb'</td>
 <td>HTCBinary</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#HTCBinary'>QuickTime HTCBinary Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'icnu'</td>
 <td>IconURI</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'infu'</td>
 <td>InfoURL</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'kgtt'</td>
 <td>TrackType</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'kywd'</td>
 <td>Keywords</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'loci'</td>
 <td>LocationInformation</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'lrcu'</td>
 <td>LyricsURI</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'lvlm'</td>
+<td>LevelMeter?</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -5908,13 +5960,33 @@ multi-language user data tags found, even if they don&#39;t exist in this table.
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>'pose'</td>
+<td>pose</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Kodak.html#pose'>Kodak pose Tags</a></td></tr>
+<tr class=b>
+<td>'ptch'</td>
+<td>Pitch</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>'ptv '</td>
 <td>PrintToVideo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#Video'>QuickTime Video Tags</a></td></tr>
 <tr class=b>
+<td>'rads'</td>
+<td>Rads?</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>'reel'</td>
 <td>ReelName</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'roll'</td>
+<td>Roll</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
 <tr>
@@ -6817,112 +6889,183 @@ multi-language user data tags found, even if they don&#39;t exist in this table.
 </table></td></tr></table></blockquote>
 
 <h2><a name='Stream'>QuickTime Stream Tags</a></h2>
-<p>Tags extracted from QuickTime movie data when the ExtractEmbedded option is
-used.</p>
+<p>Timed metadata extracted from QuickTime movie data and some AVI videos when
+the ExtractEmbedded option is used.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
-<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<tr class=h><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td>'Accelerometer'</td>
 <td>Accelerometer</td>
 <td class=c>no</td>
 <td><span class=s><span class=n>(right/up/backward acceleration in units of g)</span></span></td></tr>
 <tr class=b>
-<td>'GPSAltitude'</td>
+<td>CTMD</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#CTMD'>Canon CTMD Tags</a></td></tr>
+<tr>
+<td>FrameNumber</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>GPSAltitude</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>'GPSAltitudeRef'</td>
-<td>GPSAltitudeRef</td>
-<td class=c>no</td>
-<td><span class=s>0 = Above Sea Level
-  <br>1 = Below Sea Level</span></td></tr>
-<tr class=b>
-<td>'GPSDateTime'</td>
 <td>GPSDateTime</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
-<td>'GPSLatitude'</td>
+<tr class=b>
 <td>GPSLatitude</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
-<td>'GPSLongitude'</td>
+<tr>
 <td>GPSLongitude</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
-<td>'GPSSpeed'</td>
+<tr class=b>
 <td>GPSSpeed</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
-<td>'GPSSpeedRef'</td>
+<tr>
 <td>GPSSpeedRef</td>
 <td class=c>no</td>
 <td><span class=s>&#39;K&#39; = km/h
   <br>&#39;M&#39; = mph
   <br>&#39;N&#39; = knots</span></td></tr>
-<tr>
-<td>'GPSTrack'</td>
+<tr class=b>
 <td>GPSTrack</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
-<td>'GPSTrackRef'</td>
+<tr>
 <td>GPSTrackRef</td>
 <td class=c>no</td>
 <td><span class=s>&#39;M&#39; = Magnetic North
   <br>&#39;T&#39; = True North</span></td></tr>
+<tr class=b>
+<td>JpgFromRaw</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
 <tr>
-<td>'SampleDuration'</td>
+<td>RVMI_gReV
+  <br>RVMI_sReV</td>
+<td class=c>-<br>-</td>
+<td>--&gt; <a href='QuickTime.html#RVMI_gReV'>QuickTime RVMI_gReV Tags</a>
+  <br>--&gt; <a href='QuickTime.html#RVMI_sReV'>QuickTime RVMI_sReV Tags</a></td></tr>
+<tr class=b>
+<td>RawGSensor</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>SampleDuration</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>'SampleTime'</td>
 <td>SampleTime</td>
 <td class=c>no</td>
 <td><span class=s><span class=n>(sample decoding time)</span></span></td></tr>
 <tr>
-<td>'Text'</td>
 <td>Text</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>'TimeCode'</td>
 <td>TimeCode</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>'fdsc'</td>
-<td>GoPro_fdsc</td>
+<td>camm6</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#camm6'>QuickTime camm6 Tags</a></td></tr>
+<tr class=b>
+<td>fdsc</td>
 <td class=c>-</td>
 <td>--&gt; <a href='GoPro.html#fdsc'>GoPro fdsc Tags</a></td></tr>
-<tr class=b>
-<td>'gpmd'</td>
-<td>GoPro_gpmd</td>
+<tr>
+<td>gpmd</td>
 <td class=c>-</td>
 <td>--&gt; <a href='GoPro.html#GPMF'>GoPro GPMF Tags</a></td></tr>
-<tr>
-<td>'mebx'</td>
-<td>QuickTime_mebx</td>
+<tr class=b>
+<td>mebx</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#Keys'>QuickTime Keys Tags</a></td></tr>
-<tr class=b>
-<td>'rtmd'</td>
-<td>Sony_rtmd</td>
+<tr>
+<td>rtmd</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Sony.html#rtmd'>Sony rtmd Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='RVMI_gReV'>QuickTime RVMI_gReV Tags</a></h2>
+<p>GPS information extracted from the RVMI box of MOV videos.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='4 = 0x4'>4</td>
+<td>GPSLatitude</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='8 = 0x8'>8</td>
+<td>GPSLongitude</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='16 = 0x10'>16</td>
+<td>GPSSpeed</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='18 = 0x12'>18</td>
+<td>GPSTrack</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='RVMI_sReV'>QuickTime RVMI_sReV Tags</a></h2>
+<p>G-sensor information extracted from the RVMI box of MOV videos.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='4 = 0x4'>4</td>
+<td>GSensor</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='camm6'>QuickTime camm6 Tags</a></h2>
+<p>Tags extracted from record type 6 of the &#39;camm&#39; timed metadata of MP4 videos
+from cameras such as the Insta360.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='16 = 0x10'>16</td>
+<td>GPSLatitude</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='24 = 0x18'>24</td>
+<td>GPSLongitude</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='32 = 0x20'>32</td>
+<td>GPSAltitude</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 7, 2018</i>
+<br><i>Last revised Apr 19, 2018</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

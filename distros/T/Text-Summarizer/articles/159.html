@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html><head><title>FAQ Checker Test Cases - Don't fix errors!</title></head><body>
+<strong>FAQ Checker Test Cases&mdash;Should report errors&mdash;Don&rsquo;t fix!</strong><br />
+<br />
+This FAQ has a number of common errors that we want the FAQ debugger to automatically find and report for us. Don&rsquo;t remove these tests so that we can verify that we don&rsquo;t break the debugger when we add more tests to it.<br />
+<br />
+First, let&rsquo;s test a correct FAQ link:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=61"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=61">How do&nbsp;I set up a custom domain using Script Forwarding?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+Next, let&rsquo;s test a proper LINK link which should open in a separate window or tab:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="http://help.bingads.microsoft.com/#apex/3/en/56799/2/#exp23" target="_blank"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="http://help.bingads.microsoft.com/#apex/3/en/56799/2/#exp23" target="_blank">Click here for Bing&rsquo;s full list of parameters</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+Now let&rsquo;s try a properly formatted video link:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=frontendfunnel" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=frontendfunnel" id="video-link-new">How to use the Advanced Entry Link Setting</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+What about an inline link to the <a href="/user/action/tools/postbackd.cgi" target="_blank">Postback Debugger</a> that properly opens in a new window. Here&rsquo;s the same link to <strong><a href="/user/action/tools/postbackd.cgi" target="_blank">Postback Debugger</a></strong> but bolded.<br />
+<br />
+<br />
+But what if we&rsquo;re opening the <strong><a href="/user/action/tools/postbackd.cgi">Postback Debugger</a></strong>&nbsp;in the <em>same</em> window (bad!) or maybe we have a link to the&nbsp;<strong><a href="/tracking/">Tracking Guide</a></strong>&nbsp;and it opens in the same window... Bad again!<br />
+<br />
+<br />
+Videos can be inline too, such as this one about <strong><a href="/misc/video.cgi?name=frontendfunnel">How to use the Advanced Entry Link Setting</a></strong>. That one is good because it opens in the same window, but this one is bad because it tries to open in a new window: <strong><a href="/misc/video.cgi?name=popups" target="_blank">Using MagickPops</a></strong>...<br />
+<br />
+<br />
+Let&rsquo;s try an FAQ link where the page icon URL does not match the text URL:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=32"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=67">Can I use the same domain for links and rotators?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+Now let&rsquo;s try an FAQ link that opens in a new window&mdash;bad!<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=187" target="_blank"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=187" target="_blank">How do&nbsp;I set up a custom domain with GoDaddy?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+Let&rsquo;s try a LINK the opens in the same window&mdash;bad!:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="http://help.bingads.microsoft.com/#apex/3/en/56799/2/#exp23"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="http://help.bingads.microsoft.com/#apex/3/en/56799/2/#exp23">Click here for Bing&rsquo;s full list of parameters</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+Let&rsquo;s try a video where the links don&rsquo;t match:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=splittest" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=frontendfunnel" id="video-link-new">How to use the Front End funnel feature</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+Let&rsquo;s try a video where the video doesn&rsquo;t exist:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=method1" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=method1" id="video-link-new">How to use Method 1 domains</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+Let&rsquo;s try a video that opens in a new window&mdash;bad!:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=splittest" id="video-link-new" target="_blank"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=splittest" id="video-link-new" target="_blank">How to Set Up a Split Test in ClickMagick</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+Now let&rsquo;s test a link to a&nbsp;deleted (nonexistent) FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=35"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=35">How do&nbsp;I archive a rotator URL?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+Now let&rsquo;s test an FAQ link that uses the old <code>faq=</code> format&mdash;bad!<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?faq=93"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?faq=93">How do I track affiliate conversions with Sub-IDs?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+What if it&rsquo;s a LINK to a bad or broken URL?<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="https://support.leadpages.net/hc/en-us/articles/216961358-Adding-Tracking-Code-to-Your-Leadpage-Drag-Drop-Builder" target="_blank"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="https://support.leadpages.net/hc/en-us/articles/216961358-Adding-Tracking-Code-to-Your-Leadpage-Drag-Drop-Builder" target="_blank">This is a bad LeadPages page</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+How about a bad image? (You won&rsquo;t see the bad image below because it&rsquo;s bad&mdash;don&rsquo;t delete it!)<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/candy.jpg" /><br />
+<br />
+And what about an inline link that opens in the same window? This might happen validly for inline FAQs where we write something like&nbsp;<a href="/user/faqs.cgi?answer=61">Read&nbsp;this FAQ</a>&hellip;.<br />
+<br />
+Or what about an inline link to an FAQ such as&nbsp;<strong><a href="/user/faqs.cgi?faq=66">Can I use Facebook&rsquo;s URL Tags as Sub-IDs?</a></strong> that invalidly uses the <code>faq=</code> format?<br />
+<br />
+<br />
+Text with the &ldquo;code&rdquo; styling should never be active links since they are just examples, but the FAQ editor can accidentally convert such example links to actual links in some cases, so let&rsquo;s catch those.<br />
+<br />
+Here&rsquo;s a link with an &ldquo;A&rdquo; tag embedded between the &ldquo;code&rdquo; styling:<br />
+<code>https://www.clickmagick.com/<a href="https://www.clickmagick.com/login.cgi" target="_blank">login.cgi</a></code><br />
+<br />
+Here&rsquo;s the same link where the &ldquo;code&rdquo;&nbsp;styling is embedded between the &ldquo;A&rdquo;&nbsp;tags:<br />
+<a href="https://www.clickmagick.com/login.cgi"><code>https://www.clickmagick.com/login.cgi</code></a>
+</body></html>

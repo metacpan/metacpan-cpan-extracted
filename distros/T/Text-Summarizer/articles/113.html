@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html><head><title>What if my Postback URL isn't working reliably?</title></head><body>
+<b>What if my Postback URL isn&rsquo;t working reliably?</b><br />
+<br />
+Your Postback URL will work correctly every single time that the correct information is posted back to it, so if you&rsquo;re having problems, here are the only possible explanations:<br />
+&nbsp;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>1.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>You&rsquo;re not correctly passing a unique click ID to your affiliate link using&nbsp;ClickMagick&rsquo;s <code>[clickid]</code> token as explained in this FAQ:<br />
+			&nbsp;
+			<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+				<tbody style="box-sizing: border-box;">
+					<tr style="box-sizing: border-box;">
+						<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=119"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+						<td style="box-sizing: border-box;">&nbsp;</td>
+						<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=119">&nbsp;How do I track conversions using Postback URLs?</a></b></td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>2.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>You&rsquo;re not using all lower case for the&nbsp;<code>[clickid]</code> token&nbsp;in the Primary URL of your tracking link. The token is case-sensitive and MUST be all lower case. You can open the <strong><a href="/user/action/tools/postbackd.cgi" target="_blank">Postback Debugger</a></strong> to see a list of the most recent Postbacks you have received. If the variable &ldquo;s1&rdquo; is showing something like <code>s1=[CLICKID]</code>&nbsp;in the Request column, then this is the problem. The &ldquo;s1&rdquo; parameter should be set to a large number.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>3.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>You&rsquo;re passing the <code>[clickid]</code> correctly in your Primary URL, but you are not linking directly to your affiliate network and the click ID is being lost in the intermediate pages. If you have landing pages or opt-in pages between your tracking link and the affiliate offer, you need to pass the click ID through each of the&nbsp;intermediate pages so that it reaches the affiliate offer. This is thoroughly explained in this FAQ:<br />
+			&nbsp;
+			<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+				<tbody style="box-sizing: border-box;">
+					<tr style="box-sizing: border-box;">
+						<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=99"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+						<td style="box-sizing: border-box;">&nbsp;</td>
+						<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=99">How to pass tokens through web pages</a></b></td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>4.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>You haven&rsquo;t set up your Postback URL in your affiliate network. If your Postback URL is not set up correctly, you&rsquo;re probably not even going to see an entry in the <strong><a href="/user/action/tools/postbackd.cgi" target="_blank">Postback Debugger</a></strong>. You can use ClickMagick&rsquo;s <strong><a href="/user/action/tools/postbackb.cgi" target="_blank">Postback <em>Builder</em></a></strong> tool to create the proper Postback URL for your affiliate network.<br />
+			<br />
+			You also need to make sure that you select the correct tracking type in your affiliate back office for the offer you&rsquo;re promoting, and be sure to enter your Postback URL in the right place. If necessary please confirm with your affiliate manager that you&rsquo;ve done this correctly.<br />
+			<br />
+			If the affiliate network you&rsquo;re working with is ClickBank, they have a unique way of setting up their Postback URLs, which they call &ldquo;Instant Notification URLs.&rdquo; We have a special FAQ to walk you through the process of setting up your ClickBank account:<br />
+			&nbsp;
+			<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+				<tbody style="box-sizing: border-box;">
+					<tr style="box-sizing: border-box;">
+						<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=200"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+						<td style="box-sizing: border-box;">&nbsp;</td>
+						<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=200">&nbsp;How do I set up a Postback URL with ClickBank?</a></b></td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>5.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>You&rsquo;ve correctly set everything up, but you set it up <em>after</em> the sale was made. It&rsquo;s important to remember that sales are recorded as they happen so sales won&rsquo;t retroactively show up in ClickMagick after you&rsquo;ve set up your Postback URL. Only new sales will show up in your stats.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>6.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>The sale is being recorded, but to a tracking link other than the one you&rsquo;re expecting it to. This is really easy to check. Just go back to the <strong><a href="/user/action/tools/postbackd.cgi" target="_blank">Postback Debugger</a></strong> and look at the &ldquo;Link ID&rdquo; column. That will tell you which link the sale was attributed to. To see the name of the link, just hover your mouse over&nbsp;the link ID.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>7.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>If you&rsquo;re positive that you&rsquo;ve set everything up correctly and you&rsquo;re still showing conversions in your affiliate stats that aren&rsquo;t appearing in ClickMagick, the only possible explanation is that your affiliate network isn&rsquo;t posting the conversion data to your ClickMagick Postback URL.<br />
+			<br />
+			You can check this by going to the <strong><a href="/user/action/tools/postbackd.cgi" target="_blank">Postback Debugger</a></strong> and seeing if there are any Postbacks showing. If not, then double-check that you&rsquo;ve correctly set up your Postback URL with your affiliate network. If it looks like that was already done properly, contact your Affiliate Manager to see if they can determine why their system isn&rsquo;t posting back correctly.</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+These are the ONLY explanations why some or all of your affiliate sales aren&rsquo;t being recorded in ClickMagick, so please start at the top and go through each step to verify that you&rsquo;ve done everything correctly.<br />
+<br />
+If you&rsquo;ve done all that and you still can&rsquo;t figure out the problem, please <strong><a href="/user/action/account/help.cgi?action=helpdesk" target="_blank">submit a ticket</a></strong> explaining exactly what you&rsquo;ve done (with screenshots if possible) and what&rsquo;s not working the way you expect. The more information you can provide, the better.
+</body></html>

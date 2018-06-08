@@ -315,7 +315,7 @@ TXT
 
     P->file->write_text( $tempfile, $log );
 
-    system $ENV->user_cfg->{_}->{editor}, $tempfile;    ## no critic qw[InputOutput::RequireCheckedSyscalls]
+    system $ENV->user_cfg->{editor}, $tempfile;    ## no critic qw[InputOutput::RequireCheckedSyscalls]
 
     for my $line ( P->file->read_lines($tempfile)->@* ) {
         next if $line =~ /\ALOG:/sm;

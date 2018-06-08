@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Prereqs::EnsureVersion;
 
-our $DATE = '2017-07-28'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2018-06-07'; # DATE
+our $VERSION = '0.050'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,22 +14,10 @@ use namespace::autoclean;
 
 use Config::IOD::Reader;
 use File::HomeDir;
+use PMVersions::Util qw(version_from_pmversions);
 
 sub after_build {
     my ($self) = @_;
-
-    state $pmversions = do {
-        my $path = File::HomeDir->my_home . "/pmversions.ini";
-        my $hoh;
-        if (-e $path) {
-            $hoh = Config::IOD::Reader->new->read_file($path);
-        } else {
-            $self->log(["File %s does not exist, assuming ".
-                            "no minimum versions are specified", $path]);
-            $hoh = {};
-        }
-        $hoh->{GLOBAL} // {};
-    };
 
     my $prereqs_hash = $self->zilla->prereqs->as_string_hash;
 
@@ -40,7 +28,7 @@ sub after_build {
             my $versions = $prereqs_hash->{$phase}{$rel};
             for my $mod (sort keys %$versions) {
                 my $ver = $versions->{$mod};
-                my $minver = $pmversions->{$mod};
+                my $minver = version_from_pmversions($mod);
                 next unless defined $minver;
                 if (version->parse($minver) > version->parse($ver)) {
                     $self->log_fatal([
@@ -68,13 +56,13 @@ Dist::Zilla::Plugin::Prereqs::EnsureVersion - Make sure that prereqs have minimu
 
 =head1 VERSION
 
-This document describes version 0.04 of Dist::Zilla::Plugin::Prereqs::EnsureVersion (from Perl distribution Dist-Zilla-Plugin-Prereqs-EnsureVersion), released on 2017-07-28.
+This document describes version 0.050 of Dist::Zilla::Plugin::Prereqs::EnsureVersion (from Perl distribution Dist-Zilla-Plugin-Prereqs-EnsureVersion), released on 2018-06-07.
 
 =head1 SYNOPSIS
 
 In F<~/pmversions.ini>:
 
- Log::Any::IfLOG=0.07
+ Log::ger=0.019
  File::Write::Rotate=0.28
 
 In F<dist.ini>:
@@ -97,6 +85,14 @@ ranges, e.g.:
  Module::Name = 1.00-2.00, != 1.93
 
 =for Pod::Coverage .+
+
+=head1 ENVIRONMENT
+
+=head2 PMVERSIONS_PATH
+
+String. Set location of F<pmversions.ini> instead of the default
+C<~/pmversions.ini>. Example: C</etc/minver.conf>. Note that this is actually
+observed by in L<PMVersions::Util>.
 
 =head1 HOMEPAGE
 
@@ -128,7 +124,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

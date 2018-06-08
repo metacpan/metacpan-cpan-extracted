@@ -20,6 +20,8 @@ sub test {
      return $obj->err();
   } else {
      @dates = $obj->dates();
+     $err   = $obj->err();
+     return $err  if ($err);
      @ret   = ();
      foreach my $d (@dates) {
         $v = $d->value();
@@ -1363,6 +1365,15 @@ nbd
 2010022500:00:00
    =>
    2010012300:00:00
+
+### Test invalid frequency
+
+0*11:0:31:0:0:0
+__undef__
+now
+2028-11-22
+   =>
+   '[_locate_n] Unable to find an interval in 100 attempts'
 
 ";
 

@@ -1,12 +1,17 @@
 Revision history for Net-Hadoop-Oozie
 
+0.114 2018-06-07 BOOK
+    - add support for resuming suspended jobs
+
 0.113 2018-03-06 BOOK
+    - Collect and show more information when throwing an Oozie error
+    - minor POD updates
 
 0.112 2017-10-31 BURAK
     - Detect Kerberos with kerberos_enabled()
 
 0.111 2017-08-03 BOOK
-      Avoid a warning when the status code is not 401
+    - Avoid a warning when the status code is not 401
 
 0.110 2017-07-18 BURAK
     - Detect secure clusters.

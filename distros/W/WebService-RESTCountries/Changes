@@ -1,5 +1,9 @@
 Revision history for WebService-RESTCountries
 
+0.3  2018-06-06 23:27:06 +08
+        - Add caching support through CHI
+        - Speed up testing through caching
+
 0.2  2018-05-27 02:32:52 +08
         - Add ping method to check whether the API endpoint is up
 

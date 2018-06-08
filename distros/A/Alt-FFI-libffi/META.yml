@@ -24,9 +24,9 @@ requires:
   perl: '5.006'
 resources:
   IRC: irc://irc.perl.org/#native
-  bugtracker: https://github.com/plicease/Alt-FFI-libffi/issues
+  bugtracker: https://github.com/Perl5-FFI/Alt-FFI-libffi/issues
   homepage: https://metacpan.org/pod/Alt::FFI::libffi
-  repository: git://github.com/plicease/Alt-FFI-libffi.git
-version: '0.02'
+  repository: git://github.com/Perl5-FFI/Alt-FFI-libffi.git
+version: '0.04'
 x_serialization_backend: 'YAML::Tiny version 1.70'
 x_use_unsafe_inc: 0

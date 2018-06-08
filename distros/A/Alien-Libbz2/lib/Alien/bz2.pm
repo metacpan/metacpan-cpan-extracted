@@ -5,7 +5,7 @@ use warnings;
 use Alien::Libbz2;
 
 # ABSTRACT: Build and make available bz2
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.23'; # VERSION
 
 
 sub new
@@ -65,7 +65,7 @@ Alien::bz2 - Build and make available bz2
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 
@@ -164,7 +164,7 @@ scalar context.
  my @dlls = Alien::bz2->dlls;
 
 Returns a list of dynamic libraries (usually a list of just one library)
-that make up bz2.  This can be used for L<FFI::Raw>.
+that make up bz2.  This can be used for L<FFI::Platypus>.
 
 Returns just the first dynamic library found in scalar context.
 

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html><head><title>How do I Troubleshoot a FourPercent Funnel?</title></head><body>
+<strong>How do I Troubleshoot a FourPercent Funnel?</strong><br />
+<br />
+This is a quick checklist of things to make sure that a custom FourPercent Funnel is set up correctly. When people complain that their funnel isn&rsquo;t recording stats or actions aren&rsquo;t showing up, one of these would be the reason:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>1.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td><strong>Does the Funnel Opt-in Page match the page the person actually lands on?</strong><br />
+			<br />
+			For the funnel to track a visitor, the person must come in through the Entry Link, and that entry link should be the same URL as the page they land on.<br />
+			<br />
+			To get the URL of the Opt-in page, click on the funnel name on the Funnels page. This will open the Funnel Builder. Move your mouse over to the first page and choose Settings.<br />
+			<br />
+			You&rsquo;ll get the URL for the opt-in page.<br />
+			<br />
+			Open that in a new tab and see if the URL changes to anything else. If it does, then the clicks to this funnel won&rsquo;t be tracked.<br />
+			<br />
+			This usually happens because ClickFunnels (where most FourPercent members build their custom pages) has a generic URL for the page and then the actual URL. What we need is the actual URL.<br />
+			<br />
+			The FAQ below has details on how to set that up to match:<br />
+			&nbsp;
+			<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+				<tbody style="box-sizing: border-box;">
+					<tr style="box-sizing: border-box;">
+						<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=301"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+						<td style="box-sizing: border-box;">&nbsp;</td>
+						<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=301">Why does my funnel not show any visits?</a></b></td>
+					</tr>
+				</tbody>
+			</table>
+			&nbsp;</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>2.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td><strong>Is the person redirected to the correct Thank You URL after signing up?</strong><br />
+			<br />
+			FourPercent has a specific URL that it sends people to and redirects them to the Sales page. We need to make sure that the correct Funnel ID is passed through to the Sales page and that sales are recorded for the custom funnel.<br />
+			<br />
+			First, opt-in on the user&rsquo;s Opt-in page in Chrome. Using the Redirect Path plugin, copy the complete redirect path to the clipboard. Paste this into a text editor like Notepad on Windows or TextEdit on the Mac.<br />
+			<br />
+			Next, use our URL tool to generate the correct Thank You page URL for their custom funnel that you&rsquo;re checking:<br />
+			&nbsp;
+			<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+				<tbody style="box-sizing: border-box;">
+					<tr style="box-sizing: border-box;">
+						<td style="box-sizing: border-box; width: 20px;"><a href="https://www.clickmagick.com/user/fourpercent/urltool/" target="_blank"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+						<td style="box-sizing: border-box;">&nbsp;</td>
+						<td style="box-sizing: border-box;"><b><a href="https://www.clickmagick.com/user/fourpercent/urltool/" target="_blank">URL Tool For FourPercent</a></b></td>
+					</tr>
+				</tbody>
+			</table>
+			<br />
+			<br />
+			Doing a Find in your text file for that exact URL will show you if they&rsquo;re redirecting to the correct link.<br />
+			<br />
+			If they have a Bridge Page, the button on that bridge page should link to this URL.<br />
+			&nbsp;</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>3.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td><strong>Do the Opt-in and Thank You pages have the correct Funnel Tracking Code?</strong><br />
+			<br />
+			When you clone a funnel, the new funnel will have a different Funnel ID than the original which means the Opt-in page and the Thank You page (if there is a Thank You page) will need to have that new code added.<br />
+			<br />
+			To check that, click on the Settings menu <img src="//cdn.clickmagick.com/images/user/faqs/gear.png" /> for the funnel and choose Tracking Code.<br />
+			<br />
+			Open the Opt-in and Thank You pages in a new tab. Right click anywhere and view the source code.<br />
+			<br />
+			Searching for the funnel&rsquo;s ID should help you find and compare the code.<br />
+			<br />
+			If you want to be 100% sure, you can use this tool to compare the two pieces of code:<br />
+			&nbsp;
+			<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+				<tbody style="box-sizing: border-box;">
+					<tr style="box-sizing: border-box;">
+						<td style="box-sizing: border-box; width: 20px;"><a href="http://diffchecker.com" target="_blank"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+						<td style="box-sizing: border-box;">&nbsp;</td>
+						<td style="box-sizing: border-box;"><b><a href="http://diffchecker.com" target="_blank">Diff Checker</a></b></td>
+					</tr>
+				</tbody>
+			</table>
+			&nbsp;</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>4.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td><strong>Are you (or the customer) behind a proxy or VPN?</strong><br />
+			<br />
+			If you are, then your clicks would be flagged automatically and not show up in the UC count. Only legitimate clicks are counted as actual clicks. Disable your VPN and retest their entry link. That will usually start recording your clicks.<br />
+			&nbsp;</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>5.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td><strong>Does the Entry Link they&rsquo;re sending traffic to still exist?</strong><br />
+			<br />
+			This is rare, but sometimes users delete their entry links and still send traffic to them from some source (say, a solo ad they bought some time ago). You can check that by pasting the link, or just the <code>cmfel</code> value, into the CMFEL lookup tool on the Admin page.<br />
+			&nbsp;</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>6.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td><strong>Are they looking in the right place?</strong><br />
+			<br />
+			Some people will create an entry link and then create a tracking link that redirects to that entry link. Then, they&rsquo;ll expect to see actions on the Links page for the tracking link.<br />
+			<br />
+			This won&rsquo;t work, since it&rsquo;s the Funnel Tracking Code that&rsquo;s on their pages and not an Action Tracking Pixel. Ask them to check the Actions in the stats on the Funnels page (after confirming with them about where they are looking exactly).<br />
+			&nbsp;</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+You&rsquo;re now a FourPercent Funnel Ninja.
+</body></html>

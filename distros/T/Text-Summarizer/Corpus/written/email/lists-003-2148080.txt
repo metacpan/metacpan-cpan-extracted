@@ -1,0 +1,54 @@
+
+
+
+docno="lists-003-2148080"
+received="Wed May 19 04:11:33 1993 EST" 
+sent="Wed, 19 May 1993 13:07:45 +0200" 
+name="Harald Tveit Alvestrand" 
+email="harald.t.alvestrand@delab.sintef.no" 
+subject="Re: CHARSET considerations" 
+id=""10241*/I=t/G=harald/S=alvestrand/OU=delab/O=sintef/PRMD=uninett/ADMD=/C=no/"@MHS" 
+inreplyto="01GYBXHRZVEA8Y5JAE@INNOSOFT.COM" 
+
+To: Rick Troth <TROTH@ricevm1.rice.edu>
+Cc: scs <scs@adam.mit.edu>, pine-info <pine-info@cac.washington.edu>,DMD=/C=no/"@MHS>
+
+
+
+
+Rick Troth writes:
+>        Plain text  is defined differently from system to system.
+>On UNIX,  plain text is ASCII (now ISO-8859-1) with lines delimited by
+>NL (actually LF).   On NT,  plain text is 16 bits wide  (so I hear).
+>That ain't ASCII,  though we could be the high-order 8 bits for much
+>of plain text processing,  and that's fine by me.   (memory is cheap)
+>On VM/CMS,  plain text is EBCDIC (now CodePage 1047) and records are
+>handled by the filesystem out-of-band of the data,  so NL (and LF and CR)
+>aren't sacred characters.   Now ... "mail is plain-text,  not ASCII".
+
+Please, gentlemen.....read the RFC.
+As long as you send mail over the Internet, claiming MIME compatibility,
+the bits on the wire have to conform to the MIME convention, *NOT* to
+the local convention, whatever that is.
+
+The omission of a character set label from text/plain
+MEANS THAT THE CHARACTER SET IS US ASCII.
+
+A message that contains characters with the high bit set CANNOT BE US-ASCII,
+and therefore, a text/plain message without a charset= label in it
+that has such characters IS NOT LEGAL MIME.
+So, when SMTP strips the 8th bit, it gets what it deserves.
+
+This was ******NOT******* an oversight. This was deliberate design,
+designed to promote interoperability. The proliferation of mail in strange
+character sets without labels is *exactly* one of the things that the MIME
+effort was meant to *remove*.
+
+End of flame..............if you want a couple of tons more, read the
+archives of the SMTP and RFC-822 groups. The last flareup is hidden under
+"unknown-7bit" and "unknown-8bit" discussions.
+
+                        Harald Tveit Alvestrand
+
+
+

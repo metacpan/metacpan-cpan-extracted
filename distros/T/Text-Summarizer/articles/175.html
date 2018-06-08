@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html><head><title>How do I set up MGID with ClickMagick?</title></head><body>
+<strong>How do I set up MGID with ClickMagick?</strong><br />
+<br />
+Setting up MGID with ClickMagick is fairly straightforward&nbsp;using ClickMagick&rsquo;s &ldquo;Custom Postback&rdquo; feature. Here&rsquo;s a diagram of what a typical setup would look like:<br />
+<br />
+<br />
+&nbsp; &nbsp;<img src="//cdn.clickmagick.com/images/user/faqs/faq236diagram.jpg" /><br />
+&nbsp;<br />
+<br />
+From this diagram, you can see that traffic is sent from MGID through a ClickMagick tracking link and then on to a sales funnel. If the visitor makes a purchase and lands on the Thank You page, a conversion is recorded with ClickMagick using either a Sales Postback or a Sales tracking pixel. ClickMagick then forwards the conversion on to MGID using a <em>Custom</em> Postback.<br />
+<br />
+In this walkthrough, we&rsquo;ll cover the steps for setting up the Custom Postback from ClickMagick to MGID.<br />
+<br />
+&nbsp;
+<div class="faq-note"><b>Note:</b> If you were looking for how to set up the Postback URL from the Thank You page back to ClickMagick, that is a very different setup process that you can read about here:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=119"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=119">&nbsp;How do I track conversions using Postback URLs?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+<br />
+<br />
+<br />
+To set up a Custom Postback between MGID and ClickMagick, you first need to set up MGID so that it can receive a ClickMagick Custom Postback, and then you need to set up the actual Custom Postback within ClickMagick.<br />
+<br />
+First, let&rsquo;s set up the MGID part. It takes just a few steps once you&rsquo;ve already set up your campaign. If you haven&rsquo;t already set up an MGID campaign, do that first and make that sure it works.<br />
+<br />
+Now let&rsquo;s add ClickMagick tracking to your campaign:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>1.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Open your campaign settings by clicking on the &ldquo;gear&rdquo; <img src="//cdn.clickmagick.com/images/user/faqs/gear.png" /> icon to the right of your campaign in the campaign list.<br />
+			<br />
+			Next, scroll down to the &ldquo;Conversion Sensors&rdquo; section. For reference, the next 3 steps are numbered in this screenshot:<br />
+			&nbsp;<br />
+			<br />
+			<img src="//cdn.clickmagick.com/images/user/faqs/faq236sensors.jpg" /><br />
+			&nbsp;</td>
+		</tr>
+		<tr>
+			<td valign="top"><b>2.</b></td>
+			<td>&nbsp;</td>
+			<td>Make sure that &ldquo;MGID CONVERSION SENSOR&rdquo; is set to ON.<br />
+			&nbsp;<br />
+			&nbsp;</td>
+		</tr>
+		<tr>
+			<td valign="top"><b>3.</b></td>
+			<td>&nbsp;</td>
+			<td>For the &ldquo;Goal Type&rdquo;, select &ldquo;POSTBACK&rdquo;. You will be asked to set a value. Enter this:<br />
+			<br />
+			<code>click_id={click_id}</code><br />
+			<br />
+			Click &ldquo;OK&rdquo;.<br />
+			&nbsp;<br />
+			&nbsp;</td>
+		</tr>
+		<tr>
+			<td valign="top"><b>4.</b></td>
+			<td>&nbsp;</td>
+			<td>In the box where it says &ldquo;Event name&rdquo;, enter something unique that relates to this campaign in some way. For example, if you&rsquo;re selling golf clubs, you might use &ldquo;golfclubs&rdquo;. If that&rsquo;s not unique enough, add some random numbers on the end such as &ldquo;golfclubs82573&rdquo;. Use only letters and numbers and be extra careful to not use any spaces in this name.<br />
+			<br />
+			Write down or copy exactly what you just entered in the &ldquo;Event name&rdquo; field. You will need this in just a minute when you set up your Custom Postback in ClickMagick.<br />
+			&nbsp;<br />
+			&nbsp;</td>
+		</tr>
+		<tr>
+			<td valign="top"><strong>5.</strong></td>
+			<td>&nbsp;</td>
+			<td>Double-check all your settings and click the Save button.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+<br />
+That&rsquo;s it for MGID!<br />
+<br />
+Now let&rsquo;s set up the Custom Postback in ClickMagick:<br />
+&nbsp;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>1.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Create a new tracking link and set the Primary URL to the offer you&rsquo;d like to promote. If you need help with this step, follow the instructions here:<br />
+			&nbsp;
+			<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+				<tbody style="box-sizing: border-box;">
+					<tr style="box-sizing: border-box;">
+						<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=109"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+						<td style="box-sizing: border-box;">&nbsp;</td>
+						<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=109">&nbsp;How do I set up a very basic tracking link?</a></b></td>
+					</tr>
+				</tbody>
+			</table>
+			&nbsp;<br />
+			&nbsp;</td>
+		</tr>
+		<tr>
+			<td valign="top"><strong>2.</strong></td>
+			<td>&nbsp;</td>
+			<td>Next, create the Custom Postback using the <strong><a href="/user/action/tools/customposts.cgi" target="_blank">Custom Postbacks</a></strong> <span helvetica="" neue="" style="color: rgb(0, 0, 0); font-family: proxima-nova, ">tool in the <strong>Tools</strong> menu which you can find at the top of any page.<br />
+			<br />
+			In the &ldquo;</span>Which Link?&rdquo; drop-down, c<span helvetica="" neue="" style="color: rgb(0, 0, 0); font-family: proxima-nova, ">hoose the tracking link that</span> you created in Step 1. Choose <strong>Sales</strong> as the <strong>Conversion Type</strong>, and set the <strong>Postback URL</strong> to:<br />
+			<br />
+			<code>http://a.mgid.com/postback?c=[s1]&amp;r=[amount]&amp;e=<em>youreventname</em></code><br />
+			<br />
+			Be sure to replace <em><code>youreventname</code></em>&nbsp;with the &ldquo;Event name&rdquo; you created a moment ago in MGID. For example, if you used&nbsp;&ldquo;golfclubs82573&rdquo;, your link would look like this:<br />
+			<br />
+			<code>http://a.mgid.com/postback?c=[s1]&amp;r=[amount]&amp;e=golfclubs82573</code><br />
+			&nbsp;<br />
+			&nbsp;</td>
+		</tr>
+		<tr>
+			<td valign="top"><strong>3.</strong></td>
+			<td>&nbsp;</td>
+			<td>Double-check your settings and click on <strong>Add Custom Postback</strong>&nbsp;button.<br />
+			&nbsp;<br />
+			&nbsp;</td>
+		</tr>
+		<tr>
+			<td valign="top"><strong>4.</strong></td>
+			<td>&nbsp;</td>
+			<td>The final step is to taking your tracking link from Step 1 and inserting it into the ad you created in MGID. In other words, instead of having the ad point directly to the product or service that you&rsquo;re promoting, you would point it to the tracking link you created in Step 1.&nbsp;<br />
+			<br />
+			Also, so that everything works correctly, you need to pass an MGID &ldquo;click ID&rdquo; to the tracking link. You do that by adding <code>/{click_id}</code> to the end of tracking link. For example, suppose your tracking link for golf clubs looked like this:<br />
+			<br />
+			<code>http://www.clkmg.com/$username/golfclubs</code><br />
+			<br />
+			You would then add <code>/{click_id}</code> to the end of it, like this:<br />
+			<br />
+			<code>http://www.clkmg.com/$username/golfclubs/{click_id}</code><br />
+			<br />
+			When you use your tracking link in MGID, MGID will automatically replace the&nbsp;<code>{click_id}</code>&nbsp;token with a unique value that ClickMagick will send back to MGID in the Custom Postback.</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+With this setup, whenever anybody clicks on an MGID ad and a sale is made, the sale will be recorded in your tracking link and then ClickMagick will report the sale back to MGID.<br />
+&nbsp;<br />
+&nbsp;
+<div class="faq-tip"><b>Tip:</b> If you haven&rsquo;t already signed up with MGID, you can get a 20% credit match on your initial deposit (up to $5,000!) by signing up with MGID here:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="https://www.mgid.com/clickmagick/" target="_blank"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="https://www.mgid.com/clickmagick/" target="_blank">Get a 20% Credit Match by Signing Up with MGID!</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+</body></html>

@@ -1,0 +1,103 @@
+
+
+
+docno="lists-003-2114716"
+received="Fri May 14 14:29:45 1993 EST" 
+sent="Fri, 14 May 1993 17:29:24 -0400" 
+name="Steve Summit" 
+email="scs@adam.mit.edu" 
+subject="Re: CHARSET considerations" 
+id="9305142129.AA22544@adam.MIT.EDU" 
+inreplyto="9305121752.AA00650@dimacs.rutgers.edu" 
+
+To: TROTH@ricevm1.rice.edu, pine-info@cac.washington.edu
+Cc: ietf-822@dimacs.rutgers.edu, ietf-charsets@INNOSOFT.COM,
+
+
+
+
+In <9305121752.AA00650@dimacs.rutgers.edu>, Rick wrote:
+>         Any user of Pine 3.05 (and as far as I can tell 3.07 or 2.x)
+> can shoot themself in the foot  (head if you prefer)  by setting
+> character-set = Zeldas_private_codepage.
+
+This is almost certainly a bad idea, especially if (as Rick
+implied in another part of the referenced message) the user can do
+so by setting a default charset value in a user configuration file
+somewhere.  (If users dink with the message headers themselves,
+all bets are off.)
+
+> Should the Pine developers remove this feature?
+
+I'm not sure what the feature in question is, but if it's
+something which lets users specify the value to be sent out as the
+MIME Content-Type: charset, I think it's a bad idea, and should be
+removed or significantly altered.
+
+An easy mistake to make (I speak from experience) is to assume
+that the charset parameter on a MIME Content-Type: line encodes
+the character set used by the entity composing the message, or
+the character set to be used by the entity displaying the
+message. I find that the best way to think about charset is that
+it is *neither*.  charset is an octet-based encoding used during
+message transfer; it need bear no relation to the composing or
+viewing character sets.  In the most general case, a message will
+be composed using some native character set, translated
+automatically to a MIME-registered charset, and translated at the
+other end into a native display character set.  It should be more
+likely that the charset value be selected by an automaton, not by
+a human.
+
+(If anyone finds the above paragraph startling, you're welcome to
+write to me for clarification.  I'm not going to prolong this
+message with additional explanations right now.)
+
+It's not necessarily *wrong* to think of charset as having
+something to do with the composing or viewing character set (in
+many cases, not coincidentally, all three will be identical), but
+it is very easy to make conceptual mistakes, implement
+nonconformant software, or just generally misunderstand how MIME
+is supposed to work if you don't explicitly separate in your mind
+the concepts of composing/viewing character sets and transmission
+charsets.  (You'll notice that I reinforce this distinction in my
+own head and in this message by using the terms "character set"
+and "charset" noninterchangeably.)
+
+The charset situation is much like the canonical CRLF situation:
+the fact that the canonical representation is identical to some
+but not all of the available local representations guarantees
+misunderstandings.
+
+To be sure, automated selection of and translation to a registered
+MIME charset is a non-trivial task, and mailers which are trying
+to adopt MIME right away cannot be faulted for deferring
+development of such functionality for a while.  However, just
+letting users specify non-default, non-7-bit-US-ASCII, (non-MIME)
+charsets is an open invitation to misunderstanding and
+noninteroperability.
+
+For now, composition agents which wish to allow users to use
+extended character sets (such as Latin-1), but which elect to
+relegate character set and/or charset selection to the user,
+should either present the user with a menu of registered MIME
+charsets from which to select (presumably it will be up to the
+user to ensure that the editor or composition tool is actually
+using a character set corresponding to the selected charset), or
+(in the case of what it sounds like PINE is doing) at least filter
+the user's open-ended charset selection against the list of
+registered values (and perhaps also the X- pattern).
+
+I've copied this message to the IETF character sets mailing list
+(ietf-charsets@innosoft.com, subscription requests to
+ietf-charsets-request@innosoft.com); any followup traffic should
+be sent there, and *not* to the ietf-822 list.
+
+                                        Steve Summit
+                                        scs@adam.mit.edu
+
+P.S. to pine-info@cac.washington.edu: despite my e-mail address,
+I'm actually in Seattle, near UW.  I'd be glad to stop by one day
+and talk with you guys in person about this stuff.
+
+
+

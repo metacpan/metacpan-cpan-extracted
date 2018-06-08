@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html><head><title>When might I want to track duplicate conversions?</title></head><body>
+<b>When might I want to track duplicate conversions?</b><br />
+<br />
+Normally, when a <strong><a href="/user/faqs.cgi?answer=203">tracking pixel</a></strong>&nbsp;fires, it will only fire once for each unique visitor no matter how many times the visitor revisits the page.<br />
+<br />
+There are many reasons why you would want pixels to behave this way, but the simple case is when you have a visitor that clicks the browser&rsquo;s refresh button a few times. Clearly you wouldn&rsquo;t want all those reloaded pages to add new conversions to your counts and mess up your stats.<br />
+<br />
+That said, if you need to, you can <em>force</em> duplicate conversions to be recorded. Before we get into that, you should first review this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=295"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=295">&nbsp;How are duplicate conversions recorded?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+You may run into situations where you really do want to allow duplicate conversions to be recorded. Let&rsquo;s look at a couple of examples to see how you would set this up ...<br />
+<br />
+<br />
+<strong>System-Wide Global Pixels</strong><br />
+<br />
+Let&rsquo;s suppose you&rsquo;re working with an affiliate network that only allows you to set one global sales pixel for all product sales within that affiliate network AND you have no way to set the &ldquo;Ref&rdquo; value for the pixel on a per-product basis. This is a pretty rare situation these days, but let&rsquo;s go with it.<br />
+<br />
+To set this up, you would use the <strong><a href="/user/action/tools/pixelb.cgi" target="_blank">Pixel Builder</a></strong> to create a sales pixel that allows duplicate conversions. Choose &ldquo;Yes&rdquo; for the question about duplicates:<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq178allowdups.jpg" /><br />
+If you use this pixel as your system-wide global pixel, duplicate conversions will be recorded. Just remember&mdash;as explained in the earlier FAQ&mdash;that&nbsp;all of those duplicate sales conversions will show up as a single conversion in the &ldquo;S&rdquo; column of your stats-at-a-glance. To see the total number of conversions, you&rsquo;ll need to click on the number in the &ldquo;S&rdquo; column.&nbsp;<br />
+<br />
+<br />
+<br />
+<strong>Selling Solo Ads or Funnel Clicks</strong>
+
+<p>Another case where tracking duplicate clicks comes up is when you&rsquo;re selling clicks as a Solo Ad vendor.<br />
+<br />
+In this example, let&rsquo;s suppose that you&rsquo;re generating clicks from different sources and driving them to a single rotator to distribute to your buyers.<br />
+<br />
+Because you&rsquo;re reselling clicks to different buyers, it&rsquo;s perfectly okay to receive duplicate clicks from the same traffic source. But, if you want to count the incoming clicks&nbsp;<em>and</em> track your costs, you might want&nbsp;to use a tracking pixel.<br />
+<br />
+One way to set this up would be to use a different tracking link for each traffic source and include a sales pixel in the <strong><a href="/user/faqs.cgi?answer=298">Pixel/Code</a></strong> field of each link. If you create the pixel so that it allows duplicate conversions&nbsp;and you also set the &ldquo;Amount&rdquo; value to the cost of the traffic source, you can count all of the incoming clicks and you can also get accurate stats on exactly how much you&rsquo;re spending for the traffic.<br />
+<br />
+For example, take a look at these two tracking links which are set up identically except that the first link allows duplicate conversions:<br />
+&nbsp;<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq178dupconversions.jpg" /><br />
+&nbsp;<br />
+<br />
+The sales pixel in each tracking link has the &ldquo;Amount&rdquo; set to 0.50, and each tracking link was visited twice by the same person. Notice how the &ldquo;S&rdquo; column shows only 1 unique visitor in both cases, but the EPC column in the first link, which allows duplicates, shows the total for two visits.<br />
+<br />
+To see all the clicks, you would&nbsp;need to click on the number in the &ldquo;S&rdquo; column. Again, read the FAQ on <strong><a href="/user/faqs.cgi?answer=295">how duplicate conversions are recorded</a></strong> if you don&rsquo;t understand this point.<br />
+<br />
+With this setup,&nbsp;you can easily determine the exact ROI for each and every traffic source.</p>
+</body></html>

@@ -1,0 +1,238 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+package App::gba;
+# ABSTRACT: Command-line code uploader for the Gameboy Advance
+our $VERSION = '0.001'; # VERSION
+
+use File::ShareDir 'dist_file';
+
+use base 'App::Cmd::Simple';
+use charnames qw();
+use open qw( :encoding(UTF-8) :std );
+use Module::Load qw(load);
+use Getopt::Long::Descriptive;
+use Device::GBA;
+use Scalar::Util 'looks_like_number';
+
+use utf8;
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+gba - Command-line code uploader for the Gameboy Advance
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+    $ gba --verbose code.gba
+    .....Opening GBA file readonly
+    .....GBA file length 0x000003a0
+
+    BusPirate(mstr) GBA(slave)
+
+    Looking for GBA 0x72026202
+    0x72026202 0x00006202  ; Found GBA
+    0x72026202 0x00006102  ; Recognition OK
+    0x00020000 0x00006200  ; Transfer of header data complete
+    0x72026200 0x00006202  ; Exchange master/slave info again
+    0x72026202 0x000063d1  ; Send palette data
+    0x73c863d1 0x000063d1  ; Send palette data, receive 0x73hh****
+    0x73fa63d1 0x000064d7  ; Send handshake data
+    0x737564d7 0x00000084  ; Send length info, receive seed 0x**cc****
+    Upload:  99% [=====================================*======== ]0m00s Left
+    Wait for GBA to respond with CRC 0x00750065
+    0x00750065 0x00000066  ; GBA ready with CRC
+    0x35ec0066 0x000035ec  ; Let's exchange CRC!
+    CRC ...hope they match!
+    MultiBoot done
+
+=head1 INSTALLATION
+
+    cpan Device::GBA
+
+=head1 DESCRIPTION
+
+The Nintendo Gameboy Advance can either boot from cartridge or over link cable. The latter is caled multiboot mode and is basically SPI and a homebrew encoding scheme. Unfortunately, the Bus Pirate doesn't have a 100k SPI mode, so we are using 125k instead. If you encounter problems with booting, use the next lower speed (30k) as bitrate.
+This utility allows uploading multiboot GBA images with the L<BusPirate|Device::BusPirate>. Don't forget to pass C<-specs=gba_mb.specs> to devkitARM GCC if you want to link a multiboot image. The package's C<share/> subdirectory contains an L<example Makefile|https://github.com/athreef/Device-GBA/blob/master/share/testimg/Makefile> for cross-compilation. The wiring is as follows:
+
+    GBA     Bus Pirate
+    SO  --> MISO
+    SI  <-- MOSI
+    CLK <-- CLK
+
+Note: This is still work in progress!
+
+=head1 OPTIONS
+
+=head2 pirate
+
+Buspirate COM port/device file
+
+    $ gba -p <COM_port>
+
+=head2 verbose / no-verbose
+
+Toggle verbose output. Output is verbose by default
+
+    $ gba --no-verbose
+
+=head2 version / v
+
+Shows the current version number
+
+    $ gba --version
+
+=head2 help / h
+
+Shows a brief help message
+
+    $ gba --help
+
+=cut
+
+sub opt_spec {
+    return (
+        [ 'pirate|p=s'  => "BusPirate COM port", { default =>
+                 $^O eq 'darwin'  ? '/dev/tty.usbserial-A603PKBX'
+               : $^O eq 'MSWin32' ? 'COM1'
+               :                    '/dev/ttyUSB0' }],
+
+        [
+            verbosity => hidden => { one_of => [
+                [ 'verbose'    => "Verbose output" ],
+                [ 'no-verbose' => "Don't output verbosely" ],
+            ] },
+        ],
+        [
+            mb => hidden => { one_of => [
+                [ 'multiboot'        => "Upload firmware image over multiboot protocol" ],
+                [ 'no-multiboot|raw' => "Upload directly without multiboot handshakes" ],
+            ] },
+        ],
+        [
+            bus => hidden => { one_of => [
+               #[ 'uart' => "Communicate over UART" ],
+                [ 'spi'  => "Communicate over 32-bit SPI" ],
+            ] },
+        ],
+        [ 'cat|c'       => "Cat", { default => '125k' } ],
+        [ 'bitrate|b=s' => "BusPirate SPI speed", { default => '125k' } ],
+       #[ 'spi|s=s'     => "Linux SPI device file"   ],
+        [ 'version|v'   => "show version number"     ],
+        [ 'help|h'      => "display a usage message" ],
+    );
+}
+
+sub validate_args {
+    my ($self, $opt, $args) = @_;
+
+    if ($opt->{'help'}) {
+        my ($opt, $usage) = describe_options(
+            $self->usage_desc(),
+            $self->opt_spec(),
+        );
+        print $usage;
+        print "\n";
+        print "For more detailed help see 'perldoc Device::GBA'\n";
+
+        print "\n";
+        exit;
+    }
+    elsif ($opt->{'version'}) {
+        print $main::VERSION, "\n";
+        exit;
+    }
+
+    if ($opt->{multiboot} and $opt->{uart}) {
+        $self->usage_error(
+            "Multiboot is only possible over SPI\n"
+        );
+    }
+
+    $opt->{bus} = $opt->{bus} // 'spi';
+    if ($opt->{bus} eq 'uart' && not defined $opt->{mb}) {
+        $self->{multiboot} = 0;
+    } else {
+        $self->{multiboot} = ($opt->{mb} // 'multiboot') eq 'multiboot';
+    }
+    my $default_verbosity = $self->{multiboot} ? 'verbose' : 'no-verbose';
+    $self->{verbose} = ($opt->{verbosity} // $default_verbosity) eq 'verbose';
+
+    if ($self->{verbose} && not $self->{multiboot}) {
+        $self->usage_error(
+            "Verbose output is not possible when running in raw mode\n"
+        );
+    }
+
+    if ($self->{multiboot}) {
+        if (@$args > 1) {
+            $self->usage_error(
+                "You can specify at most one GBA program to upload\n"
+            );
+        } elsif ( @$args == 0) {
+            print STDERR "No image specified. Uploading test image...\n";
+            push @$args, dist_file 'Device-GBA', 'testimg/test.gba';
+        }
+    }
+
+    return;
+}
+
+sub execute {
+    my ($self, $opt, $args) = @_;
+
+    my $gba = Device::GBA->new(buspirate => $opt->{pirate}, verbose => $self->{verbose}, bitrate => $opt->{bitrate});
+    if ($self->{multiboot}) {
+        $gba->upload($args->[0]);
+    } else {
+        @ARGV = @$args;
+        my $num = 0xFFFF_FFFF;
+        while (<>) {
+            my $num = looks_like_number($_) ? $_ : $num;
+            printf "%08x\n", $gba->spi_writeread($num);
+        }
+    }
+
+    return;
+}
+
+1;
+
+package main;
+import App::gba;
+
+App::gba->run();
+
+exit 0;
+
+__END__
+
+=head1 GIT REPOSITORY
+
+L<http://github.com/athreef/Device-GBA>
+
+=head1 SEE ALSO
+
+L<Device::GBA> powering this utility.
+
+=head1 AUTHOR
+
+Ahmad Fatoum C<< <athreef@cpan.org> >>, L<http://a3f.at>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2018 Ahmad Fatoum
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License v2.0 or later.
+
+=cut

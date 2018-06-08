@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html><head><title>How do we prioritize “bad clicks”?</title></head><body>
+<strong>How do we prioritize &ldquo;bad clicks&rdquo;?</strong><br />
+<br />
+When a user adds an IP address in their IP Manager, that &ldquo;user&rdquo; setting overrides any classification that the system has already attached to the IP.<br data-text="true" />
+<br />
+So, for example, if the IP is currently flagged as an &ldquo;Abuser&rdquo; by the system and Abuser clicks are getting blocked, if the user then adds that IP to their IP Manager, that IP is now a &ldquo;User&rdquo; click and would be handled according to the setting for User clicks.<br data-text="true" />
+<br />
+This means that if the User clicks are set to &ldquo;Nothing&rdquo; the clicks will be passed on to the Primary URL even though the system may have previously classified the IP as an Abuser.<br data-text="true" />
+<br />
+It&rsquo;s also important to remember than any clicks that are automatically flagged as an Abuser will only be flagged for 24 hours.
+</body></html>

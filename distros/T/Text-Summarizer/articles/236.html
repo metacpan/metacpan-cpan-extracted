@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html><head><title>What is the Pixel/Code field of a tracking link used for?</title></head><body>
+<strong>What is the Pixel/Code field of a tracking link used for?</strong><br />
+<br />
+The Pixel/Code field of a tracking link allows you to fire tracking pixels or execute JavaScript code in situations where you can&rsquo;t insert pixels or JavaScript code on the page that the tracking link redirects to.<br />
+<br />
+This would probably be clearer with an example ...<br />
+<br />
+Suppose you have an opt-in page that leads directly to the offer page of an affiliate network. Normally, you would put an action pixel on the page after the email opt-in to record that the opt-in happened. But in this example, you can&rsquo;t put a pixel on the sales page of the affiliate network because you don&rsquo;t control that page and can&rsquo;t edit it.<br />
+<br />
+This is a perfect use for the Pixel/Code field. Instead of firing the pixel once you land on the destination page,&nbsp;you would fire the pixel while the link is <em>redirecting</em> to the destination page.<br />
+<br />
+To set this up, you would use a tracking link as the Thank You page URL from your opt-in page. You would then set up the tracking link to point to the sales page of the affiliate offer and you would insert your pixel or JavaScript code into the Pixel/Code field of the tracking link.<br />
+<br />
+With this setup, when the opt-in page redirects through the tracking link to the sales page of the affiliate offer, the pixels will fire and the JavaScript code will execute.<br />
+<br />
+You can often use this technique when you need to fire a pixel or execute a piece of JavaScript code but cannot edit the page where you would normally insert them. If you can point a tracking link at the page, you can set everything up using the Pixel/Code field of the tracking link.<br />
+<br />
+Just follow these steps:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>1.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Create a new tracking link and set the Primary URL to the destination page.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>2.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>If you&rsquo;re trying to fire a ClickMagick tracking pixel, create a new tracking pixel using the <strong><a href="/user/action/tools/pixelb.cgi" target="_blank">Pixel Builder</a></strong>. Make sure that you select &ldquo;Last Click&rdquo; for &ldquo;Conversion Attribution&rdquo; and select Yes&nbsp;for the question &ldquo;Are you adding this pixel to a tracking link?&rdquo; These two settings must be correct or things won&rsquo;t work as expected.<br />
+			<br />
+			After you&rsquo;ve made your other selections for the new pixel, copy the generated &ldquo;Image/HTML&rdquo; pixel from the bottom of the page.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>3.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Open the Advanced Settings of the new tracking link and paste your new ClickMagick pixel, Facebook pixel, retargeting pixel, tracking code, etc., into the Pixel/Code section. It&rsquo;s perfectly okay to&nbsp;paste more than one pixel or piece of tracking code into the Pixel/Code section.&nbsp;Just be sure to cut and paste them carefully. If you mess this up it can cause your tracking link to malfunction.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>4.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Save the tracking link.</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+You can now direct clicks to the tracking link which will first fire all the pixels and tracking code in the Pixel/Code setting and will then redirect to the original destination page in your Primary URL. Nice and clean!<br />
+<br />
+You can also check out these videos that show exactly how to set up a tracking or retargeting pixel for a page you can&rsquo;t edit:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=pixcodetracking" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=pixcodetracking" id="video-link-new">Add a Tracking Pixel Using a Tracking Link</a></b></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=pixcoderetarg" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=pixcoderetarg" id="video-link-new">Add a Retargeting Pixel Using a Tracking Link</a></b></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+&nbsp;
+<div class="faq-caution"><b>Caution:</b> Tracking pixels will only fire if the click is sent to your Primary URL&nbsp;or to a split test URL. Pixels will NOT fire if the click is sent to your Backup URL, or any other re-routed URL.</div>
+&nbsp;
+
+<div class="faq-note"><b>Note:</b> If you need to pass a click ID through the tracking link, simply pass the click ID as the first Sub-ID to the tracking link and then add the <code>s1=[s1]</code> query string parameter to your Primary URL. ClickMagick will automatically replace the <code>[s1]</code> token in your Primary URL with the first sub-ID that you passed to the tracking link (your click ID). For more information on how to pass click IDs to tracking links, see this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/user/faqs.cgi?answer=99"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" width="17" /></a></td>
+			<td>&nbsp;</td>
+			<td><b><a href="/user/faqs.cgi?answer=99">How to pass Click IDs through a Tracking Link</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+</body></html>

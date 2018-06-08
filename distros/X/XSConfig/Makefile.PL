@@ -8,8 +8,8 @@ my $version = MM->parse_version('Config.pm');
 WriteMakefile(
     'ABSTRACT'		=> 'Fast XS drop-in replacement for Config.pm with perfect hashing',
     'AUTHOR'		=> ($ExtUtils::MakeMaker::VERSION >= '6.58'
-                                ? ['Daniel Dragan <bulkdd@cpan.org>', 'Reini Urban <rurban@cpanel.net>']
-                                : 'Daniel Dragan <bulkdd@cpan.org>, Reini Urban <rurban@cpanel.net>'),
+                                ? ['Daniel Dragan <bulkdd@cpan.org>', 'Reini Urban <rurban@cpan.org>']
+                                : 'Daniel Dragan <bulkdd@cpan.org>, Reini Urban <rurban@cpan.org>'),
     'DISTNAME'		=> 'XSConfig',
     'LICENSE'		=> 'perl',
     'NAME'		=> 'Config',
@@ -37,25 +37,24 @@ WriteMakefile(
                                       Config_xs_heavy.pl   Config_def.old
                                       UNINST_0             UNINST_1
                                       ')},
-    'PM' => {
-        'Config.pm'      => '$(INST_LIBDIR)/Config.pm',
-        ($in_core ? () : ('Config_mini.pl'     => '$(INST_LIBDIR)/Config_mini.pl',
-                          'Config_xs_heavy.pl' => '$(INST_LIBDIR)/Config_xs_heavy.pl',
-                          'XSConfig.pod'       => '$(INST_LIBDIR)/XSConfig.pod')),
-    },
     # XS Config can not be loaded by P5P DynaLoader, only by XSLoader WITHOUT
     # XSLoader passing the "complicated" loading scenario to DynaLoader.
     # P5P DL use'es Config, to get $Config{dlext}, a bootstraping problem for XS
     # Config, XSLoader passes onto DynaLoader if the auto/Config/Config.dll is
     # not in the same @INC dir as Config.pm, so put Config.pm in /arch.
-    ($in_core ? () : (INST_LIB => '$(INST_ARCHLIB)')),
+    'PM' => {
+        'Config.pm'     => '$(INST_ARCHLIBDIR)/Config.pm',
+        ($in_core ? () : ('Config_mini.pl'     => '$(INST_ARCHLIBDIR)/Config_mini.pl',
+                          'Config_xs_heavy.pl' => '$(INST_ARCHLIBDIR)/Config_xs_heavy.pl',
+                          'XSConfig.pod'       => '$(INST_ARCHLIBDIR)/XSConfig.pod')),
+    },
 
     #XSOPT  => ' -nolinenumbers ',
 );
 
 use ExtUtils::Command ();
 
-{
+unless ($ENV{PERL_CORE}) {
     local @ARGV;
     unlink('UNINST_0');
     unlink('UNINST_1');
@@ -149,8 +148,8 @@ sub pm_to_blib {
 ');
     chomp($blib); #old EUMMs dont have a newline at the end, new ones do
     return $blib.'
-	$(NOECHO) $(CHMOD) $(PERM_RW) $(INST_LIB)/Config.pm
-	$(NOECHO) $(EQUALIZE_TIMESTAMP) Config_pm_mtime $(INST_LIB)/Config.pm';
+	$(NOECHO) $(CHMOD) $(PERM_RW) $(INST_ARCHLIBDIR)/Config.pm
+	$(NOECHO) $(EQUALIZE_TIMESTAMP) Config_pm_mtime $(INST_ARCHLIBDIR)/Config.pm';
 }
 
 sub processPL {
@@ -168,6 +167,7 @@ sub processPL {
 sub makefile {
     my $makefile = $_[0]->SUPER::makefile(@_);
     my $pos = index($makefile, '$(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)');
+    return $makefile if $in_core;
     die 'can\'t match in sub makefile()' if $pos == -1;
     substr($makefile, $pos,
         length('$(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)'),

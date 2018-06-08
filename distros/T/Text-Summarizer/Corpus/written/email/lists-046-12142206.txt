@@ -1,0 +1,51 @@
+
+
+docno="lists-046-12142206"
+name="Nico Poppelier"
+email="nico@valacar.elsevier.nl"
+sent="Wed, 5 Jun 1996 09:41:42 +0200 (MET DST)"
+id="199606050741.JAA03224@thorin.elsevier.nl"
+* X-Mailer: ELM [version 2.4 PL25]
+subject="more comments on HTML-Math proposal"
+To: w3c-math-erb@w3.org
+
+
+
+     
+   
+I've read the proposal from Wolfram Research again. Some more
+comments:
+
+I agree with Ron Whitney, and should have said so before, that the
+effort that has gone into this proposal is substantial, and this
+is really concrete stuff we can "chew on".
+I also had the feeling for some time, and the same feeling exists
+in the SGML community, that the developments of HTML-Math and of
+HTML in general were suffering from a NIH syndrome. I also
+see that extensible languages are hard to realize within the
+possibilities of the SGML language. I certainly support the use
+of ISO TR 9573 entity names for mathematical and technical symbols,
+as I have written earlier.
+
+While reading the discussion between Bruce Smith and Ron Whitney, I
+have come to the conclusion that the plug-in solution will not
+work, because we need the possibility of anchor's within math,
+and math in text in math. I'd like to see what you all think
+about this, since this is what Dave proposed e.g. at the DLI
+Math meeting in Illinois.
+
+Regards,
+
+Nico
+
+------------------------------------------------------------------------
+Dr. Nico A.F.M. Poppelier
+Elsevier Science, APD, ITD               Email: n.poppelier@elsevier.nl.
+Molenwerf 1, 1014 AG Amsterdam           Phone: +31-20-4853482.
+The Netherlands                          Fax:   +31-20-4853706.
+------------------------------------------------------------------------
+                  The truth, the whole truth, and nothing but the truth.
+                                             And maybe some compromises.
+     
+
+

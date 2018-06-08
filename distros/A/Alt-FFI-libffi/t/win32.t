@@ -44,9 +44,12 @@ ok -d $d, "-d \$d";
 my $h = $GetModuleHandle->(0);
 ok $h, 'GetModuleHandle';
 
-$d = ' ' x 200;
-$n = $GetModuleFileName->($h, $d, 200);
-$d = substr($d, 0, $n);
-my $exp = $^O eq "MSWin32" ? $^X : Cygwin::posix_to_win_path($^X);
-$exp = quotemeta $exp;
-like $d, qr{^$exp(\.exe)?$}, "\$ like ^$exp";
+SKIP: {
+  skip "cygwin", 1 if $^O eq 'cygwin';
+
+  $d = ' ' x 200;
+  $n = $GetModuleFileName->($h, $d, 200);
+  $d = substr($d, 0, $n);
+  my $exp = $^O eq "MSWin32" ? $^X : Cygwin::posix_to_win_path($^X);
+  like $d, qr{^\Q$exp\E(\.exe)?$}, "\$ like ^$exp";
+};

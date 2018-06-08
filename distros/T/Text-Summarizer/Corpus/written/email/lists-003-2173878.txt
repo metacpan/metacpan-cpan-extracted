@@ -1,0 +1,122 @@
+
+
+
+docno="lists-003-2173878"
+received="Mon Jun 21 10:40:25 1993 EST" 
+sent="Wed, 16 Jun 1993 15:13:52 +0200" 
+name="Borka Jerman-Blazic" 
+email="jerman-blazic@ijs.si" 
+subject="IETF BOF" 
+id="1149*/S=jerman-blazic/O=ijs/PRMD=ac/ADMD=mail/C=si/@MHS" 
+inreplyto="" 
+
+To: WG-CHAR <WG-CHAR@rare.nl>
+
+
+
+
+The timing for the BOF will be announced soon. I am enclosing the
+approved version of the charter.
+
+Regards,
+
+Borka
+
+
+==================
+
+
+Erik and IESG members,
+
+I believe that the revised charter defines most of the issues and
+defines them well.  I believe that the number of issues to be covered in
+one BOF session to be somewhat intimidating.  However, our criteria for
+this BOF should be that it helps illuminate and define the problem and
+advances the understanding needed to define WGs, and I think it is more
+likely to do that than anything else we are likely to come up with.  And
+it is "only" a BOF and does not commit us to long-term action until we
+see the outcome and Borka's minutes.
+
+Let's go with it.
+   john
+
+    
+------ revised draft charter ---------
+
+    The Universal Character Set Standard (UCS) in Networked Services
+
+                                      or
+
+         Can We Think About Real Multilingual Networking?
+
+We are in the process of building global directory systems and other
+information services on the global Internet.  In many parts of the world it is
+seen as essential for the success of the global services that they should be
+able to recognize, store, and present textual information like personal and
+organizational names, represented in the character sets used by those
+concerned. This means that the Directory must be able to handle national
+characters not found in the US-ASCII repetoire.  The same applies to the other
+global information services on the network (e.g the data bases used in many
+information servers). This is especially a problem as information services are
+provided for clients on various difference hardware architectures.
+
+Currently, for the Western European languages at least 5 different encodings
+are in use on the network: ISO-7 National Variants, ISO 8859/1, ROMAN8, T.61,
+and RC850. (See RFC1345 for further information on these character sets.) If we
+consider the other scripts used in Europe and the other encodings the number of
+different charater set codes rise to as many as 40. This is the real (and
+messy) world we live in.  Changing the character sets in this world is not an
+option, as current systems run applications which can support only the
+character sets used by that system.
+
+However, a universal encoding has begun to appear: UCS (ISO 10646). Initial
+experience with this solution has been positive. However, there are still
+many issued to be addressed in the context of ISO 10 646 and the other
+character set codes, which will exist on the Internet in the future:
+
+
+(1) Can we agree on some common network services/model for character set
+   handling?
+
+(2) Should a general-purpose SW tool be designed that will support both
+    UCS and regional character sets?
+
+(3) Is there a solution that will make character set convertors for diffrent
+    codes "plug-and-play" (i.e. an API) without specifying the actual
+    underlying implementation? Can we use UCS as a common denominator for that?
+
+(4) Is it necessary to have a document identifying the language and the
+    character sets which cater for particular language?
+
+(5) If we need to solve these problems and UCS (ISO 10 646)  is the
+    only available general option today which is maybe close to be
+    sufficient,  can we  start with UCS and make minimal
+    changes or specifications which will be sufficient for our needs. Can we
+    discuss the missing agreement/specifiactions  required in the
+    communication protocols such as:
+
+(5.1) The order of octets in the interchange of data is left to be specified
+    by the sender and the recipient in UCS.  What are the "sender" and
+    "recipient"      on the Internet? Can we define a mechanism to
+    identify the serialized     byte order of a data stream?
+
+(5.2) Additional encoding mechanisms for the UCS have been proposed.  Do these
+    schemes have any merit?
+
+(5.3) Some amount of profiling may be necessary for UCS use in some countries,
+      do we need to specify that globally or we can leave it to particular
+      region to be solved as regional matter?
+
+(5.4) Do we need to differentiate or specify how tagged data (i.e the field typ
+e
+    in a data base)and how "serialized byte order" data are treated in a
+    communication protocol or will some common specification for the tag and
+    the type be sufficient?
+
+
+The goal of the BOF is to test the interest for the various issues.
+If possible a clear set of issues could be identified then WG(s)
+will be defined.
+
+
+

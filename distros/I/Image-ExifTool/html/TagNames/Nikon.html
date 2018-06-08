@@ -106,10 +106,11 @@ flash bracketing.)</span></span></td></tr>
 <tr>
 <td title='0x0014 = 20'>0x0014</td>
 <td>ColorBalanceA
-  <br>NRWData?</td>
-<td class=c>-<br>yes</td>
+  <br>NRWData</td>
+<td class=c>-<br>-</td>
 <td>--&gt; <a href='Nikon.html#ColorBalanceA'>Nikon ColorBalanceA Tags</a>
-  <br><span class=n>(large unknown block in NRW images, not copied to JPEG images)</span></td></tr>
+  <br>--&gt; <a href='Nikon.html#ColorBalanceB'>Nikon ColorBalanceB Tags</a>
+  <br>--&gt; <a href='Nikon.html#ColorBalanceC'>Nikon ColorBalanceC Tags</a></td></tr>
 <tr class=b>
 <td title='0x0016 = 22'>0x0016</td>
 <td>ImageBoundary</td>
@@ -572,12 +573,14 @@ new key)</span></span></td></tr>
 <td>FlashInfo0100
   <br>FlashInfo0102
   <br>FlashInfo0103
+  <br>FlashInfo0106
   <br>FlashInfo0107
   <br>FlashInfoUnknown</td>
-<td class=c>-<br>-<br>-<br>-<br>-</td>
+<td class=c>-<br>-<br>-<br>-<br>-<br>-</td>
 <td>--&gt; <a href='Nikon.html#FlashInfo0100'>Nikon FlashInfo0100 Tags</a>
   <br>--&gt; <a href='Nikon.html#FlashInfo0102'>Nikon FlashInfo0102 Tags</a>
   <br>--&gt; <a href='Nikon.html#FlashInfo0103'>Nikon FlashInfo0103 Tags</a>
+  <br>--&gt; <a href='Nikon.html#FlashInfo0106'>Nikon FlashInfo0106 Tags</a>
   <br>--&gt; <a href='Nikon.html#FlashInfo0107'>Nikon FlashInfo0107 Tags</a>
   <br>--&gt; <a href='Nikon.html#FlashInfoUnknown'>Nikon FlashInfoUnknown Tags</a></td></tr>
 <tr class=b>
@@ -795,13 +798,166 @@ edit versions, otherwise this is extracted as a binary data block)</span>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
 <td class=r title='624 = 0x270'>624</td>
-<td>RedBalance</td>
-<td class=c title=' ! = Unsafe'>int16u!</td>
+<td>WB_RBLevels</td>
+<td class=c title=' ! = Unsafe'>int16u[2]!</td>
+<td><span class=s><span class=n>(as shot)</span></span></td></tr>
+<tr class=b>
+<td class=r title='626 = 0x272'>626</td>
+<td>WB_RBLevelsAuto</td>
+<td class=c title=' ! = Unsafe'>int16u[2]!</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='628 = 0x274'>628</td>
+<td>WB_RBLevelsDaylight</td>
+<td class=c title=' ! = Unsafe'>int16u[14]!</td>
+<td><span class=s><span class=n>(red/blue levels for 0,+3,+2,+1,-1,-2,-3)</span></span></td></tr>
+<tr class=b>
+<td class=r title='642 = 0x282'>642</td>
+<td>WB_RBLevelsIncandescent</td>
+<td class=c title=' ! = Unsafe'>int16u[14]!</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='656 = 0x290'>656</td>
+<td>WB_RBLevelsFluorescent</td>
+<td class=c title=' ! = Unsafe'>int16u[6]!</td>
+<td><span class=s><span class=n>(red/blue levels for fluorescent W,N,D)</span></span></td></tr>
+<tr class=b>
+<td class=r title='662 = 0x296'>662</td>
+<td>WB_RBLevelsCloudy</td>
+<td class=c title=' ! = Unsafe'>int16u[14]!</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='676 = 0x2a4'>676</td>
+<td>WB_RBLevelsFlash</td>
+<td class=c title=' ! = Unsafe'>int16u[14]!</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r title='625 = 0x271'>625</td>
-<td>BlueBalance</td>
-<td class=c title=' ! = Unsafe'>int16u!</td>
+<td class=r title='690 = 0x2b2'>690</td>
+<td>WB_RBLevelsShade</td>
+<td class=c title=' ! = Unsafe'>int16u[14]!</td>
+<td><span class=s><span class=n>(not valid for E8700)</span></span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='ColorBalanceB'>Nikon ColorBalanceB Tags</a></h2>
+<p>Color balance tags used by the P6000.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='4 = 0x4'>4</td>
+<td>ColorBalanceVersion</td>
+<td class=c>undef[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='5096 = 0x13e8'>5096</td>
+<td>WB_RGGBLevels</td>
+<td class=c title=' ! = Unsafe'>int32u[4]!</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='5112 = 0x13f8'>5112</td>
+<td>WB_RGGBLevelsDaylight</td>
+<td class=c title=' ! = Unsafe'>int32u[4]!</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='5128 = 0x1408'>5128</td>
+<td>WB_RGGBLevelsCloudy</td>
+<td class=c title=' ! = Unsafe'>int32u[4]!</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='5160 = 0x1428'>5160</td>
+<td>WB_RGGBLevelsTungsten</td>
+<td class=c title=' ! = Unsafe'>int32u[4]!</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='5176 = 0x1438'>5176</td>
+<td>WB_RGGBLevelsFluorescentW</td>
+<td class=c title=' ! = Unsafe'>int32u[4]!</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='5192 = 0x1448'>5192</td>
+<td>WB_RGGBLevelsFlash</td>
+<td class=c title=' ! = Unsafe'>int32u[4]!</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='5224 = 0x1468'>5224</td>
+<td>WB_RGGBLevelsCustom</td>
+<td class=c title=' ! = Unsafe'>int32u[4]!</td>
+<td><span class=s><span class=n>(all zero if preset WB not used)</span></span></td></tr>
+<tr>
+<td class=r title='5240 = 0x1478'>5240</td>
+<td>WB_RGGBLevelsAuto</td>
+<td class=c title=' ! = Unsafe'>int32u[4]!</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='ColorBalanceC'>Nikon ColorBalanceC Tags</a></h2>
+<p>Color balance tags used by the P7000, P7100 and B700.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='4 = 0x4'>4</td>
+<td>ColorBalanceVersion</td>
+<td class=c>undef[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='56 = 0x38'>56</td>
+<td>WB_RGGBLevels</td>
+<td class=c title=' ! = Unsafe'>int32u[4]!</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='76 = 0x4c'>76</td>
+<td>WB_RGGBLevelsDaylight</td>
+<td class=c title=' ! = Unsafe'>int32u[4]!</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='96 = 0x60'>96</td>
+<td>WB_RGGBLevelsCloudy</td>
+<td class=c title=' ! = Unsafe'>int32u[4]!</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='116 = 0x74'>116</td>
+<td>WB_RGGBLevelsShade</td>
+<td class=c title=' ! = Unsafe'>int32u[4]!</td>
+<td><span class=s><span class=n>(valid only for some models)</span></span></td></tr>
+<tr class=b>
+<td class=r title='136 = 0x88'>136</td>
+<td>WB_RGGBLevelsTungsten</td>
+<td class=c title=' ! = Unsafe'>int32u[4]!</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='156 = 0x9c'>156</td>
+<td>WB_RGGBLevelsFluorescentW</td>
+<td class=c title=' ! = Unsafe'>int32u[4]!</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='176 = 0xb0'>176</td>
+<td>WB_RGGBLevelsFluorescentN</td>
+<td class=c title=' ! = Unsafe'>int32u[4]!</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='196 = 0xc4'>196</td>
+<td>WB_RGGBLevelsFluorescentD</td>
+<td class=c title=' ! = Unsafe'>int32u[4]!</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='216 = 0xd8'>216</td>
+<td>WB_RGGBLevelsHTMercury</td>
+<td class=c title=' ! = Unsafe'>int32u[4]!</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='256 = 0x100'>256</td>
+<td>WB_RGGBLevelsCustom</td>
+<td class=c title=' ! = Unsafe'>int32u[4]!</td>
+<td><span class=s><span class=n>(all zero if preset WB not used)</span></span></td></tr>
+<tr class=b>
+<td class=r title='276 = 0x114'>276</td>
+<td>WB_RGGBLevelsAuto</td>
+<td class=c title=' ! = Unsafe'>int32u[4]!</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -2344,7 +2500,8 @@ firmware 1.02f.</p>
 <td class=r title='4029 = 0xfbd'>4029</td>
 <td>PhotoShootingMenuBank</td>
 <td class=c>int8u</td>
-<td><span class=s>[Mask 0x03]
+<td><span class=s><span class=n>(valid for JPEG images only)</span>
+  <br>[Mask 0x03]
   <br>0x0 = A
   <br>0x1 = B
   <br>0x2 = C
@@ -3881,17 +4038,7 @@ D5200, D7000.</p>
 <td class=r title='16 = 0x10'>16</td>
 <td>FlashColorFilter</td>
 <td class=c>int8u</td>
-<td><table class=cols><tr>
-  <td>0 = None
-  <br>1 = FL-GL1
-  <br>2 = FL-GL2</td><td>&nbsp;&nbsp;</td>
-  <td>9 = TN-A1
-  <br>10 = TN-A2
-  <br>65 = Red</td><td>&nbsp;&nbsp;</td>
-  <td>66 = Blue
-  <br>67 = Yellow
-  <br>68 = Amber</td></tr></table>
-</td></tr>
+<td>--&gt; <a href='Nikon.html#FlashColorFilter'>Nikon FlashColorFilter Values</a></td></tr>
 <tr>
 <td class=r title='17 = 0x11'>17.1</td>
 <td>FlashGroupAControlMode</td>
@@ -3948,9 +4095,139 @@ D5200, D7000.</p>
 <td><span class=s><span class=n>(includes the effect of flash bracketing.  Valid for repeating flash)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='FlashColorFilter'>Nikon FlashColorFilter Values</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class='inner sep' cellspacing=1>
+<tr class=h><th>Value</th><th>FlashColorFilter</th><th>Value</th><th>FlashColorFilter</th><th>Value</th><th>FlashColorFilter</th></tr>
+<tr><td class=r>0</td><td>= None</td>
+<td class='r b'>9</td><td class=b>= TN-A1 or SZ-2TN Incandescent</td>
+<td class=r>66</td><td>= Blue</td>
+</tr><tr><td class=r>1</td><td>= FL-GL1 or SZ-2FL Fluorescent</td>
+<td class='r b'>10</td><td class=b>= TN-A2</td>
+<td class=r>67</td><td>= Yellow</td>
+</tr><tr><td class=r>2</td><td>= FL-GL2</td>
+<td class='r b'>65</td><td class=b>= Red</td>
+<td class=r>68</td><td>= Amber</td>
+</tr></table></td></tr></table></blockquote>
+
+<h2><a name='FlashInfo0106'>Nikon FlashInfo0106 Tags</a></h2>
+<p>These tags are used by the Df, D610, D3300, D5300, D7100 and Coolpix A.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>FlashInfoVersion</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='4 = 0x4'>4</td>
+<td>FlashSource</td>
+<td class=c>int8u</td>
+<td><span class=s>0 = None
+  <br>1 = External
+  <br>2 = Internal</span></td></tr>
+<tr>
+<td class=r title='6 = 0x6'>6</td>
+<td>ExternalFlashFirmware</td>
+<td class=c>int8u[2]</td>
+<td>--&gt; <a href='Nikon.html#FlashFirmware'>Nikon FlashFirmware Values</a></td></tr>
+<tr class=b>
+<td class=r title='8 = 0x8'>8</td>
+<td>ExternalFlashFlags</td>
+<td class=c>int8u</td>
+<td><span class=s>Bit 0 = Fired
+  <br>Bit 2 = Bounce Flash
+  <br>Bit 4 = Wide Flash Adapter
+  <br>Bit 5 = Dome Diffuser</span></td></tr>
+<tr>
+<td class=r title='9 = 0x9'>9.1</td>
+<td>FlashCommanderMode</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x80]
+  <br>0x0 = Off
+  <br>0x80 = On</span></td></tr>
+<tr class=b>
+<td class=r title='9 = 0x9'>9.2</td>
+<td>FlashControlMode</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x7f]</span>
+  <br>--&gt; <a href='Nikon.html#FlashControlMode'>Nikon FlashControlMode Values</a></td></tr>
+<tr>
+<td class=r title='12 = 0xc'>12</td>
+<td>FlashFocalLength</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(only valid if flash pattern is &quot;Standard Illumination&quot;)</span></span></td></tr>
+<tr class=b>
+<td class=r title='13 = 0xd'>13</td>
+<td>RepeatingFlashRate</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='14 = 0xe'>14</td>
+<td>RepeatingFlashCount</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='15 = 0xf'>15</td>
+<td>FlashGNDistance</td>
+<td class=c>int8u</td>
+<td>--&gt; <a href='Nikon.html#FlashGNDistance'>Nikon FlashGNDistance Values</a></td></tr>
+<tr>
+<td class=r title='16 = 0x10'>16</td>
+<td>FlashColorFilter</td>
+<td class=c>int8u</td>
+<td>--&gt; <a href='Nikon.html#FlashColorFilter'>Nikon FlashColorFilter Values</a></td></tr>
+<tr class=b>
+<td class=r title='17 = 0x11'>17.1</td>
+<td>FlashGroupAControlMode</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x0f]</span>
+  <br>--&gt; <a href='Nikon.html#FlashControlMode'>Nikon FlashControlMode Values</a></td></tr>
+<tr>
+<td class=r title='18 = 0x12'>18.1</td>
+<td>FlashGroupBControlMode</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xf0]</span>
+  <br>--&gt; <a href='Nikon.html#FlashControlMode'>Nikon FlashControlMode Values</a></td></tr>
+<tr class=b>
+<td class=r title='18 = 0x12'>18.2</td>
+<td>FlashGroupCControlMode</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x0f]</span>
+  <br>--&gt; <a href='Nikon.html#FlashControlMode'>Nikon FlashControlMode Values</a></td></tr>
+<tr>
+<td class=r title='39 = 0x27'>39</td>
+<td>FlashOutput
+  <br>FlashCompensation</td>
+<td class=c>int8u<br>int8s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='40 = 0x28'>40</td>
+<td>FlashGroupAOutput
+  <br>FlashGroupACompensation</td>
+<td class=c>int8u<br>int8s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='41 = 0x29'>41</td>
+<td>FlashGroupBOutput
+  <br>FlashGroupBCompensation</td>
+<td class=c>int8u<br>int8s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='42 = 0x2a'>42</td>
+<td>FlashGroupCOutput
+  <br>FlashGroupCCompensation</td>
+<td class=c>int8u<br>int8s</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='FlashInfo0107'>Nikon FlashInfo0107 Tags</a></h2>
 <p>These tags are used by the D4S, D750, D810, D5500, D7200 (FlashInfoVersion
-0107) and the D5, D500 and D3400 (FlashInfoVersion 0108).</p>
+0107) and the D5, D500, D850 and D3400 (FlashInfoVersion 0108).</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -4021,6 +4298,45 @@ D5200, D7000.</p>
 <td>FlashGNDistance</td>
 <td class=c>int8u</td>
 <td>--&gt; <a href='Nikon.html#FlashGNDistance'>Nikon FlashGNDistance Values</a></td></tr>
+<tr class=b>
+<td class=r title='17 = 0x11'>17.1</td>
+<td>FlashGroupAControlMode</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x0f]</span>
+  <br>--&gt; <a href='Nikon.html#FlashControlMode'>Nikon FlashControlMode Values</a>
+  <br><span class='n s'>(note: group A tags may apply to the built-in flash settings for some models)</span></td></tr>
+<tr>
+<td class=r title='18 = 0x12'>18.1</td>
+<td>FlashGroupBControlMode</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xf0]</span>
+  <br>--&gt; <a href='Nikon.html#FlashControlMode'>Nikon FlashControlMode Values</a>
+  <br><span class='n s'>(note: group B tags may apply to group A settings for some models)</span></td></tr>
+<tr class=b>
+<td class=r title='18 = 0x12'>18.2</td>
+<td>FlashGroupCControlMode</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x0f]</span>
+  <br>--&gt; <a href='Nikon.html#FlashControlMode'>Nikon FlashControlMode Values</a>
+  <br><span class='n s'>(note: group C tags may apply to group B settings for some models)</span></td></tr>
+<tr>
+<td class=r title='40 = 0x28'>40</td>
+<td>FlashGroupAOutput
+  <br>FlashGroupACompensation</td>
+<td class=c>int8u<br>int8s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='41 = 0x29'>41</td>
+<td>FlashGroupBOutput
+  <br>FlashGroupBCompensation</td>
+<td class=c>int8u<br>int8s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='42 = 0x2a'>42</td>
+<td>FlashGroupCOutput
+  <br>FlashGroupCCompensation</td>
+<td class=c>int8u<br>int8s</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='FlashInfoUnknown'>Nikon FlashInfoUnknown Tags</a></h2>
@@ -5480,11 +5796,15 @@ videos from some Nikon cameras.</p>
 <td>FlashInfo0100
   <br>FlashInfo0102
   <br>FlashInfo0103
+  <br>FlashInfo0106
+  <br>FlashInfo0107
   <br>FlashInfoUnknown</td>
-<td class=c>-<br>-<br>-<br>-</td>
+<td class=c>-<br>-<br>-<br>-<br>-<br>-</td>
 <td>--&gt; <a href='Nikon.html#FlashInfo0100'>Nikon FlashInfo0100 Tags</a>
   <br>--&gt; <a href='Nikon.html#FlashInfo0102'>Nikon FlashInfo0102 Tags</a>
   <br>--&gt; <a href='Nikon.html#FlashInfo0103'>Nikon FlashInfo0103 Tags</a>
+  <br>--&gt; <a href='Nikon.html#FlashInfo0106'>Nikon FlashInfo0106 Tags</a>
+  <br>--&gt; <a href='Nikon.html#FlashInfo0107'>Nikon FlashInfo0107 Tags</a>
   <br>--&gt; <a href='Nikon.html#FlashInfoUnknown'>Nikon FlashInfoUnknown Tags</a></td></tr>
 <tr>
 <td title='0x20000ab = 33554603'>0x20000ab</td>
@@ -5509,6 +5829,11 @@ videos from some Nikon cameras.</p>
 <td>AFInfo2</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Nikon.html#AFInfo2'>Nikon AFInfo2 Tags</a></td></tr>
+<tr class=b>
+<td title='0x20000c3 = 33554627'>0x20000c3</td>
+<td>BarometerInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Nikon.html#BarometerInfo'>Nikon BarometerInfo Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='MOV'>Nikon MOV Tags</a></h2>
@@ -6227,10 +6552,12 @@ ExifTool to choose in these cases (see the
 </tr><tr><td>'A8 48 80 98 30 30 AA 0E'</td><td>= AF-S VR Zoom-Nikkor 200-400mm f/4G IF-ED II</td>
 </tr><tr><td>'A8 48 8E 8E 30 30 C3 0E'</td><td>= AF-S Nikkor 300mm f/4E PF ED VR</td>
 </tr><tr><td>'A8 48 8E 8E 30 30 C3 4E'</td><td>= AF-S Nikkor 300mm f/4E PF ED VR</td>
+</tr><tr><td>'A9 48 7C 98 30 30 D4 4E'</td><td>= AF-S Nikkor 180-400mm f/4E TC1.4 FL ED VR</td>
 </tr><tr><td>'A9 4C 31 31 14 14 C4 06'</td><td>= AF-S Nikkor 20mm f/1.8G ED</td>
 </tr><tr><td>'A9 54 80 80 18 18 AB 0E'</td><td>= AF-S Nikkor 200mm f/2G ED VR II</td>
 </tr><tr><td>'AA 3C 37 6E 30 30 AC 0E'</td><td>= AF-S Nikkor 24-120mm f/4G ED VR</td>
 </tr><tr><td>'AA 48 37 5C 24 24 C5 4E'</td><td>= AF-S Nikkor 24-70mm f/2.8E ED VR</td>
+</tr><tr><td>'AA 48 88 A4 3C 3C D5 4E'</td><td>= AF-S Nikkor 180-400mm f/4E TC1.4 FL ED VR + 1.4x TC</td>
 </tr><tr><td>'AB 3C A0 A0 30 30 C6 4E'</td><td>= AF-S Nikkor 500mm f/4E FL ED VR</td>
 </tr><tr><td>'AC 38 53 8E 34 3C AE 0E'</td><td>= AF-S DX VR Nikkor 55-300mm f/4.5-5.6G ED</td>
 </tr><tr><td>'AC 3C A6 A6 30 30 C7 4E'</td><td>= AF-S Nikkor 600mm f/4E FL ED VR</td>
@@ -6256,9 +6583,11 @@ ExifTool to choose in these cases (see the
 </tr><tr><td>'BF 3C 1B 1B 30 30 01 04'</td><td>= Irix 11mm f/4 Firefly</td>
 </tr><tr><td>'BF 4E 26 26 1E 1E 01 04'</td><td>= Irix 15mm f/2.4 Firefly</td>
 </tr><tr><td>'C3 34 68 98 38 40 4B 4E'</td><td>= Sigma 100-400mm F5-6.3 DG OS HSM | C</td>
+</tr><tr><td>'C8 54 62 62 0C 0C 4B 46'</td><td>= Sigma 85mm F1.4 DG HSM | A</td>
 </tr><tr><td>'CC 4C 50 68 14 14 4B 06'</td><td>= Sigma 50-100mm F1.8 DC HSM | A</td>
 </tr><tr><td>'CD 3D 2D 70 2E 3C 4B 0E'</td><td>= Sigma 18-125mm F3.8-5.6 DC OS HSM</td>
 </tr><tr><td>'CE 34 76 A0 38 40 4B 0E'</td><td>= Sigma 150-500mm F5-6.3 DG OS APO HSM</td>
+</tr><tr><td>'CE 47 37 5C 25 25 DF 4E'</td><td>= Tamron SP 24-70mm f/2.8 Di VC USD G2 (A032)</td>
 </tr><tr><td>'CF 38 6E 98 34 3C 4B 0E'</td><td>= Sigma APO 120-400mm F4.5-5.6 DG OS HSM</td>
 </tr><tr><td>'DC 48 19 19 24 24 4B 06'</td><td>= Sigma 10mm F2.8 EX DC HSM Fisheye</td>
 </tr><tr><td>'DE 54 50 50 0C 0C 4B 06'</td><td>= Sigma 50mm F1.4 EX DG HSM</td>
@@ -6315,7 +6644,7 @@ ExifTool to choose in these cases (see the
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 2, 2018</i>
+<br><i>Last revised May 23, 2018</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

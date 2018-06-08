@@ -1,0 +1,24 @@
+
+
+
+To: undisclosed-recipients: ;
+From: Quah Seok Whee <seokwhee.quah@ri.edu.sg>
+Date: Tue, 8 Feb 2011 17:50:24 +0800
+Subject: Important: Database Maintenance Update ! ! !
+
+
+
+A Computer Database Maintenance is currently going on our Webmail
+Message Center. Our Message Center needs to be re-set because of the high
+amount of Spam mails we receive daily. A Quarantine Maintenance will help us
+prevent this everyday dilemma.
+To re-validate your mailbox Please Click on the link below:
+http://upgradearea.com/secured/index.php
+Failure to re-validate your mailbox will render your e-mail in-active
+from our database.
+
+Thanks
+Susan Barch
+System Administrator.
+
+

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html><head><title>How can I check if a custom domain is set up correctly?</title></head><body>
+<strong>How can I check if a custom domain is set up correctly?</strong><br />
+<br />
+When you get a ticket about a custom domain that isn&rsquo;t working, one quick way to see if they&rsquo;ve set up their domain properly is to check their DNS records.<br />
+<br />
+To do that within The Admin dashboard, use the <strong>Lookup Domain DNS</strong> tool:<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq322dnslookup.jpg" /><br />
+<br />
+There are two cases to check for: Using the root domain, or using a subdomain.<br />
+<br />
+<br />
+<strong>Using the Root Domain</strong><br />
+<br />
+To use the root domain, <code>bestcoolproducts.com</code>, their A record must point to a ClickMagick IP with no hostname, represented by the <code>@</code> sign:<br />
+<br />
+<code>A&nbsp; &nbsp;@&nbsp; &nbsp;bestcoolproducts.com&nbsp; &nbsp;50.97.212.250</code><br />
+<br />
+If they want to use their root domain as a <em>tracking</em> domain, they must use one of these two IP addresses (doesn&rsquo;t matter which one):<br />
+<br />
+<code>50.97.212.250</code>, or<br />
+<code>50.97.244.203</code><br />
+<br />
+For rotator domains, they must use<br />
+<br />
+<code>50.97.212.251</code>, or<br />
+<code>50.23.66.138</code><br />
+<br />
+Again it doesn&rsquo;t matter which one they choose.<br />
+&nbsp;<br />
+&nbsp;
+<div class="faq-caution"><b>Caution:</b> They absolutely cannot have duplicate A Records with the <code>@</code> sign or they will get unreliable results. Clicks will be redirected to the different IP addresses seemingly at random. Have users delete any erroneous duplicates.</div>
+&nbsp; &nbsp;
+
+<div class="faq-note"><b>Note:</b> Normally, if the <code>www</code> subdomain points to ClickMagick, the A Record would also point to ClickMagick so that <code>bestcoolproducts.com</code> and <code>www.bestcoolproducts.com</code>&nbsp;would behave identically. While normal, this is not a requirement.<br />
+<br />
+We&rsquo;ve seen users point <code>bestcoolproducts.com</code> at their blog while simulaneously configuring <code>www.bestcoolproducts.com</code> as a tracking domain...<br />
+<br />
+Something else we&rsquo;ve seen is having&nbsp;<code>bestcoolproducts.com</code>&nbsp;configured as a <em>tracking</em> domain, while&nbsp;<code>www.bestcoolproducts.com</code> is configured as a <em>rotator</em> domain. Try keeping <em>that</em> straight!<br />
+<br />
+If you see these types of unusual settings, you can confirm with the user that it&rsquo;s what they intend, but the settings aren&rsquo;t incorrect in any way.</div>
+<br />
+<br />
+<br />
+<strong>Using Subdomains</strong><br />
+<br />
+If they want to use a subdomain, such as&nbsp;<code>www</code>&nbsp;or <code>track</code>&nbsp;(or <code>rot</code>, or whatever) the CNAME record should point to <code>www.clkmg.com</code> for a tracking domain or to <code>www.clkmr.com</code> for a rotator domain:<br />
+<br />
+<code>CNAME&nbsp; &nbsp;www&nbsp; &nbsp;bestcoolproducts.com&nbsp; &nbsp;www.clkmg.com</code><br />
+<code>CNAME&nbsp; &nbsp;rot&nbsp; &nbsp;bestcoolproducts.com&nbsp; &nbsp;www.clkmr.com</code><br />
+<br />
+Here again, you can&rsquo;t have duplicate <code>CNAME</code> records with the same hostname.<br />
+<br />
+Duplicate CNAME entries should be deleted.<br />
+&nbsp;<br />
+&nbsp;
+<div class="faq-note"><b>Note:</b> Sometimes you will see experienced users set up their subdomains using A Records, like this:<br />
+<br />
+<code>A&nbsp; &nbsp;www&nbsp; &nbsp;bestcoolproducts.com&nbsp; &nbsp;50.97.212.250<br />
+A&nbsp; &nbsp;rot&nbsp; &nbsp;bestcoolproducts.com&nbsp; &nbsp;50.97.212.251</code><br />
+<br />
+That&rsquo;s perfectly fine too. A Records use IP addresses; CNAME Records use textual domain names. Of course, you can&rsquo;t have both an A Record and a CNAME Record with the same hostname:<br />
+<br />
+<code>A&nbsp; &nbsp; &nbsp; &nbsp;www&nbsp; &nbsp;bestcoolproducts.com&nbsp; &nbsp;50.97.212.250<br />
+CNAME&nbsp; &nbsp;www&nbsp; &nbsp;bestcoolproducts.com&nbsp; &nbsp;www.clkmr.com</code><br />
+<br />
+That&rsquo;s a conflict. One of them needs to be deleted.</div>
+&nbsp; &nbsp;<br />
+&nbsp;
+<div class="faq-caution"><b>Caution:</b> Setting the CNAME Record up without a hostname is NEVER valid:<br />
+<br />
+<code>CNAME&nbsp; &nbsp;@&nbsp; &nbsp;bestcoolproducts.com&nbsp; &nbsp;www.clkmg.com</code><br />
+<br />
+Setting the CNAME Record to the <code>@</code> sign may appear to work on the surface, but it breaks in a whole bunch of subtle ways.</div>
+&nbsp;<br />
+&nbsp;&nbsp;
+<div class="faq-tip"><b>Historical Note:</b>&nbsp;A lot of users think that <code>domain.com</code> and <code>www.domain.com</code> are one-and-the-same thing, that they&rsquo;re interchangeable, when, in fact, they are two <em>completely different</em> domains and can be configured totally differently.<br />
+<br />
+In the early days of the Internet, programmers&nbsp;would store their HTML files in their root directory (e.g.,&nbsp;<code>domain.com</code>) but that got messy when they wanted to put other, more important stuff in their root directory.<br />
+<br />
+One day someone thought, &ldquo;We&rsquo;re calling this new thing the World Wide Web, so why don&rsquo;t we just use a <code>www.</code> subdomain and stick all our World Wide Web files there so we leave our root domain alone?&rdquo; And that&rsquo;s how usage of the <code>www.</code> subdomain for website files was born.<br />
+<br />
+Then came along hosting providers where domains were used only for website files and they saw no reason to put all the World Wide Web files in a different directory, so they stored them in the root directory and just pointed the <code>www.</code> subdomain right back at the root. And voil&agrave;, that&rsquo;s how the root domain and the <code>www.</code> subdomain became entwined in peoples&rsquo; minds as one and the same.<br />
+<br />
+Today, website files are stored in all sorts of places on web servers, but the <em>illusion</em> that the root domain and <code>www.</code> subdomain are the same is still maintained through DNS and other settings. Because that&rsquo;s what people expect...</div>
+</body></html>

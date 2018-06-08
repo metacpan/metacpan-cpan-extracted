@@ -1,0 +1,34 @@
+
+
+
+docno="lists-034-10066763"
+name="Holger Reif"
+email="Holger.Reif@prakinf.tu-ilmenau.de "
+sent="Mon, 22 Apr 96 08:02:05 +0200"
+subject="RE: Merged Transport Layer Protocol Development"
+To: tomste@microsoft.com
+Cc: tls-draft@w3.org
+
+
+
+     
+   
+
+> strawman document is not an official IETF document.  Win Treese,
+> Microsoft and Netscape did not want this document to be confused in any
+> way with the actual spec that is being developed by the working group.
+
+I'm yet to read the document in detail but this sounds like we are going to
+have a IETF-Standard and an a separate NS/MS standard ???
+
+This is not a good thing.
+
+
+read you later  -  Holger Reif
+----------------------------------------  Signaturprojekt Deutsche Einheit
+TU Ilmenau - Informatik - Telematik                      (Verdamp lang her)
+Holger.Reif@PrakInf.TU-Ilmenau.DE         Alt wie ein Baum werden, um ueber
+http://Remus.PrakInf.TU-Ilmenau.DE/Reif/  alle 7 Bruecken gehen zu koennen
+     
+
+

@@ -1,3 +1,7 @@
+0.9176      Wed Jun  6 08:38:32 BST 2018
+
+* Fix the no_index issue for bundled directory
+
 0.9174      Mon May 21 20:28:36 BST 2018
 
 * Fix circular dependency on CPANPLUS::Dist::Build when

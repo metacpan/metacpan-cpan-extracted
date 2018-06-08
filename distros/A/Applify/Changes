@@ -1,5 +1,8 @@
 Revision history for perl distribution Applify
 
+0.15 2018-06-06T22:52:43+0800
+ - Improved documentation
+
 0.14 2017-10-06T10:26:43+0200
  - Add support for subcommands #4
    Contributor: Roy Storey

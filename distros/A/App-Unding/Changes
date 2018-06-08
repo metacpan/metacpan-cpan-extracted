@@ -1,0 +1,14 @@
+Revision history for App-Unding
+ 
+0.004     2018-06-08 11:11:05+02:00 Europe/Zurich
+ - clarifiy that script should be copied to local directoy in pod
+
+0.003     2018-06-08 10:51:37+02:00 Europe/Zurich
+ - correctly display help if no storage and decrypting
+ - die if encrypting and no write access on file, also mention in pod
+
+0.002     2018-06-08 10:28:17+02:00 Europe/Zurich
+ - added stub module for cpan indexing
+
+0.001     2018-06-08 08:59:24+02:00 Europe/Zurich
+ - initial release

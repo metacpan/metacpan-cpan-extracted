@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html><head><title>How do I track affiliate conversions using Sub-IDs?</title></head><body>
+<b>How do I track affiliate conversions using Sub-IDs?</b><br />
+<br />
+If the affiliate offers you&rsquo;re promoting don&rsquo;t support Tracking Pixels or Postback URLs, you&rsquo;ll generally have to resort to using &ldquo;Sub-IDs&rdquo; for conversion tracking.<br />
+<br />
+Some of the affiliate platforms where you&rsquo;re forced to use Sub-ID tracking include:<br />
+<br />
+&nbsp; &nbsp; &nbsp;Amazon<br />
+&nbsp; &nbsp; &nbsp;JVZoo<br />
+&nbsp; &nbsp; &nbsp;LinkShare<br />
+&nbsp; &nbsp; &nbsp;ShareASale<br />
+<br />
+Part 4 of the <strong><a href="https://www.clickmagick.com/tracking/" target="_blank">Tracking Guide</a></strong>&nbsp;talked about using only Sub-IDs to track affiliate sales if whatever you&rsquo;re promoting doesn&rsquo;t support tracking pixels or Postback URLs.<br />
+<br />
+To track your sales using Sub-IDs you need to pass a unique Sub-ID to your affiliate link with each click. With ClickMagick it&rsquo;s as simple as adding a unique&nbsp;<code><span style="color:#008000;">[clickid]</span></code> token&nbsp;wherever you want the Sub-ID to be inserted into your affiliate link.<br />
+<br />
+You can find a complete walkthrough of how to set this up for the JVZoo network here:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=246"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=246">&nbsp;How do I track affiliate conversions with JVZoo?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+If you&rsquo;re using one of the other networks where you need to use Sub-IDs to track conversions, you would follow exactly the same steps that you see in the FAQ for JVZoo.<br />
+<br />
+The only real difference is in how you pass the <code>[clickid]</code> token to your network. LinkShare and ShareASale use these <code>[clickid]</code> <strong><a href="/user/faqs.cgi?answer=177">query string parameters</a></strong>&nbsp;which you would simply append to the end of your affiliate links:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="width: 424px;">
+	<tbody>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 28px;">&nbsp;</td>
+			<td style="width: 135px;">LinkShare</td>
+			<td style="width: 253px;"><code>&amp;U1=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 28px;">&nbsp;</td>
+			<td style="width: 135px;">ShareASale</td>
+			<td style="width: 253px;"><code>&amp;afftrack=[clickid]</code></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+If you&rsquo;re working with Amazon, you&rsquo;ll want to read about Amazon Tracking IDs here:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="https://affiliate-program.amazon.com/gp/associates/help/t10" target="_blank"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="https://affiliate-program.amazon.com/gp/associates/help/t10" target="_blank">Amazon Associates Central &ndash; Manage Your Tracking IDs</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</body></html>

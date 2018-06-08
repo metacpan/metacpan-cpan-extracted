@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html><head><title>Can I use Sub-IDs with my tracking links?</title></head><body>
+<b>Can I use Sub-IDs with my tracking links?</b><br />
+<br />
+Absolutely! If you want you can add a Sub-ID to the end of any tracking link for even more granular tracking.<br />
+<br />
+For example, here&rsquo;s a regular tracking link:<br />
+<br />
+<code>http://$linkdomain/linkID</code><br />
+<br />
+If you wanted to add a Sub-ID with the value of &ldquo;homepage&rdquo; you can just add it to the end like this:<br />
+<br />
+<code>http://$linkdomain/linkID/homepage</code><br />
+<br />
+Or a Sub-ID with the value of &ldquo;top_banner&rdquo; like this:<br />
+<br />
+<code>http://$linkdomain/linkID/top_banner</code><br />
+<br />
+You can add up to 5 Sub-IDs to the end of any tracking or rotator link just by adding them one after the other, separated with a &ldquo;<code>/</code>&rdquo; :<br />
+<br />
+<code>.../value1/value2/value3/value4/value5</code><br />
+<br />
+By clicking on the number in the TC column of your overall stats, you can view the stats broken down by individual Sub-IDs. The breakdown shows only the first two Sub-IDs so, for meaningful results, you&rsquo;ll want to make sure they are distinct combinations:<br />
+<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq3tcstats.jpg" /><br />
+<br />
+<br />
+You can see any additional Sub-IDs by hovering over the <img src="//cdn.clickmagick.com/images/user/moreinfo.png" /> symbol:&nbsp;<br />
+<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq3subids.jpg" /><br />
+&nbsp;<br />
+<br />
+The Sub-ID breakdown from the stats page only shows results based on the first two Sub-IDs. If you need a more detailed report based on all 5 possible Sub-IDs, use the <strong><a href="/user/reports.cgi" target="_blank">Sub-ID Stats Report</a></strong> that you can find in the <strong>Tools</strong> menu under &ldquo;Link Reports&rdquo;.<br />
+<br />
+For more details check out the video tutorial below which can also be found on the <strong><a href="/user/tutorials.cgi" target="_blank">Tutorials</a></strong> page:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=subids" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=subids" id="video-link-new">How To Use Sub-IDs with Tracking Links</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+&nbsp;<br />
+<strong>Combine your Sub-ID stats</strong><br />
+<br />
+If you have more than two Sub-IDs and you want to see the data from your link stats&mdash;without having to download the data&mdash;simply combine multiple Sub-IDs into a single Sub-ID using a separation character, such as a &ldquo;-&rdquo;.<br />
+<br />
+For example instead of using a link like this with three Sub-IDs:<br />
+<br />
+<code>http://$linkdomain/linkID/subid1/subid2/subid3</code><br />
+<br />
+... you could combine subid2 and subid3 using a hyphen or other character like this,:<br />
+<br />
+<code>http://$linkdomain/linkID/subid1/subid2-subid3</code><br />
+<br />
+Just be aware that when you combine multiple Sub-IDs like this, you might exceed the maximum length for a Sub-ID which is currently 50 characters. Any extra characters&nbsp;will be dropped.<br />
+<br />
+<br />
+<strong>Passing Sub-IDs to your Primary URL</strong><br />
+<br />
+If you want to pass your Sub-IDs to the link in the Primary URL, you can do that too. The tokens <code>[s1]</code>-<code>[s5]</code> can be used anywhere in your Primary URL and ClickMagick will replace each token with the corresponding Sub-ID that is passed in with each click.<br />
+<br />
+For example if you wanted to pass the first Sub-ID to the <code>offer</code> parameter in the query string of your Primary URL, you would do it like this:<br />
+<br />
+<code>http://www.company.com?offer=[s1]</code><br />
+<br />
+If you were passing the third Sub-ID to another ClickMagick tracking link (or rotator) in your Primary URL, you would simply pass it forward just as you would pass any Sub-ID to a link or rotator:<br />
+<br />
+<code>http://$linkdomain/linkID/[s3]</code><br />
+<br />
+That would pass the <code>[s3]</code> value as the first Sub-ID to the link.<br />
+<br />
+&nbsp;
+<div class="faq-tip"><b>Tip:</b>&nbsp;Before using Sub-IDs, you&rsquo;ll want to make sure you understand exactly what you can pass in them. Sub-IDs are pretty flexible, but there are a few restrictions:<br />
+<br />
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;"><tbody style="box-sizing: border-box;"><tr style="box-sizing: border-box;"><td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=351"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td><td style="box-sizing: border-box;">&nbsp;</td><td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=351">What are the valid characters and length of a Sub-ID?</a></b></td></tr></tbody></table></div>
+</body></html>

@@ -87,7 +87,7 @@
          "web" : "https://github.com/Perl-Hadoop/Net-Hadoop-Oozie"
       }
    },
-   "version" : "0.113",
+   "version" : "0.114",
    "x_contributors" : [
       "Canran Gou <canrangou@cpan.org>",
       "Philippe Bruhat (BooK) <book@cpan.org>",
@@ -96,6 +96,6 @@
       "Eric Herman <eherman@cpan.org>",
       "Rafa\u00ebl Garcia-Suarez <rgarcia@cpan.org>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

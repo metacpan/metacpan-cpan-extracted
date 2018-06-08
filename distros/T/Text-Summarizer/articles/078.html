@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html><head><title>Can I link my ClickBank account with ClickMagick?</title></head><body>
+<b>Can I link my ClickBank account with ClickMagick?</b><br />
+<br />
+Yes! If you promote ClickBank products you&rsquo;ll be glad to know that ClickMagick works with ClickBank&rsquo;s &ldquo;Instant Notification Service&rdquo; so your ClickBank sales can be logged to your ClickMagick account automagickly!<br />
+<br />
+You can also use ClickBank&rsquo;s &ldquo;Integrated Sales Reporting&rdquo; by adding tracking pixels to your ClickBank account, but this isn&rsquo;t as accurate as the integration described below, so we suggest that you use the &ldquo;Instant Notification Service&rdquo; method as a first choice unless you&rsquo;re using ClickMagick&rsquo;s &ldquo;Entry Link&rdquo; setting.<br />
+&nbsp;
+<div class="faq-caution"><b>Caution:</b> If you&rsquo;re using the advanced &ldquo;Entry Link&rdquo; setting, you <em>must</em> use ClickBank&rsquo;s &ldquo;Integrated Sales Reporting&rdquo; method because the &ldquo;Instant Notification Service&rdquo; is incompatible with the Entry Link setting. You can read more about ClickBank&rsquo;s Integrated Sales Reporting&nbsp;here:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="https://support.clickbank.com/hc/en-us/articles/220375827-Integrated-Sales-Reporting" target="_blank"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="https://support.clickbank.com/hc/en-us/articles/220375827-Integrated-Sales-Reporting" target="_blank">ClickBank&rsquo;s Integrated Sales Reporting</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+<br />
+If you&rsquo;re familiar with the concept of &ldquo;Postback URLs&rdquo;, ClickBank&rsquo;s version of this concept uses an &ldquo;Instant Notification URL&rdquo; with<span style="background-color: rgb(255, 255, 255);">&nbsp;a &ldquo;Secret Key&rdquo; for added security. Taken together, ClickBank calls this their &ldquo;Instant Notification Service.&rdquo;<br />
+<br />
+So let&rsquo;s get this set up!<br />
+<br />
+You can watch the video walkthrough here, or follow the written walkthrough below.</span><br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=clickbankins" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=clickbankins" id="video-link-new">Integrating ClickMagick with ClickBank</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+<strong>Create a ClickBank &ldquo;Secret Key&rdquo;</strong><br />
+<br />
+The first thing you&rsquo;ll need to do set up the Instant Notification Service is to create a &ldquo;Secret Key&rdquo; in ClickBank that it uses to communicate with other tools like ClickMagick. This is fairly straightforward if you follow these steps:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>1.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Log in to your ClickBank account.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>2.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Click the Settings tab near the upper-right corner of the page.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>3.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Click &ldquo;My Site&rdquo; in the sub navigation menu bar.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>4.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Scroll down to the &ldquo;Advanced Tools&rdquo; section &hellip;</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>5.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Click the &ldquo;Edit&rdquo; link in the upper-right corner.</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<img height="61" src="//cdn.clickmagick.com/images/user/faqs/cbkey1.gif" width="406" /><br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>6.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>If the Secret Key is empty, you&rsquo;ll need to create one. Simply enter any combination of UPPER CASE LETTERS and/or numbers, up to 16 characters. You will get an error if you use any lowercase letters, spaces, or symbols.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>7.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>If the &ldquo;Instant Notification URL&rdquo; section shows a red link that says &ldquo;<span style="color: rgb(178, 34, 34);">(request access)</span>&rdquo; (as shown in the screenshot above), click on that link to show a form.&nbsp;Select &ldquo;Yes&rdquo; for all the questions and click on the checkbox that says you agree to the Terms of Service.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>8.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Click on &ldquo;Save Changes&rdquo; to instantly enable the &ldquo;Instant Notification Service&rdquo; in your ClickBank account.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>9.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Finally, scroll&nbsp;back down to the same section and copy your Secret Key. We&rsquo;ll be pasting that into ClickMagick in the next section.</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+<strong>Copy the Secret Key to your ClickMagick User Profile</strong><br />
+<br />
+Now that you have your Secret Key set up in ClickBank, you need to let ClickMagick know about it &hellip;&nbsp;<br />
+<br />
+Just head over to&nbsp;your&nbsp;<strong><a href="/user/profile.cgi?cat=misc" target="_blank">ClickMagick Profile</a></strong>&nbsp;in the Account menu and enter your &ldquo;Secret Key&rdquo; in the ClickBank settings of the &ldquo;Misc&rdquo; category. If you&rsquo;re following the steps outlined here, your Secret Key should be on the clipboard&nbsp;so just paste it into your settings and save your changes by clicking on the &ldquo;Update My Profile&rdquo; button.<br />
+<br />
+<em>If you don&rsquo;t click on the &ldquo;Update My Profile&rdquo; button to save the changes, the Instant Notification Service will not work.</em><br />
+<br />
+<br />
+<b>Add your ClickMagick Instant Notification URL to ClickBank</b><br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>1.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>You&rsquo;ll need to copy your unique ClickMagick Instant Notification URL and paste it into your ClickBank settings. First, copy this link exactly as you see it:<br />
+			<br />
+			<code>https://www.clkmg.com/api/s/cb/?uid=$userid</code></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<div class="faq-note"><b>Note:</b> The unique URL above is used only to link your ClickBank account with ClickMagick. It is not meant to be accessed directly in your browser, and if you do so you&rsquo;ll see an error message which is totally normal.</div>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>2.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Go back to ClickBank to the Advanced Tools section where you created your Secret Key. You&rsquo;ll find it in the Settings tab, under the &ldquo;My Site&rdquo; sub menu. Scroll down to &ldquo;Advanced Tools&rdquo;.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>3.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Click the &ldquo;Edit&rdquo; link in the upper-right corner.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>4.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>In the first empty slot that says &ldquo;Instant Notification URL:&rdquo;, paste in the ClickMagick Instant Notification URL that you copied above.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>5.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Make sure version 6.0 is selected in the drop-down.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>6.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>You MUST save your changes here before testing your setup in the next few steps, otherwise ClickBank&rsquo;s system will say your URL doesn&rsquo;t work.&nbsp;</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>7.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Now that you&rsquo;ve saved your changes, scroll back down to the Advanced Tools section&nbsp;and click &ldquo;Edit&rdquo; in the upper-right corner one last time &hellip;</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>8.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Click the &ldquo;TEST IPN&rdquo; link next to your URL to activate it in ClickBank&rsquo;s system.</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+Once you&rsquo;ve tested your URL without error you&rsquo;re done with the integration of your ClickMagick and ClickBank accounts.<br />
+<br />
+<br />
+<b>To Use the Instant Notification Service, add the Click ID to Your Hoplinks&hellip;</b><br />
+<br />
+Now that you&rsquo;ve integrated your ClickMagick account with Clickbank, you can&nbsp;use ClickMagick&rsquo;s [clickid] token to pass a unique click ID to your ClickBank hoplinks through a &ldquo;query&rdquo; string so ClickBank can track and report your sales back to ClickMagick.<br />
+<br />
+This can get a bit technical, and you can read all about how to do it below, but first, we&rsquo;ve put together a series of videos that you can watch if you&rsquo;re a more visual learner.<br />
+<br />
+Just keep in mind that the videos use the term &ldquo;Postback URL&rdquo; which is the same thing as the Instant Notification URL that you set up above. When you hear about &ldquo;Postback URLs&rdquo; in the videos, just remember that you&rsquo;ve already set that up for ClickBank and you can ignore the set up instructions in the video.<br />
+<br />
+For these videos to make sense, you must watch them in order:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=affnetwork" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=affnetwork" id="video-link-new">&nbsp;Integrating ClickMagick with Affiliate Networks</a></b></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=affnetworklp" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=affnetworklp" id="video-link-new">&nbsp;Integrating Landing Pages with Affiliate Networks</a></b></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=affnetworkar" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=affnetworkar" id="video-link-new">&nbsp;Integrating Autoresponders with Affiliate Networks</a></b></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=affiliatepixel" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=affiliatepixel" id="video-link-new">&nbsp;Tracking Calls-To-Action and Opt-ins with Affiliate Networks</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+This written overview makes heavy use of &ldquo;query&rdquo; strings. If you&rsquo;re unsure what a query string is and how to modify them, you should read through this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=177"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=177">What is a &ldquo;query&rdquo; string?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+For the Instant Notification Service to work, you need to pass a special piece of data to ClickBank that uniquely identifies which click resulted in the sale.<br />
+<br />
+To do this, ClickMagick has a special&nbsp;<em>[clickid]</em>&nbsp;token that you must add to the end of your ClickBank hoplinks when you set up your tracking links.<br />
+<br />
+For example, here&rsquo;s a standard ClickBank hoplink:<br />
+<br />
+<code>http://xxx.yyy.hop.clickbank.net</code><br />
+<br />
+ClickBank expects to find the <code>[clickid]</code> value in the <code>tid</code> or <code>vtid</code> query string parameter&mdash;depending on whether you&rsquo;re an affiliate or the vendor&mdash;so when setting up your tracking link in ClickMagick you would add either a <code>tid</code> or <code>vtid</code> query string parameter to your Primary URL. For example&hellip;<br />
+<br />
+If you&rsquo;re an <strong>affiliate</strong> promoting a &ldquo;hoplink&rdquo;, your link would look like this:<br />
+<br />
+<code>http://XXX.YYY.hop.clickbank.net/<strong>?tid=[clickid]</strong></code><br />
+<br />
+If you&rsquo;re a <strong>vendor</strong> promoting your own payment page, your link would look like this:<br />
+<br />
+<code>http://ITEM.VENDOR.pay.clickbank.net/<strong>?vtid=[clickid]</strong></code><br />
+<br />
+It works the same with Clickbank&rsquo;s encrypted hoplinks if you use those. As an affiliate just add <code>?tid=[clickid]</code> to the end:<br />
+<br />
+<code>http://b6b043y5x1nunwl1l.hop.clickbank.net/<strong>?tid=[clickid]</strong></code><br />
+<br />
+And as a vendor just use <code>vtid</code> instead of <code>tid</code>:<br />
+<br />
+<code>http://b6b043y5x1nunwl1l.pay.clickbank.net/<strong>?vtid=[clickid]</strong></code><br />
+<br />
+When you do this, each time someone clicks on your ClickMagick tracking link the system will automatically replace the <code>[clickid]</code> token in your link with actual click ID of the click being processed.<br />
+<br />
+This will allow the ClickBank system to report sales back to the proper link in your ClickMagick account whenever a sale is made.<br />
+<br />
+<br />
+<strong>Verifying Your Setup</strong><br />
+<br />
+To confirm that you&rsquo;ve set things up correctly, just look for TID values in your ClickBank stats after you&rsquo;ve sent traffic to your hoplink.<br />
+<br />
+If you&rsquo;re correctly passing the Click ID through your ClickBank link using the <code>[clickid]</code> token, you&rsquo;ll see unique Click ID values that are at least 9 digits long in the TID column of your ClickBank stats.<br />
+<br />
+Note that you won&rsquo;t see your actual keywords or anything like that in your ClickBank account&mdash;you&rsquo;ll only see a unique Click ID. You can easily find all of your other stats in ClickMagick.<br />
+<br />
+&nbsp;
+<div class="faq-note"><b>Note:</b> If the ClickBank URL you want to promote already has a query string&mdash;meaning it already has a question mark (<code>?)</code>&nbsp;in it&mdash;you need to add <code>&amp;tid=[clickid]</code> or <code>&amp;vtid=[clickid]</code> to the end. Simply replace the question mark (<code>?</code>) in the examples above with an ampersand (<code>&amp;</code>) character. Review the <strong><a href="/user/faqs.cgi?answer=177">FAQ on query strings</a></strong> for a complete explanation of this.</div>
+&nbsp;
+
+<div class="faq-note"><b>Note:</b> We support all ClickBank transaction types including standard sales, rebills, JV sales, JV rebills, refunds, and chargebacks. When ClickMagick gets a refund or chargeback, the previously attributed conversion will simply be removed from your ClickMagick account as if it never happened.</div>
+</body></html>

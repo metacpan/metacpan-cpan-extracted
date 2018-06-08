@@ -1,0 +1,81 @@
+
+
+
+docno="lists-034-10077455"
+name="Tom Stephens"
+email="tomste@microsoft.com"
+sent="Mon, 22 Apr 1996 08:54:53 -0700"
+subject="RE: Status (if any) of STLP?"
+To: "'sanders_james@tandem.com'" <sanders_james@tandem.com>
+Cc: "'ietf-tls@w3.org'" <ietf-tls@w3.org>, "'tls-draft@w3.org'"<tls-draft@w3.org>
+
+
+
+     
+   
+Jim,
+
+Win Treese and representatives from Microsoft and Netscape met a couple
+of weeks ago to begin hammering out some of the components for the
+foundation of a spec.  At that meeting, Microsoft precented our STLP
+strawman document.  That document was an experiment by Microsoft to
+determine how well SSL and PCT could be merged into one protocol - using
+SSL as a base and adding PCT deltas.  Our goal was to deal with the
+differences Microsoft and Netscape quickly so that the normal IETF
+process would move forward without any detractions from either Microsoft
+or Netscape.
+
+Tom
+
+>----------
+>From:  sanders_james@tandem.com[SMTP:sanders_james@tandem.com]
+>Sent:  Monday, April 22, 1996 7:53 AM
+>To:    Tom Stephens
+>Cc:    ietf-tls@w3.org; tls-draft@w3.org
+>Subject:       Re: Status (if  any) of STLP?
+
+>On Friday 4/19, at 8:24 PM, Tom Stephens wrote:
+
+>>Tls-draft was created specifically as a forum for the discussion of the
+>>Microsoft STLP strawman document.  The reason for this is that the STLP
+>>strawman document is not an official IETF document.  Win Treese,
+>>Microsoft and Netscape did not want this document to be confused in any
+>>way with the actual spec that is being developed by the working group.
+>>
+>>However, since the consensus of the emails is to discuss the STLP
+>>strawman document on ietf-tls, then Microsoft does not object.  To
+>>facilitate the discussion, you can find the STLP strawman document at:
+>>
+>>http://pct.microsoft.com/stlp.
+>>>
+>>Tom Stephens
+>>---------------------------------
+>Tom, could you or Win Treese tell us exactly what is going on?  I was
+>there
+>in LA on March 6 evening meeting, and this (recent unilateral release
+>by
+>Microsoft of a document of unknown status to an unknown enitity) does
+>not
+>feel like the intentions I heard expressed at that time.  If Microsoft
+>released a unilateral draft, to whom did you release it?  If it was to
+>the
+>IETF, but is "not an official IETF document," what status does it have?
+>Most of all, if the working group is still working on an "actual spec,"
+>what purpose is served by this unilateral STLP document?
+
+>These (apparently sub rosa) machinations do not inspire confidence in
+>the
+>integrity of the original commitments (surprising as they were) to work
+>out
+>a unified protocol.  The rest of the industry needs to have confidence
+>in
+>this process.
+
+>--Jim Sanders--
+>"Speaking for myself, not necessarily for my employer."
+
+><< Jim Sanders, Staff Scientist, Transaction Security    >>
+><< Network Applications Services, Tandem Computers       >>
+><< Voice: 408-285-492; E-mail: sanders_james@tandem.com  ))
+
+

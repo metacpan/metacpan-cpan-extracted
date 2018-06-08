@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html><head><title>What does “email” in the link name do?</title></head><body>
+<strong>What does &ldquo;email&rdquo; in the link name do?</strong><br />
+<br />
+Including the word &ldquo;email&rdquo; in the friendly name of a tracking link causes any pixels that are fired in the following 5 seconds to be ignored.<br data-text="true" />
+<br />
+That may sound like pretty weird behavior, but it can be used to prevent false conversions from being reported in certain scenarios...<br data-text="true" />
+<br />
+For example, take this tracking link example:<br />
+&nbsp;<br />
+<br />
+&nbsp; &nbsp; &nbsp;<img src="//cdn.clickmagick.com/images/user/faqs/faq327funneldiagram.jpg" /><br />
+<br />
+When someone goes through one of the Entry links and opts in to the email list, they land on the sales video page where an action pixel is fired and recorded. They also get put on an autoresponder and start receiving email messages.<br data-text="true" />
+<br />
+Now, if they click on the link in the email that takes them back to the sales video page, you don&#39;t want the action pixel on that page to fire again because that would record a duplicate conversion.<br data-text="true" />
+<br />
+So... whenever ClickMagick sees the word &ldquo;email&rdquo; in the friendly name of a tracking link (whether or not it&rsquo;s part of a tracking link funnel setup), it will ignore any pixels that are fired on the target page (and on any pages it may automatically redirect to for up to 5 seconds).
+</body></html>

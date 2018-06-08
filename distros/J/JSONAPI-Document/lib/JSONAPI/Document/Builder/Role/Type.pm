@@ -1,12 +1,12 @@
 package JSONAPI::Document::Builder::Role::Type;
-$JSONAPI::Document::Builder::Role::Type::VERSION = '1.5';
+$JSONAPI::Document::Builder::Role::Type::VERSION = '1.6';
 =head1 NAME
 
 JSONAPI::Document::Builder::Role::Type - Normalizer for document types
 
 =head1 VERSION
 
-version 1.5
+version 1.6
 
 =head1 DESCRIPTION
 

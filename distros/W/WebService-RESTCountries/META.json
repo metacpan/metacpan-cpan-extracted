@@ -49,11 +49,14 @@
       },
       "runtime" : {
          "requires" : {
+            "CHI" : "0",
             "Data::Serializer" : "0",
+            "Digest::MD5" : "0",
             "JSON" : "0",
             "Moo" : "0",
             "REST::Client" : "0",
             "Role::REST::Client" : "0",
+            "Sereal" : "0",
             "Types::Standard" : "0",
             "namespace::clean" : "0",
             "strictures" : "2"
@@ -81,7 +84,7 @@
          "web" : "https://github.com/kianmeng/webservice-restcountries"
       }
    },
-   "version" : "0.2",
+   "version" : "0.3",
    "x_contributors" : [
       "Kian-Meng, Ang <kianmeng@users.noreply.github.com>"
    ],

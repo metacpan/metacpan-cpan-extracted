@@ -1,5 +1,5 @@
 package Net::Hadoop::Oozie::Constants;
-$Net::Hadoop::Oozie::Constants::VERSION = '0.113';
+$Net::Hadoop::Oozie::Constants::VERSION = '0.114';
 use 5.010;
 use strict;
 use warnings;
@@ -171,7 +171,7 @@ Net::Hadoop::Oozie::Constants - Constants for Oozie
 
 =head1 VERSION
 
-version 0.113
+version 0.114
 
 =head1 DESCRIPTION
 

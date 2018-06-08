@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html><head><title>What is a “query string”?</title></head><body>
+<b>What is a &ldquo;query string&rdquo;?</b><br />
+<br />
+A &ldquo;query string&rdquo; is one of several methods of passing data from one web page to another. You&rsquo;ve probably seen URLs that look like this:<br />
+<br />
+<code>http://www.calendar.com<strong><span style="color:#000000;">?</span></strong>day=25&amp;month=1&amp;year=2018</code><br />
+<br />
+That URL contains two parts, separated by the &ldquo;<code>?</code>&rdquo; character. The part before the &ldquo;<code>?</code>&rdquo; mark is the <em>link</em> and the part after the &ldquo;<code>?</code>&rdquo; mark is <em>data</em> being passed to the link.<br />
+<br />
+In effect, the URL above says to go to the website <code>www.calendar.com</code> and pass the data<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top">&nbsp;</td>
+			<td>&nbsp;&nbsp;</td>
+			<td>day = 25<br />
+			month = 1<br />
+			year = 2018</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+Who knows what <code>calendar.com</code> is going to do with that data, but it&rsquo;s reasonable to assume that it has something to do with the date &ldquo;January 25, 2018.&rdquo;<br />
+<br />
+When you look at the URL in this example, the query string is introduced by the &ldquo;<code>?</code>&rdquo; mark, followed by the actual query string which is made up of&nbsp;<code><em>name=value</em></code>&nbsp;data pairs, each separated by the &ldquo;<code>&amp;</code>&rdquo; character:<br />
+<br />
+<code>http://www.calendar.com<strong><span style="color:#000000;">?</span><span style="color:#008000;">day=25</span><span style="color:#000000;">&amp;</span><span style="color:#008000;">month=1</span><span style="color:#000000;">&amp;</span><span style="color:#008000;">year=2018</span></strong></code><br />
+<br />
+The &ldquo;<code>&amp;</code>&rdquo; character is commonly pronounced &ldquo;and&rdquo; in computer programming languages, so you can loosely think of that query string like this:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top">&nbsp;</td>
+			<td>&nbsp;&nbsp;</td>
+			<td><strong>?</strong> &nbsp;<em>(pass the following data:)</em><br />
+			<strong>day = 25</strong>, &nbsp;and<br />
+			<strong>month = 1</strong>, &nbsp;and<br />
+			<strong>year = 2018</strong></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+In this example, each of these <code><em>name=value</em></code> pairs shows numerical values, but values can contain numbers, characters, and symbols as well. The <strong>month</strong> value could just as easily have been either of these:<br />
+<br />
+<code>month=jan<br />
+month=[January]</code><br />
+<br />
+It&rsquo;s really up to the target website to determine what the data means and how you need to pass it in.<br />
+<br />
+Query strings are used in several places in ClickMagick. You&rsquo;ll find them in tracking pixels, Postback URLs, affiliate network integration, and the Funnel Builder.<br />
+<br />
+You may need to edit query strings at times, or add a new <code><em>name=value</em></code> parameter. For example, let&rsquo;s assume you have a URL and you need to add this ClickMagick integration parameter:<br />
+<br />
+<code>s1=[clickid]</code><br />
+<br />
+If the URL doesn&rsquo;t have a query string yet (meaning there&rsquo;s no &ldquo;<code>?</code>&rdquo; mark yet), you&rsquo;ll need to <em>create</em> the query string by adding a &ldquo;<code>?</code>&rdquo; mark followed by the new parameter:<br />
+<br />
+<code>http://www.website.com<span style="color:#000000;"><strong>?</strong></span><span style="color:#008000;"><strong>s1=[clickid]</strong></span></code><br />
+<br />
+On the other hand, if the URL already <em>has</em> a query string (meaning there&rsquo;s already a &ldquo;<code>?</code>&rdquo; mark), you would simply add the new parameter to the end using the &ldquo;<code>&amp;</code>&rdquo; character:<br />
+<br />
+<code>http://www.website.com<strong>?</strong>id=475<span style="color:#000000;"><strong>&amp;</strong></span><span style="color:#008000;"><strong>s1=[clickid]</strong></span></code><br />
+<br />
+You can search the web for a much more thorough discussion of query strings, but this should get you through 97% of the situations you&rsquo;ll ever run across.<br />
+<br />
+<br />
+<strong>Encoded Query Strings</strong><br />
+<br />
+One thing you&rsquo;re sure to run into is &ldquo;encoded&rdquo; query strings. These are query strings where some characters are replaced with a more &ldquo;machine friendly&rdquo; form. For example, the space character will typically be replaced with <code>%20</code>, colons with <code>%3A</code>, and slashes with <code>%2F</code>. Don&rsquo;t be surprised if you see <code>http://</code>&nbsp;encoded as<code> http%3A%2F%2F</code>. <strong><a href="http://www.w3schools.com/tags/ref_urlencode.asp" target="_blank">Check out W3Schools.com&rsquo;s complete list of URL encodings</a></strong>.<br />
+<br />
+HTML has a different way of encoding characters using named &ldquo;entities.&rdquo; For example, the &ldquo;<code>&amp;</code>&rdquo; character itself will often be replaced with <code>&amp;<span style="font-size:1px;"> </span>amp;</code>. This creates some unusual looking query strings, especially when you paste an otherwise normal looking link into a Page Builder and you see your <code><em>name=value</em></code> pairs separated by <code>&amp;<span style="font-size: 1px;">&nbsp;</span>amp;</code> entities when you view your page source. You can find an extensive list of these <strong><a href="http://www.w3schools.com/html/html_entities.asp" target="_blank">HTML entities at W3Schools.com</a></strong>.<br />
+<br />
+You won&rsquo;t need to worry about encoded query strings in ClickMagick, but at least you&rsquo;ll know what those <code>%##</code>&nbsp;and <code>&amp;<i>entity</i>;</code> encodings are when you do see them.<br />
+<br />
+<br />
+<strong>Value-less Parameters</strong><br />
+<br />
+Another thing you&rsquo;ll see are query strings where the parameters don&rsquo;t have any values, such as:<br />
+<br />
+<code>http://www.calendar.com?day=&amp;month=&amp;year=</code><br />
+<br />
+Parameters without values are perfectly fine. It just means they aren&rsquo;t specified. For this <code>www.calendar.com</code> example, this might simply mean &ldquo;display today&rdquo; since an actual date is not specified. Using value-less parameters is quite common, so don&rsquo;t let it confuse you if you see them.<br />
+<br />
+&nbsp;
+<div class="faq-tip"><b>Tip:</b> If you want to pass a query string from a tracking link to its Primary URL, you can use the <code>[query_string]</code> token. See the section on <strong>Passthrough Tokens</strong> in this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=41"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=41">&nbsp;What data can I pass to the URLs I promote?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+&nbsp;
+
+<div class="faq-note"><b>Note:</b> For a more complete description of query strings, take a look at this Wikepedia entry:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="https://en.wikipedia.org/wiki/Query_string" target="_blank"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="https://en.wikipedia.org/wiki/Query_string" target="_blank">History and Use of Query Strings</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+</body></html>

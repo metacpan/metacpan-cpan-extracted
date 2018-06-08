@@ -30,18 +30,18 @@ name: FFI-TinyCC
 requires:
   Alien::TinyCC: '0'
   FFI::Platypus: '0.15'
-  FFI::Platypus::Type::StringArray: '0.01'
   File::ShareDir::Dist: '0'
   perl: '5.008001'
 resources:
   IRC: irc://irc.perl.org/#native
-  bugtracker: https://github.com/plicease/FFI-TinyCC/issues
+  bugtracker: https://github.com/Perl5-FFI/FFI-TinyCC/issues
   homepage: https://metacpan.org/pod/FFI::TinyCC
-  repository: git://github.com/plicease/FFI-TinyCC.git
-version: '0.26'
+  repository: git://github.com/Perl5-FFI/FFI-TinyCC.git
+version: '0.28'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - aero
   - 'Dylan Cali (calid)'
   - pipcet
 x_serialization_backend: 'YAML::Tiny version 1.70'
+x_use_unsafe_inc: 0

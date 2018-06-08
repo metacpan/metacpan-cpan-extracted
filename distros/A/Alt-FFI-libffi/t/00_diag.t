@@ -15,7 +15,12 @@ $modules{$_} = $_ for qw(
   Test::More
 );
 
-
+$post_diag = sub {
+  require FFI::Platypus;
+  foreach my $key (sort keys %{ FFI::Platypus->abis }) {
+    diag "  abi.$key = ", FFI::Platypus->abis->{$key};
+  }
+};
 
 my @modules = sort keys %modules;
 

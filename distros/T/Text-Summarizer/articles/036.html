@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html><head><title>What data or tokens can I pass to the URLs I promote?</title></head><body>
+<b>What data or tokens can I pass to the URLs I promote?</b><br />
+<br />
+You can use the following &ldquo;tokens&rdquo; to pass data through your tracking links to your Primary URL, or through your rotators to your individual rotator URLs.<br />
+<br />
+This is useful for passing data to other analytics systems, your CRM or shopping cart, affiliate networks, etc.<br />
+<br />
+To use a token, just add it wherever you want that value to appear in the URL you&rsquo;re redirecting traffic to. All tokens are case-sensitive, so be sure to use lower case when entering them.<br />
+<br />
+<br />
+<b>ClickMagick Sub-ID Tokens</b><br />
+<br />
+You can pass up to 5 sub-ID values to your tracking links by adding them to your link using a &ldquo;<code>/</code>&rdquo; followed by the Sub-ID value. For example:<br />
+<br />
+<code>http</code><code>://$linkdomain/linkID/subid1/subid2/...</code><br />
+<br />
+You can then pass the sub-ID values to your link using these tokens:<br />
+<br />
+<code>[s1]</code> - This is <code>subid1</code> that you&rsquo;ve added to the end of an incoming tracking or rotator link.<br />
+<code>[s2]</code> - This is <code>subid2</code> ...<br />
+<code>[s3]</code> - <code>subid3</code><br />
+<code>[s4]</code> - etc.<br />
+<code>[s5]</code><br />
+<br />
+There are some restrictions in the characters that you can use in a sub-ID. Please be sure to read the note at the end of this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=3"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=3">&nbsp;Can I use Sub-IDs with my tracking links?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+<strong>ClickMagick UTM Tokens</strong><br />
+<br />
+Google&rsquo;s UTM query string parameters can be passed to your tracking or rotator links using their corresponding tokens:<br />
+<br />
+<code>[utm_source]</code><br />
+<code>[utm_medium]</code><br />
+<code>[utm_term]</code><br />
+<code>[utm_content]</code><br />
+<code>[utm_campaign]</code><br />
+<br />
+When a tracking link receives a UTM parameter, it&rsquo;s value will be stored for later use in Postback URLs and Custom Postbacks. The values are stored in ClickMagick&rsquo;s Sub-ID 1 through Sub-ID 5 variables and you would use the <code>[s1]</code>-<code>[s5]</code> tokens to retrieve them. For more information, read this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=201"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=201">How do I use UTM parameters with ClickMagick?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+<strong>Miscellaneous ClickMagick Tokens</strong><br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><code>[clickid]</code></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>&ndash; A unique identifier assigned to every click. Used with Postback URLs.</td>
+		</tr>
+		<tr>
+			<td valign="top"><code>[lname]</code></td>
+			<td>&nbsp;</td>
+			<td>&ndash; The link ID name used when creating the link.</td>
+		</tr>
+		<tr>
+			<td valign="top"><code>[country]</code></td>
+			<td>&nbsp;</td>
+			<td>&ndash; The country the click originated from.</td>
+		</tr>
+		<tr>
+			<td valign="top"><code>[ref]</code></td>
+			<td>&nbsp;</td>
+			<td>&ndash; Tracking pixel &ldquo;ref&rdquo; value.&nbsp; Used with Custom Postbacks.</td>
+		</tr>
+		<tr>
+			<td valign="top"><code>[lid]</code></td>
+			<td>&nbsp;</td>
+			<td>&ndash; The internal link ID number. &nbsp;Rarely used.</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+<b>Passthrough Tokens</b><br />
+<br />
+These values are not logged in ClickMagick and are generally only used with Google Analytics or by advanced users who know what to do with them:<br />
+<br />
+<code>[query_string]</code> &ndash; Passes the entire query string untouched<br />
+<br />
+To make use of these tokens, there needs to be data in the &ldquo;query string&rdquo; at the end of your incoming links. For example:<br />
+<br />
+<code>http://$linkdomain/calendar<strong>?day=25&amp;month=1&amp;year=2017</strong></code><br />
+<br />
+The &ldquo;query string&rdquo; is the question mark in the URL and everything that comes after it. Query strings consist of one or more <code>name=value</code> pairs separated by ampersands (<code>&amp;</code>). You can learn all about query strings and how to modify them in this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b style="box-sizing: border-box;"><a href="/user/faqs.cgi?answer=177" style="box-sizing: border-box; background: transparent;">How to work with query strings</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+In the case of Google UTM parameters, these will normally be added to the end of your tracking links automatically once you&rsquo;ve enabled them in your Google account.<br />
+<br />
+<br />
+<b>Example of How to Pass Sub-ID Data to a URL</b><br />
+<br />
+To pass one or more Sub-ID values to a URL you&rsquo;re promoting, simply use the ClickMagick tokens above wherever you want the Sub-ID values to appear in the Primary URL you&rsquo;re redirecting traffic to.<br />
+<br />
+Say you&rsquo;re promoting a ClickBank URL like this:<br />
+<br />
+<code>http://xxx.yyy.hop.clickbank.net</code><br />
+<br />
+ClickBank uses the <code>tid</code> parameter to accept Sub-IDs, so you would add this query string to your ClickBank link:<br />
+<br />
+<code>http://xxx.yyy.hop.clickbank.net/?tid=[s1]</code><br />
+<br />
+If you were passing a token to another ClickMagick tracking link or rotator link, you would simply pass the token in using the <code>/subid</code> format just like you would for any other value:<br />
+<br />
+<code>http://$linkdomain/somelink/[s1]</code>
+</body></html>

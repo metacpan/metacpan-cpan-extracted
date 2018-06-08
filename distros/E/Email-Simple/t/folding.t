@@ -1,6 +1,6 @@
 #!perl -w
 use strict;
-use Test::More tests => 7;
+use Test::More tests => 14;
 
 # This time, with folding!
 
@@ -53,3 +53,44 @@ END
 
   unlike($email_1->as_string, qr/\Q$subject/, "we fold the 50-A line");
 }
+
+{
+  my $to   = 'to@example.com';
+  my $from = 'from@example.com';
+
+  my $subject = 'A ' x 50; # Long enough to need to be folded
+
+  my $email_1 = Email::Simple->create(
+    header => [
+      To      => $to,
+      From    => $from,
+      Subject => $subject, # string specified in constructor does *not* get folded
+    ]
+  );
+
+  $email_1->header_raw_prepend( 'Test' ,"This is a test of folding an existing header which is just the right xx\r\n size to fold twice" );
+  $email_1->header_raw_prepend( 'Test2' ,"This is a test of folding an existing header which is long enough to fold but should never fold because it is already folded\n manually." );
+  $email_1->header_raw_prepend( 'Test3', "this\n line\n is\n very\n folded" );
+  $email_1->header_raw_prepend( 'Test4', "Folded line with a crlf at the end\n" );
+  $email_1->header_raw_prepend( 'Test5', 'foobar' );
+
+  unlike($email_1->as_string(), qr/xx\r?\n\s+\r?\n/, 'we do not have a blank fold line' );
+  like( $email_1->as_string(), qr/This is a test of folding an existing header which is long enough to fold but should never fold because it is already folded\n manually./, 'do not refold if already folded long lines' );
+  like( $email_1->as_string(), qr/this\n line\n is\n very\n folded/, 'do not refold if already folded short lines' );
+  unlike($email_1->as_string(), qr/at the end\n\s+\n/, 'no double fold on line ending in newline' );
+
+
+  {
+    my @warnings;
+    my $string = do {
+      local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+      $email_1->header_raw_prepend( 'Test6', "Invalid\nFolding" );
+      $email_1->as_string;
+    };
+
+    is(@warnings, 1, "setting an invalidly-folded header emits a warning");
+    like($warnings[0], qr/bad space/, "...and it's the right one");
+    like($string, qr/Test6: Invalid\r?\n Folding\r?\n/, "header fixed");
+  }
+}
+

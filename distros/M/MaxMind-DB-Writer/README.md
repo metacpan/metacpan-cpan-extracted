@@ -4,7 +4,7 @@ MaxMind::DB::Writer - Create MaxMind DB database files
 
 # VERSION
 
-version 0.300001
+version 0.300002
 
 # SYNOPSIS
 
@@ -77,10 +77,11 @@ Bugs may be submitted through [https://github.com/maxmind/MaxMind-DB-Writer-perl
 # CONTRIBUTORS
 
 - Florian Ragwitz <rafl@debian.org>
-- Ilya M <ilya77@gmail.com>
+- Ilya Melamed <ilya77@gmail.com>
 - Jan Bieron &lt;jbieron+github@gmail.com>
-- tjmather <tjmather@maxmind.com>
+- Thomas J Mather <tjmather@maxmind.com>
 - William Storey <wstorey@maxmind.com>
+- Will Storey <will@summercat.com>
 
 # COPYRIGHT AND LICENSE
 

@@ -8,7 +8,7 @@ use Pcore::Util::Scalar qw[weaken is_plain_arrayref];
 with qw[Pcore::API::SCM];
 
 has capabilities => ( is => 'ro', isa => Str, init_arg => undef );
-has _server_proc => ( is => 'ro', isa => InstanceOf ['Pcore::Util::PM::Proc'], init_arg => undef );
+has _server_proc => ( is => 'ro', isa => InstanceOf ['Pcore::Util::Sys::Proc'], init_arg => undef );
 
 our $SERVER_PROC;
 
@@ -39,7 +39,7 @@ sub _server ( $self, $cb ) {
     else {
         local $ENV{HGENCODING} = 'UTF-8';
 
-        P->pm->run_proc(
+        P->sys->run_proc(
             [qw[hg serve --config ui.interactive=True --cmdserver pipe]],
             stdin    => 1,
             stdout   => 1,

@@ -20,6 +20,8 @@ sub test {
      return $obj->err();
   } else {
      @dates = $obj->dates();
+     $err   = $obj->err();
+     return $err  if ($err);
      @ret   = ();
      foreach my $d (@dates) {
         $v = $d->value();

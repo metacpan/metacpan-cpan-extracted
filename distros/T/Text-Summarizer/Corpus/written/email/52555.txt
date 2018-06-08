@@ -1,0 +1,64 @@
+
+
+
+Message-ID: <30170440.1075856614663.JavaMail.evans@thyme>
+Date: Sun, 10 Dec 2000 03:03:00 -0800 (PST)
+From: vkaminski@aol.com
+To: vkamins@enron.com
+Subject: Fwd: Successful purchase of NBER Paper
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+
+Return-Path: <Gregory_Gordon@ssrn.com>
+Received: from rly-xd03.mx.aol.com (rly-xd03.mail.aol.com [172.20.105.168]) 
+by air-xd05.mail.aol.com (v77.14) with ESMTP; Sun, 10 Dec 2000 10:57:06 -0500
+Received: from zeus.ssrn.com (zeus.ssrn.com [38.202.236.235]) by 
+rly-xd03.mx.aol.com (v77.27) with ESMTP; Sun, 10 Dec 2000 10:56:51 -0500
+Received: from ssrn.com ([38.202.236.235]) by zeus.ssrn.com 
+(Post.Office MTA v3.5.3 release 223 ID# 0-61092U100L2S100V35) with 
+SMTP id com; Sun, 10 Dec 2000 10:56:50 -0500
+Subject: Successful purchase of NBER Paper
+Date: Sun, 10 Dec 2000 10:56:49 -0500
+From: Gregory_Gordon@ssrn.com (Gregory_Gordon)
+To: <vkaminski@aol.com>
+CC:
+Message-ID: <20001210155650048.AAA365@zeus.ssrn.com@ssrn.com>
+
+Dear Wincenty Kaminski:
+
+Thank you for your purchase at Social Science Research Network. Your
+credit card has been charged $ 5.00. This charge will appear on your
+statement as Social Science Electronic Publishing, our parent company.
+The confirmation number for this transaction is NBER_103397 and a
+summary of your order is below.
+
+If you have any questions about this charge please email
+Mailto:NBERSupport@ssrn.com for assistance.
+
+If you have any comments or suggestions about how SSRN can improve this
+service, please let me know at Mailto:Gregory_Gordon@ssrn.com.
+
+Thank you,
+ 
+Gregory Gordon
+ 
+President
+
+ORDER INFORMATION
+================================
+Diagnosing Market Power in California's Restructured Wholesale
+Electricity Market
+NBER Collection
+Borenstein / Bushnell / Wolak
+
+BILLING INFORMATION
+================================
+Wincenty Kaminski
+1400 Smith
+Houston, TX 77002
+USA
+713 853 3848
+
+

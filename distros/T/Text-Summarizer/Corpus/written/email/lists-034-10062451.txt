@@ -1,0 +1,66 @@
+
+
+
+docno="lists-034-10062451"
+name="Tom Stephens"
+email="tomste@microsoft.com"
+sent="Fri, 19 Apr 1996 19:32:07 -0700"
+subject="RE: Merged Transport Layer Protocol Development"
+To: "'ietf-tls@w3.org'" <ietf-tls@w3.org>
+Cc: "'tls-draft@w3.org'" <tls-draft@w3.org>
+
+
+
+     
+   
+Tls-draft was created specifically as a forum for the discussion of the
+Microsoft STLP strawman document.  The reason for this is that the STLP
+strawman document is not an official IETF document.  Win Treese,
+Microsoft and Netscape did not want this document to be confused in any
+way with the actual spec that is being developed by the working group.
+
+However, since the consensus of the emails is to discuss the STLP
+strawman document on ietf-tls, then Microsoft does not object.  To
+facilitate the discussion, you can find the STLP strawman document at:
+
+http://pct.microsoft.com/stlp.
+
+
+Tom Stephens
+
+>----------
+>From:  Eric Murray[SMTP:ericm@lne.com]
+>Sent:  Friday, April 19, 1996 3:18 PM
+>To:    Tom Stephens
+>Cc:    ietf-tls@w3.org
+>Subject:       Re: Merged Transport Layer Protocol Development
+
+>Tom Stephens writes:
+>>
+>> David made some excellent points regarding STLP.  These points and
+>> others will be discussed in some detail on tls-draft@w3.org - as that is
+>> the alias for discussion of the STLP strawman document.  If you are not
+>> a member of that alias, I would strongly encourage you to join and
+>> >participate in the discussion.  To join the tls-draft alias, send an
+>> >mail to tls-draft-request@w3.org with the word "subscribe" in the
+>> subject line.
+
+>Perhaps I don't understand IETF procedure, but I am puzzled as to why
+>there is now a second mailing list.  It's not like the original
+>TLS list is getting too much traffic.
+
+>In fact, it's not getting enough traffic... for one, I can't find any
+>reference to any mail that included the URL for the STLP "strawman".
+
+>Where is it?
+
+
+
+>--
+>Eric Murray  ericm@lne.com  ericm@motorcycle.com
+>http://www.lne.com/ericm
+>PGP keyid:E03F65E5 fingerprint:50 B0 A2 4C 7D 86 FC 03  92 E8 AC E6 7E
+>27 29 AF
+
+
+

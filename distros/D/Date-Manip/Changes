@@ -15,6 +15,44 @@ Also, the Changes document is automatically generated from the document:
 and that document should be considered the canonical source for all change
 related information.
 
+6.72  2018-06-06
+  -  Fixed recurrence bug
+        The fix in the previous version for a rare recurrence problem broke
+        another recurrence form. It is now corrected. Michael Schout (GitHub
+        #20)
+
+  -  Fixed version problem
+        The wrong version was included in two files for some reason. This is
+        fixed.
+
+  -  Documentation fixes
+        Fixed a grammatical error reported by Xavier Guimard (GitHub #19).
+
+6.71  2018-06-01
+  -  Fixed an extremely rare problem with recurrences
+        It is possible to specify a recurrence that never produces a valid
+        date. In these cases, looking for dates went into an infinite loop.
+        The MaxRecurAttempts config variable was added which will stop that
+        from happening. If no occurrence was found, an error condition will
+        be set. Dean Hamstead (RT 123708)
+
+  -  Changes file supported
+        It was requested that I include a valid Changes file. I wrote a
+        simple script to convert the Change6.pod file into a valid Change
+        file. The Changes6.pod file is still the canonical source of this
+        information! Requested by H. Merijn Brand
+
+  -  Fix for timezone determination
+        On MacOS X High Sierra, some of the timezone files were symlinks,
+        but not properly followed. This was fixed by Stu Tomlinson (GitHub
+        #15).
+
+  -  Time zone fixes
+        Newest zoneinfo data (tzdata 2018e)
+
+  -  Documentation fixes
+        Minor fix provided by Mohammad S Anwar (GitHub #17)
+
 6.70  2018-03-01
   -  (*) (!) Changes to deltas
         Improved handling of deltas to better support the different types of

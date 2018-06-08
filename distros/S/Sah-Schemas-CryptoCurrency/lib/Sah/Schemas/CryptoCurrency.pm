@@ -1,7 +1,7 @@
 package Sah::Schemas::CryptoCurrency;
 
-our $DATE = '2018-06-06'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2018-06-07'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 1;
 # ABSTRACT: Various Sah cryptocurrency schemas
@@ -18,7 +18,7 @@ Sah::Schemas::CryptoCurrency - Various Sah cryptocurrency schemas
 
 =head1 VERSION
 
-This document describes version 0.009 of Sah::Schemas::CryptoCurrency (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-06-06.
+This document describes version 0.010 of Sah::Schemas::CryptoCurrency (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-06-07.
 
 =head1 SAH SCHEMAS
 

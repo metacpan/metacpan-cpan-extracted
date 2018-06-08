@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html><head><title>Can I use Postback URLs for Actions and Engagements?</title></head><body>
+<strong>Can I use Postback URLs for Actions and Engagements?</strong><br />
+<br />
+Yep. ClickMagick fully supports postback URLs for actions and engagements. The <strong><a href="/user/action/tools/postbackb.cgi" target="_blank">Postback Builder</a></strong> tool creates Postback URLs for sales, but those URLs can easily be changed to track actions and engagements instead. Here&rsquo;s how ...<br />
+<br />
+Take a look at this generic Postback URL for a sale. In particular, notice the bolded &ldquo;/s/&rdquo;&nbsp;in it:<br />
+<br />
+<code>http://www.clkmg.com/api<strong>/s/</strong>post/?uid=$userid&amp;s1={TRACKID}&amp;amt=0.00&amp;ref=</code><br />
+<br />
+To turn that Postback URL into an Action Postback URL, simply change the &ldquo;s&rdquo; to an &ldquo;a&rdquo;:<br />
+<br />
+<code>http://www.clkmg.com/api<strong>/a/</strong>post/?uid=$userid&amp;s1={TRACKID}&amp;amt=0.00&amp;ref=</code><br />
+<br />
+For an Engagement Postback URL, change the &ldquo;s&rdquo;&nbsp;to an &ldquo;e&rdquo;:<br />
+<br />
+<code>http://www.clkmg.com/api<strong>/e/</strong>post/?uid=$userid&amp;s1={TRACKID}&amp;amt=0.00&amp;ref=</code><br />
+&nbsp;<br />
+&nbsp;
+<div class="faq-caution"><b>Caution:</b> You cannot use the URLs shown above because the <code>{TRACKID}</code> value must be replaced with the actual token that your network uses.&nbsp;The easiest way to create a correct Postback URL for your network is to use the <strong><a href="/user/action/tools/postbackb.cgi" target="_blank">Postback Builder</a></strong> tool to create a Sales Postback URL and&nbsp;then change the generated Postback URL to use an &ldquo;a&rdquo; or an &ldquo;e&rdquo; instead of an &ldquo;s&rdquo;, as explained.<br />
+<br />
+If your network is not listed in the <strong><a href="/user/action/tools/postbackb.cgi" target="_blank">Postback Builder</a></strong> tool, you can manually create your Postback URL by following the instructions here:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=210"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=210">&nbsp;How do I create a Postback URL for my network?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+</body></html>

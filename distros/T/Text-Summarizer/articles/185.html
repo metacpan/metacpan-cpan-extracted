@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html><head><title>How do I track affiliate conversions with JVZoo?</title></head><body>
+<b>How do I track affiliate conversions with JVZoo?</b><br />
+<br />
+JVZoo doesn&rsquo;t&nbsp;yet support industry-standard Tracking Pixels or Postback URLs so tracking conversions with JVZoo requires that you use Sub-IDs. This walkthrough will explain exactly how to set up a JVZoo product offer using Sub-IDs.<br />
+<br />
+For example, let&rsquo;s assume that you&rsquo;re promoting an offer through JVZoo and your link looks like this:<br />
+<br />
+<code>http://www.jvzoo.com/c/3522/3665/</code><br />
+<br />
+To track conversions, you need to pass a unique Sub-ID to your JVZoo affiliate link by adding ClickMagick&rsquo;s <code>[clickid]</code> token to the end of the URL like this:<br />
+<br />
+<code>http://www.jvzoo.com/c/3522/3665/<strong>?tid=[clickid]</strong></code><br />
+<br />
+You would use this modified JVZoo link as your Primary URL when creating a ClickMagick tracking link for a&nbsp;particular affiliate offer.<br />
+<br />
+Once you&rsquo;ve added <code>?tid=[clickid]</code>&nbsp;to the end of your affiliate link, ClickMagick will replace the&nbsp;<code>[clickid]</code>&nbsp;token with a unique number every time someone clicks on your tracking link. When JVZoo gets the click, it will record the value of the click ID in the <code>tid</code> column of your JVZoo stats along with your clicks and sales.<br />
+<br />
+<br />
+<strong>Syncing ClickMagick with JVZoo</strong><br />
+<br />
+To sync ClickMagick with JVZoo, you&rsquo;ll need to manually download your conversion report from JVZoo occasionally and import it into your ClickMagick account.<br />
+<br />
+Just follow these steps:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>1.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>The first thing you&rsquo;ll need to do is export your transaction information from JVZoo. To do that, simply go the <strong>Affiliates</strong> menu at the top of the screen and select <strong>Transactions</strong>. From there, click on the Export button shown here on the lower right side of this screenshot:<br />
+			<br />
+			<img src="//cdn.clickmagick.com/images/user/faqs/faq246jvzooexpt.jpg" /><br />
+			<br />
+			Save the file where you can easily find it.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;&nbsp;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>2.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Before you can import the data file into ClickMagick, you&rsquo;ll need to edit the file slightly using a spreadsheet program like Microsoft Excel, Google Sheets, or Apple Numbers.<br />
+			<br />
+			Specifically, you&rsquo;ll need to rearrange the columns so that the first three columns are in this order: <code>tid</code>, <code>payout</code>, and <code>completed</code>&nbsp;(which holds date/time values). Delete all other columns and <em>be sure to save the file in <strong>CSV format</strong></em>. If you save the file in Excel, Sheets, or Numbers format, it will NOT import into ClickMagick.<br />
+			&nbsp;
+			<div class="faq-tip"><b>Tip:</b> If you have any trouble rearranging the columns in your spreadsheet program, search the help documents for your spreadsheet&mdash;it&rsquo;s usually quite simple to rearrange columns once you know how. If you still have trouble, contact us at the <strong><a href="/user/action/account/help.cgi?action=helpdesk" target="_blank">1-Hour Support</a></strong> desk which you can find in the <strong>Help</strong> menu at the top of every page. Be sure to attach the&nbsp;file you exported from JVZoo so we can edit it for you.</div>
+			&nbsp;
+
+			<div class="faq-note"><b>Note:</b>&nbsp;The JVZoo export feature sometimes leaves&nbsp;the <code>tid</code> value&nbsp;empty for sales that have been made even though those same sales show a <code>tid</code> value in your JVZoo transaction report. If you see a blank entry in the <code>tid</code> column for a particular sale, simply look at your JVZoo transaction report and manually copy the value to the spreadsheet. You might also want to mention the problem to the JVZoo support desk to alert them that this problem still exists.</div>
+			</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;&nbsp;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>3.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>
+			<table border="0" cellpadding="0" cellspacing="0">
+				<tbody>
+					<tr>
+						<td>The next step is to import your data into ClickMagick. Do this by going to the tracking link you want to update, then click on the Settings menu&nbsp;<img alt="" src="//cdn.clickmagick.com/images/user/options.png" />&nbsp;to the right of the tracking link and select <strong>Add/Import Revenue</strong>:<br />
+						<br />
+						<img src="//cdn.clickmagick.com/images/user/faqs/faq246uploadstats.jpg" /></td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>4.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>From the <strong>Add/Import Revenue</strong> page (shown above), select your file and click the <strong>Upload</strong> button. If you edited your file correctly and saved it in CSV format, your data should be imported and all of your stats should&nbsp;show accurately.<br />
+			&nbsp;
+			<div class="faq-caution"><b>Caution:</b> It&rsquo;s important to remember that the sales and revenue-related stats you see in ClickMagick will only be accurate when you select a date range that exactly matches the date range of the conversion reports you&rsquo;ve uploaded.</div>
+			</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+&nbsp;<br />
+If you follow these steps, you should have no trouble importing your JVZoo data into ClickMagick.<br />
+<br />
+That said, this entire process could be fully automated if JVZoo were to support industry-standard pixels and Postback URLs. If you&rsquo;re interested in having this process fully automated, kindly asked your JVZoo representative to have pixel and Postback URLs supported by their system.
+</body></html>

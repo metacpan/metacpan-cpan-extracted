@@ -1,7 +1,7 @@
 package SQL::Schema::Versioned;
 
-our $DATE = '2018-05-10'; # DATE
-our $VERSION = '0.235'; # VERSION
+our $DATE = '2018-06-06'; # DATE
+our $VERSION = '0.236'; # VERSION
 
 use 5.010001;
 use strict;
@@ -439,7 +439,7 @@ sub create_or_update_db_schema {
             if ($from_v) {
                 # install from a specific version
                 if ($spec->{"install_v$from_v"}) {
-                    log_debug("Creating version $from_v of database schema ...");
+                    log_debug("Creating version $from_v of database schema (component $comp) ...");
                     my $i = 0;
                     for my $step (@{ $spec->{"install_v$from_v"} }) {
                         $i++;
@@ -468,7 +468,7 @@ sub create_or_update_db_schema {
             } else {
                 # install directly the latest version
                 if ($spec->{install}) {
-                    log_debug("Creating latest version of database schema ...");
+                    log_debug("Creating latest version of database schema (component $comp) ...");
                     my $i = 0;
                     for my $step (@{ $spec->{install} }) {
                         $i++;
@@ -500,7 +500,7 @@ sub create_or_update_db_schema {
 
       UPGRADE:
         my $next_v = $current_v + 1;
-        log_debug("Updating database schema from version $current_v to $next_v ...");
+        log_debug("Updating database schema (component $comp) from version $current_v to $next_v ...");
         $spec->{"upgrade_to_v$next_v"}
             or do { $res = [400, "Error in spec: upgrade_to_v$next_v not specified"]; last SETUP };
         my $i = 0;
@@ -552,7 +552,7 @@ SQL::Schema::Versioned - Routine and convention to create/update your applicatio
 
 =head1 VERSION
 
-This document describes version 0.235 of SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2018-05-10.
+This document describes version 0.236 of SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2018-06-06.
 
 =head1 DESCRIPTION
 

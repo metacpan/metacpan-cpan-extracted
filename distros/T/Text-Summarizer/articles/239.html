@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html><head><title>Why don’t my funnel pages show any visits?</title></head><body>
+<strong>Why don&rsquo;t my funnel pages show any visits?</strong><br />
+<br />
+There are a couple of reasons why your pages might not&nbsp;show any visits. The simplest reason is that you&rsquo;re looking at the wrong filter settings. To see if this is the problem, simply set all of the filters to show &ldquo;All&rdquo;:<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq301filters.jpg" /><br />
+<br />
+If your missing stats suddenly show up, then either your filter settings were wrong, or your visits are being attributed to the wrong category.<br />
+<br />
+Of the four types of filters, the only one that generally confuses people is the difference between a &ldquo;qualified&rdquo; and an &ldquo;unqualified&rdquo;&nbsp;visitor. You can read about the difference here:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=243"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=243">&nbsp;What&rsquo;s the difference between Qualified &amp; Unqualified visitors?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+If you&rsquo;ve check your filter settings and your missing stats are still missing, then read on &hellip;<br />
+<br />
+<br />
+<strong>Your Page Settings URL is Incorrect</strong><br />
+<br />
+The other very common reason for page visits not showing up is that you&rsquo;ve entered the wrong URL for the &ldquo;Page URL&rdquo; setting of your FunnelMagick page:<br />
+&nbsp;<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq301pageurl.jpg" /><br />
+&nbsp;<br />
+<br />
+For FunnelMagick to work correctly, the URL you enter as the Page URL must be the actual, final page that the user sees. The setting cannot be a link that redirects to your final page, such as a link shortener like Bitly or TinyURL.<br />
+<br />
+ClickFunnels is a popular Page Builder that uses a redirect link to the pages that you create with it. Because ClickFunnels is so popular, let&rsquo;s use it as an example for how to set the proper Page URL in FunnelMagick even though ClickFunnels gives you a redirect link which won&rsquo;t work.<br />
+<br />
+Take a look at this&nbsp;opt-in page we created inside the ClickFunnels Page Builder:<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq301cflink.jpg" /><br />
+&nbsp;<br />
+<br />
+Notice the generic ClickFunnels URL that it shows:<br />
+<br />
+<code>http://clickmagick.clickfunnels.com/optinog321qfo</code><br />
+<br />
+That link will certainly display the opt-in page, but when you use it, look at the <em>final</em> URL in the Address Bar:<br />
+&nbsp;<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq301aswpage.jpg" /><br />
+<br />
+<br />
+The final URL uses the <code>antarcticsnowwater.com</code> custom domain that we set up with ClickFunnels and uses the &ldquo;path&rdquo; <code>optin-bottles</code> that ClickFunnels asked us for when we created the page. That&rsquo;s normal user behavior with ClickFunnels which is why so many ClickFunnel users have trouble with the Page URL setting in FunnelMagick.&nbsp;<br />
+<br />
+The way ClickFunnels works&mdash;and the way a LOT of Page Builders work&mdash;is that it gives you a link into its own system that then redirects to the final page that you created.<br />
+<br />
+There&rsquo;s absolutely nothing wrong with that approach, but for your visits to show up in your FunnelMagick stats, you have to use the <em>final</em> URL&mdash;not the <em>initial</em> URL&mdash;for the page.<br />
+<br />
+Here&rsquo;s why &hellip;<br />
+<br />
+When a visitor lands on your web page, the piece of FunnelMagick tracking code that you inserted on the page is executed. The first thing that piece of code does is grab the URL of the page its on.<br />
+<br />
+Next, the code looks at the Page URL setting of every page in your funnel to see which page just got visited. If you&rsquo;ve set the Page URL to the <em>initial</em> page URL that ClickFunnels gives you, the funnel tracking code won&rsquo;t find the page and no visit will be recorded!<br />
+<br />
+This is why you <em>must</em> set the Page URL setting to the actual, <em>final</em> URL that the tracking code is going to execute from. If you don&rsquo;t, your visits won&rsquo;t be recorded.<br />
+<br />
+<br />
+<strong>So how do you ensure that you have the correct URL?</strong><br />
+<br />
+It&rsquo;s pretty easy &hellip;<br />
+<br />
+Just enter the URL that your Page Builder gives you and use the final URL that shows up in the Address Bar.<br />
+<br />
+In this ClickFunnels example, we would enter ...<br />
+<br />
+<code>http://clickmagick.clickfunnels.com/optinog321qfo</code><br />
+<br />
+&hellip; into the browser and once the has page loaded, the Address Bar would show:<br />
+<br />
+<code>http://antarcticsnowwater.com/optin-bottles/</code><br />
+<br />
+This is the URL we have to use in the Page URL setting with FunnelMagick.<br />
+<br />
+If you enter a URL into your browser and the same URL is still showing after the page has been displayed, that simply means that your Page Builder isn&rsquo;t using any redirected links. Yay!<br />
+<br />
+<br />
+<strong>Correcting the Page URL Setting</strong><br />
+<br />
+If you discover that you&rsquo;ve entered the wrong URL into your Page URL setting, all you need to do is enter the correct URL.<br />
+<br />
+There is one hitch &hellip;<br />
+<br />
+If you&rsquo;ve created any Entry Links to the funnel, all of those entry links will point to the old incorrect Page URL. You&rsquo;ll need to delete those entry links and recreate them after you&rsquo;ve updated the Page URL.<br />
+<br />
+In fact, FunnelMagick won&rsquo;t even let you change the Page URL until you&rsquo;ve deleted the erroneous Entry Links. So, delete the Entry links, change the Page URL, then recreate your Entry Links and you should be good to go.<br />
+<br />
+If you need to, you can read more about this step in the FAQ we have on the topic:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=273"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=273">&nbsp;Why can&rsquo;t I change my funnel&rsquo;s Page URL setting?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</body></html>

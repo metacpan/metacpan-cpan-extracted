@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html><head><title>How do I track conversions using Tracking Pixels?</title></head><body>
+<b>How do I track conversions using Tracking Pixels?</b><br />
+<br />
+Tracking conversions with ClickMagick is really easy. It&rsquo;s a simple two-step process.<br />
+<br />
+First, you need to create a tracking pixel using the <strong><a href="/user/action/tools/pixelb.cgi" target="_blank">Pixel Builder</a></strong>&nbsp;which you can find in the Tools menu under the&nbsp;Tracking Pixels sub-menu. You can create an Action pixel, an Engagement pixel, or a Sales pixel.&nbsp;<br />
+<br />
+Action and Engagement pixels behave identically, with the only difference being which column the pixel data is recorded in. Action pixels will be recorded in the &ldquo;A&rdquo; column of your stats and Engagement pixels will be reported in the &ldquo;E&rdquo; column.<br />
+<br />
+Sales pixels will be recorded in the &ldquo;S&rdquo; column of your stats, but because Sales pixels also include an &ldquo;amount&rdquo; setting, that amount will be used to compute other stats, such as your earning-per-click (EPC).<br />
+<br />
+&nbsp;
+<div class="faq-tip"><b>Tip:</b> ClickMagick uses &ldquo;universal&rdquo; or &ldquo;global&rdquo; pixels which means that the same Action, Engagement, or Sales pixel will work with any tracking link&mdash;when a pixel fires, it will typically refer back to the most recently encountered tracking link. Additionally, each pixel can have several options, depending on what you&rsquo;re trying to do. The <strong><a href="/user/action/tools/pixelb.cgi" target="_blank">Pixel Builder</a></strong>&nbsp;will help you create any type of pixel you need.</div>
+<br />
+<br />
+For a walkthrough of exactly how to use tracking pixels to track your entire funnel, watch this video:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=trackconversions" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=trackconversions" id="video-link-new">How To Track Conversions Using Tracking Pixels</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+We&rsquo;ve even created a separate tutorial that shows you how to add your tracking pixels in all the popular page builders and eCommerce platforms at the link below:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=203"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=203">Adding Tracking Pixels in Popular Page Builders</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+For more detailed instructions and notes about using tracking pixels, please read the following &hellip;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>1.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Because tracking pixels are HTML &ldquo;display&rdquo; elements, they must be added to the <code>((body))</code><span style="background-color: rgb(255, 255, 255);">&hellip;</span><code>((/body))</code> section of your web page, anywhere between the opening and the closing tags. They cannot be added to the <code>((head))</code>...<code>((/head))</code> section or they will not &ldquo;fire&rdquo; and be recorded.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>2.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>For sales tracking you should replace the amount &ldquo;0.00&rdquo; in the <strong><a href="/user/action/tools/pixelb.cgi" target="_blank">Pixel Builder</a></strong> with the actual sales value if you know what it is.<br />
+			<br />
+			If your sales value varies, you can also replace 0.00 with a placeholder or token that will insert the sales value dynamically. This placeholder or token will vary depending upon your payment processing system, shopping cart, etc. Review your payment processor&rsquo;s documentation or ask their support desk to get the placeholder or token their system uses.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>3.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>The &ldquo;Ref&rdquo; value in the tracking pixel code is for an optional reference value such as a product or offer name, an internal tracking code or ID or anything else you want. Typical values would be &ldquo;opt-in&rdquo;, &ldquo;checkout&rdquo;, &ldquo;upsell1&rdquo;, etc.<br />
+			<br />
+			You can set the optional &ldquo;Ref&rdquo; value in the <strong><a href="/user/action/tools/pixelb.cgi" target="_blank">Pixel Builder</a></strong>. If provided, the value must be 1-20 characters containing only letters, numbers, hyphens (&ldquo;-&rdquo;) and underscores (&ldquo;_&rdquo;). The &ldquo;space&rdquo; character is not allowed.<br />
+			&nbsp;
+			<div class="faq-caution"><b>Caution:</b> If you want to track multiple conversions of the same type for the same user&mdash;such as an upsell after an initial sale&mdash;you MUST provide a unique <strong>Ref</strong>&nbsp;value for each Action, Engagement, or Sales pixel. For example, <strong>Ref</strong> could be <code>product1</code>, <code>product2</code>, etc.</div>
+			</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>4.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>If you need to place a tracking pixel on a secure page, you&rsquo;ll need to answer &ldquo;Yes&rdquo; to the question, &ldquo;<strong>Are you adding this pixel to a secure https:// page?</strong>&rdquo; or&nbsp;browsers will display security warnings.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>5.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>If you&rsquo;re placing the tracking pixel in the Pixel/Code field of a tracking link, you&rsquo;ll need to answer &ldquo;Yes&rdquo; to the question &ldquo;<strong>Are you adding this pixel to a tracking link?</strong>&rdquo; If you answer &ldquo;No&rdquo; to this question, the tracking pixel will attribute its conversion to the tracking pixel it&rsquo;s embedded in and not to the previous tracking link as you were probably expecting it to. For more on this, read this FAQ:<br />
+			&nbsp;
+			<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+				<tbody style="box-sizing: border-box;">
+					<tr style="box-sizing: border-box;">
+						<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=208"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+						<td style="box-sizing: border-box;">&nbsp;</td>
+						<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=208">&nbsp;How can I set up an intermediate page to fire a pixel?</a></b></td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+If you&rsquo;re still having trouble tracking conversions or seem to have &ldquo;missing&rdquo; conversions, read this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=70"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=70">What if my conversion stats don&rsquo;t seem accurate?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</body></html>

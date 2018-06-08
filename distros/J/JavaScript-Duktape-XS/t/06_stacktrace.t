@@ -38,13 +38,6 @@ sub test_stacktrace {
     my $duk = JavaScript::Duktape::XS->new();
     ok($duk, "created JavaScript::Duktape::XS object");
 
-    my @js_files = qw/
-        c_eventloop.js
-    /;
-    foreach my $js_file (@js_files) {
-        load_js_file($duk, $js_file);
-    }
-
     my $js_code = <<EOS;
 var fail = true;
 function d() { if (fail) { throw new Error("failed"); } }

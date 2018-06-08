@@ -2,7 +2,7 @@ package Crypt::Misc;
 
 use strict;
 use warnings;
-our $VERSION = '0.060';
+our $VERSION = '0.061';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 use Carp 'croak';
@@ -216,6 +216,9 @@ sub _name2mode {
   my ($cipher, undef, $klen, $mode) = $cipher_name =~ /^(AES|CAMELLIA|DES|DES-EDE3|SEED)(-(\d+))?-(CBC|CFB|ECB|OFB)$/i;
   croak "FATAL: unsupported cipher '$cipher_name'" unless $cipher && $mode;
   $cipher = $trans{$cipher} || $cipher;
+  $klen = 192 if $cipher eq 'DES_EDE';
+  $klen = 64  if $cipher eq 'DES';
+  $klen = 128 if $cipher eq 'SEED';
   $klen = $klen ? int($klen/8) : Crypt::Cipher::min_keysize($cipher);
   my $ilen = Crypt::Cipher::blocksize($cipher);
   croak "FATAL: unsupported cipher '$cipher_name'" unless $klen && $ilen;

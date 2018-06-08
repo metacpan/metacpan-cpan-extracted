@@ -10,7 +10,10 @@ my $subtlex =
   Lingua::Norms::SUBTLEX->new();
 my $val;
 
-$subtlex->set_lang(lang => 'US', path => File::Spec->catfile($Bin, qw'samples US.csv'), fieldpath =>  File::Spec->catfile($Bin, qw'.. lib Lingua Norms SUBTLEX specs.csv'));
+my $fieldpath = File::Spec->catfile($Bin, qw'.. lib Lingua Norms SUBTLEX specs.csv');
+#diag($fieldpath);
+
+$subtlex->set_lang(lang => 'US', path => File::Spec->catfile($Bin, qw'samples US.csv'), fieldpath => $fieldpath);
 
 $val = $subtlex->get_lang();
 ok($val eq 'US', 'lang value after set_lang is not US but ' . $val);

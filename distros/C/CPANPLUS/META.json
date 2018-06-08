@@ -16,6 +16,7 @@
    "no_index" : {
       "directory" : [
          "lib/CPANPLUS/inc",
+         "bundled",
          "inc",
          "t"
       ]
@@ -31,6 +32,6 @@
          "url" : "http://github.com/jib/cpanplus-devel"
       }
    },
-   "version" : "0.9174",
+   "version" : "0.9176",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

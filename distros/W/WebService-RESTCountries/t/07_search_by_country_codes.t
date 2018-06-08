@@ -8,7 +8,13 @@ use WebService::RESTCountries;
 
 my $got;
 
-my $api = WebService::RESTCountries->new;
+my $api = WebService::RESTCountries->new(
+    cache => CHI->new(
+        driver => 'File',
+        namespace => 'restcountries',
+        root_dir => $ENV{PWD} . '/t/cache/',
+    )
+);
 
 $got = $api->search_by_country_codes(['MY', 'SG']);
 is(scalar @$got, 2, 'expect 2 countries found by two-letters country code');

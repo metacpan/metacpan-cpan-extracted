@@ -11,7 +11,7 @@ use File::Spec;
 use File::ShareDir::Dist qw( dist_share );
 
 # ABSTRACT: Tiny C Compiler for FFI
-our $VERSION = '0.26'; # VERSION
+our $VERSION = '0.28'; # VERSION
 
 
 sub _dlext ()
@@ -336,7 +336,7 @@ FFI::TinyCC - Tiny C Compiler for FFI
 
 =head1 VERSION
 
-version 0.26
+version 0.28
 
 =head1 SYNOPSIS
 

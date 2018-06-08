@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html><head><title>What else should I know about the click auditing system?</title></head><body>
+<b>What else should I know about the click auditing system?</b><br />
+<br />
+We&rsquo;re obviously biased, but we&rsquo;ve poured a lot of time and resources into the continual development of our click auditing system, and we firmly believe it&rsquo;s the most accurate &ldquo;traffic cleaning&rdquo; system of its kind &hellip;<br />
+<br />
+&hellip; and we&rsquo;ll even pay you to help keep it that way!<br />
+<br />
+Please keep reading for more info about our click auditing system, answers to frequently asked questions, and more information on how you can help us ensure that the auditing system is as accurate as possible.<br />
+<br />
+<br />
+<b>How accurate is ClickMagick&rsquo;s click auditing system?</b><br />
+<br />
+Our own internal testing, and analysis of millions of clicks our customers have received, indicates that our auditing system is over 99.9% accurate.<br />
+<br />
+In real-world terms that means that out of every 1,000 flagged clicks, you&rsquo;d have a hard time finding even 1 legitimate click that was flagged incorrectly.<br />
+<br />
+<br />
+<b>Do you use any outside data or 3rd-party APIs?</b><br />
+<br />
+ClickMagick&rsquo;s auditing system is 100% proprietary, and does not rely on any outside data or 3rd-party APIs.<br />
+<br />
+We&rsquo;ve tested them all, and found them to be wildly inaccurate &ndash; often blocking 5-10% of legitimate clicks.<br />
+<br />
+This is mainly due to their strange habit of blocking entire IP ranges when they identify a single &ldquo;bad&rdquo; IP address.<br />
+<br />
+The only 3rd-party data we use at all is domain registration and IP allocation information from ICANN, ARIN and other official sources, to help identify ownership and relationships for and between various domains and IP addresses.<br />
+<br />
+<br />
+<b>So how does the click auditing system work?</b><br />
+<br />
+Instead, our system was built entirely in-house, and it constantly monitors and analyzes the millions and millions of clicks our users get each month.<br />
+<br />
+We have literally over a dozen monitoring systems that constantly analyze not only every detail of every click, but actual click and user &ldquo;behavior&rdquo; including sessions, conversions, and lots more we just can&rsquo;t talk about.<br />
+<br />
+&ldquo;Legitimate&rdquo; bots properly identify themselves, but this allows us to catch all the rest &ndash; the malicious bots, content scrapers and other automated processes that try to disguise themselves as legitimate web browsers.<br />
+<br />
+Between our automated monitoring systems, input from users like you, and lots of manual human oversight on our end, the auditing system actually gets &ldquo;smarter&rdquo; and more accurate each and every day.<br />
+<br />
+<br />
+<b>What&rsquo;s the difference between flagging and blocking?</b><br />
+<br />
+We&rsquo;ve noticed that some users get confused about the difference between flagging and blocking.<br />
+<br />
+This distinction is covered elsewhere in other FAQs, but we figured we&rsquo;d cover it here as well &hellip;<br />
+<br />
+If a click is &ldquo;flagged&rdquo; it is still processed and redirected through your link or rotator as normal, so the website or person you&rsquo;re sending traffic to will still receive the click just like it would any other click.<br />
+<br />
+The difference is that flagged clicks are not normally &ldquo;real&rdquo; clicks from real people so they are not counted in your Total Clicks (TC), Unique Clicks (UC), and they are not used in computing conversion rates and other critical stats in order to keep these values as accurate as possible.<br />
+<br />
+Instead, you can view clicks which have been flagged by clicking the number in the FC (Flagged Clicks) column of any link or rotator.<br />
+<br />
+Non-ClickMagick users can also view the clicks which have been flagged or blocked by reviewing the &ldquo;public stats page&rdquo; for any link or rotator.<br />
+<br />
+On the other hand, if you decide to &ldquo;block&rdquo; certain clicks they will not be processed at all.<br />
+<br />
+Blocked clicks will not be redirected (a generic error page is displayed instead), and you will not see any indication of them at all in your stats.<br />
+<br />
+For a more indepth look at this topic, check out this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=175"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=175">&nbsp;What&rsquo;s the difference between click flagging and blocking?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+<b>Why would a residential IP be flagged as a bot?</b><br />
+<br />
+If you see that an IP address from a residential ISP such as Comcast, Time Warner, Verizon, etc. was flagged as a bot, it generally means one of two things:<br />
+<br />
+1. The user is using software to generate fake clicks, or<br />
+<br />
+2. Their computer is infected with some type of malware and is currently part of a large botnet.<br />
+<br />
+If you want us to take a look at a particular flagged IP, please report the details to us as outlined below.<br />
+<br />
+<br />
+<b>What should I know about Google proxies and flagged clicks?</b><br />
+<br />
+A proxy acts as an intermediary for requests from web browsers, and Google has lots of proxies they use in conjunction with various Google services &hellip;<br />
+<br />
+&hellip; including but not limited to Data Compression for mobile Chrome users, Google website previews, Google Translate, and Google Mobilizer just to name a few.<br />
+<br />
+Here&rsquo;s what you need to know about Google proxies and ClickMagick&rsquo;s auditing system &hellip;<br />
+<br />
+Any time an end-user&rsquo;s request is routed through Google&rsquo;s proxies for any reason, Google adds an &ldquo;X-Forwarded-For&rdquo; header to the HTTP request which contains the user&rsquo;s actual IP address.<br />
+<br />
+This allows ClickMagick to grab the user&rsquo;s actual IP address and process the click correctly, even though the request came from one of Google&rsquo;s proxy servers.<br />
+<br />
+On the other hand, if a Google proxy request does not contain a valid &ldquo;X-Forwarded-For&rdquo; header that means the request did not come from a real user, but rather it came from one of Google&rsquo;s automated systems i.e. a &ldquo;bot.&rdquo;<br />
+<br />
+You can identify these requests in your ClickMagick logs because the hostname for such a request will always start with &ldquo;google-proxy.&rdquo;<br />
+<br />
+If you want us to take a look at a particular flagged IP, please report the details to us as outlined below.<br />
+<br />
+<br />
+<b>Why can&rsquo;t I redirect flagged clicks somewhere else?</b><br />
+<br />
+Some of our users who sell &ldquo;solo ads&rdquo; have asked us to add the ability to redirect flagged clicks to a separate URL, because they are generally obsessed with maximizing the value of each and every click.<br />
+<br />
+While this is completely understandable, we have not and will not be adding the ability to redirect flagged clicks to a separate URL for 2 reasons:<br />
+<br />
+<br />
+<b>Reason #1:</b> Our auditing system is over 99.9% accurate.<br />
+<br />
+That means out of every 1,000 flagged clicks you&rsquo;d be lucky to find 1 legitimate click that was flagged incorrectly.<br />
+<br />
+There&rsquo;s no point in redirecting this traffic anywhere because you simply can&rsquo;t make money off of it.<br />
+<br />
+<br />
+<b>Reason #2:</b> Unfortunately, each and every day we see people mistakenly adding sales conversion tracking pixels to their opt-in and other inappropriate pages, resulting in incredibly inaccurate stats.<br />
+<br />
+If we allowed users to redirect flagged clicks separately, this would result in some inattentive users seeing &ldquo;sales&rdquo; generated by &ldquo;clicks&rdquo; from bots and other automated processes due to sales tracking pixels being placed on publicly accessible pages and incorrect pages &hellip;<br />
+<br />
+&hellip; and this would result in massive amounts of confusion, &ldquo;unsolvable&rdquo; support tickets, and tons of wasted time that would do us all a lot more harm than good.<br />
+<br />
+<br />
+<b>How can I help make the click auditing system better?</b><br />
+<br />
+We do want your help in making ClickMagick&rsquo;s click auditing system as accurate as possible &hellip;<br />
+<br />
+For every flagged click we provide as much info as possible including the IP address, hostname, operating system, browser, device type, timestamp and more &hellip;<br />
+<br />
+&hellip; and we encourage you to use this information to do your own research and investigation into any clicks flagged by ClickMagick if you&rsquo;re interested.<br />
+<br />
+If you ever notice a click that you think was flagged incorrectly, please <strong><a href="/user/action/account/help.cgi?action=helpdesk" target="_blank">submit a ticket</a></strong> with all the details and we will investigate it immediately.<br />
+<br />
+We&rsquo;ll let you know what we find, and if it turns out the click was indeed flagged incorrectly <b>we&rsquo;ll send you $50</b> via PayPal as a way of saying &ldquo;thanks&rdquo; for your help.<br />
+<br />
+<br />
+If you have any other questions about ClickMagick&rsquo;s click auditing system, just <strong><a href="/user/action/account/help.cgi?action=helpdesk" target="_blank">submit a ticket</a></strong>. Thanks!
+</body></html>

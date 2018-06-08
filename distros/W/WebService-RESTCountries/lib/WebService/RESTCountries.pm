@@ -1,14 +1,18 @@
 package WebService::RESTCountries;
 
 use utf8;
-use Moo;
-use Types::Standard qw(Str ArrayRef);
 use strictures 2;
 use namespace::clean;
 
+use CHI;
+use Digest::MD5 qw(md5_hex);
+use Moo;
+use Sereal qw(encode_sereal decode_sereal);
+use Types::Standard qw(Str ArrayRef);
+
 with 'Role::REST::Client';
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 has api_url => (
     isa => Str,
@@ -21,6 +25,22 @@ has fields => (
     is => 'rw',
     default => sub { [] },
 );
+
+has cache => (
+    is      => 'rw',
+    lazy    => 1,
+    builder => 1,
+);
+
+sub _build_cache {
+    my $self = shift;
+
+    return CHI->new(
+        driver => 'File',
+        namespace => 'restcountries',
+        root_dir => '/tmp/cache/',
+    );
+}
 
 sub BUILD {
     my ($self) = @_;
@@ -38,6 +58,19 @@ sub ping {
     my $response = $self->user_agent->request('HEAD', $self->api_url);
 
     return ($response->code == 200) ? 1 : 0;
+}
+
+sub download {
+    my ($self, $file_name) = @_;
+
+    $file_name ||= 'RESTCountries.json';
+
+    my $uri = $self->api_url . 'all';
+    my $response = $self->user_agent->request('GET', $uri);
+
+    open(my $fh, '>', $file_name) or die $!;
+    print $fh $response->decoded_content;
+    close($fh);
 }
 
 sub search_all {
@@ -158,11 +191,21 @@ sub _request {
     $self->server($self->api_url);
     $self->type(qq|application/json|);
 
-    my $path = $endpoint;
+    my $response_data;
+    my $cache_key = md5_hex($endpoint . encode_sereal($queries));
 
-    my $response = $self->get($path, $queries);
+    my $cache_response_data = $self->cache->get($cache_key);
+    if (defined $cache_response_data) {
+        $response_data = decode_sereal($cache_response_data);
+    }
+    else {
+        my $response = $self->get($endpoint, $queries);
+        $response_data = $response->data;
 
-    return $response->data;
+        $self->cache->set($cache_key, encode_sereal($response->data));
+    }
+
+    return $response_data;
 }
 
 
@@ -244,6 +287,27 @@ The URL of the API resource.
     # Set through method.
     $api->api_url('https://example.com/v2/');
 
+=head3 cache
+
+The cache engine used to cache the web service API calls. By default, it uses
+file-based caching.
+
+    # Instantiate the class by setting the cache engine.
+    my $api = WebService::RESTCountries->new(
+        CHI->new(
+            driver => 'File',
+            namespace => 'restcountries',
+            root_dir => $ENV{PWD} . '/tmp/cache/'
+        )
+    );
+
+    # Set through method.
+    $api->cache(CHI->new(
+        driver => 'File',
+        namespace => 'restcountries',
+        root_dir => $ENV{PWD} . '/tmp/cache/'
+    ));
+
 =head3 fields
 
 Show the country data in specified fields. Do this before making any webservice
@@ -263,9 +327,26 @@ Check whether the API endpoint is currently up.
     # Returns 1 if up and 0 otherwise.
     $api->ping();
 
+=head2 download([$file_name])
+
+Download the whole countries data as JSON file. Optional path and file name.
+
+    # Using default path and file name.
+    $api->download();
+
+    # Using specific path and file name.
+    $api->download('/tmp/countries.json');
+
+Check whether the API endpoint is currently up.
+
+    # Returns 1 if up and 0 otherwise.
+    $api->ping();
+
 =head2 search_all()
 
-Get all the countries.
+Get all the countries. Basically just pull the whole data in JSON format.
+
+    $api->search_all();
 
 =head2 search_by_calling_code($calling_code)
 
@@ -361,5 +442,3 @@ This is free software, licensed under:
 =head1 AUTHOR
 
 Kian Meng, Ang E<lt>kianmeng@users.noreply.github.comE<gt>
-
-=cut

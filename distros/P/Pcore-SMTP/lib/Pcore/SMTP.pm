@@ -1,18 +1,22 @@
-package Pcore::SMTP v0.5.7;
+package Pcore::SMTP v0.5.9;
 
 use Pcore -dist, -const, -class, -res;
 use Pcore::AE::Handle qw[:TLS_CTX];
-use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_plain_arrayref];
+use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_plain_arrayref is_plain_coderef];
 use Pcore::Util::Data qw[from_b64 to_b64];
 use Pcore::Util::Text qw[encode_utf8];
 use Authen::SASL;
 
-has host     => ( is => 'ro', isa => Str,         required => 1 );
-has port     => ( is => 'ro', isa => PositiveInt, required => 1 );
-has username => ( is => 'ro', isa => Str,         required => 1 );
-has password => ( is => 'ro', isa => Str,         required => 1 );
-has tls      => ( is => 'ro', isa => Bool,        default  => 1 );
-has tls_ctx => ( is => 'ro', isa => Maybe [ HashRef | Enum [ $TLS_CTX_HIGH, $TLS_CTX_LOW ] ], default => $TLS_CTX_HIGH );
+# required
+has host     => ();
+has port     => ();
+has username => ();
+has password => ();
+has tls      => ();
+
+# handle settings
+has timeout => 10;
+has tls_ctx => $TLS_CTX_HIGH;    # Maybe [ HashRef | Enum [ $TLS_CTX_HIGH, $TLS_CTX_LOW ] ]
 
 const our $STATUS_REASON => {
     200 => q[(nonstandard success response, see rfc876)],
@@ -48,7 +52,7 @@ const our $STATUS_REASON => {
 };
 
 sub sendmail ( $self, @ ) {
-    my $cb = $_[-1] // sub {return};
+    my $cb1 = is_plain_coderef $_[-1] ? pop : undef;
 
     my %args = (
         from     => undef,
@@ -59,7 +63,7 @@ sub sendmail ( $self, @ ) {
         subject  => undef,
         headers  => undef,    # ArrayRef
         body     => undef,    # Str, ScalarRef
-        splice @_, 1, -1
+        splice @_, 1
     );
 
     $args{to}  = undef if defined $args{to}  && !$args{to};
@@ -70,24 +74,34 @@ sub sendmail ( $self, @ ) {
     $args{cc}  = [ $args{cc} ]  if defined $args{cc}  && !is_plain_arrayref $args{cc};
     $args{bcc} = [ $args{bcc} ] if defined $args{bcc} && !is_plain_arrayref $args{bcc};
 
+    my $rouse_cb = defined wantarray ? Coro::rouse_cb : ();
+
+    my $cb = sub ( $h, $res ) {
+        $h->destroy;
+
+        $rouse_cb ? $cb1 ? $rouse_cb->( $cb1->($res) ) : $rouse_cb->($res) : $cb1 ? $cb1->($res) : ();
+
+        return;
+    };
+
     Pcore::AE::Handle->new(
-        connect          => 'smtp://' . $self->host . q[:] . $self->port,
-        connect_timeout  => 10,
-        timeout          => 10,
+        connect          => 'smtp://' . $self->{host} . q[:] . $self->{port},
+        connect_timeout  => $self->{timeout},
+        timeout          => $self->{timeout},
         persistent       => 0,
         tls_ctx          => $self->{tls_ctx},
         on_connect_error => sub ( $h, $reason ) {
-            $cb->( res [ 500, $reason ] );
+            $cb->( $h, res [ 500, $reason ] );
 
             return;
         },
         on_error => sub ( $h, $fatal, $reason ) {
-            $cb->( res [ 500, $reason ] );
+            $cb->( $h, res [ 500, $reason ] );
 
             return;
         },
         on_connect => sub ( $h, $host, $port, $retry ) {
-            $h->starttls('connect') if $self->tls;
+            $h->starttls('connect') if $self->{tls};
 
             # read handshake response
             $self->_read_response(
@@ -96,7 +110,7 @@ sub sendmail ( $self, @ ) {
 
                     # HANDSHAKE error
                     if ( !$res ) {
-                        $cb->($res);
+                        $cb->( $h, $res );
                     }
 
                     # HANDSHAKE ok
@@ -109,7 +123,7 @@ sub sendmail ( $self, @ ) {
 
                                 # EHLO error
                                 if ( !$ehlo ) {
-                                    $cb->($ehlo);
+                                    $cb->( $h, $ehlo );
                                 }
 
                                 # EHLO ok
@@ -123,7 +137,7 @@ sub sendmail ( $self, @ ) {
 
                                             # AUTH error
                                             if ( !$auth ) {
-                                                $cb->($auth);
+                                                $cb->( $h, $auth );
                                             }
 
                                             # AUTH ok
@@ -137,7 +151,7 @@ sub sendmail ( $self, @ ) {
 
                                                         # MAIL error
                                                         if ( !$mail ) {
-                                                            $cb->($mail);
+                                                            $cb->( $h, $mail );
                                                         }
 
                                                         # MAIL ok
@@ -151,7 +165,7 @@ sub sendmail ( $self, @ ) {
 
                                                                     # RCPT error
                                                                     if ( !$rcpt ) {
-                                                                        $cb->($rcpt);
+                                                                        $cb->( $h, $rcpt );
                                                                     }
 
                                                                     # RCPT ok
@@ -165,7 +179,7 @@ sub sendmail ( $self, @ ) {
 
                                                                                 # DATA error
                                                                                 if ( !$data ) {
-                                                                                    $cb->($data);
+                                                                                    $cb->( $h, $data );
                                                                                 }
 
                                                                                 # DATA ok
@@ -177,7 +191,7 @@ sub sendmail ( $self, @ ) {
                                                                                         sub($quit) {
 
                                                                                             # quit status is not checked
-                                                                                            $cb->($quit);
+                                                                                            $cb->( $h, $quit );
 
                                                                                             return;
                                                                                         }
@@ -217,7 +231,7 @@ sub sendmail ( $self, @ ) {
         },
     );
 
-    return;
+    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
 }
 
 sub _EHLO ( $self, $h, $cb ) {
@@ -263,9 +277,9 @@ sub _AUTH ( $self, $h, $mechanisms, $cb ) {
     my $sasl = Authen::SASL->new(
         mechanism => $mechanisms,
         callback  => {
-            user     => $self->username,
-            pass     => $self->password,
-            authname => $self->username,
+            user     => $self->{username},
+            pass     => $self->{password},
+            authname => $self->{username},
         },
         debug => 0,
     );
@@ -299,7 +313,7 @@ sub _AUTH ( $self, $h, $mechanisms, $cb ) {
         # we should probably allow the user to pass the host, but I don't
         # currently know and SASL mechanisms that are used by smtp that need it
 
-        $client = $sasl->client_new( 'smtp', $self->host, 0 );
+        $client = $sasl->client_new( 'smtp', $self->{host}, 0 );
 
         $str = $client->client_start;
     }
@@ -580,21 +594,21 @@ sub _read_response ( $self, $h, $cb ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 50                   | * Subroutine "sendmail" with high complexity score (29)                                                        |
-## |      | 381                  | * Subroutine "_DATA" with high complexity score (30)                                                           |
+## |      | 54                   | * Subroutine "sendmail" with high complexity score (35)                                                        |
+## |      | 395                  | * Subroutine "_DATA" with high complexity score (30)                                                           |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 167                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 181                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 508                  | * Private subroutine/method '_RSET' declared but not used                                                      |
-## |      | 516                  | * Private subroutine/method '_VRFY' declared but not used                                                      |
-## |      | 522                  | * Private subroutine/method '_NOOP' declared but not used                                                      |
+## |      | 522                  | * Private subroutine/method '_RSET' declared but not used                                                      |
+## |      | 530                  | * Private subroutine/method '_VRFY' declared but not used                                                      |
+## |      | 536                  | * Private subroutine/method '_NOOP' declared but not used                                                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 517                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
+## |    3 | 531                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 550, 552             | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
+## |    3 | 564, 566             | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 53                   | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
+## |    1 | 57                   | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -5,13 +5,11 @@ use warnings;
 package Task::MasteringPerl;
 
 our $AUTHORITY = 'cpan:BDFOY';
-our $VERSION   = '1.002';
+our $VERSION   = '1.005';
 
 1;
 
 __END__
-
-=pod
 
 =encoding utf-8
 
@@ -421,17 +419,17 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Task-MasteringPerl>.
 
 =head1 SEE ALSO
 
-L<Task>.
+L<Task>
 
 =head1 AUTHOR
 
-brian d foy C<< <bdfoy@gmail.com> >>
+brian d foy, <bdfoy@gmail.com>
 
 =head1 COPYRIGHT AND LICENCE
 
-Copyright (c) 2014, brian d foy.
+Copyright © 2014-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+the terms of the Artistic License 2.0.
 
 =cut

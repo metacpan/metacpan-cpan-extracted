@@ -45,7 +45,6 @@
             "BioSAILs::Utils::LoadConfigs" : "0",
             "BioSAILs::Utils::Plugin" : "0",
             "BioSAILs::Utils::Traits" : "0",
-            "BioX::Workflow::Command::run::Rules::Directives::MCE" : "0",
             "Capture::Tiny" : "0",
             "Config::Any" : "0",
             "Cwd" : "0",
@@ -126,7 +125,7 @@
          "web" : "https://github.com/biosails/BioX-Workflow-Command"
       }
    },
-   "version" : "2.4.0",
+   "version" : "2.4.1",
    "x_generated_by_perl" : "v5.22.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225",
    "x_static_install" : 1

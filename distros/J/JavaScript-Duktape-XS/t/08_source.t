@@ -54,9 +54,7 @@ EOS
     my $duk = JavaScript::Duktape::XS->new({save_messages => 1});
     ok($duk, "created JavaScript::Duktape::XS object that saves messages");
 
-    my @js_files = qw/
-        c_eventloop.js
-    /;
+    my @js_files;
     my $js_file = save_tmp_file($js_code);
     push @js_files, $js_file;
     ok(1, "saved tp tmp file '$js_file'");

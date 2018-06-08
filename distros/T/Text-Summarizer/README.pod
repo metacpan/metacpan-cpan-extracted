@@ -1,0 +1,281 @@
+=pod
+ 
+=encoding utf-8  
+
+=head1 NAME
+
+Text::Summarizer - Summarize Bodies of Text  
+
+=head1 SYNOPSIS
+
+  use Text::Summarizer;
+
+    # all constructor arguments shown are OPTIONAL and reflect the DEFAULT VALUES of each attribute
+  $summarizer = Text::Summarizer->new(
+                    articles_path  => 'subdirectory/to/summarize/*',
+                    permanent_path => 'data/permanent.stop',
+                    stopwords_path => 'data/stopwrods.stop',
+                    store_working  => 0,
+                    print_scanner  => 0,
+                    print_summary  => 0,
+                    print_graphs   => 0,
+                    print_typifier => 0,
+                    return_count   => 20,
+                    phrase_thresh  => 2,
+                    phrase_radius  => 5,
+                    freq_constant  => 0.004,
+                );
+
+
+  $summarizer = Text::Summarizer->new();
+
+    # to summarize a string
+  $stopwords = $summarizer->scan_text( 'this is a sample text' );
+  $summary   = $summarizer->summ_text( 'this is a sample text' );
+
+    # or to summarize an entire file
+  $stopwords = $summarizer->scan_file("some/file.txt");
+  $summary   = $summarizer->summ_file("some/file.txt");
+
+    # or to summarize in bulk
+    #   (if no argument provided, uses the 'articles_path' attribute)
+  @stopwords = $summarizer->scan_each("/directory/glob/*");
+  @summaries = $summarizer->summ_each("/directory/glob/*");
+
+=head1 DESCRIPTION
+
+This module allows you to summarize bodies of text into a scored hash of  I<sentences>,  I<phrase-fragments>, and  I<individual words> from the provided text.
+
+These scores reflect the weight (or precedence) of the relative text-fragments, i.e. how well they summarize or reflect the overall nature of the text.
+
+All of the sentences and phrase-fragments are drawn from within the existing text, and are NOT proceedurally generated.  
+
+=head1 ATTRIBUTES
+
+X< read-write accessible >
+
+B< The following constructor attributes are available to the user, and can be accessed/modified at any time via C<< $summarizer->_set_[attribute] >> >:
+
+=over 8
+
+=item C<articles_path>   – [directory]
+
+folder containing some text-files you wish to summarize
+
+=item C<permanent_path>  – [filepath]
+
+file containing a base set of universal stopwords (defaults to English stopwords)
+
+=item C<stopwords_path>  – [filepath]
+
+file containing a list of new stopwords identified by the C<scan> function
+
+=item C<store_scanner>   – [boolean]
+
+flag for storing new stopwords in the file indicated by C<stopwords_path>
+
+=item C<print_scanner>   – [boolean]
+
+flag that enables visual graphing of scanner activity (prints to C<STDOUT>)
+
+=item C<print_summary>   – [boolean]
+
+flag that enables visual charting of summary activity (prints to C<STDOUT>)
+
+=item C<return_count>  – [int]
+
+number of items to list when printing summary list
+
+=item C<phrase_thresh>   – [int]
+
+minimum number of word tokens allowed in a phrase
+
+=item C<phrase_radius>   – [int]
+
+distance iterated backward and forward from a given word when establishing a phrase (i.e. maximum length of phrase divided by 2)
+
+=item C<freq_constant>   – [float]
+
+mathematical constant for establishing minimum threshold of occurence for frequently occuring words (defaults to C<< 0.004 >>)
+
+=back
+
+X< read only >
+
+B< These attributes are read-only, and can be accessed via C<< $summarizer->[attribute] >> >:
+
+=over 8
+
+=item C<full_text> – [string]
+
+all the lines of the provided text, joined together
+
+=item C<sentences> – [array-ref]
+
+list of each sentence found in the provided text
+
+=item C<sen_words> – [array-ref]
+
+for each sentence, contains an array of each word in order
+
+=item C<word_list> – [array-ref]
+
+each individual word of the entire text, in order (token stream)
+
+=item C<freq_hash> – [hash-ref]
+
+all words that occur more than a specified threshold, paired with their frequency of occurence
+
+=item C<clst_hash> – [hash-ref]
+
+for each word in the text, specifies the position of each occurence of the word, both relative to the sentence it occurs in and absolute within the text
+
+=item C<phrs_hash> – [hash-ref]
+
+for each word in the text, contains a phrase of radius I<r> centered around the given word, and references the sentence from which the phrase was gathered
+
+=item C<sigma_hash> – [hash-ref]
+
+gives the population standard deviation of the clustering of each word in the text
+
+=item C<inter_hash> – [hash-ref]
+
+list of each chosen phrase-fragment-scrap, paired with its score
+
+=item C<score_hash> – [hash-ref]
+
+list of each word in the text, paired with its score
+
+=item C<phrs_list>  – [hash-ref]
+
+list of complete sentences that each scrap was drawn from, paired with its score
+
+=item C<frag_list>  – [array-ref]
+
+for each chosen scrap, contains a hash of: the pivot word of the scrap; the sentence containing the scrap; the number of occurences of each word in the sentence; an ordered list of the words in the phrase from which the scrap was derived
+
+=item C<file_name> – [string]
+
+the filename of the current text-source (if text was extracted from a file)
+
+=item C<text_hint> – [string]
+
+brief snippet of text containing the first 50 and the final 30 characters of the current text
+
+=item C<summary> – [hash-ref]
+
+scored lists of each summary sentence, each chosen scrap, and each frequently-occuring word
+
+=item C<stopwords> - [hash-ref]
+
+list of all stopwords, both permanent and proceedural
+
+=item C<watchlist> - [hash-ref]
+
+list of proceedurally generated stopwords, derived by the `scan` function
+
+=back  
+
+=head1 FUNCTIONS
+
+
+=head2 C<scan>
+
+Scan is a utility that allows the Text::Summarizer to parse through a body of text to find words that occur with unusually high frequency. These words are then stored as new stopwords via the provided C<< stopwords_path >>. Additionally, calling any of the three C<< scan_[...] >> subroutines will return a reference (or array of references) to an unordered list containing the new stopwords.  $stopwords = $summarizer->scan_text( 'this is a sample text' );
+  $stopwords = $summarizer->scan_file( 'some/file/path.txt' );
+  @stopwords = $summarizer->scan_each( 'some/directory/*' );
+# if no argument provided, uses the 'articles_path' attribute
+
+
+=head2 C<summarize>
+
+Summarizing is, not surprisingly, the heart of the Text::Summarizer. Summarizing a body of text provides three distinct categories of information drawn from the existing text and ordered by relevance to the summary: I<full sentences>, I<phrase-fragments / context-free token streams>, and a list of I<frequently occuring words>.
+
+There are three provided functions for summarizing text documents.  $summary   = $summarizer->summarize_text( 'this is a sample text' );
+  $summary   = $summarizer->summarize_file( 'some/file/path.txt' );
+  @summaries = $summarizer->summarize_each( 'some/directory/*' );
+# if no argument provided, defaults to the 'articles_path' attribute   # or their short forms
+  $summary   = $summarizer->summ_text('...');
+  $summary   = $summarizer->summ_file('...');
+  @sumamries = $summarizer->summ_each('...');
+# if no argument provided, defaults to the 'articles_path' attribute
+
+C<< summarize_text >> and C<< summarize_file >> each return a summary hash-ref containing three array-refs, while C<< summarize_each >> returns a list of these hash-refs. These summary hashes take the following form:
+
+=over 8
+
+=item *
+
+C<sentences> => a list of full sentences from the given text, with composite scores of the words contained therein
+
+=item *
+
+C<fragments> => a list of phrase fragments from the given text, scored similarly to sentences
+
+=item *
+
+C<words>   => a list of all words in the text, scored by a three-factor system consisting of  I<frequency of appearance>,  I<population standard deviation>, and  I<use in important phrase fragments>.
+
+=back  
+
+=head3 (note about fragments)
+
+Phrase fragments are in actuality short "scraps" of text (usually only two or three words) that are derived from the text via the following process:
+
+=over 8
+
+=item 1
+
+the entirety of the text is tokenized and scored into a C<< frequency >> table, with a high-pass threshold of frequencies above C<< # of tokens * user-defined scaling factor >>
+
+=item 2
+
+each sentence is tokenized and stored in an array
+
+=item 3
+
+for each word within the C<< frequency >> table, a table of phrase-fragments is derived by finding each occurance of said word and tracking forward and backward by a user-defined "radius" of tokens (defaults to S<C<< radius = 5 >>>, does not include the central key-word) — each phrase-fragment is thus compiled of (by default) an 11-token string
+
+=item 4
+
+all fragments for a given key-word are then compared to each other, and each word is deleted if it appears only once amongst all of the fragments (leaving only C<< I<A> ∪ I<B> ∪ ... ∪ I<S> >> where I<A>, I<B>, ..., I<S> are the phrase-fragments)
+
+=item 5
+
+what remains of each fragment is a list of "scraps" — strings of consecutive tokens — from which the longest scrap is chosen as a representation of the given phrase-fragment
+
+=item 6
+
+when a shorter fragment-scrap (C<I<A>>) is included in the text of a longer scrap (C<I<B>>) such that C<< I<A> ⊂ I<B> >>, the shorter is deleted and its score is added to that of the longer
+
+=item 7
+
+when multiple fragments are equivalent (i.e. they consist of the same list of tokens when stopwords are excluded), they are condensed into a single scrap in the form of C<< "(some|word|tokens)" >> such that the fragment now represents the tokens of the scrap (excluding stopwords) regardless of order (refered to as a "context-free token stream")
+
+=back  
+
+=head1 SUPPORT
+
+Bugs should always be submitted via the project hosting bug tracker
+
+L<https://github.com/faelin/text-summarizer/issues>
+
+For other issues, contact the maintainer.  
+
+=head1 AUTHOR
+
+Faelin Landy <faelin.landy@gmail.com> (current maintainer)  
+
+=head1 CONTRIBUTORS
+
+* Michael McClennen <michaelm@umich.edu>  
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2018 by the AUTHOR as listed above
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+
+=cut

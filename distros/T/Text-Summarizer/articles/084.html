@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html><head><title>Why does my pop up fire when someone opts in?</title></head><body>
+<b>Why does my pop up fire when someone opts in?</b><br />
+<br />
+If you&rsquo;re using an exit pop up or a MagickBar on an opt-in page, depending on how you have your page setup you may notice that the pop up fires when someone opts in, or that the MagickBar remains on the &ldquo;thank you&rdquo; page.<br />
+<br />
+In the case of the exit pop up, the reason for this is that unless you do something to prevent it, when someone opts in it results in them leaving the current page, which triggers the exit pop up &ndash; as it should.<br />
+<br />
+In the case of the MagickBar, the reason is that again, unless you do something to prevent it, the thank you page is loaded in the same window and so the MagickBar stays where it is.<br />
+<br />
+The solution in both cases is simple &ndash; you need to open your thank you page in a new browser window.<br />
+<br />
+There are two possible solutions &hellip;<br />
+<br />
+<br />
+<b>Method #1:</b> For Both Exit Pops &amp; MagickBars<br />
+<br />
+If you have access to the HTML form code, all you have to do is add the following to your&nbsp;tag:
+<form ...=""><br />
+<code>target=&quot;_blank&quot;</code><br />
+<br />
+For example, if your form tag looks like this:<br />
+<br />
+<code>((form action=&quot;xyz.php&quot; method=&quot;POST&quot;))</code><br />
+<br />
+You just change it to this:<br />
+<br />
+<code>((form action=&quot;xyz.php&quot; method=&quot;POST&quot; target=&quot;_blank&quot;))</code><br />
+<br />
+This will cause your Thank You page to open in a new browser window, and it will solve both of the above-mentioned &ldquo;problems&rdquo; with exit pops or MagickBars.<br />
+<br />
+<br />
+<b>Method #2:</b> For MagickBars Only<br />
+<br />
+If you don&rsquo;t have access to change the form code for some reason, you can also solve the MagickBar problem by adding a few lines of JavaScript code to the &ldquo;head&rdquo; section of your thank you page, between the <code>((head))</code>&hellip;<code>((/head))</code> tags:<br />
+<br />
+<code>((script language=&quot;JavaScript&quot; type=&quot;text/javascript&quot;))<br />
+if (top.location != location) { top.location.href = document.location.href; }<br />
+((/script))</code><br />
+<br />
+Adding this code to your page will cause the page to automatically &ldquo;break out&rdquo; of the frame that is used for cloaking, which will cause the MagickBar to disappear.<br />
+<br />
+Note however that this will NOT solve the exit pop up problem. For that you need to use Method #1 above.</form>
+</body></html>

@@ -73,11 +73,11 @@ Valid characters in tag names are <code>A-Z</code>, <code>a-z</code>,
 <a href="TagNames/index.html">tag name documentation</a> for a complete list of
 available tag names.</blockquote>
 
-<blockquote>Tag names may be optionally prefixed by a family 0 or 1 group name
-to specify a particular information type or location.  Use the
-<code>-g0</code> and <code>-g1</code> (or
-<code>-G0</code> and <code>-G1</code>) options when extracting
-information to see the corresponding group names.
+<blockquote>Tag names may be optionally prefixed by a family 0, 1 or 2
+group name to specify a particular information type or location.  Use the
+<code>-g0</code>, <code>-g1</code> or <code>-g2</code> (or
+<code>-G0</code>, <code>-G1</code> or <code>-G2</code>) options when
+extracting information to see the corresponding group names.
 </blockquote>
 
 <a name="Q3"></a>
@@ -701,7 +701,7 @@ capital "<code>T</code>").</li>
 <li>Set either the <b>HOME</b> or the <b>EXIFTOOL_HOME</b> environment variable
 to the name of the directory where you put your "<code>.ExifTool_config</code>"
 file.</li>
-<li>Put the config file in the same directory as the exiftool script.  (Also, be
+<li>Put the config file in the same directory as the exiftool app.  (Also, be
 sure the config filename starts with a dot!  See the note above for help
 renaming the config file.)</li>
 <li>If you can't get the config file to load automatically, you can try loading
@@ -904,14 +904,14 @@ with ExifTool is "lossless" as far as the image is concerned</b>.</blockquote>
 <blockquote>ExifTool is very flexible in the formats allowed for entering GPS
 coordinates.  Any string containing between 1 and 3 floating point numbers is
 valid.  The numbers represent degrees, (and optionally) minutes and
-seconds.</blockquote>
+seconds with any number of decimal places.</blockquote>
 
 <blockquote>For EXIF GPS coordinates, the reference direction is specified
 separately with the EXIF:GPSLatitudeRef or EXIF:GPSLongitudeRef tag. 
 GPSLatitudeRef may be written with a string ending in "<code>N</code>" or
 "<code>S</code>", or with a signed coordinate value, positive for the northern
 hemisphere or negative for the south.  GPSLongitudeRef accepts similar values,
-but for E and W.</blockquote>
+but for E (positive) and W (negative).</blockquote>
 
 <blockquote>For XMP GPS coordinates, the reference direction is specified within
 the XMP:GPSLatitude or XMP:GPSLongitude value, with west longitudes and south
@@ -1003,7 +1003,19 @@ example:
 
 Using <code>-m</code> will downgrade the minor error to a warning, allowing the
 file to be written, but <u>some MakerNote information may be lost when ignoring
-errors like this</u>. </blockquote>
+errors like this</u>.</blockquote>
+
+<blockquote>You may also get one of these warnings when reading or writing a
+file containing unknown maker notes:
+
+<pre>Warning: [minor] Unrecognized MakerNotes
+Warning: [minor] Maker notes could not be parsed</pre>
+
+These warnings indicate that ExifTool didn't recognize the maker notes in a
+file, so it couldn't extract any information from them when reading, or had to
+copy the maker notes as a block when writing.  If the maker notes contain
+absolute offsets then this could result in corrupted makernote information when
+writing, but this is very unlikely.</blockquote>
 
 <a name="Q16"></a>
 <p>16. <b>"Why doesn't ExifTool rename my AVI files?"</b></p>
@@ -1056,8 +1068,8 @@ any previously existing keywords:
 <pre>exiftool -keywords=one -keywords=two -keywords=three DIR
 </pre>
 
-List items are assigned separately, NOT all together, because this would
-represent a single keyword:
+List items are assigned separately as above, NOT all together, because this
+would represent a single keyword:
 
 <pre>exiftool -keywords="one, two, three" test.jpg  <span class=blk>(WRONG!)</span>
 </pre>
@@ -1124,18 +1136,32 @@ an image:
 <pre>exiftool -keywords-=one -keywords+=one -keywords-=two -keywords+=two DIR
 </pre>
 
-When copying list tags using the <code>-tagsFromFile</code> option, items are
-copied individually to form proper lists.  However, there is a complication when
-copying multiple tags to a single list tag:  Here, any assignment to a tag
-overrides earlier assignments to the same tag in the command.  For instance,
-this command
+When <b>copying list tags</b> using the <code>-tagsFromFile</code> feature,
+items are copied individually to form proper lists if the tag is copied directly
+(note that <code>-tagsFromFile @</code> is implied by the "<code>&lt;</code>"
+operation in this and the following commands, causing tags to be copied from the
+original file):
 
-<pre>exiftool "-keywords&lt;filename" "-keywords&lt;comment" DIR
+<pre>exiftool "-keywords&lt;subject" DIR</pre>
+
+However, this is not the case if the tag is interpolated within a format string
+(ie. has a leading "<code>$</code>" symbol), like this
+
+<pre>exiftool "-keywords&lt;$subject" DIR  <span class=blk>(WRONG!)</span></pre>
+
+but here the <code>-sep</code> option may be used to split the list back into
+separate items:
+
+<pre>exiftool "-keywords&lt;$subject" -sep "//" DIR</pre>
+
+Note there is a complication when <b>copying multiple tags to a single list</b>
+tag:  Here, any assignment to a tag overrides earlier assignments to the same
+tag in the command.  For instance, this command:
+
+<pre>exiftool "-keywords&lt;filename" "-keywords&lt;comment" DIR  <span class=blk>(WRONG!)</span>
 </pre>
 
-writes only the value from the Comment tag.  (Note that <code>-tagsFromFile @</code>
-is implied by the "<code>&lt;</code>" operation in this command, causing tags to
-be copied from the original file.)  This may seem strange, but it prevents
+writes only the value from the Comment tag.  This may seem strange, but it prevents
 duplicate items from being added to a list when copying a group of tags from a
 file containing duplicate information.  Alternatively, the
 <code>-addTagsFromFile</code> option may be used to accumulate items when
@@ -1531,9 +1557,10 @@ and will often catch more problems when writing, but it does not attempt to do a
 full validation.  There are other packages that are designed to do validation
 like this, for example, <a href="http://jhove.sourceforge.net">JHOVE</a>.</blockquote>
 
-<blockquote><b>Update:</b> ExifTool now has an experimental <code>-validate</code>
-option.  The following command invokes the validation feature and shows all
-associated Error and Warning messages:
+<blockquote><b>Feb 2017 Update:</b> ExifTool now has a <code>-validate</code>
+option which implements a number of validation tests when reading images.  The
+following command invokes the validation feature and shows all associated Error
+and Warning messages:
 
 <pre>exiftool -validate -error -warning -a test.jpg</pre>
 </blockquote>
@@ -1612,19 +1639,19 @@ tag value without running a second command.  For example, this is <b>wrong</b>
 because the copy operation is superseded by the shift, and the result is that
 the existing DateTimeOriginal is shifted back by two hours:
 
-<pre>exiftool "-datetimeoriginal&lt;filemodifydate" -datetimeoriginal-=2 image.jpg <span class=blk>(WRONG!)</span>
+<pre>exiftool "-datetimeoriginal&lt;filemodifydate" -datetimeoriginal-=2 image.jpg  <span class=blk>(WRONG!)</span>
 </pre>
 
-The <code>-globalTimeShift</code> option was created to fill this void -- it
-shifts all date/time tags by the specified amount when reading or copying,
-allowing a shifted date/time value to be copied to another tag.  So this is the
-proper technique for shifting a date/time value when copying:
+The <code>-globalTimeShift</code> option fills this niche -- it shifts all
+date/time tags by the specified amount when reading or copying, allowing a
+shifted date/time value to be copied to another tag.  So this is the proper
+technique for shifting a date/time value when copying:
 
 <pre>exiftool "-datetimeoriginal&lt;filemodifydate" -globaltimeshift -2 image.jpg</pre>
 </blockquote>
 
 <hr>
-<i>Last revised Feb 20, 2018</i>
+<i>Last revised May 16, 2018</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

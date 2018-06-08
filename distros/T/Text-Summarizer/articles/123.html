@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html><head><title>What are the conversion attribution options?</title></head><body>
+<b>What are the conversion attribution options?</b><br />
+<br />
+If a visitor clicks multiple tracking links, or is tagged as an &ldquo;organic&rdquo; visitor but they also click one or more tracking links, ClickMagick gives you a few options when it comes to attributing conversions.<br />
+<br />
+Normally you&rsquo;ll want to use the &ldquo;Last Click&rdquo; setting, which is the default, but there are a few other settings that might be more appropriate in certain situations &hellip;<br />
+<br />
+<br />
+<b>First Click</b> &ndash; This will attribute conversions to the first tracking link, or the first organic project the user visited.<br />
+<br />
+You would use this setting if you have multiple tracking links between your starting tracking link and the page where your pixel fires. Normally with the &ldquo;Last Click&rdquo; setting (below), the pixel would record its conversion with the most recent tracking link visited. If you need the conversion recorded with the very first tracking link in your funnel, you would use the &ldquo;First Click&rdquo; setting.<br />
+&nbsp;
+<div class="faq-caution"><b>Caution:</b> Be careful using the &ldquo;First Click&rdquo; setting. &ldquo;First&rdquo; literally means <em>first</em>. If you have multiple funnels that repeat visitors may come through, the &ldquo;First Click&rdquo; setting will cause the pixel to attribute its conversion with the very first tracking link your visitor ever clicked on, not necessarily the first tracking link of the specific funnel they came through.</div>
+<br />
+<br />
+<b>Last Click</b> &ndash; This will attribute conversions to the last tracking link, or the last organic project the user visited.<br />
+<br />
+&ldquo;Last Click&rdquo; is the default setting and is generally what you&rsquo;ll want to use. Keep in mind, however, that if you&rsquo;re using the pixel in the Pixel/Code section of a tracking link that this setting will report the conversion to the Pixel/Code tracking link itself which generally is not what you want. If you intend to embed the pixel in the Pixel/Code field of a track link, you&rsquo;ll want to read this FAQ to make sure the conversion is attributed to the tracking link that you expect it to:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=209"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=209">&nbsp;What should I know about adding pixels to a tracking link?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+<b>First Link Click</b> &ndash; This will attribute conversions to the first tracking link the user clicked, even if they previously arrived at your site via an &ldquo;organic&rdquo; source.<br />
+<br />
+<br />
+<b>Last Link Click</b> &ndash; This will attribute conversions to the last tracking link the user clicked, even if they more recently arrived at your site via an &ldquo;organic&rdquo; source.<br />
+<br />
+&nbsp;
+<div class="faq-tip"><b>Tip:</b> ClickMagick also supports a <strong>2nd-to-Last Click</strong> setting which works exactly like it sounds.<br />
+<br />
+The &ldquo;Last Click&rdquo;&nbsp;setting attributes the conversion to the most recent tracking link. The &ldquo;2nd-to-Last Click&rdquo; setting attributes the conversions to the tracking link visited right before that one.<br />
+<br />
+One common use for the &ldquo;2nd-to-Last Click&rdquo; setting is when you&rsquo;re inserting a tracking pixel in the Pixel/Code field of a tracking link.<br />
+<br />
+In this scenario, when the pixel fires, you generally don&rsquo;t want the conversion attributed to the tracking link that the pixel is embedded in. In this case, you almost always want the pixel conversion to be reported to the tracking link right before the tracking link that the pixel is embedded in. In other words, the &ldquo;2nd-to-Last Click.&rdquo;<br />
+<br />
+To set a pixel to use the &ldquo;2nd-to-Last Click&rdquo; attribution, you would use the <strong>Last Click</strong>&nbsp;setting for <strong>Conversion Attribution</strong> and you must add the query string variable <code>&amp;ignore=1</code>&nbsp;to the tracking pixel. This &ldquo;ignore&rdquo; option ignores the most recent tracking link causing the &ldquo;Last Click&rdquo; setting to use the tracking link before that.<br />
+<br />
+You can use the&nbsp;<strong><a href="/user/action/tools/pixelb.cgi" target="_blank">Pixel Debugger</a></strong> to automatically add the&nbsp;<code>&amp;ignore=1</code>&nbsp;for you by choosing&nbsp;<strong>Yes</strong> to the question&nbsp;&ldquo;<strong>Are you adding this pixel to a tracking link?</strong>&rdquo; All that question&nbsp;does is add the <code>&amp;ignore=1</code> option to the tracking pixel when you choose the&nbsp;<strong>Yes</strong>&nbsp;option.</div>
+</body></html>

@@ -1,0 +1,31 @@
+
+
+docno="lists-046-12139072"
+name="Dave Raggett"
+email="dsr@w3.org"
+sent="Tue, 04 Jun 1996 15:30:06 -0400"
+id="199606041930.AA164046606@w3.org"
+subject="Re: Comments on parsing steps:"
+To: w3c-math-erb@w3.org<199606040606.AA03032@drizzle.wri.com>
+
+
+
+     
+   
+
+> Mathematica's parsing, which works in a manner similar to what Bruce
+> describes, has no problem handling complex embellishments.
+
+I can see value in allowing prefix and postfix operators to act as
+operator embellishments, for instance to add accents to operators or
+to change their relative size, or position.
+
+If these embellishment prefix and postfix operators have a high
+precedence and hence bind tightly to the adjacent operator then
+I don't see any problems. Am I missing something?
+
+-- Dave Raggett <dsr@w3.org> tel: +1 (617) 258 5741 fax: +1 (617) 258 5999
+   World Wide Web Consortium, 545 Technology Square, Cambridge, MA 02139
+   url = http://www.w3.org/People/Raggett
+
+

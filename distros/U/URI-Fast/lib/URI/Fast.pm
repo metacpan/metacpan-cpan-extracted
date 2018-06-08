@@ -4,7 +4,7 @@ use strict;
 use warnings;
 no strict 'refs';
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 use Carp;
 use Exporter;
@@ -19,7 +19,6 @@ use overload '""' => sub{ $_[0]->to_string };
 
 sub uri ($) {
   my $self = URI::Fast->new($_[0]);
-  $self->set_scheme('file') unless $self->get_scheme;
   $self;
 }
 
@@ -71,10 +70,10 @@ sub path {
   }
 
   if (wantarray) {
-    return @{ $self->split_path };
+    @{ $self->split_path };
   }
   elsif (defined wantarray) {
-    return decode($self->get_path);
+    decode($self->get_path);
   }
 }
 
@@ -122,7 +121,7 @@ sub param {
 
   return wantarray     ? @$params
        : @$params == 1 ? $params->[0]
-                       : $params;
+       : croak("param: multiple values encountered for query parameter '$key' when called in SCALAR context");
 }
 
 =encoding UTF8
@@ -135,12 +134,12 @@ URI::Fast - A fast(er) URI parser
 
   use URI::Fast qw(uri);
 
-  my $uri = uri 'http://www.example.com/some/path?a=b&c=d';
+  my $uri = uri 'http://www.example.com/some/path?fnord=slack&foo=bar';
 
   if ($uri->scheme =~ /http(s)?/) {
-    my @path = $uri->path;
-    my $a = $uri->param('a');
-    my $b = $uri->param('b');
+    my @path  = $uri->path;
+    my $fnord = $uri->param('fnord');
+    my $foo   = $uri->param('foo');
   }
 
   if ($uri->path =~ /\/login/ && $uri->scheme ne 'https') {
@@ -197,7 +196,7 @@ port number:
 
 Setting this field may be done with a string (see the note below about
 L</ENCODING>) or a hash reference of individual field names (C<usr>, C<pwd>,
-C<host>, and C<sport>). In both cases, the existing values are completely
+C<host>, and C<port>). In both cases, the existing values are completely
 replaced by the new values and any values not present are deleted.
 
 =head3 usr
@@ -232,12 +231,15 @@ The path may also be updated using either a string or an array ref of segments:
 
 =head2 query
 
-Returns the complete query string. Does not include the leading C<?>. The query
-string may be set in several ways.
+In scalar context, returns the complete query string, excluding the leading
+C<?>. The query string may be set in several ways.
 
   $uri->query("foo=bar&baz=bat"); # note: no percent-encoding performed
   $uri->query({foo => 'bar', baz => 'bat'}); # foo=bar&baz=bat
   $uri->query({foo => 'bar', baz => 'bat'}, ';'); # foo=bar;baz=bat
+
+In list context, returns a hash ref mapping query keys to array refs of their
+values (see L</query_hash>).
 
 =head3 query_keys
 
@@ -259,8 +261,8 @@ parameter to C<undef> deletes the parameter from the URI.
   $uri->param('fnord', 'slack');
 
   my $value_scalar    = $uri->param('fnord'); # fnord appears once
-  my $value_array_ref = $uri->param('foo');   # foo appears twice
-  my @value_list      = $uri->param('foo');   # list context always yields a list
+  my @value_list      = $uri->param('foo');   # foo appears twice
+  my $value_scalar    = $uri->param('foo');   # croaks; expected single value but foo has multiple
 
   # Delete 'foo'
   $uri->param('foo', undef);
@@ -308,7 +310,7 @@ Percent-encodes a string for use in a URI. By default, both reserved and UTF-8
 chars (C<! * ' ( ) ; : @ & = + $ , / ? # [ ] %>) are encoded.
 
 A second (optional) parameter provides a string containing any characters the
-caller does not wish to be decoded. An empty string will result in the default
+caller does not wish to be encoded. An empty string will result in the default
 behavior described above.
 
 For example, to encode all characters in a query-like string I<except> for

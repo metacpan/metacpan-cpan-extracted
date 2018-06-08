@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Madrid
 
+0.07  2018-06-07
+      - Added key 'provides' to the Makefile.PL script.
+
 0.06  2018-06-05
       - Updated dependency on Map::Tube v3.51.
 

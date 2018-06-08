@@ -41,6 +41,7 @@
             "DBD::SQLite" : "0",
             "Test::DBIx::Class" : "0.52",
             "Test::MockModule" : "0",
+            "Test::MockObject" : "0",
             "Test::Most" : "0",
             "Test::Pod" : "0",
             "perl" : "5.010"
@@ -50,35 +51,35 @@
    "provides" : {
       "JSONAPI::Document" : {
          "file" : "lib/JSONAPI/Document.pm",
-         "version" : "1.5"
+         "version" : "1.6"
       },
       "JSONAPI::Document::Builder" : {
          "file" : "lib/JSONAPI/Document/Builder.pm",
-         "version" : "1.5"
+         "version" : "1.6"
       },
       "JSONAPI::Document::Builder::Compound" : {
          "file" : "lib/JSONAPI/Document/Builder/Compound.pm",
-         "version" : "1.5"
+         "version" : "1.6"
       },
       "JSONAPI::Document::Builder::Relationships" : {
          "file" : "lib/JSONAPI/Document/Builder/Relationships.pm",
-         "version" : "1.5"
+         "version" : "1.6"
       },
       "JSONAPI::Document::Builder::Role::Attributes" : {
          "file" : "lib/JSONAPI/Document/Builder/Role/Attributes.pm",
-         "version" : "1.5"
+         "version" : "1.6"
       },
       "JSONAPI::Document::Builder::Role::Parameters" : {
          "file" : "lib/JSONAPI/Document/Builder/Role/Parameters.pm",
-         "version" : "1.5"
+         "version" : "1.6"
       },
       "JSONAPI::Document::Builder::Role::Type" : {
          "file" : "lib/JSONAPI/Document/Builder/Role/Type.pm",
-         "version" : "1.5"
+         "version" : "1.6"
       },
       "JSONAPI::Document::Role::Attributes" : {
          "file" : "lib/JSONAPI/Document/Role/Attributes.pm",
-         "version" : "1.5"
+         "version" : "1.6"
       }
    },
    "release_status" : "stable",
@@ -88,7 +89,7 @@
          "web" : "https://github.com/ziali088/jsonapi-document.git"
       }
    },
-   "version" : "1.5",
+   "version" : "1.6",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],

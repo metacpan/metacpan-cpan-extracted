@@ -1,0 +1,75 @@
+NAME
+    PMVersions::Util - Utilities related to pmversions.ini
+
+VERSION
+    This document describes version 0.001 of PMVersions::Util (from Perl
+    distribution PMVersions-Util), released on 2018-06-07.
+
+SYNOPSIS
+    In ~/pmversions.ini:
+
+     Log::ger=0.023
+     File::Write::Rotate=0.28
+
+    In your code:
+
+     use PMVersions::Util qw(version_from_pmversions);
+
+     my $v1 = version_from_pmversions("Log::ger");  # => 0.023
+     my $v2 = version_from_pmversions("Data::Sah"); # => undef
+
+DESCRIPTION
+    pmversions.ini is a file that list (minimum) version of modules. This
+    module provides routines related to this file.
+
+FUNCTIONS
+  read_pmversions
+    Usage:
+
+     read_pmversions([ $path ]) => hash
+
+    Read pmversions.ini and return a hash of module names and versions. If
+    $path is not specified, will look at "PMVERSIONS_PATH" environment
+    variable, or defaults to ~/pmversions.ini. Will die if file cannot be
+    read or parsed.
+
+  version_from_pmversions
+    Usage:
+
+     version_from_pmversions($mod [ , $path ]) => str
+
+    Check version from pmversions file. $path will be passed to
+    "read_pmversions" only the first time; after that, the contents of the
+    file is cached in a hash variable so the pmversions file is only read
+    and parsed once.
+
+ENVIRONMENT
+  PMVERSIONS_PATH
+    String. Set location of pmversions.ini instead of the default
+    "~/pmversions.ini". Example: "/etc/minver.conf".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/PMVersions-Util>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-PMVersions-Util>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=PMVersions-Util>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

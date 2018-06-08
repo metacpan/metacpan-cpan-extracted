@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html><head><title>Why can I not find the sales conversion after a sales pixel fired?</title></head><body>
+<strong>Why can I not find the sales conversion after a sales pixel fired?</strong><br />
+<br />
+Sometimes you&#39;ll see a ticket where a sales pixel is set up on a page, but sales only show up intermittently in the user&#39;s ClickMagick stats. This can be puzzling if you&#39;ve never run into it before.<br data-text="true" />
+<br />
+The key to understanding this situation is knowing that if a sales pixel fires and there&#39;s no tracking link to report it to, it won&#39;t show up in any tracking link, but it also won&#39;t show up in the Pixel Debugger nor the IP Lookup tool. In effect, there is no observable record of the pixel ever firing, which might make you think that it didn&#39;t fire...<br data-text="true" />
+<br />
+<strong>When would you see this type of behavior?</strong><br data-text="true" />
+<br />
+1) This could happen if a user Google&#39;s something, lands in the middle of a sales funnel, and makes a purchase. If the funnel was built assuming that people always came in through a tracking link that points to the first page, then a sale could happen with no tracking link to point to.<br data-text="true" />
+<br />
+This could be what&#39;s happening if someone is only missing a recorded sale every once in awhile.<br data-text="true" />
+<br />
+If you look at the user&#39;s website and it&#39;s full of information, such as a blog, and it&#39;s possible to purchase something without going through a tracking link, then this could be the cause.<br data-text="true" />
+<br />
+2) If the user&#39;s funnel has an opt-in page and the visitors receive email messages with a link to the user&#39;s offer, they could also run into the problem of a pixel firing, but not having a tracking link to report the conversion to.<br data-text="true" />
+<br />
+This can happen if a visitor opts-in from a desktop machine, but reads email from his or her phone. If they respond to the offer from the phone and the link to the offer is a direct link (not through a tracking link), they could click on the offer&#39;s link and make a purchase and there would be no tracking link to report the conversion to because the phone has never gone through a tracking link&mdash;remember, they opted-in from their desktop machine.<br data-text="true" />
+<br />
+<strong>Solution:</strong><br data-text="true" />
+<br />
+1) Always use a tracking link to link from email messages to offer pages. This ensures that there is always a tracking link to report the conversion to if the visitor makes a purchase from the follow-up email series.<br data-text="true" />
+<br />
+2) From the user&#39;s website (blog), make sure that any links to the offer page are through a tracking link, again to ensure that there is a link to report the conversion to.<br data-text="true" />
+<br />
+3) They should enable organic tracking for their website to see where their clicks are coming from. This is really easy to set up&mdash;all they need to do is follow our video tutorial.
+</body></html>

@@ -808,6 +808,10 @@ SV* new(pTHX_ const char* class, SV* uri_str) {
     src = SvPV_nomg_const(uri_str, len);
   }
 
+  // set default scheme
+  const char* default_scheme = "file";
+  strncpy(uri->scheme, default_scheme, 4);
+
   uri_scan(uri, src, len);
 
   return obj_ref;

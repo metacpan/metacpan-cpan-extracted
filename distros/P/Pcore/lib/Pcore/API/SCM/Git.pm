@@ -26,7 +26,7 @@ sub _scm_cmd ( $self, $cmd, $root = undef, $cb = undef ) {
     # git "clone" and "init" does not support --porcelain -z options
     push @cmd, qw[--porcelain -z] if $cmd->[0] ne 'init' && $cmd->[0] ne 'clone';
 
-    P->pm->run_proc(
+    P->sys->run_proc(
         \@cmd,
         stdout    => 1,
         stderr    => 1,

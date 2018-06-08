@@ -1,4 +1,4 @@
-package cppAdaptive2 v2.0.1;
+package cppAdaptive2 v2.0.2;
 
 use strict;
 use warnings;
@@ -45,7 +45,7 @@ CPP
 sub update {
     my ( $obsVector, $futVector, $betaVector, $n_observed ) = @_;
 
-    return _update( $obsVector, $futVector, $betaVector, $n_observed )->@*;
+    return @{ _update( $obsVector, $futVector, $betaVector, $n_observed ) };
 }
 
 1;

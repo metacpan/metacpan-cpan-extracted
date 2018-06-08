@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html><head><title>What are tracking pixels and tracking code?</title></head><body>
+<strong>What are tracking pixels and tracking code?</strong><br />
+<br />
+ClickMagick supports&nbsp;industry-standard &ldquo;tracking pixels&rdquo; and three types of tracking code to help you track conversions and goals within your sales funnel.<br />
+<br />
+If you&rsquo;re not familiar with tracking pixels or tracking code, these are pieces of HTML or JavaScript code that you insert into your web pages that alert tracking systems like ClickMagick that a page has just been displayed. This information can tell you all sorts of great information.<br />
+<br />
+For example, if you&rsquo;re asking for an email address in an opt-in page, and the Thank You page for the email opt-in is displayed, then you know that the email address was entered and accepted. If you install a tracking pixel or piece of tracking code in the Thank You page, then when the page it displayed, it can report the results back to ClickMagick.<br />
+<br />
+The &ldquo;trick&rdquo; is in installing the tracking pixel or tracking code in the <em>right</em> place on the page and that&rsquo;s what we&rsquo;re going cover here.<br />
+<br />
+<br />
+<strong>Tracking Pixels vs. Tracking Code</strong><br />
+<br />
+Strictly speaking, a traditional tracking &ldquo;pixel&rdquo; is a piece of HTML code that displays a single dot on the screen, and in computer terminology, a single dot is called a &ldquo;pixel,&rdquo; short for &ldquo;picture element.&rdquo; The pixel is displayed using the &ldquo;image&rdquo; tag of the HTML markup language and looks like this:<br />
+<br />
+<code>((img src=&quot;...&quot; height=&quot;1&quot; width=&quot;1&quot; /))</code><br />
+<br />
+Because a pixel is a display element, it&nbsp;<em>must</em>&nbsp;be inserted in the &ldquo;body&rdquo; section of your web page which will be explained in just a&nbsp;moment.<br />
+&nbsp;
+<div class="faq-tip"><b>Tip:</b>&nbsp;ClickMagick&rsquo;s <a href="/user/action/tools/pixelb.cgi" target="_blank"><strong>Pixel Builder</strong></a>&nbsp;makes it easy to create tracking pixels. You can always find the <a href="/user/action/tools/pixelb.cgi" target="_blank"><strong>Pixel Builder</strong></a> in the <strong>Tools</strong> menu.</div>
+<br />
+<br />
+Tracking code, on the other hand, is computer code usually written in the JavaScript language. Tracking code starts with a&nbsp;<code>((script))</code>&nbsp;tag and looks like this:<br />
+<br />
+<code>((script)) ...code... ((/script))</code><br />
+<br />
+Tracking code can legally be included anywhere on the web page, but depending on what the code does, you may have to insert it in specific places for it to work as intended.<br />
+<br />
+<br />
+<strong>The Structure of an HTML Page</strong><br />
+<br />
+With that background, a typical HTML page has this structure behind the scenes:<br />
+<br />
+<code>((html))<br />
+&nbsp;&nbsp;((head))<br />
+&nbsp;&nbsp; &nbsp;... initializations<br />
+&nbsp;&nbsp;((/head))<br />
+&nbsp;&nbsp;((body))<br />
+&nbsp; &nbsp; ... display elements<br />
+&nbsp;&nbsp;((/body))<br />
+((/html))</code><br />
+<br />
+Because traditional HTML tracking pixels are display elements, they&nbsp;<em>must</em>&nbsp;go in the &ldquo;body&rdquo; section, between the&nbsp;<code>((body))</code>&nbsp;and&nbsp;<code>((/body))</code>&nbsp;tags, and for best performance, you&rsquo;ll want to place them as close as possible to the top&nbsp;<code>((body))</code>&nbsp;tag. That way, if the page loads slowly and the user clicks away before the page is fully loaded, the tracking pixel has a better chance of being loaded before the page disappears.<br />
+<br />
+ClickMagick supports both traditional HTML tracking pixels and the newer JavaScript tracking pixels. You would use&nbsp;JavaScript tracking pixels&nbsp;only in the rare cases when traditional HTML tracking pixels can&rsquo;t be used, such as for Page Builders or affiliate networks that only support JavaScript tracking code.<br />
+<br />
+For&nbsp;best performance, you&rsquo;ll want to put <em>JavaScript</em> tracking pixels in the &ldquo;head&rdquo; section, between the <code>((head))</code>&hellip;<code>((/head))</code> tags, again so that they&rsquo;ll load as early as possible.<br />
+<br />
+ClickMagick&rsquo;s Organic tracking code and FunnelMagick tracking code are two other types of JavaScript tracking code that can go in either the &ldquo;head&rdquo; section or the&nbsp;&ldquo;body&rdquo; section, and again, for best performance, you&rsquo;ll want to put them in the &ldquo;head&rdquo; section, if at all possible.<br />
+<br />
+If you&rsquo;re editing directly in HTML, you can install your tracking pixels or tracking code by simply pasting them between the correct HTML tags for what you&rsquo;re trying to do.<br />
+&nbsp;
+<div class="faq-caution"><b>Caution:</b> If you install the FunnelMagick tracking code in the body section of a page that you&rsquo;re split testing, the split test may show a brief flash as the page is loaded. For this reason, it&rsquo;s good practice to always install FunnelMagick tracking code in the &ldquo;head&rdquo; section of all your pages, if possible.</div>
+&nbsp;
+
+<div class="faq-tip"><b>Tip:</b> If you can&rsquo;t edit&nbsp;your web pages directly in HTML,&nbsp;you&rsquo;ll need to add your tracking pixels and tracking code using the page settings of the Page Builder or affiliate network you&rsquo;re working with. Every system is different so we have a separate FAQ that can help you find where to enter these settings for your specific situation:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=221"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=221">How do I add tracking pixels or JavaScript code to [...]?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+</body></html>

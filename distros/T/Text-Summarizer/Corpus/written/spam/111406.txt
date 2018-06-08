@@ -1,0 +1,31 @@
+
+
+
+Date: Tue, 8 Feb 2011 22:24:13 +0600
+Subject: Email Quota Limit
+From: "System Administrator" <sayeedma@dab-bd.org>
+To: undisclosed-recipients: ;
+
+
+
+
+You have exceeded the storage limit on your mailbox.
+
+You will not be able to send or receive new mail until you upgrade your
+email.
+
+Click the below link and fill the form to upgrade your account.
+
+http://beam.to/emailaccountsquota-limit.us.net
+
+System Administrator
+192.168.0.11
+
+
+
+-- 
+This message has been scanned for viruses and
+dangerous content by OpenProtect(http://www.openprotect.com), and is
+believed to be clean.
+
+

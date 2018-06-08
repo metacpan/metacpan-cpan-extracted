@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html><head><title>How do I set up RevContent with ClickMagick?</title></head><body>
+<strong>How do I set up RevContent with ClickMagick?</strong><br />
+<br />
+While RevContent doesn&rsquo;t give you a Postback URL to track conversions, it gives you a unique tracking pixel for each campaign you run, and that can be used to track your conversions. Instead of using your complete pixel code, you&rsquo;ll just use the URL in the code.<br />
+<br />
+Here&rsquo;s how to set it up:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>1.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Set up our ClickMagick tracking link that you&rsquo;ll use on RevContent.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>2.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Set up your campaign and ad in RevContent, and then set this as the URL to send traffic to:<br />
+			<br />
+			<code>http://www.clkmg.com/$username/yourlinkid</code></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>3.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>In your RevContent account, create a conversion pixel by choosing the&nbsp;<strong>CPA ROI</strong>&nbsp;option in Revcontent&rsquo;s campaign setup.<br />
+			<br />
+			This will give you the pixel code that looks something like this:<br />
+			<br />
+			<code>((img src=&quot;http://trends.revcontent.com/conv.php?t=OGeFlrdKqCdOV8DberGcCHchMZIcixcvb&quot; /))</code><br />
+			<br />
+			You would only need the URL, which is:<br />
+			<code>http://trends.revcontent.com/conv.php?t=OGeFlrdKqCdOV8DberGcCHchMZIcixcvb</code></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>4.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Open the <a href="/user/action/tools/customposts.cgi" target="_blank"><strong>Custom Postbacks</strong></a> tool by clicking on Custom Postbacks in the Tools menu and choose your tracking link that you created from the <strong>Which Link?</strong> drop-down. Next, choose the <strong>Conversion Type</strong>.<br />
+			<br />
+			Set the Postback URL to:<br />
+			<code>http://trends.revcontent.com/conv.php?t=OGeFlrdKqCdOV8DberGcCHchMZIcixcvb</code><br />
+			&nbsp;
+			<div class="faq-caution"><b>Caution:</b> The URL will change for each RevContent campaign that you set up.</div>
+			</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>5.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Click on <strong>Add Custom Postback</strong>.</td>
+		</tr>
+	</tbody>
+</table>
+</body></html>

@@ -7,39 +7,37 @@ use Test::More;
 use JavaScript::Duktape::XS;
 
 sub _module_resolve {
-    my ($module_id, $parent_id) = @_;
+    my ($requested_id, $parent_id) = @_;
 
-    my $resolved = sprintf("%s.js", $module_id);
-    # printf STDERR ("resolve_cb id='%s', parent-id='%s', resolve-to='%s'\n", $module_id, $parent_id, $resolved);
-    return $resolved;
+    my $module_name = sprintf("%s.js", $requested_id);
+    # printf STDERR ("resolve_cb requested-id='%s', parent-id='%s', resolve-to='%s'\n", $requested_id, $parent_id, $module_name);
+    return $module_name;
 
 }
 
 sub _module_load {
-    my ($module_id, $exports, $module, $filename) = @_;
+    my ($module_name, $exports, $module) = @_;
 
-    # printf STDERR ("load_cb id='%s', filename='%s'\n", $module_id, $filename);
+    # printf STDERR ("load_cb module_name='%s'\n", $module_name);
 
     my $source;
-    if ($module_id eq 'pig.js') {
-        $source = sprintf("module.exports = 'you\\'re about to get eaten by %s';", $module_id);
+    if ($module_name eq 'pig.js') {
+        $source = sprintf("module.exports = 'you\\'re about to get eaten by %s';", $module_name);
     }
-    elsif ($module_id eq 'cow.js') {
+    elsif ($module_name eq 'cow.js') {
         $source = "module.exports = require('pig');";
     }
-    elsif ($module_id eq 'ape.js') {
+    elsif ($module_name eq 'ape.js') {
         $source = "module.exports = { module: module, __filename: __filename, wasLoaded: module.loaded };";
     }
-    elsif ($module_id eq 'badger.js') {
+    elsif ($module_name eq 'badger.js') {
         $source = "exports.foo = 123; exports.bar = 234;";
     }
-    elsif ($module_id eq 'comment.js') {
+    elsif ($module_name eq 'comment.js') {
         $source = "exports.foo = 123; exports.bar = 234; // comment";
     }
-    elsif ($module_id eq 'shebang.js') {
+    elsif ($module_name eq 'shebang.js') {
         $source = "#!ignored\nexports.foo = 123; exports.bar = 234;";
-    # } else {
-    #     (void) duk_type_error(ctx, "cannot find module: %s", module_id);
     }
 
     return $source;
@@ -58,26 +56,37 @@ sub test_module {
     # printf STDERR ("cow: %s", Dumper($duk->get('r')));
     ok($duk->get('c') >= 0, 'nested require()');
 
-    # ./test 'var ape = require("ape"); assert(typeof ape.module.require === "function", "module.require()");'
-    # ./test 'var ape = require("ape"); assert(ape.module.exports === ape, "module.exports");'
-    # ./test 'var ape = require("ape"); assert(ape.module.id === "ape.js" && ape.module.id === ape.module.filename, "module.id");'
-    # ./test 'var ape = require("ape"); assert(ape.module.filename === "ape.js", "module.filename");'
-    # ./test 'var ape = require("ape"); assert(ape.module.loaded === true && ape.wasLoaded === false, "module.loaded");'
-    # ./test 'var ape = require("ape"); assert(ape.__filename === "ape.js", "__filename");'
+    $duk->eval('var ape1 = require("ape"); var ape2 = require("ape");');
+    my $a1 = $duk->get('ape1');
+    my $a2 = $duk->get('ape2');
+    is_deeply($a1, $a2, 'cached require');
 
-    # $duk->eval('var ape1 = require("ape"); var ape2 = require("ape");');
-    # is_deeply($duk->get('ape1'), $duk->get('ape2'), 'cached require');
-    # my $a1 = $duk->get('ape1');
-    # my $a2 = $duk->get('ape2');
-    # is_deeply($a1, $a2, 'cached require');
+    $duk->eval('var ape1 = require("ape"); var inCache = "ape.js" in require.cache; delete require.cache["ape.js"]; var ape2 = require("ape");');
+    ok($duk->get('inCache'), 'cached required, inCache');
+    ok($duk->get('ape2') ne $duk->get('ape1'), 'cached require, not equal');
 
-    # $duk->eval('var ape1 = require("ape"); var inCache = "ape.js" in require.cache; delete require.cache["ape.js"]; var ape2 = require("ape");');
-    # ok($duk->get('inCache'), 'cached required, inCache');
-    # ok($duk->get('ape2') ne $duk->get('ape1'), 'cached require, not equal');
+    $duk->eval('var ape3 = require("ape");');
 
-    # $duk->eval('var ape3 = require("ape");');
-    # printf STDERR ("ape: %s", Dumper($duk->get('ape3')));;
-    # is($duk->typeof('ape3'), "function", "module.require()");
+    is($duk->typeof('ape3.module.require'), "function", "module.require is a function");
+
+    my $a30 = $duk->get('ape3');
+    my $a31 = $duk->get('ape3.module.exports');
+    my $a32 = $duk->get('ape3.module.id');
+    my $a33 = $duk->get('ape3.module.filename');
+    my $a34 = $duk->get('ape3.module.loaded');
+    my $a35 = $duk->get('ape3.wasLoaded');
+    my $a36 = $duk->get('ape3.__filename');
+
+    is_deeply($a30, $a31, 'aped require');
+
+    is($a32, 'ape.js', 'ape module id');
+
+    is($a32, $a33, 'ape module filename');
+
+    ok( $a34, 'module loaded');
+    ok(!$a35, 'wasLoaded');
+
+    is($a36, 'ape.js', 'ape __filename');
 
     $duk->eval('var badger = require("badger");');
     # printf STDERR ("badger: %s", Dumper($duk->get('badger')));

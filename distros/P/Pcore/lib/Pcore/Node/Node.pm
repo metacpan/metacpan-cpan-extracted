@@ -104,8 +104,6 @@ sub run ( $type, $args ) {
 
     syswrite *FH, unpack( 'H*', $data->$* ) . $LF or die $!;
 
-    close *FH or die $!;
-
     AE::cv->recv;
 
     exit;

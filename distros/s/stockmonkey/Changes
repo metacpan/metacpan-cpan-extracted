@@ -1,3 +1,8 @@
+2.9308: Wed Jun 06 2018
+   - It's been a few years since I thought about this project, but Marcel Ebbrecht sent
+     a patch to CCI.pm to avoid overwriting the sma in the while loop — an
+     artifact that remains untested in t/12_cci.t
+
 2.9307: Fri Feb 12 2016
    - No sense using // in exactly one spot and spoiling the perl5.8 tests for no reason
 

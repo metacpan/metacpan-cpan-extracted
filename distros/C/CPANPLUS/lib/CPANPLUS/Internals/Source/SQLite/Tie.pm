@@ -14,7 +14,7 @@ use Module::Load::Conditional   qw[can_load];
 use Locale::Maketext::Simple    Class => 'CPANPLUS', Style => 'gettext';
 
 use vars qw[@ISA $VERSION];
-$VERSION = "0.9174";
+$VERSION = "0.9176";
 
 require Tie::Hash;
 push @ISA, 'Tie::StdHash';

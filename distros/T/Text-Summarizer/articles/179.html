@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html><head><title>How do I set up Outbrain with ClickMagick?</title></head><body>
+<strong>How do I set up Outbrain with ClickMagick?</strong><br />
+<br />
+Outbrain supports Postback URL tracking, so you can send back conversion data to Outbrain.<br />
+<br />
+Here&rsquo;s how to set it up:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>1.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Create a ClickMagick tracking link that you&rsquo;ll use with Outbrain. Set the Primary URL of this link to the offer you&rsquo;d like to promote.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>2.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Set up your campaign and ad in Outbrain then add your tracking link URL to the&nbsp;<strong>Add Content</strong>&nbsp;section of your campaign. You can this find setting by clicking on the <strong>Add Content</strong> link in the upper-right corner of the Create Campaign settings:<br />
+			<br />
+			<img src="//cdn.clickmagick.com/images/user/faqs/faq240addcontent.jpg" /><br />
+			<br />
+			You can add many different URLs to an Outbrain campaign as you&rsquo;d like.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>3.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Edit your Campaign settings, and scroll down to the <strong>Tracking</strong> section. In the Tracking Code entry, add the unique click ID token for Outbrain as a UTM Parameter:<br />
+			<br />
+			<code>utm_campaign={{ob_click_id}}</code><br />
+			<br />
+			Outbrain will automatically add the actual click ID and send it to ClickMagick as a UTM Parameter<br />
+			<br />
+			<br />
+			<img src="//cdn.clickmagick.com/images/user/faqs/faq240tracking.jpg" /></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>4.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Next, you&rsquo;ll need to create a &ldquo;custom postback&rdquo; for Outbrain using the <strong><a href="/user/action/tools/customposts.cgi" target="_blank">Custom Postbacks</a></strong> <span helvetica="" neue="" style="color: rgb(0, 0, 0); font-family: proxima-nova, ">tool in ClickMagick&rsquo;s&nbsp;<strong>Tools</strong> menu. In the </span><strong>Which Link?</strong> drop-down, c<span helvetica="" neue="" style="color: rgb(0, 0, 0); font-family: proxima-nova, ">hoose the tracking link that</span> you created in step 1. Choose <strong>Sales</strong> as the <strong>Conversion Type</strong>, and set the <strong>Postback URL</strong> to:<br />
+			<br />
+			<code>https://tr.outbrain.com/pixel?ob_click_id=[s5]</code><br />
+			<br />
+			<br />
+			<img src="//cdn.clickmagick.com/images/user/faqs/faq240custompb.jpg" /><br />
+			<br />
+			Click on <strong>Add Custom Postback</strong>.</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+Now, every time a sale is made, ClickMagick will report back to Outbrain that a sale has been made for the tracking link you selected.
+</body></html>

@@ -3,22 +3,19 @@
 # Perl module for scoring the semantic association of terms in the Unified
 # Medical Language System (UMLS).
 #
-# This module borrows heavily from the UMLS::Interface package so you will 
-# see similarities
-#
 # Copyright (c) 2015
 #
-# Bridget T. McInnes, Virginia Commonwealth University
-# btmcinnes at vcu.edu
+# Sam Henry, Virginia Commonwealth University
+# henryst at vcu.edu
+#
+# Bridget McInnes, Virginia Commonwealth University
+# btmcinees at vcu.edu
 #
 # Keith Herbert, Virginia Commonwealth University
 # herbertkb at vcu.edu
 #
 # Alexander D. McQuilkin, Virginia Commonwealth University 
 # alexmcq99 at yahoo.com
-#
-# Sam Henry, Virginia Commonwealth University
-# henryst at vcu.edu
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -42,8 +39,6 @@
 UMLS::Association -  A suite of Perl modules that implement a number of semantic
 association measures in order to calculate the semantic association between two
 concepts in the UMLS. 
-
-=head1 SYNOPSIS
 
 
 =head1 INSTALL
@@ -71,35 +66,6 @@ with other parameters, unless you know what you're doing.
 
 This package provides a Perl interface to 
 
-=head1 DATABASE SETUP
-
-The interface assumes that the CUI network extracted from the MetaMapped 
-Medline Baseline is present in a mysql database. The name of the database 
-can be passed as configuration options at initialization. However, if the 
-names of the databases are not provided at initialization, then default 
-value is used -- the database is called 'CUI_BIGRAMS'.
-
-The CUI_BIGRAMS database must contain four? tables: 
-	1. N11
-	2. N1P
-	3. NP1
-	4. NPP
-
-All other tables in the databases will be ignored, and any of these
-tables missing would raise an error.
-
-A script explaining how to create the CUI network and the mysql database 
-are in the INSTALL file.
-
-If the files that are being parsed are large, "ERROR 1206: The total number
-of locks exceeds the lock table size" may occur. This can be corrected by increasing 
-the lock table size of mysql. This is done by increasing the innodb_buffer_pool_size
-variable in your my.cnf file. If the variable does not exist in the my.cnf file simply
-add a line such as:
-"innodb_buffer_pool_size=1G"
-which sets the size to 1 GB. Once updated mysql must be restarted for the changes to 
-take effect.
-
 =head1 INITIALIZING THE MODULE
 
 To create an instance of the interface object, using default values
@@ -108,89 +74,30 @@ for all configuration options:
   use UMLS::Association;
   my $associaton = UMLS::Association->new();
 
-Database connection options can be passed through the my.cnf file. For 
-example: 
-           [client]
-	    user            = <username>
-	    password    = <password>
-	    port	      = 3306
-	    socket        = /tmp/mysql.sock
-	    database     = mmb
-
-Or through the by passing the connection information when first 
-instantiating an instance. For example:
-
-    $associaton = UMLS::Association->new({"driver" => "mysql", 
-				  "database" => "$database", 
-				  "username" => "$username",  
-				  "password" => "$password", 
-				  "hostname" => "$hostname", 
-				  "socket"   => "$socket"}); 
-
-  'driver'       -> Default value 'mysql'. This option specifies the Perl 
-                    DBD driver that should be used to access the
-                    database. This implies that the some other DBMS
-                    system (such as PostgresSQL) could also be used,
-                    as long as there exist Perl DBD drivers to
-                    access the database.
-  'database'     -> Default value 'CUI_BIGRAM'. This option specifies the name
-                    of the database.
-  'hostname'     -> Default value 'localhost'. The name or the IP address
-                    of the machine on which the database server is
-                    running.
-  'socket'       -> Default value '/tmp/mysql.sock'. The socket on which 
-                    the database server is using.
-  'port'         -> The port number on which the database server accepts
-                    connections.
-  'username'     -> Username to use to connect to the database server. If
-                    not provided, the module attempts to connect as an
-                    anonymous user.
-  'password'     -> Password for access to the database server. If not
-                    provided, the module attempts to access the server
-                    without a password.
-
 More information is provided in the INSTALL file. 
 
-=head1 PARAMETERS
-
-You can also pass other parameters which controls the functionality 
-of the Association.pm module. 
-
-    $assoc = UMLS::Association->new({"measure"     => "lch"});
-
-   'measure'    -> This modifies the association measure 
-
-=head1 FUNCTION DESCRIPTIONS
-
 =cut
-
 package UMLS::Association;
 
 use Fcntl;
 use strict;
 use warnings;
-use DBI;
 use bytes;
 
 use UMLS::Association::StatFinder;
 use UMLS::Association::ErrorHandler; 
 
-my $errorhandler     = ""; 
-my $statfinder_G = ""; 
-
 my $pkg = "UMLS::Association";
 
 use vars qw($VERSION);
 
-$VERSION = '0.15';
-  
+$VERSION = '0.17';
+
+my $errorhandler     = ""; 
+my $statfinder_G = "";   
 my $debug = 0;
-my $umls_G = undef;
-my $conceptExpansion_G = 0;
 my $precision_G = 4; #precision of the output
 
-
-# UMLS-specific stuff ends ----------
 
 # -------------------- Class methods start here --------------------
 
@@ -233,31 +140,27 @@ sub _initialize {
     my $paramCount = 0;
     if ($params->{'mwa'}) {$paramCount++;}
     if ($params->{'lta'}) {$paramCount++;}
-    if ($params->{'vsa'}) {$paramCount++;}
+    if ($params->{'lsa'}) {$paramCount++;}
+    if ($params->{'sbc'}) {$paramCount++;}
+    if ($params->{'wsa'}) {$paramCount++;}
     if ($paramCount > 1) {
-	$errorhandler->_error($pkg, $function, "Only one of LTA, MWA, and VSA may be specified", 12);
+	$errorhandler->_error($pkg, $function, "Only one of lta, mwa, lsa, sbc, wsa may be specified", 12);
     }
 
     # set parameters
-    if ($params->{'conceptexpansion'}) {
-	$conceptExpansion_G = 1;
-    }
     if ($params->{'precision'}) {
 	$precision_G = $params->{'precision'};
     }
-    $umls_G = $params->{'umls'};
+    if ($params->{'debug'}) {
+	$debug = 1;
+    }
 
     # set the statfinder
+    $params->{'association'} = $self; #set associaiton for WSA
     $statfinder_G = UMLS::Association::StatFinder->new($params);
     if(! defined $statfinder_G) { 
 	my $str = "The UMLS::Association::StatFinder object was not created.";
 	$errorhandler->_error($pkg, $function, $str, 8);
-    }
-
-    #require UMLS::Interface to be defined if using a DB, or if
-    # using concept expansion
-    if ($conceptExpansion_G && !defined $umls_G) {
-	die( "ERROR initializing Association: UMLS::Interface (params{umls}) must be defined when using database queries or when using concept expansion\n");
     }
 }
 
@@ -274,29 +177,30 @@ sub version {
 ##########################################################################
 # All association scores are computed through a data structure, the pair hash 
 # list. This forces all the modes of operation to use the same code, and allows
-# all data to be retreived in a single pass of a matrix file, or efficient DB 
-# queries. The pair hash list is an array of pairHashRefs. The pair hash is a 
+# all data to be retreived in a single pass of a matrix file 
+# The pair hash list is an array of pairHashRefs. The pair hash is a 
 # hash with two keys, 'set1' and 'set2' each of these keys holds an arrayRef of 
 # cuis which correspond to cuis in that set. This allows for lists of pairs of 
-# sets of CUIs to be computed, either through concept expansion or input as a 
-# set. In the case where only a single pair computation is needed, or rather 
+# sets of CUIs to be computed
+#  In the case where only a single pair computation is needed, or rather 
 # than a set, just a single cui is needed, each function still wraps the 
 # values into a pairHashList. 'set1' cuis are the leading cuis in the pair, and
 # 'set2 are the trailing cuis in the pair'
 
 
 # calculates association for a list of single cui pairs
-# input:  $cuiPairsFromFileRef - an array ref of comma seperated cui pairs  
-#                                the first in the pair is the leading, 
-#                                second in the pair is the trailing
+# input:  $cuiPairListRef - an array ref of comma seperated cui pairs  
+#                           the first in the pair is the leading, 
+#                           second in the pair is the trailing
 #         $measure - a string specifying the association measure to use
-# output: $score - the association between the cuis
+# output: \@scores - an array ref of scores corresponding to the assocaition
+#                    score for each of the pairHashes that were input
 sub calculateAssociation_termPairList {
     my $self = shift;
     my $cuiPairListRef = shift;
     my $measure = shift;
 
-    #create the cuiPairs hash datasetructure
+    #create the cuiPairs hash datastructure
     my @pairHashes = ();
     foreach my $pair (@{$cuiPairListRef}) {
 	#grab the cuis from the pair
@@ -341,7 +245,7 @@ sub calculateAssociation_setPair {
 
     #create the cuiPairs hash datasetructure
     my @pairHashes = ();
-    push @pairHashes, $self->createPairHash_termList($cuis1Ref, $cuis2Ref);
+    push @pairHashes, $self->_createPairHash_termLists($cuis1Ref, $cuis2Ref);
 
     #return the association score, which is the first (and only)
     # value of the return array
@@ -349,14 +253,37 @@ sub calculateAssociation_setPair {
 }
 
 
-# calculate association between a list of cui pairs
-# input:
-# output:
+# calculate association between a list of cui set pairs. The cui lists are
+# passed in as parallel arrays of sets of cuis, where assoc(cuis1[i], and cuis2[i]
+# are calcualted. 
+# input: \@cuis1Ref - an array ref to an array of arrays, where each element
+#                     of the array contains a set of cuis
+#        \@cuis2Ref - an array ref to an array of arrays of the same format as 
+#                     \@cuis1Ref
+#        $measure - a string specifying the association measure to use
+# \@scores - an array ref of scores corresponding to the assocaition
+#                    score for each of the pairHashes that were input
 sub calculateAssociation_setPairList {
+    my $self = shift;
+    my $cuis1Ref = shift;
+    my $cuis2Ref = shift;
+    my $measure = shift;
+    
+    #create the pair hash for each set of pairs
+    my @pairHashes = ();
+    for (my $i = 0; $i < scalar @{$cuis1Ref}; $i++) {
+	#turn the cui arrays into a hash ref
+	push @pairHashes, $self->_createPairHash_termLists(${$cuis1Ref}[$i],${$cuis2Ref}[$i]);
+    }
 
-#TODO
-
+    #return the array of association scores for each pair
+    return $self->_calculateAssociation_pairHashList(\@pairHashes, $measure);
 }
+
+
+
+
+
 
 ##########################################################################
 #                          PairHash Creators
@@ -375,34 +302,37 @@ sub _createPairHash_singleTerms {
     my %pairHash = ();
 
     #populate the @cuiLists
-    if ($conceptExpansion_G) {
-	#set the cui lists to the expanded concept
-	$pairHash{'set1'} = $self->_expandConcept($cui1);
-	$pairHash{'set2'} = $self->_expandConcept($cui2);
-    }
-    else {
-	#set the cui lists to the concept
-	my @cui1List = ();
-	push @cui1List, $cui1;
-	my @cui2List = ();
-	push @cui2List, $cui2;
+    #set the cui lists to the concept
+    my @cui1List = ();
+    push @cui1List, $cui1;
+    my @cui2List = ();
+    push @cui2List, $cui2;
 
-	$pairHash{'set1'} = \@cui1List;
-	$pairHash{'set2'} = \@cui2List;
-    }
+    $pairHash{'set1'} = \@cui1List;
+    $pairHash{'set2'} = \@cui2List;
+
     return \%pairHash;
 }
 
 
 # Creates a pair hash from two cui lists
-# input:
-# output:
+# input:  \@set1Ref - the leading cuis of the pair set 
+#         \@set2Ref - the trailing cuis of the pair set
+# output: \%pairHash - a ref to a pairHash
 sub _createPairHash_termLists {
     my $self = shift;
     my $set1Ref = shift;
     my $set2Ref = shift;
 
-    #TODO
+    #create the hash data structures
+    my %pairHash = ();
+
+    #set the cui lists to the pair hash directly
+    $pairHash{'set1'} = $set1Ref;
+    $pairHash{'set2'} = $set2Ref;
+    
+
+    return \%pairHash;
 
 }
 
@@ -441,13 +371,6 @@ sub _calculateAssociation_pairHashList {
 }
 
 # calculates an association score from the provided values
-# NOTE: Please be careful when writing code that uses this
-# method. Results may become inconsistent if you don't check
-# that CUIs occur in the hierarchy before calling
-# e.g. C0009951 does not occur in the SNOMEDCT Hierarchy but
-# it likely occurs in the association database so if not check
-# is made an association score will be calculate for it, but it has not
-# been done in reported results from this application
 # input:  $n11 <- n11 for the cui pair
 #         $npp <- npp for the dataset
 #         $n1p <- n1p for the cui pair
@@ -463,12 +386,17 @@ sub _calculateAssociation_fromObservedCounts {
     my $npp = shift;
     my $statistic = shift;
 
+    #print the values used in computation if debugging
+    if ($debug) {
+	print "-----n11, n1p, np1, npp = $n11, $n1p, $np1, $npp\n";
+    }
+
     #set frequency and marginal totals
     my %values = (n11=>$n11, 
 		  n1p=>$n1p, 
 		  np1=>$np1, 
 		  npp=>$npp); 
-    
+   
     #return cannot compute, or 0
     #if($n1p < 0 || $np1 < 0) { #NOTE, this kind of makes sense, says if there as an error then return -1
     # the method I am doing now just says if any didn't occurr in the dataset then return -1
@@ -485,7 +413,7 @@ sub _calculateAssociation_fromObservedCounts {
     }
 
     #set statistic module (Text::NSP)
-    my $includename = ""; my $usename = "";  my $ngram = 2; #TODO, what is this ngram parameter
+    my $includename = ""; my $usename = "";  my $ngram = 2; #NOTE: calculation actually change slightly with 3-grams, 4-grams, etc... does it make enough of a difference to matter?
     if ($statistic eq "freq") {
 	return $n11;
     }
@@ -553,32 +481,6 @@ sub _calculateAssociation_fromObservedCounts {
     return $statScore; 
 }
 
-#################################################
-#  Utilitiy Functions
-#################################################
-
-# Applies concept expansion by creating an array
-# of the input concept and all of its UMLS d
-# descendants
-# input : $cui - the cui that will be expanded
-# output:  \@cuis - the expanded concept array
-sub _expandConcept {
-    my $self = shift;
-    my $cui = shift;
-
-    #find all descendants
-    my $descendantsRef = $umls_G->findDescendants($cui);
-
-    #add all cuis to the expanded cuis list
-    my @cuis = ();
-    push @cuis, $cui;
-    foreach my $desc (keys %{$descendantsRef}) {
-	push @cuis, $desc;
-    }
-    
-    #return the expanded cuis array
-    return \@cuis;
-}
 
 1;
 
@@ -602,8 +504,8 @@ Sam Henry <henryst@vcu.edu>
 =head1 COPYRIGHT
 
  Copyright (c) 2015
- Bridget T. McInnes, Virginia Commonwealth University
- btmcinnes at vcu.edu
+ Sam Henry, Virginia Commonwealth University
+ henryst at vcu.edu
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software

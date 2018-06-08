@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html><head><title>How do I set up a custom domain with Plesk?</title></head><body>
+<strong>How do I set up a custom domain with Plesk?&nbsp;</strong><br />
+<br />
+First of all, before you try to set up a custom domain with Plesk, make sure that you understand the details of setting up a CNAME DNS record by reading this FAQ first:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=140"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=140">&nbsp;What is the recommended way to set up a custom domain?&nbsp;</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+You should also watch our Setup Video even though it shows the setup process using the NameCheap registrar. The video explains many important details that are common to setting up a custom domain no matter what registrar or control panel you are using:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=cnamedns" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=cnamedns" id="video-link-new">How To Set Up A Custom Domain Using a CNAME DNS Record</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+<strong>Setting up your custom domain with Plesk ...</strong><br />
+<br />
+<strong>Step 1:</strong>&nbsp;<strong>Create a CNAME record in the DNS Settings</strong><br />
+<br />
+From Plesk, open your domain and click on the &ldquo;DNS Settings&rdquo; tool. Plesk changes with every major&nbsp;release, but with a bit of poking around, you&rsquo;ll find something that looks like this:<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/plskpanel.png" /><br />
+<br />
+DNS Settings will show you all of the existing DNS records for your domain and give you the option to add new DNS records with an &ldquo;Add Record&rdquo; link near the top of the page.<br />
+<br />
+To add a new CNAME record, click on the &ldquo;Add Record&rdquo; link and fill in the fields.<br />
+<br />
+For example, if you want your custom tracking domain to be <code>www.yourdomain.com</code>, you&rsquo;d enter <strong>www</strong> in the &ldquo;Domain name&rdquo; section of the DNS entry, and point it to one of ClickMagick&rsquo;s domains. Use&nbsp;<code>www.clkm<strong>g</strong>.com</code>&nbsp;for tracking links and split tests or&nbsp;<code>www.clkm<strong>r</strong>.com</code>&nbsp;for rotators.<br />
+<br />
+Your entry should look like this:<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/plskcname.png" /><br />
+<br />
+Click the &ldquo;OK&rdquo; button and you should see this CNAME entry:<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/plskwwwent.png" /><br />
+<br />
+Plesk will not allow you to enter duplicate CNAME entries. If you get an error, either delete the existing entry and try again, or edit the existing entry and change its values to those above.<br />
+<br />
+If you don&rsquo;t want to use &ldquo;<strong>www</strong>.yourdomain.com&rdquo; for your tracking domain because it already points to another website, you&rsquo;ll want to set the Domain Name to something other than &ldquo;www&rdquo;.&nbsp; The word &ldquo;track&rdquo; is a good choice, giving you &ldquo;track.yourdomain.com&rdquo; as your tracking domain:<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/plsktrkent.png" /><br />
+<br />
+<br />
+<b>Step 2: Add your custom domain to ClickMagick</b><br />
+<br />
+Once you complete Step 1 above, the only other thing you need to do is add your custom domain to your ClickMagick account using the&nbsp;<strong><a href="/user/domains.cgi" target="_blank">Domain Manager</a></strong>.<br />
+<br />
+Be sure to add your custom domain exactly as you&rsquo;ve set it up in Step 1 above e.g. either <code>www.yourdomain.com</code> or <code>track.yourdomain.com</code> in the examples above.<br />
+<br />
+ClickMagick&rsquo;s Domain Manager will thoroughly test your domain when you try to add it. If the Domain Manager accepts the domain, then you&rsquo;ve set it up correctly and it&rsquo;s working perfectly! Otherwise, read and follow any error messages you get.<br />
+<br />
+<br />
+<b>Step 3: Create your custom domain without &ldquo;www.&rdquo; &nbsp;<em>(optional)</em></b><br />
+<br />
+If you&rsquo;re using your custom domain <em>only</em> for tracking purposes, you&rsquo;ll probably want to also set up the non-&rdquo;www.&rdquo; version of your domain (i.e., &ldquo;yourdomain.com&rdquo;). This would typically be the case if you&rsquo;ve just bought your domain specifically for tracking purposes.<br />
+<br />
+For example, if you just set up a CNAME record with a hostname of &ldquo;www&rdquo; as in Step 1 above, your tracking links will look like this:<br />
+<br />
+<code>http://www.yourdomain.com/linkID</code><br />
+<br />
+However, if you leave off the &ldquo;www.&rdquo; like this&hellip;<br />
+<br />
+<code>http://yourdomain.com/linkID</code><br />
+<br />
+&hellip; the tracking domain will NOT work.<br />
+<br />
+You have to set the non-&ldquo;www.&rdquo; version up as well, and because the non-&ldquo;www.&rdquo; domain does not have a hostname, you cannot use a CNAME record to properly set it up. Instead, you need to use an &ldquo;A&rdquo; record.<br />
+<br />
+<em><span style="background-color: rgb(255, 255, 224);">Caution: you cannot make this change if you have any existing content at &ldquo;yourdomain.com&rdquo;. The second you add the &ldquo;A&rdquo; record, your domain will point to ClickMagick and not to your original website. This will break your existing website if you have one, and that includes a WordPress blog.</span></em><br />
+<br />
+If you&rsquo;re unsure whether you have existing content, just enter your domain without the &ldquo;www.&rdquo; and see what pulls up. If it&rsquo;s a website you want to keep, then you can&rsquo;t add the &ldquo;A&rdquo; record or you will lose that website&hellip;<br />
+<br />
+<span style="background-color: rgb(255, 255, 255);">To get started, if there&rsquo;s an existing &ldquo;A&rdquo; record that has just your domain with nothing in front of it, then you&rsquo;ll need to delete it. You will almost certainly have to do this step. An existing entry will look like this, but with a different IP address:<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/plskaent.png" /></span><br />
+<br />
+Next, add a new &ldquo;A&rdquo; record, leaving the Domain Name field blank. Set the IP address to&nbsp;<strong>50.97.212.250</strong> for tracking domains or&nbsp;<strong>50.97.212.251</strong> for rotator domains:<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/plskarec.png" /><br />
+<br />
+Click &ldquo;OK&rdquo; and your &ldquo;A&rdquo; record is all set up! Your final complete setup&mdash;without duplicates&mdash;should look like this:<br />
+<br />
+<img alt="" src="//cdn.clickmagick.com/images/user/faqs/plskfinalsetup.png" style="width: 600px; height: 95px;" /><br />
+<br />
+You will see other entries in your DNS records, but as long as you have only one entry for <code>www.yourdomain.com</code> and only one &ldquo;A&rdquo; record entry for <code>yourdomain.com</code>, then you&rsquo;ve set it up correctly.<br />
+<br />
+<br />
+<strong>Step 4:&nbsp;</strong><b>Add your custom domain (without &ldquo;www.&rdquo;) to ClickMagick</b><br />
+<br />
+Finally, you have to also add the non-www version of your domain to your&nbsp;<strong><a href="/user/domains.cgi" target="_blank">Domain Manager</a></strong><br />
+and you&rsquo;ll be all set.
+</body></html>

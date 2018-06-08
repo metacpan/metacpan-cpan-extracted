@@ -1,3 +1,10 @@
+2.28  08/06/2018 (madroach, ARC, OCBNET, ppisar)
+- fix creating file with trailing whitespace on filename - fixes 103279
+- allow archiving with absolute pathnames - fixes 97748
+- small POD fix
+- Speed up extract when archive contains lots of files
+- CVE-2018-12015 directory traversal vulnerability [RT#125523]
+
 2.26  12/05/2017
 - '0' is a valid name for an archive, change 'iter' to check definedness
 

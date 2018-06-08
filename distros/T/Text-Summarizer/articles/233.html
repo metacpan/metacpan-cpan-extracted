@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html><head><title>How are duplicate conversions recorded?</title></head><body>
+<strong>How are duplicate conversions recorded?</strong><br />
+<br />
+By default, duplicate conversions generated from <strong><a href="/user/faqs.cgi?answer=203">tracking pixels</a></strong> are ignored to keep your stats as accurate as possible. For example, you wouldn&rsquo;t want the same pixel to fire over and over if someone kept refreshing the page where you had a pixel&hellip;<br />
+<br />
+<br />
+<strong>What exactly is a duplicate conversion?</strong><br />
+<br />
+When a pixel fires, ClickMagick looks at the type of pixel (Action, Engagement, or Sales) and at the &ldquo;Reference&rdquo; value for the pixel. It then checks to see if that type of pixel with that exact &ldquo;Ref&rdquo; value has ever been fired for this particular visitor.<br />
+<br />
+If an exact pixel has fired before, the conversion is considered to be a duplicate and is ignored.<br />
+<br />
+Let&rsquo;s look at an example &hellip;<br />
+<br />
+Suppose you have a primary offer in you funnel, and an upsell. Let&rsquo;s suppose&nbsp;they both use a Sales pixel but neither has a &ldquo;Ref&rdquo; value. When the second, upsell, pixel fires it will be ignored because both pixels are sales pixels that have the same &ldquo;Ref&rdquo; value (in this case nothing), <em>and</em> it&rsquo;s the same vistor.<br />
+<br />
+Clearly, this is not&nbsp;what you want.<br />
+<br />
+In this case, if you want both Sales pixels to be considered unique, you must set different &ldquo;Ref&rdquo; values for each one.<br />
+<br />
+Fortunately, it&rsquo;s really easy to set the &ldquo;Ref&rdquo; value in&nbsp;<strong><a href="/user/action/tools/pixelb.cgi" target="_blank">Pixel Builder</a></strong>&nbsp;when you create your pixels. Just enter enter a unique value in this line for each pixel you create:<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq295refval.jpg" /><br />
+<br />
+If you&rsquo;re using a lot of tracking links, you might want to adopt a naming strategy for your &ldquo;Ref&rdquo;&nbsp;values, such as using the name of the funnel or tracking link followed by a dash and then the purpose of the pixel. For example:<br />
+<br />
+<code>golfclubs-optin<br />
+golfclubs-bonuses<br />
+golfclubs-clubset<br />
+golfclubs-golfballs<br />
+golfclubs-golfglove</code><br />
+&hellip;<br />
+<br />
+&nbsp;
+<div class="faq-tip"><b>Tip:</b> It&rsquo;s considered a Best Practice to give every pixel you create a unique &ldquo;Ref&rdquo; value to avoid unintentional duplicate conversions. Giving every pixel a unque &ldquo;Ref&rdquo; value also makes using the <strong><a href="/user/pixeltest.cgi" target="_blank">Pixel Debugger</a></strong> much easier because you can instantly see every pixel that has fired. If you don&rsquo;t find a pixel in the Pixel Debugger&rsquo;s history of pixels fired, either the pixel is a duplicate and wasn&rsquo;t recorded, or the pixel never fired in the first place.</div>
+<br />
+<br />
+<br />
+<strong>Reviewing your Stats</strong><br />
+<br />
+If your sales funnel has multiple Actions, Engagements, or Sales, they will show up in your stats-at-a-glance, but all Actions will be lumped together as a single unique action per visitor, as will all Engagments and Sales.<br />
+<br />
+If you&rsquo;re familiar with Sub-IDs for tracking links, the &ldquo;Ref&rdquo; value is kind of like that for pixels.<br />
+<br />
+To be clear, if you have two Action pixels, one with the &ldquo;Ref&rdquo; value <code>golfclubs-optin</code> and the other with <code>golfclubs-bonuses</code> and both pixels fire, both will be recorded, but you&rsquo;ll only see 1 Action recorded in your stats-at-a-glance for that user.<br />
+<br />
+To see the breakdown of your Action pixels, click on the number in the A column. Notice in this screenshot how there&rsquo;s only 1 action in the A column, but the breakdown shows two actions with their &ldquo;Ref&rdquo;&nbsp;values:<br />
+<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq295actions.jpg" /><br />
+<br />
+<br />
+You can think of the A, E, and S columns as &ldquo;the number of people who made <em>some kind</em> of action, engagement, or sale.&rdquo;<br />
+<br />
+The stats-at-a-glance don&rsquo;t show the <em>total</em> number.<br />
+<br />
+This is similar to how the TC and UC counts work together.<br />
+<br />
+&nbsp;
+<div class="faq-tip"><b>Tip:</b> There are some legitimate situations where you would actually want to have duplicate conversions recorded. If you think that might be the case for you, check out this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=178"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=178">&nbsp;When might I want to track duplicate conversions?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+</body></html>

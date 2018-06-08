@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html><head><title>Can I pass data to my affiliate links or autoresponder?</title></head><body>
+<b>Can I pass data to my affiliate links or autoresponder?</b><br />
+<br />
+You betcha&mdash;you just need to use a little magick.<br />
+<br />
+The trick is to pass the data from one page to the next through either query string parameters or hidden&nbsp;form fields, using some JavaScript code to dynamically update the pages.<br />
+<br />
+The way it works is pretty simple. When the page is loaded, the JavaScript code will search for all occurrences of the Sub-ID tokens <code>[s1]</code> through <code>[s5]</code> in the <code>((body))</code> section of the page and replace them with the corresponding <code>s1</code> through <code>s5</code> query string values passed to the page.<br />
+<br />
+This lets you set values in links and hidden form fields without actually knowing what those values will be ahead of time. Just insert the tokens as placeholders and the&nbsp;magick&nbsp;will happen.<br />
+<br />
+Query strings are a pretty important part of passing data to affiliate links, so if you don&rsquo;t know what a query string is and how you pass data using them, you should study the following FAQ until you feel totally comfortable with the topic:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b style="box-sizing: border-box;"><a href="/user/faqs.cgi?answer=177" style="box-sizing: border-box; background: transparent;">What is a &ldquo;query string&rdquo;?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+Finally, for each page that you want to pass data through, simply follow these steps:<br />
+&nbsp;
+<form name="would "><strong>Step 1:</strong> Add the following Sub-ID code to the very end of your page, just before the closing <code>((/body))</code> tag. (Some Page Builders call this the &ldquo;footer&rdquo; section, not to be confused with the <code>((footer))</code>&hellip; <code>((/footer))</code> tags.)<br />
+<br />
+<input class="tracking_link" onclick="this.select();" size="85" type="text" value="<script type='text/javascript' src='//cdn.clickmagick.com/misc/js/pass_subidsv2.js'></script>" />&nbsp;<br />
+<br />
+This is the code that dynamically replaces the <code>[s1]</code> through <code>[s5]</code> tokens in the <code>((body))</code> section of your page with the actual values of the <code>s1</code> through <code>s5</code> query string values passed to the page.</form>
+&nbsp;
+
+<div class="faq-caution"><b>Caution:</b> If you insert this Sub-ID JavaScript code at the top of the <code>((body))</code>&nbsp;section it won&rsquo;t work correctly and may also cause your page to flicker or flash momentarily. To&nbsp;work correctly, this JavaScript code must be inserted as close to the final <code>((/body))</code> tag as possible.</div>
+<br />
+<br />
+<strong>Step 2:</strong> The next step is to use the Sub-ID tokens <code>[s1]</code>, <code>[s2]</code>, <code>[s3]</code>, <code>[s4]</code> and <code>[s5]</code> in the <code>((body))</code> section of your page wherever you want the corresponding <code>s1</code> through <code>s5</code> query string values to be inserted.<br />
+<br />
+For example, if you want to add the value of the <code>s1</code> query string parameter to the end of your ClickBank affiliate link, you&rsquo;d do it like this:<br />
+<br />
+<code>http://xxx.yyy.hop.clickbank.net/?tid=<strong>[s1]</strong></code><br />
+<br />
+If you want to pass any of the <code>s1</code> through <code>s5</code> query string values to a ClickMagick tracking link on the page, simply insert the tokens as Sub-IDs for the link:<br />
+<br />
+<code>http://www.clkmg.com/$username/somelink/<strong>[s1]</strong>/<strong>[s2]</strong>/<strong>[s3]</strong></code><br />
+&nbsp;
+<div class="faq-caution"><b>Caution:</b> You cannot use the <code>[s1]</code> through <code>[s5]</code> tokens in the <code>((head))</code> section&nbsp;of a page. Replacing text in the <code>((head))</code> section is undefined behavior in HTML and does not work in all&nbsp;browsers.</div>
+<br />
+<br />
+<strong>Step 3:</strong> The <code>[s1]</code> through <code>[s5]</code> tokens won&rsquo;t work between <code>((script))</code>&hellip;<code>((/script))</code> tags. If you need to use any of the <code>s1</code> through <code>s5</code> query string values in existing JavaScript code, you must use the JavaScript variables <code>qsubids.s1</code>, <code>qsubids.s2</code> etc. to &ldquo;build&rdquo; the URL.<br />
+<br />
+For example, instead of writing this link in your JavaScript code...<br />
+<br />
+<code>window.open(&quot;http://www.site.com?s1=[s1]&amp;s2=[s2]&quot;); &nbsp; // Incorrect</code><br />
+<br />
+... which won&rsquo;t work, you would need to code it this way:<br />
+<br />
+<code>window.open(&quot;http://www.site.com?s1=&quot; + qsubids.s1 + &quot;&amp;s2=&quot; + qsubids.s2);</code><br />
+<br />
+Similarly, if you want to pass query string values to a ClickMagick tracking link in JavaScript code, you can&rsquo;t write...<br />
+<br />
+<code>window.open(&quot;http://www.clkmg.com/$username/somelink/[s1]/[s2]&quot;); &nbsp;// Incorrect</code><br />
+<br />
+... which also won&rsquo;t work. Instead, you would have to code it like this:<br />
+<br />
+<code>window.open(&quot;http://www.clkmg.com/$username/somelink/&quot; + qsubids.s1 + &quot;/&quot; + qsubids.s2);</code><br />
+<br />
+<br />
+<strong>Step 4:</strong> Once you have your page set up, you can link to it by passing your Sub-ID values to your page by adding a query string to your link like this:<br />
+<br />
+<code>http://www.site.com/page.html<strong>?s1=val1&amp;s2=val2&amp;s3=val3&amp;s4=val4&amp;s5=val5</strong></code><br />
+<br />
+All of the Sub-IDs are optional, so you can omit any <code>name=value</code> pair or just leave the value blank for any Sub-ID you&rsquo;re not using.<br />
+<br />
+<br />
+<strong>Step 5:</strong> If you need to pass Sub-IDs to multiple pages through a funnel, just repeat this process for every applicable page and then chain them all together.<br />
+<br />
+Just remember that if you&rsquo;re chaining two pages together through a tracking link rather than by a direct link, the Primary URL of the tracking link should pass on the Sub-ID values it gets by using the same <code>[s1]</code>-<code>[s5]</code> tokens:<br />
+<br />
+<span style="color:#000000;">Primary URL:&nbsp;<code>http://www.site.com/nextpage.html?s1=[s1]&amp;s2=[s2]&amp;s3=...&nbsp;</code></span><br />
+<br />
+<br />
+<strong>Demo:</strong> Here&rsquo;s a demo page with the JavaScript installed. Play with the query string parameters so you can see the code in action &hellip;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="https://www.clickmagick.com/user/misc/pass_subids.html?s1=&amp;s2=&amp;s3=&amp;s4=&amp;s5=" target="_blank"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="https://www.clickmagick.com/user/misc/pass_subids.html?s1=&amp;s2=&amp;s3=&amp;s4=&amp;s5=" target="_blank">Demo Page</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+<b>Passing Data to your Autoresponder</b><br />
+<br />
+To pass one or more Sub-IDs (including the click ID) through an email opt-in form, the best way is to pass the value through the Thank You page URL in the HTML generated by your autoresponder form editor.<br />
+<br />
+Most autoresponders today have&nbsp;editors where you can design the opt-in form for your email opt-in page.<br />
+<br />
+As you edit your form, look for a &ldquo;Thank You&rdquo; page setting or &ldquo;Success&rdquo; page URL setting and point it to the next page in your funnel.<br />
+<br />
+Once you&rsquo;ve created the opt-in form, you&rsquo;re generally asked to &ldquo;publish&rdquo; it.&nbsp;You&rsquo;re typically given two formats to publish your form in: an HTML version and a JavaScript version.<br />
+<br />
+We&rsquo;re hoping to find the &ldquo;Thank You&rdquo; page or &ldquo;Success&rdquo; page URL somewhere in the HTML or JavaScript code. If we find that, then passing sub-IDs (and the click ID) is super easy.<br />
+&nbsp;<br />
+For instance, suppose your HTML looks something like this:<br />
+<br />
+<code>((form action=&rdquo;...&rdquo;))<br />
+&nbsp;&nbsp;&nbsp;...​<br />
+&nbsp;&nbsp;&nbsp;((input type=&rdquo;hidden&rdquo; name=&rdquo;thankyou_url&rdquo; value=&rdquo;http://www.site.com/thankyou.html&quot;))<br />
+&nbsp;&nbsp;&nbsp;...​<br />
+((/form))</code><br />
+<br />
+Here you see a &ldquo;hidden&rdquo; URL with &ldquo;thankyou&rdquo; in the name and a value that points to the Thank You page you specified when you created the form.<br />
+<br />
+To pass your Sub-ID, you simply need to add the <code>[s1]</code>&mdash;<code>[s5]</code> tokens to the Thank You page URL. So, if you were passing the click ID through the <code>s1</code> query string variable, you would create (or add) the <code>s1</code> variable to the URL:<br />
+<br />
+<code>((input type=&quot;hidden&quot; name=&quot;thankyou_url&quot; value=&quot;http://www.site.com/thankyou.html<strong>?s1=[s1]</strong>&quot;))</code><br />
+<br />
+If you&rsquo;ve added the JavaScript Sub-ID code from <strong>Step 1</strong>, this will take the <code>s1</code> value that was passed to your opt-in page, and pass it right along to your Thank You page after the visitor&rsquo;s email address has been captured.<br />
+<br />
+You can see this entire set up process for both the Aweber and GetResponse autoresponders in this video from our Video Tutorials section:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=affnetworkar" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=affnetworkar" id="video-link-new">How to pass Sub-IDs through Email Opt-in Forms</a></b></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<div class="faq-tip"><b>Tip:</b>&nbsp;The &ldquo;[&rdquo;&nbsp;and &ldquo;]&rdquo; characters are not allowed in URLs, so some autoresponders won&rsquo;t let you directly enter the <code>[s1]</code>-<code>[s5]</code> tokens in the Thank You page URLs of their forms. If you run into this restriction, simply enter a fake URL for&nbsp;the Thank You page URL, then once you generate the autoresponder HTML for the form, simply replace the fake URL in the HTML code with the actual Thank You page URL that contains the <code>[s1]</code>-<code>[s5]</code> tokens.</div>
+<br />
+<br />
+<strong>What if there isn&rsquo;t a Thank You page URL?</strong><br />
+<br />
+If your autoresponder doesn&rsquo;t generate HTML code&nbsp;or doesn&rsquo;t include the Thank You page URL when it does, then check the JavaScript code that it generates and look for the URL there. If you find one, follow the instructions in <strong>Step 3</strong> to modify the JavaScript code correctly.<br />
+<br />
+If for some reason, you simply cannot edit the Thank You page URL in the HTML or JavaScript code generated by your autoresponder, then you&rsquo;ll need to read their&nbsp;documentation to see how you can pass &ldquo;custom values&rdquo; through their system.<br />
+<br />
+If you can&rsquo;t immediately find help for passing &ldquo;custom values&rdquo;, contact your autoresponder service for help with this. Remember, they know their system inside out and they are the experts for their system, not us &hellip;<br />
+<br />
+Generally speaking, if you can&rsquo;t modify the Thank You page URL, you&rsquo;ll instead have to pass custom values in hidden data fields like this:<br />
+<br />
+<code>((input type=&rdquo;hidden&rdquo; name=&rdquo;custom1&rdquo; value=&rdquo;[s1]&rdquo;))</code><br />
+<code>((input type=&rdquo;hidden&rdquo; name=&rdquo;custom2&rdquo; value=&rdquo;[s2]&rdquo;))</code><br />
+etc.<br />
+<br />
+Once you&rsquo;ve done this, you can then pass the custom values on to your Thank You page URL using whatever tokens your autoresponder system supports. You&rsquo;ll need to set that part up inside your autoresponder settings.<br />
+<br />
+If you need help configuring your autoresponder to pass custom values, contact the support folks for your autoresponder for help with this.<br />
+&nbsp;
+<div class="faq-caution"><b>Caution:</b> Modifying the <code>((head))</code>&hellip;<code>((/head))</code> section of your page is unpredictable, which means you can&rsquo;t use the&nbsp;<code>[s1]</code>-<code>[s5]</code> tokens anywhere in your page header. It is especially important to remember that you cannot use these tokens in a &ldquo;meta refresh&rdquo; tag and expect them to work.<br />
+<br />
+<code><span style="color: rgb(0, 128, 0);">// This meta refresh will not work reliably...</span></code><br />
+<code>((meta http-equiv=&quot;refresh&quot; content=&quot;3; url=http://mylink.com?s1=[s1]&quot;))</code><br />
+<br />
+The need for a &ldquo;meta refresh&rdquo; usually comes up when you&rsquo;re trying to create an intermediate or interstitial&nbsp;page to fire a tracking pixel. ClickMagick has a more effective approach using the advanced&nbsp;<em>Pixel/Code</em> feature of tracking links. You can get all the details in this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=208"><img src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle; width: 17px; height: 20px;" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=208">How can I set up an intermediate page to fire a pixel?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+</body></html>

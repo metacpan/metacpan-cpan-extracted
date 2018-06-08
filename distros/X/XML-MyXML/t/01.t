@@ -13,23 +13,23 @@ my $xml = "<(ng-something)><eur>10</eur><usd>8</usd></(ng-something)>";
 my $simple = xml_to_simple($xml);
 
 is_deeply($simple, {
-	'(ng-something)' => {
-		eur => 10,
-		usd => 8,
-	}
+    '(ng-something)' => {
+        eur => 10,
+        usd => 8,
+    }
 }, 'xml_to_simple, tagname with symbols');
 
 $xml = "<item><name>Τραπέζι</name><price><usd>10.00</usd><eur>8.50</eur></price></item>";
 $simple = xml_to_simple($xml);
 
 is_deeply($simple, {
-	item => {
-		name => 'Τραπέζι',
-		price => {
-			usd => '10.00',
-			eur => '8.50',
-		},
-	},
+    item => {
+        name => 'Τραπέζι',
+        price => {
+            usd => '10.00',
+            eur => '8.50',
+        },
+    },
 }, 'xml_to_simple');
 
 my $obj = xml_to_object($xml);
@@ -37,13 +37,13 @@ is($obj->path('price/eur')->value, '8.50', 'xml_to_object & path & value');
 is($obj->path('name')->value, 'Τραπέζι', 'value wide-characters');
 
 $simple = {
-	item => [
-		name => 'Τραπέζι',
-		price => [
-			usd => '10.00',
-			eur => '8.50',
-		],
-	],
+    item => [
+        name => 'Τραπέζι',
+        price => [
+            usd => '10.00',
+            eur => '8.50',
+        ],
+    ],
 };
 
 my $xml2 = simple_to_xml($simple);
@@ -71,13 +71,13 @@ close $thatfh1;
 simple_to_xml($simple, { save => $filename1 });
 my $test_smp = xml_to_simple($filename1, { file => 1 });
 is_deeply($test_smp, {
-	item => {
-		name => 'Τραπέζι',
-		price => {
-			usd => '10.00',
-			eur => '8.50',
-		},
-	},
+    item => {
+        name => 'Τραπέζι',
+        price => {
+            usd => '10.00',
+            eur => '8.50',
+        },
+    },
 }, 'simple_to_xml (save) and xml_to_simple (file)');
 
 # TEST NO-STRIPNS TAG
@@ -90,11 +90,11 @@ is($obj->tag({ strip_ns => 1 }), 'μαθητής', 'tag stripped_ns');
 # TEST STRIP_NS XML_TO_SIMPLE
 $simple = xml_to_simple($xml, { strip_ns => 1 });
 is_deeply($simple, {
-	'μαθητής' => 'Peter',
+    'μαθητής' => 'Peter',
 }, 'xml_to_simple with strip_ns');
 $simple = xml_to_simple($xml);
 is_deeply($simple, {
-	'school:μαθητής' => 'Peter',
+    'school:μαθητής' => 'Peter',
 }, 'xml_to_simple without strip_ns');
 
 # TEST QUICK-CLOSE
@@ -133,9 +133,9 @@ ok( ! check_xml('<person>'), 'check_xml 2' );
 note 'checking weakened refs';
 my ($ch1, $ch2);
 {
-	$xml = '<items><item>Table</item><item>Chair</item></items>';
-	$obj = xml_to_object($xml);
-	($ch1, $ch2) = $obj->path('item');
+    $xml = '<items><item>Table</item><item>Chair</item></items>';
+    $obj = xml_to_object($xml);
+    ($ch1, $ch2) = $obj->path('item');
 }
 is($ch1->to_xml, '<item>Table</item>', 'item1');
 is($ch2->to_xml, '<item>Chair</item>', 'item2');
@@ -148,94 +148,94 @@ $xml = <<'EOB';
 <!ENTITY copyright "Alex">
 <!ENTITY author "Alex">
 <person>
-	<author>&author;</author>
-	<copy>&copyright;</copy>
+    <author>&author;</author>
+    <copy>&copyright;</copy>
 </person>
 EOB
 $simple = xml_to_simple($xml, {internal => 1});
 is_deeply($simple, {
-	author => 'Alex',
-	copy => 'Alex',
+    author => 'Alex',
+    copy => 'Alex',
 }, 'matching entities');
 
 # PATH TESTS
 note 'path tests';
 {
-	$xml = <<'EOB';
-		<people>
-			<student class="B">
-				<name>
-					<first>Alex</first>
-					<last>Karelas</last>
-				</name>
-			</student>
-			<student class="A">
-				<name>
-					<first>John</first>
-					<last>Doe</last>
-				</name>
-			</student>
-			<teacher class="A">
-				<name>
-					<first>Mary</first>
-					<last>Poppins</last>
-				</name>
-			</teacher>
-			<teacher class="A">
-				<name>
-					<first>Peter</first>
-					<last>Gabriel</last>
-				</name>
-			</teacher>
-			<teacher class="High ] C">
-				<name>
-					<first>Barbara</first>
-					<last>Mullins</last>
-				</name>
-			</teacher>
-		</people>
+    $xml = <<'EOB';
+        <people>
+            <student class="B">
+                <name>
+                    <first>Alex</first>
+                    <last>Karelas</last>
+                </name>
+            </student>
+            <student class="A">
+                <name>
+                    <first>John</first>
+                    <last>Doe</last>
+                </name>
+            </student>
+            <teacher class="A">
+                <name>
+                    <first>Mary</first>
+                    <last>Poppins</last>
+                </name>
+            </teacher>
+            <teacher class="A">
+                <name>
+                    <first>Peter</first>
+                    <last>Gabriel</last>
+                </name>
+            </teacher>
+            <teacher class="High ] C">
+                <name>
+                    <first>Barbara</first>
+                    <last>Mullins</last>
+                </name>
+            </teacher>
+        </people>
 EOB
-	my $obj = xml_to_object($xml);
-	my @people1 = map $_->simplify({internal => 1}), $obj->path('student');
-	my @people2 = map $_->simplify({internal => 1}), $obj->path('/people/student');
-	is_deeply(\@people1, [
-		{
-			name => {
-				first => 'Alex',
-				last => 'Karelas',
-			},
-		},
-		{
-			name => {
-				first => 'John',
-				last => 'Doe',
-			},
-		},
-	], 'people1');
-	is_deeply(\@people2, \@people1, 'people2');
-	@people1 = map $_->simplify, $obj->path('student[class=A]');
-	@people2 = map $_->simplify, $obj->path('/people/student[class=A]');
-	my @people3 = map $_->simplify, $obj->path('student[class="A"]');
-	is_deeply(\@people1, [
-		{
-			student => {
-				name => {
-					first => 'John',
-					last => 'Doe',
-				},
-			},
-		},
-	], 'people1 2');
-	is_deeply(\@people2, \@people1, 'people2 2');
-	is_deeply(\@people3, \@people1, 'quotes in attr values');
-	@people1 = map $_->simplify, $obj->path('/peoples/student');
-	is_deeply(\@people1, [], 'paths first element compares ok');
-	is($obj->path('/people')->tag, 'people', 'identity path');
-	is($obj->path('/')->tag, 'people', 'identity path 2');
-	my @names_a = map $_->value, $obj->path('/people/[class=A]/name/first');
-	is_deeply(\@names_a, ['John', 'Mary', 'Peter'], 'multiple deep paths');
-	my $special = $obj->path('teacher[class="High ] C"]/name/first')->value;
-	is($special, 'Barbara', 'closing square bracket in attr value');
+    my $obj = xml_to_object($xml);
+    my @people1 = map $_->simplify({internal => 1}), $obj->path('student');
+    my @people2 = map $_->simplify({internal => 1}), $obj->path('/people/student');
+    is_deeply(\@people1, [
+        {
+            name => {
+                first => 'Alex',
+                last => 'Karelas',
+            },
+        },
+        {
+            name => {
+                first => 'John',
+                last => 'Doe',
+            },
+        },
+    ], 'people1');
+    is_deeply(\@people2, \@people1, 'people2');
+    @people1 = map $_->simplify, $obj->path('student[class=A]');
+    @people2 = map $_->simplify, $obj->path('/people/student[class=A]');
+    my @people3 = map $_->simplify, $obj->path('student[class="A"]');
+    is_deeply(\@people1, [
+        {
+            student => {
+                name => {
+                    first => 'John',
+                    last => 'Doe',
+                },
+            },
+        },
+    ], 'people1 2');
+    is_deeply(\@people2, \@people1, 'people2 2');
+    is_deeply(\@people3, \@people1, 'quotes in attr values');
+    @people1 = map $_->simplify, $obj->path('/peoples/student');
+    is_deeply(\@people1, [], 'paths first element compares ok');
+    is($obj->path('/people')->tag, 'people', 'identity path');
+    is($obj->path('/')->tag, 'people', 'identity path 2');
+    my @names_a = map $_->value, $obj->path('/people/[class=A]/name/first');
+    is_deeply(\@names_a, ['John', 'Mary', 'Peter'], 'multiple deep paths');
+    my $special = $obj->path('teacher[class="High ] C"]/name/first')->value;
+    is($special, 'Barbara', 'closing square bracket in attr value');
 }
 
 # BYTES FLAG
@@ -247,16 +247,16 @@ is($obj->to_xml, '<ατομο><ονομα>Γιώργος</ονομα></ατομ�
 is($obj->to_xml({bytes => 1}), encode_utf8('<ατομο><ονομα>Γιώργος</ονομα></ατομο>'), 'to_xml with bytes flag');
 $tidy_xml = <<EOB;
 <ατομο>
-	<ονομα>Γιώργος</ονομα>
+    <ονομα>Γιώργος</ονομα>
 </ατομο>
 EOB
 is($obj->to_xml({bytes => 1, tidy => 1}), encode_utf8($tidy_xml), 'to_xml with bytes and tidy flags');
 is($obj->to_tidy_xml({bytes => 1}), encode_utf8($tidy_xml), 'to_tidy_xml with bytes flag');
 $simple = xml_to_simple(encode_utf8($xml), {bytes => 1});
 is_deeply($simple, {
-	'ατομο' => {
-		'ονομα' => 'Γιώργος',
-	},
+    'ατομο' => {
+        'ονομα' => 'Γιώργος',
+    },
 }, 'xml_to_simple with bytes flag');
 is simple_to_xml($simple, {bytes => 1}), encode_utf8($xml), 'simple_to_xml with bytes flag';
 

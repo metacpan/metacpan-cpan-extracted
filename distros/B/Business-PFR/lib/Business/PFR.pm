@@ -1,8 +1,5 @@
 package Business::PFR;
-{
-  $Business::PFR::VERSION = '1.0.1';
-}
-
+$Business::PFR::VERSION = '1.0.2';
 use strict;
 use warnings FATAL => 'all';
 use utf8;
@@ -80,9 +77,9 @@ sub _check_is_valid {
 sub _get_check_digit {
     my ($self, $sum) = @_;
 
-    return '00' if $sum == 100;
+    my ($digit) = sprintf("%02d", $sum % 101) =~ /(\d{2})\z/;
 
-    return sprintf("%02d", $sum % 101);
+    return $digit;
 }
 
 1;
@@ -99,7 +96,7 @@ Business::PFR - validate Russian pension fund number
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.2
 
 =head1 SYNOPSIS
 

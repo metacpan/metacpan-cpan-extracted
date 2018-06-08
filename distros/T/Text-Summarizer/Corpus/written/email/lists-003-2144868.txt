@@ -1,0 +1,27 @@
+
+
+
+docno="lists-003-2144868"
+received="Tue May 18 20:20:31 1993 EST" 
+sent="Wed, 19 May 1993 12:17:09 +0900 (JST)" 
+name="Masataka Ohta" 
+email="mohta@necom830.cc.titech.ac.jp" 
+subject="Re: CHARSET considerations" 
+id="9305190317.AA01493@necom830.cc.titech.ac.jp" 
+inreplyto="01GYBXHRZVEA8Y5JAE@INNOSOFT.COM" 
+
+To: TROTH@ricevm1.rice.edu (Rick Troth)
+Cc: scs@adam.mit.edu, pine-info@cac.washington.edu, ietf-charsets@INNOSOFT.COM,
+
+
+
+
+I don't know what pine is.
+
+But, could you please discuss on pine specific features in pine ML
+only?
+
+                                        Masataka Ohta
+
+
+

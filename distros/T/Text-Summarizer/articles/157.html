@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html><head><title>Internal FAQ Style Guide</title></head><body>
+This FAQ Style Guide shows the conventions we use for ClickMagick FAQs so that they have a consistent look-and-feel to them.<br />
+&nbsp;
+<div class="faq-note"><b>Note:</b> There are many FAQs that were written before these formatting guidelines were in place. When you notice something that doesn&rsquo;t conform to this style guide, take a moment to update it.</div>
+<br />
+<br />
+<br />
+<strong>Setting Up the FAQ Editor</strong><br />
+<br />
+Before getting into the style guide, you should make sure that the FAQ Editor&rsquo;s AutoCorrect options are configured so that a lot of basic formatting guidelines happen automatically.<br />
+<br />
+By default, the FAQ Editor converts links into hyperlinks as you type and we don&rsquo;t want to do that. To turn off this AutoCorrect feature, you need to open the <strong>AutoCorrect Options</strong> shown here:<br />
+<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq214edoptions.jpg" /><br />
+<br />
+<br />
+You should set the same options for both the <strong>AutoFormat As You Type</strong> and <strong>AutoFormat</strong> tabs.<br />
+<br />
+We <em>do</em> want to use curly quotes and use real dashes, so those options should be checked. Just use the exact settings shown in the screenshot above and everything should work just fine.<br />
+<br />
+<br />
+<strong>Using Abbreviations</strong><br />
+<br />
+As a general rule, it&rsquo;s never a great idea to use abbreviations in business communication unless there&rsquo;s a strong need to. In particular, always fully spell out &ldquo;ClickMagick&rdquo;&nbsp;and never use only &ldquo;CM&rdquo;&nbsp;in the FAQs, or in any communication with our users.<br />
+<br />
+The types of abbreviations we want to avoid are known as &ldquo;lazy&rdquo; abbreviations, such as using &ldquo;info&rdquo; for &ldquo;information.&rdquo; One exception to this is the word &ldquo;stats&rdquo; which is standard jargon in the click-tracking world.&nbsp;<br />
+<br />
+Acronyms such as &ldquo;OTO&rdquo; for &ldquo;one-time-offer,&rdquo; etc., should be also avoided unless it would sound awkward saying them each time. If you do need to use acronyms, use the full phrase at least once with a parenthetical reference to the acronym. For example, &ldquo;if you have a one-time-offer (OTO), you can always...&rdquo;.<br />
+<br />
+Feel free to use <em>contractions</em> in words. Those are perfectly acceptable.<br />
+<br />
+<br />
+<strong>Spell out Small Numbers</strong><br />
+<br />
+When using numbers to specify &ldquo;a number of things,&rdquo; spell out the numbers 0 through 9. For example, write &ldquo;three URLs&rdquo; instead of &ldquo;3 URLs.&rdquo; This is standard practice in technical writing.<br />
+<br />
+<br />
+<strong>Formatting Tokens, HTML, and JavaScript</strong><br />
+<br />
+All types of computer code should be formatted using the <em>Styles &gt; Computer Code</em> format in the FAQ Editor. You should use this formatting for code even if it is in the middle of a paragraph of text. This eliminates the need to use quotation marks or bold formatting for the code. Here&rsquo;s how a link using the Computer Code formatting should look:<br />
+<br />
+<code>http://bestcoolproducts.com/golf</code><br />
+<br />
+<br />
+<strong>Showing HTML Tags or the Characters &ldquo;&lt;&rdquo; and &ldquo;&gt;&rdquo;</strong><br />
+<br />
+If you enter either &ldquo;&lt;&rdquo; or &ldquo;&gt;&rdquo;, the FAQ lightbox will try to interpret those as part of an HTML tag and won&rsquo;t necessarily display them properly. (You&rsquo;ll know this has happened when you view the FAQ and an HTML example&mdash;such as a pixel&mdash;has &ldquo;disappeared.&rdquo;)<br />
+<br />
+So, when you want to actually display &ldquo;&lt;&rdquo; or &ldquo;&gt;&rdquo; in an FAQ, use &ldquo;((&rdquo; instead of &ldquo;&lt;&rdquo; and &ldquo;))&rdquo; instead of &ldquo;&gt;&rdquo;. For example, to display the <code><span>&lt;</span>head&gt;</code> tag, you would actually type <code>((head))</code>&nbsp;in the editor.<br data-text="true" />
+<br />
+<br />
+<strong>Line Spacing</strong><br />
+<br />
+For consistency, use two blank lines before any subtitle and before and after graphic images. Also, use two blank lines after any <code>FAQ</code>, <code>VIDEO</code>, or <code>LINK</code> macro (see below).<br />
+<br />
+If the graphic, <code>FAQ</code>, <code>VIDEO</code>, or <code>LINK</code> macros are followed by a subtitle, it usually looks best if you use three blank lines before the subtitle. Use your best judgement ...<br />
+<br />
+<br />
+<strong><span>N</span>OTE(<em>text</em>), <span>C</span>AUTION(<em>text</em>), and <span>T</span>IP(<em>text</em>)</strong><br />
+<br />
+These three macros create outlined text boxes&nbsp;with icons and background colors related to their meaning and intent. Notes point out details, cautions point out hazards to avoid, and tips point out best practices that should be embraced. (You can see examples of these below.)<br />
+<br />
+These text boxes can contain any content that you want to create for them. If you&rsquo;re trying to create a box with a lot of content, it may be easier to first create the box with some minimal content, then edit the box after you&rsquo;ve saved the FAQ once and converted the macro. This prevents problems with embedded parentheses when creating the boxes for the first time.<br />
+<br />
+<br />
+<strong><span>FAQ</span>(number, Title Text)</strong><br />
+<br />
+This macro creates a nice little page icon followed by the &ldquo;Title Text&rdquo; with both the icon and the text linking to FAQ &ldquo;number&rdquo;. The macro will automatically create links for both the page icon and the text, and the new FAQ will open in the same window as the current one. Here&rsquo;s what the generated HTML will look like:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=140"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=140">What is the recommended way to set up a custom domain?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+<br />
+<strong><span>LINK</span>(URL, Title Text)</strong><br />
+<br />
+This macro links to other ClickMagick pages or to external pages and opens the link in a new window. This looks just like the &ldquo;FAQ icon and text&rdquo; except that you provide the URL to the page rather than an FAQ number.<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="http://help.bingads.microsoft.com/#apex/3/en/56799/2/#exp23" target="_blank"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="http://help.bingads.microsoft.com/#apex/3/en/56799/2/#exp23" target="_blank">&nbsp;Click here for Bing&rsquo;s full set of custom parameters</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+<br />
+<strong><span>VIDEO</span>(videoname, Title Text)</strong><br />
+<br />
+The VIDEO macro will create a Play icon with the &ldquo;Title Text&quot; to the right of it, like this:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=cnamedns" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=cnamedns" id="video-link-new">&nbsp;How To Set Up A Custom Domain Using a CNAME DNS Record</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+You can find the <code>videoname</code>&nbsp;for any video by going to the Video Tutorials section and hovering over the video that you want to insert into an FAQ. You will see the <code>videoname</code>&nbsp;in the link in the lower left corner of your browser window.<br data-text="true" />
+<br />
+<br />
+<strong>IMG(filename) or IMG(URL)</strong><br />
+<br />
+Generates the proper URL for an image uploaded to the ClickMagick site on GitHub. If you need to add a non-ClickMagick image to an FAQ, use the full URL, not just a file name.<br />
+<br />
+For FAQ images, use a maximum width of 600 pixels. This usually means creating the graphic the way you want it, then resizing it down to 600 pixels.<br />
+<br />
+<br />
+<strong>Top Level Menus</strong><br />
+<br />
+When referring to the <strong>Links</strong>, <strong>Funnels</strong>, <strong>Organic</strong>, <strong>Rotators</strong>, <strong>Content</strong>, <strong>Tools</strong>, <strong>Help</strong>, and <strong>Account</strong> menus at the top of the screen, use bold font. For example: Go the <strong>Help</strong> menu and select &ldquo;1-Hour Support&rdquo;.<br />
+<br />
+<br />
+<strong>Icon Menus</strong><br />
+<br />
+For the drop-down menus that are represented by icons, we use the spoken name of the menu followed by its graphic symbol. For example, the &ldquo;Clone&rdquo; command is in the Edit menu <img src="//cdn.clickmagick.com/images/user/faqs/pencil.png" /> and the Settings menu <img src="//cdn.clickmagick.com/images/user/faqs/gear.png" /> has the &ldquo;Split Testing&rdquo; command. The Report menu <img src="//cdn.clickmagick.com/images/user/faqs/page.png" /> can also be useful. Note that the name of the menu is capitalized.<br />
+<br />
+To generate the menu icons, just use the IMG macro with <code>pencil.png</code>, <code>gear.png</code>, and <code>page.png</code>.&nbsp;For example, &ldquo;Report menu <span>IMG</span>(page.png).&rdquo; Note that these are <code>.png</code> images, not <code>.jpg</code>s. This allows the icons to look sharp in the colored backgrounds of <code>TIP</code>, <code>NOTE</code>, and <code>CAUTION</code> boxes.<br />
+<br />
+<br />
+<strong>Menu Choices, Button Labels, etc.</strong><br />
+<br />
+When you name a menu selection in the Settings menu <img src="//cdn.clickmagick.com/images/user/faqs/gear.png" />, Edit menu <img src="//cdn.clickmagick.com/images/user/faqs/pencil.png" />, or Reports menu <img src="//cdn.clickmagick.com/images/user/faqs/page.png" />, put the name in quotes. For example: Go to the Settings menu <img src="//cdn.clickmagick.com/images/user/faqs/gear.png" /> and select &ldquo;Split Testing&rdquo;.<br />
+<br />
+For dialog boxes, use quotes around labels and button names. For example: Enter the URL in the &ldquo;Page URL&rdquo;&nbsp;box and click &ldquo;OK&rdquo;.<br />
+&nbsp;
+<div class="faq-note"><b>Note:</b> If you&rsquo;re talking about a menu selection in a top-level menu like the <strong>Help</strong> menu, you would turn that selection into a link that goes directly to that page. For example: If you need help, just contact us at our <strong><a href="/user/action/account/help.cgi?action=helpdesk" target="_blank">1-Hour Support</a></strong> desk which you can always find in the <strong>Help</strong> menu.</div>
+&nbsp;<br />
+&nbsp;<br />
+<br />
+<strong>Other Types of Links</strong><br />
+<br />
+If the various link macros don&rsquo;t meet your needs, links to other pages in ClickMagick should use the <code>/user/faqs.cgi</code> format , leaving off the <code>clickmagick.com</code>&nbsp;domain. If the links are included inline in a paragraph, they should be in <strong>boldface</strong>, and open in a new window (<code>_blank</code>) <em>unless</em> they are linking to another FAQ. Inline links will automatically be in &ldquo;ClickMagick Green.&rdquo;<br />
+<br />
+Here is an inline example of linking to the <strong><a href="/user/pixeltest.cgi" target="_blank">Pixel Debugger</a></strong> from within a sentence. Right click on the link from within the FAQ editor, choose Edit Link, and take a look at the settings. Look at the URL and Target settings.<br />
+<br />
+If you are referencing an FAQ or video from within a paragraph, try to rewrite the paragraph so that the FAQ or video reference is on its own line using the <code>FAQ</code>&nbsp;or <code>VIDEO</code>&nbsp;macros.<br />
+&nbsp;
+<div class="faq-tip"><b>Tip:</b> If you&rsquo;re using the <code>IMG</code> macro, all links to images on the ClickMagick site should be generated automatically, but just for the record, all ClickMagick images should have a full URL starting with <code>//</code>:<br />
+<br />
+<code>//cdn.clickmagick.com/&hellip;</code><br />
+<br />
+This is a &ldquo;protocol agnostic&rdquo; style&mdash;no <code>https:</code> is needed.</div>
+&nbsp;
+
+<div class="faq-caution"><b>Caution:</b> There are two links you can use for FAQs, but only one that you&rsquo;ll use inside an existing FAQ. The two forms of links are:<br />
+<br />
+<code>https://www.clickmagick.com/user/faqs.cgi?faq=73</code><br />
+<code>https://www.clickmagick.com/user/faqs.cgi?answer=73</code><br />
+<br />
+You can find the first version (<code>faq=</code>) displayed at the very bottom of any FAQ when it&rsquo;s showing in a lightbox, and it&rsquo;s the one that you would give out to people in tickets and so on. The <code>faq=</code> version will always open the FAQ search page with the FAQ opened in a lightbox.<br />
+<br />
+The second, <code>answer=</code> version simply opens the FAQ in the current window which is why we use this version inside of existing FAQs&mdash;so they&rsquo;ll open in the same lightbox window. The <code>FAQ</code> macro automatically generates this second version using its relative, rather than absolute, format: <code>/user/faqs.cgi?answer=73</code><br />
+<br />
+As long as you stick to using the <code>FAQ</code> macro, you&rsquo;ll probably never have to worry about the distinction between the two types of FAQ links.</div>
+<br />
+<br />
+<br />
+<strong>LI(<em>number</em>)</strong><br />
+<br />
+The <code>LI</code>&nbsp;macro generates a series of one-line numeric tables, properly formatted for multiple paragraph text blocks. You would typically use the <code>LI</code> macro to list steps in a process: 1, 2, 3, etc. All you have to do is enter the content and everything will already be properly formatted.<br />
+<br />
+<br />
+<strong>$username, $userid, and $ip</strong><br />
+<br />
+Inserts the username, user ID, or user&rsquo;s IP address of the currently logged in session. Useful for customizing FAQs:<br data-text="true" />
+<br />
+<code>http://www.clkmg.com/$username/atkinsdiet</code><br />
+<br />
+<br />
+<strong>$linkdomain and $rotatordomain</strong><br />
+<br />
+These use an actual custom tracking link or rotator domain in the user&rsquo;s account&mdash;if one exists&mdash;otherwise the account URL is used instead. These do not include the <code>http://</code> protocol so you have to add it to your examples:<br />
+<br />
+<code>http://$linkdomain/hoverboard</code><br data-text="true" />
+<br />
+That would generate text in the FAQ like one of these two examples, depending upon whether they&rsquo;ve created a custom tracking domain (<code>bestcoolproducts.com</code> in this example):<br data-text="true" />
+<br />
+<code>http://bestcoolproducts.com/hoverboard<br />
+http://www.clkmg.com/<strong><em>username</em></strong>/hoverboard</code><br />
+&nbsp;
+<div class="faq-tip"><b>Tip:</b> There are many FAQs that could use this extra personalization touch. When you run across these FAQs, update them to give the user that extra warm and fuzzy feeling.</div>
+<br />
+<br />
+<br />
+<strong>[[TEXT_OPEN row=# cols=]]</strong>&nbsp;&hellip; <strong>[[TEXT_CLOSE]]</strong><br />
+<br />
+These tags open and close a multi-line&nbsp;<code><span>&lt;</span>textarea&gt;</code> &hellip;&nbsp;<code><span>&lt;</span>/textarea&gt;</code> block. They are rarely used, but when you need them, here&rsquo;s how to do it:<br />
+<br />
+[[TEXT_OPEN rows=5 cols=30]]<br />
+Enter default text here...<br />
+[[TEXT_CLOSE]]<br />
+<br />
+<br />
+<strong>Linking to the 1-Hour Support desk</strong><br />
+<br />
+There are two links you can use to reach <strong><a href="/user/action/account/help.cgi?action=helpdesk" target="_blank">1-Hour Support</a></strong> depending upon what you&rsquo;re explaining in the&nbsp;FAQ.<br />
+<br />
+In almost all cases, you do NOT want the link you would find in <strong>Help</strong> menu. That link forces users to enter an FAQ search, which they just did if they&rsquo;re currently reading an FAQ with a <strong><a href="/user/action/account/help.cgi?action=helpdesk" target="_blank">1-Hour Support</a></strong> link in it &hellip;<br />
+<br />
+In this scenario, we want the <strong><a href="/user/action/account/help.cgi?action=helpdesk" target="_blank">1-Hour Support</a></strong> link to bypass the FAQ page. To do that, use this link:<br />
+<br />
+<code>/user/action/account/help.cgi?action=helpdesk</code><br />
+<br />
+In the rare case when you want the user to go to the actual page they&rsquo;d reach by choosing &ldquo;1-Hour Support&rdquo; in the <strong>Help</strong> menu, you would use this link:<br />
+<br />
+<code>/user/action/account/help.cgi</code><br />
+<br />
+In either case, be sure to open the link in a new window.<br />
+&nbsp;
+<div class="faq-tip"><b>Tip:</b> To make things even easier, the FAQ editor has a &ldquo;<span>S</span>UPPORT&rdquo; macro that will create the link for you. Just write something like, &ldquo;Please contact our <span>S</span>UPPORT desk if you need additional help.&rdquo; The word &ldquo;<span>S</span>UPPORT&rdquo; will be replaced and the sentence will read &ldquo;Please contact our&nbsp;<strong><a href="/user/action/account/help.cgi?action=helpdesk" target="_blank">1-Hour Support</a></strong>&nbsp;desk if you need additional help.&rdquo;</div>
+<br />
+<br />
+<br />
+<strong>Linking to Specific Categories on the User Profile Page</strong><br />
+<br />
+To set up a link to a specific category on the &ldquo;User Profile&rdquo; page, use these links, opening in a new window:<br />
+<br />
+<code>/user/profile.cgi?cat=auditing<br />
+/user/profile.cgi?cat=traffic<br />
+/user/profile.cgi?cat=monitoring<br />
+/user/profile.cgi?cat=publicstats<br />
+/user/profile.cgi?cat=misc</code><br />
+<br />
+<br />
+<strong>Adding $ signs in FAQs</strong><br />
+<br />
+The &ldquo;$&rdquo; sign is treated specially in FAQs so that things like <code>$username</code> and <code>$userid</code> will be substituted with other values. If you use a &ldquo;$&rdquo; sign without taking any precautions, it will probably just &ldquo;disappear&rdquo; when the FAQ is displayed.<br />
+<br />
+To make sure that &ldquo;$&rdquo; signs show up, simply put a &ldquo;\&rdquo; in front of them. For example, to write &ldquo;$20&rdquo;, you would actually enter &ldquo;\$20&rdquo;.<br />
+<br />
+<br />
+<strong>Consistent Terminology</strong><br />
+<br />
+In some cases precise terminology is important.<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td style="width: 144px;" valign="top"><b>User </b>vs.<br />
+			<b>Visitor</b></td>
+			<td style="width: 702px;">In the FAQs, a &ldquo;user&rdquo; is a ClickMagick <em>customer</em>, whereas a &ldquo;visitor&rdquo; is someone who clicks on a tracking or rotator link. It&rsquo;s easy to get these two terms mixed up when writing an FAQ, so&nbsp;if you run across an FAQ that needs updating, feel free to do so!<br />
+			&nbsp;</td>
+		</tr>
+		<tr>
+			<td style="width: 144px;" valign="top"><strong>Cloaking</strong> vs.<br />
+			<strong>Masking</strong></td>
+			<td style="width: 702px;">ClickMagick uses the term &ldquo;cloaking&rdquo; rather than &ldquo;masking&rdquo; so always use the word &ldquo;cloaking&rdquo; in the FAQs. When adding keywords, be sure to include &ldquo;mask&rdquo; in any FAQs related to cloaking.<br />
+			&nbsp;</td>
+		</tr>
+		<tr>
+			<td style="width: 144px;" valign="top"><strong>Drop-down</strong> vs.<br />
+			<strong>Pop-down</strong></td>
+			<td style="width: 702px;">Most people would say these terms are identical, but technically &ldquo;pop-down&rdquo; menus only stay down while you&rsquo;re holding the mouse button down. ClickMagick only uses drop-down menus, which stay down even if you let up on the mouse button. For consistency, if nothing else, let&rsquo;s stick with &ldquo;drop-down&rdquo; in the FAQs.</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+<br />
+<strong>Common Misspellings that Show Up in FAQs</strong><br />
+<br />
+Words and phrases like &ldquo;setup&rdquo; and &ldquo;set up&rdquo; need to be used carefully. &ldquo;Setup&rdquo; as one word is a noun, whereas &ldquo;set up&rdquo; as two words is the verb form. So, you would say,<br />
+<br />
+<em>&nbsp; &nbsp; &nbsp;The new setup was set up the other day.</em><br />
+<br />
+That&rsquo;s correct.&nbsp;Lot&rsquo;s of &ldquo;up&rdquo; words work this way. &ldquo;Setup&rdquo; and &ldquo;set up&rdquo;, for example&hellip;&nbsp;You find the same issue with &ldquo;in&rdquo; words and phrases such as&nbsp;&ldquo;login&rdquo; and &ldquo;log in&rdquo;, &ldquo;signin&rdquo; and &ldquo;sign in&rdquo;, etc.<br />
+<br />
+If you have a situation where you&rsquo;re unsure which form to use, put the word or phrase in the past tense and see if it makes sense. For example: &ldquo;I setupped the computer the other day&rdquo; doesn&rsquo;t make any sense, so you know &ldquo;set up&rdquo; should be two words: &ldquo;I set up the computer the other day&rdquo;. (&ldquo;Set&rdquo; is the past tense of &ldquo;set&rdquo;...)<br />
+<br />
+A more obvious example uses &ldquo;login&rdquo;: You wouldn&rsquo;t say &ldquo;I loginned the other day&rdquo;, but you would say &ldquo;<em>I logged in the other day.</em>&rdquo; You can see the difference here:<br />
+<br />
+&nbsp;&nbsp; &nbsp; <em>I logged in by entering my login information.</em><br />
+<br />
+In the first use, you&rsquo;re forced to use two words, whereas the second use, you&rsquo;re not, so in present tense, you would write:<br />
+<br />
+&nbsp;&nbsp; &nbsp; <em>I log in by entering my login information.</em><br />
+<br />
+Make sense?<br />
+<br />
+<br />
+<br />
+<strong>Creating Keywords for Awesome Search Results</strong><br />
+<br />
+You should add keywords to every FAQ that you create. This topic is so important that we have a separate FAQ just on this topic:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=223"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=223">&nbsp;Creating FAQ Keywords for Awesome Search Results</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+<br />
+<strong>Checking FAQs for Correctness</strong><br />
+<br />
+Make it a habit to use the FAQ <strong><a href="https://www.clickmagick.com/cgi-bin/misc/admins/admin.cgi?action=faq_check" target="_blank">Check All</a></strong> tool to scan all of the FAQs looking for bad links and other problems that sneak in and need to be corrected. The tool can take up to a minute to run, so be patient.
+</body></html>

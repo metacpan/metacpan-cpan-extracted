@@ -1,7 +1,7 @@
 package Sah::SchemaR::cryptocurrency;
 
-our $DATE = '2018-06-06'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2018-06-07'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 our $rschema = ["str",[{description=>"\nCryptocurrency code or name or safename that is listed in\n<pm:CryptoCurrency::Catalog>, e.g. BTC, \"Bitcoin Cash\", ethereum-classic.\n\nCode/name/safename must be listed.\n\nWill be normalized to code in uppercase.\n\n",summary=>"Cryptocurrency code, name, or safename","x.completion"=>"cryptocurrency","x.perl.coerce_rules"=>["str_to_cryptocurrency_code"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::cryptocurrency - Cryptocurrency code, name, or safename
 
 =head1 VERSION
 
-This document describes version 0.009 of Sah::SchemaR::cryptocurrency (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-06-06.
+This document describes version 0.010 of Sah::SchemaR::cryptocurrency (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-06-07.
 
 =head1 DESCRIPTION
 

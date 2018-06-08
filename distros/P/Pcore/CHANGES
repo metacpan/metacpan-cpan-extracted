@@ -1,3 +1,9 @@
+v0.67.0 2018-06-06T18:21:46Z
+ - .ini parser improved
+ - PM util merged with Sys
+ - monitor forked subchild node
+ - pod
+
 v0.66.0 2018-05-30T06:38:58Z
  - web2 removed
  - argon2 create_hash args added

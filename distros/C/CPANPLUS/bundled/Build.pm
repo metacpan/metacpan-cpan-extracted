@@ -1,5 +1,5 @@
 package CPANPLUS::Dist::Build;
-$CPANPLUS::Dist::Build::VERSION = '0.88';
+$CPANPLUS::Dist::Build::VERSION = '0.90';
 #ABSTRACT: CPANPLUS plugin to install packages that use Build.PL
 
 use if $] > 5.017, 'deprecate';

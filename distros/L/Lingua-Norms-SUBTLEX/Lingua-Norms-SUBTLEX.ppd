@@ -1,4 +1,4 @@
-<SOFTPKG NAME="Lingua-Norms-SUBTLEX" VERSION="0.06">
+<SOFTPKG NAME="Lingua-Norms-SUBTLEX" VERSION="0.07">
     <ABSTRACT>Retrieve word frequencies and related values and lists from subtitles corpora</ABSTRACT>
     <AUTHOR>Roderick Garton &lt;rgarton@cpan.org&gt;</AUTHOR>
     <IMPLEMENTATION>
@@ -17,6 +17,6 @@
         <REQUIRE NAME="Text::CSV::Hashify" VERSION="0.08" />
         <REQUIRE NAME="Text::CSV::Separator" VERSION="0.20" />
         <REQUIRE NAME="Text::Unidecode" VERSION="1.30" />
-        <CODEBASE HREF="PPM-Lingua-Norms-SUBTLEX-0.06.tar.gz" />
+        <CODEBASE HREF="PPM-Lingua-Norms-SUBTLEX-0.07.tar.gz" />
     </IMPLEMENTATION>
 </SOFTPKG>

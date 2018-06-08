@@ -7,9 +7,8 @@ no warnings;
 use Carp;
 
 use subs qw();
-use vars qw($VERSION);
 
-$VERSION = '1.002';
+our $VERSION = '1.003';
 
 =encoding utf8
 
@@ -21,21 +20,21 @@ Mac::OSVersion - Get the Mac OS X system version
 
 	use Mac::OSVersion;
 
-	my $version = Mac::OSXVersion->version; # 10.4.11
-	my @version = Mac::OSXVersion->version; # (10, 4, 11, 'Tiger', '8.10.1' )
+	my $version = Mac::OSVersion->version; # 10.4.11
+	my @version = Mac::OSVersion->version; # (10, 4, 11, 'Tiger', '8.10.1' )
 
-	my $name    = Mac::OSXVersion->name; # Tiger, etc.
-	my $name    = Mac::OSXVersion->minor_to_name( 3 ); 'Panther';
+	my $name    = Mac::OSVersion->name; # Tiger, etc.
+	my $name    = Mac::OSVersion->minor_to_name( 3 ); 'Panther';
 
-	my $major   = Mac::OSXVersion->major;  # 10 of 10.4.11
+	my $major   = Mac::OSVersion->major;  # 10 of 10.4.11
 
-	my $minor   = Mac::OSXVersion->minor;  # 4 or 10.4.11
+	my $minor   = Mac::OSVersion->minor;  # 4 or 10.4.11
 
-	my $point   = Mac::OSXVersion->point;  # 11 of 10.4.11
+	my $point   = Mac::OSVersion->point;  # 11 of 10.4.11
 
-	my $build   = Mac::OSXVersion->build;  # 8R2218
+	my $build   = Mac::OSVersion->build;  # 8R2218
 
-	my $kernel  = Mac::OSXVersion->kernel; # 8.10.1
+	my $kernel  = Mac::OSVersion->kernel; # 8.10.1
 
 =head1 DESCRIPTION
 
@@ -77,8 +76,7 @@ no strict 'refs';
 my @positions = qw(MAJOR MINOR POINT NAME BUILD KERNEL);
 use vars ( map { "_$_" } @positions );
 
-foreach my $index ( 0 .. $#positions )
-	{
+foreach my $index ( 0 .. $#positions ) {
 	my $name = $positions[$index];
 
 	*{"_$name" } = sub () { $index }
@@ -89,8 +87,7 @@ foreach my $index ( 0 .. $#positions )
 my %methods = map { $_, 1 }
 	qw(uname gestalt sw_vers system_profiler default);
 
-sub version
-	{
+sub version {
 	my( $class, $method ) = @_;
 
 	$method ||= 'default';
@@ -134,6 +131,8 @@ number.
 	10	Yosemite
 	11  El Capitan
 	12  Sierra
+	13  High Sierra
+	14  Mojave
 
 =item minor_version_numbers()
 
@@ -149,7 +148,8 @@ qw(Cheetah Puma ... )
 BEGIN {
 my @names = qw( Cheetah Puma Jaguar Panther Tiger Leopard ) ;
 push @names, 'Snow Leopard', 'Lion', 'Mountain Lion',
-	'Mavericks', 'Yosemite', 'El Capitan', 'Sierra';
+	'Mavericks', 'Yosemite', 'El Capitan', 'Sierra',
+	'High Sierra', 'Mojave';
 
 sub minor_to_name { $names[ $_[1] ] }
 
@@ -158,8 +158,7 @@ sub minor_version_numbers { ( 0 .. $#names ) }
 sub minor_version_numbers { @names }
 }
 
-sub name
-	{
+sub name {
 	$_[0]->minor_to_name(
 		${
 			[ $_[0]->version( $_[1] ) ]
@@ -251,8 +250,7 @@ Uses several methods to collect information.
 
 =cut
 
-sub default
-	{
+sub default {
 	my $class = shift;
 
 	my @list;
@@ -272,8 +270,7 @@ the same list as C<version>, although some fields may be missing.
 
 =cut
 
-sub gestalt
-	{
+sub gestalt {
 	my $class = shift;
 
 	eval { require Mac::Gestalt };
@@ -310,8 +307,7 @@ the same list as C<version>, although some fields may be missing.
 BEGIN {
 my $command = '/usr/bin/sw_vers';
 
-sub sw_vers
-	{
+sub sw_vers {
 	croak "Missing $command!" unless -x $command;
 
 	my $class = shift;
@@ -346,8 +342,7 @@ missing.
 BEGIN {
 my $command = '/usr/sbin/system_profiler';
 
-sub system_profiler
-	{
+sub system_profiler {
 	croak "Missing $command!" unless -x $command;
 
 	my $class = shift;
@@ -358,11 +353,9 @@ sub system_profiler
 
 	# mavericks omits the Mac in the output
 	if( $output =~
-		m/  \s+System\ Version:\ (?:Mac\ )? OS\ X\ (\d+\.\d+(?:\.\d+)?)\ \((.*?)\)
+		m/  \s+System\ Version:\ (?:(?:Mac\ )? OS\ X|macOS)\ (\d+\.\d+(?:\.\d+)?)\ \((.*?)\)
 			\s+Kernel\ Version:\ Darwin\ (\d+\.\d+\.\d+)
-			/xm )
-
-		{
+			/xm ) {
 		return $1 unless wantarray;
 
 		my( $version, $build, $kernel ) = ($1, $2, $3 );
@@ -404,8 +397,7 @@ the same list as C<version>, although some fields may be missing.
 BEGIN {
 my $command = '/usr/bin/uname';
 
-sub uname
-	{
+sub uname {
 	croak "Missing $command!" unless -x $command;
 
 	my $class = shift;
@@ -413,8 +405,7 @@ sub uname
 	chomp( my $output = `$command -a` );
 
 	my @list = ();
-	if( $output =~ /Darwin Kernel Version (\d+\.\d+\.\d+)/ )
-		{
+	if( $output =~ /Darwin Kernel Version (\d+\.\d+\.\d+)/ ) {
 		return $1 unless wantarray;
 		$list[_KERNEL] = $1;
 		}
@@ -449,7 +440,7 @@ sub uname
 
 This module is in Github
 
-	git://github.com/briandfoy/mac-osversion.git
+	https://github.com/briandfoy/mac-osversion
 
 =head1 AUTHOR
 
@@ -457,9 +448,9 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2016, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+You may redistribute this under the terms of the Artistic License 2.0.
 
 =cut
 

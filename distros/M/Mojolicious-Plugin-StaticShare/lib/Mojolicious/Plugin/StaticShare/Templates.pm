@@ -340,7 +340,7 @@ pre {
 % my $con;
 % for my $part (@{$url_path->parts}) {
 %   $con .="/$part";
-  <a href="<%= $con %>" class="chip maroon-text maroon lighten-5"><%= $part %></a>
+  <a href="<%= $con %>" class="chip card maroon-text maroon lighten-5"><%= $part %></a>
 % }
 
 % if ($c->plugin->root_url->to_route ne $url_path->to_route) {

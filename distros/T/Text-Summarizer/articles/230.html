@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html><head><title>Why can't I use my custom domain as the Primary URL?</title></head><body>
+<strong>Why can&#39;t I use my custom domain as the Primary URL?</strong><br />
+<br />
+Actually, you <em>can</em> use a custom domain in the Primary URL but you must be sure to include a valid link ID with it, such as the link ID&nbsp;<code>/movies </code>in this URL:<br />
+<br />
+<code>http://$linkdomain/movies</code><br />
+<br />
+Because the link ID <code>/movies</code> follows the custom domain <code>$linkdomain/</code>, ClickMagick knows exactly where to redirect incoming clicks to.<br />
+<br />
+The problem occurs when you <em>don&rsquo;t</em> include a&nbsp;link ID:<br />
+<br />
+<code>http://$linkdomain</code><br />
+<br />
+Without a link ID, ClickMagick doesn&rsquo;t know where to redirect clicks to, creating an error condition.<br />
+<br />
+Very simply, if you&rsquo;re going to use a custom domain in the Primary URL of a tracking link, make sure that you remember to include a link ID so that ClickMagick knows exactly where to redirect incoming clicks.<br />
+<br />
+If you&rsquo;re unsure about what a link ID is or why you need one, we have an FAQ that will walk you through the steps for creating a tracking link:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=109"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=109">&nbsp;How do I set up a very basic tracking link?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</body></html>

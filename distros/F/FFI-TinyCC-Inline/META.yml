@@ -1,0 +1,36 @@
+---
+abstract: 'Embed Tiny C code in your Perl program'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test2::V0: '0.000060'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FFI-TinyCC-Inline
+requires:
+  FFI::Platypus: '0.15'
+  FFI::Platypus::Type::StringArray: '0.01'
+  FFI::TinyCC: '0.27'
+  base: '0'
+  perl: '5.010'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/Perl5-FFI/FFI-TinyCC-Inline/issues
+  homepage: https://metacpan.org/pod/FFI::TinyCC::Inline
+  repository: git://github.com/Perl5-FFI/FFI-TinyCC-Inline.git
+version: '0.28'
+x_contributors:
+  - 'Graham Ollis <plicease@cpan.org>'
+  - aero
+  - 'Dylan Cali (calid)'
+  - pipcet
+x_serialization_backend: 'YAML::Tiny version 1.70'
+x_use_unsafe_inc: 0

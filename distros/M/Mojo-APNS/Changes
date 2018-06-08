@@ -1,5 +1,9 @@
 Revision history for perl distribution Mojo-APNS
 
+1.01 2018-06-08T13:51:50+0800
+ - Add send_p()
+ - Add insecure() attribute #8
+
 1.00 2016-02-25T14:15:02+0100
  - Bumping to 1.0, since it seems pretty stable at this point
  - Improved documentation and SYNOPSIS example

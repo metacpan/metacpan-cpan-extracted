@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html><head><title>What happens when a user downgrades a Past Due account?</title></head><body>
+<strong>What happens when a user downgrades a Past Due account?</strong><br />
+<br />
+Stripe doesn&rsquo;t allow downgrades on past due subscriptions, so when this happens, from a technical standpoint we have to cancel their existing subscription and put them on a new subscription at the new lower plan.<br data-text="true" />
+<br />
+When this happens, the user is automatically sent a cancellation email even though their account is not really being canceled. To account for that, ClickMagick immediately sends out a follow-up email to explain to the user what is happening, and to ignore the cancellation email.<br />
+&nbsp;<br data-text="true" />
+&nbsp;
+<div class="faq-note"><b>Note:</b> Here&rsquo;s the email they get &hellip;<br />
+<br />
+<strong>Subject:</strong> READ THIS FIRST<br />
+<br />
+<em>Hi there,<br />
+<br />
+I just wanted to send you a quick note about the<br />
+subscription change you just made &hellip;<br />
+<br />
+Your previous subscription was &ldquo;past due&rdquo;, and our<br />
+billing system doesn&rsquo;t allow subscription changes when<br />
+that&rsquo;s the case &ndash;&nbsp;so we had to cancel your past due<br />
+subscription and set you up with a new one.<br />
+<br />
+&hellip;&nbsp;and because of that, you may receive (if you<br />
+haven&rsquo;t already) an automated email from our billing<br />
+system about your account being canceled.<br />
+<br />
+DON&rsquo;T PANIC &ndash;&nbsp;you can safely ignore that email.<br />
+<br />
+If you have any questions, feedback, or believe you<br />
+have received this email in error, just hit reply!<br />
+<br />
+Your in success,<br />
+<br />
+ClickMagick Support Team<br />
+https://ClickMagick.com</em></div>
+</body></html>

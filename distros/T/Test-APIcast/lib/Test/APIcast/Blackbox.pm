@@ -158,7 +158,7 @@ my $write_nginx_config = sub {
     }
 
     my ($env, $env_file) = tempfile();
-    my $apicast_cmd = "${\(join(', ', @env_list))} APICAST_CONFIGURATION_LOADER='test' $apicast_cli start --test --environment $env_file";
+    my $apicast_cmd = "${\(join(' ', @env_list))} APICAST_CONFIGURATION_LOADER='test' $apicast_cli start --test --environment $env_file";
 
     if (defined $configuration_file) {
         $apicast_cmd .= " --configuration $configuration_file"

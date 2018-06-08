@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "CHI" => 0,
     "Carp" => 0,
-    "JSONAPI::Document" => "1.4",
+    "JSONAPI::Document" => "1.5",
     "Lingua::EN::Inflexion" => 0,
     "Mojo::Base" => 0
   },
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "1.5",
+  "VERSION" => "1.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "CHI" => 0,
   "Carp" => 0,
-  "JSONAPI::Document" => "1.4",
+  "JSONAPI::Document" => "1.5",
   "Lingua::EN::Inflexion" => 0,
   "Mojo::Base" => 0,
   "Mojolicious::Lite" => 0,

@@ -8,7 +8,7 @@ use Algorithm::Cron;
 
 use Carp 'croak';
 
-our $VERSION = "0.024";
+our $VERSION = "0.025";
 use constant CRON_DIR => 'mojo_cron_dir';
 my $crondir;
 
@@ -135,7 +135,7 @@ concept of a project. It helps also in the deployment phase because in the end i
 could mean less and simpler installation/removing tasks.
 
 As an extension to regular cron, seconds are supported in the form of a sixth space
-sepparated field (For more information on cron sintax please see L<Algorithm::Cron>).
+separated field (For more information on cron syntax please see L<Algorithm::Cron>).
 
 =head1 BASICS
 

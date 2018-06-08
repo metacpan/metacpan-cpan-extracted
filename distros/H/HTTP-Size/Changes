@@ -1,5 +1,9 @@
 Revision history for Perl module HTTP::Size
 
+1.151 2018-06-06T14:36:21Z
+	* Change to Artistic License 2.0.
+	* Fix a test that needs a domain that even harder to access
+
 1.15 2015-08-26T15:46:15Z
 	* Doc and distribution refreshmentsâno code changes
 

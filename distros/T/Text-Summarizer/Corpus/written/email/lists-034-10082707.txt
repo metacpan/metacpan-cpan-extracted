@@ -1,0 +1,76 @@
+
+
+
+docno="lists-034-10082707"
+name="Tom Stephens"
+email="tomste@microsoft.com"
+sent="Mon, 22 Apr 1996 12:10:54 -0700"
+subject="RE: Status (if any) of STLP?"
+To: "'sanders_james@tandem.com'" <sanders_james@tandem.com>
+Cc: "'ietf-tls@w3.org'" <ietf-tls@w3.org>, "'tls-draft@w3.org'"<tls-draft@w3.org>
+
+
+
+     
+   
+Jim,
+
+As you pointed out, there has been some confusion over this issue.  It
+was unfortunate that the strawman document was labeled as a draft in the
+press and by others.  That was never our intention.  For that confusion,
+we apologize.
+
+Tom
+
+>----------
+>From:  sanders_james@tandem.com[SMTP:sanders_james@tandem.com]
+>Sent:  Monday, April 22, 1996 10:39 AM
+>To:    Tom Stephens
+>Cc:    ietf-tls@w3.org; tls-draft@w3.org
+>Subject:       RE: Status (if  any) of STLP?
+
+>>Jim,
+>>
+>>Win Treese and representatives from Microsoft and Netscape met a couple
+>>of weeks ago to begin hammering out some of the components for the
+>>foundation of a spec.  At that meeting, Microsoft precented our STLP
+>>strawman document.  That document was an experiment by Microsoft to
+>>determine how well SSL and PCT could be merged into one protocol - using
+>>SSL as a base and adding PCT deltas.  Our goal was to deal with the
+>>differences Microsoft and Netscape quickly so that the normal IETF
+>>process would move forward without any detractions from either Microsoft
+>>or Netscape.
+>>
+>>Tom
+>-----------------------------
+>Thanks Tom,
+
+>I have no dispute with the events you describe, but process integrity
+>would
+>have been better served if you or Win had described this intent up
+>front,
+>and answered the queries by other folks who, like me, could not figure
+>out
+>what was going on.  This was especialy true in light of the press
+>reports of
+>"Draft submitted to IETF."  I believe that what you are saying is that
+>no draft
+>was "submitted," but rather "made available for review," albeit with
+>rather late
+>instructions as to location and ownership.
+
+>All the above reflects my personal belief that this particular
+>BOF-cum-WG
+>should stretch to maintain the status of "Caesar's wife;" and also
+>reflects
+>my concern at the questions being raised by others last week.
+
+>Thanks again for your prompt response.
+>--Jim--
+
+><< Jim Sanders, Staff Scientist - Transaction Security            >>
+><< Network Application Services, Tandem Computers             >>
+><< Voice: 408-285-4192; E-mail: sanders_james@tandem.com >>
+
+
+

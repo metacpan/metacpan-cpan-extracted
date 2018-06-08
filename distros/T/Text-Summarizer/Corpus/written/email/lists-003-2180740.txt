@@ -1,0 +1,30 @@
+
+
+
+docno="lists-003-2180740"
+received="Mon Jun 21 11:37:15 1993 EST" 
+sent="Mon, 21 Jun 1993 14:36:41 -0400" 
+name="Chris Weider" 
+email="clw@merit.edu" 
+subject="Re:  IETF BOF" 
+id="9306211836.AA18241@merit.edu" 
+inreplyto=" IETF BOF" 
+
+To: WG-CHAR@rare.nl, ietf-charsets@INNOSOFT.COM
+
+
+
+
+Borka, Hi!
+  I'd like to request that the scheduling for the Character Set BOF be done
+so that it does not conflict with any of the other information service working
+groups (IIIR, IDS, OSI-DS, URI, for example) as I and I suspect most of the
+information service people feel we *need* to attend this BOF. The interest
+will be quite high, I think. Thanks for getting this together.
+Chris Weider
+Merit Network, Inc.
+Chair, IIIR
+Co-chair, IDS
+
+
+

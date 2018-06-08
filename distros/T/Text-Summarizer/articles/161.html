@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html><head><title>Why am I getting a “Stats Discrepancy” warning?</title></head><body>
+<strong>Why am I getting a &ldquo;Stats Discrepancy&rdquo; warning?</strong><br />
+<br />
+If you&rsquo;re getting a &ldquo;stats discrepancy&rdquo;&nbsp;warning, it means that your tracking link or rotator settings are configured to send clicks to another ClickMagick link or rotator that has conflicting settings which could result in a discrepancy in statistics.<br />
+<br />
+This is more easily explained with an example...<br />
+<br />
+Suppose you have a rotator with these advanced settings:<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq220nothings.png" /><br />
+<br />
+With these settings, all clicks will be sent to your rotator URLs as &ldquo;normal&rdquo; clicks and counted against the total number of &ldquo;Max Clicks&rdquo; that each URL is supposed to receive.<br />
+<br />
+Now, if one of your rotator URLs is another user&rsquo;s ClickMagick tracking link and it has these ClickMagick default settings...<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq220defaults.png" /><br />
+<br />
+then every time your rotator sends a Bot, Server, Spider, or User click to the URL, the rotator will subtract that click from the Max Clicks count for the URL, but the receiving URL will &ldquo;flag&rdquo; those same clicks and not count them as Unique Clicks received.<br />
+<br />
+That means, for example, that your rotator might think it has sent 100 unique clicks, but to the receiving URL, it might look like you&rsquo;ve sent only 73 unique clicks because the other 27 were &ldquo;flagged&rdquo; as questionable.&nbsp;That&rsquo;s a &ldquo;stats discrepancy&rdquo;.<br />
+&nbsp;
+<div class="faq-caution"><b>Caution:</b> You can have a &ldquo;stats discrepancy&rdquo;&nbsp;any time a ClickMagick tracking link or rotator points to another ClickMagick tracking link or&nbsp;rotator with different settings. It&rsquo;s quite common, for example,&nbsp;to receive incoming traffic through a tracking link which redirects that traffic to one or more rotators. You can definitely have setting conflicts in this common scenario, so just check your settings whenever you get a warning.</div>
+<br />
+<br />
+<strong>How do you resolve this?</strong><br />
+<br />
+There are several ways you can handle the warning you&rsquo;re getting.<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>1.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td><strong>Change your settings.</strong> After reviewing your settings, you may realize that you&rsquo;ve simply used the wrong settings for your rotator (or tracking link).</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>2.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td><strong>Ask them to change their settings.</strong> Normally you wouldn&rsquo;t want to ask someone else to change their settings, but you might want to if their settings are overly harsh&mdash;for example, if they&rsquo;ve set all 6 &ldquo;Bad Click&rdquo; settings to Block. But keep in mind that they may be reselling clicks and want to keep their clicks at the highest quality level and quite intentionally have all questionable clicks set to Block.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>3.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td><strong>Do nothing.</strong> Oftentimes, doing nothing is the right thing to do because your own settings are exactly what you think they should be. In this case, it&rsquo;s&nbsp;just good to know that you may be asked about a click discrepancy from the person receiving the clicks.&nbsp;</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+How ever you choose to handle the warning, the main thing is that you won&rsquo;t be surprised if you get asked about a &ldquo;stats discrepancy&rdquo; since you know for certain that it&rsquo;s possible for a stats discrepancy to occur if you&rsquo;re getting this warning.<br />
+<br />
+For a complete explanation of the &ldquo;Bad Clicks&rdquo; settings, read this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=79"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=79">&nbsp;What are the 6 types of potentially &ldquo;bad&rdquo; clicks?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</body></html>

@@ -26,7 +26,7 @@ my $app = <: $module_name :>->new( {    #
             ssl    => 0,
         },
         api => {
-            connect => $cfg->{_}->{auth},
+            connect => $cfg->{auth},
             rpc     => {
                 workers => undef,
                 argon   => {

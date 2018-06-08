@@ -13,7 +13,6 @@ $modules{$_} = $_ for qw(
   Alien::TinyCC
   Archive::Ar
   FFI::Platypus
-  FFI::Platypus::Type::StringArray
   File::ShareDir::Dist
   File::chdir
   Module::Build

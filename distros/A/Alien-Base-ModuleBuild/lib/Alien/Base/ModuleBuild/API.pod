@@ -212,7 +212,7 @@ Each command may be either a string or an array reference.  If the array referen
 
 [version 0.005]
 
-If set to true, then dynamic libraries will be moved from the C<lib> directory to a separate C<dynamic> directory.  This makes them available for FFI modules (see L<FFI::Platypus>, or L<FFI::Raw>), while preferring static libraries when creating XS extensions.
+If set to true, then dynamic libraries will be moved from the C<lib> directory to a separate C<dynamic> directory.  This makes them available for FFI modules (see L<FFI::Platypus>), while preferring static libraries when creating XS extensions.
 
 =item alien_msys
 

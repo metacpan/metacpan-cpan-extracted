@@ -16,11 +16,24 @@
 #include "pl_eventloop.h"
 #include "pl_console.h"
 #include "pl_native.h"
+#include "pl_inlined.h"
+#include "pl_sandbox.h"
 #include "pl_util.h"
 
-static void duk_fatal_error_handler(void* data, const char* msg)
+#define MAX_MEMORY_MINIMUM  (128 * 1024) /* 128 KB */
+#define MAX_TIMEOUT_MINIMUM (500000)     /* 500_000 us = 500 ms = 0.5 s */
+
+#define TIMEOUT_RESET(duk) \
+    do { \
+        if (duk->max_timeout_us > 0) { \
+            duk->eval_start_us = now_us(); \
+        } \
+    } while (0) \
+
+static void duk_fatal_error_handler(void* udata, const char* msg)
 {
-    UNUSED_ARG(data);
+    /* Duk* duk = (Duk*) udata; */
+    UNUSED_ARG(udata);
     dTHX;
     PerlIO_printf(PerlIO_stderr(), "duktape fatal error, aborting: %s\n", msg ? msg : "*NONE*");
     abort();
@@ -31,14 +44,10 @@ static Duk* create_duktape_object(pTHX_ HV* opt)
     Duk* duk = (Duk*) malloc(sizeof(Duk));
     memset(duk, 0, sizeof(Duk));
 
-    duk->pagesize = getpagesize();
+    duk->pagesize_bytes = getpagesize();
+
     duk->stats = newHV();
     duk->msgs = newHV();
-
-    duk->ctx = duk_create_heap(0, 0, 0, 0, duk_fatal_error_handler);
-    if (!duk->ctx) {
-        croak("Could not create duk heap\n");
-    }
 
     if (opt) {
         hv_iterinit(opt);
@@ -66,9 +75,26 @@ static Duk* create_duktape_object(pTHX_ HV* opt)
                 duk->flags |= SvTRUE(value) ? DUK_OPT_FLAG_SAVE_MESSAGES : 0;
                 continue;
             }
+            if (memcmp(kstr, DUK_OPT_NAME_MAX_MEMORY_BYTES, klen) == 0) {
+                int param = SvIV(value);
+                duk->max_allocated_bytes = param > MAX_MEMORY_MINIMUM ? param : MAX_MEMORY_MINIMUM;
+                continue;
+            }
+            if (memcmp(kstr, DUK_OPT_NAME_MAX_TIMEOUT_US, klen) == 0) {
+                int param = SvIV(value);
+                duk->max_timeout_us = param > MAX_TIMEOUT_MINIMUM ? param : MAX_TIMEOUT_MINIMUM;
+                continue;
+            }
             croak("Unknown option %*.*s\n", (int) klen, (int) klen, kstr);
         }
     }
+
+    duk->ctx = duk_create_heap(pl_sandbox_alloc, pl_sandbox_realloc, pl_sandbox_free, duk, duk_fatal_error_handler);
+    if (!duk->ctx) {
+        croak("Could not create duk heap\n");
+    }
+
+    TIMEOUT_RESET(duk);
 
     // register a bunch of native functions
     pl_register_native_functions(duk);
@@ -78,6 +104,9 @@ static Duk* create_duktape_object(pTHX_ HV* opt)
 
     // register event loop dispatcher
     pl_register_eventloop(duk);
+
+    // inline a bunch of JS functions
+    pl_register_inlined_functions(duk);
 
     // initialize console object
     pl_console_init(duk);
@@ -135,6 +164,7 @@ get(Duk* duk, const char* name)
     duk_context* ctx = 0;
     Stats stats;
   CODE:
+    TIMEOUT_RESET(duk);
     ctx = duk->ctx;
     pl_stats_start(aTHX_ duk, &stats);
     RETVAL = pl_get_global_or_property(aTHX_ ctx, name);
@@ -147,6 +177,7 @@ exists(Duk* duk, const char* name)
     duk_context* ctx = 0;
     Stats stats;
   CODE:
+    TIMEOUT_RESET(duk);
     ctx = duk->ctx;
     pl_stats_start(aTHX_ duk, &stats);
     RETVAL = pl_exists_global_or_property(aTHX_ ctx, name);
@@ -159,6 +190,7 @@ typeof(Duk* duk, const char* name)
     duk_context* ctx = 0;
     Stats stats;
   CODE:
+    TIMEOUT_RESET(duk);
     ctx = duk->ctx;
     pl_stats_start(aTHX_ duk, &stats);
     RETVAL = pl_typeof_global_or_property(aTHX_ ctx, name);
@@ -171,6 +203,7 @@ instanceof(Duk* duk, const char* object, const char* class)
     duk_context* ctx = 0;
     Stats stats;
   CODE:
+    TIMEOUT_RESET(duk);
     ctx = duk->ctx;
     pl_stats_start(aTHX_ duk, &stats);
     RETVAL = pl_instanceof_global_or_property(aTHX_ ctx, object, class);
@@ -183,6 +216,7 @@ set(Duk* duk, const char* name, SV* value)
     duk_context* ctx = 0;
     Stats stats;
   CODE:
+    TIMEOUT_RESET(duk);
     ctx = duk->ctx;
     pl_stats_start(aTHX_ duk, &stats);
     RETVAL = pl_set_global_or_property(aTHX_ ctx, name, value);
@@ -191,37 +225,9 @@ set(Duk* duk, const char* name, SV* value)
 
 SV*
 eval(Duk* duk, const char* js, const char* file = 0)
-  PREINIT:
-    duk_context* ctx = 0;
-    Stats stats;
-    duk_uint_t flags = 0;
-    duk_int_t rc = 0;
   CODE:
-    ctx = duk->ctx;
-
-    /* flags |= DUK_COMPILE_STRICT; */
-
-    pl_stats_start(aTHX_ duk, &stats);
-    if (!file) {
-        rc = duk_pcompile_string(ctx, flags, js);
-    }
-    else {
-        duk_push_string(ctx, file);
-        rc = duk_pcompile_string_filename(ctx, flags, js);
-    }
-    pl_stats_stop(aTHX_ duk, &stats, "compile");
-
-    if (rc != DUK_EXEC_SUCCESS) {
-        croak("JS could not compile code: %s\n", duk_safe_to_string(ctx, -1));
-    }
-
-    pl_stats_start(aTHX_ duk, &stats);
-    rc = duk_pcall(ctx, 0);
-    pl_stats_stop(aTHX_ duk, &stats, "run");
-    check_duktape_call_for_errors(rc, ctx);
-
-    RETVAL = pl_duk_to_perl(aTHX_ ctx, -1);
-    duk_pop(ctx);
+    TIMEOUT_RESET(duk);
+    RETVAL = pl_eval(aTHX_ duk, js, file);
   OUTPUT: RETVAL
 
 SV*
@@ -229,6 +235,7 @@ dispatch_function_in_event_loop(Duk* duk, const char* func)
   PREINIT:
     Stats stats;
   CODE:
+    TIMEOUT_RESET(duk);
     pl_stats_start(aTHX_ duk, &stats);
     RETVAL = newSViv(pl_run_function_in_event_loop(duk, func));
     pl_stats_stop(aTHX_ duk, &stats, "dispatch");
@@ -239,6 +246,7 @@ run_gc(Duk* duk)
   PREINIT:
     Stats stats;
   CODE:
+    TIMEOUT_RESET(duk);
     pl_stats_start(aTHX_ duk, &stats);
     RETVAL = newSVnv(pl_run_gc(duk));
     pl_stats_stop(aTHX_ duk, &stats, "run_gc");

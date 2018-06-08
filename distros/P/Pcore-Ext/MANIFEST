@@ -15,9 +15,11 @@ lib/Pcore/Ext/Context/Func.pm
 lib/Pcore/Ext/Context/L10N.pm
 lib/Pcore/Ext/Context/Raw.pm
 lib/Pcore/Ext/Lib/AmCharts.pm
-lib/Pcore/Ext/Lib/Grid.pm
-lib/Pcore/Ext/Lib/PayPal.pm
-lib/Pcore/Ext/Lib/ReCaptcha.pm
+lib/Pcore/Ext/Lib/Plugin.pm
+lib/Pcore/Ext/Lib1/AmCharts.pm
+lib/Pcore/Ext/Lib1/Grid.pm
+lib/Pcore/Ext/Lib1/PayPal.pm
+lib/Pcore/Ext/Lib1/ReCaptcha.pm
 share/dist-id.json
 share/dist.yaml
 share/l10n/l10n.pot

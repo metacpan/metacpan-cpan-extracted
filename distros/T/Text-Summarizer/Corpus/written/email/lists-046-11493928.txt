@@ -1,0 +1,250 @@
+
+
+
+docno="lists-046-11493928"
+name="Nico Poppelier"
+email="nico@valacar.elsevier.nl"
+sent="Thu, 4 Apr 1996 09:08:31 +0200 (MET DST)"
+inreplyto="199604032337.PAA00531@labrador.mv.us.adobe.com"
+subject="Re: Agenda for Monday April 1st"
+To: raman@labrador.mv.us.adobe.com (Raman T. V.)
+Cc: w3c-math-erb@w3.org
+
+
+
+     
+   
+I've read the minutes of the last few meetings and Dave's
+proposal. Here are some comments.
+
+1. If you want to have a model for large or extendible characters,
+I would like to suggest that we consider (again) the model of TeX
+and the Computer Modern fonts. Barbara Beeton of the AMS has also
+done interesting work on math font layout in some ISO workgroup.
+
+2. Automatic numbering, or better: automatic generation of numbers
+(labels) from keys used in symbolic referencing, a la \label/\ref
+in LaTeX or ID/IDREF in SGML, is fraught with difficulties.
+Between =-=-=-= lines I'll include a piece I wrote about that in
+relation to the Elsevier Science DTD's.
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+The problem of symbolic referencing has never been one of the DTDs,
+but one of finding an algorithm for deriving (printed) numbers/labels
+from symbolic labels in the SGML source document.
+
+
+Earlier summary of the problem
+------------------------------
+A generic mechanism for counters, including some rules for
+presentation of counters, is as follows.
+
+- Every type of numbered object, table, figure, equation,
+  reference, has its own counter.
+- All top-level counters start at the value 0 (zero) at the
+  beginning of the document.
+- If nesting is possible, every nesting level has its own counter.
+- Counters of levels below top-level start at the value 0 (zero) at the
+  start tag of the next higher (parent) level.
+- From the values of the counter(s) a label is calculated. This
+  label is e.g. printed in the article as it appears in a journal
+  issue. The relation between labels and counters is
+  application-dependent.
+  Example: |<sec id="99">| could be printed as ``3.2.1''.
+- The values of the |id| attributes are unique within the
+  document instance.
+- The |id| attribute is not identical to the counter value.
+- If the |id| attribute is missing, the counter is not
+  incremented, and the element is not numbered. This allows for e.g.
+  un-numbered equations. This means that tables and figures always have
+  an |id| attribute even when they are not referenced. (Or are
+  there also cases where tables and figures are not numbered?)
+
+There are (at least) the following exceptions to the algorithm
+described above:
+
+1. The contents of a figure form one (physical) entity, but
+inspection of the contents show that there are logical sub-figures
+(hidden) inside the figure. Example: the contents of figure~2 contains
+markers `a', `b' and `c', which indicate logical sub-figures 2a, 2b and
+2c.
+
+2. Normal equation numbering (1, 2, 3, ...) is interrupted by an
+equation number that is `derived from' an earlier one. Example: (1),
+(2), (3), (1'), (4), (5), ...
+
+3. Numbering in lists, or sub-numbering in equations, is
+interrupted. Example: a numbered list with items 1, 2, 3, is followed
+by a paragraph of text (the || is on the same level as the
+|<l>|), and then the list continues 4, 5, 6. The intention of the
+author appears to be {\em one\/} list, but this list is
+interrupted. A similar example can be found in equation sub-numbering:
+equations (4a) and (4b) are followed by a paragraph of text, followed
+by equations (4c) and (4d).
+
+Below I will discuss each case separately.
+
+Hidden sub-figures
+------------------
+
+When a figure (as far as we know, hidden sub-components occur only
+with figures.) that exists as one physical entity consists of logical
+sub-entities, the only solution lies in adding this information, which
+lies *outside* the document, to the document. One possibility for this
+is to give the |<fig>| start tag a new attribute that specifies the
+labels of the individual components. This enables generation of the
+labels of the sub-figures.
+
+First an example of a regular case:
+
+  <fig id=fig4>
+  <fig id=fig4a><figlnk file="fig4a"></fig>
+  <fig id=fig4b><figlnk file="fig4b"></fig>
+  </fig>
+
+Here the outer figure and the two nested figures each have their own
+unique key for referencing (fig4, fig4a, fig4b), and we have the
+following (id, label) pairs:
+
+  (fig4, 4)  (fig4a, (4 1))  (fig4b, (4 2))
+
+where the counter strings (4 1) and (4 2) are represented as `4a' and `4b'
+(but this presentation is application-dependent of course).
+
+Second an example of hidden sub-figures:
+
+  <fig id=fig4>
+  <figlnk file="fig4">
+  </fig>
+
+the picture in |fig4| contains two labels, `a' and `b', that identify
+sub-figures. Both the figure as a whole and the individual sub-figures
+are referenced. If we add an attribute to the start tag we can achieve
+this: |<fig id=fig4 comp="a b"^gt;|. The keys `fig4a' and `fig4b' are
+implied (automatically generated); these implied keys act as aliases
+for `fig4', since they refer to the same physical object.
+Unfortunately, the attribute |comp="a b"| also suggests a
+presentation. Now we have the following (id, label) pairs:
+
+  (fig4, 4)  (fig4a, (4 1))  (fig4b, (4 2))
+
+where |4|, |(4 1)| and |(4 2)| refer to the same object
+(physical figure) in the document instance.
+
+Derived equation numbers
+------------------------
+We illustrate this case with an example. Suppose an article contains
+the following sequence of equations: (1), (2), (3), (1'), (4), (5),
+... In that case we have the following (id, label) pairs for the first
+three equations:
+
+  (eq1, 1)  (eq2, 2)  (eq3, 3)
+
+The next equation should have an (id, label) pair like this:
+
+  (eq$1, label(eq1)')
+
+where |eq$1| is the unique |id| assigned to equation~(1'), and
+|label(eq1)| stands for the label of the equation with id=eq1.
+
+And the next equation, (4), should have an (id, label) pair like this:
+
+  (eq4, 4)
+
+The question is whether appending material to an existing label is the
+only form of derivation, or whether other forms of derivation exist.
+
+Interrupted sequences
+---------------------
+This case occurs with list items within a numbered list, or with
+numbered sub-equations. (Lists look like a special case of nesting:
+numbering of list items normally starts with 1, but every list item
+must have an \verb|id| that is unique within the document. This could
+be achieved if we also numbered the parent element \verb|<l^gt;|.)
+
+Suppose we have
+
+  <l>
+  <li id="liA">a footnote is ...
+  <li id="liB">footnotes should be ...
+  </l>
+  A paragraph of text comes between the two numbered lists.
+  <l>
+  <li id="liC">a figure is ...
+  <li id="liD">a table is ...
+  </l>
+
+and the author has numbered the list items as 1, 2, 3, 4. We agreed
+earlier that one of the guiding principles is to follow the author
+unless there are errors in the manuscript.
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+3. "HTML-Math is intended to allow ... as well as rendering to
+graphical bitmapped displays." What about rendering to paper??
+
+4. "There are hundreds of symbols in use in mathematics." For those
+of you who think this is covered by Unicode, Computer Modern fonts and
+the AMS fonts (although the latter *are* very useful), should study
+pages 47-50 of the following document
+
+    ftp://ftp.elsevier.nl/pub/sgml/artdoc.ps.gz
+
+This is the documentation of our article DTD, and it contains
+tables with *all* symbols and characters we use in typesetting our
+products. There is redundancy in it, I know. But more important is
+that to cover this set 100% you need more than the font sets I
+mentioned earlier. Elsevier Science is in discussion with several
+societies about the possibility of completing a font set that
+covers all this, and perhaps more, and make it freely available.
+This will also solve legal problems with embedding fonts or parts
+of fonts in PDF files.
+
+5. Superiors/inferiors: I think we should add something about
+vertical position of inferiors in mathematics and chemistry (these
+differ, as some of you may know).
+
+6. In the list of layout idioms I believe there is at least
+one missing, namely an arrow that adjusts its width to the text
+appearing above or below it. This is used in chemical formulas, and
+is different from an arrow or brace AS ORNAMENT, that adjusts its width
+to the text underneath it. Examples of both:
+
+    \widebrace{a b c ... x y z} (the brace is the ornament)
+
+           catalyst
+      A  -----------> B         (the text above the arrow is the ornament)
+
+7. In example 2 a lot of reserved words occur: from, to, of. How
+do you get these words as normal words in the text (in roman)?
+
+8. What about coding fractions: are we going to follow LaTeX and most
+SGML DTD's and use something like (fraction (numerator ...)
+(denominator ...)) or are we copying the horrible TeX construct
+(... over ...)? I've been asked by people on the LaTeX3 development
+team to express a strong preference for the former, and a strong
+dislike for \over!
+
+That's it. I'll try to monitor the corner designated to our group
+on www.w3.org, although the password Dave gave me doesn't work!  :-)
+
+If Dave can let me know several days in advance when a telephone
+conference occurs (on Monday evenings) I can try to attend. But
+there will be Mondays on which I am not at home from 7 pm to midnight
+(that's 12 noon to 5 pm EST, since we're in daylight saving time
+as of last weekend).
+
+Regards,
+
+Nico
+
+------------------------------------------------------------------------
+Dr. Nico A.F.M. Poppelier
+Elsevier Science, APD, ITD               Email: n.poppelier@elsevier.nl.
+Molenwerf 1, 1014 AG Amsterdam           Phone: +31-20-4853482.
+The Netherlands                          Fax:   +31-20-4853706.
+------------------------------------------------------------------------
+                  The truth, the whole truth, and nothing but the truth.
+                                             And maybe some compromises.
+     
+
+

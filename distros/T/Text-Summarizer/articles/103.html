@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html><head><title>How do I track my Pay-Per-Click (PPC) Keywords?</title></head><body>
+<b>How do I track my Pay-Per-Click (PPC) Keywords?</b><br />
+<br />
+If you&rsquo;re doing any kind of Pay-Per-Click advertising it&rsquo;s crucial that you track your results for each and every individual keyword you bid on.<br />
+<br />
+Fortunately this is really easy to do with ClickMagick, and we&rsquo;ve created a tutorial showing you exactly how.<br />
+<br />
+In this guide you&rsquo;ll learn how to track your ads and keywords in both Google AdWords and Bing Ads, how to add your tracking links so your ads are approved, and some general discussion on PPC tracking strategy &hellip;<br />
+<br />
+Before getting into the written tutorial, you may want to watch these video tutorials on how to set up an ad with Bing or AdWords:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=bingsetup" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=bingsetup" id="video-link-new">How to set up a Bing Ad to track keywords</a></b></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=adwordssetup" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=adwordssetup" id="video-link-new">How to set up an AdWords Ad to track keywords</a></b></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+<br />
+Now, let&rsquo;s suppose that you&rsquo;ve set up a cloaked custom domain named <code>bestcoolproducts.com</code> and you&rsquo;ve created&nbsp;a tracking link for your Google AdWords ads that looks like this:<br />
+<br />
+<code><span style="color: rgb(0, 128, 0);">http://</span>bestcoolproducts.com<span style="color: rgb(0, 128, 0);">/google/</span></code><br />
+<br />
+To instruct Google to append the exact keyword that generated the click to the end of your tracking link as a sub-ID, you just add&nbsp;<code><span style="color:#008000;">{keyword}</span></code>&nbsp;to the end like this:<br />
+<br />
+<code><span style="color: rgb(0, 128, 0);">http://</span>bestcoolproducts.com<span style="color: rgb(0, 128, 0);">/google<strong>/{keyword}</strong></span></code><br />
+<br />
+Once you do this, if a web surfer searches for &ldquo;best tracking system&rdquo; on Google and then clicks on an ad you were promoting for ClickMagick, the user would be redirected to:<br />
+<br />
+<code><span style="color: rgb(0, 128, 0);"><code>http</code>://</span>bestcoolproducts.com<span style="color: rgb(0, 128, 0);">/google/<strong>best+tracking+system</strong></span></code><br />
+<br />
+ClickMagick will record the sub-ID &ldquo;best+tracking+system&rdquo; with the click &hellip;<br />
+<br />
+&hellip; and then from that point on you can simply click the number in the &ldquo;TC&rdquo; column on your main links page in ClickMagick to see all your stats broken down by keyword.<br />
+<br />
+This works exactly the same with Bing Ads. You would just enter your tracking link with the <code><span style="color:#008000;">{KeyWord}</span></code> token at the end in the Destination URL field and you&rsquo;re all set.<br />
+<br />
+&nbsp;
+<div class="faq-caution"><b>Caution:</b> These tokens will <strong>NOT </strong>work properly if you have &lsquo;Auto-tagging&rsquo;&nbsp;enabled on your Bing account. You must turn that option off if you want Bing to send the token information back to ClickMagick. You can learn how to turn off Bing&rsquo;s auto-tagging feature in this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=307"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=307">&nbsp;How do I troubleshoot my Bing ad?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+<br />
+<br />
+<br />
+<strong>Bing&rsquo;s {QueryString} Token</strong><br />
+<br />
+Bing actually also has another token called&nbsp;<code><span style="color:#008000;">{QueryString}</span></code>&nbsp;that you can experiment with &hellip;<br />
+<br />
+<code><span style="color:#008000;">{KeyWord}</span></code> will return the keyword that generated the click, while <code><span style="color:#008000;">{QueryString}</span></code> will return the exact search phrase entered by the user, which is not always the same.<br />
+<br />
+The <code><span style="color:#008000;">{KeyWord}</span></code> token is what most people have been using for years, but we&rsquo;ve noticed it&rsquo;s no longer listed in Bing&rsquo;s documentation. It does still seem to work as it always has, but we don&rsquo;t know if it&rsquo;s being &ldquo;phased out&rdquo; or if it&rsquo;s now &ldquo;unsupported.&rdquo;<br />
+<br />
+So with Bing try using whichever token returns the exact data you want, but if you ever have problems using the <code><span style="color:#008000;">{KeyWord}</span></code> token we&rsquo;d suggest switching to <code><span style="color:#008000;">{QueryString}</span></code>.<br />
+<br />
+<br />
+<strong>Additional Tokens You Might Want To Use</strong><br />
+<br />
+Both Google and Bing offer a few additional tokens that you may want to use as well, for example, to help you identify the ad or match type that generated the click.<br />
+<br />
+Here are the additional tokens that are available &hellip;<br />
+<br />
+<strong>Google AdWords</strong><br />
+&nbsp;
+<div style="overflow-x:auto;">
+<table border="0" cellpadding="0" cellspacing="0" style="width: 755px;">
+	<tbody>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 150px;"><code><span style="color: rgb(0, 128, 0);">{adgroupid}</span></code></td>
+			<td style="width: 600px;">the ID of the ad group that served the ad</td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 150px;"><code><span style="color: rgb(0, 128, 0);">{campaignid}</span></code></td>
+			<td style="width: 600px;">the ID of the campaign that served the ad</td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 150px;"><code><span style="color: rgb(0, 128, 0);">{creative}</span></code></td>
+			<td style="width: 600px;">the ID of your ad creative</td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 150px;"><code><span style="color: rgb(0, 128, 0);">{device}</span></code></td>
+			<td style="width: 600px;">returns &ldquo;m&rdquo; for mobile, &ldquo;t&rdquo; for tablet or &ldquo;c&rdquo; for computer</td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 150px;"><code><span style="color: rgb(0, 128, 0);">{matchtype}</span></code></td>
+			<td style="width: 600px;">will return &ldquo;e&rdquo; for exact, &ldquo;p&rdquo; for phrase, or &ldquo;b&rdquo; for broad</td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 150px;"><code><span style="color: rgb(0, 128, 0);">{network}</span></code></td>
+			<td style="width: 600px;">returns &ldquo;g&rdquo; for Google search, &ldquo;s&rdquo; for search partner or &ldquo;d&rdquo; for display</td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 150px;"><code><span style="color: rgb(0, 128, 0);">{placement}</span></code></td>
+			<td style="width: 600px;">the site your ad was clicked on</td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 150px;"><code><span style="color: rgb(0, 128, 0);">{target}</span></code></td>
+			<td style="width: 600px;">the category of the placement</td>
+		</tr>
+		<tr>
+			<td style="width: 150px;">Others</td>
+			<td style="width: 600px;"><a href="https://support.google.com/adwords/answer/6305348" target="_blank">See &ldquo;Final URL, tracking template, or custom parameter&rdquo; section</a></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+<br />
+<strong>Bing Ads</strong><br />
+&nbsp;
+<div style="overflow-x:auto;">
+<table border="0" cellpadding="0" cellspacing="0" style="width: 752px;">
+	<tbody>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 150px;"><code><span style="color: rgb(0, 128, 0);">{AdGroupID}</span></code></td>
+			<td style="width: 599px;">the ID of the ad group that triggered the ad</td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 150px;"><code><span style="color: rgb(0, 128, 0);">{AdGroup}</span></code></td>
+			<td style="width: 599px;">the name of the ad group that triggered the ad</td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 150px;"><code><span style="color: rgb(0, 128, 0);">{AdID}</span></code></td>
+			<td style="width: 599px;">the numeric ID of your ad creative</td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 150px;"><code><span style="color: rgb(0, 128, 0);">{CampaignID}</span></code></td>
+			<td style="width: 599px;">the ID of the campaign that triggered the ad</td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 150px;"><code><span style="color: rgb(0, 128, 0);">{Campaign}</span></code></td>
+			<td style="width: 599px;">the name of the campaign that triggered the ad</td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 150px;"><code><span style="color: rgb(0, 128, 0);">{Device}</span></code></td>
+			<td style="width: 599px;">returns &ldquo;m&rdquo; for mobile, &ldquo;t&rdquo; for tablet or &ldquo;c&rdquo; for computer</td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 150px;"><code><span style="color: rgb(0, 128, 0);">{MatchType}</span></code></td>
+			<td style="width: 599px;">will return &ldquo;e&rdquo; for exact, &ldquo;p&rdquo; for phrase, or &ldquo;b&rdquo; for broad</td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 150px;"><code><span style="color: rgb(0, 128, 0);">{Network}</span></code></td>
+			<td style="width: 599px;">returns &ldquo;o&rdquo; for Bing and AOL or &ldquo;s&rdquo; for syndicated ads</td>
+		</tr>
+		<tr>
+			<td style="width: 150px;">Others</td>
+			<td style="width: 599px;"><a href="http://help.bingads.microsoft.com/#apex/3/en/56799/2/#exp23" target="_blank">Click here for Bing&rsquo;s full set of custom parameters</a></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+<br />
+You have two options if you want to use these additional tokens ...<br />
+<br />
+ClickMagick supports up to 5 sub-IDs, so to add additional sub-IDs to the end of your tracking link you can simply keep adding <code><span style="color:#008000;">/some_value</span></code> to the end of your link.<br />
+<br />
+For example earlier we talked about adding the&nbsp;<code><span style="color:#008000;">{keyword}</span></code>&nbsp;token to the end like this:<br />
+<br />
+<code><span style="color: rgb(0, 128, 0);"><code>http</code>://</span>bestcoolproducts.com<span style="color: rgb(0, 128, 0);">/google/<strong>{keyword}</strong></span></code><br />
+<br />
+If you wanted to add&nbsp;<code><span style="color:#008000;">{matchtype}</span></code>&nbsp;as a second sub-ID, you&rsquo;d do it like this:<br />
+<br />
+<code><span style="color: rgb(0, 128, 0);"><code>http</code>://</span>bestcoolproducts.com<span style="color: rgb(0, 128, 0);">/google/{KeyWord}<strong>/{matchtype}</strong></span></code><br />
+<br />
+You can add up to 5 sub-IDs in this way, but please keep in mind that currently only the first two sub-IDs will show up in your ClickMagick stats and in order to see the additional sub-IDs you&rsquo;ll need to download your data and view it that way.<br />
+<br />
+The other option is to simply combine the two tokens into one sub-ID value, so you can see both in ClickMagick, by simply separating them with a hyphen like this:<br />
+<br />
+<code><span style="color:#008000;"><code>http</code>://</span>bestcoolproducts.com<span style="color:#008000;">/google<strong>/{keyword}-{matchtype}</strong></span></code><br />
+<br />
+So, if somebody entered&nbsp;&ldquo;best tracking system&rdquo; and that exactly matched your keyword,&nbsp;the sub-ID in your stats would appear as &ldquo;best+tracking+system-e&rdquo; where the &ldquo;-e&rdquo; part is the <code><span style="color:#008000;">{matchtype}</span></code>, meaning the match type was exact.<br />
+<br />
+Just keep in mind that sub-IDs can only be 50 characters long. If the sub-ID is longer, it will be truncated to 50 characters.<br />
+<br />
+<br />
+<strong>Adding Your Tracking Link In Google AdWords</strong><br />
+<br />
+Google introduced something called &ldquo;Upgraded URLs&rdquo; in May of 2015.<br />
+<br />
+There&rsquo;s no longer a Destination URL field, and you need to specify both your Final URL (the URL of the page the user actually ends up on) and your tracking link separately.<br />
+<br />
+The upside is that you can now change your tracking links in AdWords any time without it triggering a manual review and pausing your ads which used to be a real pain.<br />
+<br />
+So to enter your tracking link in AdWords just click on &ldquo;Ad URL options (advanced)&rdquo; and then enter it in the &ldquo;Tracking template&rdquo; field there.<br />
+<br />
+If you&rsquo;re using ClickMagick and you need more help, there&rsquo;s also a video walkthrough titled &ldquo;<a href="/misc/video.cgi?name=adwordssetup">How To Set Up Tracking Links in AdWords</a>&rdquo; on the&nbsp;<a href="/user/tutorials.cgi" target="_blank">Video Tutorials</a>&nbsp;page.<br />
+<br />
+<img alt="" src="//cdn.clickmagick.com/images/user/faqs/adwordsurl.png" /><br />
+<br />
+<br />
+<strong>&ldquo;Upgraded URLs&rdquo;&nbsp;In Bing Ads</strong><br />
+<br />
+As of August 16<sup>th</sup>, 2016 Bing Ads now supports Upgraded URLs, just like Google.<br />
+<br />
+This has all of the same benefits, like more consistent ad approvals and the ability to make changes to your tracking links without triggering a manual review once you&rsquo;ve switched over to using this new method.<br />
+<br />
+For all the details, including instructions on how to use <strong><a href="http://help.bingads.microsoft.com/#apex/3/en/52007/-1" target="_blank">Bing Ads Editor</a></strong> to export your entire account to make bulk changes to all of your existing ads, please see <a href="http://help.bingads.microsoft.com/#apex/3/en/56751/-1" target="_blank">this page</a>.<br />
+<br />
+If you prefer to use the Bing Ads web-based editor, here&rsquo;s all you need to do:<br />
+<br />
+<strong>Step 1</strong>&nbsp;&ndash; Enter your Display URL. This should match the domain that the user will see in their browser when they arrive at the final landing page.<br />
+<br />
+<strong>Step 2</strong>&nbsp;&ndash; You&rsquo;ll no longer be using &ldquo;Destination URL&rdquo; (Bing is getting rid of this at the end of the year), so in the Landing Page section you&rsquo;ll want to select the option that says &ldquo;Final URL (recommended)&rdquo; and enter the actual destination URL here.<br />
+<br />
+<strong>Step 3</strong>&nbsp;&ndash; Enter your ClickMagick tracking link in the Tracking Template field.<br />
+<br />
+<strong>Note:</strong>&nbsp;If you don&rsquo;t see the Tracking Template field, just click the link that says &ldquo;Ad URL Options&rdquo; which will reveal the Tracking Template field and other advanced options.<br />
+<br />
+If you&rsquo;re using ClickMagick and you need more help, check out the video walkthrough titled &ldquo;<a href="/misc/video.cgi?name=bingsetup">How To Set Up Tracking Links in Bing</a>&rdquo; on the <a href="/user/tutorials.cgi" target="_blank">Video Tutorials</a> page.<br />
+<br />
+If you want you can get even fancier and enter a separate mobile URL, and enter custom tracking parameters, which you can learn about by clicking the &ldquo;Learn more&rdquo; link in the screenshot below &hellip;<br />
+<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/bingurls.jpg" /><br />
+<br />
+<br />
+<br />
+<strong>Pay-Per-Click Tracking Strategy</strong><br />
+<br />
+So that&rsquo;s the technical side of it, but let&rsquo;s also talk a tiny bit about strategy.<br />
+<br />
+This obviously isn&rsquo;t a detailed Pay-Per-Click Advertising course, but we do have a few tips based on experience that might be helpful.<br />
+<br />
+The biggest problem we see when it comes to PPC is people simply not tracking things at all.<br />
+<br />
+The next biggest problem is almost the opposite&mdash;micromanaging.<br />
+<br />
+Now, we&rsquo;re not trying to tell you how to set up and run your PPC campaigns because there are a million different variables and every business is different &hellip;<br />
+<br />
+But, from our experience, the overwhelming majority of PPC advertisers tend to micromanage their campaigns and end up wasting a ton of time.<br />
+<br />
+While it&rsquo;s important to set up your tracking so you can track your results down to the keyword level, when it comes to analyzing your results and optimizing your campaigns, don&rsquo;t focus on keywords with hardly any clicks.<br />
+<br />
+If you&rsquo;re like most PPC advertisers, the majority of your clicks will come from a relatively small percentage of your keywords. It&rsquo;s the old 80/20 rule&hellip;<br />
+<br />
+These are the keywords that you need to track and optimize.<br />
+<br />
+In a perfect world, we recommend that you actually set up a separate ad and tracking link for every &ldquo;important&rdquo; keyword that generates a meaningful number of clicks.<br />
+<br />
+You&rsquo;ll need to decide what number of clicks is critical for you, but normally it&rsquo;s not worth spending much time on a keyword that only gets a handful of clicks a week.<br />
+<br />
+Setting up a separate ad and tracking link for each important keyword does a few things &hellip;<br />
+<br />
+First of all, this will allow you to easily send visitors for different keywords to different landing pages and conduct split tests on individual keywords.<br />
+<br />
+Matching your message to what the user is looking for, based specifically&nbsp;on the exact search term they entered, is one of the few &ldquo;secrets&rdquo; to PPC success. Creating and optimizing individual landing pages for your important keywords is the way to go.<br />
+<br />
+Sure it&rsquo;s more work, but at the end of the day, it&rsquo;s also the key to allowing you to spend more ad money than your competitors&mdash;which means you can grab a bigger share of the clicks.<br />
+<br />
+The other thing this will do is make it easier for you to see the exact ROI for individual keywords.<br />
+<br />
+Google and Bing don&rsquo;t provide any way to pass click costs to your tracking links, probably&nbsp;because they often don&rsquo;t know exactly how much you&rsquo;ll end up getting charged until after the click actually happens, combined with the fact that they also sometimes make &ldquo;adjustments&rdquo; to your click costs after the fact.<br />
+<br />
+This is less than ideal from a tracking standpoint &hellip;<br />
+<br />
+&hellip; but if you&rsquo;re using a separate link for each of your important keywords at least you&rsquo;ll be able to periodically enter your actual click costs into ClickMagick to see exact ROIs on individual important keywords.<br />
+<br />
+Now with all of that being said, you might want to try this:<br />
+<br />
+If you have a very simple funnel you may want to also track the Return-On-Investment in your AdWords or Bing Ads account by adding their tracking pixels to your &ldquo;thank you&rdquo; pages.<br />
+<br />
+This only really works if you have a very simple funnel without any one-time-offers, upsells, downsells, and things like that, but if you can you&rsquo;ll be able to easily and automatically see ROIs for individual keywords within your Google or Bing Ads account, while at the same time using ClickMagick to track and optimize everything else.<br />
+<br />
+Whatever you do, just remember the 80/20 rule &hellip;<br />
+<br />
+You&rsquo;ll be MUCH better off spending your time split testing and optimizing for your top 10 or 20 &ldquo;money&rdquo; keywords than you&rsquo;ll be by micromanaging 100s or 1,000s of keywords.
+</body></html>

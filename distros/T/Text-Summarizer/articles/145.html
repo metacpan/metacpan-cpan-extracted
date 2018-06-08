@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html><head><title>What should I know about Sequential rotators?</title></head><body>
+<strong>What should I know about Sequential rotators?</strong><br />
+<br />
+A sequential rotator will send incoming clicks to each individual rotator URL in order, and then when it reaches the bottom it will simply start over again at the top.<br />
+<br />
+With the most basic setup, using a sequential rotator ensures that each individual rotator URL receives the same number of clicks, which is the primary reason to use one.<br />
+<br />
+Keep in mind however that this is not always the case once you start using some of the optional rotator URL settings and options in a sequential rotator.<br />
+<br />
+The way that rotators work, regardless of the type of rotator you choose, is that they always send each click to the next ELIGIBLE rotator URL &ndash; which is NOT always the &ldquo;next&rdquo; URL in the sequence.<br />
+<br />
+Consider a sequential rotator with three individual rotator URLs:<br />
+<br />
+URL #1 is added to the rotator with no other optional settings<br />
+URL #2 is added with a Max Daily Clicks setting of 20<br />
+URL #3 is added with geotargeting settings that only allow US traffic<br />
+<br />
+As clicks come in to this rotator, the optional settings on URL #2 and URL #3 will cause these URLs to be skipped at times &ndash; so each URL will NOT receive the same number of clicks.<br />
+<br />
+For example once URL #2 receives 20 clicks in a day it&rsquo;s no longer eligible to receive any more clicks, so only URL #1 and URL #3 will be eligible to receive clicks for the rest of that day.<br />
+<br />
+Or imagine that URL #3 is the &ldquo;next&rdquo; URL in line to receive a click, but the incoming click is from Canada. URL #3 only allows US traffic so it&rsquo;s not eligible to receive the click from Canada, so it will be skipped over and the click from Canada will actually go to URL #1.<br />
+<br />
+In short, if you don&rsquo;t use any optional settings for your individual rotator URLs a sequential rotator will perfectly divide all of the incoming clicks between each rotator URL.<br />
+<br />
+But once you start using some of the optional rotator URL settings this may not also be the case, so please keep this in mind as this will explain any &ldquo;discrepancies&rdquo; you see with sequential rotators.<br />
+<br />
+If you want to use geotargeting with sequential rotators, here&rsquo;s a &ldquo;workaround&rdquo; you might want to try. Just follow these steps:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>1.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Create a &ldquo;primary&rdquo; rotator that receives all of your incoming traffic.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>2.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Create a separate rotator for each &ldquo;group&rdquo; of URLs, based on their common settings. For example, the US only URLs should all be in one rotator. The Canada URLs should all be in their own rotator, etc.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>3.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Place the rotators created in Step 2 above into the &ldquo;primary&rdquo; rotator created in Step 1.</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+Once you do something like this you&rsquo;ll find that all of your US only URLs all receive the same number of clicks, all your Canada only URLs receive the same number of clicks, etc.
+</body></html>

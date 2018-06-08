@@ -255,6 +255,7 @@ src/ltc/headers/tomcrypt_math.h
 src/ltc/headers/tomcrypt_misc.h
 src/ltc/headers/tomcrypt_pk.h
 src/ltc/headers/tomcrypt_pkcs.h
+src/ltc/headers/tomcrypt_private.h
 src/ltc/headers/tomcrypt_prng.h
 src/ltc/mac/blake2/blake2bmac.c
 src/ltc/mac/blake2/blake2bmac_file.c
@@ -483,6 +484,7 @@ src/ltc/pk/ecc/ecc_export_openssl.c
 src/ltc/pk/ecc/ecc_free.c
 src/ltc/pk/ecc/ecc_get_curve.c
 src/ltc/pk/ecc/ecc_get_key.c
+src/ltc/pk/ecc/ecc_get_oid_str.c
 src/ltc/pk/ecc/ecc_get_size.c
 src/ltc/pk/ecc/ecc_import.c
 src/ltc/pk/ecc/ecc_import_openssl.c
@@ -552,6 +554,7 @@ src/ltc/stream/salsa20/salsa20_done.c
 src/ltc/stream/salsa20/salsa20_ivctr64.c
 src/ltc/stream/salsa20/salsa20_keystream.c
 src/ltc/stream/salsa20/salsa20_setup.c
+src/ltc/stream/salsa20/xsalsa20_setup.c
 src/ltc/stream/sober128/sober128_stream.c
 src/ltc/stream/sober128/sober128tab.c
 src/ltc/stream/sosemanuk/sosemanuk.c
@@ -596,7 +599,6 @@ src/ltm/bn_mp_fwrite.c
 src/ltm/bn_mp_gcd.c
 src/ltm/bn_mp_get_int.c
 src/ltm/bn_mp_get_long.c
-src/ltm/bn_mp_get_long_long.c
 src/ltm/bn_mp_grow.c
 src/ltm/bn_mp_import.c
 src/ltm/bn_mp_init.c
@@ -653,7 +655,6 @@ src/ltm/bn_mp_rshd.c
 src/ltm/bn_mp_set.c
 src/ltm/bn_mp_set_int.c
 src/ltm/bn_mp_set_long.c
-src/ltm/bn_mp_set_long_long.c
 src/ltm/bn_mp_shrink.c
 src/ltm/bn_mp_signed_bin_size.c
 src/ltm/bn_mp_sqr.c

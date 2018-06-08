@@ -1,6 +1,6 @@
 #############################################################################
 #################         Easy Debugging Module        ######################
-################# Copyright 2013 - 2017 Richard Kelsch ######################
+################# Copyright 2013 - 2018 Richard Kelsch ######################
 #################          All Rights Reserved         ######################
 #############################################################################
 ####### Licensing information available near the end of this file. ##########
@@ -33,7 +33,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION = '1.20';
+    our $VERSION = '1.21';
 
     # Inherit from Exporter to export functions and variables
     our @ISA = qw(Exporter);
@@ -57,12 +57,12 @@ for (my $count = 0 ; $count < scalar(@Levels) ; $count++) {
     $LevelLogic{$Levels[$count]} = $count;
 }
 
-my %ANSILevel   = ();                     # Global debug level colorized messages hash.  It will be filled in later.
-my $LOG         = Log::Fast->global();    # Let's snag the Log::Fast object.
-my $MASTERSTART = time;                   # Script start timestamp.
+our %ANSILevel;                            # Global debug level colorized messages hash.  It will be filled in later.
+our $LOG         = Log::Fast->global();    # Let's snag the Log::Fast object.
+my $MASTERSTART = time;                    # Script start timestamp.
 my ($SCRIPTNAME, $SCRIPTPATH, $suffix) = fileparse($0);
 my $PARENT      = $$;                     # Get the parent process ID
-my $TIMEZONE    = DateTime::TimeZone->new(name => 'local');
+our $TIMEZONE    = DateTime::TimeZone->new(name => 'local');
 
 =head1 NAME
 
@@ -212,6 +212,7 @@ DEFAULT:  '%Date% %Time% %Benchmark% %Loglevel%[%Subroutine%][%Lastline%] '
 
  %Date%       = Date (Uses format of "DateStamp" below)
  %Time%       = Time (Uses format of "TimeStamp" below)
+ %Epoch%      = Epoch (Unix epoch)
  %Benchmark%  = Benchmark - The time it took between the last benchmark display
                 of this loglevel.  If in an INFO level message, it benchmarks
                 the time until the next INFO level message.  The same rule is
@@ -224,6 +225,7 @@ DEFAULT:  '%Date% %Time% %Benchmark% %Loglevel%[%Subroutine%][%Lastline%] '
  %PID%        = Process ID
  %date%       = Just Date (typically used internally only, use %Date%)
  %time%       = Just time (typically used internally only, use %Time%)
+ %epoch%      = Unix epoch (typically used internally only, use %Epoch%)
  %Filename%   = Script Filename (parsed $0)
  %Fork%       = Running in parent or child?
      P = Parent
@@ -366,6 +368,7 @@ sub new {
         'Color'              => TRUE,                                    # Default to colorized output
         'DateStamp'          => colored(['yellow'], '%date%'),
         'TimeStamp'          => colored(['yellow'], '%time%'),
+        'Epoch'              => colored(['cyan'],   '%epoch%'),
         'Padding'            => -20,                                     # Default padding is 20 spaces
         'Lines-Padding'      => -2,
         'Subroutine-Padding' => 0,
@@ -383,6 +386,7 @@ sub new {
         },
         @_
     };
+
     # This pretty much makes all hash keys uppercase
     my @Keys = (keys %{$self});
     foreach my $Key (@Keys) {
@@ -589,6 +593,7 @@ sub _send_to_logger {      # This actually simplifies the previous method ... se
     my $prefix   = $self->{$level . '-PREFIX'} . '';    # A copy not a pointer
     my $forked   = ($PARENT ne $$) ? 'C' : 'P';
     my $threaded = 'PT-';
+    my $epoch    = time;
     if (exists($Config{'useithreads'}) && $Config{'useithreads'}) { # Do eval so non-threaded perl's don't whine
         eval(q(
             my $tid   = threads->tid();
@@ -603,8 +608,10 @@ sub _send_to_logger {      # This actually simplifies the previous method ... se
     $prefix =~ s/\%Subroutine\%/$shortsub/g;
     $prefix =~ s/\%Date\%/$self->{'DATESTAMP'}/g;
     $prefix =~ s/\%Time\%/$self->{'TIMESTAMP'}/g;
+    $prefix =~ s/\%Epoch\%/$self->{'EPOCH'}/g;
     $prefix =~ s/\%date\%/$Date/g;
     $prefix =~ s/\%time\%/$Time/g;
+    $prefix =~ s/\%epoch\%/$epoch/g;
     $prefix =~ s/\%Filename\%/$self->{'FILENAME'}/g;
     $prefix =~ s/\%Fork\%/$forked/g;
     $prefix =~ s/\%Thread\%/$threaded/g;

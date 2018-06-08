@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Email::Simple::Creator;
 # ABSTRACT: private helper for building Email::Simple objects
-$Email::Simple::Creator::VERSION = '2.214';
+$Email::Simple::Creator::VERSION = '2.216';
 sub _crlf {
   "\x0d\x0a";
 }
@@ -44,7 +44,7 @@ Email::Simple::Creator - private helper for building Email::Simple objects
 
 =head1 VERSION
 
-version 2.214
+version 2.216
 
 =head1 AUTHORS
 

@@ -1,6 +1,9 @@
 Revision history for Lingua-Norms-SUBTLEX-0.06
 
-0.06    2016.11.17
+0.07    2018.06.08
+        - resolves issue in set_lang() method for finding the specs.csv file during pre-install testing - thanks to Slaven Rezic for pointing this out
+
+0.06    2018.03.27
         - case- and mark-sensitivity control introduced: Following what is used in the Perl module "Text::Levenshtein". By a "matching level" set in new() and via "set_eq()" method. The default remains to search case (and mark) insensitively.
         - pos_all method added
         - pos_ methods have added argument 'conform' to transliterate the file-given strings into common code.

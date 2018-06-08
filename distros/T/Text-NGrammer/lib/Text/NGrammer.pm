@@ -10,7 +10,7 @@ use Carp;
 use Lingua::Sentence;
 
 use vars qw($VERSION);
-$VERSION = '0.01';
+$VERSION = '0.03';
 
 sub new {
   my $class = shift;
@@ -211,6 +211,14 @@ Extracts all the n-grams of length C<$n> from the C<@array>.  Exactly as in the 
 =item 0.01
 
 Initial version of the module
+
+=item 0.02
+
+Fixed dependencies
+
+=item 0.03
+
+Fixed dependencies in Makefile.PL
 
 =back
 

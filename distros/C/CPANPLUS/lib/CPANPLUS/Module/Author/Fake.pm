@@ -9,7 +9,7 @@ use strict;
 use vars            qw[@ISA $VERSION];
 use Params::Check   qw[check];
 
-$VERSION = "0.9174";
+$VERSION = "0.9176";
 
 @ISA = qw[CPANPLUS::Module::Author];
 

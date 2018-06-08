@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html><head><title>How do I get link previews when sharing on Facebook?</title></head><body>
+<b>How do I get link previews when sharing on Facebook?</b><br />
+<br />
+When you share a link on Facebook, their system tries to pull in the page title, description and a relevant image from the page to display along with your post.<br />
+<br />
+The good news is you can still benefit from this when using custom domain tracking links on Facebook, you just have to be aware of one limitation:<br />
+<br />
+With custom domains set up using Script Forwarding, cloaking must be set to &ldquo;No&rdquo; within the custom file you upload to your server.<br />
+<br />
+With the CNAME DNS method it should just work fine with either setting.<br />
+<br />
+Then in your ClickMagick account, for each of your tracking links, you have two options &hellip;<br />
+<br />
+If you want Facebook to automatically generate a link preview for your tracking link you must set Cloaking to &ldquo;No&rdquo; in your link settings.<br />
+<br />
+If you set Cloaking to &ldquo;Yes&rdquo; in your link settings, you will need to manually provide the Title, Description and Image URL so Facebook can generate the preview.<br />
+<br />
+If you plan on using a lot of tracking links on Facebook and want to take advantage of the automated link previews, you may want to consider setting up a dedicated domain just for Facebook if you need to use other types of cloaking combinations for other links.<br />
+<br />
+&nbsp;
+<div class="faq-note"><b>Note:</b> Sometimes Facebook&rsquo;s system is a little flaky. After you create or edit a link it can take up to 1 hour or longer for the preview to work properly on Facebook if you&rsquo;re using custom meta data (title, image, etc).<br />
+<br />
+&hellip; And occasionally it won&rsquo;t work at all in which case you should simply try editing your link (even if you don&rsquo;t change anything) which will signal Facebook to try fetching the correct info again.<br />
+<br />
+Facebook also employs various caching mechanisms that can cause you to see outdated meta info if you add it or change it after you&rsquo;ve initially created the tracking link.<br />
+<br />
+In this case you should use Facebook&rsquo;s <strong><a href="https://developers.facebook.com/tools/debug/og/object/" target="_blank">Open Graph Debugger Tool</a></strong> to &ldquo;Fetch new scrape information.&rdquo;</div>
+&nbsp;
+
+<div class="faq-tip"><b>Tip:</b> The maximum recommended image size for Facebook previews is 560 x 292 pixels. If you use a larger image Facebook will resize it smaller&mdash;and depending&nbsp;upon how big an image you start with and what it contains, text within the image may not be readable once they shrink it down.</div>
+</body></html>

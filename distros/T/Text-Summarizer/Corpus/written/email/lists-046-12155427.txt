@@ -1,0 +1,35 @@
+
+
+docno="lists-046-12155427"
+name="Dave Raggett"
+email="dsr@w3.org"
+sent="Wed, 05 Jun 1996 15:50:28 -0400"
+id="199606051950.AA173014228@w3.org"
+subject="Re: more comments on HTML-Math proposal"
+To: n.poppelier@elsevier.nl
+Cc: w3c-math-erb@w3.org<199606050741.JAA03224@thorin.elsevier.nl>
+
+
+     
+   
+
+
+> While reading the discussion between Bruce Smith and Ron Whitney, I
+> have come to the conclusion that the plug-in solution will not
+> work, because we need the possibility of anchor's within math,
+> and math in text in math. I'd like to see what you all think
+> about this, since this is what Dave proposed e.g. at the DLI
+> Math meeting in Illinois.
+
+I agree that today's plug-in api's are inadequate and am working
+to get this fixed. You can however make anchors within plugins
+work. The plugin is passed mouse events and can in turn call
+back to the browser to display a URL. This is enough to allow
+anchor's within math, and math in text in math, with the
+burden placed on the plugin.
+
+-- Dave Raggett <dsr@w3.org> tel: +1 (617) 258 5741 fax: +1 (617) 258 5999
+   World Wide Web Consortium, 545 Technology Square, Cambridge, MA 02139
+   url = http://www.w3.org/People/Raggett
+
+

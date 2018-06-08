@@ -95,7 +95,7 @@ with tag keys.  Below is an explanation of the meaning of each special key:
     extended    - 80-bit extended floating float
     ifd         - Unsigned 32-bit integer sub-IFD pointer (EXIF 'IFD')
     ifd64       - Unsigned 64-bit integer sub-IFD pointer (BigTIFF 'IFD8')
-    string      - Series of 8-bit ASCII characters        (EXIF 'ASCII')
+    string      - Series of 8-bit characters              (EXIF 'ASCII')
     undef       - Undefined-format binary data            (EXIF 'UNDEFINED')
     binary      - Binary data (same as 'undef')
 
@@ -400,7 +400,7 @@ numerical.
                   if the preview must be stored inside the maker notes.
 
                   'Mandatory' - set for mandatory tags.  Used only by TagInfoXML
-                  and documentation purposes.  Mandatory tags may be added
+                  and for documentation purposes.  Mandatory tags may be added
                   automatically by ExifTool.
 
                   'NestedHtmlDump' - flag set if value for this tag is also
@@ -483,7 +483,9 @@ numerical.
                   this, 'Main:' and 'Doc#:' prefixes are added to all Require'd
                   and Desire'd tag names which don't already start with 'Main:'
                   or 'Doc#:', and the Composite tag is built once for each of
-                  the main document and all sub-documents.
+                  the main document and all sub-documents.  May be a reference
+                  to a list of indices for Desire'd tags, one of which must
+                  exist to generate this tag for sub-documents.
 
                   'SubIFD' - used in writing to determine that the tag specifies
                   an offset to a sub-IFD.  When this flag is set, the Group1

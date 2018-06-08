@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html><head><title>How do we determine duplicate pixel conversions?</title></head><body>
+<strong>How do we determine duplicate pixel conversions?</strong><br />
+<br />
+Although duplicate clicks are determined by a combination of a user&#39;s IP address and cookie data stored in their browser, duplicate conversions from tracking pixels are handled differently.<br data-text="true" />
+<br />
+When a tracking pixel fires, it is considered a duplicate if just the IP address matches a previous conversion for the same tracking link with the same Ref value&mdash;there is no check against cookie data. More importantly, switching to different browsers, or using incognito mode, will not generate unique conversions if the IP is the same, which it would be if you&#39;re trying it all from the same machine. (Using different browsers would create unique clicks though.)<br data-text="true" />
+<br />
+In practical terms, this means that clearing your cookies will have no effect on whether a pixel conversion is considered a duplicate or not, and if you&#39;re expecting that clearing cookie data will have an effect, you can be confused by the results you see...<br data-text="true" />
+<br />
+By the way, we do NOT make this information public in any FAQs or other documentation because we don&#39;t want to give scammers any information that could make their jobs easier. That said, sometimes it might be necessary to mention this to a user experiencing a problem in a ticket.
+</body></html>

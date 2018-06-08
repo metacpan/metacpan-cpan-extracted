@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html><head><title>What if my conversion stats don’t seem accurate?</title></head><body>
+<b>What if my conversion stats don&rsquo;t seem accurate?</b><br />
+<br />
+If conversions aren&rsquo;t tracking properly, we understand that&rsquo;s a big problem and we have a few tips for you. It&rsquo;s definitely something on your end, and these are the most common reasons for &ldquo;missing&rdquo; conversions&hellip;<br />
+<br />
+<br />
+<b>Check #1:</b> Are you sure ALL your traffic is reaching your sales funnel via a ClickMagick tracking link? Any traffic that reaches your funnel any other way can not and will not be tracked by ClickMagick.<br />
+<br />
+Check for &ldquo;holes&rdquo; in your marketing and make sure all your traffic is routed through a tracking link.<br />
+<br />
+<br />
+<b>Check #2:</b> Have you added the right conversion tracking pixel to the appropriate pages, in the right place?<br />
+<br />
+Obviously, if you don&rsquo;t add the ClickMagick tracking pixel to your &ldquo;thank you&rdquo; pages properly, that&rsquo;s a problem. Use ClickMagick&rsquo;s <strong><a href="/user/pixeltest.cgi" target="_blank">Pixel Debugger</a></strong> to test whether a web page has a properly formatted tracking pixel on it.<br />
+<br />
+Remember that all tracking pixels MUST be placed between the <code>((body))</code>...<code>((/body))</code> tags to function properly and that for the <strong><a href="/user/pixeltest.cgi" target="_blank">Pixel Debugger</a></strong> to work correctly, you must be logged in to the same ClickMagick account that the tracking pixels refer to.<br />
+<br />
+Also, if you add a tracking pixel to an &ldquo;intermediary&rdquo; or &ldquo;bridge&rdquo; page that redirects the user somewhere else, be sure to allow several seconds before redirecting.<br />
+<br />
+This will give our tracking pixels plenty of time to load in case the user has a slow Internet connection.<br />
+<br />
+Finally, if you&rsquo;re using a page builder with WordPress, you&rsquo;ll generally want to add the pixel somewhere in your page builder and NOT directly in WordPress.<br />
+<br />
+Every Page Builder is different, but here&rsquo;s an example of where to add your tracking pixels in OptimizePress.<br />
+<br />
+If you can&rsquo;t figure out where to add your tracking pixels in your page builder, just check their documentation or tutorials or contact them and ask &hellip;<br />
+<br />
+<img border="0" height="154" src="//cdn.clickmagick.com/images/user/faqs/oppixel.gif" width="425" /><br />
+<br />
+<br />
+<b>Check #3:</b> Do you have multiple &ldquo;thank you&rdquo; pages because you&rsquo;re split testing, or for any other reason?<br />
+<br />
+Sometimes users add a tracking pixel to one &ldquo;thank you&rdquo; page but forget about the others, so go through your entire funnel and make sure that ALL of your &ldquo;thank you&rdquo; pages have the appropriate pixels, and test them all.<br />
+<br />
+<br />
+<b>Check #4:</b> Are users always properly redirected to your &ldquo;thank you&rdquo; pages after the action occurs?<br />
+<br />
+Double-check for example that the &ldquo;thank you&rdquo; page URLs that users are redirected to after opting in at all your different squeeze pages are correct. The <strong><a href="/user/pixeltest.cgi" target="_blank">Pixel Debugger</a></strong>&nbsp;will show you the most recent pixels that have been &ldquo;fired&rdquo; and what tracking links the conversions were attributed to. The <strong><a href="/user/pixeltest.cgi" target="_blank">Pixel Debugger</a></strong> makes it easy to see exactly what is happening.<br />
+<br />
+If you have 5 squeeze pages and 1 isn&rsquo;t redirecting to the right &ldquo;thank you&rdquo; page for one reason or another, you&rsquo;re probably going to miss about 20% of your conversions...<br />
+<br />
+<br />
+<b>Check #5:</b> Are you using ClickMagick tracking links to link to your &ldquo;thank you&rdquo; pages?<br />
+<br />
+If you are, and you haven&rsquo;t set up &ldquo;funnel&rdquo; tracking properly, this will cause your conversions to be attributed to your &ldquo;thank you&rdquo; page tracking link since that&rsquo;s the last tracking link the user passes through.<br />
+<br />
+<br />
+<b>Check #6:</b> If you want to track multiple conversions of the same type for the same user &ndash; such as an upsell after an initial sale &ndash; you MUST provide a unique &ldquo;Reference&rdquo; value for each action or sale type e.g. product1, product2, etc.<br />
+<br />
+If you forget this crucial bit of information, ClickMagick will only track the first conversion per user.<br />
+<br />
+This also means for example that if a user opts-in to your list twice using two different email addresses, your autoresponder will report two new subscribers while ClickMagick will report only one conversion (one new subscriber) &ndash; which is accurate. Just something to keep in mind &hellip;<br />
+<br />
+<br />
+<b>Check #7:</b> If you&rsquo;ve added a pixel to a secure (<code>https</code>) page, make sure you change <code>http</code>&nbsp;in the pixel code to <code>https</code> otherwise most browsers won&rsquo;t load the pixel. More specifically, change the <code>src=</code>&nbsp;part of the pixel code from this:<br />
+<br />
+&nbsp;&nbsp;&nbsp; <code>src=&rdquo;</code><code>http</code><code>://&hellip;</code><br />
+<br />
+to this:<br />
+<br />
+&nbsp;&nbsp;&nbsp; <code>src=&rdquo;https://&hellip;</code><br />
+<br />
+This is easy to do if you&rsquo;re using ClickMagick&rsquo;s <a href="/user/action/tools/pixelb.cgi" target="_blank"><strong>Pixel Builder</strong></a>. Just select the &ldquo;secure&rdquo; option before copying the pixel that the Pixel Builder creates for you.<br />
+<br />
+<br />
+<b>Still can&rsquo;t figure it out?</b><br />
+<br />
+If you&rsquo;ve checked these 7 things and still can&rsquo;t figure it out, please open a <strong><a href="http://help.clickmagick.com/helpdesk" target="_blank">Help Desk</a></strong> ticket and we&rsquo;ll do our best to help. <b>Please be sure to include the following information:</b>
+<ul>
+	<li>A tracking link from your account that redirects to your landing/squeeze/sales/whatever page.<br />
+	&nbsp;</li>
+	<li>The URL of your &ldquo;thank you&rdquo; page.<br />
+	&nbsp;</li>
+	<li>One or more IP addresses of users whose action or sale you think wasn&rsquo;t tracked properly.</li>
+</ul>
+<b>Just to be clear,</b> there is absolutely NOTHING we can do if you don&rsquo;t provide all three pieces of info. Thanks!
+</body></html>

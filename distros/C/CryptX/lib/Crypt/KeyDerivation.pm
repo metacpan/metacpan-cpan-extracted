@@ -2,7 +2,7 @@ package Crypt::KeyDerivation;
 
 use strict;
 use warnings;
-our $VERSION = '0.060';
+our $VERSION = '0.061';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw(pbkdf1 pbkdf2 hkdf hkdf_expand hkdf_extract)] );
@@ -22,6 +22,8 @@ use CryptX;
 Crypt::KeyDerivation - PBKDF1, PBKDF2 and HKDF key derivation functions
 
 =head1 SYNOPSIS
+
+  use Crypt::KeyDerivation ':all';
 
   ### PBKDF1/2
   $derived_key1 = pbkdf1($password, $salt, $iteration_count, $hash_name, $len);

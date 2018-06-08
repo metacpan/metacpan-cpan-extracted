@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html><head><title>Will ClickMagick work with secure websites, links, or pixels?</title></head><body>
+<strong>Will ClickMagick work with secure websites, links, or pixels? </strong><br />
+<br />
+Absolutely!<br />
+<br />
+There are three common cases where people run into problems when working with secure websites: Tracking links, tracking pixels, and custom domains. All three work great with ClickMagick but you need to be aware of the details so that you don&rsquo;t get unexpected browser security warnings.<br />
+<br />
+We&rsquo;ll cover all three cases here &hellip;<br />
+<br />
+<br />
+<strong>Secure Tracking Links</strong><br />
+<br />
+By default, ClickMagick generates regular tracking links because that&rsquo;s what the vast majority of our users want but our tracking links work with secure websites as well&mdash;all you need to do is change the <code>http:</code> in the front of the link to <code>https:</code>. In other words, change&hellip;<br />
+<br />
+<code>http://www.clkmg.com/$username/yourlink</code><br />
+<br />
+to<br />
+<br />
+<code>http<strong>s</strong>://www.clkmg.com/$username/yourlink</code><br />
+<br />
+This works correctly because we have secure SSL certificates for all of our domains.<br />
+&nbsp;
+<div class="faq-caution"><b>Caution:</b> If you&rsquo;re using a custom domain with your tracking link, be sure to read the section below that talks specifically about how to use secure custom domains with ClickMagick.</div>
+<br />
+<br />
+<br />
+<strong>Secure Tracking Pixels</strong><br />
+<br />
+By default, ClickMagick tracking pixels use the normal <code>http:</code> protocol in their links:<br />
+<br />
+<code>((img src=&quot;http://www.clkmg.com/api &hellip;</code><br />
+<br />
+However, if you try to use a normal tracking pixel on a secure page, your browser will likely give you some type of security warning. Fortunately, this is easy to correct.<br />
+<br />
+If you know that you&rsquo;re putting a tracking pixel on a secure page, use the <code>https:</code> secure protocol instead of the normal <code>http:</code> protocol by including the letter &ldquo;<code>s</code>&rdquo; after the &ldquo;<code>http</code>&rdquo; in the link:<br />
+<br />
+<code>((img src=&quot;http<strong>s</strong>://www.clkmg.com/api &hellip;</code><br />
+<br />
+This works because all of ClickMagick&rsquo;s domains have SSL security certificates and the <code>www.clkmg.com</code> domain shown in the pixel is a secure ClickMagick domain.<br />
+<br />
+In some cases, you may not know whether the page you&rsquo;re putting a pixel on is secure or not. In these cases, you can safely use a secure pixel&mdash;you can always load secure content, such as pixels, whether or not the page itself is secure.<br />
+<br />
+&nbsp;
+<div class="faq-tip"><b>Tip:</b> If you&rsquo;re using the <strong><a href="/user/action/tools/pixelb.cgi" target="_blank">Pixel Builder</a></strong> to create your pixels for you, you can create secure pixels by selecting <strong>Yes</strong> for the question&nbsp;<strong>Are you adding this pixel to a secure https:// page?</strong>.</div>
+&nbsp;
+
+<div class="faq-caution"><b>Caution:</b> If you&rsquo;re planning to insert the pixel into the Pixel/Code setting of a secure tracking link, use a secure pixel to prevent browser warnings. For more on this topic see:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=209"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=209">&nbsp;What should I know about adding pixels to a tracking link?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+<br />
+<br />
+<br />
+<strong>Custom Domains</strong><br />
+<br />
+Some people have trouble getting their custom tracking and rotator domains to work with secure websites. ClickMagick works great with secure websites, but people make a common&mdash;and understandable&mdash;mistake. Let&rsquo;s go over that here.<br />
+<br />
+Let&rsquo;s suppose that you&rsquo;ve created a custom tracking domain called <code>bestcoolproducts.com</code> and that you have it pointing to a secure ClickFunnels page in your Primary URL:<br />
+<br />
+<br />
+<img alt="" src="https://cdn.clickmagick.com/images/user/faqs/linkfaq206.jpg" /><br />
+<br />
+<br />
+If you use the tracking link that ClickMagick automatically generates (highlighted in green in the screenshot), then everything works perfectly.<br />
+<br />
+The common mistake people make is thinking that because the link in the Primary URL uses <code>https:</code> then their tracking domain must also use <code>https:</code>:<br />
+<br />
+<code>https://bestcoolproducts.com/water</code><br />
+<br />
+Using <code>https:</code> with your custom domain will cause your browser to issue a security warning unless you&rsquo;re using an &ldquo;SSL-Enabled Custom Domain&rdquo; which is unlikely and generally not necessary. (See the next section.)<br />
+<br />
+So, if you&rsquo;re getting a security warning with your tracking link, just make sure that you&rsquo;re using the normal <code>http:</code> protocol, with no &ldquo;<code>s</code>&rdquo;:<br />
+<br />
+<code>http://bestcoolproducts.com/water</code><br />
+<br />
+This works because your tracking link is simply forwarding the click on to the link in your&nbsp;Primary URL, or to your split test URLs.<br />
+<br />
+The rule of thumb here is simply to use the tracking link that ClickMagick automatically generates (highlighted in green to the left of the &ldquo;preview&rdquo; button).<br />
+<br />
+If you&rsquo;re working with a custom rotator domain and you&rsquo;re getting a security warning, simply verify that you&rsquo;re using <code>http:</code> and not <code>https:</code> with your custom rotator domain.<br />
+<br />
+<br />
+<strong>Secure SSL-Enabled Custom Domains</strong><br />
+<br />
+Although rare, there are situations where you <em>need</em>&nbsp;to use the secure <code>https:</code> protocol with your custom domain&mdash;typically when you&rsquo;re trying to use your domain with a service that only accepts secure links.<br />
+<br />
+Most hosting companies can provide you with an SSL certificate, but that won&rsquo;t work with custom domain setups that point to other domains, such as pointing your custom domain to ClickMagick&rsquo;s <code>www.clkmg.com</code> domain using a CNAME or &ldquo;A&rdquo; record.<br />
+<br />
+Instead, you need a setup that&rsquo;s called &ldquo;SSL-Enabled Custom Domains&rdquo; and very few domain registrars or hosting companies provide this service. <strong><a href="https://www.cloudflare.com" target="_blank">CloudFlare.com</a></strong> is the leader in this category and we recommend that you use their service if you need this type of service.<br />
+<br />
+We have separate instructions to walk you through the setup process for CloudFlare:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=191"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=191">Setting up an SSL-Enabled Custom Domain with CloudFlare</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</body></html>

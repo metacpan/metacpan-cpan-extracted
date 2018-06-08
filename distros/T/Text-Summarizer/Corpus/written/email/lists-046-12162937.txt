@@ -1,0 +1,80 @@
+
+
+docno="lists-046-12162937"
+name="Dave Raggett"
+email="dsr@w3.org"
+sent="Thu, 06 Jun 1996 11:10:10 -0400"
+id="199606061510.AA181383810@w3.org"
+subject="Re: Comments on parsing steps:"
+To: w3c-math-erb@w3.org<199606060206.AA06946@drizzle.wri.com>
+
+
+
+     
+   
+
+Neil,
+
+>>I can see value in allowing prefix and postfix operators to act as
+>>operator embellishments, for instance to add accents to operators or
+>>to change their relative size, or position.
+...
+> Since the details of why a prefix embellishing operator sometimes "works"
+> right and sometimes doesn't are probably beyond most authors, I think we
+> should avoid them.  Or if we must have them, tell people to always uses
+> braces to properly group it.
+
+I am unconvinced by your examples.
+
+> When the parser encounters something like a + _2 b,
+> it knows by the time of reading the '+' that it must have a right operand.
+
+Fine, but that also applies to:
+
+        a &big + b
+
+with the information that &big can act as a prefix embellishment operator
+this yields:
+
+        {a {&big +} b}
+
+Otherwise this would parse as:
+
+        {a . {&big {+ b}}}
+
+where `.' is an inferred infix operator, presumably denoting multiplication.
+
+> However, consider the following:
+
+>       &bold + 2
+
+> with '&bold' being a high-precedence prefix operator. When the parser sees
+> the '+', it sees that it must be a prefix operator, and so will shift the
+> `2' on.  So, this expression would result in:
+
+>       {&bold {+ 2}}
+
+If each operator has a property indicating that it can act as an
+embellishment on other operators, then we can use this fact to make
+the above parse as
+
+        {&bold +} 2
+
+in preference to the interpretation of &bold as a normal prefix operator.
+In essence we sort the operator precedence reduction rules into a sequence
+that resolves potential ambiguities between different operator roles defined
+by the dictionary for each symbol.
+
+You have already asserted that people are comfortable with dictionary
+definitions for the roles of symbols as prefix, infix or postfix operators
+(including their precedences). Extending the dictionary to define whether
+each symbol can act as prefix, infix or postfix embellishment operators
+seems a straightforward addition.
+
+Can you give me examples that would be hard to explain to a user?
+
+-- Dave Raggett <dsr@w3.org> tel: +1 (617) 258 5741 fax: +1 (617) 258 5999
+   World Wide Web Consortium, 545 Technology Square, Cambridge, MA 02139
+   url = http://www.w3.org/People/Raggett
+
+

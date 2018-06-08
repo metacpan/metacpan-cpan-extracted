@@ -1,0 +1,145 @@
+
+
+docno="lists-046-12122969"
+name="Dave Raggett"
+email="dsr@w3.org"
+sent="Tue, 04 Jun 1996 11:58:23 -0400"
+id="199606041558.AA160953903@w3.org"
+subject="Minutes June 3rd"
+To: w3c-math-erb@w3.org
+
+
+
+     
+   
+
+Present:
+
+Dave Raggett
+Patrick Ion
+Robert Miner
+T. V. Raman   (left early)
+Ralph Youngen
+Ron Whitney
+Bruce Smith
+Neil Soiffer
+
+The meeting discussed Bruce's new proposal, see:
+
+        http://www.w3.org/pub/WWW/MarkUp/Math/WG/Smith-960531.html
+
+Dave asked about lexical details. For instance if one uses an SGML
+named character entity how does the tokenizer know whether the
+character is allowed as part of an identifier? Bruce replied that
+there needs to be a large dictionary that specifies properties such
+as:
+
+    o   Whether the character is allowed as the first or subsequent
+        characters in an identifier.
+
+    o   If it is an operator, its types (prefix/infix/postfix) and the
+        associated left and right precedences.
+
+    o   Whether it can be used to embellish other operators.
+
+Action: Bruce to add a detailed schema for the character dictionary.
+
+Dave also suggested that as a matter of principle any tag names should
+have meaningful names. Bruce said he wanted to avoid potential naming
+conflicts with other groups wishing to define new HTML tags. Dave said
+that this wasn't a big problem, given W3C's role in defining HTML.
+
+Action: Dave to post a proposal for the HTML-math tag names.
+
+Robert added that to allow him to implement the proposal he would need
+more detail on the various layout schema. Bruce will work on this.
+
+Dave queried the flat associativity with same precedences for `+' and `-'.
+Neil explained that this makes it much easier to write the line breaking
+algorithm.
+
+Macro definitions. Bruce will add an SGML element to represent these.
+This raises the issue of scoping and how a plug-in could exploit the
+HTML parse tree. In the short term, this will remain a problem.
+
+We discussed the representation for arrays. Dave explained that the
+HTML 3.0 proposal borrowed from LaTeX and TeX. See:
+
+    http://www.w3.org/pub/WWW/MarkUp/html3/arrays.html
+
+It supports:
+
+    o   setting position of array relative to
+        preceding and followng expressions
+
+    o   column specification for cell alignment
+
+    o   cells spanning multiple rows or columns
+
+    o   "+", "-" or "=" characters as column separators
+
+    o   separation of first row/column as labels
+
+    o   setting left and right bracket symbols
+
+    o   filling a cell spanning several columns with dots
+
+The features needed for math make it inappropriate to use the HTML
+table tags.
+
+We discussed what HTML tags might be appropriate within HTML-math.
+The current inability to call the browser to handle such nested tags
+suggests we need to take a cautious approach. A the minimum we probably
+need:
+
+    o   plain text
+
+    o   simple kinds of emphasis (bold/italic)
+
+    o   control over font size
+
+    o   hypertext links
+
+    o   line numbering
+
+We could further allow this text to include math elements so that we get
+math including text including math etc. This doesn't seem to be needed
+in practice though.
+
+The current plug-in api's are inadequate. For instance one would like to
+know the current font family, size and baseline position, as well as the
+background color or texture tile and pattern origin. One would like to
+set the visible size according to the expression being displayed, and
+to be sent a message when relevant parameters are changed. How can CSS
+based style sheets influence the style properties used within plugins?
+Dave would like the math-erb to put pressure on browser vendors to fix
+these problems.
+
+Action: Neil to investigate Netscape Navigator 3.0 plug-in SDK to see
+what improvements have been made to the api.
+
+One short term solution would be to add parameters to the math tags
+to specify the context in which the elements occur, e.g. <h1>, or .
+The control panel for the html-math plug-in would allow the user to
+set the font size to be used in these contexts.
+
+We discussed ideas for folding and unfolding expressions. One idea is
+to allow the author to name a subexpression and then to use that name
+in place of further occurrences of that subexpression. When folded the
+given name would be shown in place of the subexpression itself. The
+scope for such definitions shouldn't be resticted to a single math
+element. This could be supported via SGML tags and attributes.
+
+Bruce talked through the case where names for subexpressions are generated
+automatically at browse-time. This doesn't require any special markup,
+although the ability to give the same name to common subexpressions will
+depend on the ability to recognize that these subexpressions are in fact
+semantically identical. In a previous discussion Raman pointed out that
+it would be helpful if the user is allowed to set the name of subexpressions
+as this makes it easier to remember (important for speech-base browsers).
+
+-- Dave Raggett <dsr@w3.org> tel: +1 (617) 258 5741 fax: +1 (617) 258 5999
+   World Wide Web Consortium, 545 Technology Square, Cambridge, MA 02139
+   url = http://www.w3.org/People/Raggett
+
+

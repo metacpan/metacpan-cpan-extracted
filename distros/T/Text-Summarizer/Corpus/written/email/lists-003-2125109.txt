@@ -1,0 +1,56 @@
+
+
+
+docno="lists-003-2125109"
+received="Mon May 17 09:16:46 1993 EST" 
+sent="Mon, 17 May 1993 09:06:59 -0700 (PDT)" 
+name="Laurence Lundblade" 
+email="lgl@nwnet.net" 
+subject="Re: CHARSET considerations" 
+id="Pine.3.07.9305170958.E23900-b100000@norman.nwnet.net" 
+inreplyto="MS-C.737437622.2035015474.mrc@Ikkoku-Kan.Panda.COM" 
+
+To: Mark Crispin <mrc@Ikkoku-Kan.Panda.COM>
+Cc: ietf-charsets@INNOSOFT.COM, scs@adam.mit.edu, TROTH@ricevm1.rice.edu,
+
+
+
+
+I haven't followed this discussion, but Pine does do a few things with
+character sets.  For example if you set Pine to use ISO-8859-1 and send an
+all ASCII message it will tag it US-ASCII (instead of ISO-8859-1).  Also,
+it's smart enough to display the lower 128 for all incoming messages in
+the ISO-8859-X characters sets and greek the ones it can't if the
+character set of the receiving Pine is US-ASCII or ISO-8859-X.  Thought
+that was what required for minimal MIME compliance.
+
+Hope I haven't upgraded the sin from omission to comision....
+
+LL
+
+
+On Fri, 14 May 1993, Mark Crispin wrote:
+> Steve -
+
+>      Thanks for your comments.  You needn't convince me; I've been involved
+> with the MIME charset issue for a long time (you'll note that I am one of the
+> authors of the ISO-2022-JP spec).  In defense of the other Pine team members,
+> the sin is one of omission rather than of comission; they wanted to do
+> something about character sets and didn't want to wire in a table of legal
+> values (since it might change).
+
+>      I've suggested that as a first pass the charset should only be settable
+> in the system config file, and that the charset always be coerced to US-ASCII
+> unless the text contains 8-bit characters and/or has ``funny'' control
+> characters such as ESC or SI/SO.  More work would definitely be needed in thi
+s
+> area, but you'll appreciate that there are other, higher priorities just
+> now...
+
+> -- Mark --
+
+
+
+
+
+

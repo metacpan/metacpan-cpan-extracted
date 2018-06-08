@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html><head><title>Why isn’t the [clickid] token being replaced?</title></head><body>
+<strong>Why isn&rsquo;t the [clickid] token being replaced?</strong><br />
+<br />
+There are two different scenarios where the <code>[clickid]</code> token might not get&nbsp;replaced with the actual click ID value. Either the token isn&rsquo;t&nbsp;getting replaced in the Primary URL of your tracking link, or it&rsquo;s not getting replaced in a link on page elsewhere in your funnel.<br />
+<br />
+Let&rsquo;s tackle both of these scenarios ...<br />
+<br />
+<br />
+<strong>The Primary URL</strong><br />
+<br />
+If you&rsquo;ve used the <code>[clickid]</code> token in the Primary URL of your tracking link and it&rsquo;s not being replaced when you click on the tracking link, that&rsquo;s usually because the click is being <strong><a href="/user/faqs.cgi?answer=175">flagged</a></strong>.<br />
+<br />
+When a click is flagged, it doesn&rsquo;t go through all the normal processing that a regular click would and that includes replacing the <code>[clickid]</code> token before the tracking link redirects to the Primary URL.<br />
+<br />
+You can tell if a click is being flagged by clicking on the number in the FC column of your stats to see a list of clicks that have been flagged for this tracking link:<br />
+<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq296flaggedcol.jpg" /><br />
+<br />
+<br />
+Most of the time when users ask why the <code>[clickid]</code> isn&rsquo;t being replaced in the Primary URL, it&rsquo;s because they&rsquo;re using a VPN service and ClickMagick is detecting the VPN as server clicks&mdash;which they are&mdash;and server clicks are typically from bots which should be flagged.<br />
+<br />
+If your VPN is being flagged, you can get it whitelisted by following the instructions in this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=313"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=313">&nbsp;Why is my VPN being flagged in the stats?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+&nbsp;
+<div class="faq-tip"><b>Tip:</b> If you&rsquo;re clicking on the &ldquo;preview&rdquo;&nbsp;link in the settings area of a tracking link, that will also bypass normal click processing in some cases. When testing, it&rsquo;s a Best Practice to copy the the link and paste it into a new browser window.</div>
+<br />
+<br />
+<br />
+<strong>Passing [clickid] Through a Page</strong><br />
+<br />
+If you&rsquo;re trying to pass the <code>[clickid]</code> through a link on a page and it&rsquo;s not being replaced, the most common reason is that you haven&rsquo;t added our special piece of JavaScript code to the page. This JavaScript snippet is what makes all the magick happen. You can get it here:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=99"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=99">&nbsp;Can I pass data to my affiliate links or autoresponder?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+If you <em>have</em> added the JavaScript to your page, you need to make sure that it&rsquo;s in the <code>((body))</code> section of the page and not in the <code>((head))</code> section. Also, the code needs to be at the very bottom of the <code>((body)) </code>section or there&rsquo;s no guarantee that the replacement will be made.<br />
+<br />
+If you need help understanding where to add the JavaScript code, this FAQ will show you exactly how to do it for many of the popular Page Builders:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=221"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=221">&nbsp;How do I add tracking pixels or JavaScript code to [...]?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+&nbsp;
+<div class="faq-note"><b>Note:</b> For the techie types, the reason the JavaScript code needs to be at the very bottom of the page, just before the <code>((/body))</code>, tag is simply because the page needs to fully load before the code executes. The code does a global search and replace of the <code>[clickid]</code> token and if the page hasn&rsquo;t fully loaded yet before the code executes, the code will only do a search and replace on what <em>has</em> been loaded to the point.</div>
+</body></html>

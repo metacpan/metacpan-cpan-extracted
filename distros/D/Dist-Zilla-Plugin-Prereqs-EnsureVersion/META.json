@@ -22,16 +22,18 @@
       "develop" : {
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08"
          }
       },
       "runtime" : {
          "requires" : {
-            "Config::IOD::Reader" : "0.31",
+            "Config::IOD::Reader" : "0.340",
             "Dist::Zilla::Role::AfterBuild" : "0",
             "File::HomeDir" : "0",
             "Moose" : "0",
+            "PMVersions::Util" : "0",
             "namespace::autoclean" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -59,7 +61,7 @@
          "web" : "https://github.com/perlancar/perl-Dist-Zilla-Plugin-Prereqs-EnsureVersion"
       }
    },
-   "version" : "0.04",
+   "version" : "0.050",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
@@ -154,7 +156,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.58"
+            "version" : "0.592"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -425,6 +427,11 @@
             "version" : "2.056"
          },
          {
+            "class" : "Dist::Zilla::Plugin::Test::Perl::Critic",
+            "name" : "@Author::PERLANCAR/Test::Perl::Critic",
+            "version" : "3.001"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",
             "name" : "@Author::PERLANCAR/Test::Rinci",
             "version" : "0.03"
@@ -446,19 +453,19 @@
             "version" : "0.03"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Acme::CPANLists::Blacklist",
-            "name" : "@Author::PERLANCAR/Acme::CPANLists::Blacklist",
-            "version" : "0.04"
+            "class" : "Dist::Zilla::Plugin::Acme::CPANModules::Blacklist",
+            "name" : "@Author::PERLANCAR/Acme::CPANModules::Blacklist",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::EnsureVersion",
             "name" : "@Author::PERLANCAR/Prereqs::EnsureVersion",
-            "version" : "0.03"
+            "version" : "0.04"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::CheckCircular",
             "name" : "@Author::PERLANCAR/Prereqs::CheckCircular",
-            "version" : "0.005"
+            "version" : "0.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple",

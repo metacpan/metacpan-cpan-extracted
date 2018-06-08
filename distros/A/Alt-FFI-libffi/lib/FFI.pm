@@ -4,16 +4,20 @@ use strict;
 use warnings;
 use Carp ();
 use FFI::Platypus;
-use constant _is_win32 => $^O =~ /^(MSWin32|cygwin|msys2?)$/ && do { require Config; $Config::Config{longsize} == 4 };
+use constant _is_win32 => $^O =~ /^(MSWin32|cygwin|msys2?)$/ && FFI::Platypus->abis->{stdcall};
 
 # ABSTRACT: Perl Foreign Function Interface based on libffi
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 our $ffi = FFI::Platypus->new;
 $ffi->lib(undef);
 
 my $stdcall_ffi = _is_win32
-  ? do { my $ffi = FFI::Platypus->new; $ffi->lib(undef); $ffi->abi('stdcall'); }
+  ? do {
+    my $ffi = FFI::Platypus->new;
+    $ffi->lib(undef);
+    $ffi->abi('stdcall');
+  }
   : $ffi;
 
 our %typemap = qw(
@@ -85,7 +89,7 @@ FFI - Perl Foreign Function Interface based on libffi
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -299,7 +303,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Graham Ollis.
+This software is copyright (c) 2016-2018 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -72,13 +72,6 @@ sub main {
     my $duk = JavaScript::Duktape::XS->new();
     ok($duk, "created JavaScript::Duktape::XS object");
 
-    my @js_files = qw/
-        c_eventloop.js
-    /;
-    foreach my $js_file (@js_files) {
-        load_js_file($duk, $js_file);
-    }
-
     test_js_timeout($duk);
     test_timeout_with_error($duk);
 

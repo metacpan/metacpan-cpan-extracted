@@ -18,6 +18,7 @@ arg_files/xmp2pdf.args
 config_files/age.config
 config_files/bibble.config
 config_files/convert_regions.config
+config_files/dji.config
 config_files/example.config
 config_files/fotoware.config
 config_files/gps2utm.config
@@ -155,6 +156,7 @@ html/TagNames/Torrent.html
 html/TagNames/Unknown.html
 html/TagNames/VCard.html
 html/TagNames/Vorbis.html
+html/TagNames/WTV.html
 html/TagNames/XMP.html
 html/TagNames/ZIP.html
 html/TagNames/iWork.html
@@ -378,6 +380,7 @@ lib/Image/ExifTool/Unknown.pm
 lib/Image/ExifTool/VCard.pm
 lib/Image/ExifTool/Validate.pm
 lib/Image/ExifTool/Vorbis.pm
+lib/Image/ExifTool/WTV.pm
 lib/Image/ExifTool/WriteCanonRaw.pl
 lib/Image/ExifTool/WriteExif.pl
 lib/Image/ExifTool/WriteIPTC.pl
@@ -421,6 +424,7 @@ t/CanonRaw_4.out
 t/CanonRaw_5.out
 t/CanonRaw_6.out
 t/CanonRaw_7.out
+t/CanonRaw_8.out
 t/CanonVRD.t
 t/CanonVRD_11.out
 t/CanonVRD_12.out
@@ -722,6 +726,7 @@ t/QuickTime_2.out
 t/QuickTime_3.out
 t/QuickTime_4.out
 t/QuickTime_5.out
+t/QuickTime_6.out
 t/RIFF.t
 t/RIFF_2.out
 t/RIFF_3.out
@@ -763,6 +768,8 @@ t/VCard_2.out
 t/VCard_3.out
 t/Vorbis.t
 t/Vorbis_2.out
+t/WTV.t
+t/WTV_2.out
 t/Writer.t
 t/Writer_10.out
 t/Writer_11.out
@@ -848,6 +855,7 @@ t/XMP_42.out
 t/XMP_43.out
 t/XMP_44.out
 t/XMP_45.out
+t/XMP_46.out
 t/XMP_5.out
 t/XMP_6.out
 t/XMP_7.out
@@ -873,6 +881,7 @@ t/images/BigTIFF.btf
 t/images/Canon.jpg
 t/images/Canon1DmkIII.jpg
 t/images/CanonRaw.cr2
+t/images/CanonRaw.cr3
 t/images/CanonRaw.crw
 t/images/CanonVRD.dr4
 t/images/CanonVRD.vrd
@@ -1006,6 +1015,7 @@ t/images/Unknown.jpg
 t/images/VCard.ics
 t/images/VCard.vcf
 t/images/Vorbis.ogg
+t/images/WTV.wtv
 t/images/Writer.jpg
 t/images/XMP.inx
 t/images/XMP.jpg

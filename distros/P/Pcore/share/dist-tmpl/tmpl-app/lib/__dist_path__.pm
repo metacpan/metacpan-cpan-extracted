@@ -17,7 +17,7 @@ sub run ( $self ) {
 
     # update schema
     print 'Updating DB schema ... ';
-    say( my $res = $self->{util}->update_schema( $self->{cfg}->{_}->{db} ) );
+    say( my $res = $self->{util}->update_schema( $self->{cfg}->{db} ) );
     return $res if !$res;
 
     # load settings

@@ -1,3 +1,11 @@
+0.050   2018-06-07 (PERLANCAR)
+
+	- [refactor] Split pmversions.ini-related functionality to
+	  PMVersions::Util.
+
+	- Observe PMVERSIONS_PATH.
+
+
 0.04    2017-07-28 (PERLANCAR)
 
 	- Ignore prereqs with custom (/^x_/) phase & relationship.

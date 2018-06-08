@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html><head><title>What should I know about adding pixels to a tracking link?</title></head><body>
+<strong>What should I&nbsp;know about adding pixels to a tracking link?</strong><br />
+<br />
+When you&rsquo;re adding a pixel to the &ldquo;Pixel/Code&rdquo; field of&nbsp;a tracking link, there are two questions the <strong><a href="/user/action/tools/pixelb.cgi" target="_blank">Pixel Builder</a></strong> asks that can be a bit tricky to answer.<br />
+<br />
+The first question is whether you&rsquo;re planning to add the tracking pixel to a secure page (instead of to a tracking link), and the second is whether you&rsquo;re going to be&nbsp;adding the pixel to a tracking link&mdash;which would seem like an obvious &ldquo;Yes&rdquo;&mdash; but there&rsquo;s a bit more to the story there so read on ...<br />
+<br />
+Let&rsquo;s cover both of these settings&hellip;<br />
+<br />
+<br />
+<b>Option: </b><strong>Are you adding this pixel to a secure https:// page?</strong><br />
+<br />
+Since we&rsquo;re talking about adding a tracking pixel to the &ldquo;Pixel/Code&rdquo; setting of a tracking link, the &ldquo;obvious&rdquo;&nbsp;answer to this question would appear to be No, we&rsquo;re not adding the pixel to a secure <em>page</em>. But what this question is <em>really</em> asking is <strong>Do you want to create a secure tracking pixel?</strong><br />
+<br />
+So, if you&rsquo;re using a secure tracking link which uses&nbsp;<code>http<strong>s</strong>://</code> rather than <code>http://</code>&nbsp;(no &ldquo;s&rdquo; after the &ldquo;p&rdquo;), you would answer <strong>Yes</strong> to this question. Secure tracking links must use secure tracking pixels or you will get security warnings from your browser.<br />
+<br />
+However, if&nbsp;you&rsquo;re using a regular non-secure tracking link (<code>http://</code>), you can choose either&nbsp;<strong>Yes</strong> or <strong>No</strong> for the question because it doesn&rsquo;t really matter whether the pixel is secure or not. The pixel will work fine either way&mdash;without generating any browser security warnings.<br />
+&nbsp;
+<div class="faq-tip"><b>Tip:</b> Browsers don&rsquo;t care if a non-secure page (or tracking link) tries to load something that <em>is</em> secure, but they care A LOT if a secure page tries to load something that is <em>not</em> secure.&nbsp;So when in doubt, choose secure pixels.&nbsp;</div>
+<br />
+<br />
+<br />
+<b>Option: Are you adding this pixel to a tracking link?</b><br />
+<br />
+Normally, you should be using the &ldquo;Last Click&rdquo; conversion attribution setting for your pixel, but this setting can create confusing results when you use the pixel in the Pixel/Code field of a tracking link.<br />
+<br />
+The first time someone inserts a pixel in the Pixel/Code field of a tracking link, they usually expect that pixel to fire and show a conversion in the main tracking link of their funnel, but that&rsquo;s not what happens&hellip;<br />
+<br />
+Here&rsquo;s why &hellip;<br />
+<br />
+The &ldquo;Last Click&rdquo; setting truly means &ldquo;the <em>very last</em> tracking link clicked&rdquo; which, in the case of a tracking link with a pixel in its Pixel/Code field, is the tracking link itself. Basically, the pixel attributes the conversion to the tracking link that it&rsquo;s inside of, and that&rsquo;s not what most people are expecting.<br />
+<br />
+To correct this, you might think that choosing the &ldquo;First Click&rdquo; setting of the tracking pixel would be the way to go, but that can have some surprises too, because &ldquo;First Click&rdquo; literally means the <em>very first</em> tracking link the user <em>ever</em> clicked on, even if it was for another product you were promoting 8 months ago &hellip;<br />
+<br />
+So, if you&rsquo;re adding a pixel to the Pixel/Code field of a tracking link, you almost always want to choose &ldquo;Last Click&rdquo; for the attribute conversion setting and you want to choose <strong>Yes</strong> for the question&nbsp;<b>Are you adding this pixel to a tracking link?</b><br />
+<br />
+With these two settings, when ClickMagick fires the pixel in the Pixel/Code field, it ignores the tracking link that contains the pixel and instead attributes the conversion to the previous tracking link, which is exactly what most people are expecting to see happen.<br />
+<br />
+That said, there are situations where you might actually want conversions attributed to the tracking link that you&rsquo;ve added the pixel to.&nbsp;In this case, simply select <strong>No</strong> when the <strong><a href="/user/action/tools/pixelb.cgi" target="_blank">Pixel Builder</a></strong> asks if you&rsquo;re adding the pixel to a tracking link.<br />
+<br />
+&nbsp;
+<div class="faq-note"><b>Note:</b> Answering &ldquo;<strong>Yes</strong>&rdquo; to the question&nbsp;&ldquo;<strong>Are you adding this pixel to a tracking link?</strong>&rdquo; simply tells ClickMagick to ignore the most recent tracking link which, in effect, attributes pixel conversions to the &ldquo;<strong>2nd-to-Last</strong>&rdquo; tracking link clicked.<br />
+<br />
+This question in the Pixel Builder could just as easily have said &ldquo;<strong>Attribute Conversions to the 2nd-to-Last Tracking Link?</strong>&rdquo; which is generally the behavior you want when adding a pixel to a tracking link.<br />
+<br />
+If you have a situation where you&rsquo;re not using the Pixel/Code setting of a tracking link, but you still want to attribute conversions to the 2nd-to-Last tracking link visited, simply choose&nbsp;&ldquo;Yes&rdquo; for this question. Keep in mind that for&nbsp;this option to work correctly, you must also choose the &ldquo;<strong>Last Click</strong>&rdquo; option for the&nbsp;<b>Conversion Attribution</b>.</div>
+</body></html>

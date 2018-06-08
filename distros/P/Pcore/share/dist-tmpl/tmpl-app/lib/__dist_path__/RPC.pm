@@ -12,7 +12,7 @@ around BUILD => sub ( $orig, $self, $args ) {
 
     $self->{util}->@{ keys $args->{util}->%* } = values $args->{util}->%*;
 
-    $self->{util}->build_dbh( $self->{cfg}->{_}->{db} );
+    $self->{util}->build_dbh( $self->{cfg}->{db} );
 
     return $self->$orig($args);
 };

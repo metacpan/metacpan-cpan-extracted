@@ -11,6 +11,11 @@ TO DO LIST
 
     3. resolve windowing ambiguity issue (see example case below)
 
+    4. Problem with --noorder for overlapping sets. It is not well defined
+    and can throw errors. This is a known issue. see functions.t and the
+    last commented out test. That WILL fail and we need a theoretical base
+    for how to deal with this kind of situation
+
   Windowing Ambiguity Issue Example
     CUICollector was changed in order to implement windowing. To do
     windowing all CUIs in each phrase were placed into a tree/hash structure
@@ -111,7 +116,7 @@ TO DO LIST
     checked for, which will probably add more complexity to CUICollector.
 
 AUTHORS
-    Bridget McInnes <btmcinnes at vcu.edu>
+    Sam Henry <henryst at vcu.edu> Bridget McInnes <btmcinnes at vcu.edu>
 
 COPYRIGHT
     Copyright (C) 2015 Bridget T. McInnes

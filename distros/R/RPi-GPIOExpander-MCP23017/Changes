@@ -1,0 +1,14 @@
+Revision history for RPi-GPIOExpander-MCP23017
+
+0.01    2018-06-07
+        - initial public release
+        - most core registers available
+        - ability to change a single pin, a pin bank, or all pins at once
+        - read(), write(), mode(), pullup() methods available for single pins,
+          a pin bank and all pins
+        - exposed register() and register_bits(), but these are more-or-less
+          hidden in documentation and we advise they shouldn't really be used;
+          they are a convenience for those who know how to understand IC
+          registers
+        - 5000+ tests
+

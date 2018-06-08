@@ -1,4 +1,4 @@
-package Pcore::PgSQL v0.18.2;
+package Pcore::PgSQL v0.19.1;
 
 use Pcore -dist, -class;
 
@@ -31,7 +31,7 @@ sub run ( $self, $cb ) {
 
         chown $uid, $uid, $pwfile or die;
 
-        my $res = P->pm->run_proc( [ 'su', 'postgres', '-c', "initdb --encoding UTF8 --no-locale -U postgres --pwfile $pwfile -D $db_dir" ] );
+        my $res = P->sys->run_proc( [ 'su', 'postgres', '-c', "initdb --encoding UTF8 --no-locale -U postgres --pwfile $pwfile -D $db_dir" ] );
 
         unlink $pwfile or 1;
 
@@ -58,7 +58,7 @@ sub run ( $self, $cb ) {
     chown $uid, $uid, '/var/run/postgresql/' or die;
 
     # run server
-    P->pm->run_proc(
+    P->sys->run_proc(
         [ 'su', 'postgres', '-c', "postgres -D $db_dir" ],
         on_finish => sub ($proc) {
             $cb->($proc);

@@ -1,5 +1,9 @@
 This file documents the revision history for Perl extension Text::SimpleTable.
 
+2.05  2010-06-06 16:38:00
+        - Add CJK support (usausat)
+        - Add unicode box support (pjsg)
+
 2.04  2018-03-23 14:13:00
         - Add line drawing using Unicode line drawing characters as an option (pjsg)
         - Update metadata (grinnz)

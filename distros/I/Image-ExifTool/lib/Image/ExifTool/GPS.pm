@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.48';
+$VERSION = '1.49';
 
 my %coordConv = (
     ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val)',
@@ -231,10 +231,7 @@ my %coordConv = (
         Writable => 'string',
         Notes => 'tags 0x0013-0x001a used for subject location according to MWG 2.0',
         Count => 2,
-        PrintConv => {
-            N => 'North',
-            S => 'South',
-        },
+        PrintConv => { N => 'North', S => 'South' },
     },
     0x0014 => {
         Name => 'GPSDestLatitude',
@@ -246,10 +243,7 @@ my %coordConv = (
         Name => 'GPSDestLongitudeRef',
         Writable => 'string',
         Count => 2,
-        PrintConv => {
-            E => 'East',
-            W => 'West',
-        },
+        PrintConv => { E => 'East', W => 'West' },
     },
     0x0016 => {
         Name => 'GPSDestLongitude',
@@ -376,7 +370,7 @@ my %coordConv = (
         PrintConv => 'Image::ExifTool::GPS::ToDMS($self, $val, 1, "E")',
     },
     GPSAltitude => {
-        SubDoc => 1,    # generate for all sub-documents
+        SubDoc => [1,3], # generate for sub-documents if Desire 1 or 3 has a chance to exist
         Desire => {
             0 => 'GPS:GPSAltitude',
             1 => 'GPS:GPSAltitudeRef',
@@ -395,6 +389,23 @@ my %coordConv = (
             $val = int($val * 10) / 10;
             return ($val =~ s/^-// ? "$val m Below" : "$val m Above") . " Sea Level";
         },
+    },
+    GPSDestLatitude => {
+        Require => {
+            0 => 'GPS:GPSDestLatitude',
+            1 => 'GPS:GPSDestLatitudeRef',
+        },
+        ValueConv => '$val[1] =~ /^S/i ? -$val[0] : $val[0]',
+        PrintConv => 'Image::ExifTool::GPS::ToDMS($self, $val, 1, "N")',
+    },
+    GPSDestLongitude => {
+        SubDoc => 1,    # generate for all sub-documents
+        Require => {
+            0 => 'GPS:GPSDestLongitude',
+            1 => 'GPS:GPSDestLongitudeRef',
+        },
+        ValueConv => '$val[1] =~ /^W/i ? -$val[0] : $val[0]',
+        PrintConv => 'Image::ExifTool::GPS::ToDMS($self, $val, 1, "E")',
     },
 );
 
@@ -446,6 +457,11 @@ sub ToDMS($$;$$)
     my ($et, $val, $doPrintConv, $ref) = @_;
     my ($fmt, @fmt, $num, $sign);
 
+    unless (length $val) {
+        # don't convert an empty value
+        return $val if $doPrintConv and $doPrintConv eq 1;  # avoid hiding existing tag when extracting
+        return undef; # avoid writing empty value
+    }
     if ($ref) {
         if ($val < 0) {
             $val = -$val;
@@ -513,7 +529,8 @@ sub ToDegrees($;$)
     my ($val, $doSign) = @_;
     # extract decimal or floating point values out of any other garbage
     my ($d, $m, $s) = ($val =~ /((?:[+-]?)(?=\d|\.\d)\d*(?:\.\d*)?(?:[Ee][+-]\d+)?)/g);
-    my $deg = ($d || 0) + (($m || 0) + ($s || 0)/60) / 60;
+    return '' unless defined $d;
+    my $deg = $d + (($m || 0) + ($s || 0)/60) / 60;
     # make negative if S or W coordinate
     $deg = -$deg if $doSign ? $val =~ /[^A-Z](S|W)$/i : $deg < 0;
     return $deg;

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html><head><title>How do I track conversions using Postback URLs?</title></head><body>
+<b>How do I track conversions using Postback URLs?</b><br />
+<br />
+Tracking affiliate conversions with Postback URLs is a bit more involved than using tracking pixels, so we&rsquo;ve put together this tutorial to walk you through the process.<br />
+<br />
+We also have a series of videos that will walk you through exactly how to track conversions with Affiliate Networks using Postback URLs. For these videos to make sense, you must watch them in order:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=affnetwork" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=affnetwork" id="video-link-new">Part 1:&nbsp;Integrating ClickMagick with Affiliate Networks</a></b></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=affnetworklp" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=affnetworklp" id="video-link-new">Part 2:&nbsp;Integrating Landing Pages</a></b></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=affnetworkar" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=affnetworkar" id="video-link-new">Part 3:&nbsp;Integrating Opt-in Forms &amp; Autoresponders</a></b></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=affiliatepixel" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=affiliatepixel" id="video-link-new">Part 4:&nbsp;Tracking Calls-To-Action and Email Opt-ins</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+The first video in this series will show you how to set up your Postback URLs. The other videos will show you how to set up any landing pages or opt-in forms that you may want to use with your affiliate network.<br />
+<br />
+Here is the written walkthrough of the set up process for using Postback URLs:<br />
+<br />
+<br />
+<strong>Step 1 &ndash; Pass A Unique Sub-ID To Your Affiliate Link</strong><br />
+<br />
+The first step is to start passing a unique Sub-ID with each click to your affiliate link, and with ClickMagick it&rsquo;s as simple as adding the&nbsp;<code><span style="color:#008000;">[clickid]</span></code> token wherever you want the Sub-ID to be inserted into your affiliate link. (Note that the <code>[clickid]</code> token is case sensitive and MUST be all lower case.)<br />
+&nbsp;
+<div class="faq-note"><b>Note:</b> This explanation assumes that you know what a &ldquo;query strings&rdquo; are and how to manipulate them. If you need a quick overview of what query strings are, take a moment to read this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/user/faqs.cgi?answer=177"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" width="17" /></a></td>
+			<td>&nbsp;</td>
+			<td><b><a href="/user/faqs.cgi?answer=177">What is a &ldquo;Query String&rdquo;?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+<br />
+&nbsp;<br />
+For example, if you&rsquo;re promoting a Peerfly offer and your affiliate link looks like this:<br />
+<br />
+<code><span style="color:#008000;">http://trkur.com/trk?o=1&amp;p=1&amp;s1=</span></code><br />
+<br />
+&hellip; you&rsquo;d pass a unique Sub-ID to Peerfly using ClickMagick&rsquo;s <code><span style="color:#008000;">[clickid]</span></code> token like this:<br />
+<br />
+<code><span style="color:#008000;">http://trkur.com/trk?o=1&amp;p=1&amp;s1=<strong>[clickid]</strong></span></code><br />
+<br />
+So that&rsquo;s the exact URL you&rsquo;d enter for the &ldquo;Primary URL&rdquo; in ClickMagick when you&rsquo;re setting up a tracking link for this particular affiliate offer.<br />
+<br />
+<br />
+<img alt="" src="//cdn.clickmagick.com/images/user/faqs/faq119primaryurl.jpg" /><br />
+<br />
+<br />
+Each network is a bit different in terms of how you pass the Sub-ID value. Here is a list of the popular networks and how you would add the <code><span style="color:#008000;">[clickid]</span></code> token to the Primary URL. If adding these types of variables to a URL is unfamiliar to you, reading <strong><a href="/user/faqs.cgi?answer=177">How to add a variable to a query string</a></strong>&nbsp;should help.<br />
+&nbsp;
+<table border="0" cellpadding="8" cellspacing="0" style="width: 566px;">
+	<tbody>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">A4D</td>
+			<td style="width: 232px;"><code>&amp;s1=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">AboveAllOffers</td>
+			<td style="width: 232px;"><code>&amp;s1=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">ActionAds</td>
+			<td style="width: 232px;"><code>&amp;aff_sub=[clickid]</code></td>
+		</tr>
+		<tr>
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">adcombo</td>
+			<td style="width: 232px;"><code>&amp;clickid=[clickid]</code></td>
+		</tr>
+		<tr>
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">addiliate</td>
+			<td style="width: 232px;"><code>&amp;add1=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">Adsimilis</td>
+			<td style="width: 232px;"><code>&amp;s1=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">Adsup</td>
+			<td style="width: 232px;"><code>&amp;aff_sub=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">affiliaXe</td>
+			<td style="width: 232px;"><code>&amp;aff_sub=[clickid]</code></td>
+		</tr>
+		<tr>
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">AWIN</td>
+			<td style="width: 232px;"><code>&amp;clickref=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">Beeoption</td>
+			<td style="width: 232px;"><code>&amp;aff_sub=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">BlackFox</td>
+			<td style="width: 232px;"><code>&amp;aff_sub=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">C2M</td>
+			<td style="width: 232px;"><code>&amp;s1=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">Cash Network</td>
+			<td style="width: 232px;"><code>&amp;s2=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">CJ Affiliate</td>
+			<td style="width: 232px;"><code>?SID=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">ClickBank</td>
+			<td style="width: 232px;"><code>?tid=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">Clickbooth</td>
+			<td style="width: 232px;"><code>&amp;s1=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">ClickPromise</td>
+			<td style="width: 232px;"><code>&amp;SID=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">CPAlead</td>
+			<td style="width: 232px;"><code>&amp;subid=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">CPAWay</td>
+			<td style="width: 232px;"><code>&amp;subid=[clickid]</code></td>
+		</tr>
+		<tr>
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">CrakRevenue</td>
+			<td style="width: 232px;"><code>&amp;aff_sub=[clickid]</code></td>
+		</tr>
+		<tr>
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">Envyus Media</td>
+			<td style="width: 232px;"><code>&amp;s1=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">ExpertMobi</td>
+			<td style="width: 232px;"><code>?subid1=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">GlobalWide Media</td>
+			<td style="width: 232px;"><code>&amp;s1=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">KissMyAds</td>
+			<td style="width: 232px;"><code>&amp;aff_sub=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">MaxBounty</td>
+			<td style="width: 232px;"><code>&amp;s2=[clickid]</code></td>
+		</tr>
+		<tr>
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">Mobidea</td>
+			<td style="width: 232px;"><code>&amp;data3=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">Mobidealer</td>
+			<td style="width: 232px;"><code>&amp;aff_sub=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">Mobileader</td>
+			<td style="width: 232px;"><code>&amp;aff_sub=[clickid]</code></td>
+		</tr>
+		<tr>
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">OasisAds</td>
+			<td style="width: 232px;"><code>&amp;s1=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">Peerfly</td>
+			<td style="width: 232px;"><code>&amp;s1=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">PerformanceRevenues</td>
+			<td style="width: 232px;"><code>&amp;aff_sub=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">ShareASale</td>
+			<td style="width: 232px;"><code>&amp;afftrack=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">Tapgerine</td>
+			<td style="width: 232px;"><code>&amp;aff_sub=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">W4</td>
+			<td style="width: 232px;"><code>&amp;c1=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">XY7.com</td>
+			<td style="width: 232px;"><code>&amp;SID=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">YeahMobile</td>
+			<td style="width: 232px;"><code>&amp;aff_sub=[clickid]</code></td>
+		</tr>
+		<tr>
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">Other CAKE network</td>
+			<td style="width: 232px;"><code>&amp;s1=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">Other HasOffers networks</td>
+			<td style="width: 232px;"><code>&amp;aff_sub=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">Other HitPath networks</td>
+			<td style="width: 232px;"><code>&amp;c1=[clickid]</code></td>
+		</tr>
+		<tr style="vertical-align:top; height:35px">
+			<td style="width: 50px;">&nbsp;</td>
+			<td style="width: 234px;">Other LinkTrust networks</td>
+			<td style="width: 232px;"><code>&amp;SID=[clickid]</code></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+<strong>Step 2 &ndash; Generate Your Postback URL with ClickMagick&rsquo;s Postback Builder Tool</strong><br />
+<br />
+If you want to do things the &ldquo;easy&rdquo; way, we&rsquo;ve got your back.<br />
+<br />
+Just select <strong><a href="/user/action/tools/postbackb.cgi" target="_blank">Postback Builder</a></strong> from the Tools menu within ClickMagick, then select the affiliate network you&rsquo;re working with, and ClickMagick will generate the customized Postback URL you need ready for you to paste into your affiliate network.<br />
+<br />
+<br />
+<img alt="" src="//cdn.clickmagick.com/images/user/faqs/faq119pbdebugger.jpg" /><br />
+<br />
+<br />
+Just select the network you&rsquo;re working with, click the &ldquo;Select Network&rdquo; button, and ClickMagick will show you how to add the <code>[clickid]</code> to your affiliate link <em>and</em> generate the correct Postback URL for your affiliate network without you having to worry about the details!<br />
+<br />
+The Postback URL is case-sensitive&mdash;do not change anything unless you REALLY know what you&rsquo;re doing. Just copy the URL and paste it into your Affiliate account.<br />
+<br />
+<strong>Note:</strong> If the <strong><a href="/user/action/tools/postbackb.cgi" target="_blank">Postback Builder</a></strong> does yet not list your network, you can easily create your own Postback URL. Just follow this guide:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=210"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=210">&nbsp;How do I create a Postback URL for my network?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+<strong>Step 3 &ndash; Add Your Postback URL To Your Affiliate Account</strong><br />
+<br />
+Once you&rsquo;ve pasted your Postback URL into your Affiliate account, any time you generate an affiliate sale your affiliate network will &ldquo;post back&rdquo; the conversion data to your ClickMagick account, and ClickMagick will attribute the sale and the revenue to the appropriate tracking link or funnel!<br />
+<br />
+Every affiliate network is a bit different in terms of how and where you add your Postback URL. For example with MaxBounty you add it one time on your Profile page:<br />
+<br />
+<img alt="" src="//cdn.clickmagick.com/images/guide/postback4.jpg" style="width: 700px; height: 349px;" /><br />
+<br />
+<br />
+&hellip; with Peerfly you add it to the &ldquo;Global Offer Postback&rdquo; page &hellip;<br />
+<br />
+<br />
+<img alt="" src="//cdn.clickmagick.com/images/guide/postback3.jpg" style="width: 700px; height: 486px;" /><br />
+<br />
+&hellip; and with some other networks you may need to select the specific offer you&rsquo;re promoting within your affiliate account and add your Postback URL there.<br />
+<br />
+Some networks&mdash;like MaxBounty&mdash;allow you to set up a universal Postback URL which will be used for all offers, and an offer-specific Postback URL where the URL will only be used for the specific offer.<br />
+<br />
+We STRONGLY recommend that you simply add your Postback URL into your affiliate network profile, if possible, and then forget about it.<br />
+<br />
+Also, when you add your Postback URL you may have to select a &ldquo;type&rdquo; to go with it.<br />
+<br />
+Each affiliate network is a bit different, but <em>always</em> choose the option that says something like URL, Postback URL, etc. and <em>never</em> select pixel, iframe, HTML, etc.<br />
+<br />
+If you can&rsquo;t figure out where to add your Postback URL in your affiliate account, just ask your affiliate manager or contact their customer support and they can tell you.<br />
+<br />
+<br />
+<strong>Troubleshooting your Postback URLs</strong><br />
+<br />
+If you&rsquo;re new to tracking affiliate sales with Postback URLs you may run into a few problems. When you do, it&rsquo;ll be helpful to keep a few things in mind &hellip;<br />
+<br />
+<br />
+<strong>1. It&rsquo;s totally normal to have problems.</strong><br />
+<br />
+This &ldquo;stuff&rdquo; can get a bit technical at times and learning it for the first time can be tough. That&rsquo;s normal and it&rsquo;s just part of your online marketing education. It will become simple pretty quickly.<br />
+<br />
+No one has ever learned to ride a bike without falling a few times &hellip;<br />
+<br />
+&hellip; and if all this &ldquo;stuff&rdquo; took no effort at all everyone would be an online millionaire.<br />
+<br />
+<br />
+<strong>2. It&rsquo;s probably NOT a problem with ClickMagick.</strong><br />
+<br />
+We&rsquo;re all human here at ClickMagick, but we&rsquo;re ridiculously passionate about what we do and the reality is that we just don&rsquo;t &ldquo;mess up&rdquo; very often.<br />
+<br />
+ClickMagick has been in constant development for many years, and we have many 1,000s of people using it daily. ClickMagick just doesn&rsquo;t have &ldquo;bugs&rdquo; or random &ldquo;problems.&rdquo;<br />
+<br />
+The simple fact is that most likely it&rsquo;s going to be a problem with something you&rsquo;ve done (or not done) rather than a problem with ClickMagick or your affiliate network.<br />
+<br />
+<br />
+<strong>3. We&rsquo;re here to help!</strong><br />
+<br />
+If you&rsquo;re having trouble with your Postback URL, we built the <strong><a href="/user/action/tools/postbackd.cgi" target="_blank">Postback Debugger</a></strong> just for you. You&rsquo;ll find it in the Tools menu and it has tools and information to help you figure out your problem.<br />
+<br />
+If you have any questions, please <strong><a href="/user/action/account/help.cgi?action=helpdesk" target="_blank">submit a ticket</a></strong> at our Help desk with all the relevant details and we&rsquo;ll be happy to take a look.<br />
+<br />
+Be sure to explain exactly what you&rsquo;ve done based on the steps of this tutorial (with screenshots if possible) and what&rsquo;s not working as expected.<br />
+<br />
+Remember &ndash; the more details you provide, the better we&rsquo;ll be able to help you!
+</body></html>

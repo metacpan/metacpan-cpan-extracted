@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html><head><title>How do I set up a custom domain using Script Forwarding?</title></head><body>
+<b>How do I set up a custom domain using Script Forwarding?</b><br />
+<br />
+Normally when you set up a custom tracking domain, you would use one of these subdomain formats:<br />
+<br />
+<code>http://yourdomain.com<br />
+http://www.yourdomain.com<br />
+http://track.yourdomain.com</code><br />
+<br />
+In some cases, you might want to use a slightly different style which uses a <em>subdirectory</em>:<br />
+<br />
+<code>http://yourdomain.com/recommends/</code><br />
+<br />
+If you want to use <code>yourdomain.com</code> or a subdomain such as <code>track.yourdomain.com</code> as your tracking domain, you&rsquo;ll want to set up your custom domain using the a CNAME DNS record, explained here:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=140"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=140">What is the recommended way to set up a custom domain?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+If you want to use the <code>yourdomain.com/recommends/</code>&nbsp;subdirectory style, you&rsquo;ll need to set up your tracking domain using Script Forwarding with your own server, and that set up process is explained below.<br />
+&nbsp;
+<div class="faq-caution"><b>Caution:</b>&nbsp;Unless you have a really good reason for using the subdirectory style, we recommend using the <strong><a href="/user/faqs.cgi?answer=140" target="_parent">CNAME DNS method</a></strong>&mdash;it&rsquo;s rock-solid, performs faster redirects, and will still deliver your clicks even if your own server goes down for any reason.</div>
+<br />
+<br />
+To use this Script Forwarding approach, just follow the steps in this video, or follow the written walkthrough below.<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=scriptforward" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=scriptforward" id="video-link-new">Create a Custom Domain Using Script Forwarding</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+To set up your custom tracking domain&nbsp;using Script Forwarding, follow these step-by-step instructions :<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>1.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Set up a server<br />
+			<br />
+			Unless you already have your own server, you&rsquo;ll need to sign up for a decent Linux VPS or cloud server plan with a dedicated IP address.<br />
+			<br />
+			Expect to pay no more than \$10-\$20 USD a month for this.<br />
+			<br />
+			You don&rsquo;t absolutely need a dedicated IP address but it&rsquo;ll help you get the best email deliverability possible if you&rsquo;ll be running email campaigns from your server. All VPS and cloud server accounts should come with a dedicated IP address.<br />
+			<br />
+			We do NOT recommend using a cheap shared hosting plan. Shared hosting plans can lose clicks due to their overburdened servers, and can also cause visitors to click away from your offers before they see anything because pages pull up so slowly. Our advice&mdash;don&rsquo;t risk it!<br />
+			&nbsp;</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>2.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Create your customized settings files<br />
+			<br />
+			We have a Setup Wizard to help you generate the custom files:&nbsp;<strong><a href="/user/custom.cgi" target="_blank">Launch the Setup Wizard</a></strong>. The Setup Wizard will generate a compressed file called <code>$username.zip</code> that you can download.<br />
+			&nbsp;</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>3.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Upload the compressed file to a subdirectory in your hosting account.<br />
+			<br />
+			First create a new subdirectory on your domain, such as <code>yourdomain.com/recommends/</code>, then upload the file <code>$username.zip</code> to the directory.<br />
+			<br />
+			Once uploaded, use your file manager or FTP program to extract the <code>$username.zip</code> file. This should create two additional files:<br />
+			<br />
+			<code>htaccess</code><br />
+			<code>index.php</code><br />
+			<br />
+			If your file manager or FTP program can&rsquo;t extract the file, you can extract the file before uploading, then separately upload the two files shown above.<br />
+			&nbsp;</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>4.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Rename the file named <code>htaccess</code> to <code>.htaccess</code><br />
+			<br />
+			You simply need to rename the <code>htaccess</code> file so that it starts with a period (<code>.</code>).<br />
+			<br />
+			If for some reason you can&rsquo;t add a period to the start of the filename, it&rsquo;s most likely caused by a setting somewhere in your hosting account file manager. In this&nbsp;case,&nbsp;you&rsquo;ll need to contact your hosting company and they&rsquo;ll tell you how to change the filename.<br />
+			&nbsp;</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>5.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Add your new domain to your ClickMagick account using the&nbsp;<strong><a href="/user/domains.cgi" target="_blank">Domain Manager</a></strong>&nbsp;which you can find in the <strong>Tools</strong> menu.<br />
+			<br />
+			Be sure to enter the full URL, including the subdirectory. For example, if you created the subdirectory <code>/recommends</code> and you uploaded your files there, the full tracking domain would be:<br />
+			<br />
+			<code>yourdomain.com/recommends</code><br />
+			<br />
+			When you attempt to add your tracking domain to the Domain Manager, you may get an error saying that the domain can&rsquo;t be found.&nbsp;Just read the error message and follow any instructions.<br />
+			<br />
+			When you create a new domain, it can take 1 to 24 hours for the domain to become active on the Internet. If you get an error when you try to add the domain to the Domain Manager, just wait a bit and try again.</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+<b>That&rsquo;s it, you&rsquo;re done!</b><br />
+<br />
+You&rsquo;ll get all the benefits of a custom domain with a dedicated IP, and the script we provide will route all of your traffic through your ClickMagick account.<br />
+<br />
+<br />
+<b>Troubleshooting</b><br />
+<br />
+<b>Problem #1:</b><br />
+<br />
+The most common problem people run into when setting up custom domain Script Forwarding is an &ldquo;Internal Server Error&rdquo; when testing a tracking link using their new custom tracking domain.<br />
+<br />
+This has nothing to do with ClickMagick, but rather it indicates that your server isn&rsquo;t properly set up to use <code>.htaccess</code> files in the directory you uploaded the files to.<br />
+<br />
+Unfortunately, this isn&rsquo;t something we can help with from our end, so if you&rsquo;re 100% positive you did step #4 above you&rsquo;ll need to get help from your hosting company &hellip;<br />
+<br />
+99 out of 100 times things will be set up properly by default, but in case you&rsquo;re one of the unlucky few who have a non-standard Apache setup, please tell your hosting company the following:<br />
+<br />
+&ldquo;I&rsquo;m trying to use <code>.htaccess</code> files in XYZ directory [the directory where you uploaded the files] but it&rsquo;s not working. Can you take a look or let me know how to enable <code>.htaccess</code> files in this directory?&rdquo;<br />
+<br />
+<br />
+<b>Problem #2:</b><br />
+<br />
+You&rsquo;re trying to use your tracking domain without a link or rotator ID and you&rsquo;re getting an error telling you that the ID is missing.<br />
+<br />
+If you&rsquo;re getting this error it simply means that you&rsquo;re entering your custom domain without specifying a link or rotator ID. That doesn&rsquo;t mean there is anything wrong with your custom domain.<br />
+<br />
+For example, every time you create a new link, you will be asked to choose a unique Link ID to distinguish that link from all the others in your account. So, if you were to create a link with the Link ID <code>video</code>, you would reference that link using your custom domain like this: &nbsp;<br />
+<br />
+<code>http://yourdomain.com/recommends/video</code><br />
+<br />
+If you forget to add the <code>/video</code>&nbsp;, you will be told that the &ldquo;Link ID is missing from that URL.&rdquo; That&rsquo;s perfectly normal behavior and there is nothing wrong with your custom domain.<br />
+&nbsp;<br />
+&nbsp;
+<div class="faq-tip"><b>Tip:</b> If you&rsquo;re getting an error that is not explained here, every possible custom domain error that ClickMagik generates is explained in this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=116"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=116">&nbsp;How do I troubleshoot my custom domain setup?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+</body></html>

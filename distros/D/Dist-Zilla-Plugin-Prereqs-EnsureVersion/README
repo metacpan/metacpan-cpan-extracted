@@ -3,14 +3,14 @@ NAME
     have minimum versions
 
 VERSION
-    This document describes version 0.04 of
+    This document describes version 0.050 of
     Dist::Zilla::Plugin::Prereqs::EnsureVersion (from Perl distribution
-    Dist-Zilla-Plugin-Prereqs-EnsureVersion), released on 2017-07-28.
+    Dist-Zilla-Plugin-Prereqs-EnsureVersion), released on 2018-06-07.
 
 SYNOPSIS
     In ~/pmversions.ini:
 
-     Log::Any::IfLOG=0.07
+     Log::ger=0.019
      File::Write::Rotate=0.28
 
     In dist.ini:
@@ -31,6 +31,12 @@ DESCRIPTION
     version ranges, e.g.:
 
      Module::Name = 1.00-2.00, != 1.93
+
+ENVIRONMENT
+  PMVERSIONS_PATH
+    String. Set location of pmversions.ini instead of the default
+    "~/pmversions.ini". Example: "/etc/minver.conf". Note that this is
+    actually observed by in PMVersions::Util.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -60,7 +66,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

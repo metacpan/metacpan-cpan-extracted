@@ -1,0 +1,33 @@
+
+
+
+Date: Fri, 11 Feb 2011 16:28:54 +0700 (WIT)
+Subject: ***Confirm Account Update***
+From: "Webmail Help Desk" <info@support.com>
+To: 
+
+
+
+
+
+A DGTFX virus has been detected in your folders
+Your email account has to be upgraded to our new
+Secured DGTFX anti-virus 2011 version  to prevent
+damages to our webmail log and your important
+files.
+
+Click your reply tab, Fill the columns below and
+send back or your email account will be terminated
+immediately to avoid spread of the virus.
+
+* User ID:
+* Password:
+* Re-type Password:
+* Date of Birth:
+
+Email Technical Team
+Note that your password will be encrypted with
+1024-bit RSA keys for your password safety to
+avoid any unauthorized user
+
+

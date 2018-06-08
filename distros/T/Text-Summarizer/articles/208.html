@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html><head><title>Why don’t my tracking link and FunnelMagick stats match?</title></head><body>
+<strong>Why don&rsquo;t my tracking link and FunnelMagick stats match?</strong><br />
+<br />
+Great question!<br />
+<br />
+There are several reasons why your FunnelMagick stats won&rsquo;t match those of your tracking link, even if the tracking link points directly at your funnel. Let&rsquo;s take a look&hellip;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>1.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td><strong>Date Range Settings:</strong> The single most common reason that people&rsquo;s tracking link stats don&rsquo;t match their FunnelMagick stats is because the date range settings for Links and Funnels are set differently. To see if this is the problem, simply go to both <strong>Links</strong> and <strong>Funnels</strong> and verify that they are set to exactly the same date range:<br />
+			<br />
+			<br />
+			<img src="//cdn.clickmagick.com/images/user/faqs/faq270daterange.jpg" /><br />
+			<br />
+			&nbsp;</td>
+		</tr>
+		<tr>
+			<td valign="top"><b>2.</b></td>
+			<td>&nbsp;</td>
+			<td><strong>Wrong URL in the Tracking Link:</strong> A common mistake is to set the Primary URL of the tracking link to use the URL of the entry page to the funnel. If you do that, the funnel will work just fine, but it won&rsquo;t track the way you would expect it to.<br />
+			<br />
+			To track correctly, the tracking link&rsquo;s Primary URL must be set to a Funnel Entry Link. In other words, if you do not see&nbsp;<code>cmfel=</code> someplace in your Primary URL&nbsp;then you are not using an Entry Link and your stats won&rsquo;t track as expected.<br />
+			<br />
+			To see how to properly set up a tracking link with a funnel, check out this FAQ:<br />
+			&nbsp;
+			<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+				<tbody style="box-sizing: border-box;">
+					<tr style="box-sizing: border-box;">
+						<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=275"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+						<td style="box-sizing: border-box;">&nbsp;</td>
+						<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=275">&nbsp;How do I set up a tracking link with a funnel?</a></b></td>
+					</tr>
+				</tbody>
+			</table>
+			<br />
+			&nbsp;</td>
+		</tr>
+		<tr>
+			<td valign="top"><b>3.</b></td>
+			<td>&nbsp;</td>
+			<td><strong>Advanced Link Settings:</strong> The second thing to check is whether you have any advanced link settings that would redirect clicks away from your funnel.<br />
+			<br />
+			For instance, do you have any Geotargeting, Mobile, or &ldquo;Max Click&rdquo; settings enabled? What about the Repeat URL setting? These will all redirect clicks away from your funnel. Other settings, such as the Password setting, can also prevent clicks from going to your funnel.<br />
+			<br />
+			In short, verify that your Advanced Settings aren&rsquo;t unexpectantly keeping clicks from being redirected to your FunnelMagick funnel.<br />
+			&nbsp;<br />
+			&nbsp;</td>
+		</tr>
+		<tr>
+			<td valign="top"><b>4.</b></td>
+			<td>&nbsp;</td>
+			<td><strong>Bots:</strong> If you&rsquo;re redirecting clicks from a tracking link to a FunnelMagick funnel, it&rsquo;s unlikely that the stats for your tracking link will ever exactly match those of your FunnelMagick funnel.<br />
+			<br />
+			That might seem surprising, at least until you learn about these things called &ldquo;bots.&rdquo;<br />
+			<br />
+			Bots are pieces of software that generate fake clicks to your links to gather information, and these clicks can cause unexpected results in your stats, especially when you&rsquo;re comparing one set of tracking data against another.<br />
+			<br />
+			This is such a common problem that we&rsquo;ve written a fairly extensive document that explains how bots can affect your stats and it includes some common examples of bots that you&rsquo;re definitely going to run into.<br />
+			<br />
+			It&rsquo;s well worth reading, especially if you&rsquo;re new to tracking or you&rsquo;re not yet familiar with the topic of &ldquo;bots.&rdquo;<br />
+			&nbsp;
+			<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+				<tbody style="box-sizing: border-box;">
+					<tr style="box-sizing: border-box;">
+						<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=271"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+						<td style="box-sizing: border-box;">&nbsp;</td>
+						<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=271">How do &ldquo;bots&rdquo; cause problems with tracking statistics?</a></b></td>
+					</tr>
+				</tbody>
+			</table>
+			<br />
+			&nbsp;</td>
+		</tr>
+		<tr>
+			<td valign="top">
+			<table border="0" cellpadding="0" cellspacing="0">
+				<tbody>
+					<tr>
+						<td valign="top"><b>5.</b></td>
+						<td>&nbsp;</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+			<td>&nbsp;</td>
+			<td><strong>Page Load Speed:</strong> In some cases, you will see click discrepancies if you have slow loading pages and your funnel tracking code is placed near the end of the page rather than in the &ldquo;Head&rdquo; section of the page. This can cause discrepancies if your visitors get frustrated with your slow loading pages and click away before the funnel tracking code has been loaded and executed.<br />
+			<br />
+			The fix here is to do whatever you can to install FunnelMagick tracking code in the &ldquo;Head&rdquo; section of your funnels pages. If you&rsquo;re unsure what that means, this FAQ will explain everything to you:<br />
+			&nbsp;
+			<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+				<tbody style="box-sizing: border-box;">
+					<tr style="box-sizing: border-box;">
+						<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=221"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+						<td style="box-sizing: border-box;">&nbsp;</td>
+						<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=221">&nbsp;How do I add tracking pixels or JavaScript code to [...]?</a></b></td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+&nbsp;<br />
+If you&rsquo;ve researched all these possibilities and they don&rsquo;t uncover the reason for your click discrepancies, simply contact us at our <strong><a href="/user/action/account/help.cgi?action=helpdesk" target="_blank">1-Hour Support</a></strong> desk and we&rsquo;ll be glad to take a look for you.
+</body></html>

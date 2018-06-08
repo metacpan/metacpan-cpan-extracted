@@ -1,5 +1,9 @@
 Revision history for Perl module Ma::OSVersion
 
+1.003 2018-06-06T14:16:04Z
+	* Update for High Sierra and Mojave
+	* Change to the Artistic License 2.0
+
 1.002 2016-06-30T23:04:33Z
 	* Add El Capitan and Sierra
 

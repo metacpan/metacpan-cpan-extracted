@@ -1,0 +1,166 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+# Autor: Boris Däppen, 2018
+# No guarantee given, use at own risk and will
+
+# PODNAME: unding
+# ABSTRACT: dark magic, encrypted wallet
+
+use v5.6.0;
+
+use File::Slurp;
+use Term::ReadKey;
+use Data::Serializer;
+#cpanm Crypt::CBC
+#cpanm Crypt::Blowfish
+
+my  $DATA_ptr;
+our $old_state; # what was in DATA, when script started
+our $new_state; # what should be in DATA, after script ends
+our $encrypt_mode = 0;
+
+INIT {
+    $DATA_ptr = tell DATA;        # where is DATA?
+    $old_state = join "", <DATA>; # slurp
+}
+
+my $help_message = <<'END_HELP';
+
+  Encrypt a file. Content will be stored in unding.
+  Attention: File will remain on disk!
+
+      unding /path/to/file
+
+  Decrypt and display content stored in unding.
+
+      unding
+
+END_HELP
+
+if (      # decrypt (no arg given) but nothing stored
+          (not defined $ARGV[0] and (length($old_state) < 2))
+          # encrypt (arg given) but --help instead of path
+       or (defined $ARGV[0] and $ARGV[0] =~ /^(-h|--help)/)
+   ) {
+     print STDERR $help_message;
+     exit 1;
+}
+
+# read password, without any prompt
+ReadMode('noecho');
+chomp(my $password = <STDIN>);
+ReadMode('restore');
+
+my $obj = Data::Serializer->new(
+                   serializer => 'Data::Dumper',
+                   digester   => 'SHA-256',
+                   cipher     => 'Blowfish',
+                   secret     => $password,
+                   portable   => '1',
+                   compress   => '0',
+             serializer_token => '1',
+                     options  => {},
+                  );
+
+if ( defined $ARGV[0] ) {
+    die "\n\n\twrite permissons on script needed (yes!)\n\n" if (not -w $0);
+    $encrypt_mode = 1;
+    my $filename = $ARGV[0];
+    my $data = read_file($filename);
+    $new_state =$obj->serialize($data);
+}
+else {
+    my $data =$obj->deserialize($old_state);
+    if (defined $data) {
+        print $data;
+    }
+    else {
+        print STDERR "Wrong password?\n";
+    }
+}
+
+
+END {
+    if ($encrypt_mode) {
+        open DATA, '+<', $0;   # $0 is the name of this script
+        seek DATA, $DATA_ptr, 0;
+        print DATA $new_state;
+        truncate DATA, tell DATA;  # in case new data is shorter than old data
+        close DATA;
+    }
+}
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+unding - dark magic, encrypted wallet
+
+=head1 VERSION
+
+version 0.004
+
+=head1 SYNOPSIS
+
+This is an executable script, not a library.
+Since this script needs write access on it self (yes!), it's best you copy it to your local directory before using.
+
+ cp $(which unding) .
+ chmod 755 unding
+
+Encrypt a file. Content will be stored in unding.
+Attention: File will remain on disk!
+
+ ./unding /path/to/file
+
+Decrypt and display content stored in unding.
+
+ ./unding
+
+In both cases you must enter a password, but no prompt will tell you so.
+
+=head1 MOTIVATION
+
+B<Why «dark magic»?> The script uses a technique which making use of, is higly disencouraged by intelligent programmers:
+L<https://stackoverflow.com/questions/41061214/write-to-the-data-section-in-perl>
+
+B<Why the name «unding»?> C<unding> derives from the German I<Un-Ding>, meaning the negation of a thing, a I<Not-Thing> (nothing).
+The negation can be meant pejoratively, relating to the I<dark magic> invoced.
+But also descriptively, because the script transforms a I<thing> (text) into a I<nothing> (cypher text).
+
+B<So what's in for me?> The I<dark magic> offers you your encrypted secrets together with the code to decrypt it in one single file.
+All you need to de- and encrypt is this file and a Perl environment.
+No separation of ciphertext and cryptologic.
+
+=head1 WARNINGS
+
+=over
+
+=item This is an early release. Use it at your own risk.
+
+=item While encryption, the script does not check if it overwrites existing encrypted data.
+
+=item While encryption, the script does not check if the password is the same as before. Decrypt once to be sure you made no typos.
+
+=item After encryption, the script does not delete the original file. You have to do this yourself. This may be considered a feature, since it might prevent loss of data.
+
+=back
+
+=head1 AUTHOR
+
+Boris Däppen <bdaeppen.perl@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Boris Däppen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+__DATA__
+

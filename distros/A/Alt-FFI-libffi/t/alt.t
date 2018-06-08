@@ -2,7 +2,6 @@ use strict;
 use warnings;
 use FFI;
 use Test::More;
-#use YAML ();
 
 my %types = map { $_ => 1 } FFI::Platypus->types;
 

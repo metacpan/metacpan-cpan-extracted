@@ -1,5 +1,31 @@
 Revision history for XSConfig
 
+6.24    Thu, Jun 07, 2018  2:56:27 PM
+        -more common keys for CPAN Testers
+        -soft delete keys in the pre-generated fallback hash for systems without
+         gperf, this saves a couple KBs of disk/memory
+
+6.23    Wed, Jun 06, 2018  1:16:20 AM
+        -import changes from cperl
+          -fixed cast to pointer not allowed (C++ build)
+          -changed rurban email address
+          -patch Config_lookup()'s prototype for key len to be 32 bits as
+           before because gperf 3.1 changed it to 64 bit key length
+           See cperl#286
+          -dont regen canned gperf hash when in core/cperl
+        -fixed XSConfig.t to work with newer Test::More based off Test2
+        -more common keys for CPAN Testers
+        -fixed XSConfig.t to work with newer Test::More based off Test2
+        -fixed genkeys.PL tool generated randomly trailing space at the end of
+         each qw() line. Now there will be no extra trailing whitespace on those
+         lines.
+        -fixed Config_xs.PL to read %Config keys from perl distros using
+         Portable.pm
+
+6.22    2016-09-10 21:06:56 rurban (never released)
+        -protect sv in END during global destruction, esp. with B::C
+        -fixes for no . in @INC (cperl or -Dfortify_inc)
+
 6.21    Sun, Jun 26, 2016  2:02:00 PM
         -more common keys for CPAN Testers
 

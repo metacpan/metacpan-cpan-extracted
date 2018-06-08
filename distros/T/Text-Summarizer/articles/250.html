@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html><head><title>How do I get my SiteScout pixel to work with ClickMagick?</title></head><body>
+<strong>How do I get my SiteScout pixel to work with ClickMagick?</strong><br />
+<br />
+To use SiteScout pixels with ClickMagick, you need to change one line of code in the JavaScript pixel code that they give you. ClickMagick doesn&rsquo;t allow backslash &ldquo;\&rdquo; characters in pixel code so all you need to do is replace the original line of code with a slightly rewritten one.&nbsp;Fortunately, this is a fairly straightforward fix.<br />
+<br />
+The problematic line in the SiteScout pixel is this one:<br />
+<br />
+<code>doc.open().write(&#39;((body onload=&quot;window.location.href=\&#39;&#39;+syncUrl+&#39;\&#39;&quot;))&#39;);</code><br />
+<br />
+That line can be rewritten to remove the &ldquo;\&rdquo; characters&nbsp;like this:<br />
+<br />
+<code>doc.open().write(&quot;((body onload=&#39;window.location.href=&quot;+&#39;&quot;&#39;+syncUrl+&#39;&quot;&#39;+&quot;&#39;))&quot;);</code><br />
+<br />
+One easy way to replace the line of code is to take the pixel code you get from SiteScout and paste it into a JavaScript beautifier program like this one:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="http://jsbeautifier.org/" target="_blank"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="http://jsbeautifier.org/" target="_blank">The JavaScript Beautifier</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+After you&rsquo;ve pasted your SiteScout pixel into the JavaScript Beautifier, click on the button that says &ldquo;Beautify JavaScript or HTML&rdquo; at the bottom of the edit window:<br />
+<br />
+<br />
+&nbsp; &nbsp;<img src="//cdn.clickmagick.com/images/user/faqs/faq314beautifybtn.jpg" /><br />
+&nbsp;<br />
+<br />
+That will reformat your code so that it&rsquo;s easy to replace the original line of&nbsp;code with the corrected, non-&ldquo;\&rdquo; version, above. After you&rsquo;ve made the replacement, the tail end of your fixed pixel code should look like this:<br />
+<br />
+<code>&nbsp; &nbsp; &nbsp; ⋮<br />
+&nbsp; &nbsp; &nbsp; var doc = iframe.contentWindow.document;<br />
+&nbsp; &nbsp; &nbsp; doc.open().write(&quot;((body onload=&#39;window.location.href=&quot;+&#39;&quot;&#39;+syncUrl+&#39;&quot;&#39;+&quot;&#39;))&quot;);<br />
+&nbsp; &nbsp; &nbsp;&nbsp;doc.close();<br />
+&nbsp; &nbsp;})(document);<br />
+((/script))</code><br />
+&nbsp;<br />
+<br />
+Once you&rsquo;ve replaced the line of code, your ScoutSite pixel will work correctly with ClickMagick.
+</body></html>

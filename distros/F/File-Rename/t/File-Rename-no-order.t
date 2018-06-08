@@ -19,23 +19,12 @@ die $@ unless $require_ok;
 # Insert your test code below, the Test::More module is use()ed here so read
 # its man page ( perldoc Test::More ) for help writing this test script.
 
-use File::Spec;
-use File::Path ();
+unshift @INC, 't' if -d 't';
+require 'testlib.pl';
 
-my $dir = 'temp';
-File::Path::rmtree $dir if -d $dir;
-File::Path::mkpath $dir; 
+my $dir = tempdir();
 
-sub create (@) {
-    for (@_) { 
-        open my $fh, '>',  File::Spec->catfile($dir, $_) or die $!; 
-        close $fh or die $!;
-    } 
-}
-
-create qw(bing.txt bong.txt);
-
-sub main_argv { local @ARGV = @_; main () } 
+create(qw(bing.txt bong.txt));
 
 # test 2
 
@@ -43,9 +32,7 @@ main_argv(
 	glob( File::Spec->catfile($dir,'b*') ),
 	'-e', 's/i/u/'
 ); 
-opendir DIR, $dir or die $!;
-is_deeply( [ sort grep !/^\./, readdir DIR ], 
+is_deeply( [ sort( listdir( $dir ) ) ],
 		[qw(bong.txt bung.txt)], 'rename - files' );
-closedir DIR or die $!; 
 
-File::Path::rmtree $dir;
+File::Path::rmtree($dir);

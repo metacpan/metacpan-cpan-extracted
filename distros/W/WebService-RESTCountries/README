@@ -72,6 +72,27 @@ METHODS
         # Set through method.
         $api->api_url('https://example.com/v2/');
 
+  cache
+
+    The cache engine used to cache the web service API calls. By default,
+    it uses file-based caching.
+
+        # Instantiate the class by setting the cache engine.
+        my $api = WebService::RESTCountries->new(
+            CHI->new(
+                driver => 'File',
+                namespace => 'restcountries',
+                root_dir => $ENV{PWD} . '/tmp/cache/'
+            )
+        );
+    
+        # Set through method.
+        $api->cache(CHI->new(
+            driver => 'File',
+            namespace => 'restcountries',
+            root_dir => $ENV{PWD} . '/tmp/cache/'
+        ));
+
   fields
 
     Show the country data in specified fields. Do this before making any
@@ -91,9 +112,28 @@ METHODS
         # Returns 1 if up and 0 otherwise.
         $api->ping();
 
+ download([$file_name])
+
+    Download the whole countries data as JSON file. Optional path and file
+    name.
+
+        # Using default path and file name.
+        $api->download();
+    
+        # Using specific path and file name.
+        $api->download('/tmp/countries.json');
+
+    Check whether the API endpoint is currently up.
+
+        # Returns 1 if up and 0 otherwise.
+        $api->ping();
+
  search_all()
 
-    Get all the countries.
+    Get all the countries. Basically just pull the whole data in JSON
+    format.
+
+        $api->search_all();
 
  search_by_calling_code($calling_code)
 

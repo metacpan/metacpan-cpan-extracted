@@ -1,3 +1,16 @@
+0.000063    2018-06-08
+            * Embed all required JS code into the module.
+
+0.000062    2018-06-07
+            * Add support for sandboxing: when creating the duktape object, you
+              can now specify limits for how much memory will be allocated, and
+              how long a duktape operation can run before aborting.
+            * Add more specific types returned by typeof.
+            * Support data structures with cycles, both in Perl and duktape.
+            * Add more error checking when gathering stats.
+            * Several Code refactorings.
+            * Fixed and improved documentation.
+
 0.000061    2018-05-30
             * Stop declaring variables inside a for loop -- doh.
 

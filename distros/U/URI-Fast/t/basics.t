@@ -148,9 +148,9 @@ subtest 'query' => sub{
     foreach my $sep (qw(& ;)) {
       subtest "separator '$sep'" => sub {
         my $uri = uri "http://www.test.com?foo=bar${sep}foo=baz${sep}fnord=slack";
-        is $uri->param('foo'), array{ item 'bar'; item 'baz'; end; }, 'get (scalar): multiple values as array ref';
-        is $uri->param('fnord'), 'slack', 'get (scalar): single value as scalar';
         is [$uri->param('foo')], array{ item 'bar'; item 'baz'; end; }, 'get (list)';
+        is $uri->param('fnord'), 'slack', 'get (scalar): single value as scalar';
+        ok dies{ my $foo = $uri->param('foo'); }, 'get (scalar): dies when encountering multiple values';
 
         subtest 'unset' => sub {
           is $uri->param('foo', undef, $sep), U, 'set';
@@ -165,8 +165,8 @@ subtest 'query' => sub{
         };
 
         subtest 'set: array ref' => sub {
-          is $uri->param('foo', [qw(bar baz)], $sep), [qw(bar baz)], 'set (scalar, array ref)';
-          is $uri->param('foo'), [qw(bar baz)], 'get';
+          is [$uri->param('foo', [qw(bar baz)], $sep)], [qw(bar baz)], 'set';
+          is [$uri->param('foo')], [qw(bar baz)], 'get';
           is $uri->query, "fnord=slack${sep}foo=bar${sep}foo=baz", 'updated: query';
         };
 

@@ -1,4 +1,4 @@
-package Pcore v0.66.0;
+package Pcore v0.67.0;
 
 use v5.26.0;
 use common::header;
@@ -49,7 +49,6 @@ our $UTIL = {
     net      => 'Pcore::Util::Net',
     path     => 'Pcore::Util::Path',
     perl     => 'Pcore::Util::Perl',
-    pm       => 'Pcore::Util::PM',
     progress => 'Pcore::Util::Term::Progress',
     random   => 'Pcore::Util::Random',
     scalar   => 'Pcore::Util::Scalar',
@@ -273,7 +272,7 @@ sub _CORE_INIT ($import) {
     require Pcore::Core::Exception;    # set $SIG{__DIE__}, $SIG{__WARN__}, $SIG->{INT}, $SIG->{TERM} handlers
 
     # process -forktmpl pragma
-    require Pcore::Util::PM::ForkTmpl if !$MSWIN && $import->{pragma}->{forktmpl};
+    require Pcore::Util::Sys::ForkTmpl if !$MSWIN && $import->{pragma}->{forktmpl};
 
     _CORE_INIT_AFTER_FORK();
 
@@ -334,9 +333,9 @@ sub _CORE_RUN {
             }
 
             # change priv
-            Pcore->pm->change_priv( gid => $ENV->{GID}, uid => $ENV->{UID} );
+            Pcore->sys->change_priv( gid => $ENV->{GID}, uid => $ENV->{UID} );
 
-            P->pm->daemonize if $ENV->{DAEMONIZE};
+            P->sys->daemonize if $ENV->{DAEMONIZE};
         }
     }
 
@@ -484,15 +483,15 @@ sub sendlog ( $self, $key, $title, $data = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 87                   | Variables::ProtectPrivateVars - Private variable used                                                          |
+## |    3 | 86                   | Variables::ProtectPrivateVars - Private variable used                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 227, 256, 259, 263,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
-## |      | 295, 298, 303, 306,  |                                                                                                                |
-## |      | 331, 357, 468        |                                                                                                                |
+## |    3 | 226, 255, 258, 262,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
+## |      | 294, 297, 302, 305,  |                                                                                                                |
+## |      | 330, 356, 467        |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 313                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_CORE_RUN' declared but not used    |
+## |    3 | 312                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_CORE_RUN' declared but not used    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 231                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
+## |    1 | 230                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

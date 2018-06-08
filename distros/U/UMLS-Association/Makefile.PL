@@ -11,10 +11,10 @@ use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 
-my $author4 = 'Sam Henry <henryst@vcu.edu>';
-my $author3 = 'Andriy Mulyar <andriy.mulyar@gmail.com>'; 
-my $author2 = 'Keith Herbert <herbertkb@vcu.edu>'; 
-my $author1 = 'Bridget McInnes <btmcinnes@vcu.edu';
+my $author4 = 'Andriy Mulyar <andriy.mulyar@gmail.com>'; 
+my $author3 = 'Keith Herbert <herbertkb@vcu.edu>'; 
+my $author2 = 'Bridget McInnes <btmcinnes@vcu.edu';
+my $author1 = 'Sam Henry <henryst@vcu.edu>';
 
 WriteMakefile(
               'NAME'		  => 'UMLS::Association',

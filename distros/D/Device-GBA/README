@@ -1,0 +1,94 @@
+NAME
+
+    Device::GBA - Perl Interface to the Gameboy Advance
+
+VERSION
+
+    version 0.001
+
+SYNOPSIS
+
+        use Device::GBA;
+    
+        my $gba = Device::GBA->new(buspirate => '/dev/ttyUSB0') or die "No such device!\n";
+        $gba->upload('helloworld.gba');
+
+DESCRIPTION
+
+    The Nintendo Gameboy Advance can either boot from cartridge or over
+    link cable. The latter is caled multiboot mode and is basically SPI and
+    a homebrew encoding scheme. Unfortunately, the Bus Pirate doesn't have
+    a 100k SPI mode, so we are using 125k instead. If you encounter
+    problems with booting, use the next lower speed (30k) as bitrate. This
+    utility allows uploading multiboot GBA images with the BusPirate. Don't
+    forget to pass -specs=gba_mb.specs to devkitARM GCC if you want to link
+    a multiboot image. The package's share/ subdirectory contains an
+    example Makefile
+    <https://github.com/athreef/Device-GBA/blob/master/share/testimg/Makefile>
+    for cross-compilation. The wiring is as follows:
+
+        GBA     Bus Pirate
+        SO  --> MISO
+        SI  <-- MOSI
+        CLK <-- CLK
+
+    Note: This is still work in progress!
+
+METHODS AND ARGUMENTS
+
+    new()
+
+      Opens specified device and returns the corresponding object
+      reference. Returns undef if an attempt to open the device has failed.
+      Accepts following parameters:
+
+      buspirate
+
+	COM port or handle of the BusPirate connected to the Gameboy
+	Advance.
+
+      verbose
+
+	if true, methods on this instance will narrate what they're doing.
+	Default is 0.
+
+    upload
+
+          $gba->upload($firmware_file)
+
+      Reads in $firmware_file and uploads it to the Gameboy Advance.
+
+    spi_writeread
+
+          $miso = $gba->spi_writeread($mosi)
+
+      reads and writes 32 bit from the SPI bus.
+
+    crc
+
+          $c = Device::GBA::crc($w, [$c = 0x0000c387])
+
+      Calculates CRC for word $w and CRC $c according to the algrithm used
+      by the GBA multiboot protocol.
+
+GIT REPOSITORY
+
+    http://github.com/athreef/Device-GBA
+
+SEE ALSO
+
+    gba -- The command line utility
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+    Based on The uploader written by Ken Kaarvik.
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2018 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License v2.0 or later.
+

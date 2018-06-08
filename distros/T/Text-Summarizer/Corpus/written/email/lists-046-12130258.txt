@@ -1,0 +1,30 @@
+
+
+docno="lists-046-12130258"
+name="Neil Soiffer"
+email="soiffer@wri.com"
+sent="Mon, 3 Jun 1996 23:06:04 -0700"
+id="199606040606.AA03032@drizzle.wri.com"
+subject="Re: Comments on parsing steps:"
+To: raman@adobe.com
+Cc: w3c-math-erb@w3.org
+
+
+     
+   
+>>From first reading, it appears that the step of "parsing embellishments"
+>e.g. superscripts, accents etc needs to happen *before* the operator
+>precedence parsing step.
+
+>Also, this will allow us to handle complex expressions appearing as
+>embellishments to other complex expressions correctly.
+
+Mathematica's parsing, which works in a manner similar to what Bruce describes,
+has no problem handling complex embellishments as in your example.
+Perhaps I am too familar with the algorithm and that I filled in pieces
+missing in Bruce's description, but I didn't see anything wrong with his
+description.  Do you have a (simple) example in mind where it fails?
+
+        Neil
+
+

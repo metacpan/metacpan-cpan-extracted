@@ -1,3 +1,9 @@
+0.010   2018-06-07 (PERLANCAR)
+
+        - [build] Rebuild to set minimum version of coerce module dependencies
+          [RT#125498].
+
+
 0.009   2018-06-06 (PERLANCAR)
 
 	- Add schema: cryptoexchange::currency_pair.

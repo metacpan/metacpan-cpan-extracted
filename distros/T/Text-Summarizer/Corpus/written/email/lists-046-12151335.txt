@@ -1,0 +1,53 @@
+
+
+docno="lists-046-12151335"
+name="Nico Poppelier"
+email="nico@valacar.elsevier.nl"
+sent="Wed, 5 Jun 1996 16:38:21 +0200 (MET DST)"
+id="199606051438.QAA03524@thorin.elsevier.nl"
+* X-Mailer: ELM [version 2.4 PL25]
+subject="Response to Ron Whitney"
+To: w3c-math-erb@w3.org
+
+
+
+     
+   
+Ron Whitney writes:
+> undogmatic.  I view their contributions as wholly positive.  I'm
+> certain that Nico was *not* asserting otherwise, but I would
+Ron is right: I was not trying to assert otherwise, but I was
+asking a question (perhaps not neutrally enough :-), because
+I am only vaguely familiar with Mathematica. I asked the question
+because I wanted to know how feasible the mechanisms are that Bruce
+describes. If Mathematica already implements something similar, this
+is an argument in support of feasibility. It also might give an
+indication of how easy or difficult it is to come up with a real
+implementation.
+
+I agree with Ron that there is some politics involved as well. I
+think this group should make it absolutely clear that we will
+draw inspiration from ISO 12083 as much as we need, and that we
+will use the ISO TR 9573 entity sets, and also that WRI is not
+"running the show".
+
+As an aside: at the SGML Europe'96 conference Roy Pike attended the
+meeting of the committee responsible for ISO 12083, chaired by Eric
+van Herwijnen, and we got him to consent to the idea that there will
+always be users who need/insist on a P(resentation) (geometric, visual)
+notation. I said "he consented", but I should have said
+"he consented grudgingly and certainly not wholeheartedly". :-)
+
+Nico
+
+------------------------------------------------------------------------
+Dr. Nico A.F.M. Poppelier
+Elsevier Science, APD, ITD               Email: n.poppelier@elsevier.nl.
+Molenwerf 1, 1014 AG Amsterdam           Phone: +31-20-4853482.
+The Netherlands                          Fax:   +31-20-4853706.
+------------------------------------------------------------------------
+                  The truth, the whole truth, and nothing but the truth.
+                                             And maybe some compromises.
+     
+
+

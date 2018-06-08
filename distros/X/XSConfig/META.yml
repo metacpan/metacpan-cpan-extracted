@@ -1,30 +1,30 @@
 ---
-abstract: 'Fast XS drop-in replacement for Config.pm with perfect hashing'
+abstract: Fast XS drop-in replacement for Config.pm with perfect hashing
 author:
-  - 'Daniel Dragan <bulkdd@cpan.org>'
-  - 'Reini Urban <rurban@cpanel.net>'
+- Daniel Dragan <bulkdd@cpan.org>
+- Reini Urban <rurban@cpan.org>
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+generated_by: ExtUtils::MakeMaker version 7.3503, CPAN::Meta::Converter version 2.150010
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
+  version: 1.4
 name: XSConfig
 no_index:
   directory:
-    - t
-    - inc
+  - t
+  - inc
 provides:
   XSConfig:
     file: Config.pm
-    version: '6.21'
+    version: '6.24'
 requires:
   perl: '5.008007'
 resources:
   repository: https://github.com/perl11/p5-Config
-version: '6.21'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '6.24'
+x_serialization_backend: YAML::XS version 0.66

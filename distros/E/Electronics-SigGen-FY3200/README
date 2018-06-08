@@ -1,0 +1,94 @@
+NAME
+
+    Electronics::SigGen::FY3200 - control a FeelTech FY32xx signal
+    generator
+
+SYNOPSIS
+
+       use Electronics::SigGen::FY3200;
+    
+       my $fy3200 = Electronics::SigGen::FY3200->new( dev => "/dev/ttyUSB0" );
+    
+       my $ch1 = $fy3200->channel(1);
+    
+       $ch1->set_wave( 'sine' )->get;
+       $ch1->set_frequency( 1E3 )->get; # in Hz
+       $ch->set_amplitude( 2 )->get;    # in Volts peak
+
+DESCRIPTION
+
+    This module allows control of a FeelTech FY32xx series signal
+    generator, such as the FY3224S, when connected over USB.
+
+ Interface Design
+
+    The interface is currently an ad-hoc collection of whatever seems to
+    work here, but my hope is to find a more generic shareable interface
+    that multiple different modules can use, to provide standard interfaces
+    to various kinds of electronics test equipment.
+
+    The intention is that it should eventually be possible to write a
+    script for performing automated electronics testing or experimentation,
+    and easily swap out modules to suit the equipment available. Similar
+    concepts apply in fields like DBI, or Device::Chip, so there should be
+    plenty of ideas to borrow.
+
+METHODS
+
+ identify
+
+       $str = $fy3200->identify->get
+
+ channel
+
+       $ch = $fy3200->channel( $n )
+
+    Returns a Channel object representing the main (if $n is 1) or
+    secondary (if $n is 2) channel.
+
+CHANNEL METHODS
+
+ set_wave
+
+       $ch->set_wave( $type )->get
+
+    Sets the basic wave shape - one of sine, square, triangle, etc... or
+    one of the direct numbers from 0 to 16 recognised by the device.
+
+ set_frequency
+
+       $ch->set_frequency( $hz )->get
+
+    Sets the frequency in Hz.
+
+ set_amplitude
+
+       $ch->set_amplitude( $vpk )->get
+
+    Sets the amplitude in Volts peak.
+
+ set_offset
+
+       $ch->set_offset( $v )->get
+
+    Sets the offset in Volts.
+
+ set_duty
+
+       $ch->set_duty( $duty )->get
+
+    Sets the duty cycle as a fraction from 0 to 1.
+
+ set_phase
+
+       $ch->set_phase( $phase )->get
+
+    Sets the phase offset as a fraction from 0 to 1.
+
+    Note that due to hardware limitations this only takes effect on the
+    secondary channel; the primary channel will ignore it.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

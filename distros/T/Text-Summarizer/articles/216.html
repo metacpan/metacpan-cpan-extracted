@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html><head><title>How can I track which email messages perform best?</title></head><body>
+<strong>How can I track which email messages perform best?</strong><br />
+<br />
+Online marketers generally use two different methods for sending email messages to their subscribers.<br />
+<br />
+The first method is to send new subscribers a series of pre-written messages over a few weeks or months. This content educates new subscribers about who you are, what you do, and what value you can provide to them.<br />
+<br />
+The second method is to send &ldquo;one-off&rdquo; messages on a regular basis. For example, an online marketer might make it a habit to write and send a new message to their list every single day, ideally providing good solid value to their&nbsp;subscribers, sprinkling in calls-to-action wherever it makes sense.<br />
+<br />
+It&rsquo;s common to use both methods together.<br />
+<br />
+And with all these messages being sent, it&rsquo;s smart to track your open rates&mdash;which your autoresponder will help you with&mdash;and click-through rates, which ClickMagick excels at. The idea is to find which messages generate the most click-throughs so you can analyze and optimize future messages.<br />
+<br />
+As you might expect, there are a couple of ways to track your messages, depending in part on personal preference and in part on how detailed you want to be. For example, do you just want to know how each message performs, or do you want to know how every separate link in every single message performs?<br />
+<br />
+So let&rsquo;s get into it&hellip;<br />
+<br />
+<br />
+<strong>The Two Approaches to Tracking Email Messages</strong><br />
+<br />
+There are two basic approaches to tracking your messages: Creating a separate tracking link for each action you want to track, or creating a single tracking link, then using Sub-IDs with that link to track the different actions.<br />
+<br />
+Of course, you&rsquo;ll probably want to use a combination of both approaches ...<br />
+<br />
+Creating a separate tracking link for every link in every message is pretty straightforward, so we&rsquo;re going to skip ahead to the Sub-ID approach. If you&rsquo;re not already familiar with Sub-IDs and how they work, you&rsquo;ll definitely want to read this FAQ before moving forward:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=3"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=3">&nbsp;Can I use Sub-IDs with my tracking links?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+&nbsp;<br />
+<br />
+<strong>Using Sub-IDs to Track Which Link was Clicked</strong><br />
+<br />
+When you&rsquo;re tracking email messages, the most important information is which message generated the click and which specific call-to-action link within that message your reader clicked on.<br />
+<br />
+Let&rsquo;s see how you would set this up using Sub-IDs ...<br />
+<br />
+First, create a tracking link that you&rsquo;ll use for your email messages. Let&rsquo;s arbitrarily use a <code>&hellip;/linkID</code> with the name <code>emails</code>:<br />
+<br />
+<code>http://$linkdomain/emails</code><br />
+<br />
+Now that you have a tracking link to your offer, you can use it in all of your email messages by using a Sub-ID that reminds you of your email&rsquo;s subject line, and a second Sub-ID to identify which call-to-action (CTA) link in the message got the click.<br />
+<br />
+Let&rsquo;s assume that the first message in your prewritten series of messages has the subject line, &ldquo;Welcome to my Newsletter about Mason Bees!&rdquo; and&nbsp;you&rsquo;ve included two links to your offer page in the body of the message. You could then create those two CTA links using Sub-IDs like this:<br />
+<br />
+<code>http://$linkdomain/emails/Welcome/cta1</code><br />
+<code>http://$linkdomain/emails/Welcome/cta2</code><br />
+<br />
+If your second message has the subject line, &ldquo;Mason Bees Pollinate Like Crazy!&rdquo;, and that message includes 3 CTA links to your offer page, you could use these link settings:<br />
+<br />
+<code>http://$linkdomain/emails/PollinateLikeCrazy/cta1</code><br />
+<code>http://$linkdomain/emails/PollinateLikeCrazy/cta2</code><br />
+<code>http://$linkdomain/emails/PollinateLikeCrazy/cta3</code><br />
+<br />
+Your third message might be, &ldquo;Mason Bees are easy to raise&rdquo; and have a single call-to-action:<br />
+<br />
+<code>http://$linkdomain/emails/EasyToRaise/cta1</code><br />
+<br />
+With those Sub-IDs in your messages, you can easily track which messages get the most click-throughs to your offer and which specific call-to-action links get the most clicks.<br />
+<br />
+By reviewing your stats, you might find that a certain lead-in paragraph to a link generates a lot of clicks so you could re-use that in future messages (and rewrite existing messages). Or maybe you find that people consistently click on the 3rd or 4th link in your messages. That might tell you to always include at least 3 calls-to-action in your messages &hellip;<br />
+<br />
+If you&rsquo;re not interested in tracking your result right down to the specific link that was clicked, you can leave the second Sub-ID off and simply track by which message got the click.<br />
+<br />
+The best part of all of this is that you only need to create one tracking link ...<br />
+&nbsp;<br />
+&nbsp;
+<div class="faq-note"><b>Note:</b> If you use this technique, only the first click to the link from any reader will be considered &ldquo;unique.&rdquo;&nbsp;In other words, if you&rsquo;re sending out a daily message to your list and a reader clicks a call-to-action link in your first message, you&rsquo;ll see a Total Click and Unique Click recorded for that reader. But from then on, for all future messages that use the same link, any clicks by that same reader will only show up in the Total Clicks column.<br />
+<br />
+This will dramatically change your ACR, ECR, and SCR values, as well as other values that are computed using the UC count, so if these values are important to your analysis, you should use separate tracking links.</div>
+&nbsp;
+
+<div class="faq-caution"><b>Caution:</b> Be careful that you only use valid Sub-ID characters when creating the Sub-ID that&rsquo;s intended to remind you of your Subject line. If you include an invalid character, your links will break. An easy solution is to simply stick with letters, numbers, and dashes&mdash;and absolutely NO spaces. For a full list of valid Sub-ID characters, see the note at the end of this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=3"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=3">&nbsp;Can I use Sub-IDs with my tracking links?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+<br />
+<br />
+<br />
+<strong>Reviewing Your Stats</strong><br />
+<br />
+To review your stats, click on the number in the TC column for your tracking link. That will show you the individual stats for each of your links:<br />
+<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq278emailstats.jpg" /><br />
+<br />
+<br />
+If you have many messages and links, you might find it easier to analyze your data in a spreadsheet. To do that, you can download all of your click data into a CSV file that you can open in any spreadsheet program. Here are the instructions to download your click data:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=158"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=158">&nbsp;What are the Data Exporter &amp; Importer used for?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</body></html>

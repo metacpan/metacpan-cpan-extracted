@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Sah::Schemas;
 
-our $DATE = '2018-05-31'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2018-06-07'; # DATE
+our $VERSION = '0.013'; # VERSION
 
 use 5.010001;
 use strict;
@@ -10,6 +10,7 @@ use warnings;
 use Moose;
 use namespace::autoclean;
 
+use PMVersions::Util qw(version_from_pmversions);
 use Require::Hook::DzilBuild;
 
 with (
@@ -231,7 +232,7 @@ sub register_prereqs {
     for my $mod (sort keys %{$self->{_used_schema_modules} // {}}) {
         next if $self->{_our_schema_modules}{$mod};
         $self->log(["Adding prereq to %s", $mod]);
-        $self->zilla->register_prereqs({phase=>'runtime'}, $mod => 0);
+        $self->zilla->register_prereqs({phase=>'runtime'}, $mod => version_from_pmversions($mod) // 0);
     }
 
     for my $mod (sort keys %{$self->{_our_schema_modules} // {}}) {
@@ -243,7 +244,7 @@ sub register_prereqs {
             for my $c (@c) {
                 my $xcmod = "Perinci::Sub::XCompletion::$c";
                 $self->log(["Adding prereq to %s", $xcmod]);
-                $self->zilla->register_prereqs({phase=>'runtime'}, $xcmod => 0);
+                $self->zilla->register_prereqs({phase=>'runtime'}, $xcmod => version_from_pmversions($xcmod) // 0);
             }
         }
         # add prereqs to coerce modules
@@ -254,7 +255,7 @@ sub register_prereqs {
                 next unless $rule =~ /\A\w+(::\w+)*\z/;
                 my $crmod = "Data::Sah::Coerce::perl::$nsch->[0]::$rule";
                 $self->log(["Adding prereq to %s", $crmod]);
-                $self->zilla->register_prereqs({phase=>'runtime'}, $crmod => 0);
+                $self->zilla->register_prereqs({phase=>'runtime'}, $crmod => version_from_pmversions($crmod) // 0);
             }
         }
     }
@@ -276,7 +277,7 @@ Dist::Zilla::Plugin::Sah::Schemas - Plugin to use when building Sah-Schemas-* di
 
 =head1 VERSION
 
-This document describes version 0.012 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2018-05-31.
+This document describes version 0.013 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2018-06-07.
 
 =head1 SYNOPSIS
 

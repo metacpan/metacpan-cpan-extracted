@@ -44,6 +44,7 @@ t/75-serial.t
 t/80-mode_state_all_pins.t
 t/85-pwm_hw_mods.t
 t/90-servo.t
+t/92-mcp23017.t
 t/95-pod_linkcheck.t
 t/manifest.t
 t/pod-coverage.t

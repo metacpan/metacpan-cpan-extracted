@@ -4,7 +4,7 @@ use Pcore -const, -export;
 use Pcore::Util::Text qw[decode_utf8 encode_utf8 escape_scalar trim];
 use Pcore::Util::List qw[pairs];
 use Sort::Naturally qw[nsort];
-use Pcore::Util::Scalar qw[is_blessed_ref is_plain_scalarref is_plain_arrayref];
+use Pcore::Util::Scalar qw[is_ref is_blessed_ref is_plain_scalarref is_plain_arrayref is_plain_hashref];
 use URI::Escape::XS qw[];    ## no critic qw[Modules::ProhibitEvilModules]
 
 our $EXPORT = {
@@ -514,51 +514,45 @@ sub from_xml ( $data, %args ) {
 
 # INI
 sub to_ini ( $data, @ ) {
-    my $str = q[];
+    state $write_section = sub ( $buf, $section, $allow_hashref ) {
+        for ( sort keys $section->%* ) {
+            if ( !is_ref $section->{$_} ) {
+                $buf->$* .= "$_=$section->{$_}\n";
+            }
+            elsif ( $allow_hashref && is_plain_hashref $section->{$_} ) {
+                $buf->$* .= "\n" if $buf;
 
-    state $write_section = sub ( $str_ref, $section, $data ) {
-        if ($section) {
-            $str_ref->$* .= "\n" x 2 if $str_ref->$*;
+                $buf->$* .= "[$_]\n";
 
-            $str_ref->$* .= "[$section]";
-        }
-
-        for my $key ( sort keys $data->%* ) {
-            $str_ref->$* .= "\n" if $str_ref->$*;
-
-            $str_ref->$* .= "$key = " . ( defined $data->{$key} ? "$data->{$key}" : q[] );
+                __SUB__->( $buf, $section->{$_}, 0 );
+            }
+            else {
+                die 'Unsupported reference type';
+            }
         }
 
         return;
     };
 
-    if ( exists $data->{_} ) {
-        $write_section->( \$str, q[], $data->{_} );
-    }
+    $write_section->( \my $buf, $data, 1 );
 
-    for my $section ( sort grep { $_ ne '_' } keys $data->%* ) {
-        $write_section->( \$str, $section, $data->{$section} );
-    }
+    encode_utf8 $buf;
 
-    encode_utf8 $str;
-
-    return \$str;
+    return \$buf;
 }
 
 sub from_ini ( $data, @ ) {
-    my $cfg;
-
-    my $section = '_';
+    my $cfg = {};
 
     my @lines = grep { $_ ne q[] } map { trim $_} split /\n/sm, decode_utf8 is_plain_scalarref $data ? $data->$* : $data;
+
+    my $path = $cfg;
 
     for my $line (@lines) {
 
         # section
         if ( $line =~ /\A\[(.+)\]\z/sm ) {
-            $section = $1;
-
-            $cfg->{$section} = {} if !exists $cfg->{$section};
+            $path = $cfg->{$1} = {};
         }
 
         # not a section
@@ -579,7 +573,7 @@ sub from_ini ( $data, @ ) {
                     $val = undef if $val eq q[];
                 }
 
-                $cfg->{$section}->{ trim $key} = $val;
+                $path->{ trim $key} = $val;
             }
         }
     }
@@ -778,9 +772,9 @@ sub to_xor ( $buf, $mask ) {
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 |                      | ControlStructures::ProhibitPostfixControls                                                                     |
 ## |      | 365, 418             | * Postfix control "for" used                                                                                   |
-## |      | 759                  | * Postfix control "while" used                                                                                 |
+## |      | 753                  | * Postfix control "while" used                                                                                 |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 623                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 617                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

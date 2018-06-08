@@ -73,14 +73,14 @@ sub insert {
         shift @$hist while @$hist > $len;
 
         $sma->insert( $pt );
-        if( defined ($sma = $sma->query) ) {
-            my @mad = map { abs($sma - $_) } @$hist;
+        if( defined (my $v = $sma->query) ) {
+            my @mad = map { abs($v - $_) } @$hist;
             my $mad = shift @mad;
                $mad += $_ for @mad;
                $mad /= @mad+1;
 
             if( @$hist == $len ) {
-                $cci = $mul * ( $pt - $sma ) / $mad;
+                $cci = $mul * ( $pt - $v ) / $mad;
             }
         }
     }

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html><head><title>How can I control link cloaking with a CNAME custom domain?</title></head><body>
+<b>How can I control link cloaking with a CNAME custom domain?</b><br />
+<br />
+When you set up a custom domain using the CNAME method you can enable cloaking when you add it to your account via the <strong><a href="/user/domains.cgi" target="_blank">Domain Manager</a></strong> by simply setting the cloak option to &ldquo;Yes&rdquo;.<br />
+<br />
+Enabling cloaking on your domain in the Domain Manager does not automatically cloak any link that uses the domain. Instead, it tells ClickMagick what to do when you explicitly cloak a link in the link&rsquo;s settings.<br />
+<br />
+For example, regardless of whether you have declared your custom domain to be cloaked or not, if the link itself is uncloaked, the address bar will always show the destination URL after the link has been clicked.<br />
+<br />
+If, on the other hand, the tracking or rotator link itself is cloaked, what you&rsquo;ll see in the address bar depends on whether the custom domain is set to cloak:<br />
+<br />
+If your custom domain is set to cloak, you&rsquo;ll see something like this:<br />
+<br />
+&nbsp; &nbsp; &nbsp;<code><span style="color:#008000;">http://www.yourcustomdomain.com/linkID</span></code><br />
+<br />
+If your custom domain is set only to redirect, you&rsquo;ll see your generic tracking or rotator link which will look like this:<br />
+<br />
+&nbsp; &nbsp; &nbsp;<code><span style="color:#008000;">http://www.clkmg.com/$username/linkID</span></code><br />
+<br />
+In either case, your destination URL will be cloaked.<br />
+<br />
+This setup gives you maximum control over how when to cloak your tracking and rotator links.<br />
+<br />
+&nbsp;
+<div class="faq-note"><b>Note:</b> After you&rsquo;ve added your custom domain to the Domain Manager, you can always go back and change its setting by choosing either &ldquo;Cloaked&rdquo; or &ldquo;Redirect&rdquo; from the drop-down menu next to the domain&rsquo;s name. Just keep in mind that a small percentage of websites will not work correctly with a cloaked domain. For more information on that, see this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=42"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=42">&nbsp;What does it mean if I see a blank white page?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+</body></html>

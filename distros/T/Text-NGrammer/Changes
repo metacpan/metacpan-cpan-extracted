@@ -3,3 +3,11 @@ Revision history for Perl extension Text::NGrammer.
 0.01
 
  - original version.
+ 
+0.02
+
+ - fixed dependencies
+
+0.02
+
+ - fixed dependencies in Makefile.PL

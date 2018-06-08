@@ -3,84 +3,81 @@ package Pcore::Ext::Lib::AmCharts;
 use Pcore -class;
 use Pcore::Resources;
 
-sub EXT_panel ($ext) : Extend('panel') {
+sub EXT_panel ($ext) : Extend('Ext.Component') {
     return {
-        mixins => ['Ext.util.StoreHolder'],
-
         config => {
-            data        => undef,
+            store       => undef,
             chartConfig => undef,
         },
 
         layout              => 'fit',
         defaultBindProperty => 'store',
 
-        initComponent => $ext->js_func(
-            <<'JS'
-                this.bindStore(this.store || 'ext-empty-store', true);
-
+        constructor => $ext->js_func(
+            ['config'], <<'JS'
                 this.callParent(arguments);
+
+                this._loadCharts();
 JS
         ),
 
-        onBindStore => $ext->js_func(
-            [ 'store', 'initial' ], <<'JS'
-                if (!this.getStore()) return;
+        afterRender => $ext->js_func(
+            <<'JS'
+                this.callParent(arguments);
 
-                if (this.rendered) this.onStoreRefresh();
+                this._onReady();
+JS
+        ),
+
+        updateStore => $ext->js_func(
+            [ 'newStore', 'oldStore' ], <<'JS'
+                var me = this,
+                    bindEvents = Ext.apply({
+                        scope: me
+                    }, me.getStoreListeners());
+
+                if (oldStore && Ext.isObject(oldStore) && oldStore.isStore) {
+                    oldStore.un(bindEvents);
+                }
+
+                if (newStore) {
+                    newStore.on(bindEvents);
+                }
+
+                this._onReady();
 JS
         ),
 
         getStoreListeners => $ext->js_func(
             ['store'], <<'JS'
                 return {
-                    load: this.onStoreRefresh,
+                    load: this._onReady
                     // prefetch: this.updateInfo,
                     // exception: this.onTotalCountChange
                 };
 JS
         ),
 
-        setData => $ext->js_func(
-            ['data'], <<'JS'
-                if (this.chart) {
-                    this.chart.dataProvider = data;
-
-                    this.chart.validateData();
-                }
-JS
-        ),
-
-        onStoreRefresh => $ext->js_func(
-            <<'JS'
-                if (this.chart) {
-                    var store = this.getStore();
-
-                    this.setData(Ext.Array.pluck(store.data.items, 'data'));
-                }
-JS
-        ),
-
         _loadCharts => $ext->js_func(
             <<"JS"
-                var urls = [];
-
-                var chartsBaseUrl = '/static/amcharts/$Pcore::Resources::VER->{amcharts}/';
-                var mapBaseUrl = '/static/ammap/$Pcore::Resources::VER->{ammap}/';
+                var urls = [],
+                    chartConfig = this.getChartConfig(),
+                    chartsBaseUrl = '/static/amcharts/$Pcore::Resources::VER->{amcharts}/',
+                    mapBaseUrl = '/static/ammap/$Pcore::Resources::VER->{ammap}/';
 
                 if (typeof AmCharts == 'undefined') {
                     urls.push( chartsBaseUrl + 'amcharts.js');
 
-                    if (this.chartConfig.type == 'map') {
+                    if (chartConfig.type == 'map') {
                         urls.push( mapBaseUrl + 'ammap_amcharts_extension.js');
                     }
                     else {
-                        urls.push( chartsBaseUrl + this.chartConfig.type + '.js');
+                        urls.push( chartsBaseUrl + chartConfig.type + '.js');
                     }
 
-                    if (this.chartConfig.theme) urls.push( chartsBaseUrl + 'themes/' + this.chartConfig.theme + '.js');
+                    if (chartConfig.theme) urls.push( chartsBaseUrl + 'themes/' + chartConfig.theme + '.js');
                 } else {
-                    if (this.chartConfig.type == 'map') {
+                    if (chartConfig.type == 'map') {
                         if (typeof AmCharts.AmMap == 'undefined') urls.push( mapBaseUrl + 'ammap_amcharts_extension.js');
                     }
                     else {
@@ -94,10 +91,10 @@ JS
                             stock: 'AmStockChart'
                         };
 
-                        if (typeof AmCharts[this.chartConfig.type] == 'undefined') urls.push( chartsBaseUrl + this.chartConfig.type + '.js');
+                        if (typeof AmCharts[chartConfig.type] == 'undefined') urls.push( chartsBaseUrl + chartConfig.type + '.js');
                     }
 
-                    if (this.chartConfig.theme && typeof AmCharts.themes[this.chartConfig.theme] == 'undefined') urls.push( chartsBaseUrl + 'themes/' + this.chartConfig.theme + '.js');
+                    if (chartConfig.theme && typeof AmCharts.themes[chartConfig.theme] == 'undefined') urls.push( chartsBaseUrl + 'themes/' + chartConfig.theme + '.js');
                 }
 
                 if (urls.length) {
@@ -109,28 +106,35 @@ JS
                         onLoad: function () {
                             AmCharts.AmChart.prototype.brr = function () {};
 
-                            me._renderCharts();
+                            me.chartsLoaded = true;
+
+                            me._onReady();
                         }
                     });
                 } else {
-                    this._renderCharts();
+                    this.chartsLoaded = true;
+
+                    this._onReady();
                 }
 JS
         ),
 
-        _renderCharts => $ext->js_func(
+        _onReady => $ext->js_func(
             <<'JS'
-                this.chart = AmCharts.makeChart(this.getTargetEl().dom, this.chartConfig);
+                if (!this.chartsLoaded) return;
+                if (!this.rendered) return;
 
-                this.chart.write(this.getTargetEl().dom);
-JS
-        ),
+                if (!this.chart) {
+                    this.chart = AmCharts.makeChart(this.innerElement.dom, this.getChartConfig());
 
-        afterRender => $ext->js_func(
-            <<'JS'
-                this.callParent(arguments);
+                    this.chart.write(this.innerElement.dom);
+                }
 
-                this._loadCharts();
+                if (this.getStore()) {
+                    this.chart.dataProvider = Ext.Array.pluck(this.getStore().data.items, 'data');
+
+                    this.chart.validateData();
+                }
 JS
         ),
     };

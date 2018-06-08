@@ -100,4 +100,46 @@ use_ok('Mojolicious::Plugin::JSONAPI');
     };
 }
 
+{    # With long namespace
+    plugin 'JSONAPI', { namespace => 'external/api', data_dir => 't/share' };
+
+    my $test = {};    # modified in each subtest for different scenarios
+
+    get '/external/api/resource' => sub {
+        my ($c) = @_;
+        my $fields = $c->requested_fields();
+        is_deeply($fields, $test, 'included fields for the resource');
+        $c->render(status => 200, json => {});
+    };
+
+    get '/external/api/resource/relationships/author' => sub {
+        my ($c) = @_;
+        my $fields = $c->requested_fields();
+        is_deeply($fields, $test, 'included fields for the resource for relationship route');
+        $c->render(status => 200, json => {});
+    };
+
+    my $t = Test::Mojo->new();
+
+    subtest 'no fields specified' => sub {
+        $t->get_ok('/external/api/resource');
+    };
+
+    subtest 'main resources field and relation fields in long namespace' => sub {
+        $test = {
+            fields         => [qw/comments blogs/],
+            related_fields => {
+                author => [qw/name number/] } };
+        $t->get_ok('/external/api/resource?fields[resource]=comments,blogs&fields[author]=name,number');
+    };
+
+    subtest 'can get main resource from related route in long namespace' => sub {
+        $test = {
+            fields         => [qw/comments blogs/],
+            related_fields => {
+                author => [qw/name/] } };
+        $t->get_ok('/external/api/relationships/author?fields[resource]=comments,blogs&fields[author]=name');
+    };
+
+}
 done_testing;

@@ -48,6 +48,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore-sphinx/overview"
       }
    },
-   "version" : "v0.9.3",
+   "version" : "v0.9.4",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

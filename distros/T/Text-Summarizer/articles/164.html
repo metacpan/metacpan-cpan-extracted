@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html><head><title>Creating FAQ Keywords for Awesome Search Results</title></head><body>
+<strong>Creating Keywords for Awesome Search Results</strong><br />
+<br />
+Adding keywords to an FAQ is hugely important so that the user gets the best results we can generate. You should add keywords to every FAQ that you create. This document explains how to add effective keywords to your FAQs. Let&rsquo;s get started ...<br />
+<br />
+When a user searches the FAQs for something like ...<br />
+<br />
+<code>How to cancel my account?</code><br />
+<br />
+&hellip; the normal FAQ search will find our FAQ on that topic because the FAQ has the words &ldquo;cancel&rdquo;&nbsp;and &ldquo;account&rdquo;&nbsp;in it. But what if the user enters something like these:<br />
+<br />
+<code>Can I delete my account?<br />
+Cancel membership<br />
+How do I stop my service?<br />
+cancel my subscription</code><br />
+<br />
+While it&rsquo;s clear that all of these searches should display the FAQ on canceling an account, they don&rsquo;t. That&rsquo;s where keywords come in.<br />
+<br />
+In the keyword field at the bottom of the FAQ editor, you can enter additional phrases that should cause the FAQ to match as well. Use commas to separate the phrases:<br />
+<br />
+<code>delete my account, cancel membership, stop my service, cancel my subscription</code><br />
+<br />
+Keywords should also use multiple words unless you have a highly targeted word like &ldquo;cancellation&rdquo; which could really only mean canceling your account. Keywords should be at least two words so you don&rsquo;t grab FAQs that don&rsquo;t really match. Take, for example, the keywords<br />
+<br />
+<code>backup, backing up, backed up</code><br />
+<br />
+Those keywords could match FAQs about backup URLs or about backing up your link data which are two completely different topics.<br />
+<br />
+For an&nbsp;FAQ about Backup URLs, it would be much better to include &ldquo;URL&rdquo;&nbsp;in the keywords, along with any pluralized versions:<br />
+<br />
+<code>backup url, backup urls</code><br />
+<br />
+This brings up another point. Keywords should be used to match what users will commonly type, even if what they type is not grammatically correct, is misspelled, or has spelling variations.<br />
+<br />
+For example, users will commonly type the word &ldquo;backup&rdquo;&nbsp;in three different ways: <em>backup</em>, <em>back up</em>, and <em>back-up</em>. To cover all the possible combinations, you can list them all:<br />
+<br />
+<code>backup url, back up url, back-up url, backup urls, back up urls, back-up urls</code><br />
+<br />
+Users will also use different tenses: <em>backed up</em>, <em>backing up</em>, etc. When you start including those combinations, you can end up with some very long keyword lists!<br />
+<br />
+To make adding keywords much simpler, you can use Perl Compatible Regular Expression (PCRE) &ldquo;patterns&rdquo; as keywords. (These will be explained in the next section.)<br />
+<br />
+Just prefix any keyword with <code>pat:</code> and this tells ClickMagick to use a PCRE pattern search for that keyword. This one pattern will match all of those combinations of &ldquo;backup urls&rdquo; just listed:<br />
+<br />
+<code>pat:back[-\s]?up urls?</code><br />
+<br />
+You can freely mix patterns and non-patterns in a keyword list&mdash;just separate them with commas.<br />
+<br />
+A great way to look for keywords to add to FAQs is to review the <strong><a href="https://www.clickmagick.com/cgi-bin/misc/admins/admin.cgi?action=faq_main#faq_log" target="_blank">FAQ Search Log</a></strong>&nbsp;of&nbsp;actual entries that users have typed into the FAQ search tool.<br />
+&nbsp;
+<div class="faq-note"><b>Note:</b> All keyword searches are case-insensitive. You don&rsquo;t need to use variants for capitalization.</div>
+&nbsp;<br />
+<br />
+<br />
+<strong>Commonly Used Patterns in Keywords</strong><br />
+<br />
+You don&rsquo;t need to be an expert at PCRE patterns to create effective keywords provided that you know a few pattern-creation shortcuts.<br />
+<br />
+When creating a pattern for a verb, always consider the optional active tense, past tense, and &ldquo;-ing&rdquo;&nbsp;forms. For nouns, always consider the plural form. Hyphenated words come up a lot too&hellip;&nbsp;With those examples in mind, here are some &ldquo;formulas&rdquo;&nbsp;you can model to build your keyword patterns:<br />
+<br />
+&nbsp;
+<div class="faq-tip"><b>Tip:</b> Memorize these patterns and you&rsquo;ll be a keyword-creating expert!<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><code>urls?</code></td>
+			<td>&nbsp;</td>
+			<td>If a &ldquo;<code>?</code>&rdquo; mark follows a single letter it means the letter&nbsp;is optional. This pattern matches <code>url</code> or <code>urls</code>.<br />
+			&nbsp;</td>
+		</tr>
+		<tr>
+			<td valign="top">
+			<table border="0" cellpadding="0" cellspacing="0">
+				<tbody>
+					<tr>
+						<td valign="top"><code>test(s
+</body></html>

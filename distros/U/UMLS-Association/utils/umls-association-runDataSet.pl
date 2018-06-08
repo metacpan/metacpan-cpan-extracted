@@ -15,7 +15,7 @@ score
 
 =head1 USAGE
 
-Usage: umls-assocation-runDataSet.pl [OPTIONS] CUI_LIST_FILE OUTPUT_FILE
+Usage: umls-assocation-runDataSet.pl [OPTIONS] CUI_LIST_FILE OUTPUT_FILE --measure Assoc_Measure --matrix Matrix_FileName
 
 =head1 INPUT
 
@@ -27,6 +27,31 @@ the input file containing line seperated cui pairs of the form: "cui1<>cui2"
 
 the output file, where each score and cui pair are output of the form: 
 score<>cui1<>cui2
+
+[Matrix_File]                                                                                                       
+
+File name containing co-occurrence data in sparse matrix format
+ 
+[Assoc_Measure]
+
+A string specifying the association measure to use
+The measure used to calculate the assocation. Recommended = x2
+
+The package uses the Text::NSP package to do the calculation.
+The measure included within this package are: 
+    1.  Dice Coefficient 
+    2.  Fishers exact test - left sided
+    3.  Fishers exact test - right sided
+    4.  Fishers twotailed test - right sided
+    5.  Jaccard Coefficient
+    6.  Log-likelihood ratio
+    7.  Mutual Information
+    8.  Odds Ratio
+    9.  Pointwise Mutual Information
+    10. Phi Coefficient
+    11. Pearson's Chi Squared Test
+    12. Poisson Stirling Measure
+    13. T-score  
 
 =head1 OPTIONS
 
@@ -43,8 +68,6 @@ a new line of the output file.
 =over
 
 =item * Perl (version 5.8.5 or better) - http://www.perl.org
-
-=item * UMLS::Interface - http://search.cpan.org/dist/UMLS-Interface
 
 =item * Text::NSP - http://search.cpan.org/dist/Text-NSP
 
@@ -96,7 +119,6 @@ this program; if not, write to:
 
 =cut
 
-use UMLS::Interface;
 use UMLS::Association;
 use Getopt::Long;
 
@@ -105,7 +127,7 @@ my $DEFAULT_MEASURE = "tscore";
 #############################################
 #  Get Options and params
 #############################################
-eval(GetOptions( "version", "help", "debug", "username=s", "password=s", "hostname=s", "umlsdatabase=s", "assocdatabase=s", "socket=s", "measure=s", "conceptexpansion", "noorder", "lta", "mwa", "vsa", "matrix=s", "config=s","precision=s")) or die ("Please check the above mentioned option(s).\n");
+eval(GetOptions( "version", "help", "measure=s", "noorder", "lta", "mwa", "sbc", "lsa", "wsa", "matrix=s","precision=s","nonorm")) or die ("Please check the above mentioned option(s).\n");
 
 #get required input
 my $cuisFileName = shift;
@@ -140,85 +162,20 @@ if(!(defined $outputFileName)) {
     exit;
 }
 
-
-#############################################
-#  Set Up UMLS::Interface
-#############################################
-#  set UMLS-Interface options
-my %umls_option_hash = ();
-
-$umls_option_hash{"t"} = 1; 
-
-if(defined $opt_debug) {
-    $umls_option_hash{"debug"} = $opt_debug;
-}
-if(defined $opt_verbose) {
-    $umls_option_hash{"verbose"} = $opt_verbose;
-}
-if(defined $opt_username) {
-    $umls_option_hash{"username"} = $opt_username;
-}
-if(defined $opt_driver) {
-    $umls_option_hash{"driver"}   = $opt_driver;
-}
-if(defined $opt_umlsdatabase) {
-    $umls_option_hash{"database"} = $opt_umlsdatabase;
-}
-if(defined $opt_password) {
-    $umls_option_hash{"password"} = $opt_password;
-}
-if(defined $opt_hostname) {
-    $umls_option_hash{"hostname"} = $opt_hostname;
-}
-if(defined $opt_socket) {
-    $umls_option_hash{"socket"}   = $opt_socket;
-}
-if(defined $opt_config){
-    $umls_option_hash{"config"} = $opt_config;
-}
-
-#  instantiate instance of UMLS-Interface
-my $umls = UMLS::Interface->new(\%umls_option_hash); 
-die "Unable to create UMLS::Interface object.\n" if(!$umls);
-
 #############################################
 #  Set Up UMLS::Association
 #############################################
 #  set UMLS-Association option hash
 my %assoc_option_hash = ();
-$assoc_option_hash{'umls'} = $umls;
 
 if(defined $opt_measure) {
     $assoc_option_hash{"measure"} = $opt_measure;
-} else {
-    $assoc_option_hash{"measure"} = $DEFAULT_MEASURE;
-}
+} 
 if(defined $opt_debug) {
     $assoc_option_hash{"debug"} = $opt_debug;
 }
 if(defined $opt_verbose) {
     $assoc_option_hash{"verbose"} = $opt_verbose;
-}
-if(defined $opt_username) {
-    $assoc_option_hash{"username"} = $opt_username;
-}
-if(defined $opt_driver) {
-    $assoc_option_hash{"driver"}   = $opt_driver;
-}
-if(defined $opt_assocdatabase) {
-    $assoc_option_hash{"database"} = $opt_assocdatabase;
-}
-if(defined $opt_password) {
-    $assoc_option_hash{"password"} = $opt_password;
-}
-if(defined $opt_hostname) {
-    $assoc_option_hash{"hostname"} = $opt_hostname;
-}
-if(defined $opt_socket) {
-    $assoc_option_hash{"socket"}   = $opt_socket;
-}
-if(defined $opt_conceptexpansion) {
-    $assoc_option_hash{"conceptexpansion"}   = $opt_conceptexpansion;
 }
 if(defined $opt_precision){
     $assoc_option_hash{"precision"} = $opt_precision;
@@ -229,8 +186,14 @@ if(defined $opt_lta){
 if(defined $opt_mwa){
     $assoc_option_hash{"mwa"} = $opt_mwa;
 }
-if(defined $opt_vsa){
-    $assoc_option_hash{"vsa"} = $opt_vsa;
+if(defined $opt_sbc){
+    $assoc_option_hash{"sbc"} = $opt_sbc;
+}
+if(defined $opt_lsa){
+    $assoc_option_hash{"lsa"} = $opt_lsa;
+}
+if(defined $opt_wsa){
+    $assoc_option_hash{"wsa"} = $opt_wsa;
 }
 if(defined $opt_noorder){
     $assoc_option_hash{"noorder"} = $opt_noorder;
@@ -238,6 +201,10 @@ if(defined $opt_noorder){
 if(defined $opt_matrix){
     $assoc_option_hash{"matrix"} = $opt_matrix;
 }
+if(defined $opt_nonorm){
+    $assoc_option_hash{"nonorm"} = $opt_nonorm;
+}
+
 
 #  instantiate instance of UMLS-Assocation
 my $association = UMLS::Association->new(\%assoc_option_hash); 
@@ -247,26 +214,33 @@ die "Unable to create UMLS::Association object.\n" if(!$association);
 #  Calculate Association
 #############################################
 
-#read in all the first and second cuis
+#read in all the first and second cui sets
+# two comma seperated sets seperated by <> (E.G. c1,c2<>c3,c4,c5)
 open IN, $cuisFileName 
     or die ("Error: unable to open cui list file: $cuisFileName");
-my @cuiPairs = ();
+my @sets1 = ();
+my @sets2 = ();
 foreach my $line (<IN>) {
+    #read the cui sets from the line
     chomp $line;
-    (my $cui1, my $cui2) = split('<>',$line);
-    push @cuiPairs, "$cui1,$cui2";
+    (my $cuiSet1String, my $cuiSet2String) = split('<>',$line);
+    my @cuiSet1 = split(/,/,$cuiSet1String);
+    my @cuiSet2 = split(/,/,$cuiSet2String);
+
+    #add to the cui sets
+    push @sets1, \@cuiSet1;
+    push @sets2, \@cuiSet2;
 }
 close IN;
 
 #calculate association scores for each term pair
-my $scoresRef = $association->calculateAssociation_termPairList(\@cuiPairs, $assoc_option_hash{"measure"});
+my $scoresRef = $association->calculateAssociation_setPairList(\@sets1, \@sets2, $assoc_option_hash{"measure"});
 
 #output the results
 open OUT, ">$outputFileName" 
     or die ("Error: Unable to open output file: $outputFileName");
-for (my $i = 0; $i < scalar @cuiPairs; $i++) {
-    (my $cui1, my $cui2) = split(',',$cuiPairs[$i]);
-    print OUT "${$scoresRef}[$i]<>$cui1<>$cui2\n";
+for (my $i = 0; $i < scalar @{$scoresRef}; $i++) {
+    print OUT "${$scoresRef}[$i]<>".(join(',',@{$sets1[$i]}))."<>".(join(',',@{$sets2[$i]}))."\n";
 } 
 close OUT;
 
@@ -291,11 +265,12 @@ sub showHelp {
     print "contains a different cui pair and their score\n";
     print "\n";
     print "Usage: umls-association-runDataSet.pl [OPTIONS] CUI_LIST_FILE OUTPUT_FILE\n";
+    print "  --measure Assoc_Measure --matrix Matrix_File\n";
     print "\n";
     print "Please note, the optional parameters are identical to umls-association.pl.\n";
     print "to avoid inconsitencies when adding new features or updating, please see:\n";
     print "umls-association --help\n";
-    print "for a complete list of optional arguments"
+    print "for a complete list of optional arguments\n\n";
 }
 
 #shows the current version

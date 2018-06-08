@@ -46,7 +46,7 @@ concept of a project. It helps also in the deployment phase because in the end i
 could mean less and simpler installation/removing tasks.
 
 As an extension to regular cron, seconds are supported in the form of a sixth space
-sepparated field (For more information on cron sintax please see [Algorithm::Cron](https://metacpan.org/pod/Algorithm::Cron)).
+separated field (For more information on cron syntax please see [Algorithm::Cron](https://metacpan.org/pod/Algorithm::Cron)).
 
 # BASICS
 

@@ -37,13 +37,13 @@ share {
   );
   plugin Extract => 'tar.gz';
   
-  patch [ '%{patch} -p1 < %{alien.install.patch}/bzip2-1.0.6.diff' ];
+  patch [ '%{patch} -p1 < %{.install.patch}/bzip2-1.0.6.diff' ];
   
   my @build;
   
   push @build,
-    [ '%{make}', -f => '%{alien.meta.my_makefile}', 'all', "CC=%{perl.config.cc}", "CFLAGS=%{perl.config.cccdlflags} %{perl.config.optimize}", ],
-    [ '%{make}', -f => '%{alien.meta.my_makefile}', 'install', 'PREFIX=%{alien.install.prefix}', 'EXE=%{perl.config.exe_ext}' ];
+    [ '%{make}', -f => '%{.meta.my_makefile}', 'all', "CC=%{perl.config.cc}", "CFLAGS=%{perl.config.cccdlflags} %{perl.config.optimize}", ],
+    [ '%{make}', -f => '%{.meta.my_makefile}', 'install', 'PREFIX=%{.install.prefix}', 'EXE=%{perl.config.exe_ext}' ];
 
   push @build, sub {
     my($build) = @_;

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html><head><title>What does the Referrer column mean?</title></head><body>
+<strong>What does the Referrer column mean?</strong><br />
+<br />
+The Referrer column shows the URL of the web page that the click originated from.<br />
+<br />
+While the Referrer information might seem ideal for determining where your traffic is coming from, there are much better ways to do this, mainly because the Referrer information is not passed in a few common scenarios:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>1.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>If the visitor enters a tracking link or a funnel entry link directly into a browser&rsquo;s address bar, no Referrer information will be passed with the click.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>2.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>If the link is in an email message, clicking on it will not pass any Referrer information since there&rsquo;s no website involved. It&rsquo;s possible that a web-based email system could pass Referrer information, but generally speaking, links in email messages don&rsquo;t this information.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>3.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Finally, secure websites are not <em>allowed</em> to pass Referrer information unless it is to another secure site, and then only under specific circumstances. This means that for your tracking link or funnel entry link to receive Referrer information, it must use the <code>https:</code> protocol.</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+If your goal is to track your traffic sources, this FAQ explains several effective approaches:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=341"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=341">What&rsquo;s the best way to track Traffic Sources?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+&nbsp;
+<div class="faq-note"><b>Note:</b> If no Referrer information is passed with the click, <code>N/A</code> will be shown in the Referrer column.</div>
+</body></html>

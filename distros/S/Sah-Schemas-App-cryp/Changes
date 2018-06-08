@@ -1,3 +1,9 @@
+0.002   2018-06-07 (PERLANCAR)
+
+	- [test] Delete copied test from another dist, add our own test
+	  [RT#125512].
+
+
 0.001   2018-06-01 (PERLANCAR)
 
         - First release.

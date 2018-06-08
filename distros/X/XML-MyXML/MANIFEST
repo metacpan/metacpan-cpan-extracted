@@ -9,4 +9,5 @@ README
 dist.ini
 lib/XML/MyXML.pm
 t/01.t
+t/02.t
 weaver.ini

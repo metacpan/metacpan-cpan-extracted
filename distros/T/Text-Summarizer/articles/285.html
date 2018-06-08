@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html><head><title>What are the valid characters and length of a Sub-ID?</title></head><body>
+<strong>What are the valid characters and length of a Sub-ID?</strong><br />
+<br />
+Sub-ID values can be up to 50 characters and may contain letters, numbers, and the following characters:<br />
+&nbsp;
+<table border="0" cellpadding="4" cellspacing="0">
+	<tbody>
+		<tr>
+			<td>&nbsp;&nbsp;</td>
+			<td><code>-</code></td>
+			<td>hyphen</td>
+			<td><code>@</code></td>
+			<td>at symbol</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td><code>_</code></td>
+			<td>underscore</td>
+			<td><code>+</code></td>
+			<td>plus sign</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td><code>.</code></td>
+			<td>period</td>
+			<td><code>:</code></td>
+			<td>colon</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td><code>=</code></td>
+			<td>equals sign</td>
+			<td><code>{</code></td>
+			<td>opening brace</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td><code>?</code></td>
+			<td>question mark</td>
+			<td><code>}</code></td>
+			<td>closing brace</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td><code>%</code></td>
+			<td>percent sign</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+The Sub-ID characters only apply when passing data to your tracking links and rotators as Sub-IDs:<br />
+<br />
+<code>http://$linkdomain/dietplan/subid1/subid2/&hellip;</code><br />
+<br />
+The restrictions don&rsquo;t apply when&nbsp;you&rsquo;re&nbsp;adding ad network or other tokens&nbsp;(such as <code>#S1#</code>) to your ClickMagick link because those tokens will be replaced with valid characters by the ad network before the link is used.<br />
+<br />
+&nbsp;
+<div class="faq-caution"><b>Caution:</b>&nbsp;if you use a Sub-ID that looks like a cost-per-click value, such as&nbsp;<code>/0.63</code>, ClickMagick will interpret that as a cost value if it is at the very end of the URL. See:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/user/faqs.cgi?answer=33"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" width="17" /></a></td>
+			<td>&nbsp;</td>
+			<td><b><a href="/user/faqs.cgi?answer=33">Can I pass in a cost value with each click?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+Also, Sub-IDs that contain only 5 or 6-digit numbers such as <code>/360138</code> are considered special as well and will be interpreted as numerical&nbsp;link or rotator IDs rather than Sub-IDs. That means that If you try to pass a date like &ldquo;December 12, 2017&rdquo; as <code>/121217</code>, you will run into trouble...<br />
+<br />
+ClickMagick&rsquo;s click IDs&mdash;which are 9 digits or more&mdash;will be passed as Sub-IDs just fine.</div>
+</body></html>

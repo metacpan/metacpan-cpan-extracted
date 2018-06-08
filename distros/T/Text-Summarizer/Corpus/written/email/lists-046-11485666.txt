@@ -1,0 +1,63 @@
+
+
+
+docno="lists-046-11485666"
+name="Raman T. V."
+email="raman@mv.us.adobe.com "
+sent="Mon, 18 Mar 1996 09:23:53 -0800"
+subject="A short comment:"
+To: w3c-math-erb@w3.org
+Cc: raman@mv.us.adobe.com
+
+
+
+     
+   
+I'll mail this out while it's fresh in my head:
+
+The  document
+http://www.w3.org/pub/WWW/MarkUp/Math/Group/Wolfram/general.html
+contains the following statement
+which I completely disagree with (at least as stated here).
+
+
+Rendering into other media (such as speech) is expected to communicate,
+essentially, a "mental picture" of the 2-dimensional form of an
+expression. (Rationale: since almost all mathematics is conventionally
+expressed in 2-dimensional graphical form, most notations in that medium have
+no standard version in other media.)
+
+Reason I disagree:
+
+Renderings in speech need to convey more than a "2D picture" of the
+expression.  Check out (listen to ) some of the demos on my AsTeR WWW site--
+they make the point about spoken renderings being *independent* of the visual
+2D layout far better than I am capable of in a plain-text email message.
+
+Given that the contentious statement appears in our "rationale"  document, I
+thought it sufficiently importatn to have clarified.
+
+--Raman
+
+ Thanks,
+ --Raman
+
+--
+
+
+
+Best Regards,
+
+--raman
+
+      Adobe Systems                 Tel: 1 (415) 962 3945   (B-1 115)
+      Advanced Technology Group     Fax: 1 (415) 962 6063
+      1585 Charleston Road          Email: raman@adobe.com
+      Mountain View, CA 94039 -7900  raman@cs.cornell.edu
+      http://www-atg/People/Raman.html (Internal To Adobe)
+      http://www.cs.cornell.edu/Info/People/raman/raman.html  (Cornell)
+
+Disclaimer: The opinions expressed are my own and in no way should be taken
+            as representative of my employer, Adobe Systems Inc.
+
+

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html><head><title>What should I do about clicks to nonexistent links?</title></head><body>
+<strong>What should I do about clicks to nonexistent links?</strong><br />
+<br />
+When you create tracking links in your ClickMagick account, you need to provide a &ldquo;link ID&rdquo; to distinguish one tracking link from another. For example:<br />
+<br />
+<code>http://$linkdomain/dog-treats<br />
+http://$linkdomain/cat-treats</code><br />
+etc.<br />
+<br />
+Those links are perfectly valid, provided that you&rsquo;ve created the &ldquo;dog-treats&rdquo; and &ldquo;cat-treats&rdquo; links in your account.<br />
+<br />
+But what if you mistyped your link when entering it on a web&nbsp;page or in an online&nbsp;ad? For example, what if you set up a&nbsp;Facebook ad and forgot to include the dash &ldquo;-&rdquo; in the link ID:<br />
+<br />
+<code>http://$linkdomain/dogtreats</code><br />
+<br />
+Since you haven&rsquo;t created a link with a link ID named &ldquo;dogtreats&rdquo;, that link would be nonexistent&mdash;and therefore invalid&mdash;so any clicks from your Facebook ad would go to a nonexistent link. And because ClickMagick doesn&rsquo;t know which link to send these clicks to, they&rsquo;re effectively wasted&hellip;<br />
+<br />
+If you get too many wasted clicks over a 24-hour period, ClickMagick will send you an automated email message alerting you to the problem along with information to help you track down the source of the clicks.<br />
+&nbsp;
+<div class="faq-tip"><b>Tip:</b> By default, if a visitor clicks on a bad link in your account, ClickMagick will show an error page. You can change this behavior by setting up a Backup URL in your <a href="/user/profile.cgi?cat=traffic" target="_blank"><strong>User Profile</strong></a>. If you set up a Backup URL, instead of showing an error page when a visitor clicks on a bad link, the visitor will be redirected&nbsp;to the Backup URL so that <em>something</em> productive can be done...</div>
+<br />
+<br />
+<strong>Typos &amp; Bad Links</strong><br />
+<br />
+Probably the most common reason for getting clicks to links that don&rsquo;t exist is that either you or someone else is sending traffic to your ClickMagick account with a Link ID that doesn&rsquo;t exist, usually due to a typo.<br />
+<br />
+This is normally easy to spot &ndash;&nbsp;and fix &ndash; because the Link IDs in the alert email you&rsquo;ll receive will look very similar to your actual Link IDs, usually with just one or two characters being wrong.<br />
+<br />
+<br />
+<strong>Old Links You&rsquo;ve Deleted</strong><br />
+<br />
+The next most common reason is that you&rsquo;re still getting traffic to a link that you&rsquo;ve deleted.<br />
+<br />
+If it&rsquo;s just a few clicks here and there you may not care about this, but if it&rsquo;s a meaningful number of clicks you may want to re-create the link to capture those clicks and/or track down the source and update the link that traffic is being sent to and point it to a different tracking link in your account.<br />
+<br />
+<br />
+<strong>Creating Your Ads or Web Pages Before You Create Your Links</strong><br />
+<br />
+Some people are more in the habit of creating their ads or web pages first, making up&nbsp;tracking links as they go, and creating their tracking links afterwards.<br />
+<br />
+There&rsquo;s nothing wrong with that approach, but it <em>can</em> generate clicks to invalid tracking links and cause ClickMagick to send out the automated email.<br />
+<br />
+The reason for this is pretty simple&hellip;<br />
+<br />
+When you click on the Save button of an Ad Manager or Page Builder, it&rsquo;s pretty common for them to test any links you&rsquo;ve used to verify they don&rsquo;t generate a <code>404 Page Not Found</code> error. If you save your ad or web page a half dozen times while creating it, that can generate enough &ldquo;test&rdquo; clicks to tracking links that you haven&rsquo;t created yet to cause ClickMagick to send you the &ldquo;wasted click&rdquo; email.<br />
+<br />
+If you&rsquo;re getting notification emails for this reason, you can safely ignore them.<br />
+&nbsp;
+<div class="faq-tip"><b>Tip:</b> If you&rsquo;re in the habit of creating your ads or web pages before you create the tracking links you&rsquo;re using with them, you can change the number of &ldquo;wasted&rdquo; clicks that ClickMagick will process before it sends you the automated email. Go to the Monitoring section of your <strong><a href="/user/profile.cgi?cat=monitoring" target="_blank">User Profile</a></strong>&nbsp;and set the notification&nbsp;value to a higher number. From there, you can even turn off link monitoring entirely if you want to.</div>
+<br />
+<br />
+<strong>Automated &ldquo;bots&rdquo;</strong><br />
+<br />
+Another reason you might get the automated email is that a &ldquo;bot&rdquo; program might be testing different link IDs on the end of your tracking domain. This is particularly true if you&rsquo;re using a custom domain.<br />
+<br />
+You&rsquo;ll know if a &ldquo;bot&rdquo; is trying to guess links on a web page because the link IDs you see in the email you receive will be nothing like the link IDs you would normally create.<br />
+<br />
+But keep in mind, bots will also &ldquo;click&rdquo; on real links on your web pages and if those links are bad&mdash;normally because you&rsquo;ve deleted them from your account&mdash;you will get an email alert. You&rsquo;ll know that these warnings are serious because the link IDs should look familar to you.<br />
+<br />
+You&rsquo;ll definitely want to track down and fix any links that look familiar but aren&rsquo;t valid...<br />
+&nbsp;
+<div class="faq-note"><b>Note:</b> It&rsquo;s estimated that more than half of all clicks generated on the Internet are from automated botnets. This is nothing to be alarmed about, but it&rsquo;s important to keep in mind whenever you&rsquo;re trying to figure out where unknown clicks are coming from.</div>
+</body></html>

@@ -1,3 +1,36 @@
+use strict;
+use warnings;
+## This BEGIN block is a minimal fatpack entry
+## see perldoc App::FatPacker and perldoc -f require
+BEGIN {
+my %fatpacked;
+
+$fatpacked{"Help/Class.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HELP_CLASS';
+  package Help::Class;
+  1;
+  __END__
+  =head1 SYNOPSIS
+
+  How to run your script.
+
+  =cut
+
+HELP_CLASS
+s/^  //mg for values %fatpacked;
+my $class = 'FatPacked::'.(0+\%fatpacked);
+no strict 'refs';
+*{"${class}::files"} = sub { keys %{$_[0]} };
+*{"${class}::INC"} = sub {
+  if (my $fat = $_[0]{$_[1]}) {
+    open my $fh, '<', \$fat
+      or die "FatPacker error loading $_[1] (could be a perl installation issue?)";
+    return $fh;
+  }
+  return;
+};
+unshift @INC, bless \%fatpacked, $class;
+} ## END of FatPacked code
+
 use lib '.';
 use t::Helper;
 
@@ -33,6 +66,24 @@ is_deeply [$script->_default_options], [qw(help man version)], 'default options 
 is + (run_method($script, 'print_help'))[0], <<'HERE', 'print_help()';
 
 dummy synopsis...
+
+Usage:
+   --foo-bar  Foo can something
+   --foo-2    foo_2 can something else
+ * --foo-3    foo_3 can also something
+
+   --help     Print this help text
+   --man      Display manual for this application
+   --version  Print application name and version
+
+HERE
+
+
+$script->documentation("Help::Class");
+
+is + (run_method($script, 'print_help'))[0], <<'HERE', 'print_help() with fatpacked code';
+
+How to run your script.
 
 Usage:
    --foo-bar  Foo can something

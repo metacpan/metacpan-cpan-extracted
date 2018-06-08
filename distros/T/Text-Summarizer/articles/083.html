@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html><head><title>How can I control link cloaking with Script Forwarding?</title></head><body>
+<b>How can I control link cloaking with Script Forwarding?</b><br />
+<br />
+When you generated your custom files for Script Forwarding, you selected whether you want your custom domain tracking or rotator links to be cloaked or not by default.<br />
+<br />
+&hellip; but you can also override this default setting very easily on a per-link basis any time you want.<br />
+<br />
+Consider the following custom domain tracking link:<br />
+<br />
+<code>http://$linkdomain/linkID</code><br />
+<br />
+To force cloaking, regardless of the default setting you chose, simply add <code>/cl</code> to the end of the link, like this:<br />
+<br />
+<code>http://$linkdomain/linkID<strong>/cl</strong></code><br />
+<br />
+And to force NO cloaking, just add <code>/nc</code> like this:<br />
+<br />
+<code>http://$linkdomain/linkID<strong>/nc</strong></code><br />
+<br />
+It&rsquo;s as simple as that!<br />
+<br />
+If you&rsquo;re using Sub-IDs with your links, just make sure that the <code>/cl</code> or <code>/nc</code> goes between the link name and the Sub-ID.<br />
+<br />
+So if your Sub-ID was <code>bingad</code>, it should look like this:<br />
+<br />
+<code>http://$linkdomain/linkID/cl/bingad</code>
+</body></html>

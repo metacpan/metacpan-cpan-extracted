@@ -1,5 +1,12 @@
 Revision history for Perl extension File::Rename.
 
+0.32	Robin Barker 2018-06-08
+	Fixed syntax of rmtree() for perl5.16
+
+0.31	Robin Barker 2018-06-05
+	Removed use of s///r in tests
+	Rewrote tests - more robust - use of testlib.pl
+
 0.30	Robin Barker 2018-06-02
 	(tidied configure_requires)
 	removed typo from rename POD

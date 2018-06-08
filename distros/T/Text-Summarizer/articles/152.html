@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html><head><title>How can I set up an intermediate page to fire a pixel?</title></head><body>
+<strong>How can I set up an intermediate page to fire a pixel?</strong><br />
+<br />
+You would typically want to set up&nbsp;an intermediate page or &ldquo;interstitial&rdquo; page when you can&rsquo;t insert a tracking pixel or piece of tracking code in the target page because you can&rsquo;t edit the page or have no control over it.<br />
+<br />
+It&rsquo;s easy to set up an intermediate page or &ldquo;interstitial&rdquo; page to fire a tracking pixel or execute a piece of tracking code, but you&rsquo;ll probably want to use ClickMagick&rsquo;s advanced <em>Pixel/Code</em>&nbsp;feature to do this instead. Using the Pixel/Code feature of a tracking link eliminates the need for an intermediate page, it&rsquo;s easier to set up than using an intermediate page, and you don&rsquo;t need to know anything about HTML.<br />
+<br />
+That said, we&rsquo;ll show both solutions here so you can choose whichever better fits your needs &hellip;<br />
+<br />
+<br />
+<strong>The Intermediate (Interstitial) Page</strong><br />
+<br />
+If you want to fire a pixel or execute a piece of tracking code in an intermediate page, just use this piece of HTML and install it on your server:<br />
+<br />
+<code>((!DOCTYPE html))<br />
+((html))<br />
+&nbsp; &nbsp;((head))<br />
+&nbsp; &nbsp; &nbsp; ((meta http-equiv=&quot;refresh&quot; content=&quot;2; url=<em>destination_url</em>&quot;))<br />
+&nbsp; &nbsp;((/head))<br />
+&nbsp; &nbsp;((body))<br />
+&nbsp; &nbsp; &nbsp; Please wait...<br />
+<br />
+&nbsp; &nbsp; &nbsp; <em>(Insert ClickMagick pixels, FunnelMagick tracking code,<br />
+&nbsp; &nbsp; &nbsp; &nbsp;facebook pixels, retargeting pixels, etc.)</em><br />
+<br />
+&nbsp; &nbsp;((/body))<br />
+((/html))</code><br />
+<br />
+This page will fire your pixels or tracking code, wait two seconds (as specified in the <code>content</code> section of the &ldquo;meta refresh&rdquo; tag), and display the sentence &ldquo;Please wait...&rdquo;&nbsp;while waiting those two seconds.<br />
+&nbsp;
+<div class="faq-caution"><b>Caution:</b> If you&rsquo;re working with an affiliate network and need to pass a click ID through the <code>[s1]</code> token in your destination URL, you cannot use this &ldquo;meta refresh&rdquo; method because modifying tokens in the <code>((head))</code> section of a page is unreliable across browsers. In this case, you <em>must</em> use the advanced Pixel/Code feature of trackings links, explained below.</div>
+<br />
+<br />
+<br />
+<strong>Using the Pixel/Code Feature of Tracking Links</strong><br />
+<br />
+Instead of creating an intermediate page yourself, when you use the Pixel/Code feature of a tracking link, the tracking link itself will automatically build the page for you, fire all your pixels and execute all your tracking code, then redirect to the Primary URL (or split test URL) of the tracking link.<br />
+<br />
+It&rsquo;s really cool!<br />
+<br />
+You don&rsquo;t have to do anything except paste your pixels or tracking code into the Pixel/Code field of the tracking link and from that point on everything happens automagickally.<br />
+<br />
+By using the Pixel/Code feature of tracking links, you get all the benefits of using an intermediate page without <em>any</em> of the drawbacks. It&rsquo;s also really easy to set up. Just follow the steps in this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=298"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=298">What is the Pixel/Code field of a tracking link used for?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</body></html>

@@ -1,7 +1,7 @@
 package Sah::Schemas::App::cryp;
 
-our $DATE = '2018-06-01'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-06-07'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Various Sah schemas for the 'cryp' app family
@@ -18,7 +18,7 @@ Sah::Schemas::App::cryp - Various Sah schemas for the 'cryp' app family
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schemas::App::cryp (from Perl distribution Sah-Schemas-App-cryp), released on 2018-06-01.
+This document describes version 0.002 of Sah::Schemas::App::cryp (from Perl distribution Sah-Schemas-App-cryp), released on 2018-06-07.
 
 =head1 HOMEPAGE
 

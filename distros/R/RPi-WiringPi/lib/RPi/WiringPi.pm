@@ -21,7 +21,7 @@ use RPi::Serial;
 use RPi::SPI;
 use RPi::StepperMotor;
 
-our $VERSION = '2.3627';
+our $VERSION = '2.3628';
 
 my $fatal_exit = 1;
 
@@ -110,6 +110,14 @@ sub dpot {
     my ($self, $cs, $channel) = @_;
     $self->pin($cs);
     return RPi::DigiPot::MCP4XXXX->new($cs, $channel);
+}
+sub expander {
+    my ($self, $addr, $expander) = @_;
+
+    if (! defined $expander || $expander eq 'MCP23017'){
+        $addr = 0x20 if ! defined $addr;
+        return RPi::GPIOExpander::MCP23017->new($addr);
+    }
 }
 sub gps {
     my ($self, %args) = @_;
@@ -464,6 +472,43 @@ various items
     my $meridien = $rtc->am_pm;
 
     #
+    # MCP23017 GPIO expander
+    #
+
+    my $i2c_addr = 0x20;            # default
+
+    my $exp = $pi->expander($addr); # param not required if using the default
+
+    # pins are INPUT by default. Turn the first pin to OUTPUT
+
+    $exp->mode(0, 0); # or MCP23017_OUTPUT if using RPi::Const
+
+    # turn the pin on (HIGH)
+
+    $exp->write(0, 1); # or HIGH
+
+    # read the pin's status (HIGH or LOW)
+
+    $exp->read(6);
+
+    # turn the first bank (0) of pins (0-7) to OUTPUT, and make them live (HIGH)
+
+    $exp->mode_bank(0, 0);  # bank A, OUTPUT
+    $exp->write_bank(0, 1); # bank A, HIGH
+
+    # enable internal pullup resistors on the entire bank A (0)
+
+    $exp->pullup_bank(0, 1); # bank A, pullup enabled
+
+    # put all 16 pins as OUTPUT, and put them on (HIGH)
+
+    $exp->mode_all(0);  # or OUTPUT
+    $exp->write_all(1); # or HIGH
+
+    # cleanup all pins and reset them to default before exiting your program
+
+    $exp->cleanup;
+
     # ultrasonic distance sensor
     #
 
@@ -705,6 +750,25 @@ Parameters:
 
 Optional, Integer: The I2C address of the RTC module. Defaults to C<0x68> for
 the C<DS3231> unit.
+
+=head2 expander
+
+Creates a new L<RPi::GPIOExpander::MCP23017> GPIO expander chip object. This
+adds an additional 16 pins across two banks (8 pins per bank).
+
+See the linked documentation for full documentation on usage, or the
+L<RPi::WiringPi::FAQ> for some usage examples.
+
+Parameters:
+
+    $i2c_addr
+
+Optional, Integer: The I2C address of the device. Defaults to C<0x20>.
+
+    $expander
+
+Optional, String: The GPIO expander device type. Defaults to C<MCP23017>, and
+currently, this is the only option available.
 
 =head2 serial($device, $baud)
 

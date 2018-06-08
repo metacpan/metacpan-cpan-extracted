@@ -8,25 +8,24 @@ use Pcore::Util::Scalar qw[is_ref];
 
 with qw[Pcore::Core::Event::Listener::Pipe];
 
-has tmpl => ( is => 'ro', isa => Str, default => '[<: $date.strftime("%Y-%m-%d %H:%M:%S.%4N") :>][<: $channel :>][<: $level :>] <: $title | raw :>' );
+has tmpl => '[<: $date.strftime("%Y-%m-%d %H:%M:%S.%4N") :>][<: $channel :>][<: $level :>] <: $title | raw :>';
 
-has from => ( is => 'ro', isa => Str, required => 1 );
-has to   => ( is => 'ro', isa => Str, required => 1 );
-has reply_to => ( is => 'ro', isa => Str );
-has cc       => ( is => 'ro', isa => Str );
-has bcc      => ( is => 'ro', isa => Str );
+has from => ( required => 1 );
+has to   => ( required => 1 );
+has reply_to => ();
+has cc       => ();
+has bcc      => ();
 
-has host     => ( is => 'ro', isa => Str,         required => 1 );
-has port     => ( is => 'ro', isa => PositiveInt, required => 1 );
-has username => ( is => 'ro', isa => Str,         required => 1 );
-has password => ( is => 'ro', isa => Str,         required => 1 );
-has tls      => ( is => 'ro', isa => Bool,        default  => 1 );
-has tls_ctx => ( is => 'ro', isa => Maybe [ HashRef | Enum [ $TLS_CTX_HIGH, $TLS_CTX_LOW ] ], default => $TLS_CTX_HIGH );
+has host     => ( required => 1 );
+has port     => ( required => 1 );
+has username => ( required => 1 );
+has password => ( required => 1 );
+has tls      => 1;
+has tls_ctx => $TLS_CTX_HIGH;    # Maybe [ HashRef | Enum [ $TLS_CTX_HIGH, $TLS_CTX_LOW ] ]
 
-has _tmpl => ( is => 'ro', isa => InstanceOf ['Pcore::Util::Template'], init_arg => undef );
-has _smtp => ( is => 'ro', isa => InstanceOf ['Pcore::SMTP'],           init_arg => undef );
-
-has _init => ( is => 'ro', isa => Bool, init_arg => undef );
+has _tmpl => ( init_arg => undef );
+has _smtp => ( init_arg => undef );
+has _init => ( init_arg => undef );
 
 sub sendlog ( $self, $ev ) {
 
@@ -90,9 +89,9 @@ sub sendlog ( $self, $ev ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 55                   | Variables::ProhibitLocalVars - Variable declared as "local"                                                    |
+## |    2 | 54                   | Variables::ProhibitLocalVars - Variable declared as "local"                                                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 66                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
+## |    2 | 65                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 11                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

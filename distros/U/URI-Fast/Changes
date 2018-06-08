@@ -1,3 +1,9 @@
+0.29 2019-06-07
+-optimization: uri() now sets default scheme to "file" in XS
+-docs updated to clarify the unclear (credit: val, merlyn)
+-incompatible change: param() croaks when called in scalar context but
+ encounters multiple parameter values (credit: merlyn)
+
 0.28 2018-05-30
 -bugfix: segfault when c function uri_decode called with len=0 and an input
  string with length > 0

@@ -1,12 +1,13 @@
 Changes
+INSTALL.SKIP
 lib/Task/MasteringPerl.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-MYMETA.json
-MYMETA.yml
-README
+MANIFEST.SKIP
+README.pod
 t/load.t
 t/pod.t
+xt/changes.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

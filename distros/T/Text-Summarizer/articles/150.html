@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html><head><title>How do I clone a funnel in the Funnel Builder?</title></head><body>
+<strong>How do I&nbsp;clone a funnel in the Funnel Builder?</strong><br />
+<br />
+Cloning a funnel in the Funnel Builder requires cloning both the funnel in ClickMagick and the actual funnel web pages themselves. This is a 4-step process and you must complete all 4 steps.<br />
+<br />
+If you skip any of the 4 steps, you&rsquo;ll either break the original funnel being cloned or the cloned funnel won&rsquo;t be functional. Here&rsquo;s why &hellip;<br />
+<br />
+When you use the &ldquo;Clone&rdquo; command&nbsp;in the funnel&rsquo;s Edit menu <img src="//cdn.clickmagick.com/images/user/faqs/pencil.png" />, only the funnel in the Funnel Builder is cloned, not the actual web pages that make up that funnel&mdash;the tracking code in those web pages still point to the original funnel you created in the Funnel Builder.&nbsp;<br />
+<br />
+To <em>fully</em> clone a funnel, you need to take these steps from the main Funnels page:<br />
+&nbsp;<br />
+<strong>Step 1:</strong> Clone the funnel you created in ClickMagick using the &ldquo;Clone&rdquo; command. Simply click on the Edit menu <img src="//cdn.clickmagick.com/images/user/faqs/pencil.png" /> to the right of the funnel you want to clone and choose the &ldquo;Clone&rdquo; command.<br />
+<br />
+<strong>Step 2:</strong> Using your Page Builder, duplicate each of the web pages in your funnel. This is important because you will need to change the tracking code in the <code>((head))</code> section of these web pages.<br />
+<br />
+<strong>Step 3:</strong>&nbsp;Copy the tracking code for the new funnel you created in <strong>Step 1</strong> by choosing &ldquo;Tracking Code&rdquo; in the Settings menu <img src="//cdn.clickmagick.com/images/user/faqs/gear.png" /> to the right of the funnel&rsquo;s name. You need to paste this tracking code into the <code>((head))</code> section of each of the new pages you created in <strong>Step 2</strong>,&nbsp;<em>replacing the tracking code of the original funnel</em>. This is necessary so that when visitors land on the new pages, the clicks will report back to the cloned funnel, not to the original one.<br />
+<br />
+<strong>Step 4:</strong> You will need to create new Entry Links for the cloned funnel. Simply click on the Settings menu&nbsp;<img src="//cdn.clickmagick.com/images/user/faqs/gear.png" /> again, this time choosing &ldquo;Entry Links&rdquo;. Create the new entry links just as you did for the original funnel.<br />
+<br />
+&nbsp;
+<div class="faq-note"><b>Note:</b> If you simply want to clone the funnel in the Funnel Builder in order to experiment with different visual layouts, that&rsquo;s perfectly fine. You can clone the funnel as many times as you&rsquo;d like and make changes to them as long as you realize that the &ldquo;active&rdquo; funnel is the one whose tracking code you&rsquo;ve pasted into the <code>((head))</code>&nbsp;section of your web pages.</div>
+</body></html>

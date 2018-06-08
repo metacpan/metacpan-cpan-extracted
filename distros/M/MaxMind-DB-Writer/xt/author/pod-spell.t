@@ -29,8 +29,10 @@ MAXMIND
 MAXMIND's
 MMDB
 Mark
+Mather
 MaxMind
 MaxMind's
+Melamed
 Olaf
 Oschwald
 Oschwald's
@@ -43,9 +45,11 @@ Serializer
 Storey
 TW
 Teredo
+Thomas
 Tree
 Util
 VisualizeTree
+Will
 William
 Writer
 docs
@@ -62,5 +66,6 @@ routable
 tjmather
 toplevel
 uint
+will
 wstorey
 zh

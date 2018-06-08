@@ -27,7 +27,7 @@ plugin 'JSONAPI', { data_dir => 't/share' };
 
 get '/' => sub {
     my ($c) = @_;
-    my $doc = $c->resource_document(DBIx::Result->new(), { with_relationships => 1 });
+    my $doc = $c->resource_document(DBIx::Result->new(), { includes => [qw/author/] });
     is($doc->{id},   123);
     is($doc->{type}, 'posts');
     is_deeply($doc->{attributes}, { title => 'test post' });

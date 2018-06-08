@@ -6,9 +6,7 @@ use Pcore::AE::Handle;
 use AnyEvent::Util qw[portable_pipe];
 use if $MSWIN, 'Win32API::File';
 use Pcore::Util::Data qw[to_cbor from_cbor];
-use Pcore::Util::PM::Proc;
-
-# TODO on_finish is not called, because we can't get SIGCHLD for non-direct child
+use Pcore::Util::Sys::Proc;
 
 around new => sub ( $orig, $self, $type, % ) {
     my %args = (
@@ -22,6 +20,8 @@ around new => sub ( $orig, $self, $type, % ) {
 
     # create handles
     my ( $fh_r, $fh_w ) = portable_pipe();
+
+    Pcore::AE::Handle->new( fh => $fh_r, on_connect => sub ( $h, @ ) { $fh_r = $h } );
 
     my $boot_args = {
         script_path => $ENV->{SCRIPT_PATH},
@@ -41,19 +41,20 @@ around new => sub ( $orig, $self, $type, % ) {
         $boot_args->{fh} = fileno $fh_w;
     }
 
-    if ($Pcore::Util::PM::ForkTmpl::CHILD_PID) {
-        Pcore::Util::PM::ForkTmpl::run_node( $type, $boot_args );
+    if ($Pcore::Util::Sys::ForkTmpl::CHILD_PID) {
+        Pcore::Util::Sys::ForkTmpl::run_node( $type, $boot_args );
 
         $self->_handshake(
             $fh_r,
             sub ($res) {
-
-                # TODO on_finish is not called, because we can't get SIGCHLD for non-direct child
                 my $proc = bless {
-                    pid        => $res->{pid},
-                    _on_finish => $args{on_finish},
+                    pid => $res->{pid},
+                    fh  => $fh_r,
                   },
-                  'Pcore::Util::PM::Proc';
+                  'Pcore::Util::Sys::Proc';
+
+                $fh_r->on_error( sub { $args{on_finish}->($proc) } );
+                $fh_r->on_read( sub  { } );
 
                 $args{on_ready}->($proc);
 
@@ -81,7 +82,7 @@ around new => sub ( $orig, $self, $type, % ) {
         }
 
         # create proc
-        P->pm->run_proc(
+        P->sys->run_proc(
             $cmd,
             stdin    => 1,
             on_ready => sub ($proc) {
@@ -92,6 +93,8 @@ around new => sub ( $orig, $self, $type, % ) {
                 $self->_handshake(
                     $fh_r,
                     sub ($res) {
+                        undef $fh_r;
+
                         $args{on_ready}->($proc);
 
                         return;
@@ -108,33 +111,20 @@ around new => sub ( $orig, $self, $type, % ) {
 };
 
 sub _handshake ( $self, $fh, $cb ) {
+    $fh->push_read(
+        line => $LF,
+        sub ( $h, $line, $eol ) {
+            my $res = eval { from_cbor pack 'H*', $line };
 
-    # wrap control_fh
-    Pcore::AE::Handle->new(
-        fh         => $fh,
-        on_connect => sub ( $h, @ ) {
-            $h->push_read(
-                line => $LF,
-                sub ( $h1, $line, $eol ) {
-
-                    # destroy control fh
-                    $h->destroy;
-
-                    my $res = eval { from_cbor pack 'H*', $line };
-
-                    if ($@) {
-                        die 'Node handshake error' . $@;
-                    }
-                    else {
-                        $cb->($res);
-                    }
-
-                    return;
-                }
-            );
+            if ($@) {
+                die 'Node handshake error' . $@;
+            }
+            else {
+                $cb->($res);
+            }
 
             return;
-        },
+        }
     );
 
     return;

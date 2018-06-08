@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html><head><title>How do I troubleshoot my custom domain setup?</title></head><body>
+<strong>How do I troubleshoot my custom domain setup?</strong><br />
+<br />
+The recommended method for creating a custom domain is to use CNAME and &ldquo;A&rdquo; records in your DNS settings. If you haven&rsquo;t read the FAQ or watched the video on how to set up a custom domain using DNS records, you should read the FAQ first:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=140"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=140">&nbsp;What is the recommended way to set up a custom domain?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+If you&rsquo;ve set up your custom domain following the instructions in the FAQ and it does not seem to be working, here are the steps we use to track down the problem whenever we get a support ticket on this issue.<br />
+<br />
+Just go down this list, step-by-step&hellip;<br />
+<br />
+For these steps to make sense, the examples will use <strong><em>yourdomain.com</em></strong>. Just substitute your own custom domain in the examples.<br />
+<br />
+The first thing to understand is that <strong><em>yourdomain.com</em></strong>&nbsp;and&nbsp;<strong><em>www.yourdomain.com</em></strong>&nbsp;are two completely different domains. Most people would use those two domains interchangeably, thinking they mean the same thing, but they are as different as <strong>yourdomain.com</strong> and <strong>track.bestcoolproducts.com</strong>.<br />
+<br />
+Really.<br />
+<br />
+It&rsquo;s just extraordinarily common to point the &ldquo;www&rdquo; version at the plain version, giving the <em>illusion</em> that they are one and the same.<br />
+<br />
+So, when you hear the phrase &ldquo;your custom domain&rdquo;, you need to be super precise about what domain you&rsquo;re trying to troubleshoot. If you&rsquo;re trying to troubleshoot <strong><em>www.yourdomain.com</em></strong>, but you&rsquo;re making all your tests using only&nbsp;<strong><em>yourdomain.com</em></strong>, you&rsquo;re never going to find out what&rsquo;s wrong because they are not the same domain.<br />
+<br />
+Now let&rsquo;s go through the steps&hellip;<br />
+<br />
+<br />
+<strong>Step 1: Is your domain pointing to ClickMagick?</strong><br />
+<br />
+First, test to see if your domain is actually pointing to ClickMagick. To do this, enter your custom domain (e.g., <strong><em>yourdomain.com</em></strong>) into the address bar of your browser. If it&rsquo;s correctly pointing to ClickMagick, you should get one of these error messages:<br />
+<br />
+<br />
+<strong><span style="color: rgb(178, 34, 34);">Error:</span>&nbsp;&nbsp;<span style="color:#008000;">Oops! The tracking/rotator link ID is missing from that URL &hellip;</span></strong><br />
+<br />
+If you get this error, then your domain is working perfectly&mdash;you&rsquo;re simply not specifying a link or rotator ID so ClickMagick doesn&rsquo;t know which link to send the click to. The key point here <em>is that the custom domain is making it to ClickMagick.</em><br />
+<br />
+If this is the error you&rsquo;re trying to fix, it is fully explained in the <strong><a href="/misc/video.cgi?name=cnamedns">How to Create a Custom Domain</a></strong> video&mdash;you can skip to the explanation by looking at the table of contents at the beginning of the video.<br />
+<br />
+<br />
+<strong><span style="color: rgb(178, 34, 34);">Error:</span>&nbsp;&nbsp;</strong><span style="color:#008000;"><strong>Sorry, but that domain is no longer hosted here!</strong></span><br />
+<br />
+If you&rsquo;re getting this error, it means that you&rsquo;ve correctly set the custom domain up with your domain registrar, but you forgot to enter the domain in the ClickMagick <strong><a href="/user/domains.cgi" target="_blank">Domain Manager</a></strong>. Remember, <strong><em>yourdomain.com</em></strong>&nbsp;and <strong><em>www.yourdomain.com</em></strong>&nbsp;are two completely different domains so you need to enter <em>both</em> of them into the <strong><a href="/user/domains.cgi" target="_blank">Domain Manager</a></strong>.<br />
+<br />
+<br />
+<strong>Step 2: Confirming you have a Backup URL set in your User Profile</strong><br />
+<br />
+If you didn&rsquo;t get an error message in the previous step but a valid website pulled up instead, then you need to check the &ldquo;redirect history&rdquo; to see how you got to that website. We&rsquo;re looking to see if you got there through the <strong>Backup URL</strong> in your&nbsp;<strong><a href="/user/profile.cgi?cat=traffic" target="_blank">User Profile</a></strong>,&nbsp;under the Traffic tab. This would prove that your domain is correctly making it to ClickMagick.<br />
+<br />
+The easiest way to determine this is to use the &ldquo;Redirect Path&rdquo; extension for the Chrome Brower which is a &ldquo;must&rdquo; for anyone who is tracking their clicks. You can get the &ldquo;Redirect Path&rdquo; extension by going to the <strong><a href="https://chrome.google.com/webstore/category/extensions?hl=en-US" target="_blank">Chrome Store</a></strong> and entering &ldquo;Redirect Path&rdquo;. The extension is from Ayima. Just click &ldquo;Add to Chrome&rdquo; to install it.<br />
+<br />
+With the Redirect Path tool, you can view the complete list of redirects by clicking on the tool&rsquo;s button. Look down the list and, if everything is set up correctly, you should see one of ClickMagick&rsquo;s account domains, either <strong>www.clkmg.com</strong> or <strong>www.clkmr.com</strong>.<br />
+<br />
+<br />
+<img alt="" src="//cdn.clickmagick.com/images/user/faqs/redirectpath_clkmg.png" style="width: 632px; height: 414px;" /><br />
+<br />
+<br />
+If you see a ClickMagick account domain in the list, that means that you have the website set up as the <strong>Backup URL</strong> in your <strong><a href="/user/profile.cgi?cat=traffic" target="_blank">User Profile</a></strong>. This tells you that your domain is, in fact, making it to ClickMagick, and that your domain is set up correctly!<br />
+&nbsp;
+<div class="faq-caution"><b>Caution:</b> If you&rsquo;re seeing a valid website but you&rsquo;re not seeing a ClickMagick account domain in the redirect history, that means that your domain is not pointing to ClickMagick at all. Either you&rsquo;re troubleshooting the wrong domain, or you don&rsquo;t have it configured properly. See the &ldquo;<em><strong>Configuration problems with your Domain Registrar</strong></em>&rdquo; section below.</div>
+<br />
+<br />
+<br />
+<strong>Step 3: Fixing a &ldquo;This site can&rsquo;t be reached&rdquo; or &ldquo;Parking Page&rdquo; response</strong><br />
+<br />
+If, when you enter the domain, you get a non-ClickMagick error, such as &ldquo;this site can&rsquo;t be reached&rdquo; or you get a page that says the website hasn&rsquo;t been set up yet, then the DNS settings are most likely still propagating through the Internet.<br />
+<br />
+Propagation can take anywhere from 10 minutes to 72 hours, depending upon the registrar and the control panel being used. That said, in most parts of the world, domain propagation shouldn&rsquo;t take more than 4 hours. If it&rsquo;s been more than 4 hours and you&rsquo;re still having problems, skip to the section &ldquo;<strong>Configuration problems with your Domain Registrar&rdquo;</strong>&nbsp;and double-check your DNS settings.<br />
+<br />
+Something else to keep in mind&hellip; You would think that CNAME records and &ldquo;A&rdquo; records would take the same amount of time to propagate, but they don&rsquo;t. If you&rsquo;re adding more than one domain to ClickMagick&rsquo;s Domain Manager (e.g., <em><strong>yourdomain.com</strong></em> and <strong><em>www.yourdomain.com</em></strong>) and the Domain Manager accepts one, but does not accept the other one even though you set them up at the same time, that does not mean something is wrong. Be patient.<br />
+<br />
+If you&rsquo;re into details, the NameCheap.com domain registrar has a good explanation of domain propagation. You can read about it here:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="https://www.namecheap.com/support/knowledgebase/article.aspx/9622/10/dns-propagation--explained" target="_blank"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="https://www.namecheap.com/support/knowledgebase/article.aspx/9622/10/dns-propagation--explained" target="_blank">DNS Propagation &mdash; Explained</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+<br />
+<strong>Step 4: Fixing errors from ClickMagick&rsquo;s Domain Manager</strong><br />
+<br />
+ClickMagick will not allow you to enter a domain in its Domain Manager that is not working 100% correctly. That means if the Domain Manager accepts your domain, you&rsquo;ve set it up correctly.<br />
+<br />
+With that in mind, here are the errors you can get from the Domain Manager if something is wrong, and how you can fix them&hellip;<br />
+<br />
+<br />
+<strong><span style="color: rgb(178, 34, 34);">Error:</span>&nbsp;&nbsp;<span style="color:#008000;"><em>yourdomain.com</em>&nbsp;does not seem to be set up properly</span></strong><br />
+<br />
+You can get this error message for a few reasons:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>a)</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Your domain is still propagating. If you&rsquo;re getting this error and it&rsquo;s been less than 4 hours, it&rsquo;s quite possible that the domain changes are still propagating through the Internet. If it&rsquo;s been 24 hours or more and you&rsquo;re still getting this error, then it&rsquo;s probably not a propagation problem. Skip to the&nbsp;&ldquo;<strong>Configuration problems with your Domain Registrar</strong>&rdquo; section.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>b)</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Your domain does not actually point at ClickMagick. That would mean you either didn&rsquo;t set up the domain with your domain registrar, or you set it up incorrectly. Skip&nbsp;to the&nbsp;&ldquo;<strong>Configuration problems with your Domain Registrar</strong>&rdquo; section.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>c)</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>The domain you entered isn&rsquo;t actually the domain you set up. We see this all the time. The video shows how to set up <strong>track.<em>yourdomain.com</em></strong> and that domain is not at all the same as <em><strong>yourdomain.com</strong></em>. So, if you&rsquo;ve set up <strong>track.<em>yourdomain.com</em></strong> or <strong>go.<em>yourdomain.com</em></strong> or something else, <em>that</em> is the domain you have to enter in the Domain Manager. Double-check that you&rsquo;re including the <em>full</em> domain when you&rsquo;re trying to add it.</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+<span style="color: rgb(178, 34, 34);"><strong>Error:</strong>&nbsp;</span><strong>&nbsp;<span style="color:#008000;"><span style="background-color: rgb(255, 255, 255);">Ummm &hellip; you have already added <em>yourdomain.com</em></span></span></strong><br />
+<br />
+This typically only happens when you&rsquo;re converting a domain from an older setup method to the currently recommended setup using CNAME and &ldquo;A&rdquo; records.<br />
+<br />
+To fix this problem, simply click on the trash can icon next to the domain name in the Domain Manager to remove the outdated version, then try adding the domain again.<br />
+<br />
+<img alt="" src="//cdn.clickmagick.com/images/user/faqs/method1_deprecated.png" /><br />
+<br />
+<br />
+<strong><span style="color: rgb(178, 34, 34);">Error:</span>&nbsp; <span style="color:#008000;">Sorry but <em>yourdomain.com</em> has already been added to another account</span></strong><br />
+<br />
+This error means that the domain you&rsquo;re trying to add has already been added to someone else&rsquo;s account.<br />
+<br />
+Assuming you don&rsquo;t have a typing mistake in your domain name when you entered it, the most common reason for getting this error is that you have more than one account with ClickMagick and you&rsquo;ve already added the domain to the other account.<br />
+<br />
+If you want to enter your custom domain with the current account, you have to first delete it from the Domain Manager of the account that it&rsquo;s already associated with.<br />
+<br />
+If you only have one account with ClickMagick and you&rsquo;re sure that you&rsquo;re entering your domain spelled correctly, <strong><a href="/user/action/account/help.cgi?action=helpdesk" target="_blank">submit a ticket</a></strong>, along with a screenshot of your domain registration account showing the name of your custom domain.<br />
+<br />
+<br />
+<strong><span style="color: rgb(178, 34, 34);">Error:</span>&nbsp;&nbsp;</strong><b style="background-color: rgb(255, 255, 255);"><span style="color:#008000;">The &ldquo;For Use With&rdquo; setting does not match the settings for&nbsp;</span><b><span style="color:#008000;"><em>yourdomain.com</em></span></b></b><br />
+<br />
+This error message is simply saying that either the CNAME or &ldquo;A&rdquo; record in your domain&rsquo;s DNS settings don&rsquo;t match the &ldquo;For Use With&rdquo; setting you chose in the Domain Manager.<br />
+<br />
+ClickMagick has two domain settings, one for tracking links (which includes split tests), and another one for rotators. When you add a domain to the Domain Manager, all of the settings must match. Here are the settings you must have in the Domain Manager and in your domain&rsquo;s DNS settings with your registrar:<br />
+<br />
+<img alt="" src="//cdn.clickmagick.com/images/user/faqs/domain_settings.png" style="width: 658px; height: 126px;" /><br />
+<br />
+The domain settings are nearly identical, so review the CNAME or &ldquo;A&rdquo; record of your domain carefully. Pay particular attention to the letters and numbers in green.<br />
+<br />
+<br />
+<br />
+<strong>Step 5: Configuration problems with your Domain Registrar</strong><br />
+<br />
+The most common problem with setting up custom domains is having conflicts in your DNS settings. Let&rsquo;s cover these one-by-one &hellip;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>a)</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Duplicate &ldquo;A&rdquo; records<br />
+			<br />
+			If you&rsquo;ve set up <strong><em>yourdomain.com </em></strong><em>(with nothing in front)</em>, the host name setting should be either blank, or the &ldquo;@&rdquo; character, depending upon the DNS editor you&rsquo;re using.<br />
+			<br />
+			You&rsquo;re only allowed to have one &ldquo;A&rdquo; record with the &ldquo;@&rdquo; setting so double-check the &ldquo;A&rdquo; records for your domain. If you find another &ldquo;A&rdquo; record with the &ldquo;@&rdquo; character for the host name, you have a conflict that needs to be fixed.<br />
+			<br />
+			To correct this, delete the duplicate entry that is not set to either of ClickMagick&rsquo;s IP addresses: <strong>50.97.212.250</strong> or <strong>50.97.212.251</strong>:<br />
+			<br />
+			<img alt="" src="//cdn.clickmagick.com/images/user/faqs/arec_dup.png" style="width: 600px;" /><br />
+			<br />
+			If you don&rsquo;t have any &ldquo;A&rdquo; records that point to ClickMagick&rsquo;s IP addresses, then you&rsquo;ll need to add one if you want to use <em><strong>yourdomain.com</strong></em> with ClickMagick. See&nbsp;<strong><a href="/user/faqs.cgi?answer=140">What is the recommended way to set up a custom domain?</a></strong></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>b)</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Duplicate CNAME records<br />
+			<br />
+			Let&rsquo;s say your domain is <strong><em>www.yourdomain.com</em></strong> or <strong>track.<em>yourdomain.com</em></strong>. For these, you would have a CNAME record with the host name &ldquo;www&rdquo; and &ldquo;track&rdquo;, respectively. You need to ensure that there is only one CNAME record with the host name that you&rsquo;re using.<br />
+			<br />
+			To correct this, delete the duplicate CNAME record that is not set to either of ClickMagick&rsquo;s domains: <strong>www.clkmg.com</strong> or <strong>www.clkmr.com</strong>:<br />
+			<br />
+			<img alt="" src="//cdn.clickmagick.com/images/user/faqs/cname_dup.png" style="width: 600px; height: 95px;" /><br />
+			<br />
+			If you don&rsquo;t have any CNAME records that point to a ClickMagick domain, and you want <strong>www.<em>yourdomain.com</em></strong> (or any other variant of <strong><em>yourdomain.com</em></strong>) to work with ClickMagick, you&rsquo;ll need to add a CNAME record to your settings. See <strong><a href="/user/faqs.cgi?answer=140">What is the recommended way to set up a custom domain?</a></strong></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>c)</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Conflicting URL Redirect Records or domain redirects<br />
+			<br />
+			If you don&rsquo;t have duplicate CNAME or &ldquo;A&rdquo; records and you&rsquo;re still running into problems, the next step is to verify that you don&rsquo;t have any conflicting URL Redirect Records set up, or have any type of domain forwarding set up in the control panel of your domain registrar.<br />
+			<br />
+			For example, take a look at this &ldquo;@&rdquo; conflict in which the URL Redirect Record conflicts with the &ldquo;A&rdquo; record setting:<br />
+			<br />
+			<img alt="" src="//cdn.clickmagick.com/images/user/faqs/redirect_dup.png" style="width: 600px; height: 122px;" /><br />
+			<br />
+			If the host name of a URL Redirect Record matches the host name of a CNAME record, that would also cause a conflict and would need to be deleted. Specifically, look for a conflict with the &ldquo;www&rdquo; host name&mdash;we see that all the time.<br />
+			<br />
+			If you have used any kind of &ldquo;URL forwarding&rdquo; or &ldquo;domain redirect&rdquo; in your domain registrar&rsquo;s control panel, double-check there that you have no conflicts.</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+<br />
+<strong>Step 6: You&rsquo;re Editing the Wrong Set of DNS records</strong><br />
+<br />
+If you&rsquo;ve gotten this far, and everything looks absolutely PERFECT, then you&rsquo;re probably editing the wrong set of DNS records for your domain.<br />
+<br />
+This happens more often than you would think. Here&rsquo;s the scenario:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>a)</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>You buy a domain with a domain registrar.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>b)</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>You point that domain to another company&rsquo;s server to host your website by changing the domain&rsquo;s &ldquo;nameservers.&rdquo;</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>c)</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>You edit the DNS records at the domain registrar when you should be editing the records on the server that the nameservers point to.</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+Let&rsquo;s see how you would track this down if that description doesn&rsquo;t immediately give you an &ldquo;Aha!&rdquo; moment&hellip;<br />
+<br />
+Let&rsquo;s suppose you bought your domain at GoDaddy and you&rsquo;ve been trying to set up your custom domain with the GoDaddy control panel but you can&rsquo;t get the domain to work and you simply cannot see what is wrong. Frustrating, right?<br />
+<br />
+Well, to confirm that you&rsquo;re editing the correct set of DNS records, you would look up the nameservers for the domain.<br />
+<br />
+There are many online tools you can use to look up the nameservers of a domain. <strong><a href="http://www.ViewDNS.info" target="_blank">ViewDNS.info</a></strong> is a good one because it has a TON of tools you can use to track down different types of problems.<br />
+<br />
+Go to <strong><a href="http://www.ViewDNS.info" target="_blank">ViewDNS.info</a></strong>, enter your domain in the DNS Report box and click the Go button:<br />
+<br />
+<br />
+<img alt="" src="//cdn.clickmagick.com/images/user/faqs/viewdns.png" style="width: 563px; height: 355px;" /><br />
+<br />
+<br />
+This will pull up a report about your domain. Right near the top, it will list the domain&rsquo;s nameservers:<br />
+<br />
+<br />
+<img alt="" src="//cdn.clickmagick.com/images/user/faqs/nameserver.png" style="width: 600px; height: 136px;" /><br />
+<br />
+<br />
+And look at that!<br />
+<br />
+The nameservers point to &ldquo;1and1&rdquo; which are for the 1&amp;1 website hosting company. That means we should be editing the DNS records using 1&amp;1&rsquo;s control panel, <em>not</em>&nbsp;GoDaddy&rsquo;s control panel.<br />
+<br />
+Even though GoDaddy is the registrar for the domain, the nameservers for the domain were changed sometime in the past to point to a website hosted with 1&amp;1.<br />
+<br />
+This is super common.<br />
+<br />
+So, if you can&rsquo;t get your domain to work, and everything looks perfect, check your nameserver settings to make sure you&rsquo;re editing the right set of DNS records!<br />
+<br />
+<br />
+<br />
+<strong>Step 7: What if you still can&rsquo;t get your custom domain to work?</strong><br />
+<br />
+If you&rsquo;ve gone through this entire troubleshooting guide and you still can&rsquo;t get your domain to work correctly, simply <strong><a href="/user/action/account/help.cgi?action=helpdesk" target="_blank">submit a ticket</a></strong> to our Help desk.<br />
+<br />
+Please provide us with the name of your custom domain, who your domain registrar is, and a screenshot of your current DNS settings.<br />
+<br />
+If you don&rsquo;t know how to take a screenshot, this FAQ will explain how to do it:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=193"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=193">How do I take a screenshot on my computer?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</body></html>

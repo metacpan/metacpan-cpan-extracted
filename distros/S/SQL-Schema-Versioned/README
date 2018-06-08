@@ -3,8 +3,8 @@ NAME
     application's DB schema
 
 VERSION
-    This document describes version 0.235 of SQL::Schema::Versioned (from
-    Perl distribution SQL-Schema-Versioned), released on 2018-05-10.
+    This document describes version 0.236 of SQL::Schema::Versioned (from
+    Perl distribution SQL-Schema-Versioned), released on 2018-06-06.
 
 DESCRIPTION
     To use this module, you typically run the "create_or_update_db_schema"()

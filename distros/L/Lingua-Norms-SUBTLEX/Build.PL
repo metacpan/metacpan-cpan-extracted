@@ -37,7 +37,7 @@ my $builder = Module::Build->new(
         'Text::CSV::Separator' => '0.20',
         'Text::Unidecode'      => '1.30',
     },
-    add_to_cleanup     => ['Lingua-Norms-SUBTLEX-0.06-*'],
+    add_to_cleanup     => ['Lingua-Norms-SUBTLEX-0.07-*'],
     create_makefile_pl => 'traditional',
 );
 $builder->add_build_element('csv');

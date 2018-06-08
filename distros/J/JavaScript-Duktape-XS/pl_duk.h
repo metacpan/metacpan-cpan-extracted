@@ -8,9 +8,13 @@
 
 #define DUK_OPT_NAME_GATHER_STATS      "gather_stats"
 #define DUK_OPT_NAME_SAVE_MESSAGES     "save_messages"
+#define DUK_OPT_NAME_MAX_MEMORY_BYTES  "max_memory_bytes"
+#define DUK_OPT_NAME_MAX_TIMEOUT_US    "max_timeout_us"
 
 #define DUK_OPT_FLAG_GATHER_STATS      0x01
 #define DUK_OPT_FLAG_SAVE_MESSAGES     0x02
+#define DUK_OPT_FLAG_MAX_MEMORY_BYTES  0x04
+#define DUK_OPT_FLAG_MAX_TIMEOUT_US    0x08
 
 #define PL_NAME_ROOT              "_perl_"
 #define PL_NAME_GENERIC_CALLBACK  "generic_callback"
@@ -25,10 +29,14 @@
  */
 typedef struct Duk {
     duk_context* ctx;
-    int pagesize;
+    int pagesize_bytes;
     unsigned long flags;
     HV* stats;
     HV* msgs;
+    size_t total_allocated_bytes;
+    size_t max_allocated_bytes;
+    double max_timeout_us;;
+    double eval_start_us;
 } Duk;
 
 /*
@@ -63,6 +71,7 @@ SV* pl_typeof_global_or_property(pTHX_ duk_context* ctx, const char* name);
 SV* pl_instanceof_global_or_property(pTHX_ duk_context* ctx, const char* object, const char* class);
 SV* pl_get_global_or_property(pTHX_ duk_context* ctx, const char* name);
 int pl_set_global_or_property(pTHX_ duk_context* ctx, const char* name, SV* value);
+SV* pl_eval(pTHX_ Duk* duk, const char* js, const char* file);
 
 // Run the Duktape GC
 int pl_run_gc(Duk* duk);

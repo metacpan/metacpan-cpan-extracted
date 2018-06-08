@@ -3,22 +3,48 @@
 =head1 NAME
 
 umls-association.pl This program calculates the assocation between 
-two concepts (or terms)
+two concepts or sets of concepts
 
 =head1 SYNOPSIS
 
-This utility takes two concepts (or terms) and returns their assocation 
+This utility takes two sets of concepts and returns their assocation 
 score
 
 =head1 USAGE
 
-Usage: umls-assocation.pl [OPTIONS] CUI1|TERM CUI2|TERM
+Usage: umls-assocation.pl [OPTIONS] CUI_set1 CUI_set2 --matrix Matrix_File --measure Assoc_Measure
 
 =head1 INPUT
 
-=head2 [CUI1|TERM1] [CUI2|TERM2]
+=head2 [CUI_set1] [CUI_set2] 
 
-The input are two terms or two CUIs associated to concepts in the UMLS. 
+Two sets of CUIs in the UMLS. Each CUI in the CUI set is comma seperated
+
+[Matrix_File]
+
+File name containing co-occurrence data in sparse matrix format
+
+[Assoc_Measure]
+
+A string specifying the association measure to use
+The measure used to calculate the assocation. Recommended = x2 
+
+The package uses the Text::NSP package to do the calculation. 
+The measure included within this package are: 
+    
+    1.  Dice Coefficient
+    2.  Fishers exact test - left sided
+    3.  Fishers exact test - right sided
+    4.  Fishers twotailed test - right sided
+    5.  Jaccard Coefficient
+    6.  Log-likelihood ratio
+    7.  Mutual Information
+    8.  Odds Ratio
+    9.  Pointwise Mutual Information
+    10. Phi Coefficient
+    11. Pearson's Chi Squared Test
+    12. Poisson Stirling Measure
+    13. T-score
 
 =head1 OPTIONS
 
@@ -27,11 +53,6 @@ Optional command line arguements
 =head2 General Options:
 
 Displays the quick summary of program options.
-
-=head3 --conceptexpansion
-
-Calculates the association score taking into account the occurrences of 
-descendants of the specified CUIs.
 
 =head3 --noorder
 
@@ -50,35 +71,33 @@ Minimum Weight Association - Calculates the association scores using
 implicit or intermediate relationships between the specified CUIs, 
 and the minimum co-occurrence count between shared co-occurrences.
 
-=head3 --vsa
+=head3 --lsa
 
-Vector Set Association - Calculates the association scores using the
+Linking Set Association - Calculates the association scores using the
 association between the sets of co-occurring terms of the original terms
+
+=head3 --sbc
+
+Shared B to C association - Calculates the association scores using
+the association between the set of A co-occuring terms, and the 
+term C. 
+
+=head3 --wsa
+
+Weighted Set Association - Same as linking set association, but weights
+the members of the linking set based on their association with the original
+term. The association measure used for weighting is the same as specified
+for quantifying association overall (--measure)
+
+=head3 --nonorm
+
+Indicates that the weights in WSA will NOT be normalized between 0 and 1
+and instrad the direct association score will be used
 
 =head3 --precision N
 
 Displays values up to N places of decimal. (DEFAULT: 4)
     
-=head3 --measure STRING
-
-The measure used to calculate the assocation. Default = tscore. 
-
-The package uses the Text::NSP package to do the calculation. 
-The measure included within this package are: 
-    
-    1.  Dice Coefficient
-    2.  Fishers exact test - left sided
-    3.  Fishers exact test - right sided
-    4.  Fishers twotailed test - right sided
-    5.  Jaccard Coefficient
-    6.  Log-likelihood ratio
-    7.  Mutual Information
-    8.  Odds Ratio
-    9.  Pointwise Mutual Information
-    10. Phi Coefficient
-    11. Pearson's Chi Squared Test
-    12. Poisson Stirling Measure
-    13. T-score (DEFAULT)
 
 =head3 --help
 
@@ -88,46 +107,6 @@ Displays the quick summary of program options.
 
 Displays the version information.
 
-=head2 Input Options:
-
-=head2 General Database Options:
-
-=head3 --username STRING
-
-Username is required to access the umls database on mysql
-
-=head3 --password STRING
-
-Password is required to access the umls database on mysql
-
-=head3 --hostname STRING
-
-Hostname where mysql is located. DEFAULT: localhost
-
-=head3 --socket STRING
-
-Socket where the mysql.sock or mysqld.sock is located. 
-DEFAULT: mysql.sock
-
-=head2 UMLS::Interface Database Options:
-
-=head3 --umlsdatabase STRING        
-
-Database contain UMLS DEFAULT: umls
-
-=head3 --matrix FILE
-
-File name containing co-occurrence data in sparse matrix format
-This is an alternative to storing in a database, but will be 
-slower for single queries, but much faster for multiple queries
-File should should be sparse format of the form CUI1\tCUI2\tvalue\\n \n\n";
-
-=head2 UMLS::Association Database Options:
-
-=head3 --assocdatabase STRING        
-
-The UMLS-Association database containing the CUI bigrams and their
-associated frequency information.  DEFAULT: CUI_BIGRAMS
 
 =head1 OUTPUT
 
@@ -138,8 +117,6 @@ The association between the two concepts (or terms)
 =over
 
 =item * Perl (version 5.8.5 or better) - http://www.perl.org
-
-=item * UMLS::Interface - http://search.cpan.org/dist/UMLS-Interface
 
 =item * Text::NSP - http://search.cpan.org/dist/Text-NSP
 
@@ -158,7 +135,7 @@ The association between the two concepts (or terms)
      
   You may also contact us directly if you prefer :
     
-      Bridget T. McInnes: btmcinnes at vcu.edu 
+      Sam Henry: henryst at vcu.edu 
 
 =head1 AUTHOR
 
@@ -170,8 +147,8 @@ The association between the two concepts (or terms)
 
 Copyright (c) 2015
 
- Bridget T. McInnes, Virginia Commonwealth University 
- btmcinnes at vcu.edu
+ Sam Henry, Virginia Commonwealth University 
+ henryst at vcu.edu
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -190,17 +167,13 @@ this program; if not, write to:
  Boston, MA  02111-1307, USA.
 
 =cut
-
-use UMLS::Interface;
 use UMLS::Association;
 use Getopt::Long;
-
-my $DEFAULT_MEASURE = "tscore";
 
 #############################################
 #  Get Options and params
 #############################################
-eval(GetOptions( "version", "help", "debug", "username=s", "password=s", "hostname=s", "umlsdatabase=s", "assocdatabase=s", "socket=s",  "measure=s", "conceptexpansion", "noorder", "lta", "mwa", "vsa", "matrix=s", "config=s","precision=s")) or die ("Please check the above mentioned option(s).\n");
+eval(GetOptions( "version", "help", "debug",  "measure=s", "noorder", "lta", "mwa", "lsa", "sbc", "wsa", "matrix=s", "precision=s","nonorm")) or die ("Please check the above mentioned option(s).\n");
 
 
 #############################################
@@ -228,89 +201,28 @@ if(!(defined $opt_infile) && (scalar(@ARGV) < 1) ) {
 }
 
 #get required input
-my $cui1 = shift;
-my $cui2 = shift;
+my $cuiSet1String = shift;
+my $cuiSet2String = shift;
 
+#break the cui sets strings into arrays
+my @cuiSet1 = split (/,/,$cuiSet1String);
+my @cuiSet2 = split (/,/,$cuiSet2String);
 
-#############################################
-#  Set Up UMLS::Interface
-#############################################
-#  set UMLS-Interface options
-my %umls_option_hash = ();
-
-$umls_option_hash{"t"} = 1; 
-
-if(defined $opt_debug) {
-    $umls_option_hash{"debug"} = $opt_debug;
-}
-if(defined $opt_verbose) {
-    $umls_option_hash{"verbose"} = $opt_verbose;
-}
-if(defined $opt_username) {
-    $umls_option_hash{"username"} = $opt_username;
-}
-if(defined $opt_driver) {
-    $umls_option_hash{"driver"}   = $opt_driver;
-}
-if(defined $opt_umlsdatabase) {
-    $umls_option_hash{"database"} = $opt_umlsdatabase;
-}
-if(defined $opt_password) {
-    $umls_option_hash{"password"} = $opt_password;
-}
-if(defined $opt_hostname) {
-    $umls_option_hash{"hostname"} = $opt_hostname;
-}
-if(defined $opt_socket) {
-    $umls_option_hash{"socket"}   = $opt_socket;
-}
-if(defined $opt_config){
-    $umls_option_hash{"config"} = $opt_config;
-}
-
-#  instantiate instance of UMLS-Interface
-my $umls = UMLS::Interface->new(\%umls_option_hash); 
-die "Unable to create UMLS::Interface object.\n" if(!$umls);
 
 #############################################
 #  Set Up UMLS::Association
 #############################################
 #  set UMLS-Association option hash
 my %assoc_option_hash = ();
-$assoc_option_hash{'umls'} = $umls;
 
 if(defined $opt_measure) {
     $assoc_option_hash{"measure"} = $opt_measure;
-}
-else {
-    $assoc_option_hash = $DEFAULT_MEASURE;
 }
 if(defined $opt_debug) {
     $assoc_option_hash{"debug"} = $opt_debug;
 }
 if(defined $opt_verbose) {
     $assoc_option_hash{"verbose"} = $opt_verbose;
-}
-if(defined $opt_username) {
-    $assoc_option_hash{"username"} = $opt_username;
-}
-if(defined $opt_driver) {
-    $assoc_option_hash{"driver"}   = $opt_driver;
-}
-if(defined $opt_assocdatabase) {
-    $assoc_option_hash{"database"} = $opt_assocdatabase;
-}
-if(defined $opt_password) {
-    $assoc_option_hash{"password"} = $opt_password;
-}
-if(defined $opt_hostname) {
-    $assoc_option_hash{"hostname"} = $opt_hostname;
-}
-if(defined $opt_socket) {
-    $assoc_option_hash{"socket"}   = $opt_socket;
-}
-if(defined $opt_conceptexpansion) {
-    $assoc_option_hash{"conceptexpansion"}   = $opt_conceptexpansion;
 }
 if(defined $opt_precision){
     $assoc_option_hash{"precision"} = $opt_precision;
@@ -321,14 +233,23 @@ if(defined $opt_lta){
 if(defined $opt_mwa){
     $assoc_option_hash{"mwa"} = $opt_mwa;
 }
-if(defined $opt_vsa) {
-    $assoc_option_hash{"vsa"} = $opt_vsa;
+if(defined $opt_lsa) {
+    $assoc_option_hash{"lsa"} = $opt_lsa;
+}
+if (defined $opt_sbc){
+    $assoc_option_hash{"sbc"} = $opt_sbc;
+}
+if (defined $opt_wsa){
+    $assoc_option_hash{"wsa"} = $opt_wsa;
 }
 if(defined $opt_noorder){
     $assoc_option_hash{"noorder"} = $opt_noorder;
 }
-if(defined $opt_matrix){
+if(defined $opt_matrix) {
     $assoc_option_hash{"matrix"} = $opt_matrix;
+}
+if(defined $opt_nonorm) {
+    $assoc_option_hash{"nonorm"} = $opt_nonorm;
 }
 
 #  instantiate instance of UMLS-Assocation
@@ -340,14 +261,14 @@ die "Unable to create UMLS::Association object.\n" if(!$association);
 #  Calculate Association
 #############################################
 
-my $score = $association->calculateAssociation_termPair($cui1, $cui2, $assoc_option_hash{"measure"});
-print "$score<>$cui1<>$cui2\n";
+my $score = $association->calculateAssociation_setPair(\@cuiSet1, \@cuiSet2, $assoc_option_hash{"measure"});
+print "$score<>$cuiSet1String<>$cuiSet2String\n";
 
 ##############################################################################
 #  function to output minimal usage notes
 ##############################################################################
 sub minimalUsageNotes {
-    print "Usage: umls-association.pl [OPTIONS] [TERM1 TERM2] [CUI1 CUI2]\n";
+    print "Usage: umls-association.pl [OPTIONS] [CUI_set1 CUI_set2]\n";
     &askHelp();
     exit;
 }
@@ -357,30 +278,41 @@ sub minimalUsageNotes {
 ##############################################################################
 sub showHelp() {
         
-    print "This is a utility that takes as input either two terms \n";
-    print "or two CUIs from the command line or a file and returns \n";
-    print "their association using one of the following measures: \n";
+    print "This is a utility that takes as input two sets of CUIs \n";
+    print "an association matrix, and a string specifying the associaiton\n";
+    print " measure to use from the command line and returns \n";
+    print "their association.\n";
 
+    print "Usage: umls-assocation.pl [OPTIONS] [CUI_set1] [CUI_set2] --matrix [Matrix_File] --measure [Assoc_Measure]\n\n";
+
+    print "CUI_set1 and CUI_set2 are comma seperated sets of CUIs for which\n";
+    print "   the association will be found\n";
+    
+    print "--matrix FILE            File name containing co-occurrence data in\n";
+    print "                         sparse matrix format.\n";
+
+    print "--measure MEASURE        The measure to use to calculate the\n";
+    print "                         assocation. Valid measures are: \n";
+    print "0.  Frequency - just n11 (freq)\n";
     print "1.  Dice Coefficient (dice) \n";
-    print "2.  Fishers exact test - left sided (left)\n";
-    print "3.  Fishers exact test - right sided (right)\n";
+    print "2.  Fishers exact test - left sided (leftFisher)\n";
+    print "3.  Fishers exact test - right sided (rightFisher)\n";
     print "4.  Fishers twotailed test - right sided (twotailed)\n";
     print "5.  Jaccard Coefficient (jaccard)\n";
     print "6.  Log-likelihood ratio (ll)\n"; 
     print "7.  Mutual Information (tmi)\n";
-    print "8.  Odds Ratio (oods)\n";
+    print "8.  Odds Ratio (odds)\n";
     print "9.  Pointwise Mutual Information (pmi)\n";
     print "10. Phi Coefficient (phi)\n";
-    print "11. Pearson's Chi Squared Test (chi)\n";
+    print "11. Pearson's Chi Squared Test (x2)\n";
     print "12. Poisson Stirling Measure (ps)\n";
-    print "13. T-score (tscore) DEFAULT\n\n";
+    print "13. T-score (tscore) \n\n";
 
-    print "Usage: umls-assocation.pl [OPTIONS] TERM1 TERM2\n\n";
+    print "EXAMPLE:\n";
+    print "perl umls-association.pl C0000726,C001554 C0870221 --matrix ../Demos/Datasets/sampleMatrix --measure x2\n\n";
+
 
     print "General Options:\n\n";
-
-    print "--measure MEASURE        The measure to use to calculate the\n";
-    print "                         assocation. (DEFAULT: tscore)\n\n";
 
     print "--precision N            Displays values up to N places of decimal. (DEFAULT: 4)\n\n";
 
@@ -388,49 +320,31 @@ sub showHelp() {
     
     print "--help                   Prints this help message.\n\n";
 
-    print "--conceptexpansion       Calculates the association score taking into account
-                                    the occurrences of descendants of the specified CUIs.\n\n";
+    print "--lta                    Linking Term Association - Calculates the association scores using implicit\n"; 
+    print "                         or intermediate relationships between the specified CUIs, and the count\n";
+    print "                         of unique shared co-occurrences. \n\n";
+    print
+    print "--mwa                    Minimum Weight Association - Calculates the association scores using implicit\n";
+    print "                         or intermediate relationships between the specified CUIs, and the minimum\n";
+    print "                         of co-occurrence count between shared co-occurrences. \n\n";
 
-    print "--lta                    Linking Term Association - Calculates the association scores using implicit 
-                                    or intermediate relationships between the specified CUIs, and the count
-                                    of unique shared co-occurrences. \n\n";
+    print "--lsa                    Linking Set Association - Calculates the association scores using the\n";
+    print"                          association between the sets of co-occurring terms of the original terms\n\n";
 
-    print "--mwa                    Minimum Weight Association - Calculates the association scores using implicit 
-                                    or intermediate relationships between the specified CUIs, and the minimum
-                                    of co-occurrence count between shared co-occurrences. \n\n";
+    print "--sbc                    Shared B to C association - calculates the association scores using the\n"; 
+    print "                         association between the set of A co-occuring terms, and the term C\n\n";
 
-    print "--vsa                    Vector Set Association - Calculates the association scores using the
-                                    association between the sets of co-occurring terms of the original terms\n\n";
+    print "--wsa                    Weighted Set Association - Same as linking set association, but weights\n";
+    print "                         the members of the linking set based on their association with the original\n";
+    print "                         term. The association measure used for weighting is the same as specified\n";
+    print "                         for quantifying association overall (--measure)\n\n";
 
-    print "--noorder                If selected, the order in which CUIs appear will be disregarded when the association 
-                                    score is calculated.\n\n";
+    print "--nonorm                 Indicates that the weights in WSA will NOT be normalized between 0 and 1\n";
+    print "                         and instrad the direct association score will be used\n";
 
-    print "--config FILE            Configuration file\n\n";    
+    print "--noorder                If selected, the order in which CUIs appear will be disregarded when the association\n"; 
+    print "                         score is calculated.\n\n";
 
-    print "\n\nInput Options: \n\n";
-
-    print "\n\nGeneral Database Options:\n\n"; 
-
-    print "--username STRING        Username required to access mysql\n\n";
-
-    print "--password STRING        Password required to access mysql\n\n";
-
-    print "--hostname STRING        Hostname for mysql (DEFAULT: localhost)\n\n";
-    print "--socket STRING          Socket for mysql (DEFAULT: /tmp/mysql.sock\n\n";
-
-    print "\n\nUMLS-Interface Database Options: \n\n";
-
-    print "--matrix FILE            File name containing co-occurrence data in sparse matrix format
-                                    This is an alternative to storing in a database, but will be 
-                                    slower for single queries, but much faster for multiple queries.
-                                    File should should be sparse format of the form CUI1\tCUI2\tvalue\\n \n\n";
-
-    print "--umlsdatabase STRING    Database contain UMLS (DEFAULT: umls)\n\n";
-    
-    print "\n\nUMLS-Association Database Options: \n\n";
-
-    print "--assocdatabase STRING        Database containing CUI bigrams 
-                                         (DEFAULT: CUI_BIGRAMS)\n\n";
 }
 ##############################################################################
 #  function to output the version number

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html><head><title>How do I set up RTX with ClickMagick?</title></head><body>
+<strong>How do I set up RTX with ClickMagick?</strong><br />
+<br />
+RTX supports Postback URL tracking, so you can send back conversion data to RTX.<br />
+<br />
+Here&rsquo;s how to set it up:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>1.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Create a ClickMagick tracking link that you&rsquo;ll use with RTX. Set the Primary URL of this link to the offer you&rsquo;d like to promote.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>2.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Set up your campaign and ad in RTX, and then add <code>/{click_id}</code> to the end of the tracking link you created in step 1:<br />
+			<br />
+			<code>http://www.clkmg.com/$username/targetlink<strong>/{click_id}</strong></code><br />
+			<br />
+			RTX will replace the&nbsp;<code>{click_id}</code>&nbsp;token with a unique value that ClickMagick will send back to RTX in the custom postback.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>3.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Next, create the custom postback using the <strong><a href="/user/action/tools/customposts.cgi" target="_blank">Custom Postbacks</a></strong> <span helvetica="" neue="" style="color: rgb(0, 0, 0); font-family: proxima-nova, ">tool in the <strong>Tools</strong> menu. In the </span><strong>Which Link?</strong> drop-down, c<span helvetica="" neue="" style="color: rgb(0, 0, 0); font-family: proxima-nova, ">hoose the tracking link that</span> you created in step 1. Choose <strong>Sales</strong> as the <strong>Conversion Type</strong>, and set the <strong>Postback URL</strong> to your RTX <strong>S2S</strong> code, customized with ClickMagick&rsquo;s <code>[s1]</code> and <code>[amount]</code> tokens. It should look something like this:<br />
+			<br />
+			<code>https://p.trkjmp.com/conv?v=OGU1YTM0M2MwZjA2ODM4ODYmE5NQ%3D%3D<strong>&amp;c=[s1]&amp;r=[amount]</strong></code><br />
+			&nbsp;
+			<div class="faq-caution"><b>Caution:&nbsp;</b>Be sure to use the&nbsp;actual RTX S2S Postback URL for your campaign in your RTX account. You can read about the RTX requirements on the RTX website here:<br />
+			&nbsp;
+			<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+				<tbody style="box-sizing: border-box;">
+					<tr style="box-sizing: border-box;">
+						<td style="box-sizing: border-box; width: 20px;"><a href="http://help.rtxplatform.com/track-important-campaign-data/track-conversions-using-server-to-server-tracking" target="_blank"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+						<td style="box-sizing: border-box;">&nbsp;</td>
+						<td style="box-sizing: border-box;"><b><a href="http://help.rtxplatform.com/track-important-campaign-data/track-conversions-using-server-to-server-tracking" target="_blank">Track conversions with RTX using server-to-server tracking</a></b></td>
+					</tr>
+				</tbody>
+			</table>
+			</div>
+			</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>4.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Click on <strong>Add Custom Postback</strong>.</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+Now, whenever anybody clicks on an RTX ad and a sale is made, ClickMagick will report the sale back to RTX.
+</body></html>

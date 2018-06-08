@@ -5,7 +5,7 @@ use warnings;
 use namespace::autoclean;
 use autodie;
 
-our $VERSION = '0.300001';
+our $VERSION = '0.300002';
 
 use IO::Handle;
 use Math::Int64 0.51;
@@ -464,7 +464,7 @@ MaxMind::DB::Writer::Tree - Tree representing a MaxMind DB database in memory - 
 
 =head1 VERSION
 
-version 0.300001
+version 0.300002
 
 =head1 SYNOPSIS
 

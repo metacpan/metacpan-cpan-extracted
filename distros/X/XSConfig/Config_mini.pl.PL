@@ -3,14 +3,14 @@
 #usage: perl Config_mini.pl.PL [ignored]
 
 use strict ;
-my $VERSION = '6.00';
+my $VERSION = '6.24';
 use ExtUtils::Command;
 
 my $mini = searchdirs('Config_mini.pl', \@INC);
 if ($mini) {
     warn "found Config_mini.pl at $mini\n";
 
-    require 'xsc_test.pl'; #Config_mini.pl.PL not in cperl, no eval needed
+    require './xsc_test.pl'; #Config_mini.pl.PL not in cperl, no eval needed
     # test if Config_mini.pl is usuable in a seperate process since
     # Config_mini.pl might be so broken that the ExtUtils::Command::cp later on
     # might need something from %Config and %Config is broken after the broken

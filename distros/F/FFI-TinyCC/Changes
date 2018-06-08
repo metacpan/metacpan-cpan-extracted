@@ -1,5 +1,12 @@
 Revision history for FFI-TinyCC
 
+0.28      2018-06-07 07:52:11 -0400
+  - Production release identical to 0.27_01
+
+0.27_01   2018-06-06 14:35:59 -0400
+  - FFI::TinyCC and FFI::TinyCC::Inline are now separately distributed.
+    Older entries include the history of BOTH modules.
+
 0.26      2017-07-31 17:36:33 -0400
   - Remove dependency on IPC::System::Simple
 
@@ -9,7 +16,7 @@ Revision history for FFI-TinyCC
 
 0.24      2017-01-31 00:04:51 -0500
   - Mark executable output as possibly not supported.  Anywhere.
-  - Remove deprecated FFI::Raw support
+  - Remove deprecated support for old FFI library
 
 0.23      2017-01-06 15:12:55 -0500
   - Updated documentation to reflect FFI::Platypus preference for
@@ -66,18 +73,17 @@ Revision history for FFI-TinyCC
   - Development release not posted on CPAN
 
 0.11      2015-01-15 18:51:26 -0500
-  - migrate to FFI::Platypus.  Should still interact with FFI::Raw
+  - migrate to FFI::Platypus.  Should still interact with old FFI library
     as before.
-  - Your FFI::Raw code may break if you are not explicitly using
-    FFI::Raw, and depending on FFI::TinyCC to pull it in for you.
+  - Your old FFI library code may break if you are not explicitly using
+    that old FFI library, and depending on FFI::TinyCC to pull it in for you.
     Stop doing that.
   - Development release not posted on CPAN
 
 0.10      2015-01-08 10:09:47 -0500
-  - get_ffi_raw method is deprecated and will issue a warning
-    use FFI::Raw->new_from_ptr instead
-  - FFI::Raw will be removed as a prerequisite in the near future
-    if you are using both FFI::Raw and FFI::TinyCC then you need
+  - get_ffi_raw method is deprecated and issue a warning.
+  - Old FFI library will be removed as a prerequisite in the near future
+    if you are using both the old FFI library and FFI::TinyCC then you need
     to explicitly declare BOTH as prerequisites.
 
 0.09      2014-11-17 06:31:51 -0500

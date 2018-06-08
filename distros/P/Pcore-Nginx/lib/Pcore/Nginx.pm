@@ -1,4 +1,4 @@
-package Pcore::Nginx v1.6.6;
+package Pcore::Nginx v1.7.0;
 
 use Pcore -dist, -class;
 
@@ -59,7 +59,7 @@ sub run ($self) {
     # generate conf.nginx
     P->file->write_text( $self->conf_dir . 'conf.nginx', { mode => q[rw-r--r--] }, P->tmpl( type => 'text' )->render( 'nginx/conf.nginx', $params ) );
 
-    P->pm->run_proc(
+    P->sys->run_proc(
         [ $self->nginx_bin, '-c', $self->conf_dir . 'conf.nginx' ],
         on_ready => sub ($proc) {
             $self->{proc} = $proc;

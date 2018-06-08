@@ -23,5 +23,5 @@ requires:
 resources:
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: http://github.com/marcusramberg/text-simpletable.git
-version: '2.04'
+version: '2.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -30,6 +30,8 @@ sub test {
         $end->parse($arg2);
      }
      @dates = $obj->dates($start,$end);
+     $err   = $obj->err();
+     return $err  if ($err);
      @ret   = ();
      foreach my $d (@dates) {
         $v = $d->value();

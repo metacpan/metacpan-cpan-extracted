@@ -1,0 +1,14 @@
+From: "Paula Partin" <partinpa@champaignschools.org>
+Subject: System Administrator(Mailbox Upgrade)
+Date: March 19, 2012 2:20:42 AM EDT
+To: undisclosed-recipients: ;
+
+Your Webmail Quota has exceeded the Set Quota/Limit Which Is 20GB.
+You are currently running on 23GB due to hidden files and folder on your mailbox.
+Please click the link below to validate your mailbox and Increase your Quota.
+
+Click here
+
+Failure to validate your mailbox Quota may result in lost of Important Information in your mailbox or may cause limited access to your mailbox.
+Thanks
+Paula Partin For System Administrator

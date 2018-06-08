@@ -1,0 +1,41 @@
+
+
+
+docno="lists-003-2121270"
+received="Fri May 14 20:51:36 1993 EST" 
+sent="Fri, 14 May 1993 20:47:02 -0700 (PDT)" 
+name="Mark Crispin" 
+email="mrc@Ikkoku-Kan.Panda.COM" 
+subject="Re: CHARSET considerations" 
+id="MS-C.737437622.2035015474.mrc@Ikkoku-Kan.Panda.COM" 
+inreplyto="9305142129.AA22544@adam.MIT.EDU" 
+
+To: ietf-charsets@INNOSOFT.COM, scs@adam.mit.edu
+Cc: TROTH@ricevm1.rice.edu, pine-info@cac.washington.edu,
+
+
+
+
+Steve -
+
+ 
+     Thanks for your comments.  You needn't convince me; I've been involved
+with the MIME charset issue for a long time (you'll note that I am one of the
+authors of the ISO-2022-JP spec).  In defense of the other Pine team members,
+the sin is one of omission rather than of comission; they wanted to do
+something about character sets and didn't want to wire in a table of legal
+values (since it might change).
+
+     I've suggested that as a first pass the charset should only be settable
+in the system config file, and that the charset always be coerced to US-ASCII
+unless the text contains 8-bit characters and/or has ``funny'' control
+characters such as ESC or SI/SO.  More work would definitely be needed in this
+area, but you'll appreciate that there are other, higher priorities just
+now...
+
+
+-- Mark --
+
+
+
+

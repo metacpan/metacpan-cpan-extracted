@@ -8,7 +8,13 @@ use WebService::RESTCountries;
 
 my ($got, $expected);
 
-my $api = WebService::RESTCountries->new;
+my $api = WebService::RESTCountries->new(
+    cache => CHI->new(
+        driver => 'File',
+        namespace => 'restcountries',
+        root_dir => $ENV{PWD} . '/t/cache/',
+    )
+);
 
 my $countries_counts_per = {
     Africa => 60,

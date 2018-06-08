@@ -8,12 +8,12 @@
 #
 
 package Template::Plugin::Filter::IDN;
-$Template::Plugin::Filter::IDN::VERSION = '0.03';
+$Template::Plugin::Filter::IDN::VERSION = '0.04';
 # ABSTRACT: Template Toolkit plugin for encoding and decoding International Domain Names.
 
 use strict;
 use warnings;
-use syntax 'junction';
+use List::Util 'any';
 
 use parent 'Template::Plugin::Filter';
 
@@ -41,10 +41,10 @@ sub filter {
         $type = ($text =~ /[^ -~\s]/) ? 'to_ascii' : 'to_utf8';
     }
 
-    if ($type eq any(qw(encode to_ascii))) {
+    if (any { $_ eq $type } qw(encode to_ascii)) {
         return Net::IDN::Encode::domain_to_ascii($text);
     }
-    elsif ($type eq any(qw(decode to_utf8))) {
+    elsif (any { $_ eq $type } qw(decode to_utf8)) {
         return Net::IDN::Encode::domain_to_unicode($text);
     }
     else {
@@ -66,7 +66,7 @@ Template::Plugin::Filter::IDN - Template Toolkit plugin for encoding and decodin
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

@@ -59,7 +59,7 @@ use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 
 @EXPORT_OK = qw( rename );
-$VERSION = '0.30';
+$VERSION = '0.32';
 
 sub rename_files {
     my $code = shift;

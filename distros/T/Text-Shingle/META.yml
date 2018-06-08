@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Text-Shingle
-version:            0.01
+version:            0.03
 abstract:           ~
 author:  []
 license:            perl
@@ -13,7 +13,9 @@ build_requires:
     ExtUtils::MakeMaker:  0
     Unicode::Normalize:   0
     Text::NGrammer:       0
-requires:  {}
+requires:
+    Lingua::Sentence:     0
+    Text::NGrammer:       0
 no_index:
     directory:
         - t

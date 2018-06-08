@@ -1,7 +1,7 @@
 package Sah::SchemaR::cryptoexchange::currency_pair;
 
-our $DATE = '2018-06-06'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2018-06-07'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 our $rschema = ["str",[{description=>"\nCurrency pair is string in the form of *currency1*/*currency2*, where\n*currency1* the traded currency and must be a known cryptocurrency code (e.g.\nLTC) while *currency2* is the base currency and must be a known fiat currency or\na known cryptocurrency code (e.g. USD, or BTC).\n\nCryptocurrency code is checked against catalog in <pm:CryptoCurrency::Catalog>,\nwhile fiat currency code is checked against <pm:Locale::Codes::Currency_Codes>.\n\nWill be normalized to uppercase.\n\n",match=>qr(\A\S+/\S+\z),summary=>"Currency pair, e.g. LTC/USD","x.perl.coerce_rules"=>["str_to_cryptoexchange_currency_pair"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::cryptoexchange::currency_pair - Currency pair, e.g. LTC/USD
 
 =head1 VERSION
 
-This document describes version 0.009 of Sah::SchemaR::cryptoexchange::currency_pair (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-06-06.
+This document describes version 0.010 of Sah::SchemaR::cryptoexchange::currency_pair (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-06-07.
 
 =head1 DESCRIPTION
 

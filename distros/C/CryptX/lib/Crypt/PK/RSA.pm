@@ -2,7 +2,7 @@ package Crypt::PK::RSA;
 
 use strict;
 use warnings;
-our $VERSION = '0.060';
+our $VERSION = '0.061';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_verify_message rsa_sign_hash rsa_verify_hash)] );
@@ -10,6 +10,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use Carp;
+$Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 use Crypt::Digest qw(digest_data digest_data_b64u);
 use Crypt::Misc qw(read_rawfile encode_b64u decode_b64u encode_b64 decode_b64 pem_to_der der_to_pem);
@@ -22,6 +23,7 @@ sub new {
 
 sub export_key_pem {
   my ($self, $type, $password, $cipher) = @_;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   my $key = $self->export_key_der($type||'');
   return unless $key;
 
@@ -38,6 +40,7 @@ sub export_key_pem {
 
 sub export_key_jwk {
   my ($self, $type, $wanthash) = @_;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   my $kh = $self->key2hash;
   if ($type eq 'private') {
     return unless $kh->{N} && $kh->{e} && $kh->{d} && $kh->{p} && $kh->{q} && $kh->{dP} && $kh->{dQ} && $kh->{qP};
@@ -73,6 +76,7 @@ sub export_key_jwk {
 
 sub export_key_jwk_thumbprint {
   my ($self, $hash_name) = @_;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $hash_name ||= 'SHA256';
   my $h = $self->export_key_jwk('public', 1);
   my $json = CryptX::_encode_json({kty=>$h->{kty}, n=>$h->{n}, e=>$h->{e}});
@@ -81,6 +85,7 @@ sub export_key_jwk_thumbprint {
 
 sub import_key {
   my ($self, $key, $password) = @_;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   croak "FATAL: undefined key" unless $key;
 
   # special case

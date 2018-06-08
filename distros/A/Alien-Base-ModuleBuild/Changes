@@ -1,5 +1,10 @@
 Revision history for Perl module Alien::Base.
 
+1.04 2018-06-06 09:00:21 -0400
+  - ALIEN_INSTALL_TYPE is now fully compatible with Alien::Build
+    Previously there were some edge cases with setting it to
+    'default'
+
 1.03 2018-05-09 08:15:56 -0400
   - Fix warning
 

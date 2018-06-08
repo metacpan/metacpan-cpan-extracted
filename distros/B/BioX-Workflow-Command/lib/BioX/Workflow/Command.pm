@@ -1,7 +1,7 @@
 package BioX::Workflow::Command;
 
 use v5.10;
-our $VERSION = '2.4.0';
+our $VERSION = '2.4.1';
 
 use MooseX::App 1.39 qw(Color);
 
@@ -11,8 +11,8 @@ app_exclude(
     'BioX::Workflow::Command::run::Utils',
     'BioX::Workflow::Command::Utils',
     'BioX::Workflow::Command::inspect::Utils',
-    'BioX::Workflow::Command::Exceptions',
     'BioX::Workflow::Command::inspect::Exceptions',
+    'BioX::Workflow::Command::Exceptions',
 );
 
 with 'BioX::Workflow::Command::Utils::Log';

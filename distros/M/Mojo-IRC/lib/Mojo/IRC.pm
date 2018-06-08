@@ -11,7 +11,7 @@ use constant DEBUG        => $ENV{MOJO_IRC_DEBUG}     || 0;
 use constant DEFAULT_CERT => $ENV{MOJO_IRC_CERT_FILE} || catfile dirname(__FILE__), 'mojo-irc-client.crt';
 use constant DEFAULT_KEY  => $ENV{MOJO_IRC_KEY_FILE}  || catfile dirname(__FILE__), 'mojo-irc-client.key';
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 our %NUMERIC2NAME = (470 => 'ERR_LINKCHANNEL');
 
@@ -53,11 +53,9 @@ sub server {
   return $self if $old and $old eq $server;
   $self->{server} = $server;
   return $self unless $self->{stream_id};
-  $self->disconnect(
-    sub {
-      $self->connect(sub { });
-    }
-  );
+  $self->disconnect(sub {
+    $self->connect(sub { });
+  });
   $self;
 }
 
@@ -83,6 +81,7 @@ sub connect {
     push @extra, tls_ca   => $tls->{ca} if $tls->{ca};     # not sure why this should be supported, but adding it anyway
     push @extra, tls_cert => $tls->{cert} || DEFAULT_CERT;
     push @extra, tls_key  => $tls->{key} || DEFAULT_KEY;
+    push @extra, tls_verify => 0x00 if $tls->{insecure};
   }
 
   $port ||= 6667;
@@ -352,7 +351,7 @@ Mojo::IRC - IRC Client for the Mojo IOLoop
 
 =head1 VERSION
 
-0.44
+0.45
 
 =head1 SYNOPSIS
 
@@ -544,6 +543,11 @@ This can be generated using
 
   # certtool --generate-privkey --outfile client.key
   # certtool --generate-self-signed --load-privkey client.key --outfile client.crt
+
+To disable the verification of server certificates, the "insecure" option
+can be set:
+
+  $self->tls({insecure => 1});
 
 =head1 METHODS
 

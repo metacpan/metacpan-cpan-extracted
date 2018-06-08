@@ -1,3 +1,8 @@
+0.013   2018-06-07 (PERLANCAR)
+
+	- Use minimum version from pmversions.ini.
+
+
 0.012   2018-05-31 (PERLANCAR)
 
 	- Generate prereq to Data::Sah::Coerce::perl::* modules.

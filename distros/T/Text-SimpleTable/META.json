@@ -46,6 +46,6 @@
          "web" : "http://github.com/marcusramberg/text-simpletable"
       }
    },
-   "version" : "2.04",
+   "version" : "2.05",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

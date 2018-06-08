@@ -1,6 +1,7 @@
 #!./perl -w
 
 BEGIN {
+    push @INC, '.';
     eval {require 'xsc_test.pl'};#CPAN
     require 'test.pl' if $@;#cperl
 

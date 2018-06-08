@@ -1,0 +1,31 @@
+
+
+
+docno="lists-003-2171003"
+received="Thu May 20 12:57:41 1993 EST" 
+sent="Thu, 20 May 1993 21:56:14 +0200" 
+name="Keld J|rn Simonsen" 
+email="keld@dkuug.dk" 
+subject="Re: CHARSET considerations" 
+id="199305201956.AA28105@dkuug.dk" 
+inreplyto="lgl@nwnet.net" 
+
+To: Laurence Lundblade <lgl@nwnet.net>,
+Cc: ietf-charsets@INNOSOFT.COM, scs@adam.mit.edu, TROTH@ricevm1.rice.edu,
+
+
+
+
+Laurence Lundblade writes:
+
+> Yes, I think that's exactly right.  We can probably adjust the comment in
+> the .pinerc for now.  In the long term the .pinerc needs a lot of good
+> error checking.  It just hasn't been done because limited resources.
+
+All of the RFC 1345 character sets are registered for MIME use.
+That should be able to cover most needs.
+
+Keld
+
+
+

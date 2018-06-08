@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html><head><title>How do I create a Postback URL for my network?</title></head><body>
+<strong>How do I create a Postback URL for my network?</strong><br />
+<br />
+If all you want to know is how to create a specific Postback URL for ClickMagick, you&rsquo;re in the right place.<br />
+<br />
+If, on the other hand, what you&rsquo;re really looking for are the ins-and-outs of using Postback URLs to track conversions and you want to understand the overall topic better, you should be reading this FAQ instead:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=119"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=119">&nbsp;How do I track conversions using Postback URLs?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+That FAQ has a full discussion of using Postback URLs for server-to-server communication. That FAQ also includes set up videos, step-by-step walkthroughs, and so on.<br />
+<br />
+So, if you already know all about Postback URLs and you just want to grab ClickMagick&rsquo;s version of one, you can use&nbsp;ClickMagick&rsquo;s&nbsp;<strong><a href="/user/action/tools/postbackb.cgi" target="_blank">Postback Builder</a></strong> tool which gives you a 1-click method for creating your Postback URLs!<br />
+<br />
+You can always find the <strong><a href="/user/action/tools/postbackb.cgi" target="_blank">Postback Builder</a></strong> in the <strong>Tools</strong> menu at the top of any page.<br />
+<br />
+<br />
+<strong>But what if the Postback Builder doesn&rsquo;t list my network?</strong><br />
+<br />
+If you need to create a Postback URL for a network that isn&rsquo;t already listed in the <strong><a href="/user/action/tools/postbackb.cgi" target="_blank">Postback Builder</a>&nbsp;</strong>(which is unlikely), you can always post a ticket in our&nbsp;<strong><a href="/user/action/account/help.cgi?action=helpdesk" target="_blank">1-Hour Support Desk</a></strong>, but it&rsquo;s generally easy enough to construct one yourself with a little guidance. That&rsquo;s what we&rsquo;ll cover here.<br />
+<br />
+&nbsp;
+<div class="faq-note"><b>Note:</b> This explanation assumes that you know what a &ldquo;query strings&rdquo; are and how to manipulate them. If you need a quick overview of what query strings are, take a moment to read this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=177"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=177">What is a &ldquo;Query String&rdquo;?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+This discussion also assumes that you&rsquo;re thoroughly familiar with Postback URLs and how to set them up. If you need a refresher on that, go review the FAQ mentioned earlier.</div>
+&nbsp;&nbsp;<br />
+<br />
+To set up a Postback URL, you&rsquo;ll need to know the&nbsp;name of the Sub-ID variable to pass&nbsp;the <code>[clickid]</code> token through in the Primary URL of your tracking link. This will commonly be something like <code>s1</code>, <code>aff_sub</code>, or <code>tid</code>.&nbsp;Every network uses its own preferred name for the click ID. If you don&rsquo;t know what this is for your network, you can ask their support desk for this information.<br />
+<br />
+The second thing you&rsquo;ll need is the Postback URL itself. Here is the generic Postback URL for your account:<br />
+<br />
+<code>http://www.clkmg.com/api/s/post/?uid=$userid&amp;s1=&amp;amt=0.00&amp;ref=</code><br />
+<br />
+All you need to do is replace the <code>0.00</code>&nbsp;value with the commission token that your network uses, and set the <code>s1=</code> variable to the Sub-ID variable you passed the <code>[clickid]</code> to in your Primary URL.<br />
+<br />
+To find these two tokens, you can search online for these phrases:<br />
+<br />
+&nbsp; &nbsp; &nbsp;&ldquo;How do I pass a click ID or tracking ID to <em>network&rdquo;, and</em><br />
+&nbsp; &nbsp; &nbsp;&ldquo;Postback URL tokens for <em>network</em>&rdquo;<br />
+<br />
+where &ldquo;network&rdquo; is the name of your affiliate network.<br />
+<br />
+You can also ask your network&rsquo;s support desk this question:
+<p style="margin: 16px 0 0 25px;">&ldquo;How do&nbsp;I pass a click ID (or tracking ID) to the network with my affiliate link, and what tokens should I use in my Postback URL to return the click ID and commission amount?&rdquo;</p>
+<br />
+Their support desk should give you the format for your affiliate link, and they should provide you with the tokens to use in your Postback URL.<br />
+<br />
+For example, suppose they tell you to pass in the click ID using the <code>aff_sub</code> variable and that the click ID is returned in the Postback URL using the <code>{{TRACKID}}</code> token. Suppose they also tell you to use the <code>{{COMM}}</code> token to return the commission value in the Postback URL.<br />
+<br />
+You would then add the query string variable at the end of your affiliate link in your Primary URL like this:<br />
+<br />
+<code>https://www.myaffiliateprogram.com/...?aff_sub=[clickid]</code><br />
+<br />
+And in your generic Postback URL, you would set the <code>s1=</code> value to <code>{{TRACKID}}</code> and set the <code>amt=</code> value to <code>{{COMM}}</code>,&nbsp;like this:<br />
+<br />
+<code>http://www.clkmg.com/api/s/post/?uid=$userid&amp;s1={{TRACKID}}&amp;amt={{COMM}}&amp;ref=</code><br />
+<br />
+As long as you pass the <code>[clickid]</code> in to the network using the variable name they require, and you insert the Postback URL tokens properly in your generic ClickMagick Postback URL, you should be good to go!<br />
+<br />
+To see examples of this, just select different&nbsp;networks in the <strong><a href="/user/action/tools/postbackb.cgi" target="_blank">Postback Builder</a></strong> and review the different Postback URL settings.
+</body></html>

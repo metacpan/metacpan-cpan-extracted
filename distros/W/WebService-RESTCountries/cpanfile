@@ -1,9 +1,12 @@
+requires 'CHI';
 requires 'Data::Serializer';
+requires 'Digest::MD5';
 requires 'JSON';
 requires 'Moo';
 requires 'namespace::clean';
 requires 'REST::Client';
 requires 'Role::REST::Client';
+requires 'Sereal';
 requires 'strictures', '2';
 requires 'Types::Standard';
 

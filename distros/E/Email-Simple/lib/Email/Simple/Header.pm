@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Email::Simple::Header;
 # ABSTRACT: the header of an Email::Simple message
-$Email::Simple::Header::VERSION = '2.214';
+$Email::Simple::Header::VERSION = '2.216';
 use Carp ();
 
 require Email::Simple;
@@ -315,18 +315,18 @@ sub header_raw_prepend {
 sub crlf { $_[0]->{mycrlf} }
 
 # =method fold
-# 
+#
 #   my $folded = $header->fold($line, \%arg);
-# 
+#
 # Given a header string, this method returns a folded version, if the string is
 # long enough to warrant folding.  This method is used internally.
-# 
+#
 # Valid arguments are:
-# 
+#
 #   at      - fold lines to be no longer than this length, if possible
 #             if given and false, never fold headers
 #   indent  - indent lines with this string
-# 
+
 # =cut
 
 sub _fold {
@@ -335,17 +335,30 @@ sub _fold {
 
   $arg->{at} = $self->_default_fold_at unless exists $arg->{at};
 
+  $arg->{indent} = $self->_default_fold_indent unless exists $arg->{indent};
+
+  my $indent = $arg->{indent} || $self->_default_fold_indent;
+
+  # We will not folder headers if...
+  # * the header has vertical whitespace
+  # * all vertical whitespace is followed by horizontal whitespace or END
+  if ($line =~ /\n/) {
+    if ($line =~ s/\n([^\s\t])/\n$indent$1/g) {
+      Carp::carp("bad space in header: newline followed by non-space: $line");
+    } else {
+      $line .= $self->crlf unless $line =~ /\n$/;
+      return $line;
+    }
+  }
+
   return $line . $self->crlf unless $arg->{at} and $arg->{at} > 0;
 
   my $limit  = ($arg->{at} || $self->_default_fold_at) - 1;
 
   return $line . $self->crlf if length $line <= $limit;
 
-  $arg->{indent} = $self->_default_fold_indent unless exists $arg->{indent};
-
-  my $indent = $arg->{indent} || $self->_default_fold_indent;
-
   return $self->__fold_objless($line, $limit, $indent, $self->crlf);
+
 }
 
 sub __fold_objless {
@@ -368,19 +381,19 @@ sub __fold_objless {
 }
 
 # =method default_fold_at
-# 
+#
 # This method (provided for subclassing) returns the default length at which to
 # try to fold header lines.  The default default is 78.
-# 
+#
 # =cut
 
 sub _default_fold_at { 78 }
 
 # =method default_fold_indent
-# 
+#
 # This method (provided for subclassing) returns the default string used to
 # indent folded headers.  The default default is a single space.
-# 
+#
 # =cut
 
 sub _default_fold_indent { " " }
@@ -399,7 +412,7 @@ Email::Simple::Header - the header of an Email::Simple message
 
 =head1 VERSION
 
-version 2.214
+version 2.216
 
 =head1 SYNOPSIS
 

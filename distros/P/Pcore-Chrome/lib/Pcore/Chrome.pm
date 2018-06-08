@@ -1,4 +1,4 @@
-package Pcore::Chrome v0.3.0;
+package Pcore::Chrome v0.4.0;
 
 use Pcore -dist, -const, -class;
 use Pcore::Chrome::Tab;
@@ -91,7 +91,7 @@ sub run ( $self, @args ) {
         !$MSWIN ? '2>/dev/null' : (),
     ];
 
-    P->pm->run_proc(
+    P->sys->run_proc(
         join( q[ ], $cmd->@* ),
         win32_create_no_window => 1,
         on_ready               => sub ($proc) {

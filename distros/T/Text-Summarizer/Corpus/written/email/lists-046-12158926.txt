@@ -1,0 +1,50 @@
+
+
+docno="lists-046-12158926"
+name="Neil Soiffer"
+email="soiffer@wri.com"
+sent="Wed, 5 Jun 1996 19:06:49 -0700"
+id="199606060206.AA06946@drizzle.wri.com"
+subject="Re: Comments on parsing steps:"
+To: dsr@w3.org
+Cc: w3c-math-erb@w3.org
+
+
+     
+   
+>> Mathematica's parsing, which works in a manner similar to what Bruce
+>> describes, has no problem handling complex embellishments.
+
+>I can see value in allowing prefix and postfix operators to act as
+>operator embellishments, for instance to add accents to operators or
+>to change their relative size, or position.
+
+>If these embellishment prefix and postfix operators have a high
+>precedence and hence bind tightly to the adjacent operator then
+>I don't see any problems. Am I missing something?
+
+I think that there is a problem with prefix embellishments.
+The arguments are technical, so people who don't care can stop reading.
+
+When the parser encounters something like a +_2 b,
+it knows by the time of reading the '+' that it must have a right operand.
+The most reasonable "error correction" would be to have the '_' embellishe '+'.
+However, consider the following:
+    &bold + 2
+with '&bold' being a high-precedence prefix operator.
+When the parser sees the '+', it sees that it must be a prefix operator,
+and so will shift the '2' on.  So, this expression would result in:
+    {&bold {+ 2}}
+To get what you probably wanted, you would need to write
+    {&bold +} 2
+For a large number of cases, such as '&bold x + 2', the right thing would
+happen.  It is just when you try to embellish an operator.
+A high-precedence postfix &bold would not have this problem.
+Since the details of why a prefix embellishing operator sometimes "works"
+right and sometimes doesn't are probably beyond most authors, I think we
+should avoid them.  Or if we must have them, tell people to always uses
+braces to properly group it.
+
+        Neil
+
+

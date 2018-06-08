@@ -6,6 +6,8 @@
 
 =head2 forward remote HTTP ports to the local
 
+    # set GatewayPorts to "yes" or "clientspecified" in /etc/ssh/sshd_config
+
     autossh -M 20000 -f -N -R *:80:127.0.0.1:80 -R *:443:127.0.0.1:443 user@host
 
 =cut

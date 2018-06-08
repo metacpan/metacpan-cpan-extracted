@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html><head><title>What if a user's email address is bouncing?</title></head><body>
+<strong>What if a user&#39;s email address is bouncing?</strong><br />
+<br />
+If our system sends an email to a user and it bounces, the user will receive an alert in their account and they will not be able to continue using ClickMagick until they update their email address in their profile.<br />
+<br />
+A user who&rsquo;s email is bouncing will also NOT be able to request a password reset from the login page.<br />
+<br />
+We use SendGrid to send our emails &ndash;&nbsp;one of the largest and most reliable services of its kind &ndash;&nbsp;so if the system says their email is bouncing it almost certainly was AT THE TIME WE SENT THE EMAIL, but these types of problems are often temporary and it could be working fine now.<br />
+<br />
+Here&rsquo;s how to resolve a bouncing email issue &hellip;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>1.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Confirm that there are no obvious typos in the email address.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>2.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>If the user claims the email is correct and working fine, let them know these types of things are often very temporary, and ask them to &ldquo;reset&rdquo; their email in their profile. To &ldquo;reset&rdquo; their email in their profile they can simply change the email to something else, and then change it right back.<br />
+			<br />
+			If the email address is indeed working again, they shouldn&rsquo;t have any further problems.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>3.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>If after doing #2 above the user receives another alert that their email is still bouncing, there&rsquo;s definitely something wrong with it. Suggest that the user simply use an alternate email address, at least temporarily.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>4.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>If the user insists that the email address is working and they don&rsquo;t have any other emails to use, ask them to simply change the email to something random such as <code>test@test.com</code> while we investigate the issue.</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+Tag Troy on the ticket who will login to SendGrid and check the bounced email logs to see why the email is bouncing. Troy will report the results to the user who will often need to provide the info from the error log to their webmaster or email provider so the issue can be investigated on their end.<br />
+<br />
+<br />
+<strong>Investigating a bounced email in SendGrid</strong>
+
+<p>You can view the emails that had bounced on your account by clicking <em>**Suppression &gt; Bounces</em>*. This will show you the Bounces Suppressions List where you can search for the email and it will provide you the response from the recipient server and when the bounce had occurred.</p>
+
+<p>If a customer is reporting that the email address exists I would take a look at the Bounces Suppressions List to determine when and why the bounce had occurred. It&#39;s possible that this can occur in rare cases due to the email address not being created at the time the message had been attempted for delivery. Or if there was some issue with the recipient server and it had falsely responded with the bounce reason.</p>
+
+<p>If you&#39;d like SendGrid to attempt to deliver to this message again, you&#39;ll have to delete the email from this list by clicking the check box to the left of the email address. Then clicking <em>1 Selected &gt; Remove Selected Bounces</em>.</p>
+</body></html>

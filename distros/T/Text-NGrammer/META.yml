@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Text-NGrammer
-version:            0.01
+version:            0.03
 abstract:           ~
 author:  []
 license:            perl
@@ -11,7 +11,8 @@ configure_requires:
 build_requires:
     ExtUtils::MakeMaker:  0
     Lingua::Sentence:     0
-requires:  {}
+requires:
+    Lingua::Sentence:     0   
 no_index:
     directory:
         - t

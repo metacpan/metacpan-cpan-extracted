@@ -1,7 +1,12 @@
-1.01 - Sat Feb 22 22:28:30 2014
+Revision history for Perl module Task::MasteringPerl
+
+1.005 2018-06-07T15:12:16Z
+	* Fix up Makefile.PL to specify the META_MERGE stuff
+
+1.004 2018-06-07T14:13:22Z
+	* Change to Artistic License 2.0
+
+1.01 - 2014-02-22
 	* First release of a Task for all modules mentioned in
 	Mastering Perl, 2nd Edition
-
-1.02 - Sun Feb 23 15:35:00 2014
-	* Remove non-CPAN modules
 

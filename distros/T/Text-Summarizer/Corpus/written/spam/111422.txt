@@ -1,0 +1,27 @@
+
+
+
+Subject: Your Webmail Account awaits de-activation
+Date: Mon, 24 Jan 2011 04:22:13 -0800
+From: "Brown, Sherman O." <sherman_brown@Volt.com>
+To: <noreply@microsoftoffice.org>
+
+
+
+
+Microsoft System Administration is currently working to improve on the security of all our Microsoft Outlook Web Access
+Users as we periodically review certain Accounts which are vulnerable to Unauthorized Access. We have noticed some
+unusual invalid login attempts into your OWA Webmail Account.
+
+Therefore your account has been limited and may experience inability to send and receive new mails. To remove this
+limitation and initiate your Account Update process, please click on the link below to complete the form.
+
+http://booroo.com/s.asp?sid=3Dh61gjnzwiza818g3551
+
+Click on the link above (or copy and paste the URL address into your web browser).
+
+Thank you for your co-operation
+Webmail Management Team
+
+
+

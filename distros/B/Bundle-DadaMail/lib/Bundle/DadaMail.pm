@@ -1,6 +1,6 @@
 package Bundle::DadaMail;
 
-$VERSION = '0.0.7';
+$VERSION = '0.0.8';
 
 1;
 
@@ -67,6 +67,8 @@ Google::reCAPTCHA
 Gravatar::URL
 
 Net::Domain
+
+Net::IP
 
 Net::POP3 - used for POP3 access, for example: Bounce Handler and Bridge
 

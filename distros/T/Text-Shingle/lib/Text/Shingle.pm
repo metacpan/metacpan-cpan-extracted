@@ -11,7 +11,7 @@ use Unicode::Normalize;
 use Text::NGrammer;
 
 use vars qw($VERSION);
-$VERSION = '0.01';
+$VERSION = '0.03';
 
 sub new {
   my $class = shift;
@@ -135,6 +135,14 @@ Extracts all the shingles of width C<w>, from the constructor, from the C<@array
 =item 0.01
 
 Initial version of the module
+
+=item 0.02
+
+Fixed dependencies
+
+=item 0.03
+
+Fixed dependencies in Makefile.PL
 
 =back
 

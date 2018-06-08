@@ -98,7 +98,7 @@ sub _deps ($self) {
 
         say join q[ ], @args;
 
-        P->pm->run_proc( \@args ) or return;
+        P->sys->run_proc( \@args ) or return;
     }
 
     return 1;
@@ -112,7 +112,7 @@ sub _build ($self) {
             dir => 0,
             sub ($file) {
                 if ( $file->suffix eq 'PL' ) {
-                    my $res = P->pm->run_proc( [ $^X, $file, $file->dirname . $file->filename_base ] );
+                    my $res = P->sys->run_proc( [ $^X, $file, $file->dirname . $file->filename_base ] );
 
                     if ( !$res ) {
                         say qq["$file" return ] . $res;
@@ -128,7 +128,7 @@ sub _build ($self) {
 }
 
 sub _install ($self) {
-    if ( !P->pm->is_superuser ) {
+    if ( !P->sys->is_superuser ) {
         say qq[Root privileges required to deploy pcore at system level.];
 
         return;
@@ -144,12 +144,12 @@ sub _install ($self) {
         if ( $self->dist->is_pcore ) {
 
             # set $ENV{PERL5LIB}
-            P->pm->run_proc(qq[setx.exe /M PERL5LIB "$canon_dist_root/lib;"]) or return;
+            P->sys->run_proc(qq[setx.exe /M PERL5LIB "$canon_dist_root/lib;"]) or return;
 
             say qq[%PERL5LIB% updated];
 
             # set $ENV{PCORE_LIB}
-            P->pm->run_proc(qq[setx.exe /M PCORE_LIB "$pcore_lib_dir_canon"]) or return;
+            P->sys->run_proc(qq[setx.exe /M PCORE_LIB "$pcore_lib_dir_canon"]) or return;
 
             say qq[%PCORE_LIB% updated];
         }
@@ -170,7 +170,7 @@ sub _install ($self) {
 
             $ENV{PATH} = join $Config{path_sep}, @system_path;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
 
-            P->pm->run_proc(qq[setx.exe /M PATH "$ENV{PATH};"]) or return;
+            P->sys->run_proc(qq[setx.exe /M PATH "$ENV{PATH};"]) or return;
 
             say qq[%PATH% updated];
         }

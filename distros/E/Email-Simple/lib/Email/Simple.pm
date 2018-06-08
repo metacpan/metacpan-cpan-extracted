@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package Email::Simple;
 # ABSTRACT: simple parsing of RFC2822 message format and headers
-$Email::Simple::VERSION = '2.214';
+$Email::Simple::VERSION = '2.216';
 use Carp ();
 
 use Email::Simple::Creator;
@@ -39,9 +39,9 @@ sub __crlf_re { qr/\x0a\x0d|\x0d\x0a|\x0a|\x0d/; }
 #pod       ],
 #pod       body => '...',
 #pod   );
-#pod   
+#pod
 #pod   $email->header_set( 'X-Content-Container' => 'bottle/glass' );
-#pod   
+#pod
 #pod   print $email->as_string;
 #pod
 #pod =head1 DESCRIPTION
@@ -348,7 +348,7 @@ Email::Simple - simple parsing of RFC2822 message format and headers
 
 =head1 VERSION
 
-version 2.214
+version 2.216
 
 =head1 SYNOPSIS
 
@@ -375,9 +375,9 @@ version 2.214
       ],
       body => '...',
   );
-  
+
   $email->header_set( 'X-Content-Container' => 'bottle/glass' );
-  
+
   print $email->as_string;
 
 =head1 DESCRIPTION
@@ -541,7 +541,7 @@ Ricardo SIGNES
 
 =head1 CONTRIBUTORS
 
-=for stopwords Brian Cassidy Christian Walde Michael Stevens Pali Ricardo SIGNES Ronald F. Guilmette William Yardley
+=for stopwords Brian Cassidy Christian Walde Marc Bradshaw Michael Stevens Pali Ricardo SIGNES Ronald F. Guilmette William Yardley
 
 =over 4
 
@@ -552,6 +552,10 @@ Brian Cassidy <bricas@cpan.org>
 =item *
 
 Christian Walde <walde.christian@googlemail.com>
+
+=item *
+
+Marc Bradshaw <marc@marcbradshaw.net>
 
 =item *
 

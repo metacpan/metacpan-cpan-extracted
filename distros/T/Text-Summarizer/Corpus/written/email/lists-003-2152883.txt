@@ -1,0 +1,35 @@
+
+
+
+docno="lists-003-2152883"
+received="Wed May 19 07:16:36 1993 EST" 
+sent="Wed, 19 May 1993 10:11:53 -0400 (EDT)" 
+name="Dan Schlitt" 
+email="dan@ees1a0.engr.ccny.cuny.edu" 
+subject="Re: CHARSET considerations" 
+id="Pine.3.05.9305191050.G5139-a100000@ees1a0.engr.ccny.cuny.edu" 
+inreplyto="CHARSET considerations" 
+
+To: Harald Tveit Alvestrand <harald.t.alvestrand@delab.sintef.no>
+Cc: scs <scs@adam.mit.edu>, pine-info <pine-info@cac.washington.edu>,
+
+
+
+
+Thank you Harald.  MIME is MIME is MIME.  And if it violates the RFC it
+isn't MIME and shouldn't pretend to be.
+
+That was the point of my original cryptic comment.  Now PLEASE edit my
+address out of the headers of this.  And probably all of those other
+mailinglists and limit to pine-info.  PLEASE.
+
+Thankyou.
+
+Dan Schlitt                           School of Engineering Computer Systems
+dan@ee-mail.engr.ccny.cuny.edu        City College of New York
+(212)650-6760                         New York, NY 10031
+
+
+
+
+

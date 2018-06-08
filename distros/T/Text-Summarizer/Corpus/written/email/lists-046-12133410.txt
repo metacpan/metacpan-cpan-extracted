@@ -1,0 +1,70 @@
+
+
+docno="lists-046-12133410"
+name="T. V. Raman"
+email="raman@adobe.com"
+sent="Tue, 4 Jun 1996 10:00:57 -0700"
+inreplyto="199606041558.AA160953903@w3.org"
+id="199606041700.KAA16946@labrador.mv.us.adobe.com"
+* X-Fax: 1(415) 962-6063
+* X-Phone: 1 (415) 962-3945
+subject="Minutes June 3rd"
+To: "Dave Raggett" <dsr@w3.org>
+Cc: w3c-math-erb@w3.org
+
+
+     
+   
+Regarding the naming of subexpressions I'd like to point out two slightly
+differing kinds of subexpression/expression naming relevant to producing
+speech.
+
+In AsTeR, you could name a cross-referencable object such as an equation with
+meaningful names e.g. Fibonacci's  formula instead of equation 1.13
+--this made listening to cross-referenced material easier.
+See http://www.cs.cornell.edu/Info/People/raman/current/phd-thesis/html/node11.
+html#SECTION00162000000000000000
+
+AsTeR also performed the other kind of sub-expression naming which I think got
+discussed yesterday during the meeting.
+I refered to this in AsTeR as "variable substitution".
+--"folding" to use Dave's terminology--
+AsTeR also implemented a fairly straight-forward naming algorithm for giving
+meaningful names to sub-expressions e.g. "lower constraint 1" and denominator
+3" etc.
+
+The problem of recognizing that two subexpressions are identical is actually
+very hard if you're working with a written/typeset document --AsTeR did not
+attempt to do this. However, even without the intelligence to recognize two
+semantically equivalent instances of a  subexpression, "variable substitution"
+or "folding" as Dave refers to it in his minutes is *really* useful for speech
+and I suspect it would be very useful for small visual displays.
+
+In fact after I implemented the variable substitution  in AsTeR Rich Zippel at
+Cornell pointed out that symbolic math systems in the early 70's had to
+implement something analogous to display complex expressions since the
+displays available at the time were not as graphically rich as what we have
+today.
+
+Here are the relevant sections from the thesis:
+
+http://www.cs.cornell.edu/Info/People/raman/current/phd-thesis/html/node90.html
+#SECTION00467000000000000000
+and
+http://www.cs.cornell.edu/Info/People/raman/current/phd-thesis/html/node83.html
+#SECTION00460000000000000000
+
+--
+Best Regards,
+--raman
+
+      Adobe Systems                 Tel: 1 (415) 962 3945   (B-1 115)
+      Advanced Technology Group     Fax: 1 (415) 962 6063
+      (E 1-160) 1585 Charleston Road       Email: raman@adobe.com
+      Mountain View, CA 94039 -7900  raman@cs.cornell.edu
+      http://www-atg/People/Raman.html (Internal To Adobe)
+      http://www.cs.cornell.edu/Info/People/raman/raman.html  (Cornell)
+Disclaimer: The opinions expressed are my own and in no way should be taken
+            as representative of my employer, Adobe Systems Inc.
+
+

@@ -2,6 +2,16 @@
 
 =encoding utf8
 
+=for HTML <a href="https://travis-ci.org/briandfoy/mac-osversion"><img src="https://travis-ci.org/briandfoy/mac-osversion.svg?branch=master" /></a>
+
+=for HTML <a href='https://ci.appveyor.com/project/briandfoy/mac-osversion'><img src='https://ci.appveyor.com/api/projects/status/9aj2bkj39xpsm6rf' /></a>
+
+=for HTML <a href='https://coveralls.io/github/briandfoy/mac-osversion?branch=master'><img src='https://coveralls.io/repos/github/briandfoy/mac-osversion/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=for HTML <a href="https://github.com/briandfoy/mac-osversion/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/Mac-OSVersion.svg" /></a>
+
+=for HTML <a href="http://www.metacpan.org/module/Mac::OSVersion"><img src="https://img.shields.io/cpan/v/Mac-OSVersion.svg" /></A>
+
 =head1 The Mac::OSVersion module
 
 This is the I<README> for the L<Mac::OSVersion> Perl module. You're probably
@@ -22,17 +32,8 @@ name instead of the file location:
 
 	% perldoc Mac::OSVersion
 
-You can read the documentation and inspect the meta data on one of the
-CPAN web interfaces, such as L<CPAN Search|http://search.cpan.org/dist/Mac-OSVersion> or
-L<MetaCPAN|http://www.metacpan.org/module/Mac::OSVersion>:
-
-=over 4
-
-=item *	L<http://search.cpan.org/dist/Mac-OSVersion>
-
-=item *	L<http://www.metacpan.org/module/Mac::OSVersion>
-
-=back
+You can read the documentation and inspect the meta data on
+L<MetaCPAN|http://www.metacpan.org/module/Mac::OSVersion>.
 
 The standard module documentation has example uses in the SYNOPSIS
 section, but you can also look in the I<examples/> directory (if it's

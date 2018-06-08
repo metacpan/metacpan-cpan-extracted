@@ -3,20 +3,20 @@ package Pcore::Ext::Base;
 use Pcore -const;
 
 sub MODIFY_CODE_ATTRIBUTES ( $pkg, $ref, @attrs ) {
-    my ( $sub, $extend, @bad );
+    my @bad;
 
     for my $attr (@attrs) {
-        if ( $attr =~ /Extend [(] (?:'(.+?)')? [)]/smxx ) {
-            $extend = $1;
+        if ( $attr =~ /(Extend|Type) [(] (?:'(.+?)')? [)]/smxx ) {
+            my ( $attr, $val ) = ( $1, $2 );
 
             no strict qw[refs];
 
             for my $sym ( values %{"$pkg\::"} ) {
                 if ( *{$sym}{CODE} && *{$sym}{CODE} == $ref ) {
-                    $sub = *{$sym}{NAME};
+                    my $sub = *{$sym}{NAME};
 
                     if ( $sub =~ s/\AEXT_//sm ) {
-                        ${"$pkg\::_EXT_MAP"}->{$sub} = $extend;
+                        ${"$pkg\::_EXT_MAP"}->{$sub}->{ lc $attr } = $val;
                     }
                     else {
                         push @bad, $attr;

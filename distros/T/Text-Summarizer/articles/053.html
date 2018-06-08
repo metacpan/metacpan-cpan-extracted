@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html><head><title>Can I use Facebook's URL Parameters as Sub-IDs?</title></head><body>
+<b>Can I use Facebook&rsquo;s URL Parameters as Sub-IDs?</b><br />
+<br />
+Absolutely!<br />
+<br />
+If you have lots of Facebook ads and don&rsquo;t want to have to append Sub-IDs to the URL for each ad individually, you can use Facebook&rsquo;s Optional URL Parameters.<br />
+<br />
+&nbsp;
+<div class="faq-caution"><b>Caution:&nbsp;</b>To use this feature, make sure that the tracking links you use in your Facebook ads <em>always</em>&nbsp;end with a forward slash <code>/</code>. For example:<br />
+<br />
+<code>http://$linkdomain/myfacebookad/</code><br />
+<br />
+If you forget the final&nbsp;<code>/</code>, <em><strong>your link will not work!</strong></em></div>
+<br />
+<br />
+To pass a Sub-ID, enter the following in the <strong>Optional URL Parameters</strong> field:<br />
+<br />
+<code>fbtag1=<em>subid</em></code><br />
+<br />
+Whatever you include where it says <code>subid</code>&nbsp;will be converted to a ClickMagick Sub-ID when someone clicks your link on Facebook, and you&rsquo;ll be able to view detailed stats broken down by Sub-ID just as if you had set up all your Sub-IDs manually the traditional way.<br />
+<br />
+Just make sure to enter the following tokens to the end of your primary URL under the tracking link which you want to promote on Facebook:<br />
+<br />
+<code>/[s1]</code><br />
+<br />
+Depending on how many Facebook <strong>Optional URL Parameters</strong> you are using, you can add more of these tokens simply by separating them with a &lsquo;<code>/</code>&rsquo;.<br />
+<br />
+So if you have five URL Parameters and want to use all five Sub-IDs, you would add the following to your primary URL of the Facebook tracking link:<br />
+<br />
+<code>/[s1]/[s2]/[s3]/[s4]/[s5]</code><br />
+<br />
+If you want to see all the data in one Sub-ID, you can simply separate the tokens with a dash instead, like so:<br />
+<br />
+<code>/[s1]-[s2]-[s3]-[s4]-[s5]</code><br />
+<br />
+So if your primary URL for the Facebook tracking link which you are trying to promote looks like this:&nbsp;<br />
+<br />
+<code>http://$linkdomain/myfacebookad/</code><br />
+<br />
+then it would look like this with the Sub-ID tokens added:<br />
+<br />
+<code>http://$linkdomain/myfacebookad/[s1]-[s2]-[s3]-[s4]-[s5]</code>&nbsp;<br />
+<br />
+Or, if you prefer to separate out each Sub-ID individually it would look like this:<br />
+<br />
+<code>http://$linkdomain/myfacebookad/[s1]/[s2]/[s3]/[s4]/[s5]</code><br />
+<br />
+You can add up to a total of five Optional URL Parameters &hellip;<br />
+<br />
+Just add as many <code>name=value</code> pairs as you need, separated by an ampersand (<code>&amp;</code>) like this:<br />
+<br />
+<code>fbtag1=<strong><em>subid1</em></strong>&amp;fbtag2=<strong><em>subid2</em></strong>&amp;fbtag3=<strong><em>subid3</em></strong>&amp;fbtag4=<strong><em>subid4</em></strong>&amp;fbtag5=<strong><em>subid5</em></strong></code><br />
+<br />
+&nbsp;
+<div class="faq-note"><b>Note:</b> To learn more about URL parameters, in general, you might want to read our FAQ on the topic:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=177"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=177">What is a &ldquo;query string&rdquo;?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+</body></html>

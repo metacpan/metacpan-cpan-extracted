@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html><head><title>How do I set up Taboola with ClickMagick?</title></head><body>
+<strong>How do I set up Taboola with ClickMagick?</strong><br />
+<br />
+Taboola supports Postback URL tracking, so you can send back conversion data to Taboola.<br />
+<br />
+Here&rsquo;s how to set it up:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>1.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Set up our ClickMagick tracking link that you&rsquo;ll use with Taboola.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>2.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Set up your campaign and ad in Taboola, and then send traffic to this URL:<br />
+			<br />
+			<code>http://www.clkmg.com/$username/yourlinkid/{click_id}</code><br />
+			<br />
+			<code>{click_id}</code> is the unique Taboola token that ClickMagick will send back to them in the Postback.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>3.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Open the <a href="/user/action/tools/customposts.cgi" target="_blank"><strong>Custom Postbacks</strong></a> tool by clicking on &ldquo;Custom Postbacks&rdquo; in the <strong>Tools</strong> menu and choose the tracking link that you created from the &ldquo;Which Link?&rdquo; drop-down. Next, choose the &ldquo;Conversion Type.&rdquo;<br />
+			<br />
+			Set the Postback URL to:<br />
+			<code>https://trc.taboola.com/actions-handler/log/3/s2s-action?click-id=[s1]&amp;partner-name=<em>taboola-account-id</em></code><br />
+			&nbsp;
+			<div class="faq-caution"><b>Caution:</b> Be sure to replace <code>taboola-account-id</code>&nbsp;with your Taboola account ID. Your account ID is a 7-digit number that can be found in the URL when you log in to your Backstage account. For example, if you login and see <code>https://backstage.taboola.com/backstage/1234567/</code>, 1234567 is your account ID.</div>
+			</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>4.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Click on <strong>Add Custom Postback</strong>.</td>
+		</tr>
+	</tbody>
+</table>
+</body></html>

@@ -1,3 +1,11 @@
+v0.19.1 2018-06-07T07:37:12Z
+ - postgresql-contrib added
+
+v0.19.0 2018-06-06T18:23:03Z
+ - PM util merged with Sys
+ - Docker base image changed from "softvisio/pcore:v0.66.0" to
+   "softvisio/pcore:v0.67.0"
+
 v0.18.2 2018-05-30T08:42:20Z
  - invalid attr access fixed
 

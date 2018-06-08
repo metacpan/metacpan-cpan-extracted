@@ -1,6 +1,6 @@
 package Bundle::DadaMailXXL;
 
-$VERSION = '0.0.3';
+$VERSION = '0.0.4';
 
 1;
 
@@ -168,9 +168,13 @@ Time::Local
 
 Time::Piece
 
+Time::Piece::MySQL
+
 Try::Tiny
 
 URI
+
+URI::Escape
 
 Crypt::CipherSaber
 

@@ -694,6 +694,48 @@ usage instructions.
 
     my $meridien = $rtc->am_pm;
 
+=head1 GPIO EXPANDERS
+
+We provide access to the C<MCP23017> GPIO expander chip via the
+L<RPi::GPIOExpander::MCP23017> distribution. See that documentation for full
+usage information.
+
+=head2 Usage
+
+my $i2c_addr = 0x20;            # default
+
+my $exp = $pi->expander($addr); # param not required if using the default
+
+# pins are INPUT by default. Turn the first pin to OUTPUT
+
+$exp->mode(0, 0); # or MCP23017_OUTPUT if using RPi::Const
+
+# turn the pin on (HIGH)
+
+$exp->write(0, 1); # or HIGH
+
+# read the pin's status (HIGH or LOW)
+
+$exp->read(6);
+
+# turn the first bank (0) of pins (0-7) to OUTPUT, and make them live (HIGH)
+
+$exp->mode_bank(0, 0);  # bank A, OUTPUT
+$exp->write_bank(0, 1); # bank A, HIGH
+
+# enable internal pullup resistors on the entire bank A (0)
+
+$exp->pullup_bank(0, 1); # bank A, pullup enabled
+
+# put all 16 pins as OUTPUT, and put them on (HIGH)
+
+$exp->mode_all(0);  # or OUTPUT
+$exp->write_all(1); # or HIGH
+
+# cleanup all pins and reset them to default before exiting your program
+
+$exp->cleanup;
+
 =head1 SERVO
 
 =head2 Description
@@ -819,6 +861,13 @@ environment variable:
 
     export RPI_RTC=1
 
+=head2 MCP23017 GPIO Expander Testing
+
+To test the L<RPi::GPIOExpander::MCP23017> distribution, set the following
+environment variable:
+
+    export RPI_MCP23017=1
+
 =head2 Automated with L<Test::BrewBuild>
 
 L<Test::BrewBuild> has some special features specifically to facilitate the
@@ -881,6 +930,7 @@ column unit, leave those last two digits off.
     RPI_HCSR04=1
     BB_RPI_LCD=5,6,4,17,27,22,4,20
     RPI_RTC=1
+    RPI_MCP23017=1
     RELEASE_TESTING=1
 
 =head1 DEVELOPMENT

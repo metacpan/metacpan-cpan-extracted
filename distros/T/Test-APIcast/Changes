@@ -1,5 +1,8 @@
 Revision history for Perl extension Test-APIcast
 
+0.14 2018-06-06T13:02:23Z
+   - Fix passing ENV to apicast executable
+
 0.13 2018-06-05T13:32:34Z
     - Pass ENV from env block to apicast config generator
     - test block to make test request from nginx/lua

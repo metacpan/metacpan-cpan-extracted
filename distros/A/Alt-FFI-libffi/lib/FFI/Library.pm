@@ -7,7 +7,7 @@ use FFI;
 use constant _is_win => $^O =~ /^(MSWin32|cygwin|msys2?)$/;
 
 # ABSTRACT: Perl Access to Dynamically Loaded Libraries
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 sub new
 {
@@ -63,7 +63,7 @@ FFI::Library - Perl Access to Dynamically Loaded Libraries
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -128,10 +128,6 @@ Portable functions for finding libraries.
 Platypus is another FFI interface based on libffi.  It has a more
 extensive feature set, and libffi has a less restrictive license.
 
-=item L<FFI::Raw>
-
-Another FFI interface based on libffi.
-
 =item L<Win32::API>
 
 An FFI interface for Perl on Microsoft Windows.
@@ -163,7 +159,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Graham Ollis.
+This software is copyright (c) 2016-2018 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

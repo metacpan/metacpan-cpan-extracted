@@ -31,6 +31,7 @@ Mojo::IOLoop->server(
 $apns = Mojo::APNS->new(
   key              => "$dir/server.key",
   cert             => "$dir/server.crt",
+  insecure         => 1,
   sandbox          => 1,
   _gateway_address => '127.0.0.1',
   _feedback_port   => $port,

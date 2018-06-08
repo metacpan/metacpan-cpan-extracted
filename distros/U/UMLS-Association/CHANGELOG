@@ -52,3 +52,17 @@ NAME
 
     Added a frequency association option
 
+  Changes from version 0.15 to 0.17
+    Added indirect association measures: LTA, MWA, LSA, SBC, and beta WSA
+
+    Major re-organization of code and how association measures are
+    calculted. This is for efficiency and simplicity with the indirect
+    measures
+
+    Removed requirements for UMLS::Interface and removed concept expansion.
+
+    Removed support for databases, and streamlined code for co-occurrence
+    matrices only
+
+    Added support for set associations at the command line
+

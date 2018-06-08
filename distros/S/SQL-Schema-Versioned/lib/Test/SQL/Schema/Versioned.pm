@@ -2,8 +2,8 @@ package Test::SQL::Schema::Versioned;
 
 ## no critic (Modules::ProhibitAutomaticExportation)
 
-our $DATE = '2018-05-10'; # DATE
-our $VERSION = '0.235'; # VERSION
+our $DATE = '2018-06-06'; # DATE
+our $VERSION = '0.236'; # VERSION
 
 use 5.010001;
 use strict;
@@ -77,7 +77,7 @@ Test::SQL::Schema::Versioned - Test SQL::Schema::Versioned spec
 
 =head1 VERSION
 
-This document describes version 0.235 of Test::SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2018-05-10.
+This document describes version 0.236 of Test::SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2018-06-06.
 
 =head1 FUNCTIONS
 

@@ -118,11 +118,6 @@ requires 'File::Copy::Recursive';
 requires 'List::Util::XS';
 requires 'List::AllUtils';
 
-# Pcore::Util::PM
-feature windows => sub {
-    requires 'Win32::Process';
-};
-
 # Pcore::Util::Random
 requires 'Net::SSLeay';
 
@@ -138,6 +133,7 @@ requires 'Ref::Util::XS';
 requires 'Sys::CpuAffinity';
 feature windows => sub {
     requires 'Win32::RunAsAdmin';
+    requires 'Win32::Process';
 };
 
 # Pcore::Util::Term

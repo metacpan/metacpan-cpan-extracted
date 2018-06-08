@@ -1,0 +1,63 @@
+
+
+docno="lists-046-12146425"
+name="Ron Whitney"
+email="RFW@math.ams.org"
+sent="Wed, 05 Jun 1996 10:05:48 -0400 (EDT)"
+inreplyto="199606050741.JAA03224@thorin.elsevier.nl"
+* Mail-System-Version:
+id="833983548.437563.RFW@MATH.AMS.ORG"
+subject="Re: more comments on HTML-Math proposal"
+To: w3c-math-erb@w3.org
+
+
+
+     
+   
+Nico commented recently:
+
+> I also had the feeling for some time, and the same feeling exists in
+> the SGML community, that the developments of HTML-Math and of HTML
+> in general were suffering from a NIH syndrome.
+
+I understand such perceptions, think it's wise for this committee to
+keep good citizenship in mind, and agree that we should be receptive
+to reaction and criticism from elsewhere.  My own perceptions of this
+committee's work to date follow.
+
+While the immediate goal of an HTML-Math capability might have been to
+simply render math visually (and perhaps this was the goal of
+HTML-Math 3), that goal has been considerably expanded as we look at
+issues now.  Insofar as the work of the ISO 12083 Math Committee
+stopped short of recommending ways to handle "semantic" aspects of
+math markup, recognizing that the issues were many and difficult, the
+work of this committee in that regard feels to me a welcome addition
+to the overall discussion of those sorts of problems.  And as the
+semantics of any formal discipline lies rather closer to form than
+I've heard many SGML diehards acknowledge, I also welcome this
+committee's efforts to examine a more primitive notational base for
+the standard.  This effort, in some sense competing with Roy Pike's,
+seems very healthy to me.  Pike appears undissuadable in my view.
+
+The Wolfram proposal certainly acknowledges the need to accommodate
+SGML entities and supports and SGML style of markup.  In my recent
+list of questions and comments to Bruce, I made reference to the fact
+that I felt ISO 12083 Math gave a good basis for the fundamental
+layout schemata and might better be used than TeX for HTML-math.
+I was hoping, and still do, that formal support such as this would
+give a direct means of filtering ISO 12083 math into HTML-math.  Support
+in this way gives strong acknowledgement to prior SGML work.
+
+And then there may be the feeling that WRI is pushing a standard of
+its own.  While Stephen himself broadcasts at a very powerful wattage,
+I've found the committee members from WRI quite accommodating and
+undogmatic.  I view their contributions as wholly positive.  I'm
+certain that Nico was *not* asserting otherwise, but I would
+communicate this to others from outside the committee if a perception
+of a WRI-centric "standard" is misapprehended.  This is a quiet
+statement, not a defensive one.
+
+
+-Ron
+
+

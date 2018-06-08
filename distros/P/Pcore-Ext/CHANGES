@@ -1,3 +1,6 @@
+v0.16.1 2018-06-06T18:30:03Z
+ - lib classes
+
 v0.16.0 2018-05-30T06:43:55Z
  - Pcore::Share::WWW -> Pcore::Resources
  - www static removed

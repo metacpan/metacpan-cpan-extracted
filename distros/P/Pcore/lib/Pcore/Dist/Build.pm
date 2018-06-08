@@ -91,11 +91,11 @@ sub test ( $self, @ ) {
 
         my $psplit = $MSWIN ? q[\\] : q[/];
 
-        return if !P->pm->run_proc( [qw[perl Build.PL]] );
+        return if !P->sys->run_proc( [qw[perl Build.PL]] );
 
-        return if !P->pm->run_proc(".${psplit}Build");
+        return if !P->sys->run_proc(".${psplit}Build");
 
-        return if !P->pm->run_proc( [ ".${psplit}Build", 'test', $args{verbose} ? '--verbose' : q[] ] );
+        return if !P->sys->run_proc( [ ".${psplit}Build", 'test', $args{verbose} ? '--verbose' : q[] ] );
     }
 
     return 1;

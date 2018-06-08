@@ -28,6 +28,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Role::FileMunger" => 0,
     "Dist::Zilla::Role::PrereqSource" => 0,
     "Moose" => 0,
+    "PMVersions::Util" => 0,
     "Require::Hook::DzilBuild" => 0,
     "Text::Diff" => 0,
     "namespace::autoclean" => 0,
@@ -40,7 +41,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.012",
+  "VERSION" => "0.013",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,6 +63,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Moose" => 0,
+  "PMVersions::Util" => 0,
   "Require::Hook::DzilBuild" => 0,
   "Test::More" => 0,
   "Text::Diff" => 0,

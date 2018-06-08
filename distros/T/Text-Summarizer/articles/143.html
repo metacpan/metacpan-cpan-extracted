@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html><head><title>What are the optional funnel URL parameters I can use?</title></head><body>
+<strong>What are the optional funnel URL parameters I can use?</strong><br />
+<br />
+There are a handful of optional &ldquo;query string&rdquo; URL parameters you can append to the end of your funnel page URLs in order to override default behavior, or to pass various types of click data into ClickMagick. Here&rsquo;s a quick overview:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><strong>cmfcost</strong></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>- Override the default cost value set for the page</td>
+		</tr>
+		<tr>
+			<td valign="top"><strong>cmfgoal</strong></td>
+			<td>&nbsp;</td>
+			<td>- Override the default goal setting for a page (set to 0 or N to NOT record a goal)</td>
+		</tr>
+		<tr>
+			<td valign="top"><strong>cmfamt</strong></td>
+			<td>&nbsp;</td>
+			<td>- Override the default sales amount for a &ldquo;Sales&rdquo; goal page</td>
+		</tr>
+		<tr>
+			<td valign="top">&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td valign="top"><strong>cmfs1</strong></td>
+			<td>&nbsp;</td>
+			<td>- Pass Sub-ID 1 into ClickMagick</td>
+		</tr>
+		<tr>
+			<td valign="top"><strong>cmfs2</strong></td>
+			<td>&nbsp;</td>
+			<td>- Pass Sub-ID 2 into ClickMagick</td>
+		</tr>
+		<tr>
+			<td valign="top"><strong>cmfs3</strong></td>
+			<td>&nbsp;</td>
+			<td>- Pass Sub-ID 3 into ClickMagick</td>
+		</tr>
+		<tr>
+			<td valign="top"><strong>cmfs4</strong></td>
+			<td>&nbsp;</td>
+			<td>- Pass Sub-ID 4 into ClickMagick</td>
+		</tr>
+		<tr>
+			<td valign="top"><strong>cmfs5</strong></td>
+			<td>&nbsp;</td>
+			<td>- Pass Sub-ID 5 into ClickMagick</td>
+		</tr>
+		<tr>
+			<td valign="top">&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td valign="top"><strong>utm_source</strong></td>
+			<td>&nbsp;</td>
+			<td>- Pass <code>utm_source</code> into ClickMagick</td>
+		</tr>
+		<tr>
+			<td valign="top"><strong>utm_medium</strong></td>
+			<td>&nbsp;</td>
+			<td>- Pass <code>utm_medium</code> into ClickMagick</td>
+		</tr>
+		<tr>
+			<td valign="top"><strong>utm_term</strong></td>
+			<td>&nbsp;</td>
+			<td>- Pass <code>utm_term</code> into ClickMagick</td>
+		</tr>
+		<tr>
+			<td valign="top"><strong>utm_content</strong></td>
+			<td>&nbsp;</td>
+			<td>- Pass <code>utm_content</code> into ClickMagick</td>
+		</tr>
+		<tr>
+			<td valign="top"><strong>utm_campaign</strong></td>
+			<td>&nbsp;</td>
+			<td>- Pass <code>utm_campaign</code> into ClickMagick</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+For example, imagine you&rsquo;ve set up the URL below as a goal page on the funnel canvas, but users end up on this page whether they say &ldquo;yes&rdquo; or &ldquo;no&rdquo; to an upsell offer:<br />
+<br />
+<code>http://www.yoursite.com/thanks.html</code><br />
+<br />
+When users say &ldquo;no&rdquo; to your upsell offer you would simply direct them to the URL below, which tells the ClickMagick system NOT to attribute a conversion even though this is set up as a goal page:<br />
+<br />
+<code>http://www.yoursite.com/thanks.html<strong><span style="color:#008000;">?cmfgoal=N</span></strong></code><br />
+<br />
+&nbsp;
+<div class="faq-tip"><b>Tip:&nbsp;</b>The &ldquo;query string&rdquo; is the part of the URL that starts with the question mark and is followed by one or more&nbsp;<code>name=value</code>&nbsp;pairs separated by ampersands.&nbsp;You can learn all about query strings and how to modify them in this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><img height="20" src="https://cdn.clickmagick.com/images/user/faqpage.gif" width="17" /></td>
+			<td>&nbsp;</td>
+			<td><b><a href="https://www.clickmagick.com/user/faqs.cgi?answer=177">How to work with query strings</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		</tr>
+	</tbody>
+</table>
+</body></html>

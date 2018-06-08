@@ -3,7 +3,7 @@ package Alien::Base::ModuleBuild;
 use strict;
 use warnings;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use parent 'Module::Build';
 
@@ -48,11 +48,37 @@ our $Verbose;
 $Verbose = $ENV{ALIEN_VERBOSE} if defined $ENV{ALIEN_VERBOSE};
 
 our $Force;
-$Force = $ENV{ALIEN_FORCE} if defined $ENV{ALIEN_FORCE};
-$Force = 1 if defined $ENV{ALIEN_INSTALL_TYPE} && $ENV{ALIEN_INSTALL_TYPE} eq 'share';
-
 our $ForceSystem;
-$ForceSystem = 1 if defined $ENV{ALIEN_INSTALL_TYPE} && $ENV{ALIEN_INSTALL_TYPE} eq 'system';
+_compute_force();
+
+sub _compute_force
+{
+  undef $Force;
+  undef $ForceSystem;
+
+  if(defined $ENV{ALIEN_INSTALL_TYPE})
+  {
+    if($ENV{ALIEN_INSTALL_TYPE} eq 'share')
+    {
+      $Force       = 1;
+      $ForceSystem = 0;
+    }
+    elsif($ENV{ALIEN_INSTALL_TYPE} eq 'system')
+    {
+      $Force       = 0;
+      $ForceSystem = 1;
+    }
+    else  # anything else, including 'default'
+    {
+      $Force       = 0;
+      $ForceSystem = 0;
+    }
+  }
+  elsif(defined $ENV{ALIEN_FORCE})
+  {
+    $Force = $ENV{ALIEN_FORCE};
+  }
+}
 
 ################
 #  Parameters  #
@@ -1442,7 +1468,8 @@ Skips checking for an installed version and forces reinstalling the Alien target
 
 =item B<ALIEN_INSTALL_TYPE>
 
-Set to 'share' or 'system' to override the install type.
+Set to 'share' or 'system' to override the install type.  Set to 'default' or unset
+to restore the default.
 
 =item B<ALIEN_ARCH>
 

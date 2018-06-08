@@ -36,14 +36,13 @@ my %module_build_args = (
     "Graham Ollis <plicease\@cpan.org>"
   ],
   "dist_name" => "FFI-TinyCC",
-  "dist_version" => "0.26",
+  "dist_version" => "0.28",
   "license" => "perl",
   "module_name" => "FFI::TinyCC",
   "recursive_test_files" => 1,
   "requires" => {
     "Alien::TinyCC" => 0,
     "FFI::Platypus" => "0.15",
-    "FFI::Platypus::Type::StringArray" => "0.01",
     "File::ShareDir::Dist" => 0,
     "perl" => "5.008001"
   },

@@ -7,27 +7,25 @@ my $builder = Module::Build->new(
     license             => 'perl',
     dist_author         => 'Faelin Landy <faelin.landy@gmail.com>',
     dist_version_from   => 'lib/Text/Summarizer.pm',
-    dist_abstract	    => 'Extract Repeated Phrases from Text',
+    dist_abstract	    => 'Extract repeated phrases from text',
     build_requires => {
-        'Test::More'   => 0,
-        'Data::Dumper' => 0,
-        'Carp'         => 0,
     },
     requires => {
-        'Lingua::Sentence'  => '1.100',
-        'Moo'               => '2.003002',
-        'Types::Standard'   => 0,
-        'List::AllUtils'    => 0,
-        'Data::Dumper'      => 0,
+        'Moo'                 => 0,
+        'Types::Standard'     => 0,
+        'List::AllUtils'      => 0,
+        'Algorithm::CurveFit' => 0,
+        'Lingua::Stem'        => 0,
+
     },
     add_to_cleanup      => [ 'Text::Summarizer-*' ],
     create_makefile_pl => 'traditional',
     meta_merge     => {
         resources => {
-            repository  => 'https://github.com/faelin/text-summarizer/tree/master'
+            repository  => 'https://github.com/faelin/text-summarizer/'
         },
     },
-    configure_requires => { 'Module::Build' => 0.42 }
+    configure_requires => { 'Module::Build' => 2.01 }
 );
 
 $builder->create_build_script();

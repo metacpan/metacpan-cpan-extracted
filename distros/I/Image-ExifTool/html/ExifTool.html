@@ -304,12 +304,12 @@ take precedence over <a href="#Options">Options</a> settings.
 <p><b>Return Value:</b></p>
 
 <p><a href="#ImageInfo">ImageInfo</a> returns a reference to a hash of tag
-key/value pairs.  The tag keys are identifiers, which are similar to the tag
-names but may have an appended instance number if multiple tags with the same
-name were extracted from the image.  Many of the ExifTool functions require a
-tag key as an argument.  Use <a href="#GetTagName">GetTagName</a> to get the tag
-name for a given tag key.  Note that the case of the tag names may not be the
-same as requested.</p>
+key/value pairs.  The tag keys are identifiers -- essentially case-sensitive tag
+names with an appended instance number if multiple tags with the same name were
+extracted from the image.  Many of the ExifTool functions require a tag key as
+an argument.  Use <a href="#GetTagName">GetTagName</a> to get the tag name for a
+given tag key.  Note that the case of the tag names may not be the same as
+requested.</p>
 
 <p>Values of the returned hash are usually simple scalars, but a scalar
 reference is used to indicate binary data and an array reference may be used to
@@ -738,7 +738,7 @@ distribution for examples.</p>
     This causes some tags to be generated which normally would not be unless specifically
     requested (by passing the tag name to <a href="#ImageInfo">ImageInfo</a> or
     <a href="#ExtractInfo">ExtractInfo</a>).  May be set to 2 or 3 to enable generation
-    of some additional tags mentioned in the tag name documentation.</td>
+    of some additional tags as mentioned in the tag name documentation.</td>
     <td align=center>0, 1, 2 or 3</td><td align=center>undef</td></tr>
 <tr id="RequestTags"><td>RequestTags</td><td>List of additional tag and/or group names
     to request in the next call to <a href="#ExtractInfo">ExtractInfo</a>. This option is
@@ -811,9 +811,9 @@ distribution for examples.</p>
     Useful to allow external input into tag name expressions and ValueConv logic.
     <i>PARAM</i> is the user-defined parameter name (case insensitive). These parameters
     may be accessed in tag name expressions by prefixing the parameter name with a dollar
-    sign, just like normal tags. If called without no additional arguments,
-    <code>Options('UserParam')</code> returns a reference to the hash of all user
-    parameters (with lower-case names).
+    sign just like normal tags, or via the API by calling <code>Options('UserParam','PARAM')</code>.
+    If called without no additional arguments, <code>Options('UserParam')</code> returns
+    a reference to the hash of all user parameters (with lower-case names).
 </td>
     <td><table class=clear>
     <tr><td valign=top><i>PARAM</i></td><td valign=top>-</td><td>Get parameter</td></tr>
@@ -826,8 +826,8 @@ distribution for examples.</p>
     <tr><td valign=top><b>undef</b></td><td valign=top>-</td><td>Clear UserParam hash</td></tr>
     </table>
     </td><td align=center>{ }</td></tr>
-<tr id="Validate"><td>Validate</td><td>[Experimental] Flag to perform extra validation
-    checks when reading, causing extra warnings to be generated if problems are found.</td>
+<tr id="Validate"><td>Validate</td><td>Flag to perform extra validation checks
+    when reading, causing extra warnings to be generated if problems are found.</td>
     <td align=center>0 or 1</td><td align=center>undef</td></tr>
 <tr id="Verbose"><td>Verbose</td><td>Print verbose messages to file specified by TextOut option.
     <a href="verbose.html">Click here</a> for example outputs.</td>
@@ -1122,11 +1122,12 @@ my @requestedTags = $exifTool-&gt;<b>GetRequestedTags</b>();
 <hr><h2><a name="GetValue">GetValue</a></h2>
 <p>Get the value of a specified tag.  The returned value is either the
 human-readable (PrintConv) value, the converted machine-readable (ValueConv)
-value, or the original raw (Raw) value.  If the value type is not specified,
-the PrintConv value is returned if the PrintConv option is set, otherwise the
-ValueConv value is returned.  The PrintConv values are the same as the values
-returned by <a href="#ImageInfo">ImageInfo</a> and <a href="#GetInfo">GetInfo</a>
-in the tag/value hash unless the PrintConv option is disabled.</p>
+value, the original raw (Raw) value, or the original rational (Rational) value
+for rational formats.  If the value type is not specified, the PrintConv value
+is returned if the PrintConv option is set, otherwise the ValueConv value is
+returned.  The PrintConv values are the same as the values returned by
+<a href="#ImageInfo">ImageInfo</a> and <a href="#GetInfo">GetInfo</a> in the
+tag/value hash unless the PrintConv option is disabled.</p>
 <p>Tags which represent lists of multiple values (as may happen with
 '<code>Keywords</code>' for example) are handled specially.  In scalar context,
 the returned PrintConv value for these tags is either a string of values or
@@ -1140,7 +1141,7 @@ instead.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetValue($$;$)</td></tr>
 <tr><td valign=top><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
-    <br><b>1)</b> Tag key
+    <br><b>1)</b> Tag key, or case-sensitive tag name with optional group prefix(es)
     <br><b>2)</b> [<i>optional</i>] Value type, 'PrintConv', 'ValueConv', 'Both',
     'Raw' or 'Rational'
     <br>&nbsp;<br>The default value type is 'PrintConv' if the PrintConv option
@@ -1471,8 +1472,10 @@ in a specified file.</p>
  <a href="#MissingTagValue">MissingTagValue</a> option.  The tag value may be
  modified via changes to the default input variable (<code>$_</code>) in a Perl
  expression placed inside the braces and after a semicolon following the tag
- name (see the last example below).  Braces within the expression must be
- balanced.<br>&nbsp;<br>
+ name (see the last example below).  A <code>@</code> may be added after the tag
+ name (before the semicolon) to make the expression act on individual list items
+ instead of the concatenated string for list-type tags.  Braces within the
+ expression must be balanced.<br>&nbsp;<br>
  Multiple options hash references may be passed to set different options for
  different tags.  Options apply to subsequent tags in the argument list.
 </td></tr>
@@ -1981,12 +1984,12 @@ the specific IFD).
 APP6, APP8, ASF, Audible, CanonVRD, Composite, DICOM, DNG, DV, DjVu, Ducky,
 EXE, EXIF, ExifTool, FLAC, FLIR, File, Flash, FlashPix, Font, FotoStation,
 GIF, GIMP, GeoTiff, GoPro, H264, HTML, ICC_Profile, ID3, IPTC, ISO, ITC,
-JFIF, JPEG, Jpeg2000, LNK, Leaf, Lytro, M2TS, MIE, MIFF, MNG, MOI, MPC,
-MPEG, MPF, MXF, MakerNotes, Matroska, Meta, Ogg, OpenEXR, Opus, PDF, PICT,
-PLIST, PNG, PSP, Palm, PanasonicRaw, PhotoCD, PhotoMechanic, Photoshop,
-PostScript, PrintIM, QuickTime, RAF, RIFF, RSRC, RTF, Radiance, Rawzor,
-Real, Red, SVG, SigmaRaw, Stim, Theora, Torrent, VCard, Vorbis, XML, XMP,
-ZIP
+JFIF, JPEG, JSON, Jpeg2000, LNK, Leaf, Lytro, M2TS, MIE, MIFF, MNG, MOI,
+MPC, MPEG, MPF, MXF, MakerNotes, Matroska, Meta, Ogg, OpenEXR, Opus, PDF,
+PICT, PLIST, PNG, PSP, Palm, PanasonicRaw, PhotoCD, PhotoMechanic,
+Photoshop, PostScript, PrintIM, QuickTime, RAF, RIFF, RSRC, RTF, Radiance,
+Rawzor, Real, Red, SVG, SigmaRaw, Stim, Theora, Torrent, VCard, Vorbis, WTV,
+XML, XMP, ZIP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
 <td>AC3, AFCP, AIFF, APE, ASF, AVI1, Adobe, AdobeCM, AdobeDNG, Apple, Audible,
@@ -1998,7 +2001,7 @@ GraphConv, H264, HP, HTC, HTML, HTML-dc, HTML-ncc, HTML-office, HTML-prod,
 HTML-vw96, HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-meta,
 ICC-view, ICC_Profile, ICC_Profile#, ID3, ID3v1, ID3v1_Enh, ID3v2_2,
 ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, IPTC#, ISO, ITC, InteropIFD, JFIF, JFXX,
-JPEG, JPEG-HDR, JVC, Jpeg2000, KDC_IFD, Kodak, KodakBordersIFD,
+JPEG, JPEG-HDR, JSON, JVC, Jpeg2000, KDC_IFD, Kodak, KodakBordersIFD,
 KodakEffectsIFD, KodakIFD, KyoceraRaw, LNK, Leaf, LeafSubIFD, Leica, Lytro,
 M2TS, MAC, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender,
 MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes,
@@ -2014,7 +2017,7 @@ Radiance, Rawzor, Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4,
 Real-RA5, Real-RJMD, Reconyx, Red, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD,
 SRF#, SVG, Samsung, Sanyo, Scalado, Sigma, SigmaRaw, Sony, SonyIDC, Stim,
 SubIFD, System, Theora, Torrent, Track#, VCalendar, VCard, Version0, Vorbis,
-XML, XMP, XMP-DICOM, XMP-GAudio, XMP-GImage, XMP-GPano, XMP-GSpherical,
+WTV, XML, XMP, XMP-DICOM, XMP-GAudio, XMP-GImage, XMP-GPano, XMP-GSpherical,
 XMP-MP, XMP-MP1, XMP-PixelLive, XMP-aas, XMP-acdsee, XMP-album,
 XMP-apple-fi, XMP-aux, XMP-cc, XMP-cell, XMP-creatorAtom, XMP-crs, XMP-dc,
 XMP-dex, XMP-digiKam, XMP-drone-dji, XMP-dwc, XMP-exif, XMP-exifEX,
@@ -2052,27 +2055,26 @@ Preview, Printing, Time, Unknown, Video
 alphabetical order.
 </td></tr>
 </table></blockquote>
-<p>Below is a current list of deletable group names.  All names in this list
-are either family 0 or family 1 group names, with the exception of
-'<code>Trailer</code>' which allows all trailers in JPEG and TIFF-format images
-to be deleted at once, including unknown trailers.  To schedule a group for
-deletion, call <a href="#SetNewValue">SetNewValue</a> with an undefined value
-and a tag name like '<code>Trailer:*</code>'.</p>
+<p>Below is a current list of deletable group names.</p>
 <blockquote>AFCP, APP0, APP1, APP10, APP11, APP12, APP13, APP14, APP15, APP2, APP3,
 APP4, APP5, APP6, APP7, APP8, APP9, Adobe, Audio, Author, CIFF, Camera,
-CanonVRD, Copyright, Document, Ducky, EXIF, ExifIFD, ExifTool, File,
-FlashPix, FotoStation, GPS, GlobParamIFD, ICC_Profile, IFD0, IFD1, IPTC,
-Image, InteropIFD, JFIF, Jpeg2000, Location, MIE, MPF, MakerNotes, Meta,
-MetaIFD, NikonCapture, Other, PDF, PDF-update, PNG, PNG-pHYs, PhotoMechanic,
-Photoshop, PrintIM, Printing, RMETA, RSRC, SubIFD, Time, Trailer, Video,
-XML, XML-*, XMP, XMP-*</blockquote>
-<p>Note that the JPEG "APP" groups are special, and are used only to delete
-application segments which are not associated with another deletable group.  For
-example, deleting '<code>APP14:*</code>' will delete other APP14 segments, but
-not the APP14 "Adobe" segment.  Also note that deleting a family 0 or 1 group
-will delete the entire corresponding block of metadata, but deleting a family 2
-group (eg. Audio, Author, Camera, etc.) deletes the individual tags belonging
-to that category.</p>
+CanonVRD, Document, Ducky, EXIF, ExifIFD, ExifTool, File, FlashPix,
+FotoStation, GPS, GlobParamIFD, ICC_Profile, IFD0, IFD1, IPTC, Image,
+InteropIFD, JFIF, Jpeg2000, Location, MIE, MPF, MakerNotes, Meta, MetaIFD,
+NikonCapture, Other, PDF, PDF-update, PNG, PNG-pHYs, PhotoMechanic,
+Photoshop, Preview, PrintIM, Printing, RMETA, RSRC, SubIFD, Time, Trailer,
+Video, XML, XML-*, XMP, XMP-*</blockquote>
+<p>To schedule a group for deletion, call <a href="#SetNewValue">SetNewValue</a>
+with a tag name like '<code>EXIF:*</code>' and an undefined tag value.</p>
+<p>Deleting a family 0 or 1 group will delete the entire corresponding block of
+metadata, but deleting a family 2 group (eg. Audio, Author, Camera, etc.)
+deletes the individual tags belonging to that category.</p>
+<p>The '<code>Trailer</code>' group allows all trailers in JPEG and TIFF-format
+images to be deleted at once, including unknown trailers.  Note that the JPEG
+"APP" groups are special, and are used only to delete application segments which
+are not associated with another deletable group.  For example, deleting
+'<code>APP14:*</code>' will delete other APP14 segments, but not the APP14
+"Adobe" segment.</p>
 <p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 my @delGroups = Image::ExifTool::<b>GetDelGroups</b>();
@@ -2085,8 +2087,9 @@ my @delGroups = Image::ExifTool::<b>GetDelGroups</b>();
 <tr><td valign=top><b>Inputs</b></td>
 <td><b>0)</b> [<i>optional</i>] File name or extension
 <br><b>1)</b> [<i>optional</i>] Flag to return a description instead of a type.
-Set to 0 to return type for recognized but unsupported files (otherwise the
-return value for unsupported files is undef).
+Default is undef.  Set to 0 to also return return types of recognized but
+unsupported files (otherwise undef is returned for unsupported files), or 1 to
+return file descriptions.
 </td></tr>
 <tr><td valign=top><b>Returns</b></td><td>A string, based on the file extension, which
 indicates the basic format of the file.  Note that some files may be based on
@@ -2138,7 +2141,7 @@ my $creatable = Image::ExifTool::<b>CanCreate</b>($filename);
 the usual technique of creating user-defined tags via the
 %Image::ExifTool::UserDefined hash (see the
 <a href="config.html">sample config file</a>), because it allows tags to be added
-after the tag table has been initialized.</p>
+after a tag table has been initialized.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>AddUserDefinedTags($%)</td></tr>
 <tr><td valign=top><b>Inputs</b></td><td><b>0)</b> Destination tag table name

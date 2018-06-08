@@ -1,7 +1,7 @@
 ---
 abstract: 'A suite of Perl modules that implement a number of semantic'
 author:
-  - 'Bridget McInnes <btmcinnes@vcu.edu, Sam Henry <henryst@vcu.edu>, Keith Herbert <herbertkb@vcu.edu>, Andriy Mulyar <andriy.mulyar@gmail.com>'
+  - 'Sam Henry <henryst@vcu.edu>, Andriy Mulyar <andriy.mulyar@gmail.com>, Bridget McInnes <btmcinnes@vcu.edu, Keith Herbert <herbertkb@vcu.edu>'
 build_requires:
   ExtUtils::MakeMaker: 0
 configure_requires:
@@ -25,4 +25,4 @@ requires:
   Graph::Directed: 0
   Text::NSP: 0
   UMLS::Interface: 0
-version: 0.15
+version: 0.17

@@ -1,5 +1,5 @@
 package CPANPLUS::Dist::Build::Constants;
-$CPANPLUS::Dist::Build::Constants::VERSION = '0.88';
+$CPANPLUS::Dist::Build::Constants::VERSION = '0.90';
 #ABSTRACT: Constants for CPANPLUS::Dist::Build
 
 use if $] > 5.017, 'deprecate';

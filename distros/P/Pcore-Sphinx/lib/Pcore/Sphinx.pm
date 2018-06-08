@@ -1,4 +1,4 @@
-package Pcore::Sphinx v0.9.3;
+package Pcore::Sphinx v0.9.4;
 
 use Pcore -dist, -class;
 
@@ -41,7 +41,7 @@ around run => sub ( $orig, $self ) {
 
         $self->generate_alien_cfg;
 
-        P->pm->run_proc( [ $self->alien_indexer_bin_path, q[--config], $self->alien_cfg_path, '--all' ] ) or die;
+        P->sys->run_proc( [ $self->alien_indexer_bin_path, q[--config], $self->alien_cfg_path, '--all' ] ) or die;
 
         exit 0;
     }
@@ -179,19 +179,19 @@ around app_build => sub ( $orig, $self ) {
         eval {
 
             # sphinx
-            P->pm->run_proc( q[wget -O - http://sphinxsearch.com/files/sphinx-] . $self->sphinx_ver . qq[-release.tar.gz | tar -C $ENV->{TEMP_DIR} -xzvf -] ) or die;
+            P->sys->run_proc( q[wget -O - http://sphinxsearch.com/files/sphinx-] . $self->sphinx_ver . qq[-release.tar.gz | tar -C $ENV->{TEMP_DIR} -xzvf -] ) or die;
 
             # libstemmer
-            P->pm->run_proc( qq[wget -O - http://snowball.tartarus.org/dist/libstemmer_c.tgz | tar -C $ENV->{TEMP_DIR}sphinx-] . $self->sphinx_ver . q[-release -xzvf -] ) or die;
+            P->sys->run_proc( qq[wget -O - http://snowball.tartarus.org/dist/libstemmer_c.tgz | tar -C $ENV->{TEMP_DIR}sphinx-] . $self->sphinx_ver . q[-release -xzvf -] ) or die;
 
             {
                 my $chdir_guard = P->file->chdir( $ENV->{TEMP_DIR} . 'sphinx-' . $self->sphinx_ver . q[-release] ) or die;
 
-                P->pm->run_proc( [ './configure', '--prefix=' . $self->alien_dir, '--without-mysql', '--with-pgsql', '--with-libstemmer', '--with-libexpat', '--with-iconv', '--enable-id64' ] ) or die;
+                P->sys->run_proc( [ './configure', '--prefix=' . $self->alien_dir, '--without-mysql', '--with-pgsql', '--with-libstemmer', '--with-libexpat', '--with-iconv', '--enable-id64' ] ) or die;
 
-                P->pm->run_proc( [ 'make', '-j' . P->sys->cpus_num ] ) or die;
+                P->sys->run_proc( [ 'make', '-j' . P->sys->cpus_num ] ) or die;
 
-                P->pm->run_proc( [ 'make', 'install' ] ) or die;
+                P->sys->run_proc( [ 'make', 'install' ] ) or die;
             }
         };
 

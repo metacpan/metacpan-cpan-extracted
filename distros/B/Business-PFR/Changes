@@ -5,3 +5,6 @@ Revision history for Business::PFR
 
 1.0.1   2014-06-21
         * New dependency Perl 5.14
+
+1.0.2   2018-06-07
+        * Fixing bug with validating 'xxx-xxx-xxx 00'

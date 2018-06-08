@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html><head><title>What is the recommended way to set up a custom domain?</title></head><body>
+<b>What is the recommended way to set up a custom domain?</b><br />
+<br />
+The recommended method for setting up a custom tracking domain to use with ClickMagick is by using a CNAME DNS record to &ldquo;point&rdquo; your domain to the ClickMagick system.<br />
+<br />
+It&rsquo;s quick and easy to set up, and it&rsquo;s super reliable since it only uses the global DNS network, and doesn&rsquo;t rely on any 3rd-party to work properly (your domain registrar, hosting company, etc.)<br />
+<br />
+(If you&rsquo;re reading this because you&rsquo;re upgrading a domain you set up previously, you&rsquo;ll want to read <a href="/user/faqs.cgi?answer=184">&ldquo;What happened to Methods 1, 2, and 3?&rdquo;</a> before continuing.)<br />
+<br />
+<br />
+<strong>Purchase Your Domain and Choose a Format</strong><br />
+<br />
+To set up a custom domain using CNAME DNS records, you first need to purchase a domain if you don&rsquo;t already have one. You can purchase your domain through any domain registrar. <strong><a href="http://www.GoDaddy.com" target="_blank">GoDaddy.com</a></strong> is a very popular domain registrar, as is <strong><a href="http://www.NameCheap.com" target="_blank">NameCheap.com</a></strong>, but any registrar will work. Just go and enter domain names until you find one that&rsquo;s available.<br />
+<br />
+&nbsp;
+<div class="faq-caution"><b>Caution:</b> When you&rsquo;re buying a domain, one of the options you&rsquo;ll be given is whether to &ldquo;privately register&rdquo; your domain.&nbsp;Aside from the fact that there&rsquo;s an extra fee for this add-on, blacklisting services treat private registration as one of the red flags they look for when scanning domains for questionable behavior. Unless you feel you really need this option, we recommend skipping it.</div>
+<br />
+<br />
+Next, you need to decide if are you going to use this custom domain ONLY for tracking and for <em>nothing</em> else. If so, then you can set up a dedicated tracking domain&nbsp;using the domain itself:<br />
+<br />
+<code>http://yourdomain.com<br />
+http://www.yourdomain.com</code><br />
+<br />
+If, when people type only <code>yourdomain.com</code> or <code>www.yourdomain.com</code>, <em>you want it to go to a website or a blog</em>, and only want tracking when you have a <code>/linkID</code>&nbsp;on the end, then you need to point your domain at your website and use a &ldquo;hostname&rdquo; with your domain to use for tracking.<br />
+<br />
+Using a &ldquo;hostname&rdquo; is just a techy way of saying that you need to stick an extra word on the front of your domain, like this:<br />
+<br />
+<code>http://track.<em>yourdomain.com</em><br />
+http://rotator.<em>yourdomain.com</em><br />
+http://go.<em>yourdomain.com</em></code><br />
+<code>...</code><br />
+<br />
+You can choose just about any word or phrase you want for the first part of your domain as long as the word (hostname) isn&rsquo;t already being used.<br />
+<br />
+This way, <code>yourdomain.com</code> can point to any website or blog your want, but your tracking links will look like <code>track.yourdomain.com/linkID</code>.<br />
+<br />
+You will be asked to specify the hostname when setting up the CNAME record. In the examples above, the hostnames are <code>track</code>, <code>rotator</code>, and <code>go</code>. The <code>www</code>&nbsp;in the first set of examples is also a hostname which, by convention, simply stands for &ldquo;world wide web.&rdquo; There is nothing special at all about the <code>www</code>&nbsp;hostname&mdash;it&rsquo;s just another CNAME record that is usually set up automatically to point to your domain when you purchase it.<br />
+<br />
+If you&rsquo;re at all unsure about which format to use, choose the second format, using the hostname <code>track</code>. That will make it easy to follow our examples. You can always change it later.<br />
+<br />
+<br />
+<strong>Step-By-Step Guides for Setting Up Your Custom Domain</strong><br />
+<br />
+Setting up your custom domain will be slightly different with each registrar and control panel, but the process is always the same.<br />
+<br />
+Regardless of which registrar or control panel you&rsquo;re using, watch this video to see how it&rsquo;s done with NameCheap. This video explains some important details that are common to every situation.<br />
+<br />
+After you&rsquo;ve watched the video, follow the step-by-step guide for your registrar or control panel. If we don&rsquo;t have one listed, you can find generic setup instructions below.<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=cnamedns" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=cnamedns" id="video-link-new">How To Set Up A Custom Domain Using a CNAME DNS Record</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+If, after watching the video, you have any trouble getting your custom domain to work properly, check out this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=116"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=116">&nbsp;How do I troubleshoot my custom domain setup?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+<strong>Written walkthroughs for popular domain registrars and control panels:</strong><br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=192"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=192">How do I set up a custom domain with NameCheap?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=187"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=187">How do I set up a custom domain with GoDaddy?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=188"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=188">How do I set up a custom domain with cPanel?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=189"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=189">How do I set up a custom domain with Plesk?&nbsp;</a></b></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=191"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=191">How do I set up a custom domain with CloudFlare?&nbsp;</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+If you&rsquo;re using a domain registrar other than those listed above and you can&rsquo;t figure out how to add a CNAME record, a quick Google search will find lots of walkthroughs and tutorials no matter what domain registrar or hosting company you&rsquo;re using &hellip;<br />
+<br />
+&ldquo;set up CNAME 1&amp;1&rdquo;<br />
+&ldquo;set up CNAME HostGator&rdquo;<br />
+&ldquo;set up CNAME BlueHost&rdquo;&nbsp;<br />
+etc.<br />
+<br />
+<br />
+<strong>Generic Instructions for Setting Up Your Domain</strong><br />
+<br />
+If we don&rsquo;t have a step-by-step guide for your domain registrar or control panel (most registrars use either cPanel or Plesk) and you can&rsquo;t find instructions by searching for the information online, then you&rsquo;ll have to set up your domain using the generic instructions here&hellip;<br />
+<br />
+Setting up a CNAME DNS record is easy to do if you understand some terminology that your DNS control panel will ask you about. Let&rsquo;s cover those.<br />
+<br />
+<br />
+<strong>The Hostname</strong><br />
+<br />
+When you set up a CNAME record, you will be asked what the &ldquo;hostname&rdquo; is, often shortened to just &ldquo;host&rdquo; or &ldquo;name&rdquo;.<br />
+<br />
+In the examples we saw above, the hostname values are <code>www</code>, <code>track</code>, <code>rotator</code>, and <code>go</code>. The hostname is whatever goes in front of your custom domain name.<br />
+&nbsp;
+<div class="faq-note"><b>Note:</b> You do not want to use a CNAME record for your root domain <code>yourdomain.com</code>. You need to use an &ldquo;A&rdquo; record for that, which will be explained in a moment</div>
+<br />
+<br />
+<br />
+<strong>The Target Domain field</strong><br />
+<br />
+You will be asked for the target domain which is the domain that your CNAME record will point to. For ClickMagick, there are two target domains, one for links (which includes split tests), and one for rotators. You will need to enter one of these two domains when your create your CNAME record:<br />
+<br />
+For use with tracking links:&nbsp; <code>www.clkmg.com</code><br />
+<br />
+For use with rotators:&nbsp; <code>www.clkmr.com</code><br />
+<br />
+<br />
+<strong>The &ldquo;TTL&rdquo; Field</strong><br />
+<br />
+The TTL field is an expiration time, in seconds. The TTL value tells the Internet how often to check your DNS settings to see if they&rsquo;ve changed. A smaller value updates your settings faster when you make changes, but a larger value makes the Internet more efficient since it doesn&rsquo;t have to check for changes as often. GoDaddy recommends &frac12; hour (1,800 seconds) to an hour (3,600 seconds).<br />
+<br />
+If you&rsquo;ve ever wondered what causes &ldquo;Internet propagation delays,&rdquo; it&rsquo;s this setting.<br />
+<br />
+Note: Depending upon your DNS editor, you may not be asked for a TTL value. Don&rsquo;t freak out if you can&rsquo;t find a place to enter this value.<br />
+<br />
+<br />
+<strong>Setting up your custom domain &hellip;</strong><br />
+<br />
+These are the steps to setting up your custom domain. These steps are written to handle any DNS editor that you may encounter.<br />
+<br />
+Before you can get started, you need to find the DNS Zone editor that your system uses. Once you&rsquo;ve found that, you can create your domain. Let&rsquo;s get started.<br />
+<br />
+<br />
+<strong style="background-color: rgb(255, 255, 255);">Step 1:</strong><span style="background-color: rgb(255, 255, 255);">&nbsp;</span><strong style="background-color: rgb(255, 255, 255);">Create a CNAME record</strong><br />
+<br />
+From within your DNS editor, add a new &ldquo;record&rdquo;. There will be a button somewhere to do this.<br />
+<br />
+If you want your custom tracking domain to be <code>www.yourdomain.com</code>, you would enter <code>www</code>&nbsp;in the hostname section of the DNS entry, and point it to ClickMagick like this:<br />
+<br />
+Record Type: &nbsp;<strong>CNAME</strong><br />
+<br />
+Hostname: &nbsp;<code>www<strong>&nbsp;</strong></code>(or whatever you want in front of <code>.yourdomain.com</code>)<br />
+<br />
+Points to / Target / Address: &nbsp;<code>www.clkmg.com</code>&nbsp; (or <code>www.clkmr.com</code>&nbsp;if it&rsquo;s for rotators)<br />
+<br />
+TTL: &nbsp;Choose <strong>&frac12; hour &nbsp;&nbsp;</strong>(or <strong>1800 </strong>seconds)<br />
+<br />
+Simply add a new record with the information above. You might not be asked for a TTL value.<br />
+<br />
+If you already have an existing entry for <code>www.yourdomain.com</code>, either delete it, or just use something else instead of <code>www </code>for the hostname setting.<br />
+<br />
+For example, if you wanted your custom tracking domain to be <code>track.yourdomain.com</code> you&rsquo;d simply use <code>track </code>instead of <code>www </code>as the&nbsp;hostname of the CNAME record.<br />
+<br />
+<br />
+<b>Step 2: Add your custom domain to ClickMagick</b><br />
+<br />
+Once you complete Step 1 above, the only other thing you need to do is add your custom domain to your ClickMagick account using the&nbsp;<strong><a href="/user/domains.cgi" target="_blank">Domain Manager</a></strong>.<br />
+<br />
+Be sure to add your custom domain exactly as you&rsquo;ve set it up in Step 1 above e.g. either <code>www.yourdomain.com</code> or <code>track.yourdomain.com</code> in the examples above.<br />
+&nbsp;
+<div class="faq-tip"><b>Tip:</b> Remember to choose <strong>Yes</strong> for the question&nbsp;<strong>Cloak with this domain?</strong> if you need to create a cloaked custom domain for use with AdWords or some other advertiser.</div>
+<br />
+ClickMagick&rsquo;s Domain Manager will thoroughly test your domain when you try to add it. If the Domain Manager accepts the domain, then you&rsquo;ve set it up correctly and it&rsquo;s working perfectly! Otherwise, read and follow any error messages you get.&nbsp;<br />
+<br />
+<br />
+<b>Step 3: Add an &ldquo;A&rdquo; Record to create your domain without &ldquo;www.&rdquo; &nbsp;<em>(optional)</em></b><br />
+<br />
+If you&rsquo;re using your custom domain&nbsp;<em>only</em>&nbsp;for tracking purposes, you&rsquo;ll probably want to also set up the&nbsp;non-<code>www.</code> version (e.g., <code>yourdomain.com</code>) of your domain. This would typically be the case if you&rsquo;ve just bought your domain specifically for tracking purposes.<br />
+<br />
+For example, if you just set up a CNAME record with a hostname of <code>www</code>&nbsp;as in Step 1 above, your tracking links will look like this:<br />
+<br />
+<code>http://www.yourdomain.com/linkID</code><br />
+<br />
+However, if you leave off the <code>www</code>. like this&hellip;<br />
+<br />
+<code>http://yourdomain.com/linkID</code><br />
+<br />
+&hellip; the tracking domain will NOT work.<br />
+<br />
+You have to set up the&nbsp;non-<code>www</code>. version as well, and because the&nbsp;non-<code>www.</code>&nbsp;domain does not have a hostname, you cannot use a CNAME record to properly set it up. Instead, you need to use an &ldquo;A&rdquo; record.<br />
+&nbsp;
+<div class="faq-caution"><b>Caution:</b>&nbsp;You cannot use an &ldquo;A&rdquo; record&nbsp;if you have any existing content at <code>yourdomain.com</code>. The second you add the &ldquo;A&rdquo; record, your <em>entire</em> domain will point at ClickMagick and not to your original website. This will break your existing website if you have one, <em>and that includes a WordPress blog.</em><br />
+<br />
+If you&rsquo;re unsure whether you have existing content, just enter your domain without the <code>www.</code>&nbsp;and see what pulls up. If it&rsquo;s a website you want to keep, then you can&rsquo;t add the &ldquo;A&rdquo;&nbsp;record or you will lose that website&hellip;</div>
+<br />
+<br />
+<span style="background-color: rgb(255, 255, 255);">To get started, if there&rsquo;s an existing &ldquo;A&rdquo; record that has just your domain with nothing in front of it, then you&rsquo;ll need to delete it. You will almost certainly have to do this step. Review the step-by-step guides above to see actual examples of how this might look in your DNS editor.</span><br style="background-color: rgb(255, 255, 255);" />
+<br style="background-color: rgb(255, 255, 255);" />
+<span style="background-color: rgb(255, 255, 255);">Next, add a new &ldquo;A&rdquo; record with just your domain (no hostname) that points to one of our IP addresses here &hellip;</span><br />
+<br />
+<b>If your domain is for regular tracking links (or split tests) use one of these:</b><br />
+<br />
+50.97.212.250<br />
+50.97.244.203<br />
+<br />
+<b>If your domain is for rotator links use one of these:</b><br />
+<br />
+50.97.212.251<br />
+50.23.66.138<br />
+<br />
+When creating an &ldquo;A&rdquo; record, you will be asked for the hostname. Some DNS editors require that you leave this field blank, while others require that you use the &ldquo;@&rdquo; character. See the step-by-step guides to see how different DNS editors handle this.<br />
+<br />
+<br />
+<strong style="background-color: rgb(255, 255, 255);">Step 4:&nbsp;</strong><b style="background-color: rgb(255, 255, 255);">Add your custom domain (without &ldquo;www.&rdquo;) to ClickMagick</b><br style="background-color: rgb(255, 255, 255);" />
+<br style="background-color: rgb(255, 255, 255);" />
+<span style="background-color: rgb(255, 255, 255);">Finally, you have to also add the non-<code>www<span class="marker">.</span></code>&nbsp;version of your domain to your&nbsp;</span><strong><a href="/user/domains.cgi" style="background-color: rgb(255, 255, 255);" target="_blank">Domain Manager</a></strong>&nbsp;<span style="background-color: rgb(255, 255, 255);">and you&rsquo;ll be all set.</span>
+</body></html>

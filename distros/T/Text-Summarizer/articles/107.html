@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html><head><title>Can I pass an email address to my tracking link?</title></head><body>
+<b>Can I pass an email address to my tracking link?</b><br />
+<br />
+You can &ldquo;manually&rdquo; pass any data you want to your tracking links by simply appending Sub-IDs to the end of any tracking link as described in the FAQ below:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%; background-color: rgb(255, 255, 255);">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=3"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=3">Can I use Sub-IDs with my tracking links?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+&hellip; but ClickMagick will also automatically look for email addresses in the &ldquo;query string&rdquo; of all requests, and if it finds an email address it will automatically populate the first available Sub-ID with this email.<br />
+<br />
+For example, with Aweber you can enable a feature that&rsquo;ll add the user&rsquo;s email address to the end of your &ldquo;thank you&rdquo; page URL. When you do, Aweber will redirect the user to a URL that looks like this:<br />
+<br />
+<code>http://$linkdomain/?email=user%40domain.com</code><br />
+&nbsp;
+<div class="faq-tip"><b>Tip:</b> <code>%40</code>&nbsp;is the URL-encoded form of the <code>@</code>&nbsp;symbol.</div>
+<br />
+<br />
+So as long as you enable this feature in Aweber or any other similar features in other 3rd-party systems, and you make sure to redirect users to a ClickMagick tracking link, this is how you can get users&rsquo; email addresses into ClickMagick in the form of Sub-IDs even if the other system doesn&rsquo;t provide tokens for doing so.<br />
+<br />
+You might find this useful for all sorts of things. For example, the user that suggested this feature is using the email address as a way to manually track back-end phone sales that couldn&rsquo;t otherwise be tracked.
+</body></html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html><head><title>How do I integrate MaxBounty with ClickMagick?</title></head><body>
+<strong>How do I integrate MaxBounty with ClickMagick?</strong><br />
+<br />
+This page will teach you everything you need to know about using ClickMagick with MaxBounty, and you&rsquo;ll want to bookmark it so you can easily come back to it whenever you want.<br />
+<br />
+The key to understanding this setup is that you need to pass a unique &ldquo;click&nbsp;ID&rdquo; from your tracking link to your MaxBounty offer, and that MaxBounty needs to send the click ID back to ClickMagick.<br />
+<br />
+Just follow these steps and you&rsquo;ll be up and going in no time:<br />
+<br />
+<br />
+<strong>Step 1: Pass A Unique &ldquo;click ID&rdquo;&nbsp;To Your MaxBounty Affiliate Link</strong><br />
+<br />
+The first step is to pass a unique click ID with each click to your MaxBounty affiliate link, by inserting ClickMagick&rsquo;s special&nbsp;<code>[clickid]</code> token into your affiliate link.<br />
+<br />
+For example, if you&rsquo;re promoting a MaxBounty offer and your affiliate link looks like this:<br />
+<br />
+<code>http://www.mb103.com/lnk.asp?o=10667&amp;c=918273&amp;a=210570&amp;l=10554</code><br />
+<br />
+... you&rsquo;d pass a unique click ID to MaxBounty using ClickMagick&rsquo;s <code>[clickid]</code> token by adding <code>&amp;s2=[clickid]</code> to the end or your link, like this:<br />
+<br />
+<code>http://www.mb103.com/lnk.asp?o=10667&amp;c=918273&amp;a=210570&amp;l=10554&amp;s2=[clickid]</code><br />
+<br />
+You would enter this modified URL as the &ldquo;Primary URL&rdquo; in ClickMagick when you&rsquo;re setting up a tracking link for this particular affiliate offer:<br />
+&nbsp;<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq199newlink.jpg" /><br />
+&nbsp;<br />
+&nbsp;<br />
+<br />
+<strong>Step 2: Generate Your Postback URL with ClickMagick&rsquo;s Postback Builder Tool</strong><br />
+<br />
+The second step is to create a special URL called a &ldquo;Postback URL&rdquo; that MaxBounty will use to tell ClickMagick that a sale has just happened.<br />
+<br />
+Just select <strong><a href="/user/action/tools/postbackb.cgi" target="_blank">Postback Builder</a></strong> from the <strong>Tools</strong> menu within ClickMagick, then select MaxBounty, and ClickMagick will generate the Postback URL you&rsquo;ll need to add to your MaxBounty account. Just copy your new Postback URL from the bottom of the page:<br />
+&nbsp;<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq199pbbuilder.jpg" />&nbsp;<br />
+<br />
+<br />
+<br />
+<strong>Step 3: Add Your Postback URL To Your MaxBounty Affiliate Account</strong><br />
+<br />
+The final step is to add your new Postback URL to your MaxBounty Profile.<br />
+<br />
+Once you do this, any time you generate an affiliate sale&mdash;for any offer!&mdash;MaxBounty will &ldquo;post back&rdquo; the conversion data to your ClickMagick account, and ClickMagick will attribute the sale and the revenue to the appropriate tracking link or funnel!<br />
+<br />
+Be sure to select <strong>URL (any campaign tracking type)</strong> for the &ldquo;Default Callback Type&rdquo;, and then simply paste your Postback URL into the box that says &ldquo;Default Callback Code&rdquo; like this &hellip;<br />
+&nbsp;<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq199maxbounty.jpg" /><br />
+&nbsp;<br />
+&nbsp;<br />
+<br />
+<strong>Troubleshooting your MaxBounty Postback URL Integration</strong><br />
+<br />
+If you run in to any problems, we built the ClickMagick <strong><a href="/user/action/tools/postbackd.cgi" target="_blank">Postback Debugger</a></strong> just for you!<br />
+<br />
+You&rsquo;ll find it in the <strong>Tools</strong> menu within your ClickMagick account, and it will provide you with all the tools and information you need to figure out the problem.<br />
+<br />
+If you still can&rsquo;t figure out what&rsquo;s wrong after using the <strong><a href="/user/action/tools/postbackd.cgi" target="_blank">Postback Debugger</a></strong>, please submit a ticket to our <strong><a href="/user/action/account/help.cgi?action=helpdesk" target="_blank">1-Hour Support</a></strong> desk with all the relevant details and we&rsquo;ll be happy to take a look.<br />
+<br />
+Please be sure to explain exactly what you&rsquo;ve done based on the three steps in this tutorial (with screenshots if possible) and what&rsquo;s not working as expected.<br />
+<br />
+Remember, the more details you provide, the better we&rsquo;ll be able to help.<br />
+<br />
+<br />
+<strong>Advanced Tracking With ClickMagick and MaxBounty</strong><br />
+<br />
+Now that you understand how to set up basic conversion tracking using Postback URLs, you may be interested in learning some advanced tracking tactics.<br />
+<br />
+Check out the videos below to learn how to integrate your landing pages, opt-in forms, autoresponders, and lots more with ClickMagick and MaxBounty &hellip;<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=affnetwork" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=affnetwork" id="video-link-new">Integrating ClickMagick with CPA Affiliate Networks</a></b></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=affnetworklp" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=affnetworklp" id="video-link-new">Integrating Landing Pages with CPA Affiliate Networks</a></b></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=affnetworkar" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=affnetworkar" id="video-link-new">Integrating Autoresponders with CPA Affiliate Networks</a></b></td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td><a href="/misc/video.cgi?name=affiliatepixel" id="video-link-new"><img border="0" height="24" src="//cdn.clickmagick.com/images/user/play.png" width="24" /></a></td>
+			<td><img height="1" src="//cdn.clickmagick.com/images/spacer.gif" width="10" /></td>
+			<td><b><a href="/misc/video.cgi?name=affiliatepixel" id="video-link-new">Tracking Calls-To-Action and Opt-ins with CPA Affiliate Networks</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</body></html>

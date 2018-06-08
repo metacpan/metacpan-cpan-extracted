@@ -4,7 +4,7 @@
 <head>
 <title>exiftool Application Documentation</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:_networkd@osx352.sd.apple.com" />
+<link rev="made" href="mailto:_networkd@osx339.sd.apple.com" />
 </head>
 
 <body style="background-color: white">
@@ -39,7 +39,11 @@
           <li><a href="#Special-features">Special features</a></li>
           <li><a href="#Utilities">Utilities</a></li>
           <li><a href="#Advanced-options">Advanced options</a></li>
-          <li><a href="#Advanced-formatting-feature">Advanced formatting feature</a></li>
+          <li><a href="#Advanced-formatting-feature">Advanced formatting feature</a>
+            <ul>
+              <li><a href="#Helper-functions">Helper functions</a></li>
+            </ul>
+          </li>
         </ul>
       </li>
     </ul>
@@ -95,43 +99,44 @@
 
 <pre><code>  File Types
   ------------+-------------+-------------+-------------+------------
-  3FR   r     | DVB   r/w   | JPEG  r/w   | ODT   r     | RIFF  r
-  3G2   r/w   | DYLIB r     | JSON  r     | OFR   r     | RSRC  r
-  3GP   r/w   | EIP   r     | K25   r     | OGG   r     | RTF   r
-  A     r     | EPS   r/w   | KDC   r     | OGV   r     | RW2   r/w
-  AA    r     | EPUB  r     | KEY   r     | OPUS  r     | RWL   r/w
-  AAX   r/w   | ERF   r/w   | LA    r     | ORF   r/w   | RWZ   r
-  ACR   r     | EXE   r     | LFP   r     | OTF   r     | RM    r
-  AFM   r     | EXIF  r/w/c | LNK   r     | PAC   r     | SEQ   r
-  AI    r/w   | EXR   r     | M2TS  r     | PAGES r     | SO    r
-  AIFF  r     | EXV   r/w/c | M4A/V r/w   | PBM   r/w   | SR2   r/w
-  APE   r     | F4A/V r/w   | MAX   r     | PCD   r     | SRF   r
-  ARW   r/w   | FFF   r/w   | MEF   r/w   | PDB   r     | SRW   r/w
-  ASF   r     | FLA   r     | MIE   r/w/c | PDF   r/w   | SVG   r
-  AVI   r     | FLAC  r     | MIFF  r     | PEF   r/w   | SWF   r
-  AZW   r     | FLIF  r/w   | MKA   r     | PFA   r     | THM   r/w
-  BMP   r     | FLV   r     | MKS   r     | PFB   r     | TIFF  r/w
-  BPG   r     | FPF   r     | MKV   r     | PFM   r     | TORRENT r
-  BTF   r     | FPX   r     | MNG   r/w   | PGF   r     | TTC   r
-  CHM   r     | GIF   r/w   | MOBI  r     | PGM   r/w   | TTF   r
-  COS   r     | GPR   r/w   | MODD  r     | PLIST r     | VCF   r
-  CR2   r/w   | GZ    r     | MOI   r     | PICT  r     | VRD   r/w/c
-  CRW   r/w   | HDP   r/w   | MOS   r/w   | PMP   r     | VSD   r
-  CS1   r/w   | HDR   r     | MOV   r/w   | PNG   r/w   | WAV   r
-  DCM   r     | HEIC  r     | MP3   r     | PPM   r/w   | WDP   r/w
-  DCP   r/w   | HEIF  r     | MP4   r/w   | PPT   r     | WEBP  r
-  DCR   r     | HTML  r     | MPC   r     | PPTX  r     | WEBM  r
-  DFONT r     | ICC   r/w/c | MPG   r     | PS    r/w   | WMA   r
-  DIVX  r     | ICS   r     | MPO   r/w   | PSB   r/w   | WMV   r
-  DJVU  r     | IDML  r     | MQV   r/w   | PSD   r/w   | WV    r
-  DLL   r     | IIQ   r/w   | MRW   r/w   | PSP   r     | X3F   r/w
-  DNG   r/w   | IND   r/w   | MXF   r     | QTIF  r/w   | XCF   r
-  DOC   r     | INX   r     | NEF   r/w   | R3D   r     | XLS   r
-  DOCX  r     | ISO   r     | NRW   r/w   | RA    r     | XLSX  r
-  DPX   r     | ITC   r     | NUMBERS r   | RAF   r/w   | XMP   r/w/c
-  DR4   r/w/c | J2C   r     | O     r     | RAM   r     | ZIP   r
-  DSS   r     | JNG   r/w   | ODP   r     | RAR   r     |
-  DV    r     | JP2   r/w   | ODS   r     | RAW   r/w   |
+  3FR   r     | DV    r     | JP2   r/w   | ODT   r     | RSRC  r
+  3G2   r/w   | DVB   r/w   | JPEG  r/w   | OFR   r     | RTF   r
+  3GP   r/w   | DVR-MS r    | JSON  r     | OGG   r     | RW2   r/w
+  A     r     | DYLIB r     | K25   r     | OGV   r     | RWL   r/w
+  AA    r     | EIP   r     | KDC   r     | OPUS  r     | RWZ   r
+  AAX   r/w   | EPS   r/w   | KEY   r     | ORF   r/w   | RM    r
+  ACR   r     | EPUB  r     | LA    r     | OTF   r     | SEQ   r
+  AFM   r     | ERF   r/w   | LFP   r     | PAC   r     | SKETCH r
+  AI    r/w   | EXE   r     | LNK   r     | PAGES r     | SO    r
+  AIFF  r     | EXIF  r/w/c | M2TS  r     | PBM   r/w   | SR2   r/w
+  APE   r     | EXR   r     | M4A/V r/w   | PCD   r     | SRF   r
+  ARW   r/w   | EXV   r/w/c | MAX   r     | PDB   r     | SRW   r/w
+  ASF   r     | F4A/V r/w   | MEF   r/w   | PDF   r/w   | SVG   r
+  AVI   r     | FFF   r/w   | MIE   r/w/c | PEF   r/w   | SWF   r
+  AZW   r     | FLA   r     | MIFF  r     | PFA   r     | THM   r/w
+  BMP   r     | FLAC  r     | MKA   r     | PFB   r     | TIFF  r/w
+  BPG   r     | FLIF  r/w   | MKS   r     | PFM   r     | TORRENT r
+  BTF   r     | FLV   r     | MKV   r     | PGF   r     | TTC   r
+  CHM   r     | FPF   r     | MNG   r/w   | PGM   r/w   | TTF   r
+  COS   r     | FPX   r     | MOBI  r     | PLIST r     | VCF   r
+  CR2   r/w   | GIF   r/w   | MODD  r     | PICT  r     | VRD   r/w/c
+  CR3   r/w   | GPR   r/w   | MOI   r     | PMP   r     | VSD   r
+  CRM   r/w   | GZ    r     | MOS   r/w   | PNG   r/w   | WAV   r
+  CRW   r/w   | HDP   r/w   | MOV   r/w   | PPM   r/w   | WDP   r/w
+  CS1   r/w   | HDR   r     | MP3   r     | PPT   r     | WEBP  r
+  DCM   r     | HEIC  r     | MP4   r/w   | PPTX  r     | WEBM  r
+  DCP   r/w   | HEIF  r     | MPC   r     | PS    r/w   | WMA   r
+  DCR   r     | HTML  r     | MPG   r     | PSB   r/w   | WMV   r
+  DFONT r     | ICC   r/w/c | MPO   r/w   | PSD   r/w   | WTV   r
+  DIVX  r     | ICS   r     | MQV   r/w   | PSP   r     | WV    r
+  DJVU  r     | IDML  r     | MRW   r/w   | QTIF  r/w   | X3F   r/w
+  DLL   r     | IIQ   r/w   | MXF   r     | R3D   r     | XCF   r
+  DNG   r/w   | IND   r/w   | NEF   r/w   | RA    r     | XLS   r
+  DOC   r     | INX   r     | NRW   r/w   | RAF   r/w   | XLSX  r
+  DOCX  r     | ISO   r     | NUMBERS r   | RAM   r     | XMP   r/w/c
+  DPX   r     | ITC   r     | O     r     | RAR   r     | ZIP   r
+  DR4   r/w/c | J2C   r     | ODP   r     | RAW   r/w   |
+  DSS   r     | JNG   r/w   | ODS   r     | RIFF  r     |
 
   Meta Information
   ----------------------+----------------------+---------------------
@@ -401,13 +406,13 @@
 <dt id="b--binary"><b>-b</b> (<b>-binary</b>)</dt>
 <dd>
 
-<p>Output requested metadata in binary format without tag names or descriptions. This option is mainly used for extracting embedded images or other binary data, but it may also be useful for some text strings since control characters (such as newlines) are not replaced by &#39;.&#39; as they are in the default output. By default, list items are separated by a newline when extracted with the <b>-b</b> option, but this may be changed (see the <b>-sep</b> option for details). May be combined with <code>-j</code>, <code>-php</code> or <code>-X</code> to extract binary data in JSON, PHP or XML format.</p>
+<p>Output requested metadata in binary format without tag names or descriptions. This option is mainly used for extracting embedded images or other binary data, but it may also be useful for some text strings since control characters (such as newlines) are not replaced by &#39;.&#39; as they are in the default output. By default, list items are separated by a newline when extracted with the <b>-b</b> option, but this may be changed (see the <b>-sep</b> option for details). May be combined with <code>-j</code>, <code>-php</code> or <code>-X</code> to extract binary data in JSON, PHP or XML format, but note that &quot;unsafe&quot; tags must be specified explicitly to be extracted as binary in these formats.</p>
 
 </dd>
 <dt id="c-FMT--coordFormat"><b>-c</b> <i>FMT</i> (<b>-coordFormat</b>)</dt>
 <dd>
 
-<p>Set the print format for GPS coordinates. <i>FMT</i> uses the same syntax as the <code>printf</code> format string. The specifiers correspond to degrees, minutes and seconds in that order, but minutes and seconds are optional. For example, the following table gives the output for the same coordinate using various formats:</p>
+<p>Set the print format for GPS coordinates. <i>FMT</i> uses the same syntax as a <code>printf</code> format string. The specifiers correspond to degrees, minutes and seconds in that order, but minutes and seconds are optional. For example, the following table gives the output for the same coordinate using various formats:</p>
 
 <pre><code>            FMT                  Output
     -------------------    ------------------
@@ -615,7 +620,9 @@
 <dt id="p-FMTFILE-or-STR--printFormat"><b>-p</b> <i>FMTFILE</i> or <i>STR</i> (<b>-printFormat</b>)</dt>
 <dd>
 
-<p>Print output in the format specified by the given file or string. Tag names in the format file or string begin with a <code>$</code> symbol and may contain a leading group names and/or a trailing <code>#</code>. Case is not significant. Braces <code>{}</code> may be used around the tag name to separate it from subsequent text. Use <code>$$</code> to represent a <code>$</code> symbol, and <code>$/</code> for a newline. Multiple <b>-p</b> options may be used, each contributing a line of text to the output. Lines beginning with <code>#[HEAD]</code> and <code>#[TAIL]</code> are output before the first processed file and after the last processed file respectively. Lines beginning with <code>#[SECT]</code> and <code>#[ENDS]</code> are output around each section of files. A section is defined as a group of consecutive files with the same section header (eg. files are grouped by directory if <code>#[SECT]</code> contains <code>$directory</code>). Lines beginning with <code>#[BODY]</code> and lines not beginning with <code>#</code> are output for each processed file. Lines beginning with <code>#[IF]</code> are not output, but the BODY lines are skipped if any tag on an IF line doesn&#39;t exist. Other lines beginning with <code>#</code> are ignored. For example, this format file:</p>
+<p>Print output in the format specified by the given file or string. The argument is interpreted as a string unless a file of that name exists, in which case the string is loaded from the contents of the file. Tag names in the format file or string begin with a <code>$</code> symbol and may contain a leading group names and/or a trailing <code>#</code>. Case is not significant. Braces <code>{}</code> may be used around the tag name to separate it from subsequent text. Use <code>$$</code> to represent a <code>$</code> symbol, and <code>$/</code> for a newline.</p>
+
+<p>Multiple <b>-p</b> options may be used, each contributing a line (or more) of text to the output. Lines beginning with <code>#[HEAD]</code> and <code>#[TAIL]</code> are output before the first processed file and after the last processed file respectively. Lines beginning with <code>#[SECT]</code> and <code>#[ENDS]</code> are output around each section of files. A section is defined as a group of consecutive files with the same section header (eg. files are grouped by directory if <code>#[SECT]</code> contains <code>$directory</code>). Lines beginning with <code>#[BODY]</code> and lines not beginning with <code>#</code> are output for each processed file. Lines beginning with <code>#[IF]</code> are not output, but the BODY lines are skipped if any tag on an IF line doesn&#39;t exist. Other lines beginning with <code>#</code> are ignored. For example, this format file:</p>
 
 <pre><code>    # this is a comment line
     #[HEAD]-- Generated by ExifTool $exifToolVersion --
@@ -629,7 +636,7 @@
 
 <p>produces output like this:</p>
 
-<pre><code>    -- Generated by ExifTool 10.80 --
+<pre><code>    -- Generated by ExifTool 11.00 --
     File: a.jpg - 2003:10:31 15:44:19
     (f/5.6, 1/60s, ISO 100)
     File: b.jpg - 2006:05:23 11:57:38
@@ -847,6 +854,8 @@
 
 <p>Extract information from embedded documents in EPS files, embedded EPS information and JPEG and Jpeg2000 images in PDF files, embedded MPF images in JPEG and MPO files, streaming metadata in AVCHD videos, and the resource fork of Mac OS files. Implies the <b>-a</b> option. Use <b>-g3</b> or <b>-G3</b> to identify the originating document for extracted information. Embedded documents containing sub-documents are indicated with dashes in the family 3 group name. (eg. <code>Doc2-3</code> is the 3rd sub-document of the 2nd embedded document.) Note that this option may increase processing time substantially, especially for PDF files with many embedded images.</p>
 
+<p>When used with <b>-ee</b>, the <b>-p</b> option is evaluated for each embedded document as if it were a separate input file. This allows, for example, generation of GPS track logs from timed metadata in videos. See <a href="http://owl.phy.queensu.ca/~phil/exiftool/geotag.html#Inverse">http://owl.phy.queensu.ca/~phil/exiftool/geotag.html#Inverse</a> for examples.</p>
+
 </dd>
 <dt id="ext-EXT---ext-EXT--extension"><b>-ext</b>[+] <i>EXT</i>, <b>--ext</b> <i>EXT</i> (<b>-extension</b>)</dt>
 <dd>
@@ -898,7 +907,7 @@
 <dt id="if-EXPR"><b>-if</b> <i>EXPR</i></dt>
 <dd>
 
-<p>Specify a condition to be evaluated before processing each <i>FILE</i>. <i>EXPR</i> is a Perl-like logic expression containing tag names prefixed by <code>$</code> symbols. It is evaluated with the tags from each <i>FILE</i> in turn, and the file is processed only if the expression returns true. Unlike Perl variable names, tag names are not case sensitive and may contain a hyphen. As well, tag names may have a leading group names separated by colons, and/or a trailing <code>#</code> character to disable print conversion. The expression <code>$GROUP:all</code> evaluates to 1 if any tag exists in the specified <code>GROUP</code>, or 0 otherwise (see note 2 below). When multiple <b>-if</b> options are used, all conditions must be satisfied to process the file. Returns an exit status of 1 if all files fail the condition. Below are a few examples:</p>
+<p>Specify a condition to be evaluated before processing each <i>FILE</i>. <i>EXPR</i> is a Perl-like logic expression containing tag names prefixed by <code>$</code> symbols. It is evaluated with the tags from each <i>FILE</i> in turn, and the file is processed only if the expression returns true. Unlike Perl variable names, tag names are not case sensitive and may contain a hyphen. As well, tag names may have a leading group names separated by colons, and/or a trailing <code>#</code> character to disable print conversion. The expression <code>$GROUP:all</code> evaluates to 1 if any tag exists in the specified <code>GROUP</code>, or 0 otherwise (see note 2 below). When multiple <b>-if</b> options are used, all conditions must be satisfied to process the file. Returns an exit status of 2 if all files fail the condition. Below are a few examples:</p>
 
 <pre><code>    # extract shutterspeed from all Canon images in a directory
     exiftool -shutterspeed -if &#39;$make eq &quot;Canon&quot;&#39; dir
@@ -1243,7 +1252,7 @@
 <dt id="userParam-PARAM-VAL"><b>-userParam</b> <i>PARAM[[^]=[VAL]]</i></dt>
 <dd>
 
-<p>Set user parameter. <i>PARAM</i> is an arbitrary user parameter name. This is an interface to the API UserParam option (see the <a>Image::ExifTool Options</a> documentation), and provides a method to access user-defined parameters from inside tag name expressions (as if it were any other tag, see example below), and from PrintConv/ValueConv logic (via the ExifTool Options function). Similar to the <b>-api</b> option, the parameter value is set to 1 if <i>=VAL</i> is omitted, undef if just <i>VAL</i> is omitted and <code>=</code> is used, or an empty string if <i>VAL</i> is omitted and <code>^=</code> is used.</p>
+<p>Set user parameter. <i>PARAM</i> is an arbitrary user parameter name. This is an interface to the API UserParam option (see the <a>Image::ExifTool Options</a> documentation), and provides a method to access user-defined parameters from inside tag name expressions (as if it were any other tag, see example below), and from PrintConv/ValueConv logic (via the ExifTool Options function). Similar to the <b>-api</b> option, the parameter value is set to 1 if <i>=VAL</i> is omitted, undef if just <i>VAL</i> is omitted with <code>=</code>, or an empty string if <i>VAL</i> is omitted with <code>^=</code>.</p>
 
 <pre><code>    exiftool -p &#39;$test from $filename&#39; -userparam test=Hello FILE</code></pre>
 
@@ -1256,7 +1265,13 @@
 
 <pre><code>    exiftool -p &#39;${make;tr/ /_/;s/__+/_/g}&#39; image.jpg</code></pre>
 
+<p>A <code>@</code> may be added after the tag name to make the expression act on individual list items for list-type tags, simplifying list processing. As an example, the following command returns all subjects not containing the string &quot;xxx&quot;:</p>
+
+<pre><code>    exiftool -p &#39;${subject@;$_=undef if /xxx/}&#39; image.jpg</code></pre>
+
 <p>A default expression of <code>tr(/\\?*:|&quot;&lt;&gt;\0)()d</code> is assumed if the expression is empty (ie. <code>${TAG;}</code>). This removes the characters / \ ? * : | &lt; &gt; and null from the printed value. (These characters are illegal in Windows file names, so this feature is useful if tag values are used in file names.)</p>
+
+<h4 id="Helper-functions">Helper functions</h4>
 
 <p>ExifTool provides a <code>DateFmt</code> utility to simplify reformatting of individual date/time values. The function acts on a standard EXIF-formatted date/time value in <code>$_</code> and formats it according to the specified format string (see the <b>-d</b> option). To avoid trying to reformat an already formatted date/time value, a <code>#</code> must be added to the tag name (as in the example below) if the <b>-d</b> option is also used. For example:</p>
 

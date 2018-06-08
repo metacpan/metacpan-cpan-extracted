@@ -1,0 +1,49 @@
+==================================================
+Changes from 2017-06-06 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2018-06-06 19:41:00 +0000
+------------------------------------------
+
+  Change: 2f08de315779cfbfc567c2847fdf7b2a96d2691d
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-06-06 21:39:23 +0000
+
+    Use newest Device::BusPirate for macOS support 
+
+  Change: f4eb6027b59200386d3f639d9a15fa105ff8b7f5
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-06-04 01:02:47 +0000
+
+    Use Time::HiRes instead of select to pacify perlcritic
+
+    Perl::Critic::Policy::BuiltinFunctions::ProhibitSleepViaSelect:
+
+    "Conway discourages the use of select() for performing non-integer
+    sleeps. Although documented in perlfunc, it's something that
+    generally requires the reader to read perldoc -f select to figure out
+    what it should be doing. Instead, Conway recommends that you use the
+    Time::HiRes module when you want to sleep." 
+
+  Change: 06ac494335361c649e9b5dfa901068863cea9581
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-06-04 01:02:46 +0000
+
+    Generate top-level README.pod from command-line tool 
+
+  Change: 39842ed99e7bfd592eec8f39d0b83d32a7477524
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-06-04 01:02:46 +0000
+
+    Add test image to be uploaded by default 
+
+  Change: 836d2312c1ac5612b2c054886b037c3b838c15b9
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-06-04 01:02:45 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

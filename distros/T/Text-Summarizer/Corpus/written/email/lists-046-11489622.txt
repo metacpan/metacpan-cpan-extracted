@@ -1,0 +1,73 @@
+
+
+
+docno="lists-046-11489622"
+name="Dave Raggett"
+email="dsr@w3.org"
+sent="Fri, 22 Mar 1996 18:19:06 -0500"
+subject="Minutes for 18th March"
+To: w3c-math-erb@w3.org
+
+
+
+     
+   
+Meeting Notes of Math-ERB Teleconference:
+Thursday 18th March '96
+
+Present:
+
+      Bruce Smith, Wolfram
+      Neil Soiffer, Wolfram
+      T.V. Raman, Adobe
+      Dave Raggett, W3C
+
+Meeting time/frequency
+
+Dave has been unable to find any time that all of us can make. The new time
+will be every Monday at 1300 EST until further notice. Dave will attempt to
+keep Nico in the loop via email on the mailing list and separate phone calls.
+
+
+Adding further People to the Math-ERB
+
+Stu Weibel of OCLC sends his regrets that they are too busy to accept the
+invitation at this time. Elsevier have contacted the AMS. Ralph Youngen,
+Associate Director, Electronic Product Development for AMS has accepted the
+invitation to join the group, along with a couple of his colleagues.
+
+The need for full SGML?
+
+We discussed whether it was necessary to use SGML for the math notation.
+Basically, we have a preference for an extensible operator precedence
+notation. This can be included in HTML documents and handled correctly by
+SGML processing applications via the NOTATION mechanism.
+
+When using operator precedence, there is a need to constrain the context in
+which given operators can be used. Niel said this wasn't as simple as at
+first it might appear. Dave will work on a formal mechanism for this.
+
+It is also unclear as to when macro processing is applied. Further discussion
+on this is needed. It should be practical for parsers to deal with missing
+arguments sensibly. This in general depends on the context.
+
+Raman voiced a concern on Bruce's comment on 2D pictures. We agreed however,
+that a fixed set of "layout" idioms are sufficient for HTML-math. Raman
+promised to propose some new wording. He also gave us a URL for his test
+suite, which I have added to the math-erb home page.
+
+We ended by discussing some of the parsing issues for mismatched brackets and
+number literals. It seems clear that bracket matching can't in general be
+required. Authors should be able to control the settings for this and for
+literals.
+
+Dave has posted a dump of his understanding as a result of this conference
+call. See: current thoughts.
+
+Dave Raggett, 22nd March.
+
+-- Dave Raggett <dsr@w3.org> tel: +1 (617) 258 5741 fax: +1 (617) 258 5999
+   World Wide Web Consortium, 545 Technology Square, Cambridge, MA 02139
+   url = http://www.w3.org/People/Raggett
+
+

@@ -26,7 +26,7 @@ use Date::Manip::Base;
 use Date::Manip::TZ;
 
 our $VERSION;
-$VERSION='6.71';
+$VERSION='6.72';
 END { undef $VERSION; }
 
 ########################################################################
@@ -2054,7 +2054,6 @@ sub _locate_n {
       if ($unmod) {
          my $n = 0;
          while (1) {
-            $n++;
             if ($n > $maxatt) {
                $$self{'err'} =
                  "[_locate_n] Unable to find an interval in $maxatt attempts";
@@ -2062,14 +2061,18 @@ sub _locate_n {
             }
             $self->_nth_interval($first_int);
             my $date = $$self{'data'}{'idate'}{$first_int}[0];
-            last  if (defined $date  &&  $date->cmp($start) < 0);
+            if (defined($date)) {
+               $n = 0;
+               last  if ($date->cmp($start) < 0);
+            } else {
+               $n++;
+            }
             $first_int--;
          }
 
       } else {
          my $n = 0;
          while (1) {
-            $n++;
             if ($n > $maxatt) {
                $$self{'err'} =
                  "[_locate_n] Unable to find an interval in $maxatt attempts";
@@ -2079,7 +2082,14 @@ sub _locate_n {
             my $ptr   = $$self{'data'}{'idate'}{$first_int}[2];
             if (defined $ptr) {
                my $date  = $$self{'data'}{'dates'}{$ptr};
-               last  if (defined $date  &&  $date->cmp($start) < 0);
+               if (defined($date)) {
+                  $n = 0;
+                  last  if ($date->cmp($start) < 0);
+               } else {
+                  $n++;
+               }
+            } else {
+               $n++;
             }
             $first_int--;
          }
@@ -2091,7 +2101,6 @@ sub _locate_n {
       if ($unmod) {
          my $n = 0;
          while (1) {
-            $n++;
             if ($n > $maxatt) {
                $$self{'err'} =
                  "[_locate_n] Unable to find an interval in $maxatt attempts";
@@ -2099,7 +2108,12 @@ sub _locate_n {
             }
             $self->_nth_interval($first_int);
             my $date = $$self{'data'}{'idate'}{$first_int}[0];
-            last  if (defined $date  &&  $date->cmp($start) >= 0);
+            if (defined($date)) {
+               $n = 0;
+               last  if ($date->cmp($start) >= 0);
+            } else {
+               $n++;
+            }
             $first_int++;
          }
          $first = $$self{'data'}{'idate'}{$first_int}[1];
@@ -2107,7 +2121,6 @@ sub _locate_n {
       } else {
          my $n = 0;
          while (1) {
-            $n++;
             if ($n > $maxatt) {
                $$self{'err'} =
                  "[_locate_n] Unable to find an interval in $maxatt attempts";
@@ -2117,7 +2130,14 @@ sub _locate_n {
             my $ptr   = $$self{'data'}{'idate'}{$first_int}[2];
             if (defined $ptr) {
                my $date  = $$self{'data'}{'dates'}{$ptr};
-               last  if (defined $date  &&  $date->cmp($start) >= 0);
+               if (defined($date)) {
+                  $n = 0;
+                  last  if ($date->cmp($start) >= 0);
+               } else {
+                  $n++;
+               }
+            } else {
+               $n++;
             }
             $first_int++;
          }
@@ -2140,7 +2160,6 @@ sub _locate_n {
       if ($unmod) {
          my $n = 0;
          while (1) {
-            $n++;
             if ($n > $maxatt) {
                $$self{'err'} =
                  "[_locate_n] Unable to find an interval in $maxatt attempts";
@@ -2148,7 +2167,12 @@ sub _locate_n {
             }
             $self->_nth_interval($last_int);
             my $date = $$self{'data'}{'idate'}{$last_int}[0];
-            last  if (defined $date  &&  $date->cmp($end) > 0);
+            if (defined($date)) {
+               $n = 0;
+               last  if ($date->cmp($end) > 0);
+            } else {
+               $n++;
+            }
             $last_int++;
          }
          $last_int--;
@@ -2165,7 +2189,6 @@ sub _locate_n {
       } else {
          my $n = 0;
          while (1) {
-            $n++;
             if ($n > $maxatt) {
                $$self{'err'} =
                  "[_locate_n] Unable to find an interval in $maxatt attempts";
@@ -2175,7 +2198,14 @@ sub _locate_n {
             my $ptr   = $$self{'data'}{'idate'}{$last_int}[1];
             if (defined $ptr) {
                my $date  = $$self{'data'}{'dates'}{$ptr};
-               last  if (defined $date  &&  $date->cmp($end) > 0);
+               if (defined($date)) {
+                  $n = 0;
+                  last  if ($date->cmp($end) > 0);
+               } else {
+                  $n++;
+               }
+            } else {
+               $n++;
             }
             $last_int++;
          }
@@ -2228,7 +2258,6 @@ sub _locate_n {
    if ($unmod) {
       my $n = 0;
       while (1) {
-         $n++;
          if ($n > $maxatt) {
             $$self{'err'} =
               "[_locate_n] Unable to find an interval in $maxatt attempts";
@@ -2236,7 +2265,12 @@ sub _locate_n {
          }
          $self->_nth_interval($first_int);
          my $date = $$self{'data'}{'idate'}{$first_int};
-         last  if (defined $date  &&  $date->cmp($start) < 0);
+         if (defined($date)) {
+            $n = 0;
+            last  if ($date->cmp($start) < 0);
+         } else {
+            $n++;
+         }
          $first_int--;
       }
 
@@ -2244,7 +2278,6 @@ sub _locate_n {
       my $n = 0;
       LOOP:
       while (1) {
-         $n++;
          if ($n > $maxatt) {
             $$self{'err'} =
               "[_locate_n] Unable to find an interval in $maxatt attempts";
@@ -2252,9 +2285,17 @@ sub _locate_n {
          }
          $self->_nth_interval($first_int);
          for (my $i=($first_int+1)*$ev - 1; $i >= $first_int*$ev; $i--) {
-            next  if (! exists $$self{'data'}{'dates'}{$i});
-            my $date = $$self{'data'}{'dates'}{$i};
-            last LOOP  if ($date->cmp($start) < 0);
+            if (exists $$self{'data'}{'dates'}{$i}) {
+               my $date = $$self{'data'}{'dates'}{$i};
+               if (defined($date)) {
+                  $n = 0;
+                  last LOOP  if ($date->cmp($start) < 0);
+               } else {
+                  $n++;
+               }
+            } else {
+               $n++;
+            }
          }
          $first_int--;
       }
@@ -2266,7 +2307,6 @@ sub _locate_n {
    if ($unmod) {
       my $n = 0;
       while (1) {
-         $n++;
          if ($n > $maxatt) {
             $$self{'err'} =
               "[_locate_n] Unable to find an interval in $maxatt attempts";
@@ -2274,7 +2314,12 @@ sub _locate_n {
          }
          $self->_nth_interval($first_int);
          my $date = $$self{'data'}{'idate'}{$first_int};
-         last  if (defined $date  &&  $date->cmp($start) >= 0);
+         if (defined($date)) {
+            $n = 0;
+            last  if ($date->cmp($start) >= 0);
+         } else {
+            $n++;
+         }
          $first_int++;
       }
 
@@ -2282,7 +2327,6 @@ sub _locate_n {
       my $n = 0;
       LOOP:
       while (1) {
-         $n++;
          if ($n > $maxatt) {
             $$self{'err'} =
               "[_locate_n] Unable to find an interval in $maxatt attempts";
@@ -2290,9 +2334,17 @@ sub _locate_n {
          }
          $self->_nth_interval($first_int);
          for (my $i=($first_int+1)*$ev - 1; $i >= $first_int*$ev; $i--) {
-            next  if (! exists $$self{'data'}{'dates'}{$i});
-            my $date = $$self{'data'}{'dates'}{$i};
-            last LOOP  if ($date->cmp($start) >= 0);
+            if (exists $$self{'data'}{'dates'}{$i}) {
+               my $date = $$self{'data'}{'dates'}{$i};
+               if (defined($date)) {
+                  $n = 0;
+                  last LOOP  if ($date->cmp($start) >= 0);
+               } else {
+                  $n++;
+               }
+            } else {
+               $n++;
+            }
          }
          $first_int++;
       }
@@ -2307,7 +2359,6 @@ sub _locate_n {
    if ($unmod) {
       my $n = 0;
       while (1) {
-         $n++;
          if ($n > $maxatt) {
             $$self{'err'} =
               "[_locate_n] Unable to find an interval in $maxatt attempts";
@@ -2315,7 +2366,12 @@ sub _locate_n {
          }
          $self->_nth_interval($last_int);
          my $date = $$self{'data'}{'idate'}{$last_int};
-         last  if (defined $date  &&  $date->cmp($end) > 0);
+         if (defined($date)) {
+            $n = 0;
+            last  if ($date->cmp($end) > 0);
+         } else {
+            $n++;
+         }
          $last_int++;
       }
       $last_int--;
@@ -2324,7 +2380,6 @@ sub _locate_n {
       my $n = 0;
       LOOP:
       while (1) {
-         $n++;
          if ($n > $maxatt) {
             $$self{'err'} =
               "[_locate_n] Unable to find an interval in $maxatt attempts";
@@ -2334,7 +2389,12 @@ sub _locate_n {
          for (my $i=($last_int+1)*$ev - 1; $i >= $last_int*$ev; $i--) {
             next  if (! exists $$self{'data'}{'dates'}{$i});
             my $date = $$self{'data'}{'dates'}{$i};
-            last LOOP  if ($date->cmp($end) >= 0);
+            if (defined($date)) {
+               $n = 0;
+               last LOOP  if ($date->cmp($end) >= 0);
+            } else {
+               $n++;
+            }
          }
          $last_int++;
       }

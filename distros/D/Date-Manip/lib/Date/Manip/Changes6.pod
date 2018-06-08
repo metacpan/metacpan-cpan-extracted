@@ -27,11 +27,32 @@ For the most part, Date::Manip has remained backward compatible at
 every release, but occasionally, a change is made which is backward
 incompatible. These are marked with an exclamation mark (!).
 
-=head1 VERSION 6.73 (planned 2018-12-01)
+=head1 VERSION 6.74 (planned 2018-12-01)
 
-=head1 VERSION 6.72 (planned 2018-09-01)
+=head1 VERSION 6.73 (planned 2018-09-01)
 
-=head1 VERSION 6.71 (planned 2018-06-01)
+=head1 VERSION 6.72 (2018-06-06)
+
+=over 4
+
+=item Fixed recurrence bug
+
+The fix in the previous version for a rare recurrence problem broke
+another recurrence form.  It is now corrected.  Michael Schout
+(GitHub #20)
+
+=item Fixed version problem
+
+The wrong version was included in two files for some reason.  This
+is fixed.
+
+=item Documentation fixes
+
+Fixed a grammatical error reported by Xavier Guimard (GitHub #19).
+
+=back
+
+=head1 VERSION 6.71 (2018-06-01)
 
 =over 4
 

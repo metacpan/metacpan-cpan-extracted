@@ -14,6 +14,7 @@ t/File-Rename-list-null.t
 t/File-Rename-V.t
 t/pod.t
 t/pod-coverage.t
+t/testlib.pl
 lib/File/Rename.pm
 rename.PL
 examples/rename.pl

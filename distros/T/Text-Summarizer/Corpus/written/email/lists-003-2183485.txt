@@ -1,0 +1,38 @@
+
+
+
+docno="lists-003-2183485"
+received="Tue Jun 22 18:50:42 1993 EST" 
+sent="Wed, 23 Jun 1993 10:49:08 +0900" 
+name="Eiiti Wada" 
+email="wada@u-tokyo.ac.jp" 
+subject="Re: Who knows about 10646 escape sequences?" 
+id="9306230149.AA28724@sino.syslab.iias.flab.fujitsu.co.jp" 
+inreplyto="Who knows about 10646 escape sequences?" 
+
+To: ietf-charsets@INNOSOFT.COM
+
+
+
+
+Harald Tveit Alvestrand <harald.t.alvestrand@delab.sintef.no>:
+
+>Who knows if ISO 10646 has been assigned numbers and escape sequences?
+
+Escape sequences are assigned by the Registration Authority, and the
+ Registration
+Authority is now with ECMA.
+
+So, ask Mr. van den Beld of ECMA about the current situations of ISO 10646
+ escape
+sequences.
+
+His e-mail address is:
+
+jan.van-den-beld@ecma.ch
+
+
+Eiiti Wada (wada@u-tokyo.ac.jp)
+
+
+

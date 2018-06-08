@@ -54,7 +54,6 @@
          "requires" : {
             "Alien::TinyCC" : "0",
             "FFI::Platypus" : "0.15",
-            "FFI::Platypus::Type::StringArray" : "0.01",
             "File::ShareDir::Dist" : "0",
             "perl" : "5.008001"
          }
@@ -73,23 +72,24 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/plicease/FFI-TinyCC/issues"
+         "web" : "https://github.com/Perl5-FFI/FFI-TinyCC/issues"
       },
       "homepage" : "https://metacpan.org/pod/FFI::TinyCC",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/plicease/FFI-TinyCC.git",
-         "web" : "https://github.com/plicease/FFI-TinyCC"
+         "url" : "git://github.com/Perl5-FFI/FFI-TinyCC.git",
+         "web" : "https://github.com/Perl5-FFI/FFI-TinyCC"
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.26",
+   "version" : "0.28",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "aero",
       "Dylan Cali (calid)",
       "pipcet"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
+   "x_use_unsafe_inc" : 0
 }
 

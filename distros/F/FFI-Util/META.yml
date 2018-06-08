@@ -12,7 +12,7 @@ configure_requires:
   Module::Build::FFI: '0.19'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,8 +26,10 @@ requires:
   perl: '5.008001'
 resources:
   IRC: irc://irc.perl.org/#native
-  bugtracker: https://github.com/plicease/FFI-Util/issues
-  homepage: http://perl.wdlabs.com/FFI-Util
-  repository: git://github.com/plicease/FFI-Util.git
-version: '0.16'
+  bugtracker: https://github.com/Perl5-FFI/FFI-Util/issues
+  homepage: https://metacpan.org/pod/FFI::Util
+  repository: git://github.com/Perl5-FFI/FFI-Util.git
+version: '0.17'
 x_deprecated: 1
+x_serialization_backend: 'YAML::Tiny version 1.70'
+x_use_unsafe_inc: 0

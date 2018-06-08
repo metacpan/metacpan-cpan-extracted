@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html><head><title>Can ClickMagick send a Postback to another service?</title></head><body>
+<strong>Can ClickMagick send a Postback to another service?</strong><br />
+<br />
+You bet! In ClickMagick, we call these &ldquo;Custom Postbacks&rdquo; and you can set one up for any tracking link so that when an Action, Engagement, or Sale is attributed to that link, the Custom Postback request will be sent and your service will be notified.<br />
+<br />
+To set up a Custom Postback URL, just follow these steps:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>1.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Get the Postback URL from the service that you want ClickMagick to send the postback request to when a conversion is recorded in your tracking link.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>2.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Go to the <strong><a href="/user/action/tools/customposts.cgi" target="_blank">Custom Postbacks</a></strong> tool in the Tools menu.</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>3.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Choose the tracking link that you want the Custom Postback associated with, select which&nbsp;<strong>Conversion Type</strong>&nbsp;should trigger the postback request, and enter your service&rsquo;s postback URL:<br />
+			<br />
+			<br />
+			<img src="//cdn.clickmagick.com/images/user/faqs/faq217custompb.jpg" /><br />
+			&nbsp;</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+As a general rule you&rsquo;ll need to use the <code>[s1]</code> and <code>[amount]</code> tokens in your Custom Postbacks. The <code>[s1]</code> token represents the click ID or transaction ID that was originally sent to ClickMagick by the original service (typically a traffic source), and in the case of a sale, the <code>[amount]</code> token represents the amount of the sale that was made. For a Custom Sales Postback, you would normally use both of these tokens.<br />
+<br />
+For example, the Custom Postback setting for the MGID traffic source would look like this, with &ldquo;golfclubs82573&rdquo;&nbsp;being changed for different offers:<br />
+<br />
+<code>http://a.mgid.com/postback?c=[s1]&amp;r=[amount]&amp;e=golfclubs82573</code><br />
+<br />
+When ClickMagick processes the Custom Postback, it will automatically replace the <code>[s1]</code> and <code>[amount]</code> tokens with real values.<br />
+<br />
+If you want to send custom postbacks for more than one Conversion Type, just create a separate custom postback for each type.<br />
+&nbsp;<br />
+&nbsp;
+<div class="faq-note"><b>Note:</b> ClickMagick can both send and receive postback requests.&nbsp;The &ldquo;Custom Postbacks&rdquo; talked about in this FAQ are postbacks sent <em>from</em>&nbsp;ClickMagick&nbsp;<em>to</em> other services, whereas the Postback Builder and Postback Debugger tools are used to manage postbacks that are sent <em>to</em> ClickMagick <em>from</em> other services. To learn more about the differences between these two types of Postback, read this FAQ:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=317"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=317">&nbsp;What&rsquo;s the difference between a Postback URL and a Custom Postback?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+</body></html>

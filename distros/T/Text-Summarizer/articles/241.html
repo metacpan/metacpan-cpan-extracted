@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html><head><title>How can I set a Goal on a page I can’t edit?</title></head><body>
+<strong>How can I set a Goal on a page I can&rsquo;t edit?</strong><br />
+<br />
+In order to set a Goal on a page in the Funnel Builder, you need to add the funnel tracking code to the page that the Page URL setting points to. But what if the page where you need to add the tracking code is someone else&rsquo;s page that you can&rsquo;t edit, such as the entry page to an affiliate network?<br />
+<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq303diagram.jpg" /><br />
+<br />
+In this example, you can&rsquo;t add the funnel tracking code to the Sales Page, and because of that you can&rsquo;t set a Goal on the Sales Page in the Funnel Builder&hellip;<br />
+<br />
+So how would you set a Goal after the Opt-in Page to know how many people opted in?<br />
+<br />
+It turns out that this problem is easily solvable if you can insert an &ldquo;intermediate&rdquo; (or &ldquo;interstitial&rdquo;) page in your funnel right before the page you can&rsquo;t edit&mdash;in this case, the Sales Page:<br />
+&nbsp;<br />
+<img src="//cdn.clickmagick.com/images/user/faqs/faq303intermediate.jpg" /><br />
+&nbsp;<br />
+This new page wouldn&rsquo;t do anything&nbsp;but set the Goal and immediately redirect to the page that you can&rsquo;t edit. You&rsquo;ve certainly seen these pages before&mdash;they&rsquo;re usually a blank white page that says something like &ldquo;Please wait one moment&rdquo; or &ldquo;Redirecting in 3 seconds...&rdquo; or something like that.<br />
+&nbsp;<br />
+Workable, but not pretty.<br />
+<br />
+In our <strong><a href="/user/faqs.cgi?answer=208">FAQ on Intermediate Pages</a></strong>, we explain exactly how these pages work, and more importantly we explain how using the Pixel/Code setting of a tracking link is a <em>much</em> better solution.<br />
+<br />
+You can review the FAQ on Intermediate Pages if you&rsquo;re curious, but all you need to do is follow these steps and you&rsquo;ll be up and running:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>1.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td><strong><a href="/user/faqs.cgi?answer=109">Create a tracking link</a></strong> and set the Primary URL to point at the page that you can&rsquo;t edit. Use this tracking link to replace the link that you&rsquo;re currently using to point at that page.<br />
+			<br />
+			In other words, using our example, you would create a tracking link that points to the Sales Page and replace the link in the Opt-in Page with the tracking link. This way, after the visitor opts in, they go through the tracking link to get to the Sales Page.<br />
+			&nbsp;</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>2.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>From the Settings menu <img src="//cdn.clickmagick.com/images/user/faqs/gear.png" />&nbsp;for your funnel, select &ldquo;Tracking Code&rdquo; and copy the tracking code. Next, go back to your tracking link and paste the tracking code into the Pixel/Code setting in the Advanced Settings of the tracking link. Save your changes.<br />
+			<br />
+			By using the Pixel/Code setting, the tracking link will create a <em>hidden</em> intermediate page between the Opt-in Page and the Sales Page (in this example) that you can set your Goal on.<br />
+			&nbsp;</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>3.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Next, to add the hidden page to your Funnel Builder diagram, you&rsquo;ll need it&rsquo;s URL. This will be different for every tracking link. To get the URL for the hidden page of the tracking link you just created, follow the instructions in this FAQ:<br />
+			&nbsp;
+			<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+				<tbody style="box-sizing: border-box;">
+					<tr style="box-sizing: border-box;">
+						<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=302"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+						<td style="box-sizing: border-box;">&nbsp;</td>
+						<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=302">&nbsp;What&rsquo;s the URL for the hidden Pixel/Code page?</a></b></td>
+					</tr>
+				</tbody>
+			</table>
+			&nbsp;</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td valign="top"><b>4.</b></td>
+			<td>&nbsp;&nbsp;</td>
+			<td>Now that you have the URL to the hidden intermediate page for your tracking link, add the page to your funnel by creating a new page in the Funnel Builder and connect the pages like this:<br />
+			<br />
+			<img src="//cdn.clickmagick.com/images/user/faqs/faq303hiddenpage.jpg" /><br />
+			<br />
+			The actual settings for the hidden page in the Funnel Builder would be similar to these:<br />
+			<br />
+			<br />
+			&nbsp; &nbsp;&nbsp;<img src="//cdn.clickmagick.com/images/user/faqs/faq303pagesettings.jpg" /><br />
+			<br />
+			<br />
+			Of course, for the Page URL setting, use the URL for the hidden page you got in Step 3, not the URL in the screenshot above. In other words, the &ldquo;12345&rdquo; part of the link should be different.<br />
+			<br />
+			Save your Page Settings, and save your funnel.<br />
+			<br />
+			&nbsp;
+			<div class="faq-note"><b>Note:</b> You might not have included the pages you can&rsquo;t edit in your Funnel Builder diagram. That&rsquo;s perfectly fine. In that case, the hidden page should point to the next page in your funnel that you <em>can</em> edit, if there is one.</div>
+			</td>
+		</tr>
+	</tbody>
+</table>
+&nbsp;<br />
+&nbsp;<br />
+<br />
+With this setup, you can now track your Goal using the new hidden page!<br />
+<br />
+To FunnelMagick, the hidden page is just like any other page that you can track and set Goals on. But to your visitors, they&rsquo;ll never see it, giving your visitors a nice clean user experience.<br />
+<br />
+&nbsp;
+<div class="faq-tip"><b>Tip:&nbsp;</b>If the Pixel/Code feature is completely unfamiliar to you and you like understanding why things work the way they do, you might want to review our FAQ on that:<br />
+&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-collapse: collapse; border-spacing: 0px; max-width: 100%;">
+	<tbody style="box-sizing: border-box;">
+		<tr style="box-sizing: border-box;">
+			<td style="box-sizing: border-box; width: 20px;"><a href="/user/faqs.cgi?answer=208"><img height="20" src="//cdn.clickmagick.com/images/user/faqpage.gif" style="box-sizing: border-box; border: 0px; vertical-align: middle;" width="17" /></a></td>
+			<td style="box-sizing: border-box;">&nbsp;</td>
+			<td style="box-sizing: border-box;"><b><a href="/user/faqs.cgi?answer=208">&nbsp;How can I set up an intermediate page to fire a pixel?</a></b></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+</body></html>

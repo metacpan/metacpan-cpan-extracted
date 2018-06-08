@@ -728,6 +728,87 @@ subtest 'find lib' => sub {
   };
 };
 
+subtest 'ALIEN_FORCE and ALIEN_INSTALL_TYPE vars' => sub {
+
+  local $ENV{ALIEN_FORCE} = 1;
+  
+  Alien::Base::ModuleBuild::_compute_force();
+  is $Alien::Base::ModuleBuild::Force, T();
+  is $Alien::Base::ModuleBuild::ForceSystem, F();
+
+  
+  $ENV{ALIEN_FORCE} = 0;
+
+  Alien::Base::ModuleBuild::_compute_force();
+  is $Alien::Base::ModuleBuild::Force, F();
+  is $Alien::Base::ModuleBuild::ForceSystem, F();
+
+  delete $ENV{ALIEN_FORCE};
+  local $ENV{ALIEN_INSTALL_TYPE} = 'share';
+
+  Alien::Base::ModuleBuild::_compute_force();
+  is $Alien::Base::ModuleBuild::Force, T();
+  is $Alien::Base::ModuleBuild::ForceSystem, F();
+
+
+  $ENV{ALIEN_INSTALL_TYPE} = 'system';
+
+  Alien::Base::ModuleBuild::_compute_force();
+  is $Alien::Base::ModuleBuild::Force, F();
+  is $Alien::Base::ModuleBuild::ForceSystem, T();
+
+
+  $ENV{ALIEN_INSTALL_TYPE} = 'default';
+
+  Alien::Base::ModuleBuild::_compute_force();
+  is $Alien::Base::ModuleBuild::Force, F();
+  is $Alien::Base::ModuleBuild::ForceSystem, F();
+
+
+  $ENV{ALIEN_FORCE} = 0;
+  $ENV{ALIEN_INSTALL_TYPE} = 'share';
+
+  Alien::Base::ModuleBuild::_compute_force();
+  is $Alien::Base::ModuleBuild::Force, T();
+  is $Alien::Base::ModuleBuild::ForceSystem, F();
+
+
+  $ENV{ALIEN_INSTALL_TYPE} = 'system';
+
+  Alien::Base::ModuleBuild::_compute_force();
+  is $Alien::Base::ModuleBuild::Force, F();
+  is $Alien::Base::ModuleBuild::ForceSystem, T();
+
+
+  $ENV{ALIEN_INSTALL_TYPE} = 'default';
+
+  Alien::Base::ModuleBuild::_compute_force();
+  is $Alien::Base::ModuleBuild::Force, F();
+  is $Alien::Base::ModuleBuild::ForceSystem, F();
+
+
+  $ENV{ALIEN_FORCE} = 1;
+  $ENV{ALIEN_INSTALL_TYPE} = 'share';
+
+  Alien::Base::ModuleBuild::_compute_force();
+  is $Alien::Base::ModuleBuild::Force, T();
+  is $Alien::Base::ModuleBuild::ForceSystem, F();
+
+
+  $ENV{ALIEN_INSTALL_TYPE} = 'system';
+
+  Alien::Base::ModuleBuild::_compute_force();
+  is $Alien::Base::ModuleBuild::Force, F();
+  is $Alien::Base::ModuleBuild::ForceSystem, T();
+
+
+  $ENV{ALIEN_INSTALL_TYPE} = 'default';
+
+  Alien::Base::ModuleBuild::_compute_force();
+  is $Alien::Base::ModuleBuild::Force, F();
+  is $Alien::Base::ModuleBuild::ForceSystem, F();
+};
+
 $CWD = "$abmb_root";
 
 my $count = 1;

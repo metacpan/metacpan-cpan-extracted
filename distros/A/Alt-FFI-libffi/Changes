@@ -1,5 +1,13 @@
 Revision history for Alt-FFI-libffi
 
+0.04      2018-06-06 08:33:26 -0400
+  - Windows fixes
+  - Floating point fixes to test
+  - Moving to Perl5-FFI org on github
+
+0.03      2018-06-06 07:39:07 -0400
+  - Documentation update
+
 0.02      2018-06-01 08:46:02 -0400
   - Update test suite to match FFI 1.12
 

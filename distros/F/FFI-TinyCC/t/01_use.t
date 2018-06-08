@@ -7,7 +7,6 @@ sub require_ok ($);
 
 my $ok = subtest 'use all' => sub {
   require_ok 'FFI::TinyCC';
-  require_ok 'FFI::TinyCC::Inline';
 };
 
 unless($ok)

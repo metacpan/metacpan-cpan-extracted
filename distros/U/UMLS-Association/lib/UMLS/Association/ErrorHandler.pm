@@ -38,7 +38,6 @@ package UMLS::Association::ErrorHandler;
 use Fcntl;
 use strict;
 use warnings;
-use DBI;
 use bytes;
 
 #  Errors and their error codes

@@ -6,8 +6,8 @@ use Test::More;
 use JavaScript::Duktape::XS;
 
 sub test_eval {
-    my $duk = JavaScript::Duktape::XS->new();
-    ok($duk, "created JavaScript::Duktape::XS object");
+    # my $duk = JavaScript::Duktape::XS->new();
+    # ok($duk, "created JavaScript::Duktape::XS object");
 
     my $times = 2_000;
     my $count = 0;

@@ -1,4 +1,4 @@
-package Pcore::Redis v0.12.0;
+package Pcore::Redis v0.13.0;
 
 use Pcore -dist, -class;
 
@@ -35,7 +35,7 @@ sub run ( $self, $cb ) {
     my $log_dir = "$ENV->{DATA_DIR}";
 
     # run server
-    P->pm->run_proc(
+    P->sys->run_proc(
         [ 'redis-server', '--include', "$self->{data_dir}/redis.conf" ],
         on_finish => sub ($proc) {
             $cb->($proc);

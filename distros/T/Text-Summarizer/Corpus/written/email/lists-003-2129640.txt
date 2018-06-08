@@ -1,0 +1,36 @@
+
+
+
+docno="lists-003-2129640"
+received="Mon May 17 15:10:42 1993 EST" 
+sent="Mon, 17 May 1993 15:05:50 -0700 (PDT)" 
+name="Mark Crispin" 
+email="mrc@Tomobiki-Cho.CAC.Washington.EDU" 
+subject="Re: CHARSET considerations" 
+id="MS-C.737676350.662824084.mrc@Tomobiki-Cho.CAC.Washington.EDU" 
+inreplyto="Pine.3.07.9305170958.E23900-b100000@norman.nwnet.net" 
+
+To: Laurence Lundblade <lgl@nwnet.net>
+Cc: ietf-charsets@INNOSOFT.COM, scs@adam.mit.edu, TROTH@ricevm1.rice.edu,
+
+
+
+
+Hi Laurence -
+
+     Perhaps all that is needed is a list in the system .pinerc file of all
+the valid charsets, and not let the user set her charset to one that is not in
+the list.  So, perhaps Pine could have US-ASCII, ISO-2022-JP, and the various
+ISO-8859-x sets wired in as an initial list, and the system file specify
+additional valid sets?
+
+     The concern is to avoid letting users do things like set it to things
+such as ``Latin-1'' or ``ASCII'' or similar bogons...
+
+     What do you think?
+
+-- Mark --
+
+
+
+
