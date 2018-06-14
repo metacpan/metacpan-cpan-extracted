@@ -20,21 +20,60 @@ package Paws::CodePipeline::CreateCustomActionType;
 
 =head1 NAME
 
-Paws::CodePipeline::CreateCustomActionType - Arguments for method CreateCustomActionType on Paws::CodePipeline
+Paws::CodePipeline::CreateCustomActionType - Arguments for method CreateCustomActionType on L<Paws::CodePipeline>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateCustomActionType on the 
-AWS CodePipeline service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateCustomActionType on the
+L<AWS CodePipeline|Paws::CodePipeline> service. Use the attributes of this class
 as arguments to method CreateCustomActionType.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateCustomActionType.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateCustomActionType(Att1 => $value1, Att2 => $value2, ...);
+    my $codepipeline = Paws->service('CodePipeline');
+    my $CreateCustomActionTypeOutput = $codepipeline->CreateCustomActionType(
+      Category             => 'Source',
+      InputArtifactDetails => {
+        minimumCount => 1,    # max: 5
+        maximumCount => 1,    # max: 5
+
+      },
+      OutputArtifactDetails => {
+        minimumCount => 1,    # max: 5
+        maximumCount => 1,    # max: 5
+
+      },
+      Provider                => 'MyActionProvider',
+      Version                 => 'MyVersion',
+      ConfigurationProperties => [
+        {
+          required  => 1,
+          key       => 1,
+          name      => 'MyActionConfigurationKey',    # min: 1, max: 50
+          secret    => 1,
+          queryable => 1,
+          type => 'String',    # values: String, Number, Boolean; OPTIONAL
+          description => 'MyDescription',    # min: 1, max: 160; OPTIONAL
+        },
+        ...
+      ],                                     # OPTIONAL
+      Settings => {
+        revisionUrlTemplate  => 'MyUrlTemplate',   # min: 1, max: 2048; OPTIONAL
+        executionUrlTemplate => 'MyUrlTemplate',   # min: 1, max: 2048; OPTIONAL
+        entityUrlTemplate    => 'MyUrlTemplate',   # min: 1, max: 2048; OPTIONAL
+        thirdPartyConfigurationUrl => 'MyUrl',     # min: 1, max: 2048; OPTIONAL
+      },    # OPTIONAL
+    );
+
+    # Results:
+    my $ActionType = $CreateCustomActionTypeOutput->ActionType;
+
+    # Returns a L<Paws::CodePipeline::CreateCustomActionTypeOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/codepipeline/CreateCustomActionType>
 
 =head1 ATTRIBUTES
 
@@ -57,7 +96,8 @@ You can refer to a name in the configuration properties of the custom
 action within the URL templates by following the format of
 {Config:name}, as long as the configuration property is both required
 and not secret. For more information, see Create a Custom Action for a
-Pipeline.
+Pipeline
+(http://docs.aws.amazon.com/codepipeline/latest/userguide/how-to-create-custom-action.html).
 
 
 
@@ -101,9 +141,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateCustomA
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

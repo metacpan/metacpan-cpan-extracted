@@ -19,21 +19,43 @@ package Paws::StorageGateway::CreateStorediSCSIVolume;
 
 =head1 NAME
 
-Paws::StorageGateway::CreateStorediSCSIVolume - Arguments for method CreateStorediSCSIVolume on Paws::StorageGateway
+Paws::StorageGateway::CreateStorediSCSIVolume - Arguments for method CreateStorediSCSIVolume on L<Paws::StorageGateway>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateStorediSCSIVolume on the 
-AWS Storage Gateway service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateStorediSCSIVolume on the
+L<AWS Storage Gateway|Paws::StorageGateway> service. Use the attributes of this class
 as arguments to method CreateStorediSCSIVolume.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateStorediSCSIVolume.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateStorediSCSIVolume(Att1 => $value1, Att2 => $value2, ...);
+    my $storagegateway = Paws->service('StorageGateway');
+    # To create a stored iSCSI volume
+    # Creates a stored volume on a specified stored gateway.
+    my $CreateStorediSCSIVolumeOutput =
+      $storagegateway->CreateStorediSCSIVolume(
+      {
+        'DiskId'               => 'pci-0000:03:00.0-scsi-0:0:0:0',
+        'TargetName'           => 'my-volume',
+        'NetworkInterfaceId'   => '10.1.1.1',
+        'PreserveExistingData' => true,
+        'GatewayARN' =>
+          'arn:aws:storagegateway:us-east-1:111122223333:gateway/sgw-12A3456B',
+        'SnapshotId' => 'snap-f47b7b94'
+      }
+      );
+
+    # Results:
+    my $TargetARN         = $CreateStorediSCSIVolumeOutput->TargetARN;
+    my $VolumeSizeInBytes = $CreateStorediSCSIVolumeOutput->VolumeSizeInBytes;
+    my $VolumeARN         = $CreateStorediSCSIVolumeOutput->VolumeARN;
+
+    # Returns a L<Paws::StorageGateway::CreateStorediSCSIVolumeOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/storagegateway/CreateStorediSCSIVolume>
 
 =head1 ATTRIBUTES
 
@@ -41,7 +63,9 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 =head2 B<REQUIRED> DiskId => Str
 
 The unique identifier for the gateway local disk that is configured as
-a stored volume. Use ListLocalDisks to list disk IDs for a gateway.
+a stored volume. Use ListLocalDisks
+(http://docs.aws.amazon.com/storagegateway/latest/userguide/API_ListLocalDisks.html)
+to list disk IDs for a gateway.
 
 
 
@@ -77,8 +101,9 @@ Valid Values: true, false
 The snapshot ID (e.g. "snap-1122aabb") of the snapshot to restore as
 the new stored volume. Specify this field if you want to create the
 iSCSI storage volume from a snapshot otherwise do not include this
-field. To list snapshots for your account use DescribeSnapshots in the
-I<Amazon Elastic Compute Cloud API Reference>.
+field. To list snapshots for your account use DescribeSnapshots
+(http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-DescribeSnapshots.html)
+in the I<Amazon Elastic Compute Cloud API Reference>.
 
 
 
@@ -99,9 +124,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateStoredi
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

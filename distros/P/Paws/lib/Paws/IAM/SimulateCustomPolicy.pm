@@ -23,39 +23,73 @@ package Paws::IAM::SimulateCustomPolicy;
 
 =head1 NAME
 
-Paws::IAM::SimulateCustomPolicy - Arguments for method SimulateCustomPolicy on Paws::IAM
+Paws::IAM::SimulateCustomPolicy - Arguments for method SimulateCustomPolicy on L<Paws::IAM>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method SimulateCustomPolicy on the 
-AWS Identity and Access Management service. Use the attributes of this class
+This class represents the parameters used for calling the method SimulateCustomPolicy on the
+L<AWS Identity and Access Management|Paws::IAM> service. Use the attributes of this class
 as arguments to method SimulateCustomPolicy.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to SimulateCustomPolicy.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->SimulateCustomPolicy(Att1 => $value1, Att2 => $value2, ...);
+    my $iam = Paws->service('IAM');
+    my $SimulatePolicyResponse = $iam->SimulateCustomPolicy(
+      ActionNames => [
+        'MyActionNameType', ...    # min: 3, max: 128
+      ],
+      PolicyInputList => [
+        'MypolicyDocumentType', ...    # min: 1, max: 131072
+      ],
+      CallerArn      => 'MyResourceNameType',    # OPTIONAL
+      ContextEntries => [
+        {
+          ContextKeyValues => [ 'MyContextKeyValueType', ... ],    # OPTIONAL
+          ContextKeyType => 'string'
+          , # values: string, stringList, numeric, numericList, boolean, booleanList, ip, ipList, binary, binaryList, date, dateList; OPTIONAL
+          ContextKeyName => 'MyContextKeyNameType', # min: 5, max: 256; OPTIONAL
+        },
+        ...
+      ],                                            # OPTIONAL
+      Marker       => 'MymarkerType',               # OPTIONAL
+      MaxItems     => 1,                            # OPTIONAL
+      ResourceArns => [
+        'MyResourceNameType', ...                   # min: 1, max: 2048
+      ],                                            # OPTIONAL
+      ResourceHandlingOption => 'MyResourceHandlingOptionType',    # OPTIONAL
+      ResourceOwner          => 'MyResourceNameType',              # OPTIONAL
+      ResourcePolicy         => 'MypolicyDocumentType',            # OPTIONAL
+    );
+
+    # Results:
+    my $IsTruncated       = $SimulatePolicyResponse->IsTruncated;
+    my $Marker            = $SimulatePolicyResponse->Marker;
+    my $EvaluationResults = $SimulatePolicyResponse->EvaluationResults;
+
+    # Returns a L<Paws::IAM::SimulatePolicyResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/iam/SimulateCustomPolicy>
 
 =head1 ATTRIBUTES
 
 
 =head2 B<REQUIRED> ActionNames => ArrayRef[Str|Undef]
 
-A list of names of API actions to evaluate in the simulation. Each
-action is evaluated against each resource. Each action must include the
-service identifier, such as C<iam:CreateUser>.
+A list of names of API operations to evaluate in the simulation. Each
+operation is evaluated against each resource. Each operation must
+include the service identifier, such as C<iam:CreateUser>.
 
 
 
 =head2 CallerArn => Str
 
 The ARN of the IAM user that you want to use as the simulated caller of
-the APIs. C<CallerArn> is required if you include a C<ResourcePolicy>
-so that the policy's C<Principal> element has a value to use in
-evaluating the policy.
+the API operations. C<CallerArn> is required if you include a
+C<ResourcePolicy> so that the policy's C<Principal> element has a value
+to use in evaluating the policy.
 
 You can specify only the ARN of an IAM user. You cannot specify the ARN
 of an assumed role, federated user, or a service principal.
@@ -101,17 +135,35 @@ is specified as a string containing the complete, valid JSON text of an
 IAM policy. Do not include any resource-based policies in this
 parameter. Any resource-based policy must be submitted with the
 C<ResourcePolicy> parameter. The policies cannot be "scope-down"
-policies, such as you could include in a call to GetFederationToken or
-one of the AssumeRole APIs to restrict what a user can do while using
-the temporary credentials.
+policies, such as you could include in a call to GetFederationToken
+(http://docs.aws.amazon.com/IAM/latest/APIReference/API_GetFederationToken.html)
+or one of the AssumeRole
+(http://docs.aws.amazon.com/IAM/latest/APIReference/API_AssumeRole.html)
+API operations. In other words, do not use policies designed to
+restrict what a user can do while using the temporary credentials.
 
-The regex pattern used to validate this parameter is a string of
-characters consisting of any printable ASCII character ranging from the
-space character (\u0020) through end of the ASCII character range as
-well as the printable characters in the Basic Latin and Latin-1
-Supplement character set (through \u00FF). It also includes the special
-characters tab (\u0009), line feed (\u000A), and carriage return
-(\u000D).
+The regex pattern (http://wikipedia.org/wiki/regex) used to validate
+this parameter is a string of characters consisting of the following:
+
+=over
+
+=item *
+
+Any printable ASCII character ranging from the space character (\u0020)
+through the end of the ASCII character range
+
+=item *
+
+The printable characters in the Basic Latin and Latin-1 Supplement
+character set (through \u00FF)
+
+=item *
+
+The special characters tab (\u0009), line feed (\u000A), and carriage
+return (\u000D)
+
+=back
+
 
 
 
@@ -133,18 +185,20 @@ of the resources included in the simulation or you receive an invalid
 input error.
 
 For more information about ARNs, see Amazon Resource Names (ARNs) and
-AWS Service Namespaces in the I<AWS General Reference>.
+AWS Service Namespaces
+(http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+in the I<AWS General Reference>.
 
 
 
 =head2 ResourceHandlingOption => Str
 
-Specifies the type of simulation to run. Different APIs that support
-resource-based policies require different combinations of resources. By
-specifying the type of simulation to run, you enable the policy
-simulator to enforce the presence of the required resources to ensure
-reliable simulation results. If your simulation does not match one of
-the following scenarios, then you can omit this parameter. The
+Specifies the type of simulation to run. Different API operations that
+support resource-based policies require different combinations of
+resources. By specifying the type of simulation to run, you enable the
+policy simulator to enforce the presence of the required resources to
+ensure reliable simulation results. If your simulation does not match
+one of the following scenarios, then you can omit this parameter. The
 following list shows each of the supported scenario values and the
 resources that you must define to run the simulation.
 
@@ -154,7 +208,9 @@ then you must specify that volume as a resource. If the EC2 scenario
 includes VPC, then you must supply the network-interface resource. If
 it includes an IP subnet, then you must specify the subnet resource.
 For more information on the EC2 scenario options, see Supported
-Platforms in the I<AWS EC2 User Guide>.
+Platforms
+(http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-supported-platforms.html)
+in the I<Amazon EC2 User Guide>.
 
 =over
 
@@ -221,13 +277,28 @@ string. Each resource in the simulation is treated as if it had this
 policy attached. You can include only one resource-based policy in a
 simulation.
 
-The regex pattern used to validate this parameter is a string of
-characters consisting of any printable ASCII character ranging from the
-space character (\u0020) through end of the ASCII character range as
-well as the printable characters in the Basic Latin and Latin-1
-Supplement character set (through \u00FF). It also includes the special
-characters tab (\u0009), line feed (\u000A), and carriage return
-(\u000D).
+The regex pattern (http://wikipedia.org/wiki/regex) used to validate
+this parameter is a string of characters consisting of the following:
+
+=over
+
+=item *
+
+Any printable ASCII character ranging from the space character (\u0020)
+through the end of the ASCII character range
+
+=item *
+
+The printable characters in the Basic Latin and Latin-1 Supplement
+character set (through \u00FF)
+
+=item *
+
+The special characters tab (\u0009), line feed (\u000A), and carriage
+return (\u000D)
+
+=back
+
 
 
 
@@ -238,9 +309,9 @@ This class forms part of L<Paws>, documenting arguments for method SimulateCusto
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

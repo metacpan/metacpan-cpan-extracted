@@ -42,11 +42,20 @@ Custom libraries to be loaded into a DevEndpoint.
   Path to one or more Java Jars in an S3 bucket that should be loaded in
 your DevEndpoint.
 
+Please note that only pure Java/Scala libraries can currently be used
+on a DevEndpoint.
+
 
 =head2 ExtraPythonLibsS3Path => Str
 
-  Path to one or more Python libraries in an S3 bucket that should be
-loaded in your DevEndpoint.
+  Path(s) to one or more Python libraries in an S3 bucket that should be
+loaded in your DevEndpoint. Multiple values must be complete paths
+separated by a comma.
+
+Please note that only pure Python libraries can currently be used on a
+DevEndpoint. Libraries that rely on C extensions, such as the pandas
+(http://pandas.pydata.org/) Python data analysis library, are not yet
+supported.
 
 
 
@@ -56,9 +65,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Glue>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

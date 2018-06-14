@@ -1,4 +1,21 @@
-0.008   2018-04-06 (PERLANCAR) (unreleased)
+0.011   2018-06-13 (PERLANCAR)
+
+	- [Bugfix] get_open_orders(): Do not require pair.
+
+
+0.010   2018-06-10 (PERLANCAR)
+
+	- [Bugfix] Fix argument checking: when creating buy order, check
+	  the quote currency; when creating sell order, check the base
+	  currency.
+
+
+0.009   2018-06-10 (PERLANCAR)
+
+	- Add API function: get_order.
+
+
+0.008   2018-04-06 (PERLANCAR)
 
         - Rename dist/module from Finance-BTCIndo to Finance-Indodax.
 

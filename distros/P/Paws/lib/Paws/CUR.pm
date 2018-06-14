@@ -1,6 +1,7 @@
 package Paws::CUR;
   use Moose;
   sub service { 'cur' }
+  sub signing_name { 'cur' }
   sub version { '2017-01-06' }
   sub target_prefix { 'AWSOrigamiServiceGatewayService' }
   sub json_version { "1.1" }
@@ -11,7 +12,7 @@ package Paws::CUR;
   has retriables => (is => 'ro', isa => 'ArrayRef', default => sub { [
   ] });
 
-  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller', 'Paws::Net::JsonResponse';
+  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller';
 
   
   sub DeleteReportDefinition {
@@ -85,33 +86,59 @@ Paws::CUR - Perl Interface to AWS AWS Cost and Usage Report Service
 
 All public APIs for AWS Cost and Usage Report service
 
+For the AWS API documentation, see L<https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-costusage.html>
+
+
 =head1 METHODS
 
-=head2 DeleteReportDefinition([ReportName => Str])
+=head2 DeleteReportDefinition
+
+=over
+
+=item [ReportName => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CUR::DeleteReportDefinition>
 
 Returns: a L<Paws::CUR::DeleteReportDefinitionResponse> instance
 
-  Delete a specified report definition
+Delete a specified report definition
 
 
-=head2 DescribeReportDefinitions([MaxResults => Int, NextToken => Str])
+=head2 DescribeReportDefinitions
+
+=over
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CUR::DescribeReportDefinitions>
 
 Returns: a L<Paws::CUR::DescribeReportDefinitionsResponse> instance
 
-  Describe a list of report definitions owned by the account
+Describe a list of report definitions owned by the account
 
 
-=head2 PutReportDefinition(ReportDefinition => L<Paws::CUR::ReportDefinition>)
+=head2 PutReportDefinition
+
+=over
+
+=item ReportDefinition => L<Paws::CUR::ReportDefinition>
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CUR::PutReportDefinition>
 
 Returns: a L<Paws::CUR::PutReportDefinitionResponse> instance
 
-  Create a new report definition
+Create a new report definition
 
 
 
@@ -141,9 +168,9 @@ This service class forms part of L<Paws>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

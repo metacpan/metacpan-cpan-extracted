@@ -1,4 +1,17 @@
-Revision history for Dist-Zilla-Plugin-Rinci-AddPrereqs
+0.142   2018-06-11 (PERLANCAR)
+
+	- Really avoid perl undef warning.
+
+
+0.141   2018-06-11 (PERLANCAR)
+
+	- Avoid perl undef warning.
+
+
+0.140   2018-06-10 (PERLANCAR)
+
+	- Use minimum prereq version from pmversions.ini.
+
 
 0.13    2016-10-09 (PERLANCAR)
 

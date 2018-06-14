@@ -1,6 +1,4 @@
-###########################################
 package Archive::Tar::Wrapper;
-###########################################
 
 use strict;
 use warnings;
@@ -20,7 +18,7 @@ use IPC::Open3;
 use Symbol 'gensym';
 use Carp;
 
-our $VERSION = "0.25";
+our $VERSION = "0.26";
 
 ###########################################
 sub new {
@@ -37,8 +35,10 @@ sub new {
         dirs                  => 0,
         max_cmd_line_args     => 512,
         ramdisk               => undef,
-        gzip_regex            => qr/\.t?gz$/i,
-        bzip2_regex           => qr/\.bz2$/i,
+        gzip_regex            => qr/\.t? # an optional t for matching tgz
+                                    gz$ # ending with gz, which means compressed by gzip
+                                    /ix,
+        bzip2_regex => qr/\.bz2$/ix,
         %options,
     };
 
@@ -80,12 +80,11 @@ sub new {
 sub tardir {
 ###########################################
     my ($self) = @_;
-
     return $self->{tardir};
 }
 
 ###########################################
-sub read {
+sub read {    ## no critic (ProhibitBuiltinHomonyms)
 ###########################################
     my ( $self, $tarfile, @files ) = @_;
 
@@ -159,8 +158,8 @@ sub is_compressed {
       or croak("Cannot sysread $tarfile: $!");
     close($fh);
     return 'z'
-      if (  ( ord( substr( $two, 0, 1 ) ) eq 0x1F )
-        and ( ord( substr( $two, 1, 1 ) ) eq 0x8B ) );
+      if (  ( ( ord( substr( $two, 0, 1 ) ) ) == 0x1F )
+        and ( ( ord( substr( $two, 1, 1 ) ) ) == 0x8B ) );
 
     return q{};
 }
@@ -244,10 +243,10 @@ sub add {
           or LOGDIE "Can't chmod $target to $perm ($!)";
     }
 
-    if (    !defined $uid
-        and !defined $gid
-        and !defined $perm
-        and !ref($path_or_stringref) )
+    if (    not defined $uid
+        and not defined $gid
+        and not defined $perm
+        and not ref($path_or_stringref) )
     {
         perm_cp( $path_or_stringref, $target )
           or LOGDIE "Can't perm_cp $path_or_stringref to $target ($!)";
@@ -320,57 +319,62 @@ sub list_all {
 sub list_reset {
 ###########################################
     my ($self) = @_;
-
     my $list_file = File::Spec->catfile( $self->{objdir}, "list" );
-    open my $fh, '>', $list_file or LOGDIE "Can't open $list_file: $!";
-
     my $cwd = getcwd();
     chdir $self->{tardir} or LOGDIE "Can't chdir to $self->{tardir} ($!)";
+    my @entries_types;
 
     find(
         sub {
             my $entry = $File::Find::name;
-            $entry =~ s#^\./##;
+            $entry =~ s#^\./##x;
             my $type = (
                   -d $_ ? "d"
                 : -l $_ ? "l"
                 :         "f"
             );
-            print $fh "$type $entry\n";
+            push( @entries_types, "$type $entry" );
         },
         "."
     );
 
-    chdir $cwd or LOGDIE "Can't chdir to $cwd ($!)";
-
-    close $fh;
-
+    open( my $fh, '>', $list_file ) or LOGDIE "Can't open $list_file: $!";
+    for my $entry (@entries_types) {
+        print $fh $entry, "\n";
+    }
+    close($fh);
+    chdir $cwd or LOGDIE "Can't chdir to $cwd: $!";
     $self->offset(0);
+    return 1;
 }
 
 ###########################################
 sub list_next {
 ###########################################
     my ($self) = @_;
-
     my $offset = $self->offset();
-
     my $list_file = File::Spec->catfile( $self->{objdir}, "list" );
     open my $fh, '<', $list_file or LOGDIE "Can't open $list_file: $!";
     seek $fh, $offset, 0;
+    my $data;
 
-    {
+  REDO: {
         my $line = <$fh>;
-
-        return undef unless defined $line;
-
-        chomp $line;
-        my ( $type, $entry ) = split / /, $line, 2;
-        redo if $type eq "d" and !$self->{dirs};
-        $self->offset( tell $fh );
-        return [ $entry, File::Spec->catfile( $self->{tardir}, $entry ),
-            $type ];
+        unless ( defined($line) ) {
+            close($fh);
+        }
+        else {
+            chomp $line;
+            my ( $type, $entry ) = split / /, $line, 2;
+            redo if ( ( $type eq 'd' ) and ( not $self->{dirs} ) );
+            $self->offset( tell $fh );
+            close($fh);
+            $data =
+              [ $entry, File::Spec->catfile( $self->{tardir}, $entry ), $type ];
+        }
     }
+
+    return $data;
 }
 
 ###########################################
@@ -396,7 +400,7 @@ sub offset {
 }
 
 ###########################################
-sub write {
+sub write {    ## no critic (ProhibitBuiltinHomonyms)
 ###########################################
     my ( $self, $tarfile, $compress ) = @_;
 
@@ -407,12 +411,16 @@ sub write {
         $tarfile = File::Spec::Functions::rel2abs( $tarfile, $cwd );
     }
 
-    my $compr_opt = "";
-    $compr_opt = "z" if $compress;
+    my $compr_opt = '';
+    $compr_opt = 'z' if $compress;
 
-    opendir DIR, "." or LOGDIE "Cannot open $self->{tardir}";
-    my @top_entries = grep { $_ !~ /^\.\.?$/ } readdir DIR;
-    closedir DIR;
+    opendir( my $dir, '.' ) or LOGDIE "Cannot open $self->{tardir}: $!";
+    my @top_entries = readdir($dir);
+    closedir($dir);
+
+    # removing the '.' and '..' entries
+    shift(@top_entries);
+    shift(@top_entries);
 
     my $cmd = [
         $self->{tar}, "${compr_opt}cf$self->{tar_write_options}",
@@ -421,12 +429,14 @@ sub write {
 
     if ( @top_entries > $self->{max_cmd_line_args} ) {
         my $filelist_file = $self->{tmpdir} . "/file-list";
-        open FLIST, ">$filelist_file"
-          or LOGDIE "Cannot open $filelist_file ($!)";
-        for (@top_entries) {
-            print FLIST "$_\n";
+        open( my $fh, '>', $filelist_file )
+          or LOGDIE "Cannot write to $filelist_file: $!";
+
+        for my $entry (@top_entries) {
+            print $fh "$entry\n";
         }
-        close FLIST;
+
+        close($fh);
         push @$cmd, "-T", $filelist_file;
     }
     else {
@@ -436,10 +446,10 @@ sub write {
     DEBUG "Running @$cmd";
     my $rc = run( $cmd, \my ( $in, $out, $err ) );
 
-    if ( !$rc ) {
+    unless ($rc) {
         ERROR "@$cmd failed: $err";
         chdir $cwd or LOGDIE "Cannot chdir to $cwd";
-        return undef;
+        return;
     }
 
     WARN $err if $err;
@@ -453,11 +463,10 @@ sub write {
 sub DESTROY {
 ###########################################
     my ($self) = @_;
-
-    $self->ramdisk_unmount() if defined $self->{ramdisk};
-
+    $self->ramdisk_unmount()  if defined $self->{ramdisk};
     rmtree( $self->{objdir} ) if defined $self->{objdir};
     rmtree( $self->{tmpdir} ) if defined $self->{tmpdir};
+    return 1;
 }
 
 ###########################################
@@ -466,8 +475,12 @@ sub is_gnu {
     my ($self) = @_;
     my ( $wtr, $rdr, $err ) = ( gensym, gensym, gensym );
     my $pid = open3( $wtr, $rdr, $err, "$self->{tar} --version" );
-    my $output = join "\n", <$rdr>;
-    my $error  = join "\n", <$err>;
+    my ( $output, $error );
+    {
+        local $/ = undef;
+        $output = <$rdr>;
+        $error  = <$err>;
+    }
     close($rdr);
     close($err);
     close($wtr);
@@ -495,9 +508,9 @@ sub ramdisk_mount {
     $self->{umount} = which("umount") unless $self->{umount};
 
     for (qw(mount umount)) {
-        if ( !defined $self->{$_} ) {
+        unless ( defined $self->{$_} ) {
             LOGWARN "No $_ command found in PATH";
-            return undef;
+            return;
         }
     }
 

@@ -14,6 +14,7 @@ package Paws::OpsWorks::InstancesCount;
   has SetupFailed => (is => 'ro', isa => 'Int');
   has ShuttingDown => (is => 'ro', isa => 'Int');
   has StartFailed => (is => 'ro', isa => 'Int');
+  has StopFailed => (is => 'ro', isa => 'Int');
   has Stopped => (is => 'ro', isa => 'Int');
   has Stopping => (is => 'ro', isa => 'Int');
   has Terminated => (is => 'ro', isa => 'Int');
@@ -124,6 +125,11 @@ Describes how many instances a stack has for each status.
   The number of instances with C<start_failed> status.
 
 
+=head2 StopFailed => Int
+
+  
+
+
 =head2 Stopped => Int
 
   The number of instances with C<stopped> status.
@@ -156,9 +162,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::OpsWorks>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

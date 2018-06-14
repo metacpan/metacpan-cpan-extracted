@@ -4,18 +4,22 @@ package Paws::EC2::RunInstances;
   has AdditionalInfo => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'additionalInfo' );
   has BlockDeviceMappings => (is => 'ro', isa => 'ArrayRef[Paws::EC2::BlockDeviceMapping]', traits => ['NameInRequest'], request_name => 'BlockDeviceMapping' );
   has ClientToken => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'clientToken' );
+  has CpuOptions => (is => 'ro', isa => 'Paws::EC2::CpuOptionsRequest');
+  has CreditSpecification => (is => 'ro', isa => 'Paws::EC2::CreditSpecificationRequest');
   has DisableApiTermination => (is => 'ro', isa => 'Bool', traits => ['NameInRequest'], request_name => 'disableApiTermination' );
   has DryRun => (is => 'ro', isa => 'Bool', traits => ['NameInRequest'], request_name => 'dryRun' );
   has EbsOptimized => (is => 'ro', isa => 'Bool', traits => ['NameInRequest'], request_name => 'ebsOptimized' );
   has ElasticGpuSpecification => (is => 'ro', isa => 'ArrayRef[Paws::EC2::ElasticGpuSpecification]');
   has IamInstanceProfile => (is => 'ro', isa => 'Paws::EC2::IamInstanceProfileSpecification', traits => ['NameInRequest'], request_name => 'iamInstanceProfile' );
-  has ImageId => (is => 'ro', isa => 'Str', required => 1);
+  has ImageId => (is => 'ro', isa => 'Str');
   has InstanceInitiatedShutdownBehavior => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'instanceInitiatedShutdownBehavior' );
+  has InstanceMarketOptions => (is => 'ro', isa => 'Paws::EC2::InstanceMarketOptionsRequest');
   has InstanceType => (is => 'ro', isa => 'Str');
   has Ipv6AddressCount => (is => 'ro', isa => 'Int');
   has Ipv6Addresses => (is => 'ro', isa => 'ArrayRef[Paws::EC2::InstanceIpv6Address]', traits => ['NameInRequest'], request_name => 'Ipv6Address' );
   has KernelId => (is => 'ro', isa => 'Str');
   has KeyName => (is => 'ro', isa => 'Str');
+  has LaunchTemplate => (is => 'ro', isa => 'Paws::EC2::LaunchTemplateSpecification');
   has MaxCount => (is => 'ro', isa => 'Int', required => 1);
   has MinCount => (is => 'ro', isa => 'Int', required => 1);
   has Monitoring => (is => 'ro', isa => 'Paws::EC2::RunInstancesMonitoringEnabled');
@@ -40,21 +44,156 @@ package Paws::EC2::RunInstances;
 
 =head1 NAME
 
-Paws::EC2::RunInstances - Arguments for method RunInstances on Paws::EC2
+Paws::EC2::RunInstances - Arguments for method RunInstances on L<Paws::EC2>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method RunInstances on the 
-Amazon Elastic Compute Cloud service. Use the attributes of this class
+This class represents the parameters used for calling the method RunInstances on the
+L<Amazon Elastic Compute Cloud|Paws::EC2> service. Use the attributes of this class
 as arguments to method RunInstances.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to RunInstances.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->RunInstances(Att1 => $value1, Att2 => $value2, ...);
+    my $ec2 = Paws->service('EC2');
+    my $Reservation = $ec2->RunInstances(
+      MaxCount            => 1,
+      MinCount            => 1,
+      AdditionalInfo      => 'MyString',    # OPTIONAL
+      BlockDeviceMappings => [
+        {
+          DeviceName  => 'MyString',
+          VirtualName => 'MyString',
+          NoDevice    => 'MyString',
+          Ebs         => {
+            VolumeType =>
+              'standard',    # values: standard, io1, gp2, sc1, st1; OPTIONAL
+            Iops                => 1,
+            Encrypted           => 1,            # OPTIONAL
+            KmsKeyId            => 'MyString',
+            SnapshotId          => 'MyString',
+            DeleteOnTermination => 1,            # OPTIONAL
+            VolumeSize          => 1,
+          },    # OPTIONAL
+        },
+        ...
+      ],        # OPTIONAL
+      ClientToken => 'MyString',    # OPTIONAL
+      CpuOptions  => {
+        CoreCount      => 1,
+        ThreadsPerCore => 1,
+      },                            # OPTIONAL
+      CreditSpecification => {
+        CpuCredits => 'MyString',
+
+      },                            # OPTIONAL
+      DisableApiTermination   => 1, # OPTIONAL
+      DryRun                  => 1, # OPTIONAL
+      EbsOptimized            => 1, # OPTIONAL
+      ElasticGpuSpecification => [
+        {
+          Type => 'MyString',
+
+        },
+        ...
+      ],                            # OPTIONAL
+      IamInstanceProfile => {
+        Arn  => 'MyString',
+        Name => 'MyString',
+      },                            # OPTIONAL
+      ImageId                           => 'MyString',    # OPTIONAL
+      InstanceInitiatedShutdownBehavior => 'stop',        # OPTIONAL
+      InstanceMarketOptions             => {
+        MarketType  => 'spot',    # values: spot; OPTIONAL
+        SpotOptions => {
+          BlockDurationMinutes => 1,
+          SpotInstanceType =>
+            'one-time',           # values: one-time, persistent; OPTIONAL
+          ValidUntil => '1970-01-01T01:00:00',    # OPTIONAL
+          InstanceInterruptionBehavior =>
+            'hibernate',    # values: hibernate, stop, terminate; OPTIONAL
+          MaxPrice => 'MyString',
+        },    # OPTIONAL
+      },    # OPTIONAL
+      InstanceType     => 't1.micro',                                 # OPTIONAL
+      Ipv6AddressCount => 1,                                          # OPTIONAL
+      Ipv6Addresses    => [ { Ipv6Address => 'MyString', }, ... ],    # OPTIONAL
+      KernelId         => 'MyString',                                 # OPTIONAL
+      KeyName          => 'MyString',                                 # OPTIONAL
+      LaunchTemplate   => {
+        LaunchTemplateName => 'MyString',
+        LaunchTemplateId   => 'MyString',
+        Version            => 'MyString',
+      },                                                              # OPTIONAL
+      Monitoring => {
+        Enabled => 1,                                                 # OPTIONAL
+
+      },    # OPTIONAL
+      NetworkInterfaces => [
+        {
+          SubnetId                       => 'MyString',
+          DeviceIndex                    => 1,
+          Groups                         => [ 'MyString', ... ],    # OPTIONAL
+          DeleteOnTermination            => 1,                      # OPTIONAL
+          PrivateIpAddress               => 'MyString',
+          SecondaryPrivateIpAddressCount => 1,
+          NetworkInterfaceId             => 'MyString',
+          Ipv6Addresses      => [ { Ipv6Address => 'MyString', }, ... ],
+          Description        => 'MyString',
+          PrivateIpAddresses => [
+            {
+              PrivateIpAddress => 'MyString',
+              Primary          => 1,                                # OPTIONAL
+            },
+            ...
+          ],                                                        # OPTIONAL
+          AssociatePublicIpAddress => 1,                            # OPTIONAL
+          Ipv6AddressCount         => 1,
+        },
+        ...
+      ],                                                            # OPTIONAL
+      Placement => {
+        SpreadDomain => 'MyString',
+        Affinity     => 'MyString',
+        Tenancy      => 'default',  # values: default, dedicated, host; OPTIONAL
+        AvailabilityZone => 'MyString',
+        HostId           => 'MyString',
+        GroupName        => 'MyString',
+      },    # OPTIONAL
+      PrivateIpAddress  => 'MyString',             # OPTIONAL
+      RamdiskId         => 'MyString',             # OPTIONAL
+      SecurityGroupIds  => [ 'MyString', ... ],    # OPTIONAL
+      SecurityGroups    => [ 'MyString', ... ],    # OPTIONAL
+      SubnetId          => 'MyString',             # OPTIONAL
+      TagSpecifications => [
+        {
+          Tags => [
+            {
+              Key   => 'MyString',
+              Value => 'MyString',
+            },
+            ...
+          ],                                       # OPTIONAL
+          ResourceType => 'customer-gateway'
+          , # values: customer-gateway, dhcp-options, image, instance, internet-gateway, network-acl, network-interface, reserved-instances, route-table, snapshot, spot-instances-request, subnet, security-group, volume, vpc, vpn-connection, vpn-gateway; OPTIONAL
+        },
+        ...
+      ],    # OPTIONAL
+      UserData => 'MyString',    # OPTIONAL
+    );
+
+    # Results:
+    my $RequesterId   = $Reservation->RequesterId;
+    my $ReservationId = $Reservation->ReservationId;
+    my $OwnerId       = $Reservation->OwnerId;
+    my $Groups        = $Reservation->Groups;
+    my $Instances     = $Reservation->Instances;
+
+    # Returns a L<Paws::EC2::Reservation> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ec2/RunInstances>
 
 =head1 ATTRIBUTES
 
@@ -67,23 +206,43 @@ Reserved.
 
 =head2 BlockDeviceMappings => ArrayRef[L<Paws::EC2::BlockDeviceMapping>]
 
-The block device mapping.
-
-Supplying both a snapshot ID and an encryption value as arguments for
-block-device mapping results in an error. This is because only blank
-volumes can be encrypted on start, and these are not created from a
-snapshot. If a snapshot is the basis for the volume, it contains data
-by definition and its encryption status cannot be changed using this
-action.
+One or more block device mapping entries. You can't specify both a
+snapshot ID and an encryption value. This is because only blank volumes
+can be encrypted on creation. If a snapshot is the basis for a volume,
+it is not blank and its encryption status is used for the volume
+encryption status.
 
 
 
 =head2 ClientToken => Str
 
 Unique, case-sensitive identifier you provide to ensure the idempotency
-of the request. For more information, see Ensuring Idempotency.
+of the request. For more information, see Ensuring Idempotency
+(http://docs.aws.amazon.com/AWSEC2/latest/APIReference/Run_Instance_Idempotency.html).
 
 Constraints: Maximum 64 ASCII characters
+
+
+
+=head2 CpuOptions => L<Paws::EC2::CpuOptionsRequest>
+
+The CPU options for the instance. For more information, see Optimizing
+CPU Options
+(http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-optimize-cpu.html)
+in the I<Amazon Elastic Compute Cloud User Guide>.
+
+
+
+=head2 CreditSpecification => L<Paws::EC2::CreditSpecificationRequest>
+
+The credit option for CPU usage of the instance. Valid values are
+C<standard> and C<unlimited>. To change this attribute after launch,
+use ModifyInstanceCreditSpecification. For more information, see T2
+Instances
+(http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/t2-instances.html)
+in the I<Amazon Elastic Compute Cloud User Guide>.
+
+Default: C<standard>
 
 
 
@@ -123,7 +282,7 @@ Default: C<false>
 
 =head2 ElasticGpuSpecification => ArrayRef[L<Paws::EC2::ElasticGpuSpecification>]
 
-An Elastic GPU to associate with the instance.
+An elastic GPU to associate with the instance.
 
 
 
@@ -133,9 +292,11 @@ The IAM instance profile.
 
 
 
-=head2 B<REQUIRED> ImageId => Str
+=head2 ImageId => Str
 
-The ID of the AMI, which you can get by calling DescribeImages.
+The ID of the AMI, which you can get by calling DescribeImages. An AMI
+is required to launch an instance and must be specified here or in a
+launch template.
 
 
 
@@ -149,14 +310,21 @@ Default: C<stop>
 
 Valid values are: C<"stop">, C<"terminate">
 
+=head2 InstanceMarketOptions => L<Paws::EC2::InstanceMarketOptionsRequest>
+
+The market (purchasing) option for the instances.
+
+
+
 =head2 InstanceType => Str
 
-The instance type. For more information, see Instance Types in the
-I<Amazon Elastic Compute Cloud User Guide>.
+The instance type. For more information, see Instance Types
+(http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html)
+in the I<Amazon Elastic Compute Cloud User Guide>.
 
 Default: C<m1.small>
 
-Valid values are: C<"t1.micro">, C<"t2.nano">, C<"t2.micro">, C<"t2.small">, C<"t2.medium">, C<"t2.large">, C<"t2.xlarge">, C<"t2.2xlarge">, C<"m1.small">, C<"m1.medium">, C<"m1.large">, C<"m1.xlarge">, C<"m3.medium">, C<"m3.large">, C<"m3.xlarge">, C<"m3.2xlarge">, C<"m4.large">, C<"m4.xlarge">, C<"m4.2xlarge">, C<"m4.4xlarge">, C<"m4.10xlarge">, C<"m4.16xlarge">, C<"m2.xlarge">, C<"m2.2xlarge">, C<"m2.4xlarge">, C<"cr1.8xlarge">, C<"r3.large">, C<"r3.xlarge">, C<"r3.2xlarge">, C<"r3.4xlarge">, C<"r3.8xlarge">, C<"r4.large">, C<"r4.xlarge">, C<"r4.2xlarge">, C<"r4.4xlarge">, C<"r4.8xlarge">, C<"r4.16xlarge">, C<"x1.16xlarge">, C<"x1.32xlarge">, C<"x1e.32xlarge">, C<"i2.xlarge">, C<"i2.2xlarge">, C<"i2.4xlarge">, C<"i2.8xlarge">, C<"i3.large">, C<"i3.xlarge">, C<"i3.2xlarge">, C<"i3.4xlarge">, C<"i3.8xlarge">, C<"i3.16xlarge">, C<"hi1.4xlarge">, C<"hs1.8xlarge">, C<"c1.medium">, C<"c1.xlarge">, C<"c3.large">, C<"c3.xlarge">, C<"c3.2xlarge">, C<"c3.4xlarge">, C<"c3.8xlarge">, C<"c4.large">, C<"c4.xlarge">, C<"c4.2xlarge">, C<"c4.4xlarge">, C<"c4.8xlarge">, C<"cc1.4xlarge">, C<"cc2.8xlarge">, C<"g2.2xlarge">, C<"g2.8xlarge">, C<"g3.4xlarge">, C<"g3.8xlarge">, C<"g3.16xlarge">, C<"cg1.4xlarge">, C<"p2.xlarge">, C<"p2.8xlarge">, C<"p2.16xlarge">, C<"d2.xlarge">, C<"d2.2xlarge">, C<"d2.4xlarge">, C<"d2.8xlarge">, C<"f1.2xlarge">, C<"f1.16xlarge">
+Valid values are: C<"t1.micro">, C<"t2.nano">, C<"t2.micro">, C<"t2.small">, C<"t2.medium">, C<"t2.large">, C<"t2.xlarge">, C<"t2.2xlarge">, C<"m1.small">, C<"m1.medium">, C<"m1.large">, C<"m1.xlarge">, C<"m3.medium">, C<"m3.large">, C<"m3.xlarge">, C<"m3.2xlarge">, C<"m4.large">, C<"m4.xlarge">, C<"m4.2xlarge">, C<"m4.4xlarge">, C<"m4.10xlarge">, C<"m4.16xlarge">, C<"m2.xlarge">, C<"m2.2xlarge">, C<"m2.4xlarge">, C<"cr1.8xlarge">, C<"r3.large">, C<"r3.xlarge">, C<"r3.2xlarge">, C<"r3.4xlarge">, C<"r3.8xlarge">, C<"r4.large">, C<"r4.xlarge">, C<"r4.2xlarge">, C<"r4.4xlarge">, C<"r4.8xlarge">, C<"r4.16xlarge">, C<"x1.16xlarge">, C<"x1.32xlarge">, C<"x1e.xlarge">, C<"x1e.2xlarge">, C<"x1e.4xlarge">, C<"x1e.8xlarge">, C<"x1e.16xlarge">, C<"x1e.32xlarge">, C<"i2.xlarge">, C<"i2.2xlarge">, C<"i2.4xlarge">, C<"i2.8xlarge">, C<"i3.large">, C<"i3.xlarge">, C<"i3.2xlarge">, C<"i3.4xlarge">, C<"i3.8xlarge">, C<"i3.16xlarge">, C<"i3.metal">, C<"hi1.4xlarge">, C<"hs1.8xlarge">, C<"c1.medium">, C<"c1.xlarge">, C<"c3.large">, C<"c3.xlarge">, C<"c3.2xlarge">, C<"c3.4xlarge">, C<"c3.8xlarge">, C<"c4.large">, C<"c4.xlarge">, C<"c4.2xlarge">, C<"c4.4xlarge">, C<"c4.8xlarge">, C<"c5.large">, C<"c5.xlarge">, C<"c5.2xlarge">, C<"c5.4xlarge">, C<"c5.9xlarge">, C<"c5.18xlarge">, C<"c5d.large">, C<"c5d.xlarge">, C<"c5d.2xlarge">, C<"c5d.4xlarge">, C<"c5d.9xlarge">, C<"c5d.18xlarge">, C<"cc1.4xlarge">, C<"cc2.8xlarge">, C<"g2.2xlarge">, C<"g2.8xlarge">, C<"g3.4xlarge">, C<"g3.8xlarge">, C<"g3.16xlarge">, C<"cg1.4xlarge">, C<"p2.xlarge">, C<"p2.8xlarge">, C<"p2.16xlarge">, C<"p3.2xlarge">, C<"p3.8xlarge">, C<"p3.16xlarge">, C<"d2.xlarge">, C<"d2.2xlarge">, C<"d2.4xlarge">, C<"d2.8xlarge">, C<"f1.2xlarge">, C<"f1.16xlarge">, C<"m5.large">, C<"m5.xlarge">, C<"m5.2xlarge">, C<"m5.4xlarge">, C<"m5.12xlarge">, C<"m5.24xlarge">, C<"m5d.large">, C<"m5d.xlarge">, C<"m5d.2xlarge">, C<"m5d.4xlarge">, C<"m5d.12xlarge">, C<"m5d.24xlarge">, C<"h1.2xlarge">, C<"h1.4xlarge">, C<"h1.8xlarge">, C<"h1.16xlarge">
 
 =head2 Ipv6AddressCount => Int
 
@@ -183,8 +351,9 @@ a minimum number of instances to launch.
 The ID of the kernel.
 
 We recommend that you use PV-GRUB instead of kernels and RAM disks. For
-more information, see PV-GRUB in the I<Amazon Elastic Compute Cloud
-User Guide>.
+more information, see PV-GRUB
+(http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/UserProvidedkernels.html)
+in the I<Amazon Elastic Compute Cloud User Guide>.
 
 
 
@@ -199,6 +368,15 @@ to log in.
 
 
 
+=head2 LaunchTemplate => L<Paws::EC2::LaunchTemplateSpecification>
+
+The launch template to use to launch the instances. Any parameters that
+you specify in RunInstances override the same parameters in the launch
+template. You can specify either the name or ID of a launch template,
+but not both.
+
+
+
 =head2 B<REQUIRED> MaxCount => Int
 
 The maximum number of instances to launch. If you specify more
@@ -209,7 +387,9 @@ C<MinCount>.
 Constraints: Between 1 and the maximum number you're allowed for the
 specified instance type. For more information about the default limits,
 and how to request an increase, see How many instances can I run in
-Amazon EC2 in the Amazon EC2 FAQ.
+Amazon EC2
+(http://aws.amazon.com/ec2/faqs/#How_many_instances_can_I_run_in_Amazon_EC2)
+in the Amazon EC2 FAQ.
 
 
 
@@ -222,7 +402,9 @@ Availability Zone, Amazon EC2 launches no instances.
 Constraints: Between 1 and the maximum number you're allowed for the
 specified instance type. For more information about the default limits,
 and how to request an increase, see How many instances can I run in
-Amazon EC2 in the Amazon EC2 General FAQ.
+Amazon EC2
+(http://aws.amazon.com/ec2/faqs/#How_many_instances_can_I_run_in_Amazon_EC2)
+in the Amazon EC2 General FAQ.
 
 
 
@@ -262,8 +444,9 @@ than one instance in the request.
 The ID of the RAM disk.
 
 We recommend that you use PV-GRUB instead of kernels and RAM disks. For
-more information, see PV-GRUB in the I<Amazon Elastic Compute Cloud
-User Guide>.
+more information, see PV-GRUB
+(http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/UserProvidedkernels.html)
+in the I<Amazon Elastic Compute Cloud User Guide>.
 
 
 
@@ -302,10 +485,13 @@ that are created during launch.
 =head2 UserData => Str
 
 The user data to make available to the instance. For more information,
-see Running Commands on Your Linux Instance at Launch (Linux) and
-Adding User Data (Windows). If you are using an AWS SDK or command line
-tool, base64-encoding is performed for you, and you can load the text
-from a file. Otherwise, you must provide base64-encoded text.
+see Running Commands on Your Linux Instance at Launch
+(http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html)
+(Linux) and Adding User Data
+(http://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-instance-metadata.html#instancedata-add-user-data)
+(Windows). If you are using a command line tool, base64-encoding is
+performed for you, and you can load the text from a file. Otherwise,
+you must provide base64-encoded text.
 
 
 
@@ -316,9 +502,9 @@ This class forms part of L<Paws>, documenting arguments for method RunInstances 
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

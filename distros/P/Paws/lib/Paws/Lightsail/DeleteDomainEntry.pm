@@ -15,21 +15,41 @@ package Paws::Lightsail::DeleteDomainEntry;
 
 =head1 NAME
 
-Paws::Lightsail::DeleteDomainEntry - Arguments for method DeleteDomainEntry on Paws::Lightsail
+Paws::Lightsail::DeleteDomainEntry - Arguments for method DeleteDomainEntry on L<Paws::Lightsail>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DeleteDomainEntry on the 
-Amazon Lightsail service. Use the attributes of this class
+This class represents the parameters used for calling the method DeleteDomainEntry on the
+L<Amazon Lightsail|Paws::Lightsail> service. Use the attributes of this class
 as arguments to method DeleteDomainEntry.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DeleteDomainEntry.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DeleteDomainEntry(Att1 => $value1, Att2 => $value2, ...);
+    my $lightsail = Paws->service('Lightsail');
+    my $DeleteDomainEntryResult = $lightsail->DeleteDomainEntry(
+      DomainEntry => {
+        options => {
+          'MyDomainEntryOptionsKeys' => 'Mystring',    # , value: OPTIONAL
+        },    # OPTIONAL
+        type    => 'MyDomainEntryType',    # OPTIONAL
+        name    => 'MyDomainName',         # OPTIONAL
+        target  => 'Mystring',             # OPTIONAL
+        isAlias => 1,                      # OPTIONAL
+        id      => 'MyNonEmptyString',     # OPTIONAL
+      },
+      DomainName => 'MyDomainName',
+
+    );
+
+    # Results:
+    my $Operation = $DeleteDomainEntryResult->Operation;
+
+    # Returns a L<Paws::Lightsail::DeleteDomainEntryResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/lightsail/DeleteDomainEntry>
 
 =head1 ATTRIBUTES
 
@@ -54,9 +74,9 @@ This class forms part of L<Paws>, documenting arguments for method DeleteDomainE
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

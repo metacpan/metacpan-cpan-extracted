@@ -1,3 +1,9 @@
+2.9309: Sun Jun 10 2018
+   - fix division by zero bugs in SM/Stochastic; side note:
+     What is the correct computation of K and D when H==L or L=0? We can't really know.
+     Lane didn't actually give any notes on this afaik. Marcel's notion is to
+     just set D and/or K to 100 in such situations — seems reasonable to me.
+
 2.9308: Wed Jun 06 2018
    - It's been a few years since I thought about this project, but Marcel Ebbrecht sent
      a patch to CCI.pm to avoid overwriting the sma in the while loop — an

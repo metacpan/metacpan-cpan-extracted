@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Markdent::Event::CodeBlock;
 use Markdent::Regexes qw( $BlockStart $HorizontalWS );
@@ -76,7 +76,7 @@ Markdent::Dialect::GitHub::BlockParser - Block parser for GitHub Markdown
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 DESCRIPTION
 
@@ -91,7 +91,7 @@ This role does the L<Markdent::Role::Dialect::BlockParser> role.
 
 See L<Markdent> for bug reporting details.
 
-Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Markdent> or via email to L<bug-markdent@rt.cpan.org|mailto:bug-markdent@rt.cpan.org>.
+Bugs may be submitted at L<https://github.com/houseabsolute/Markdent/issues>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 

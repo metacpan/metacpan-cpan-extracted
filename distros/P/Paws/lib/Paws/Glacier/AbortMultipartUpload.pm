@@ -11,28 +11,40 @@ package Paws::Glacier::AbortMultipartUpload;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/{accountId}/vaults/{vaultName}/multipart-uploads/{uploadId}');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'DELETE');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::API::Response');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::Glacier::AbortMultipartUpload - Arguments for method AbortMultipartUpload on Paws::Glacier
+Paws::Glacier::AbortMultipartUpload - Arguments for method AbortMultipartUpload on L<Paws::Glacier>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method AbortMultipartUpload on the 
-Amazon Glacier service. Use the attributes of this class
+This class represents the parameters used for calling the method AbortMultipartUpload on the
+L<Amazon Glacier|Paws::Glacier> service. Use the attributes of this class
 as arguments to method AbortMultipartUpload.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to AbortMultipartUpload.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->AbortMultipartUpload(Att1 => $value1, Att2 => $value2, ...);
+    my $glacier = Paws->service('Glacier');
+    # To abort a multipart upload identified by the upload ID
+    # The example deletes an in-progress multipart upload to a vault named
+    # my-vault:
+    $glacier->AbortMultipartUpload(
+      {
+        'UploadId' =>
+'19gaRezEXAMPLES6Ry5YYdqthHOC_kGRCT03L9yetr220UmPtBYKk-OssZtLqyFu7sY1_lR7vgFuJV6NtcV5zpsJ',
+        'AccountId' => '-',
+        'VaultName' => 'my-vault'
+      }
+    );
+
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/glacier/>
 
 =head1 ATTRIBUTES
 
@@ -66,9 +78,9 @@ This class forms part of L<Paws>, documenting arguments for method AbortMultipar
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

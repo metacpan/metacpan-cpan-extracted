@@ -17,7 +17,7 @@ use Getopt::Euclid qw( :vars<opt_> );
 use Data::Dumper;
 use VSGDR::StaticData;
 
-use version ; our $VERSION = qv('0.02');
+use version ; our $VERSION = qv('0.03');
 
 my $schema          = ($opt_tablename =~ m{ \A \[(.+)\] \. (\[.+\]) \z
                                           | \A \[(.+)\] \. (.+)     \z

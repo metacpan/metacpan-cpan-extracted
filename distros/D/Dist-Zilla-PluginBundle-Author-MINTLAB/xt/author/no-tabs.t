@@ -1,0 +1,17 @@
+use strict;
+use warnings;
+
+# this test was generated with Dist::Zilla::Plugin::Test::NoTabs 0.15
+
+use Test::More 0.88;
+use Test::NoTabs;
+
+my @files = (
+    'lib/Dist/Zilla/MintingProfile/Author/MINTLAB.pm',
+    'lib/Dist/Zilla/PluginBundle/Author/MINTLAB.pm',
+    't/00-compile.t',
+    't/author.t'
+);
+
+notabs_ok($_) foreach @files;
+done_testing;

@@ -1,0 +1,24 @@
+%TestML 0.1.0
+
+Plan = 4
+
+Label = 'My label'
+Get('Label') == 'My label'
+
+Label = '$BlockLabel: $num) The $fruit'
+GetLabel() == *text
+
+=== A Fruity Test
+--- num: 14
+--- fruit: apple
+--- text: A Fruity Test: 14) The apple
+
+=== X
+--- num: 21
+--- fruit: pear
+--- text: X: 21) The pear
+
+=== Last Test
+--- num: 99
+--- fruit: tomato
+--- text: Last Test: 99) The tomato

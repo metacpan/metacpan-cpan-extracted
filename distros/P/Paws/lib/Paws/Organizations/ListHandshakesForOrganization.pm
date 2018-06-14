@@ -16,21 +16,38 @@ package Paws::Organizations::ListHandshakesForOrganization;
 
 =head1 NAME
 
-Paws::Organizations::ListHandshakesForOrganization - Arguments for method ListHandshakesForOrganization on Paws::Organizations
+Paws::Organizations::ListHandshakesForOrganization - Arguments for method ListHandshakesForOrganization on L<Paws::Organizations>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ListHandshakesForOrganization on the 
-AWS Organizations service. Use the attributes of this class
+This class represents the parameters used for calling the method ListHandshakesForOrganization on the
+L<AWS Organizations|Paws::Organizations> service. Use the attributes of this class
 as arguments to method ListHandshakesForOrganization.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ListHandshakesForOrganization.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ListHandshakesForOrganization(Att1 => $value1, Att2 => $value2, ...);
+    my $organizations = Paws->service('Organizations');
+    my $ListHandshakesForOrganizationResponse =
+      $organizations->ListHandshakesForOrganization(
+      Filter => {
+        ParentHandshakeId => 'MyHandshakeId',    # OPTIONAL
+        ActionType        => 'INVITE'
+        , # values: INVITE, ENABLE_ALL_FEATURES, APPROVE_ALL_FEATURES, ADD_ORGANIZATIONS_SERVICE_LINKED_ROLE; OPTIONAL
+      },    # OPTIONAL
+      MaxResults => 1,                # OPTIONAL
+      NextToken  => 'MyNextToken',    # OPTIONAL
+      );
+
+    # Results:
+    my $NextToken  = $ListHandshakesForOrganizationResponse->NextToken;
+    my $Handshakes = $ListHandshakesForOrganizationResponse->Handshakes;
+
+# Returns a L<Paws::Organizations::ListHandshakesForOrganizationResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/organizations/ListHandshakesForOrganization>
 
 =head1 ATTRIBUTES
 
@@ -78,9 +95,9 @@ This class forms part of L<Paws>, documenting arguments for method ListHandshake
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -1,0 +1,63 @@
+{
+   "abstract" : "A Generic Software Testing Meta Language",
+   "author" : [
+      "Ingy d\u00f6t Net <ingy@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "TestML1",
+   "no_index" : {
+      "directory" : [
+         "example",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Pegex" : "0.30",
+            "perl" : "v5.8.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ingydotnet/testml-pm/issues"
+      },
+      "homepage" : "https://github.com/ingydotnet/testml-pm",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ingydotnet/testml-pm.git",
+         "web" : "https://github.com/ingydotnet/testml-pm"
+      }
+   },
+   "version" : "0.55",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0211"
+}
+

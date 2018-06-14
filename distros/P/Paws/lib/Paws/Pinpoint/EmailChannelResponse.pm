@@ -4,6 +4,7 @@ package Paws::Pinpoint::EmailChannelResponse;
   has CreationDate => (is => 'ro', isa => 'Str');
   has Enabled => (is => 'ro', isa => 'Bool');
   has FromAddress => (is => 'ro', isa => 'Str');
+  has HasCredential => (is => 'ro', isa => 'Bool');
   has Id => (is => 'ro', isa => 'Str');
   has Identity => (is => 'ro', isa => 'Str');
   has IsArchived => (is => 'ro', isa => 'Bool');
@@ -67,6 +68,11 @@ Email Channel Response.
   The email address used to send emails from.
 
 
+=head2 HasCredential => Bool
+
+  If the channel is registered with a credential for authentication.
+
+
 =head2 Id => Str
 
   Channel ID. Not used, only for backwards compatibility.
@@ -115,9 +121,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Pinpoint>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

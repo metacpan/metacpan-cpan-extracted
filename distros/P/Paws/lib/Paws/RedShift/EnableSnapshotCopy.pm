@@ -17,21 +17,33 @@ package Paws::RedShift::EnableSnapshotCopy;
 
 =head1 NAME
 
-Paws::RedShift::EnableSnapshotCopy - Arguments for method EnableSnapshotCopy on Paws::RedShift
+Paws::RedShift::EnableSnapshotCopy - Arguments for method EnableSnapshotCopy on L<Paws::RedShift>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method EnableSnapshotCopy on the 
-Amazon Redshift service. Use the attributes of this class
+This class represents the parameters used for calling the method EnableSnapshotCopy on the
+L<Amazon Redshift|Paws::RedShift> service. Use the attributes of this class
 as arguments to method EnableSnapshotCopy.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to EnableSnapshotCopy.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->EnableSnapshotCopy(Att1 => $value1, Att2 => $value2, ...);
+    my $redshift = Paws->service('RedShift');
+    my $EnableSnapshotCopyResult = $redshift->EnableSnapshotCopy(
+      ClusterIdentifier     => 'MyString',
+      DestinationRegion     => 'MyString',
+      RetentionPeriod       => 1,             # OPTIONAL
+      SnapshotCopyGrantName => 'MyString',    # OPTIONAL
+    );
+
+    # Results:
+    my $Cluster = $EnableSnapshotCopyResult->Cluster;
+
+    # Returns a L<Paws::RedShift::EnableSnapshotCopyResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/redshift/EnableSnapshotCopy>
 
 =head1 ATTRIBUTES
 
@@ -50,7 +62,9 @@ not already have cross-region snapshot copy enabled.
 The destination region that you want to copy snapshots to.
 
 Constraints: Must be the name of a valid region. For more information,
-see Regions and Endpoints in the Amazon Web Services General Reference.
+see Regions and Endpoints
+(http://docs.aws.amazon.com/general/latest/gr/rande.html#redshift_region)
+in the Amazon Web Services General Reference.
 
 
 
@@ -79,9 +93,9 @@ This class forms part of L<Paws>, documenting arguments for method EnableSnapsho
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

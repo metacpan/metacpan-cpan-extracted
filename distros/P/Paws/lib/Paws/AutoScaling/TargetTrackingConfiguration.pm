@@ -47,10 +47,10 @@ Represents a target tracking policy configuration.
 =head2 DisableScaleIn => Bool
 
   Indicates whether scale in by the target tracking policy is disabled.
-If the value is C<true>, scale in is disabled and the target tracking
-policy won't remove instances from the Auto Scaling group. Otherwise,
-scale in is enabled and the target tracking policy can remove instances
-from the Auto Scaling group. The default value is C<false>.
+If scale in is disabled, the target tracking policy won't remove
+instances from the Auto Scaling group. Otherwise, the target tracking
+policy can remove instances from the Auto Scaling group. The default is
+disabled.
 
 
 =head2 PredefinedMetricSpecification => L<Paws::AutoScaling::PredefinedMetricSpecification>
@@ -71,9 +71,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::AutoScali
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

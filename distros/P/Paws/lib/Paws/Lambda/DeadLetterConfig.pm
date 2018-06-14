@@ -31,8 +31,9 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Lambda::Dea
 
 =head1 DESCRIPTION
 
-The parent object that contains the target ARN (Amazon Resource Name)
-of an Amazon SQS queue or Amazon SNS topic.
+The Amazon Resource Name (ARN) of an Amazon SQS queue or Amazon SNS
+topic you specify as your Dead Letter Queue (DLQ). For more
+information, see dlq.
 
 =head1 ATTRIBUTES
 
@@ -40,7 +41,8 @@ of an Amazon SQS queue or Amazon SNS topic.
 =head2 TargetArn => Str
 
   The Amazon Resource Name (ARN) of an Amazon SQS queue or Amazon SNS
-topic you specify as your Dead Letter Queue (DLQ).
+topic you specify as your Dead Letter Queue (DLQ). dlq. For more
+information, see dlq.
 
 
 
@@ -50,9 +52,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Lambda>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

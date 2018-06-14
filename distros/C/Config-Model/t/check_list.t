@@ -7,6 +7,8 @@ use ExtUtils::testlib;
 use Test::More;
 use Test::Differences;
 use Test::Memory::Cycle;
+use Test::Log::Log4perl;
+use Test::Exception;
 use Config::Model;
 use Config::Model::Tester::Setup qw/init_test/;
 
@@ -182,37 +184,127 @@ is( $cl->get_help('A'), 'A help', "test help" );
 
 is( $inst->needs_save, 0, "verify instance needs_save status after reading meta data" );
 
-# test with the polymorphic 'store' method
-$cl->store( value => 'S,T ,  O, R, E' );
-ok( 1, "test store method" );
-@got = $cl->get_checked_list;
-is( scalar @got, 5, "test nb of elt in check_list after set" );
-is_deeply( \@got, [sort qw/S T O R E/], "test get_checked_list after set" );
-$inst->clear_changes;
+subtest 'test _store method' => sub {
+    # test with the polymorphic 'store' method
+    my @test_args = (
+        [ [ 'S', 1, 'yes' ], 1, ['S'] ],
+        [ [ 'A', 1, 'yes' ], 2, ['A','S'] ],
+        [ [ 'A', 0, 'yes' ], 1, ['S'] ],
+        [ [ 'bug', 1, 'skip' ], 1, ['S'] ],
+    );
 
-# test with the polymorphic 'set' method
-$cl->set( '', 'A,Z,Y,B' );
-ok( 1, "test set method" );
-@got = $cl->get_checked_list;
-is( scalar @got, 4, "test nb of elt in check_list after set" );
-is_deeply( \@got, [qw/A B Y Z/], "test get_checked_list after set" );
+    foreach my $test_arg_ref ( @test_args) {
+        my ($args, $nb, $expect) = @$test_arg_ref;
+        $cl->_store( @$args );
+        ok( 1, "test _store method with @$args" );
+        @got = $cl->get_checked_list;
+        is( scalar @got, $nb, "test nb of elt in check_list after _store" );
+        is_deeply( \@got, $expect, "test get_checked_list after _store" );
+        $inst->clear_changes;
+    }
+};
 
-is( $inst->needs_save, 1, "verify instance needs_save after set" );
-print join( "\n", $inst->list_changes("\n") ), "\n" if $trace;
+subtest 'test _store warning' => sub {
+    my $foo = Test::Log::Log4perl->expect(
+        ignore_priority => 'info',
+        ['Tree.Element.CheckList', warn => qr/Unknown check_list item/ ]
+        );
+    $cl->_store('bug-skipped', 1, 'skip');
+};
+
+throws_ok { $cl->_store('bug-error', 1, 'yes') } qr/wrong value/, 'test _store error';
+
+subtest 'test store method' => sub {
+    # test with the polymorphic 'store' method
+    my @store_args = (
+        [ 'S,T,O,R,E' ],
+        [ value => 'S,T ,  O, R, E' ],
+        [ 'S,O,T,R,E', check => 'yes' ],
+        [ value => 'S,T ,  O, R, E', check => 'yes' ],
+        [ 'S,T,O,R,E,bug', check => 'yes' ],
+    );
+
+    foreach my $test_arg ( @store_args) {
+        $cl->store( @$test_arg );
+        ok( 1, "test store method with @$test_arg" );
+        @got = $cl->get_checked_list;
+        is( scalar @got, 5, "test nb of elt in check_list after set" );
+        is_deeply( \@got, [sort qw/S T O R E/], "test get_checked_list after set" );
+        $inst->clear_changes;
+    }
+};
+
+$cl->clear;
+
+subtest "test set method and reported changes" => sub {
+    my @set_args = (
+        # set string,  changes , content after changes
+        [ 'A,B'    =>  'A:1 B:1',qw/A B/],
+        [ 'A,B,C'  =>  'C:1',    qw/A B C/],
+        [ 'A,C,D'  =>  'B:0 D:1',    qw/A C D/],
+    );
+
+    while (@set_args) {
+        my $test = shift @set_args;
+        my ($set_string, $expected_changes, @expected_content) = @$test;
+        $cl->set( '', $set_string );
+        ok( 1, "test set method with $set_string" );
+        @got = $cl->get_checked_list;
+        is_deeply( \@got, \@expected_content, "test get_checked_list content after set" );
+
+        is( $inst->needs_save, !!$expected_changes, "verify instance needs_save after set" );
+        print join( "\n", $inst->list_changes("\n") ), "\n" if $trace;
+        eq_or_diff([$inst->list_changes], ["choice_list: set_checked_list $expected_changes"],
+                   "check change message after set check list to $set_string");
+        $inst->clear_changes;
+    }
+};
+
+$cl->clear;
 $inst->clear_changes;
 
 my @set = sort qw/A C Z V Y/;
-$cl->set_checked_list(@set);
-ok( 1, "test set_checked_list" );
-@got = $cl->get_checked_list;
-is( scalar @got, 5, "test nb of elt in check_list after set_checked_list" );
-is_deeply( \@got, \@set, "test get_checked_list after set_checked_list" );
+subtest "test get_arguments" => sub {
+    my @set_args = (
+        \@set,
+        [ \@set ],
+        [ \@set , check => 'yes' ],
+    );
 
-is( $inst->needs_save, 1, "verify instance needs_save after set_checked_list" );
-print join( "\n", $inst->list_changes("\n") ), "\n" if $trace;
+    foreach my $test_arg ( @set_args) {
+        my ($list, $check, $args) = $cl->get_arguments(@$test_arg);
+        ok( 1, "test set_checked_list" );
+        eq_or_diff($list, \@set, "test passed list");
+    }
+};
+
+subtest 'test set_checked_list method' => sub {
+    my @set_args = (
+        \@set,
+        [ \@set ],
+        [ \@set , check => 'yes' ],
+        [ [ sort qw/A C Z V Y bug/ ] , check => 'skip' ],
+    );
+
+    foreach my $test_arg ( @set_args) {
+        $cl->set_checked_list(@$test_arg);
+        ok( 1, "test set_checked_list" );
+        @got = $cl->get_checked_list;
+        is( scalar @got, 5, "test nb of elt in check_list after set_checked_list" );
+        is_deeply( \@got, \@set, "test get_checked_list after set_checked_list" );
+
+        is( $inst->needs_save, 1, "verify instance needs_save after set_checked_list" );
+        print join( "\n", $inst->list_changes("\n") ), "\n" if $trace;
+        $cl->clear;
+        $inst->clear_changes;
+    }
+};
+
+$cl->clear;
 $inst->clear_changes;
 
 # test global get and set as hash
+$cl->set_checked_list(@set);
 $hr = $cl->get_checked_list_as_hash;
 map { $expect{$_} = 0 } ( 'A' .. 'Z' );
 map { $expect{$_} = 1 } @set;

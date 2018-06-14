@@ -32,20 +32,37 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Budgets::Su
 
 =head1 DESCRIPTION
 
-Subscriber model. Each notification may contain multiple subscribers
-with different addresses.
+The subscriber to a budget notification. The subscriber consists of a
+subscription type and either an Amazon Simple Notification Service
+topic or an email address.
+
+For example, an email subscriber would have the following parameters:
+
+=over
+
+=item *
+
+A C<subscriptionType> of C<EMAIL>
+
+=item *
+
+An C<address> of C<example@example.com>
+
+=back
+
 
 =head1 ATTRIBUTES
 
 
 =head2 B<REQUIRED> Address => Str
 
-  
+  The address that AWS sends budget notifications to, either an SNS topic
+or an email.
 
 
 =head2 B<REQUIRED> SubscriptionType => Str
 
-  
+  The type of notification that AWS sends to a subscriber.
 
 
 
@@ -55,9 +72,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Budgets>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

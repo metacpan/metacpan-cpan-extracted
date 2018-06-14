@@ -1,17 +1,70 @@
-use ExtUtils::MakeMaker;
+package Module::Extract::DeclaredMinimumPerl;
+use strict;
+use warnings;
 
-require 5.010;
+=encoding utf8
 
-eval "use Test::Manifest 1.21";
+=head1 The build file for Module::Extract::DeclaredMinimumPerl
 
-WriteMakefile(
-	'NAME'	       => 'Module::Extract::DeclaredMinimumPerl',
-	'ABSTRACT'     => 'Extract the version of Perl a module declares',
-	'VERSION_FROM' => 'lib/Module/Extract/DeclaredMinimumPerl.pm',
-	'LICENSE'      => 'perl',
-	'AUTHOR'       => 'brian d foy <bdfoy@cpan.org>',
-	
-	'PREREQ_PM'    => {
+This build file is a modulino; it works as both a build script and
+a module.
+
+To build the distribution, run this file normally:
+
+	% perl Makefile.PL
+
+But, it's more interesting than that. You can load it with C<require>
+and call C<arguments> to get the data structure it passes to
+C<WriteMakefile>:
+
+	my $package = require '/path/to/Makefile.PL';
+	my $arguments = $package->arguments;
+
+Note that C<require>-ing a file makes an entry in C<%INC> for exactly
+that name. If you try to C<require> another file with the same name,
+even from a different path, C<require> thinks it has already loaded
+the file. As such, I recommend you always require the full path to the
+file.
+
+The return value of the C<require> is a package name (in this case,
+the name of the main module. Use that to call the C<arguments> method.
+
+Even if this distribution needs a higher version of Perl, this bit
+only needs v5.8. You can play with the data structure with a primitive
+Perl.
+
+=cut
+
+use File::Spec::Functions qw(catfile);
+
+my $module    = __PACKAGE__;
+( my $dist = $module ) =~ s/::/-/g;
+
+my $github    = 'https://github.com/briandfoy/module-extract-declaredminimumperl';
+my $main_file = catfile( 'lib', split /::/, "$module.pm" );
+
+my %WriteMakefile = (
+	'MIN_PERL_VERSION' => '5.010',
+
+	'NAME'	        => $module,
+	'ABSTRACT_FROM' => $main_file,
+	'VERSION_FROM'  => $main_file,
+	'LICENSE'       => 'artistic_2',
+	'AUTHOR'        => 'brian d foy <bdfoy@cpan.org>',
+
+	'CONFIGURE_REQUIRES' => {
+		'ExtUtils::MakeMaker'   => '6.64',
+		'File::Spec::Functions' => '0',
+		},
+
+	'BUILD_REQUIRES' => {
+		},
+
+	'TEST_REQUIRES' => {
+		'Test::More' => '0.94',
+		},
+
+	'PREREQ_PM'     => {
 		'feature'              => '0',
 		'PPI'                  => '0',
 		'Test::More'           => '0',
@@ -19,26 +72,49 @@ WriteMakefile(
 		'version'              => '0',
 		},
 
-	(
-	$ExtUtils::MakeMaker::VERSION ge '6.48' ? 
-		(
-		MIN_PERL_VERSION => 5.006,
-
-		META_MERGE       => {
-			resources => {
-				repository => 'git://github.com/briandfoy/module-extract-declaredminimumperl.git',
+	'META_MERGE' => {
+		'meta-spec' => { version => 2 },
+		resources => {
+			repository => {
+				type => 'git',
+				url  => "$github.git",
+				web  => $github,
 				},
-			keywords => [ qw( ppi parsing static-analysis modules ) ],
-			no_index => {
-				dir       => [ qw(corpus) ],
-				directory => [ qw(corpus) ],
+			bugtracker => {
+				web    => "$github/issues",
 				},
+			homepage => $github,
 			},
-	 	) 
-	 	: 
-	 	()
-	 ),
+		no_index => {
+			dir       => [ qw(corpus) ],
+			directory => [ qw(corpus) ],
+			},
+		},
 
-	clean  => { FILES    => q|Module-Extract-DeclaredMinimumPerl-*| },
-
+	clean => { FILES => "$dist-*" },
 	);
+
+sub arguments { \%WriteMakefile }
+
+do_it() unless caller;
+sub do_it {
+	require File::Spec;
+	my $MM ='ExtUtils::MakeMaker';
+	my $MM_version =
+		eval{ "$MM " . $WriteMakefile{'CONFIGURE_REQUIRES'}{'ExtUtils::MakeMaker'} }
+			||
+		"$MM 6.64";
+	eval "use $MM_version; 1" or die "Could not load $MM_version: $@";
+	eval "use Test::Manifest 1.21"
+		if -e File::Spec->catfile( qw(t test_manifest) );
+
+	my $arguments = arguments();
+	my $minimum_perl = $arguments->{MIN_PERL_VERSION} || '5.008';
+	eval "require $minimum_perl;" or die $@;
+
+	WriteMakefile( %$arguments );
+	}
+
+
+no warnings;
+__PACKAGE__;

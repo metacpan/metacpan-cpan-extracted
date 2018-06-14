@@ -95,6 +95,7 @@ functions. If you don't specify an IAM role when starting this workflow
 type, the default Lambda role is attached to the execution. For more
 information, see
 http://docs.aws.amazon.com/amazonswf/latest/developerguide/lambda-task.html
+(http://docs.aws.amazon.com/amazonswf/latest/developerguide/lambda-task.html)
 in the I<Amazon SWF Developer Guide>.
 
 
@@ -120,7 +121,9 @@ Valid values are integers that range from Java's C<Integer.MIN_VALUE>
 indicate higher priority.
 
 For more information about setting task priority, see Setting Task
-Priority in the I<Amazon SWF Developer Guide>.
+Priority
+(http://docs.aws.amazon.com/amazonswf/latest/developerguide/programming-priority.html)
+in the I<Amazon SWF Developer Guide>.
 
 
 =head2 DefaultTaskStartToCloseTimeout => Str
@@ -145,9 +148,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::SimpleWor
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

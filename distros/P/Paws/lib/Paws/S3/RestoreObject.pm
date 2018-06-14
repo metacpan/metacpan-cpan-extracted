@@ -21,21 +21,123 @@ package Paws::S3::RestoreObject;
 
 =head1 NAME
 
-Paws::S3::RestoreObject - Arguments for method RestoreObject on Paws::S3
+Paws::S3::RestoreObject - Arguments for method RestoreObject on L<Paws::S3>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method RestoreObject on the 
-Amazon Simple Storage Service service. Use the attributes of this class
+This class represents the parameters used for calling the method RestoreObject on the
+L<Amazon Simple Storage Service|Paws::S3> service. Use the attributes of this class
 as arguments to method RestoreObject.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to RestoreObject.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->RestoreObject(Att1 => $value1, Att2 => $value2, ...);
+    my $s3 = Paws->service('S3');
+    my $RestoreObjectOutput = $s3->RestoreObject(
+      Bucket         => 'MyBucketName',
+      Key            => 'MyObjectKey',
+      RequestPayer   => 'requester',      # OPTIONAL
+      RestoreRequest => {
+        Type => 'SELECT',      # values: SELECT; OPTIONAL
+        Tier => 'Standard',    # values: Standard, Bulk, Expedited; OPTIONAL
+        GlacierJobParameters => {
+          Tier => 'Standard',    # values: Standard, Bulk, Expedited; OPTIONAL
+
+        },    # OPTIONAL
+        Days           => 1,                  # OPTIONAL
+        Description    => 'MyDescription',    # OPTIONAL
+        OutputLocation => {
+          S3 => {
+            BucketName => 'MyBucketName',
+            Prefix     => 'MyLocationPrefix',
+            Tagging    => {
+              TagSet => [
+                {
+                  Key   => 'MyObjectKey',     # min: 1,
+                  Value => 'MyValue',
+
+                },
+                ...
+              ],
+
+            },    # OPTIONAL
+            Encryption => {
+              EncryptionType => 'AES256',           # values: AES256, aws:kms
+              KMSContext     => 'MyKMSContext',     # OPTIONAL
+              KMSKeyId       => 'MySSEKMSKeyId',    # OPTIONAL
+            },    # OPTIONAL
+            CannedACL => 'private'
+            , # values: private, public-read, public-read-write, authenticated-read, aws-exec-read, bucket-owner-read, bucket-owner-full-control; OPTIONAL
+            UserMetadata => [
+              {
+                Name  => 'MyMetadataKey',      # OPTIONAL
+                Value => 'MyMetadataValue',    # OPTIONAL
+              },
+              ...
+            ],                                 # OPTIONAL
+            AccessControlList => [
+              {
+                Grantee => {
+                  Type => 'CanonicalUser'
+                  ,    # values: CanonicalUser, AmazonCustomerByEmail, Group
+                  URI          => 'MyURI',             # OPTIONAL
+                  DisplayName  => 'MyDisplayName',     # OPTIONAL
+                  EmailAddress => 'MyEmailAddress',    # OPTIONAL
+                  ID           => 'MyID',              # OPTIONAL
+                },    # OPTIONAL
+                Permission => 'FULL_CONTROL'
+                , # values: FULL_CONTROL, WRITE, WRITE_ACP, READ, READ_ACP; OPTIONAL
+              },
+              ...
+            ],    # OPTIONAL
+            StorageClass => 'STANDARD'
+            , # values: STANDARD, REDUCED_REDUNDANCY, STANDARD_IA, ONEZONE_IA; OPTIONAL
+          },    # OPTIONAL
+        },    # OPTIONAL
+        SelectParameters => {
+          Expression         => 'MyExpression',
+          ExpressionType     => 'SQL',            # values: SQL
+          InputSerialization => {
+            JSON => {
+              Type => 'DOCUMENT',    # values: DOCUMENT, LINES; OPTIONAL
+            },    # OPTIONAL
+            CompressionType => 'NONE',    # values: NONE, GZIP; OPTIONAL
+            CSV             => {
+              Comments             => 'MyComments',                # OPTIONAL
+              FieldDelimiter       => 'MyFieldDelimiter',          # OPTIONAL
+              QuoteEscapeCharacter => 'MyQuoteEscapeCharacter',    # OPTIONAL
+              QuoteCharacter       => 'MyQuoteCharacter',          # OPTIONAL
+              RecordDelimiter      => 'MyRecordDelimiter',         # OPTIONAL
+              FileHeaderInfo => 'USE',    # values: USE, IGNORE, NONE; OPTIONAL
+            },    # OPTIONAL
+          },
+          OutputSerialization => {
+            JSON => {
+              RecordDelimiter => 'MyRecordDelimiter',    # OPTIONAL
+            },    # OPTIONAL
+            CSV => {
+              FieldDelimiter       => 'MyFieldDelimiter',          # OPTIONAL
+              QuoteEscapeCharacter => 'MyQuoteEscapeCharacter',    # OPTIONAL
+              RecordDelimiter      => 'MyRecordDelimiter',         # OPTIONAL
+              QuoteCharacter       => 'MyQuoteCharacter',          # OPTIONAL
+              QuoteFields => 'ALWAYS',    # values: ALWAYS, ASNEEDED; OPTIONAL
+            },    # OPTIONAL
+          },
+
+        },    # OPTIONAL
+      },    # OPTIONAL
+      VersionId => 'MyObjectVersionId',    # OPTIONAL
+    );
+
+    # Results:
+    my $RequestCharged    = $RestoreObjectOutput->RequestCharged;
+    my $RestoreOutputPath = $RestoreObjectOutput->RestoreOutputPath;
+
+    # Returns a L<Paws::S3::RestoreObjectOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/s3/RestoreObject>
 
 =head1 ATTRIBUTES
 
@@ -77,9 +179,9 @@ This class forms part of L<Paws>, documenting arguments for method RestoreObject
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -131,6 +131,55 @@ subtest "Subdocument" => sub {
     }
 };
 
+subtest "Nested" => sub {
+
+    # hashref -> hashref
+    $hash = decode( encode( bson_doc( doc => {@kv} ) ) );
+    is( ref( $hash->{doc} ), 'HASH', "hashref->hashref" );
+    is_deeply( $hash, { doc => {@kv} }, "value correct" );
+
+    # BSON::Doc -> hashref
+    $hash = decode( encode( bson_doc( doc => bson_doc(@kv) ) ) );
+    is( ref( $hash->{doc} ), 'HASH', "BSON::Doc->hashref" );
+    is_deeply( $hash->{doc}, {@kv}, "value correct" );
+
+    # BSON::Raw -> hashref
+    $hash = decode( encode( bson_doc( doc => bson_raw( encode( {@kv} ) ) ) ) );
+    is( ref( $hash->{doc} ), 'HASH', "BSON::Raw->hashref" );
+    is_deeply( $hash->{doc}, {@kv}, "value correct" );
+
+    # MongoDB::BSON::Raw -> hashref
+    my $raw = encode( {@kv} );
+    $hash = decode( encode( bson_doc( doc => bless \$raw, "MongoDB::BSON::Raw" ) ) );
+    is( ref( $hash->{doc} ), 'HASH', "MongoDB::BSON::Raw->hashref" );
+    is_deeply( $hash->{doc}, {@kv}, "value correct" );
+
+    # Tie::IxHash tied hashref
+    tie my %ixhash, 'Tie::IxHash', @kv;
+    $hash = decode( encode( bson_doc( doc => \%ixhash ) ) );
+    is( ref( $hash->{doc} ), 'HASH', "Tie::IxHash(tied)->hashref" );
+    is_deeply( $hash->{doc}, {@kv}, "value correct" );
+
+    # Tie::IxHash object
+    my $ixdoc = Tie::IxHash->new(@kv);
+    $hash = decode( encode( bson_doc( doc => $ixdoc ) ) );
+    is( ref( $hash->{doc} ), 'HASH', "Tie::IxHash(OO)->hashref" );
+    is_deeply( $hash->{doc}, {@kv}, "value correct" );
+
+    SKIP: {
+        eval { require MongoDB::BSON::_EncodedDoc };
+        skip( "MongoDB::BSON::_EncodedDoc not installed", 4 )
+          unless $INC{'MongoDB/BSON/_EncodedDoc.pm'};
+        $hash = decode(
+            encode(
+                bson_doc( doc => MongoDB::BSON::_EncodedDoc->new( bson => $raw, metadata => {} ) )
+            )
+        );
+        is( ref( $hash->{doc} ), 'HASH', "MongoDB::BSON::_EncodedDoc->hashref" );
+        is_deeply( $hash->{doc}, {@kv}, "value correct" );
+    }
+};
+
 subtest "Ordered top level doc" => sub {
     # hashref -> hashref
     $hash = decode( encode( {@kv} ), ordered => 1 );
@@ -148,10 +197,10 @@ subtest "Ordered top level doc" => sub {
     # Unicode keys
     my $key = "\x{263a}";
     $hash = decode( encode( bson_doc( @kv, $key => 'D' ) ), ordered => 1 );
-    tie my %ixhash, 'Tie::IxHash', @kv, $key => 'D';
+    tie my %ixhash2, 'Tie::IxHash', @kv, $key => 'D';
     is( ref($hash), 'HASH', "BSON::Doc->hashref" );
     ok( tied(%$hash), "hashref is tied" );
-    is_deeply( $hash, \%ixhash, "value correct" );
+    is_deeply( $hash, \%ixhash2, "value correct" );
 };
 
 subtest "Ordered subdoc" => sub {

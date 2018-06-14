@@ -33,24 +33,26 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Glue::Condi
 
 =head1 DESCRIPTION
 
-This class has no description
+Defines a condition under which a trigger fires.
 
 =head1 ATTRIBUTES
 
 
 =head2 JobName => Str
 
-  
+  The name of the Job to whose JobRuns this condition applies and on
+which this trigger waits.
 
 
 =head2 LogicalOperator => Str
 
-  
+  A logical operator.
 
 
 =head2 State => Str
 
-  
+  The condition state. Currently, the values supported are SUCCEEDED,
+STOPPED, TIMEOUT and FAILED.
 
 
 
@@ -60,9 +62,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Glue>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

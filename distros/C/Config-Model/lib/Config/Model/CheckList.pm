@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::CheckList;
-$Config::Model::CheckList::VERSION = '2.123';
+$Config::Model::CheckList::VERSION = '2.124';
 use Mouse;
 use 5.010;
 
@@ -316,9 +316,14 @@ sub _store {
               $inst->preset  ? 'preset'
             : $inst->layered ? 'layered'
             :                  'data';
-        my $old_v = $self->{$data_name}{$choice};
+        my $old_v = $self->{$data_name}{$choice} ;
         if ( not defined $old_v or $old_v ne $value ) {
-            $changed = 1;
+            # no change notif when going from undef to 0 as the
+            # logical value does not change
+            {
+                no warnings qw/uninitialized/;
+                $changed = (!$old_v xor !$value);
+            }
             $self->{$data_name}{$choice} = $value;
         }
 
@@ -327,13 +332,18 @@ sub _store {
             push @$ord, $choice unless scalar grep { $choice eq $_ } @$ord;
         }
     }
-    elsif ( $check eq 'yes' ) {
+    else {
         my $err_str =
             "Unknown check_list item '$choice'. Expected '"
             . join( "', '", @{ $self->{choice} } ) . "'";
         $err_str .= "\n\t" . $self->{ref_object}->reference_info
             if defined $self->{ref_object};
-        Config::Model::Exception::WrongValue->throw( error => $err_str, object => $self );
+        if ($check eq 'yes') {
+            Config::Model::Exception::WrongValue->throw( error => $err_str, object => $self );
+        }
+        elsif ($check eq 'skip') {
+            $logger->warn($err_str);
+        }
     }
 
     if (    $ok
@@ -348,18 +358,25 @@ sub _store {
     return $changed;
 }
 
+sub get_arguments {
+    my $self = shift;
+    my $arg  = shift;
+    my @list  = ref $arg eq 'ARRAY' ? @$arg : ($arg, @_);
+    my %args  =  ref $arg eq 'ARRAY' ? ( check => 'yes', @_ ) : (check => 'yes');
+    my $check = $self->_check_check( $args{check} );
+    return \@list, $check, \%args;
+}
+
 sub uncheck {
     my $self  = shift;
-    my @list  = ref $_[0] eq 'ARRAY' ? @{ $_[0] } : @_;
-    my %args  = ref $_[0] eq 'ARRAY' ? @_[ 1, $#_ ] : ( check => 'yes' );
-    my $check = $self->_check_check( $args{check} );
+    my ($list, $check) = $self->get_arguments(@_);
 
     if ( defined $self->{ref_object} ) {
         $self->{ref_object}->get_choice_from_refered_to;
     }
 
     my @changed;
-    map { push @changed, $_ if $self->_store( $_, 0, $check ) } @list;
+    map { push @changed, $_ if $self->_store( $_, 0, $check ) } @$list;
 
     $self->notify_change( note => "uncheck @changed" )
         unless $self->instance->initial_load;
@@ -581,10 +598,9 @@ sub get {
 }
 
 sub set {
-    my $self = shift;
-    my $path = shift;
-    my $list = shift;
+    my ($self, $path, $list, %args) = @_;
 
+    my $check_validity = $self->_check_check( $args{check} );
     if ($path) {
         Config::Model::Exception::User->throw(
             object  => $self,
@@ -592,7 +608,8 @@ sub set {
         );
     }
 
-    return $self->set_checked_list( split /,/, $list );
+    my @list = split /,/, $list;
+    return $self->set_checked_list( \@list, check => $check_validity );
 }
 
 sub load {
@@ -601,28 +618,33 @@ sub load {
 
 sub store     {
     my $self = shift;
-     my %args =
+    my %args =
           @_ == 1 ? ( value => $_[0] )
         : @_ == 3 ? ( 'value', @_ )
         :           @_;
+    my $check_validity = $self->_check_check( $args{check} );
+
     my @set = split /\s*,\s*/, $args{value};
     foreach (@set) { s/^"|"$//g; s/\\"/"/g; }
-    $self->set_checked_list(@set);
+    $self->set_checked_list(\@set, check => $check_validity);
 }
 
 sub store_set { goto &set_checked_list }
 
 sub set_checked_list {
     my $self = shift;
-    $logger->trace("called with @_");
-    my %set = map { $_ => 1 } @_;
+    my ($list, $check) = $self->get_arguments(@_);
+
+    $logger->trace("called with @$list");
+    my %set = map { $_ => 1 } @$list;
     my @changed;
 
     foreach my $c ( $self->get_choice ) {
-        push @changed, $c if $self->_store( $c, $set{$c} // 0 );
+        my $v = $set{$c} // 0;
+        push @changed, "$c:$v" if $self->_store( $c, $v, $check );
     }
 
-    $self->{ordered_data} = [@_];    # copy list
+    $self->{ordered_data} = $list;
 
     $self->notify_change( note => "set_checked_list @changed" )
         if @changed and not $self->instance->initial_load;
@@ -630,11 +652,13 @@ sub set_checked_list {
 
 sub set_checked_list_as_hash {
     my $self = shift;
-    my %check = ref $_[0] ? %{ $_[0] } : @_;
+    my %check_list = ref $_[0] eq 'HASH' ? %{ $_[0] } : @_;
+    my %args  = ref $_[0] eq 'HASH' ? @_[ 1, $#_ ] : ( check => 'yes' );
+    my $check_validity = $self->_check_check( $args{check} );
 
     foreach my $c ( $self->get_choice ) {
-        if ( defined $check{$c} ) {
-            $self->_store( $c, $check{$c} );
+        if ( defined $check_list{$c} ) {
+            $self->_store( $c, $check_list{$c}, $check_validity );
         }
         else {
             $self->clear_item($c);
@@ -647,16 +671,16 @@ sub load_data {
 
     my %args  = @_ > 1 ? @_ : ( data => shift );
     my $data  = $args{data};
-    my $check = $self->_check_check( $args{check} );
+    my $check_validity = $self->_check_check( $args{check} );
 
     if ( ref($data) eq 'ARRAY' ) {
-        $self->set_checked_list(@$data);
+        $self->set_checked_list($data, check => $check_validity);
     }
     elsif ( ref($data) eq 'HASH' ) {
-        $self->set_checked_list_as_hash($data);
+        $self->set_checked_list_as_hash($data, check => $check_validity);
     }
     elsif ( not ref($data) ) {
-        $self->set_checked_list($data);
+        $self->set_checked_list([$data], check => $check_validity );
     }
     else {
         Config::Model::Exception::LoadData->throw(
@@ -755,7 +779,7 @@ Config::Model::CheckList - Handle check list element
 
 =head1 VERSION
 
-version 2.123
+version 2.124
 
 =head1 SYNOPSIS
 
@@ -877,36 +901,40 @@ For example:
 
 A simple check list with help:
 
-       choice_list
-       => { type => 'check_list',
-            choice     => ['A' .. 'Z'],
-            help => { A => 'A help', E => 'E help' } ,
-          },
+ choice_list => {
+     type   => 'check_list',
+     choice => ['A' .. 'Z'],
+     help   => { A => 'A help', E => 'E help' } ,
+ },
 
 =item *
 
 A check list with default values:
 
-       choice_list_with_default
-       => { type => 'check_list',
-            choice     => ['A' .. 'Z'],
-            default_list   => [ 'A', 'D' ],
-          },
+ choice_list_with_default => {
+     type => 'check_list',
+     choice     => ['A' .. 'Z'],
+     default_list   => [ 'A', 'D' ],
+ },
 
 =item *
 
 A check list whose available choice and default change depending on
 the value of the C<macro> parameter:
 
-       'warped_choice_list'
-       => { type => 'check_list',
-            warp => { follow => '- macro',
-                      rules  => { AD => { choice => [ 'A' .. 'D' ], 
-                                          default_list => ['A', 'B' ] },
-                                  AH => { choice => [ 'A' .. 'H' ] },
-                                }
-                    }
-          },
+ warped_choice_list => {
+     type => 'check_list',
+     warp => {
+         follow => '- macro',
+         rules  => {
+             AD => {
+                 choice => [ 'A' .. 'D' ],
+                 default_list => ['A', 'B' ]
+             },
+             AH => { choice => [ 'A' .. 'H' ] },
+         }
+     }
+ },
 
 =back
 
@@ -955,33 +983,34 @@ See L<refer_to parameter|Config::Model::IdElementReference/"refer_to parameter">
 A check list where the available choices are the keys of C<my_hash>
 configuration parameter:
 
-       refer_to_list
-       => { type => 'check_list',
-            refer_to => '- my_hash'
-          },
+ refer_to_list => {
+     type => 'check_list',
+     refer_to => '- my_hash'
+ },
 
 =item *
 
 A check list where the available choices are the checked items of
 C<other_check_list> configuration parameter:
 
-       other_check_list => { type => 'check_list', 
-                             choice => [qw/A B C/]
-                           },
-       refer_to_list
-       => { type => 'check_list',
-            refer_to => '- other_check_list'
-          },
+ other_check_list => {
+     type => 'check_list',
+     choice => [qw/A B C/]
+ },
+ refer_to_list => {
+     type => 'check_list',
+     refer_to => '- other_check_list'
+ },
 
 =item *
 
 A check list where the available choices are the keys of C<my_hash>
 and C<my_hash2> and C<my_hash3> configuration parameter:
 
-       refer_to_3_lists
-       => { type => 'check_list',
-            refer_to => '- my_hash + - my_hash2   + - my_hash3'
-          },
+ refer_to_3_lists => {
+     type => 'check_list',
+     refer_to => '- my_hash + - my_hash2   + - my_hash3'
+ },
 
 =item *
 
@@ -990,13 +1019,16 @@ the choice of C<refer_to_3_lists> and a hash whose name is specified
 by the value of the C<indirection> configuration parameter (this
 example is admittedly convoluted):
 
-       refer_to_check_list_and_choice
-       => { type => 'check_list',
-            computed_refer_to => { formula => '- refer_to_2_list + - $var',
-                                   variables { 'var' => '- indirection ' }
-                                 },
-            choice  => [qw/A1 A2 A3/],
-          },
+ refer_to_check_list_and_choice => {
+     type => 'check_list',
+     computed_refer_to => {
+         formula => '- refer_to_2_list + - $var',
+         variables => {
+             var => '- indirection '
+         }
+     },
+     choice  => [qw/A1 A2 A3/],
+ },
 
 =back
 
@@ -1125,22 +1157,51 @@ Returns a string listing the checked items (i.e. "A,B,C")
 
 Get a value from a directory like path.
 
-=head2 set( path , values )
+=head1 Method to check or clear items in the check list
+
+All these methods accept an optional C<check> parameter that can be:
+
+=over
+
+=item yes
+
+A wrong item to check trigger an exception (default)
+
+=item skip
+
+A wrong item trigger a warning
+
+=item no
+
+A wrong item is ignored
+
+=back
+
+=head2 set
+
+Parameters are: C<( path, items_to_set, [ check => [ yes | no | skip  ] ] )>
 
 Set a checklist with a directory like path. Since a checklist is a leaf, the path
-should be empty. The values are a comma separated list of checked items.
+should be empty.
 
-Example : C<< $leaf->set('','A,C,Z') ; >>
+The values are a comma separated list of items to set in the check list.
+
+Example :
+
+  $leaf->set('','A,C,Z');
+  $leaf->set('','A,C,Z', check => 'skip');
 
 =head2 set_checked_list
 
 Set all passed items to checked (1). All other available items
 in the check list are set to 0.
 
-Example:
+Example, for a check list that contains A B C and D check items:
 
   # set cl to A=0 B=1 C=0 D=1
   $cl->set_checked_list('B','D')
+  $cl->set_checked_list( [ 'B','D' ])
+  $cl->set_checked_list( [ 'B','D' ], check => 'yes')
 
 =head2 store_set
 
@@ -1156,20 +1217,34 @@ Example:
 
   $cl->store('B, D')
   $cl->store( value => 'B,C' )
+  $cl->store( value => 'B,C', check => 'yes' )
 
 =head2 load
 
 Alias to L</store>.
 
-=head2 set_checked_list_as_hash ()
+=head2 set_checked_list_as_hash
 
-Set check_list items. Missing items in the given list of parameters
+Set check_list items. Missing items in the given hash of parameters
 are cleared (i.e. set to undef).
 
-=head2 load_data ( ref )
+Example for a check list containing A B C D
 
-Load check_list as an array or hash ref. Array is forwarded to
+  $cl->set_checked_list_as_hash( { A => 1, B => 0} , check => 'yes' )
+  # result A => 1 B => 0 , C and D are undef
+
+=head2 load_data
+
+Load items as an array or hash ref. Array is forwarded to
 L<set_checked_list> , and hash is forwarded to L<set_checked_list_as_hash>.
+
+Example:
+
+ $cl->load_data(['A','B']) # cannot use check param here
+ $cl->load_data( data => ['A','B'])
+ $cl->load_data( data => ['A','B'], check => 'yes')
+ $cl->load_data( { A => 1, B => 1 } )
+ $cl->load_data( data => { A => 1, B => 1 }, check => 'yes')
 
 =head1 Ordered checklist methods
 
@@ -1181,11 +1256,11 @@ Swap the 2 given choice in the list. Both choice must be already set.
 
 =head1 move_up ( choice )
 
-Move the choice up in the checklist. 
+Move the choice up in the checklist.
 
 =head1 move_down ( choice )
 
-Move the choice down in the checklist. 
+Move the choice down in the checklist.
 
 =head1 AUTHOR
 
@@ -1193,9 +1268,9 @@ Dominique Dumont, (ddumont at cpan dot org)
 
 =head1 SEE ALSO
 
-L<Config::Model>, 
-L<Config::Model::Instance>, 
-L<Config::Model::Node>, 
+L<Config::Model>,
+L<Config::Model::Instance>,
+L<Config::Model::Node>,
 L<Config::Model::AnyId>,
 L<Config::Model::ListId>,
 L<Config::Model::HashId>,

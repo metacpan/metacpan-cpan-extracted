@@ -1,5 +1,5 @@
 package Authorization::RBAC::Backend::DBIx;
-$Authorization::RBAC::Backend::DBIx::VERSION = '0.10';
+$Authorization::RBAC::Backend::DBIx::VERSION = '0.11';
 use Moose::Role;
 use Carp qw/croak/;
 
@@ -80,7 +80,7 @@ Authorization::RBAC::Backend::DBIx - Backend 'DBIx' for Authorization::RBAC
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 CONFIGURATION
 

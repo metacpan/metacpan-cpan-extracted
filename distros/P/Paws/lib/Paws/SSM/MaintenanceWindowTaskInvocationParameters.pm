@@ -41,7 +41,7 @@ The parameters for task execution.
 
 =head2 Automation => L<Paws::SSM::MaintenanceWindowAutomationParameters>
 
-  The parameters for a AUTOMATION task type.
+  The parameters for an AUTOMATION task type.
 
 
 =head2 Lambda => L<Paws::SSM::MaintenanceWindowLambdaParameters>
@@ -66,9 +66,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::SSM>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

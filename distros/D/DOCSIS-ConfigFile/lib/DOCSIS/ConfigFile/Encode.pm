@@ -1,47 +1,4 @@
 package DOCSIS::ConfigFile::Encode;
-
-=head1 NAME
-
-DOCSIS::ConfigFile::Encode - Encode functions for a DOCSIS config-file.
-
-=head1 SYNOPSIS
-
-    @uchar = snmp_object({
-                 value => { oid => $str, type => $str, value => $str },
-             });
-    @uchar = bigint({ value => $bigint });
-    @uchar = int({ value => $int });
-    @uchar = uint({ value => $uint });
-    @uchar = ushort({ value => $ushort });
-    @uchar = uchar({ value => $char });
-    @uchar = vendorspec({
-                 value  => '0x001337', # vendors ID
-                 nested => [
-                     {
-                         type => $int, # vendor specific type
-                         value => $int, # vendor specific value
-                     },
-                 ],
-             });
-    @uchar = ip({ value => '1.2.3.4' });
-    @uchar = ether({ value => '0x0123456789abcdef' });
-    @uchar = ether({ value => $uint });
-    @uchar = string({ value => '0x0123456789abcdef' });
-    @uchar = string({ value => 'string containing percent: %25' });
-    @uchar = hexstr({ value => '0x0123456789abcdef' });
-    () = mic({ value => $any });
-
-=head1 DESCRIPTION
-
-This module has functions which is used to encode "human" data
-into list of unsigned characters (0-255) (refered to as "bytes")
-later in the pod. This list can then be encoded into binary data
-using:
-
-    $bytestr = pack 'C*', @uchar;
-
-=cut
-
 use strict;
 use warnings;
 use bytes;
@@ -62,21 +19,6 @@ our %SNMP_TYPE = (
   OPAQUE    => [0x44, \&uint],
   COUNTER64 => [0x46, \&bigint],
 );
-
-=head1 FUNCTIONS
-
-=head2 snmp_object
-
-This function encodes a human-readable SNMP oid into a list of bytes:
-
-    @bytes = (
-      #-type---length---------value-----type---
-        0x30,  $total_length,         # object
-        0x06,  int(@oid),     @oid,   # oid
-        $type, int(@value),   @value, # value
-    );
-
-=cut
 
 sub snmp_object {
   my $obj = _test_value(snmp_object => $_[0]);
@@ -163,13 +105,6 @@ SUB_OID:
   return @encoded_oid;
 }
 
-=head2 bigint
-
-Returns a list of bytes representing the C<$bigint>. This can be any
-number (negative or positive) which can be representing using 64 bits.
-
-=cut
-
 sub bigint {
   my $value = _test_value(bigint => $_[0]);
   my $int64 = Math::BigInt->new($value);
@@ -188,13 +123,6 @@ sub bigint {
 
   return @bytes ? @bytes : (0);    # 0 is also a number ;-)
 }
-
-=head2 int
-
-Returns a list of bytes representing the C<$int>. This can be any
-number (negative or positive) which can be representing using 32 bits.
-
-=cut
 
 sub int {
   my $obj      = $_[0];
@@ -226,13 +154,6 @@ sub int {
   return @bytes;
 }
 
-=head2 uint
-
-Returns a list of bytes representing the C<$uint>. This can be any
-positive number which can be representing using 32 bits.
-
-=cut
-
 sub uint {
   my $obj = $_[0];
   my $uint = _test_value(uint => $obj, qr{^\+?\d{1,10}$});
@@ -256,13 +177,6 @@ sub uint {
 
   return @bytes;
 }
-
-=head2 ushort
-
-Returns a list of bytes representing the C<$ushort>. This can be any
-positive number which can be representing using 16 bits.
-
-=cut
 
 sub ushort {
   my $obj = $_[0];
@@ -289,22 +203,9 @@ sub ushort {
   return @bytes;
 }
 
-=head2 uchar
-
-Returns a list with one byte representing the C<$uchar>. This can be any
-positive number which can be representing using 8 bits.
-
-=cut
-
 sub uchar {
   return _test_value(uchar => $_[0], qr/\+?\d{1,3}$/);
 }
-
-=head2 vendorspec
-
-Will byte-encode a complex vendorspec datastructure.
-
-=cut
 
 sub vendorspec {
   my $obj = $_[0];
@@ -327,25 +228,9 @@ sub vendorspec {
   return @bytes;
 }
 
-=head2 ip
-
-Returns a list of four bytes representing the C<$ip>. The C<$ip> must
-be in in the format "1.2.3.4".
-
-=cut
-
 sub ip {
   return split /\./, _test_value(ip => $_[0], qr{^(?:\d{1,3}\.){3}\d{1,3}$});
 }
-
-=head2 ether
-
-This function use either L</uint> or L</hexstr> to encode the
-input value. It will figure out the function to use by checking
-the input for either integer value or a string looking like
-a hex-string.
-
-=cut
 
 sub ether {
   my $string = _test_value(ether => $_[0]);
@@ -360,30 +245,11 @@ sub ether {
   confess "ether({ value => $string }) is invalid";
 }
 
-=head2 objectid
-
-Encodes MIB number as value of C<OBJECTID>
-can be in format: 1.2.3.4, .1.2.3.4
-
-=cut
-
 sub objectid {
   my $oid = _test_value(objectid => $_[0], qr{^\.?\d+(\.\d+)+$});
   $oid =~ s/^\.//;
   return _snmp_oid($oid);
 }
-
-=head2 string
-
-Returns a list of bytes representing the C<$str>. Will use
-L</hexstr> to decode it if it looks like a hex string (a
-string starting with leading "0x"). In other cases, it will
-decode it itself. The input string might also be encoded
-with a simple uri-encode format: "%20" will be translated
-to a space, and "%25" will be translated into "%", before
-encoded using C<ord()>.
-
-=cut
 
 sub string {
   my $string = _test_value(string => $_[0]);
@@ -397,29 +263,11 @@ sub string {
   }
 }
 
-=head2 stringz
-
-Returns a list of bytes representing the C<$str> with a zero
-terminator at the end. The "\0" byte will be added unless
-seen as the last element in the list.
-
-Only ServiceClassName needs this, see L<DOCSIS::ConfigFile::Syminfo>
-for more details.
-
-=cut
-
 sub stringz {
   my @bytes = string(@_);
   push @bytes, 0 if (@bytes == 0 or $bytes[-1] ne "\0");
   return @bytes;
 }
-
-=head2 hexstr
-
-Will encode any hex encoded string into a list of bytes. The string
-can have an optional leading "0x".
-
-=cut
 
 sub hexstr {
   my $string = _test_value(hexstr => $_[0], qr{(?:0x)?([a-f0-9]+)}i);
@@ -438,29 +286,9 @@ sub hexstr {
   return @bytes;
 }
 
-=head2 mic
-
-Cannot encode CM/CMTS mic without complete information about
-the config file, so this function returns an empty list.
-
-=cut
-
 sub mic { }
 
-=head2 no_value
-
-This method will return an empty list. It is used by DOCSIS types, which
-has zero length.
-
-=cut
-
 sub no_value { }
-
-=head2 vendor
-
-Will byte-encode a complex vendorspec datastructure.
-
-=cut
 
 sub vendor {
   my $options = $_[0]->{value}{options};
@@ -485,10 +313,149 @@ sub _test_value {
   $obj->{value};
 }
 
+1;
+
+=encoding utf8
+
+=head1 NAME
+
+DOCSIS::ConfigFile::Encode - Encode functions for a DOCSIS config-file.
+
+=head1 SYNOPSIS
+
+    @uchar = snmp_object({
+                 value => { oid => $str, type => $str, value => $str },
+             });
+    @uchar = bigint({ value => $bigint });
+    @uchar = int({ value => $int });
+    @uchar = uint({ value => $uint });
+    @uchar = ushort({ value => $ushort });
+    @uchar = uchar({ value => $char });
+    @uchar = vendorspec({
+                 value  => '0x001337', # vendors ID
+                 nested => [
+                     {
+                         type => $int, # vendor specific type
+                         value => $int, # vendor specific value
+                     },
+                 ],
+             });
+    @uchar = ip({ value => '1.2.3.4' });
+    @uchar = ether({ value => '0x0123456789abcdef' });
+    @uchar = ether({ value => $uint });
+    @uchar = string({ value => '0x0123456789abcdef' });
+    @uchar = string({ value => 'string containing percent: %25' });
+    @uchar = hexstr({ value => '0x0123456789abcdef' });
+    () = mic({ value => $any });
+
+=head1 DESCRIPTION
+
+This module has functions which is used to encode "human" data
+into list of unsigned characters (0-255) (refered to as "bytes")
+later in the pod. This list can then be encoded into binary data
+using:
+
+    $bytestr = pack 'C*', @uchar;
+
+=head1 FUNCTIONS
+
+=head2 snmp_object
+
+This function encodes a human-readable SNMP oid into a list of bytes:
+
+    @bytes = (
+      #-type---length---------value-----type---
+        0x30,  $total_length,         # object
+        0x06,  int(@oid),     @oid,   # oid
+        $type, int(@value),   @value, # value
+    );
+
+=head2 bigint
+
+Returns a list of bytes representing the C<$bigint>. This can be any
+number (negative or positive) which can be representing using 64 bits.
+
+=head2 int
+
+Returns a list of bytes representing the C<$int>. This can be any
+number (negative or positive) which can be representing using 32 bits.
+
+=head2 uint
+
+Returns a list of bytes representing the C<$uint>. This can be any
+positive number which can be representing using 32 bits.
+
+=head2 ushort
+
+Returns a list of bytes representing the C<$ushort>. This can be any
+positive number which can be representing using 16 bits.
+
+=head2 uchar
+
+Returns a list with one byte representing the C<$uchar>. This can be any
+positive number which can be representing using 8 bits.
+
+=head2 vendorspec
+
+Will byte-encode a complex vendorspec datastructure.
+
+=head2 ip
+
+Returns a list of four bytes representing the C<$ip>. The C<$ip> must
+be in in the format "1.2.3.4".
+
+=head2 ether
+
+This function use either L</uint> or L</hexstr> to encode the
+input value. It will figure out the function to use by checking
+the input for either integer value or a string looking like
+a hex-string.
+
+=head2 objectid
+
+Encodes MIB number as value of C<OBJECTID>
+can be in format: 1.2.3.4, .1.2.3.4
+
+=head2 string
+
+Returns a list of bytes representing the C<$str>. Will use
+L</hexstr> to decode it if it looks like a hex string (a
+string starting with leading "0x"). In other cases, it will
+decode it itself. The input string might also be encoded
+with a simple uri-encode format: "%20" will be translated
+to a space, and "%25" will be translated into "%", before
+encoded using C<ord()>.
+
+=head2 stringz
+
+Returns a list of bytes representing the C<$str> with a zero
+terminator at the end. The "\0" byte will be added unless
+seen as the last element in the list.
+
+Only ServiceClassName needs this, see L<DOCSIS::ConfigFile::Syminfo>
+for more details.
+
+=head2 hexstr
+
+Will encode any hex encoded string into a list of bytes. The string
+can have an optional leading "0x".
+
+=head2 mic
+
+Cannot encode CM/CMTS mic without complete information about
+the config file, so this function returns an empty list.
+
+=head2 no_value
+
+This method will return an empty list. It is used by DOCSIS types, which
+has zero length.
+
+=head2 vendor
+
+Will byte-encode a complex vendorspec datastructure.
+
 =head1 AUTHOR
 
 Jan Henning Thorsen - C<jhthorsen@cpan.org>
 
 =cut
-
-1;

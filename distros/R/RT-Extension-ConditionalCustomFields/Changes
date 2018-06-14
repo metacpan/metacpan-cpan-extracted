@@ -1,5 +1,16 @@
 Revision history for RT-Extension-ConditionalCustomFields
 
+0.11 2018-06-12
+ - Fix show conditioned CF when condition CF does not apply to current object
+
+0.10 2018-05-29
+ - Use MaxValues instead of deprecated Single suffix for tests on CFs
+ - Fix test for ConditionedBy CF with pattern matching
+ - Remove unnecessary array since _findGrouping returns a scalar value
+ - Fix RT::CustomField::MatchPattern overriding to pass parameters to original method
+ - Handle multivalued select for condition CF
+ - Add tests for multivalued select for condition CF
+
 0.09 2018-05-23
  - Allow validation (matching pattern) on ConditionedBy CF only when condition is fulfilled
 

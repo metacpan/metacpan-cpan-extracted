@@ -32,19 +32,26 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Budgets::Ca
 
 =head1 DESCRIPTION
 
-A structure that holds the actual and forecasted spend for a budget.
+The spend objects associated with this budget. The C<actualSpend>
+tracks how much you've used, cost, usage, or RI units, and the
+C<forecastedSpend> tracks how much you are predicted to spend if your
+current usage remains steady.
+
+For example, if it is the 20th of the month and you have spent C<50>
+dollars on Amazon EC2, your C<actualSpend> is C<50 USD>, and your
+C<forecastedSpend> is C<75 USD>.
 
 =head1 ATTRIBUTES
 
 
 =head2 B<REQUIRED> ActualSpend => L<Paws::Budgets::Spend>
 
-  
+  The amount of cost, usage, or RI units that you have used.
 
 
 =head2 ForecastedSpend => L<Paws::Budgets::Spend>
 
-  
+  The amount of cost, usage, or RI units that you are forecasted to use.
 
 
 
@@ -54,9 +61,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Budgets>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

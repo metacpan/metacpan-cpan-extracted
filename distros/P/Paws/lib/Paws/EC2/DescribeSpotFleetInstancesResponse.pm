@@ -19,8 +19,8 @@ Paws::EC2::DescribeSpotFleetInstancesResponse
 
 =head2 B<REQUIRED> ActiveInstances => ArrayRef[L<Paws::EC2::ActiveInstance>]
 
-The running instances. Note that this list is refreshed periodically
-and might be out of date.
+The running instances. This list is refreshed periodically and might be
+out of date.
 
 
 =head2 NextToken => Str
@@ -31,7 +31,7 @@ C<null> when there are no more results to return.
 
 =head2 B<REQUIRED> SpotFleetRequestId => Str
 
-The ID of the Spot fleet request.
+The ID of the Spot Fleet request.
 
 
 =head2 _request_id => Str

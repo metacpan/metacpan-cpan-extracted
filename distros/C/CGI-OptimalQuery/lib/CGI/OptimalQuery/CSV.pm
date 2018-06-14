@@ -14,7 +14,7 @@ sub output {
   my @t = localtime;
   $title .= '_'.($t[5] + 1900).($t[4] + 1).$t[3].$t[2].$t[1];
 
-  $$o{output_handler}->(CGI::header(-type => 'text/csv', -attachment => "$title.csv"));
+  $$o{output_handler}->($$o{httpHeader}->(-type => 'text/csv', -attachment => "$title.csv"));
 
   my $selCols = $o->get_usersel_cols();
 

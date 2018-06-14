@@ -1,18 +1,18 @@
 #!/usr/bin/env perl
 
 use Modern::Perl '2015';
-use lib ('lib');
 
 use Test::More;
+use Test::Exception;
 
 BEGIN {
-    use_ok('WG::API') || say "WG::API loaded";
+    require_ok('WG::API') || say "WG::API loaded";
 }
 
 diag $WG::API::VERSION;
 
-my WG::API $wg;
-eval { $wg = WG::API->new( application_id => $ENV{'WG_KEY'} || 'demo' ) };
+my $wg;
+lives_ok { $wg = WG::API->new( application_id => $ENV{'WG_KEY'} || 'demo' ) } 'create obj';
 
 isa_ok( $wg,       'WG::API' );
 isa_ok( $wg->net,  'WG::API::NET' );

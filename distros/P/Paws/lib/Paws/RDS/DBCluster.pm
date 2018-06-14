@@ -3,6 +3,8 @@ package Paws::RDS::DBCluster;
   has AllocatedStorage => (is => 'ro', isa => 'Int');
   has AssociatedRoles => (is => 'ro', isa => 'ArrayRef[Paws::RDS::DBClusterRole]', request_name => 'DBClusterRole', traits => ['NameInRequest']);
   has AvailabilityZones => (is => 'ro', isa => 'ArrayRef[Str|Undef]', request_name => 'AvailabilityZone', traits => ['NameInRequest']);
+  has BacktrackConsumedChangeRecords => (is => 'ro', isa => 'Int');
+  has BacktrackWindow => (is => 'ro', isa => 'Int');
   has BackupRetentionPeriod => (is => 'ro', isa => 'Int');
   has CharacterSetName => (is => 'ro', isa => 'Str');
   has CloneGroupId => (is => 'ro', isa => 'Str');
@@ -15,7 +17,9 @@ package Paws::RDS::DBCluster;
   has DBClusterParameterGroup => (is => 'ro', isa => 'Str');
   has DbClusterResourceId => (is => 'ro', isa => 'Str');
   has DBSubnetGroup => (is => 'ro', isa => 'Str');
+  has EarliestBacktrackTime => (is => 'ro', isa => 'Str');
   has EarliestRestorableTime => (is => 'ro', isa => 'Str');
+  has EnabledCloudwatchLogsExports => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
   has Endpoint => (is => 'ro', isa => 'Str');
   has Engine => (is => 'ro', isa => 'Str');
   has EngineVersion => (is => 'ro', isa => 'Str');
@@ -65,36 +69,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::RDS::DBClus
 
 =head1 DESCRIPTION
 
-Contains the result of a successful invocation of the following
-actions:
-
-=over
-
-=item *
-
-CreateDBCluster
-
-=item *
-
-DeleteDBCluster
-
-=item *
-
-FailoverDBCluster
-
-=item *
-
-ModifyDBCluster
-
-=item *
-
-RestoreDBClusterFromSnapshot
-
-=item *
-
-RestoreDBClusterToPointInTime
-
-=back
+Contains the details of an Amazon RDS DB cluster.
 
 This data type is used as a response element in the DescribeDBClusters
 action.
@@ -105,7 +80,7 @@ action.
 =head2 AllocatedStorage => Int
 
   For all database engines except Amazon Aurora, C<AllocatedStorage>
-specifies the allocated storage size in gigabytes (GB). For Aurora,
+specifies the allocated storage size in gibibytes (GiB). For Aurora,
 C<AllocatedStorage> always returns 1, because Aurora DB cluster storage
 size is not fixed, but instead automatically adjusts as needed.
 
@@ -122,6 +97,18 @@ AWS services on your behalf.
 
   Provides the list of EC2 Availability Zones that instances in the DB
 cluster can be created in.
+
+
+=head2 BacktrackConsumedChangeRecords => Int
+
+  The number of change records stored for Backtrack.
+
+
+=head2 BacktrackWindow => Int
+
+  The target backtrack window, in seconds. If this value is set to 0,
+backtracking is disabled for the DB cluster. Otherwise, backtracking is
+enabled.
 
 
 =head2 BackupRetentionPeriod => Int
@@ -183,9 +170,9 @@ cluster.
 
 =head2 DbClusterResourceId => Str
 
-  The region-unique, immutable identifier for the DB cluster. This
-identifier is found in AWS CloudTrail log entries whenever the KMS key
-for the DB cluster is accessed.
+  The AWS Region-unique, immutable identifier for the DB cluster. This
+identifier is found in AWS CloudTrail log entries whenever the AWS KMS
+key for the DB cluster is accessed.
 
 
 =head2 DBSubnetGroup => Str
@@ -195,10 +182,21 @@ cluster, including the name, description, and subnets in the subnet
 group.
 
 
+=head2 EarliestBacktrackTime => Str
+
+  The earliest time to which a DB cluster can be backtracked.
+
+
 =head2 EarliestRestorableTime => Str
 
-  Specifies the earliest time to which a database can be restored with
+  The earliest time to which a database can be restored with
 point-in-time restore.
+
+
+=head2 EnabledCloudwatchLogsExports => ArrayRef[Str|Undef]
+
+  A list of log types that this DB cluster is configured to export to
+CloudWatch Logs.
 
 
 =head2 Endpoint => Str
@@ -227,12 +225,12 @@ zone.
 =head2 IAMDatabaseAuthenticationEnabled => Bool
 
   True if mapping of AWS Identity and Access Management (IAM) accounts to
-database accounts is enabled; otherwise false.
+database accounts is enabled, and otherwise false.
 
 
 =head2 KmsKeyId => Str
 
-  If C<StorageEncrypted> is true, the KMS key identifier for the
+  If C<StorageEncrypted> is true, the AWS KMS key identifier for the
 encrypted DB cluster.
 
 
@@ -286,9 +284,9 @@ Aurora Replicas in the DB cluster. This functionality can help balance
 your read workload across multiple Aurora Replicas in your DB cluster.
 
 If a failover occurs, and the Aurora Replica that you are connected to
-is promoted to be the primary instance, your connection will be
-dropped. To continue sending your read workload to other Aurora
-Replicas in the cluster, you can then reconnect to the reader endpoint.
+is promoted to be the primary instance, your connection is dropped. To
+continue sending your read workload to other Aurora Replicas in the
+cluster, you can then reconnect to the reader endpoint.
 
 
 =head2 ReadReplicaIdentifiers => ArrayRef[Str|Undef]
@@ -325,9 +323,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::RDS>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

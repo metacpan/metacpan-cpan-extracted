@@ -7,7 +7,7 @@ use XML::Struct::Writer::Stream;
 use Scalar::Util qw(blessed reftype);
 use Carp;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 has attributes => (is => 'rw', default => sub { 1 });
 has encoding   => (is => 'rw', default => sub { 'UTF-8' });

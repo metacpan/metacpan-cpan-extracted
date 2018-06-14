@@ -1,5 +1,7 @@
 package Paws::CloudDirectory::BatchReadOperation;
   use Moose;
+  has GetLinkAttributes => (is => 'ro', isa => 'Paws::CloudDirectory::BatchGetLinkAttributes');
+  has GetObjectAttributes => (is => 'ro', isa => 'Paws::CloudDirectory::BatchGetObjectAttributes');
   has GetObjectInformation => (is => 'ro', isa => 'Paws::CloudDirectory::BatchGetObjectInformation');
   has ListAttachedIndices => (is => 'ro', isa => 'Paws::CloudDirectory::BatchListAttachedIndices');
   has ListIncomingTypedLinks => (is => 'ro', isa => 'Paws::CloudDirectory::BatchListIncomingTypedLinks');
@@ -30,20 +32,30 @@ Each attribute should be used as a named argument in the calls that expect this 
 
 As an example, if Att1 is expected to be a Paws::CloudDirectory::BatchReadOperation object:
 
-  $service_obj->Method(Att1 => { GetObjectInformation => $value, ..., LookupPolicy => $value  });
+  $service_obj->Method(Att1 => { GetLinkAttributes => $value, ..., LookupPolicy => $value  });
 
 =head3 Results returned from an API call
 
 Use accessors for each attribute. If Att1 is expected to be an Paws::CloudDirectory::BatchReadOperation object:
 
   $result = $service_obj->Method(...);
-  $result->Att1->GetObjectInformation
+  $result->Att1->GetLinkAttributes
 
 =head1 DESCRIPTION
 
 Represents the output of a C<BatchRead> operation.
 
 =head1 ATTRIBUTES
+
+
+=head2 GetLinkAttributes => L<Paws::CloudDirectory::BatchGetLinkAttributes>
+
+  Retrieves attributes that are associated with a typed link.
+
+
+=head2 GetObjectAttributes => L<Paws::CloudDirectory::BatchGetObjectAttributes>
+
+  Retrieves attributes within a facet that are associated with an object.
 
 
 =head2 GetObjectInformation => L<Paws::CloudDirectory::BatchGetObjectInformation>
@@ -60,7 +72,8 @@ Represents the output of a C<BatchRead> operation.
 
   Returns a paginated list of all the incoming TypedLinkSpecifier
 information for an object. It also supports filtering by typed link
-facet and identity attributes. For more information, see Typed link.
+facet and identity attributes. For more information, see Typed link
+(http://docs.aws.amazon.com/directoryservice/latest/admin-guide/objectsandlinks.html#typedlink).
 
 
 =head2 ListIndex => L<Paws::CloudDirectory::BatchListIndex>
@@ -83,7 +96,8 @@ given object.
 
   Retrieves all available parent paths for any object type such as node,
 leaf node, policy node, and index node objects. For more information
-about objects, see Directory Structure.
+about objects, see Directory Structure
+(http://docs.aws.amazon.com/directoryservice/latest/admin-guide/cd_key_concepts.html#dirstructure).
 
 
 =head2 ListObjectPolicies => L<Paws::CloudDirectory::BatchListObjectPolicies>
@@ -95,7 +109,8 @@ about objects, see Directory Structure.
 
   Returns a paginated list of all the outgoing TypedLinkSpecifier
 information for an object. It also supports filtering by typed link
-facet and identity attributes. For more information, see Typed link.
+facet and identity attributes. For more information, see Typed link
+(http://docs.aws.amazon.com/directoryservice/latest/admin-guide/objectsandlinks.html#typedlink).
 
 
 =head2 ListPolicyAttachments => L<Paws::CloudDirectory::BatchListPolicyAttachments>
@@ -112,7 +127,8 @@ If policies are present, and if some objects don't have the policies
 attached, it returns the C<ObjectIdentifier> for such objects. If
 policies are present, it returns C<ObjectIdentifier>, C<policyId>, and
 C<policyType>. Paths that don't lead to the root from the target object
-are ignored. For more information, see Policies.
+are ignored. For more information, see Policies
+(http://docs.aws.amazon.com/directoryservice/latest/admin-guide/cd_key_concepts.html#policies).
 
 
 
@@ -122,9 +138,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::CloudDire
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

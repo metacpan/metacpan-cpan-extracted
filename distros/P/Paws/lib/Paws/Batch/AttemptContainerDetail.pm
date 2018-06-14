@@ -70,7 +70,8 @@ additional details about a running or stopped container.
 =head2 TaskArn => Str
 
   The Amazon Resource Name (ARN) of the Amazon ECS task that is
-associated with the job attempt.
+associated with the job attempt. Each container attempt receives a task
+ARN when they reach the C<STARTING> status.
 
 
 
@@ -80,9 +81,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Batch>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

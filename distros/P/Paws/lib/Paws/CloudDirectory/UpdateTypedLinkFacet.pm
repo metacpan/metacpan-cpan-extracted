@@ -12,28 +12,68 @@ package Paws::CloudDirectory::UpdateTypedLinkFacet;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/amazonclouddirectory/2017-01-11/typedlink/facet');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'PUT');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::CloudDirectory::UpdateTypedLinkFacetResponse');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::CloudDirectory::UpdateTypedLinkFacet - Arguments for method UpdateTypedLinkFacet on Paws::CloudDirectory
+Paws::CloudDirectory::UpdateTypedLinkFacet - Arguments for method UpdateTypedLinkFacet on L<Paws::CloudDirectory>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateTypedLinkFacet on the 
-Amazon CloudDirectory service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateTypedLinkFacet on the
+L<Amazon CloudDirectory|Paws::CloudDirectory> service. Use the attributes of this class
 as arguments to method UpdateTypedLinkFacet.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateTypedLinkFacet.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateTypedLinkFacet(Att1 => $value1, Att2 => $value2, ...);
+    my $clouddirectory = Paws->service('CloudDirectory');
+    my $UpdateTypedLinkFacetResponse = $clouddirectory->UpdateTypedLinkFacet(
+      AttributeUpdates => [
+        {
+          Action    => 'CREATE_OR_UPDATE',    # values: CREATE_OR_UPDATE, DELETE
+          Attribute => {
+            RequiredBehavior =>
+              'REQUIRED_ALWAYS',    # values: REQUIRED_ALWAYS, NOT_REQUIRED
+            Type =>
+              'STRING',    # values: STRING, BINARY, BOOLEAN, NUMBER, DATETIME
+            Name         => 'MyAttributeName',    # min: 1, max: 64
+            DefaultValue => {
+              BooleanValue  => 1,                             # OPTIONAL
+              DatetimeValue => '1970-01-01T01:00:00',         # OPTIONAL
+              StringValue   => 'MyStringAttributeValue',      # OPTIONAL
+              NumberValue   => 'MyNumberAttributeValue',      # OPTIONAL
+              BinaryValue   => 'BlobBinaryAttributeValue',    # OPTIONAL
+            },    # OPTIONAL
+            Rules => {
+              'MyRuleKey' => {
+                Type => 'BINARY_LENGTH'
+                , # values: BINARY_LENGTH, NUMBER_COMPARISON, STRING_FROM_SET, STRING_LENGTH; OPTIONAL
+                Parameters =>
+                  { 'MyRuleParameterKey' => 'MyRuleParameterValue', }
+                ,    # OPTIONAL
+              },    # key: min: 1, max: 64
+            },    # OPTIONAL
+            IsImmutable => 1,    # OPTIONAL
+          },
+
+        },
+        ...
+      ],
+      IdentityAttributeOrder => [
+        'MyAttributeName',
+        ...                      # min: 1, max: 64
+      ],
+      Name      => 'MyTypedLinkName',
+      SchemaArn => 'MyArn',
+
+    );
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/clouddirectory/UpdateTypedLinkFacet>
 
 =head1 ATTRIBUTES
 
@@ -54,7 +94,8 @@ specified at the end. Any attributes that do not have a range specified
 are presumed to match the entire range. Filters are interpreted in the
 order of the attributes on the typed link facet, not the order in which
 they are supplied to any API calls. For more information about identity
-attributes, see Typed link.
+attributes, see Typed link
+(http://docs.aws.amazon.com/directoryservice/latest/admin-guide/objectsandlinks.html#typedlink).
 
 
 
@@ -78,9 +119,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateTypedLi
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

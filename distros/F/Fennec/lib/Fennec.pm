@@ -7,7 +7,7 @@ BEGIN { require Fennec::Runner }
 use Fennec::Test;
 use Fennec::Util qw/inject_sub require_module verbose_message/;
 use Carp qw/croak carp/;
-our $VERSION = '2.017';
+our $VERSION = '2.018';
 
 sub defaults {
     (
@@ -291,7 +291,12 @@ Fennec ties together several testing related modules and enhances their
 functionality in ways you don't get loading them individually. Fennec makes
 testing easier, and more useful.
 
-=head1 SYNOPSYS
+=head2 CAVEAT EMPTOR
+
+This module is deprecated in favor of L<Test2::Suite>, specifically
+L<Test2::Tools::Spec> and L<Test2::Bundle::SpecDeclare>.
+
+=head1 SYNOPSIS
 
 There are 2 ways to use Fennec. You can use Fennec directly, or you can use the
 shiny sugar-coated interface provided by the add-on module L<Fennec::Declare>.
@@ -303,6 +308,7 @@ you can always write your Fennec tests in the stone age like this... just don't
 miss any semicolons.
 
 t/some_test.t:
+
     package TEST::SomeTest;
     use strict;
     use warnings;
@@ -339,6 +345,7 @@ separate distribution on cpan. This module is separate because it uses the
 controversial L<Devel::Declare> module.
 
 t/some_test.t:
+
     package TEST::SomeTest;
     use strict;
     use warnings;
@@ -622,11 +629,6 @@ common to multiple test files.
 
 Set the random seed to be used. Defaults to current date, can be overridden by
 the FENNEC_SEED environment variable.
-
-=item debug => $BOOL
-
-Can be used to turn on internal debugging for Fennec. This currently does very
-little.
 
 =back
 
@@ -1140,7 +1142,7 @@ for the main process to demonstrate that after_all really does come last.
     7253 describe runs long before everything else
     7253 before_all runs first
 
-    7254 Case runs between before_all and before_each
+    7254 case runs between before_all and before_each
     7254 before_each runs just before tests
     7254 tests run in the middle
     7254 after_each runs just after tests
@@ -1166,7 +1168,7 @@ sample.t
         };
 
         case a_case => sub {
-            print "$$ Case runs between before_all and before_each\n";
+            print "$$ case runs between before_all and before_each\n";
         };
 
         before_each setup_b => sub {

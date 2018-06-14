@@ -2,11 +2,15 @@ NAME
     App::indodax - CLI for Indodax.com
 
 VERSION
-    This document describes version 0.023 of App::indodax (from Perl
-    distribution App-indodax), released on 2018-04-06.
+    This document describes version 0.024 of App::indodax (from Perl
+    distribution App-indodax), released on 2018-06-12.
 
 SYNOPSIS
     Please see included script indodax.
+
+DESCRIPTION
+    DEPRECATION WARNING: This app is being deprecated in favor of
+    App::cryp::Exchange::indodax and cryp-exchange.
 
 FUNCTIONS
   balance

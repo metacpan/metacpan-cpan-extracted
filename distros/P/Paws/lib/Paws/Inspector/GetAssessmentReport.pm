@@ -16,21 +16,34 @@ package Paws::Inspector::GetAssessmentReport;
 
 =head1 NAME
 
-Paws::Inspector::GetAssessmentReport - Arguments for method GetAssessmentReport on Paws::Inspector
+Paws::Inspector::GetAssessmentReport - Arguments for method GetAssessmentReport on L<Paws::Inspector>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method GetAssessmentReport on the 
-Amazon Inspector service. Use the attributes of this class
+This class represents the parameters used for calling the method GetAssessmentReport on the
+L<Amazon Inspector|Paws::Inspector> service. Use the attributes of this class
 as arguments to method GetAssessmentReport.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to GetAssessmentReport.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->GetAssessmentReport(Att1 => $value1, Att2 => $value2, ...);
+    my $inspector = Paws->service('Inspector');
+    my $GetAssessmentReportResponse = $inspector->GetAssessmentReport(
+      AssessmentRunArn => 'MyArn',
+      ReportFileFormat => 'HTML',
+      ReportType       => 'FINDING',
+
+    );
+
+    # Results:
+    my $Url    = $GetAssessmentReportResponse->Url;
+    my $Status = $GetAssessmentReportResponse->Status;
+
+    # Returns a L<Paws::Inspector::GetAssessmentReportResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/inspector/GetAssessmentReport>
 
 =head1 ATTRIBUTES
 
@@ -53,7 +66,8 @@ Valid values are: C<"HTML">, C<"PDF">
 
 Specifies the type of the assessment report that you want to generate.
 There are two types of assessment reports: a finding report and a full
-report. For more information, see Assessment Reports.
+report. For more information, see Assessment Reports
+(http://docs.aws.amazon.com/inspector/latest/userguide/inspector_reports.html).
 
 Valid values are: C<"FINDING">, C<"FULL">
 
@@ -64,9 +78,9 @@ This class forms part of L<Paws>, documenting arguments for method GetAssessment
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

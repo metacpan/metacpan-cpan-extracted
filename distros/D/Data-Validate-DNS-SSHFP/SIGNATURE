@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 b3893de683f4eb7f2669fd6adf3819710879d272 Changes
+SHA1 e439d8cda67d9b8712c8b4933525de1fa79d5467 LICENSE
+SHA1 bdffa14391b082715159ad949ba2df9061486d4e MANIFEST
+SHA1 dcab05692c626fb447637b8c74c58d2bd80aeee6 MANIFEST.SKIP
+SHA1 9b1abbefb4c4b769189a7b8c416422e721ad51ef META.json
+SHA1 bfee4b14017e260b75eb4ed47b238dfadbc88f87 META.yml
+SHA1 184ff27e2b415403caf1307c23387aebbd2534ef Makefile.PL
+SHA1 6e7e19e2266c67bc6bff2c815efd0a6f2745b75f README
+SHA1 61f3cc5319ba228eb3be30a7ba1fd111c479a5d2 lib/Data/Validate/DNS/SSHFP.pm
+SHA1 a4a52a82861443bc752380c48172068fb2b9d399 t/00-compile.t
+SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
+SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
+SHA1 19cc343f8a85c6805bbeb02580487483a6283887 t/author-signature.t
+SHA1 643cd288fca65421340acd1b385a1e8acaa4e7b0 t/oo.t
+SHA1 54a628c75f99722b642e537b7059f5628bd47e62 t/smoke.t
+SHA1 803b3c620f89aa4795c58a15b8d0a7831616e914 t/taint.t
+-----BEGIN PGP SIGNATURE-----
+
+iQJFBAEBCAAvFiEE2EtuRfhGgngE8PsARAzvLrlUzY4FAlsaslgRHG1zY2hvdXRA
+Y3Bhbi5vcmcACgkQRAzvLrlUzY7AfQ/8DyWXsvPNvZY6fi/N95i9iYrNdQvDMDpu
+73doSuPxyYMytoU+WSucmIaFfD6/2d088NHxQyxgW3KoAeqtRNhlA12qiAnrtMJA
+ohu8KuCzV9oWoIETH8aAXWe9Kx+cfYoKhFGFTT6db2+l//LdRkw1kJmqDl/72Wlh
+vCFodSYqPmQ4wYjyWrA37aaRU264plHxPN2GH2EX6IYrGNFqUp75aeQH0WBvJ+70
+EcFR1OVCMya+tPvp+eGlFH7/43w9pm8annFZfdjt78zv871mi0GbZN6FvfAtCe/1
+cQEqDrKn7QCl13Wv65L9WyAOAv9C8Yf+tv51JZVEupNJLWMQ47kZPJTOOGO/yj8k
+RYySTe8IRSdvXOH7K3omih8dNq7knXHV+VwRgZYuph3sPyqmdQUFug1Di4kEyLZn
+YpKtW3z2zwPZyzNVgnhNi7uN1+n96VJBJ8nXgFq79ZpvldCgL8Gym5C2C3lXhjnh
+V4QE0iM+ZIxIlCwqYeMuMN/UZvz+DprDw2aRYXycmwjeixGxAD0kOpbwQyixX9gp
+iWK48OL/cuwxRizNgj6PSdEU4yyH+VcDu2yemQNWzsZBHUoYZBwNNrQLjNkWSF29
+NwFJAEbCHAlw6dpUQX07AreR3OhAsW+/GRuZFoW3QwWIf/Or2JoiP4+BYi9txIEF
+/Mim4ULY/iU=
+=3/l2
+-----END PGP SIGNATURE-----

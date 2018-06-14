@@ -45,6 +45,7 @@ t/openaddr.t
 t/pod-cm.t
 t/pod.t
 t/port.t
+t/scantext.t
 t/snippets.t
 t/spelling.t
 t/strict.t
@@ -54,5 +55,6 @@ t/vars.t
 t/whosonfirst.t
 templates/Geo/Coder/Free/Display/index.tmpl
 templates/Geo/Coder/Free/Display/query.txt
+typhoon/openaddresses.ddl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -18,21 +18,40 @@ package Paws::KMS::GenerateDataKeyWithoutPlaintext;
 
 =head1 NAME
 
-Paws::KMS::GenerateDataKeyWithoutPlaintext - Arguments for method GenerateDataKeyWithoutPlaintext on Paws::KMS
+Paws::KMS::GenerateDataKeyWithoutPlaintext - Arguments for method GenerateDataKeyWithoutPlaintext on L<Paws::KMS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method GenerateDataKeyWithoutPlaintext on the 
-AWS Key Management Service service. Use the attributes of this class
+This class represents the parameters used for calling the method GenerateDataKeyWithoutPlaintext on the
+L<AWS Key Management Service|Paws::KMS> service. Use the attributes of this class
 as arguments to method GenerateDataKeyWithoutPlaintext.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to GenerateDataKeyWithoutPlaintext.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->GenerateDataKeyWithoutPlaintext(Att1 => $value1, Att2 => $value2, ...);
+    my $kms = Paws->service('KMS');
+    # To generate an encrypted data key
+    # The following example generates an encrypted copy of a 256-bit symmetric
+    # data encryption key (data key). The data key is encrypted with the
+    # specified customer master key (CMK).
+    my $GenerateDataKeyWithoutPlaintextResponse =
+      $kms->GenerateDataKeyWithoutPlaintext(
+      {
+        'KeyId'   => 'alias/ExampleAlias',
+        'KeySpec' => 'AES_256'
+      }
+      );
+
+    # Results:
+    my $KeyId = $GenerateDataKeyWithoutPlaintextResponse->KeyId;
+    my $CiphertextBlob =
+      $GenerateDataKeyWithoutPlaintextResponse->CiphertextBlob;
+
+    # Returns a L<Paws::KMS::GenerateDataKeyWithoutPlaintextResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/kms/GenerateDataKeyWithoutPlaintext>
 
 =head1 ATTRIBUTES
 
@@ -41,8 +60,9 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 
 A set of key-value pairs that represents additional authenticated data.
 
-For more information, see Encryption Context in the I<AWS Key
-Management Service Developer Guide>.
+For more information, see Encryption Context
+(http://docs.aws.amazon.com/kms/latest/developerguide/encryption-context.html)
+in the I<AWS Key Management Service Developer Guide>.
 
 
 
@@ -50,29 +70,33 @@ Management Service Developer Guide>.
 
 A list of grant tokens.
 
-For more information, see Grant Tokens in the I<AWS Key Management
-Service Developer Guide>.
+For more information, see Grant Tokens
+(http://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token)
+in the I<AWS Key Management Service Developer Guide>.
 
 
 
 =head2 B<REQUIRED> KeyId => Str
 
-The identifier of the CMK under which to generate and encrypt the data
-encryption key.
+The identifier of the customer master key (CMK) under which to generate
+and encrypt the data encryption key.
 
-A valid identifier is the unique key ID or the Amazon Resource Name
-(ARN) of the CMK, or the alias name or ARN of an alias that refers to
-the CMK. Examples:
+To specify a CMK, use its key ID, Amazon Resource Name (ARN), alias
+name, or alias ARN. When using an alias name, prefix it with "alias/".
+To specify a CMK in a different AWS account, you must use the key ARN
+or alias ARN.
+
+For example:
 
 =over
 
 =item *
 
-Unique key ID: C<1234abcd-12ab-34cd-56ef-1234567890ab>
+Key ID: C<1234abcd-12ab-34cd-56ef-1234567890ab>
 
 =item *
 
-CMK ARN:
+Key ARN:
 C<arn:aws:kms:us-east-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab>
 
 =item *
@@ -85,6 +109,8 @@ Alias ARN: C<arn:aws:kms:us-east-2:111122223333:alias/ExampleAlias>
 
 =back
 
+To get the key ID and key ARN for a CMK, use ListKeys or DescribeKey.
+To get the alias name and alias ARN, use ListAliases.
 
 
 
@@ -112,9 +138,9 @@ This class forms part of L<Paws>, documenting arguments for method GenerateDataK
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -111,7 +111,7 @@ instance.
 
 =head2 OwnerInformation => Str
 
-  Placeholder information, this field will always be empty in the current
+  Placeholder information. This field will always be empty in the current
 release of the service.
 
 
@@ -133,9 +133,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::SSM>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

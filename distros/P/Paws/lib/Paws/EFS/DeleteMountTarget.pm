@@ -9,28 +9,36 @@ package Paws::EFS::DeleteMountTarget;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/2015-02-01/mount-targets/{MountTargetId}');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'DELETE');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::API::Response');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::EFS::DeleteMountTarget - Arguments for method DeleteMountTarget on Paws::EFS
+Paws::EFS::DeleteMountTarget - Arguments for method DeleteMountTarget on L<Paws::EFS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DeleteMountTarget on the 
-Amazon Elastic File System service. Use the attributes of this class
+This class represents the parameters used for calling the method DeleteMountTarget on the
+L<Amazon Elastic File System|Paws::EFS> service. Use the attributes of this class
 as arguments to method DeleteMountTarget.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DeleteMountTarget.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DeleteMountTarget(Att1 => $value1, Att2 => $value2, ...);
+    my $elasticfilesystem = Paws->service('EFS');
+    # To delete a mount target
+    # This operation deletes a mount target.
+    $elasticfilesystem->DeleteMountTarget(
+      {
+        'MountTargetId' => 'fsmt-12340abc'
+      }
+    );
+
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem/DeleteMountTarget>
 
 =head1 ATTRIBUTES
 
@@ -48,9 +56,9 @@ This class forms part of L<Paws>, documenting arguments for method DeleteMountTa
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

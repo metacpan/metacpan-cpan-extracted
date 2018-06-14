@@ -22,21 +22,46 @@ package Paws::SSM::UpdateMaintenanceWindow;
 
 =head1 NAME
 
-Paws::SSM::UpdateMaintenanceWindow - Arguments for method UpdateMaintenanceWindow on Paws::SSM
+Paws::SSM::UpdateMaintenanceWindow - Arguments for method UpdateMaintenanceWindow on L<Paws::SSM>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateMaintenanceWindow on the 
-Amazon Simple Systems Manager (SSM) service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateMaintenanceWindow on the
+L<Amazon Simple Systems Manager (SSM)|Paws::SSM> service. Use the attributes of this class
 as arguments to method UpdateMaintenanceWindow.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateMaintenanceWindow.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateMaintenanceWindow(Att1 => $value1, Att2 => $value2, ...);
+    my $ssm = Paws->service('SSM');
+    my $UpdateMaintenanceWindowResult = $ssm->UpdateMaintenanceWindow(
+      WindowId                 => 'MyMaintenanceWindowId',
+      AllowUnassociatedTargets => 1,                                  # OPTIONAL
+      Cutoff                   => 1,                                  # OPTIONAL
+      Description              => 'MyMaintenanceWindowDescription',   # OPTIONAL
+      Duration                 => 1,                                  # OPTIONAL
+      Enabled                  => 1,                                  # OPTIONAL
+      Name                     => 'MyMaintenanceWindowName',          # OPTIONAL
+      Replace                  => 1,                                  # OPTIONAL
+      Schedule                 => 'MyMaintenanceWindowSchedule',      # OPTIONAL
+    );
+
+    # Results:
+    my $Duration = $UpdateMaintenanceWindowResult->Duration;
+    my $AllowUnassociatedTargets =
+      $UpdateMaintenanceWindowResult->AllowUnassociatedTargets;
+    my $Schedule    = $UpdateMaintenanceWindowResult->Schedule;
+    my $Name        = $UpdateMaintenanceWindowResult->Name;
+    my $Enabled     = $UpdateMaintenanceWindowResult->Enabled;
+    my $Cutoff      = $UpdateMaintenanceWindowResult->Cutoff;
+    my $WindowId    = $UpdateMaintenanceWindowResult->WindowId;
+    my $Description = $UpdateMaintenanceWindowResult->Description;
+
+    # Returns a L<Paws::SSM::UpdateMaintenanceWindowResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ssm/UpdateMaintenanceWindow>
 
 =head1 ATTRIBUTES
 
@@ -107,9 +132,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateMainten
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

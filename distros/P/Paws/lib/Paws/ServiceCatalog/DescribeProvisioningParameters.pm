@@ -17,21 +17,40 @@ package Paws::ServiceCatalog::DescribeProvisioningParameters;
 
 =head1 NAME
 
-Paws::ServiceCatalog::DescribeProvisioningParameters - Arguments for method DescribeProvisioningParameters on Paws::ServiceCatalog
+Paws::ServiceCatalog::DescribeProvisioningParameters - Arguments for method DescribeProvisioningParameters on L<Paws::ServiceCatalog>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DescribeProvisioningParameters on the 
-AWS Service Catalog service. Use the attributes of this class
+This class represents the parameters used for calling the method DescribeProvisioningParameters on the
+L<AWS Service Catalog|Paws::ServiceCatalog> service. Use the attributes of this class
 as arguments to method DescribeProvisioningParameters.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DescribeProvisioningParameters.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DescribeProvisioningParameters(Att1 => $value1, Att2 => $value2, ...);
+    my $servicecatalog = Paws->service('ServiceCatalog');
+    my $DescribeProvisioningParametersOutput =
+      $servicecatalog->DescribeProvisioningParameters(
+      ProductId              => 'MyId',
+      ProvisioningArtifactId => 'MyId',
+      AcceptLanguage         => 'MyAcceptLanguage',    # OPTIONAL
+      PathId                 => 'MyId',                # OPTIONAL
+      );
+
+    # Results:
+    my $ConstraintSummaries =
+      $DescribeProvisioningParametersOutput->ConstraintSummaries;
+    my $TagOptions = $DescribeProvisioningParametersOutput->TagOptions;
+    my $UsageInstructions =
+      $DescribeProvisioningParametersOutput->UsageInstructions;
+    my $ProvisioningArtifactParameters =
+      $DescribeProvisioningParametersOutput->ProvisioningArtifactParameters;
+
+# Returns a L<Paws::ServiceCatalog::DescribeProvisioningParametersOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/servicecatalog/DescribeProvisioningParameters>
 
 =head1 ATTRIBUTES
 
@@ -61,9 +80,9 @@ C<zh> - Chinese
 
 =head2 PathId => Str
 
-The identifier of the path for this product's provisioning. This value
-is optional if the product has a default path, and is required if there
-is more than one path for the specified product.
+The path identifier of the product. This value is optional if the
+product has a default path, and required if the product has more than
+one path. To list the paths for a product, use ListLaunchPaths.
 
 
 
@@ -75,8 +94,7 @@ The product identifier.
 
 =head2 B<REQUIRED> ProvisioningArtifactId => Str
 
-The provisioning artifact identifier for this product. This is
-sometimes referred to as the product version.
+The identifier of the provisioning artifact.
 
 
 
@@ -87,9 +105,9 @@ This class forms part of L<Paws>, documenting arguments for method DescribeProvi
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

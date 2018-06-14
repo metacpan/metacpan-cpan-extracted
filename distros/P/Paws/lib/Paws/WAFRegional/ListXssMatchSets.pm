@@ -15,21 +15,34 @@ package Paws::WAFRegional::ListXssMatchSets;
 
 =head1 NAME
 
-Paws::WAFRegional::ListXssMatchSets - Arguments for method ListXssMatchSets on Paws::WAFRegional
+Paws::WAFRegional::ListXssMatchSets - Arguments for method ListXssMatchSets on L<Paws::WAFRegional>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ListXssMatchSets on the 
-AWS WAF Regional service. Use the attributes of this class
+This class represents the parameters used for calling the method ListXssMatchSets on the
+L<AWS WAF Regional|Paws::WAFRegional> service. Use the attributes of this class
 as arguments to method ListXssMatchSets.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ListXssMatchSets.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ListXssMatchSets(Att1 => $value1, Att2 => $value2, ...);
+    my $waf-regional = Paws->service('WAFRegional');
+    # To list XSS match sets
+    # The following example returns an array of up to 100 XSS match sets.
+    my $ListXssMatchSetsResponse = $waf -regional->ListXssMatchSets(
+      {
+        'Limit' => 100
+      }
+    );
+
+    # Results:
+    my $XssMatchSets = $ListXssMatchSetsResponse->XssMatchSets;
+
+    # Returns a L<Paws::WAFRegional::ListXssMatchSetsResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/waf-regional/ListXssMatchSets>
 
 =head1 ATTRIBUTES
 
@@ -61,9 +74,9 @@ This class forms part of L<Paws>, documenting arguments for method ListXssMatchS
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -92,7 +92,7 @@ Config::AutoConf - A module to implement some of AutoConf macros in pure perl.
 
 =cut
 
-our $VERSION = '0.316';
+our $VERSION = '0.317';
 $VERSION = eval $VERSION;
 
 =head1 ABSTRACT
@@ -142,7 +142,7 @@ my $glob_instance;
 
 =head2 new
 
-This function instantiates a new instance of Config::AutoConf, eg. to
+This function instantiates a new instance of Config::AutoConf, e.g. to
 configure child components. The constructor adds also values set via
 environment variable C<PERL5_AUTOCONF_OPTS>.
 
@@ -228,11 +228,14 @@ sub check_files
     1;
 }
 
-sub _sanitize_prog
+sub _quote_shell_arg { scalar Text::ParseWords::shellwords($_[0]) > 1 ? QUOTE . $_[0] . QUOTE : $_[0] }
+
+sub _sanitize_prog { shift; _quote_shell_arg shift }
+
+sub _append_prog_args
 {
-    my ($self, $prog) = @_;
-    (scalar Text::ParseWords::shellwords $prog) > 1 and $prog = QUOTE . $prog . QUOTE;
-    $prog;
+    shift;
+    join " ", map { _quote_shell_arg $_ } @_;
 }
 
 my @exe_exts = ($^O eq "MSWin32" ? qw(.exe .com .bat .cmd) : (""));
@@ -331,16 +334,9 @@ sub check_progs
     return;
 }
 
-sub _append_prog_args
-{
-    my $self = shift->_get_instance();
-    my $prog = shift;
-    join(" ", $self->_sanitize_prog($prog), @_);
-}
-
 =head2 check_prog_yacc
 
-From the autoconf documentation,
+From the L<GNU Autoconf|https://www.gnu.org/software/autoconf/autoconf.html> documentation,
 
   If `bison' is found, set [...] `bison -y'.
   Otherwise, if `byacc' is found, set [...] `byacc'. 
@@ -374,7 +370,7 @@ sub check_prog_yacc
 
 =head2 check_prog_awk
 
-From the autoconf documentation,
+From the L<GNU Autoconf|https://www.gnu.org/software/autoconf/autoconf.html> documentation,
 
   Check for `gawk', `mawk', `nawk', and `awk', in that order, and
   set output [...] to the first one that is found.  It tries
@@ -395,7 +391,7 @@ sub check_prog_awk
 
 =head2 check_prog_egrep
 
-From the autoconf documentation,
+From the L<GNU Autoconf|https://www.gnu.org/software/autoconf/autoconf.html> documentation,
 
   Check for `grep -E' and `egrep', in that order, and [...] output
   [...] the first one that is found.  The result can be overridden by
@@ -432,7 +428,7 @@ sub check_prog_egrep
 
 =head2 check_prog_lex
 
-From the autoconf documentation,
+From the L<GNU Autoconf|https://www.gnu.org/software/autoconf/autoconf.html> documentation,
 
   If flex is found, set output [...] to ‘flex’ and [...] to -lfl, if that
   library is in a standard place. Otherwise set output [...] to ‘lex’ and
@@ -541,7 +537,7 @@ EOLEX
 
 =head2 check_prog_sed
 
-From the autoconf documentation,
+From the L<GNU Autoconf|https://www.gnu.org/software/autoconf/autoconf.html> documentation,
 
   Set output variable [...] to a Sed implementation that conforms to Posix
   and does not have arbitrary length limits. Report an error if no
@@ -1377,7 +1373,7 @@ variable.
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
-When a I<prologue> exists in the optional hash at end, it will be favoured
+When a I<prologue> exists in the optional hash at end, it will be favored
 over C<default includes> (represented by L</_default_includes>). If any of
 I<action_on_cache_true>, I<action_on_cache_false> is defined, both callbacks
 are passed to L</check_cached> as I<action_on_true> or I<action_on_false> to
@@ -1437,13 +1433,13 @@ ACEOF
 For each of the symbols (with optional function argument types for C++
 overloads), run L<check_decl>.
 
-Contrary to GNU autoconf, this method does not declare HAVE_DECL_symbol
+Contrary to B<GNU Autoconf>, this method does not declare C<HAVE_DECL_symbol>
 macros for the resulting C<confdefs.h>, because it differs as C<check_decl>
 between compiling languages.
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
-When a I<prologue> exists in the optional hash at end, it will be favoured
+When a I<prologue> exists in the optional hash at end, it will be favored
 over C<default includes> (represented by L</_default_includes>). If any of
 I<action_on_cache_true>, I<action_on_cache_false> is defined, both callbacks
 are passed to L</check_cached> as I<action_on_true> or I<action_on_false> to
@@ -1731,7 +1727,7 @@ This method caches its result in the C<ac_cv_type_>type variable.
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
-When a I<prologue> exists in the optional hash at end, it will be favoured
+When a I<prologue> exists in the optional hash at end, it will be favored
 over C<default includes> (represented by L</_default_includes>). If any of
 I<action_on_cache_true>, I<action_on_cache_false> is defined, both callbacks
 are passed to L</check_cached> as I<action_on_true> or I<action_on_false> to
@@ -1797,7 +1793,7 @@ for type and return the accumulated result (accumulation op is binary and).
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
-When a I<prologue> exists in the optional hash at end, it will be favoured
+When a I<prologue> exists in the optional hash at end, it will be favored
 over C<default includes> (represented by L</_default_includes>). If any of
 I<action_on_cache_true>, I<action_on_cache_false> is defined, both callbacks
 are passed to L</check_cached> as I<action_on_true> or I<action_on_false> to
@@ -1933,7 +1929,7 @@ the default includes are used.
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
-When a I<prologue> exists in the optional hash at end, it will be favoured
+When a I<prologue> exists in the optional hash at end, it will be favored
 over C<default includes> (represented by L</_default_includes>). If any of
 I<action_on_cache_true>, I<action_on_cache_false> is defined, both callbacks
 are passed to L</check_cached> as I<action_on_true> or I<action_on_false> to
@@ -2005,7 +2001,7 @@ Checks for the size of the specified type by compiling and define
 C<SIZEOF_type> using the determined size.
 
 In opposition to GNU AutoConf, this method can determine size of structure
-members, eg.
+members, e.g.
 
   $ac->check_sizeof_type( "SV.sv_refcnt", { prologue => $include_perl } );
   # or
@@ -2015,7 +2011,7 @@ This method caches its result in the C<ac_cv_sizeof_E<lt>set langE<gt>>_type var
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
-When a I<prologue> exists in the optional hash at end, it will be favoured
+When a I<prologue> exists in the optional hash at end, it will be favored
 over C<default includes> (represented by L</_default_includes>). If any of
 I<action_on_cache_true>, I<action_on_cache_false> is defined, both callbacks
 are passed to L</check_cached> as I<action_on_true> or I<action_on_false> to
@@ -2102,7 +2098,7 @@ is executed when one size of the types could not determined.
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
-When a I<prologue> exists in the optional hash at end, it will be favoured
+When a I<prologue> exists in the optional hash at end, it will be favored
 over C<default includes> (represented by L</_default_includes>). If any of
 I<action_on_cache_true>, I<action_on_cache_false> is defined, both callbacks
 are passed to L</check_cached> as I<action_on_true> or I<action_on_false> to
@@ -2182,7 +2178,7 @@ variable name mapped to underscores.
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
-When a I<prologue> exists in the optional hash at end, it will be favoured
+When a I<prologue> exists in the optional hash at end, it will be favored
 over C<default includes> (represented by L</_default_includes>). If any of
 I<action_on_cache_true>, I<action_on_cache_false> is defined, both callbacks
 are passed to L</check_cached> as I<action_on_true> or I<action_on_false> to
@@ -2272,7 +2268,7 @@ is executed when one align of the types could not determined.
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
-When a I<prologue> exists in the optional hash at end, it will be favoured
+When a I<prologue> exists in the optional hash at end, it will be favored
 over C<default includes> (represented by L</_default_includes>). If any of
 I<action_on_cache_true>, I<action_on_cache_false> is defined, both callbacks
 are passed to L</check_cached> as I<action_on_true> or I<action_on_false> to
@@ -2364,7 +2360,7 @@ This macro caches its result in the C<ac_cv_>aggr_member variable.
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
-When a I<prologue> exists in the optional hash at end, it will be favoured
+When a I<prologue> exists in the optional hash at end, it will be favored
 over C<default includes> (represented by L</_default_includes>). If any of
 I<action_on_cache_true>, I<action_on_cache_false> is defined, both callbacks
 are passed to L</check_cached> as I<action_on_true> or I<action_on_false> to
@@ -2453,7 +2449,7 @@ This function will return a true value (1) if at least one member is found.
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
-When a I<prologue> exists in the optional hash at end, it will be favoured
+When a I<prologue> exists in the optional hash at end, it will be favored
 over C<default includes> (represented by L</_default_includes>). If any of
 I<action_on_cache_true>, I<action_on_cache_false> is defined, both callbacks
 are passed to L</check_cached> as I<action_on_true> or I<action_on_false> to
@@ -3370,14 +3366,42 @@ sub check_lm
 
 =head2 pkg_config_package_flags($package, \%options?)
 
-Search for pkg-config flags for package as specified. The flags which are
-extracted are C<--cflags> and C<--libs>. The extracted flags are appended
-to the global C<extra_compile_flags> and C<extra_link_flags>, respectively.
-In case, no I<package configuration> matching given criteria could be found,
-return a C<false> value (C<0>).
+  use Config::AutoConf
+  
+  my $c = Config::AutoConf->new;
+  $c->pkg_config_package_flags('log4cplus');
+  WriteMakefile(
+    ...
+    INC  => $c->_get_extra_compiler_flags,
+    LIBS => $c->_get_extra_linker_flags,
+  );
 
-Call it with the package you're looking for and optional callback whether
-found or not.
+Search for C<pkg-config> flags for package as specified. The flags which are
+extracted are C<--cflags> and C<--libs>. The extracted flags are appended
+to the global C<extra_preprocess_flags>, C<extra_link_flags> or C<extra_libs>,
+respectively. Distinguishing between C<extra_link_flags> and C<extra_libs>
+is essential to avoid conflicts with L<search_libs function|/search_libs>
+and family.  In case, no I<package configuration> matching given criteria
+could be found, return a C<false> value (C<0>).
+
+The C<pkg-config> flags are taken from I<environment variables>
+C<< ${package}_CFLAGS >> or C<< ${package}_LIBS >> when defined, respectively.
+It will be a nice touch to document the particular envonment variables
+for your build procedure - as for above example it should be
+
+  $ env log4cplus_CFLAGS="-I/opt/coolapp/include" \
+        log4cplus_LIBS="-L/opt/coolapp/lib -Wl,-R/opt/coolapp/lib -llog4cplus" \
+    perl Makefile.PL
+
+Call C<pkg_config_package_flags> with the package you're looking for and
+optional callback whether found or not.
+
+To support stage compiling properly (C<rpath> vs. library file location),
+the internal representation is a moving target. Do not use the result
+directly - the getters L<_get_extra_compiler_flags|/_get_extra_compiler_flags>
+and L<_get_extra_linker_flags|/_get_extra_linker_flags> are strongly
+encouraged. In case this is not possible, please open a ticket to get
+informed on invasive changes.
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
@@ -3588,7 +3612,7 @@ sub check_produce_xs_build
     $self->check_pureperl_required() and return _on_return_callback_helper(0, $options, "action_on_false");
     eval { $self->check_valid_compilers($_[0] || [qw(C)]) }
       or return _on_return_callback_helper(0, $options, "action_on_false");
-    # XXX necessary check for $Config{useshrlib}? (need to dicuss with eg. TuX, 99% likely return 0)
+    # XXX necessary check for $Config{useshrlib}? (need to dicuss with e.g. TuX, 99% likely return 0)
     $self->check_compile_perlapi_or_die();
 
     $options->{action_on_true}
@@ -3733,7 +3757,7 @@ sub _fill_defines
 =head2 _default_includes
 
 returns a string containing default includes for program prologue taken
-from autoconf/headers.m4:
+from C<autoconf/headers.m4>:
 
   #include <stdio.h>
   #ifdef HAVE_SYS_TYPES_H
@@ -3903,7 +3927,7 @@ sub _add_log_lines
 
 =head2 add_log_fh
 
-Push new file handles at end of log-handles to allow tee-ing log-output
+Push new file handles at end of log-handles to allow tee'ing log-output
 
 =cut
 
@@ -3954,13 +3978,25 @@ sub _cache_type_name
     $self->_cache_name(map { $_ =~ tr/*/p/; $_ } @names);
 }
 
+=head2 _get_extra_compiler_flags
+
+Returns the determined flags required to run the compile stage as string
+
+=cut
+
 sub _get_extra_compiler_flags
 {
     my $self    = shift->_get_instance();
     my @ppflags = @{$self->{extra_preprocess_flags}};
     my @cflags  = @{$self->{extra_compile_flags}->{$self->{lang}}};
-    join(" ", @ppflags, @cflags);
+    join(" ", map { _quote_shell_arg $_ } (@ppflags, @cflags));
 }
+
+=head2 _get_extra_linker_flags
+
+Returns the determined flags required to run the link stage as string
+
+=cut
 
 sub _get_extra_linker_flags
 {
@@ -3968,7 +4004,7 @@ sub _get_extra_linker_flags
     my @libs     = @{$self->{extra_libs}};
     my @lib_dirs = @{$self->{extra_lib_dirs}};
     my @ldflags  = @{$self->{extra_link_flags}};
-    join(" ", @ldflags, map('-L' . $self->_sanitize_prog($_), @lib_dirs), map("-l$_", @libs));
+    join(" ", map { _quote_shell_arg $_ } (@ldflags, map("-L" . $self->_sanitize_prog($_), @lib_dirs), map("-l$_", @libs)));
 }
 
 =head1 AUTHOR

@@ -37,8 +37,10 @@ my @files = (
     't/lib/Class/Load/VersionCheck2.pm',
     't/lib/Test/Class/Load.pm',
     'xt/author/00-compile.t',
+    'xt/author/changes_has_content.t',
     'xt/author/eol.t',
     'xt/author/kwalitee.t',
+    'xt/author/minimum-version.t',
     'xt/author/mojibake.t',
     'xt/author/no-tabs.t',
     'xt/author/pod-spell.t',
@@ -46,8 +48,7 @@ my @files = (
     'xt/author/portability.t',
     'xt/release/changes_has_content.t',
     'xt/release/cpan-changes.t',
-    'xt/release/distmeta.t',
-    'xt/release/minimum-version.t'
+    'xt/release/distmeta.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

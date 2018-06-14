@@ -9,7 +9,6 @@
 #include "spvm_util_allocator.h"
 #include "spvm_opcode_array.h"
 #include "spvm_runtime.h"
-#include "spvm_runtime_allocator.h"
 #include "spvm_op.h"
 #include "spvm_sub.h"
 #include "spvm_dumper.h"
@@ -73,7 +72,9 @@ int main(int argc, char *argv[])
 #endif
   
   // Create run-time
-  SPVM_RUNTIME* runtime = SPVM_COMPILER_new_runtime(compiler);
+  SPVM_RUNTIME* runtime = SPVM_RUNTIME_new(compiler);
+  compiler->runtime = runtime;
+  
   SPVM_ENV* env = runtime->env;
 
   // Entry point subroutine address
@@ -94,21 +95,21 @@ int main(int argc, char *argv[])
     exit(EXIT_FAILURE);
   }
 
-  SPVM_VALUE args[1];
+  SPVM_VALUE* args = runtime->args;
   args[0].ival = 2;
   
   // Run
-  int32_t return_value = env->call_int_sub(env, sub_id, args);
+  env->call_sub(env, sub_id, args);
   
   if (runtime->exception) {
     SPVM_RUNTIME_API_print(env, runtime->exception);
     printf("\n");
   }
   else {
-    printf("TEST return_value: %" PRId32 "\n", return_value);
+    printf("TEST return_value: %" PRId32 "\n", args[0].ival);
   }
   
-  SPVM_RUNTIME_API_free_runtime(env, runtime);
+  SPVM_RUNTIME_free(runtime);
   
   return 0;
 }

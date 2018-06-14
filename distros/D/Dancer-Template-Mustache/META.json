@@ -4,7 +4,7 @@
       "Yanick Champoux <yanick@babyl.dyndns.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,6 +37,7 @@
             "Moo" : "0",
             "Path::Tiny" : "0",
             "Template::Mustache" : "v1.0.2",
+            "perl" : "v5.10.0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -57,7 +58,7 @@
    "provides" : {
       "Dancer::Template::Mustache" : {
          "file" : "lib/Dancer/Template/Mustache.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.1.0"
       }
    },
    "release_status" : "stable",
@@ -72,7 +73,7 @@
          "web" : "https://github.com/yanick/Dancer-Template-Mustache"
       }
    },
-   "version" : "1.0.1",
+   "version" : "1.1.0",
    "x_author_pledge" : {
       "version" : 1
    },

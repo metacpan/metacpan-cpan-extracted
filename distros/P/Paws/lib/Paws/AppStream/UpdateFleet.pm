@@ -26,21 +26,59 @@ package Paws::AppStream::UpdateFleet;
 
 =head1 NAME
 
-Paws::AppStream::UpdateFleet - Arguments for method UpdateFleet on Paws::AppStream
+Paws::AppStream::UpdateFleet - Arguments for method UpdateFleet on L<Paws::AppStream>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateFleet on the 
-Amazon AppStream service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateFleet on the
+L<Amazon AppStream|Paws::AppStream> service. Use the attributes of this class
 as arguments to method UpdateFleet.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateFleet.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateFleet(Att1 => $value1, Att2 => $value2, ...);
+    my $appstream2 = Paws->service('AppStream');
+    my $UpdateFleetResult = $appstream2->UpdateFleet(
+      Name               => 'MyString',
+      AttributesToDelete => [
+        'VPC_CONFIGURATION',
+        ... # values: VPC_CONFIGURATION, VPC_CONFIGURATION_SECURITY_GROUP_IDS, DOMAIN_JOIN_INFO
+      ],    # OPTIONAL
+      ComputeCapacity => {
+        DesiredInstances => 1,
+
+      },    # OPTIONAL
+      DeleteVpcConfig            => 1,                  # OPTIONAL
+      Description                => 'MyDescription',    # OPTIONAL
+      DisconnectTimeoutInSeconds => 1,                  # OPTIONAL
+      DisplayName                => 'MyDisplayName',    # OPTIONAL
+      DomainJoinInfo             => {
+        DirectoryName => 'MyDirectoryName',             # OPTIONAL
+        OrganizationalUnitDistinguishedName =>
+          'MyOrganizationalUnitDistinguishedName',      # max: 2000; OPTIONAL
+      },    # OPTIONAL
+      EnableDefaultInternetAccess => 1,             # OPTIONAL
+      ImageName                   => 'MyString',    # OPTIONAL
+      InstanceType                => 'MyString',    # OPTIONAL
+      MaxUserDurationInSeconds    => 1,             # OPTIONAL
+      VpcConfig                   => {
+        SubnetIds => [
+          'MyString', ...                           # min: 1,
+        ],                                          # OPTIONAL
+        SecurityGroupIds => [
+          'MyString', ...                           # min: 1,
+        ],                                          # max: 5; OPTIONAL
+      },    # OPTIONAL
+    );
+
+    # Results:
+    my $Fleet = $UpdateFleetResult->Fleet;
+
+    # Returns a L<Paws::AppStream::UpdateFleetResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/>
 
 =head1 ATTRIBUTES
 
@@ -65,7 +103,7 @@ Deletes the VPC association for the specified fleet.
 
 =head2 Description => Str
 
-The description displayed to end users.
+The description for display.
 
 
 
@@ -80,13 +118,13 @@ Specify a value between 60 and 57600.
 
 =head2 DisplayName => Str
 
-The fleet name displayed to end users.
+The fleet name for display.
 
 
 
 =head2 DomainJoinInfo => L<Paws::AppStream::DomainJoinInfo>
 
-The information needed for streaming instances to join a domain.
+The information needed to join a Microsoft Active Directory domain.
 
 
 
@@ -98,7 +136,7 @@ Enables or disables default internet access for the fleet.
 
 =head2 ImageName => Str
 
-The name of the image used by the fleet.
+The name of the image used to create the fleet.
 
 
 
@@ -220,9 +258,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateFleet i
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

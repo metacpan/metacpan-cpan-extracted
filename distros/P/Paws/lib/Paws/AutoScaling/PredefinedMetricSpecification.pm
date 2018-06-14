@@ -72,7 +72,7 @@ in an Application Load Balancer target group
 =back
 
 For predefined metric types C<ASGAverageCPUUtilization>,
-C<ASGAverageNetworkIn> and C<ASGAverageNetworkOut>, the parameter must
+C<ASGAverageNetworkIn>, and C<ASGAverageNetworkOut>, the parameter must
 not be specified as the resource associated with the metric type is the
 Auto Scaling group. For predefined metric type
 C<ALBRequestCountPerTarget>, the parameter must be specified in the
@@ -92,9 +92,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::AutoScali
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

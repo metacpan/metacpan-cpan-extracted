@@ -31,18 +31,18 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Firehose::R
 
 =head1 DESCRIPTION
 
-Configures retry behavior in case Kinesis Firehose is unable to deliver
-documents to Amazon Redshift.
+Configures retry behavior in case Kinesis Data Firehose is unable to
+deliver documents to Amazon Redshift.
 
 =head1 ATTRIBUTES
 
 
 =head2 DurationInSeconds => Int
 
-  The length of time during which Kinesis Firehose retries delivery after
-a failure, starting from the initial request and including the first
-attempt. The default value is 3600 seconds (60 minutes). Kinesis
-Firehose does not retry if the value of C<DurationInSeconds> is 0
+  The length of time during which Kinesis Data Firehose retries delivery
+after a failure, starting from the initial request and including the
+first attempt. The default value is 3600 seconds (60 minutes). Kinesis
+Data Firehose does not retry if the value of C<DurationInSeconds> is 0
 (zero) or if the first delivery attempt takes longer than the current
 value.
 
@@ -54,9 +54,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Firehose>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

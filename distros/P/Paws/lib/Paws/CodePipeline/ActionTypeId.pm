@@ -61,7 +61,7 @@ would be specified as CodeDeploy.
 
 =head2 B<REQUIRED> Version => Str
 
-  A string that identifies the action type.
+  A string that describes the action version.
 
 
 
@@ -71,9 +71,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::CodePipel
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

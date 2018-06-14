@@ -1,5 +1,13 @@
 Revision history for Data-Random-NL
 
+1.4       2018-06-08 12:38:59Z
+
+    * POD fixes in the command line scripts
+
+1.3       2018-06-08 12:09:35Z
+
+    * Add command line scripts for quickly generating the random data
+
 1.2       2018-06-03 09:14:36Z
 
     * Fix bug when generating rsin with a starting number

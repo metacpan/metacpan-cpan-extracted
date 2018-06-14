@@ -1,5 +1,17 @@
 Revision history for Perl extension Unix::Statgrab.
 
+0.112	2018-06-28
+    - adapt to Config::AutoConf 0.317
+      ==> including the recommended doc in Makefile.PL how to
+          recover when autoconf fails (but there is a suitable
+          libstatgrab)
+      ==> Fix RT#125204 (Thanks to Slaven Rezić <slaven@rezic.de>
+          for reporting and analyzing the regression and Petr Písař
+          <ppisar@cpan.org> for nagging me not to put this patch off)
+    - clarify license, fix RT#125519 (Thanks to Dan Book <dbook@cpan.org>)
+    - bump copyright
+    - update bundled ppport.h to 3.42
+
 0.111	2016-05-01
     - Release 0.110_003 without further changes
 

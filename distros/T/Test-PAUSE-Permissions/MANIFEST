@@ -6,7 +6,10 @@ MANIFEST			This list of files
 README
 t/00_load.t
 xt/10_self.t
+xt/10_self_metacpan.t
+xt/10_self_metacpan_env_var.t
 xt/10_self_with_id.t
+xt/10_self_with_id_metacpan.t
 xt/10_strict_self.t
 xt/20_worepan.t
 xt/30_authority_mismatch.t

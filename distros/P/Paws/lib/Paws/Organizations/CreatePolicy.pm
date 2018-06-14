@@ -17,21 +17,34 @@ package Paws::Organizations::CreatePolicy;
 
 =head1 NAME
 
-Paws::Organizations::CreatePolicy - Arguments for method CreatePolicy on Paws::Organizations
+Paws::Organizations::CreatePolicy - Arguments for method CreatePolicy on L<Paws::Organizations>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreatePolicy on the 
-AWS Organizations service. Use the attributes of this class
+This class represents the parameters used for calling the method CreatePolicy on the
+L<AWS Organizations|Paws::Organizations> service. Use the attributes of this class
 as arguments to method CreatePolicy.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreatePolicy.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreatePolicy(Att1 => $value1, Att2 => $value2, ...);
+    my $organizations = Paws->service('Organizations');
+    my $CreatePolicyResponse = $organizations->CreatePolicy(
+      Content     => 'MyPolicyContent',
+      Description => 'MyPolicyDescription',
+      Name        => 'MyPolicyName',
+      Type        => 'SERVICE_CONTROL_POLICY',
+
+    );
+
+    # Results:
+    my $Policy = $CreatePolicyResponse->Policy;
+
+    # Returns a L<Paws::Organizations::CreatePolicyResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/organizations/CreatePolicy>
 
 =head1 ATTRIBUTES
 
@@ -39,11 +52,14 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 =head2 B<REQUIRED> Content => Str
 
 The policy content to add to the new policy. For example, if you create
-a service control policy (SCP), this string must be JSON text that
-specifies the permissions that admins in attached accounts can delegate
-to their users, groups, and roles. For more information about the SCP
-syntax, see Service Control Policy Syntax in the I<AWS Organizations
-User Guide>.
+a service control policy
+(http://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scp.html)
+(SCP), this string must be JSON text that specifies the permissions
+that admins in attached accounts can delegate to their users, groups,
+and roles. For more information about the SCP syntax, see Service
+Control Policy Syntax
+(http://docs.aws.amazon.com/organizations/latest/userguide/orgs_reference_scp-syntax.html)
+in the I<AWS Organizations User Guide>.
 
 
 
@@ -57,8 +73,9 @@ An optional description to assign to the policy.
 
 The friendly name to assign to the policy.
 
-The regex pattern that is used to validate this parameter is a string
-of any of the characters in the ASCII character range.
+The regex pattern (http://wikipedia.org/wiki/regex) that is used to
+validate this parameter is a string of any of the characters in the
+ASCII character range.
 
 
 
@@ -78,9 +95,9 @@ This class forms part of L<Paws>, documenting arguments for method CreatePolicy 
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

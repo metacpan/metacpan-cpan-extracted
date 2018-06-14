@@ -18,21 +18,46 @@ package Paws::DirectConnect::AllocateConnectionOnInterconnect;
 
 =head1 NAME
 
-Paws::DirectConnect::AllocateConnectionOnInterconnect - Arguments for method AllocateConnectionOnInterconnect on Paws::DirectConnect
+Paws::DirectConnect::AllocateConnectionOnInterconnect - Arguments for method AllocateConnectionOnInterconnect on L<Paws::DirectConnect>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method AllocateConnectionOnInterconnect on the 
-AWS Direct Connect service. Use the attributes of this class
+This class represents the parameters used for calling the method AllocateConnectionOnInterconnect on the
+L<AWS Direct Connect|Paws::DirectConnect> service. Use the attributes of this class
 as arguments to method AllocateConnectionOnInterconnect.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to AllocateConnectionOnInterconnect.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->AllocateConnectionOnInterconnect(Att1 => $value1, Att2 => $value2, ...);
+    my $directconnect = Paws->service('DirectConnect');
+    my $Connection = $directconnect->AllocateConnectionOnInterconnect(
+      Bandwidth      => 'MyBandwidth',
+      ConnectionName => 'MyConnectionName',
+      InterconnectId => 'MyInterconnectId',
+      OwnerAccount   => 'MyOwnerAccount',
+      Vlan           => 1,
+
+    );
+
+    # Results:
+    my $Vlan            = $Connection->Vlan;
+    my $ConnectionId    = $Connection->ConnectionId;
+    my $Region          = $Connection->Region;
+    my $LagId           = $Connection->LagId;
+    my $Bandwidth       = $Connection->Bandwidth;
+    my $OwnerAccount    = $Connection->OwnerAccount;
+    my $PartnerName     = $Connection->PartnerName;
+    my $LoaIssueTime    = $Connection->LoaIssueTime;
+    my $Location        = $Connection->Location;
+    my $AwsDevice       = $Connection->AwsDevice;
+    my $ConnectionState = $Connection->ConnectionState;
+    my $ConnectionName  = $Connection->ConnectionName;
+
+    # Returns a L<Paws::DirectConnect::Connection> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/directconnect/AllocateConnectionOnInterconnect>
 
 =head1 ATTRIBUTES
 
@@ -97,9 +122,9 @@ This class forms part of L<Paws>, documenting arguments for method AllocateConne
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

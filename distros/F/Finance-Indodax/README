@@ -2,8 +2,8 @@ NAME
     Finance::Indodax - Trade with Indodax.com using Perl
 
 VERSION
-    This document describes version 0.008 of Finance::Indodax (from Perl
-    distribution Finance-Indodax), released on 2018-04-06.
+    This document describes version 0.011 of Finance::Indodax (from Perl
+    distribution Finance-Indodax), released on 2018-06-13.
 
 SYNOPSIS
      use Finance::Indodax;
@@ -240,6 +240,16 @@ METHODS
     *   type => str (required)
 
         Either "buy" or "sell".
+
+    *   order_id => num (required)
+
+  get_order
+    Get information about a specific order. The API method name is
+    "getOrder".
+
+    Arguments:
+
+    *   pair => str (required)
 
     *   order_id => num (required)
 

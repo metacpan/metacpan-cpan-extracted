@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"perlSyntax.perlExecutable": "/Users/jonasbn/perl5/perlbrew/perls/perl-5.22.3/bin/perl",
+		"perlSyntax.includePaths": [
+			"t",
+			"lib",
+			"local/lib/perl5"
+		],
+		"perlcritic.severity": "brutal",
+		"perlcritic.additionalArguments": [
+			"-p t/perlcritic.rc"
+		]
+	}
+}

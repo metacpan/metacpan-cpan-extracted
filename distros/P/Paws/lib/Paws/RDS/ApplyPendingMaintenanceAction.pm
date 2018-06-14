@@ -16,21 +16,34 @@ package Paws::RDS::ApplyPendingMaintenanceAction;
 
 =head1 NAME
 
-Paws::RDS::ApplyPendingMaintenanceAction - Arguments for method ApplyPendingMaintenanceAction on Paws::RDS
+Paws::RDS::ApplyPendingMaintenanceAction - Arguments for method ApplyPendingMaintenanceAction on L<Paws::RDS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ApplyPendingMaintenanceAction on the 
-Amazon Relational Database Service service. Use the attributes of this class
+This class represents the parameters used for calling the method ApplyPendingMaintenanceAction on the
+L<Amazon Relational Database Service|Paws::RDS> service. Use the attributes of this class
 as arguments to method ApplyPendingMaintenanceAction.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ApplyPendingMaintenanceAction.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ApplyPendingMaintenanceAction(Att1 => $value1, Att2 => $value2, ...);
+    my $rds = Paws->service('RDS');
+    # To apply a pending maintenance action
+    # This example immediately applies a pending system update to a DB instance.
+    my $ApplyPendingMaintenanceActionResult =
+      $rds->ApplyPendingMaintenanceAction(
+      {
+        'ApplyAction' => 'system-update',
+        'ResourceIdentifier' =>
+          'arn:aws:rds:us-east-1:992648334831:db:mymysqlinstance',
+        'OptInType' => 'immediate'
+      }
+      );
+
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/rds/ApplyPendingMaintenanceAction>
 
 =head1 ATTRIBUTES
 
@@ -46,7 +59,7 @@ Valid values: C<system-update>, C<db-upgrade>
 =head2 B<REQUIRED> OptInType => Str
 
 A value that specifies the type of opt-in request, or undoes an opt-in
-request. An opt-in request of type C<immediate> cannot be undone.
+request. An opt-in request of type C<immediate> can't be undone.
 
 Valid values:
 
@@ -75,7 +88,8 @@ requests.
 
 The RDS Amazon Resource Name (ARN) of the resource that the pending
 maintenance action applies to. For information about creating an ARN,
-see Constructing an RDS Amazon Resource Name (ARN).
+see Constructing an RDS Amazon Resource Name (ARN)
+(http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_Tagging.ARN.html#USER_Tagging.ARN.Constructing).
 
 
 
@@ -86,9 +100,9 @@ This class forms part of L<Paws>, documenting arguments for method ApplyPendingM
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

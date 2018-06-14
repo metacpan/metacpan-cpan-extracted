@@ -1,5 +1,20 @@
 Revision history for Dist::Zilla::PluginBundle::Author::WATERKIP
 
+2.0       2018-06-12 08:08:14Z
+
+    * Add meta provides
+    * Add ReadmeFromPOD
+    * Add PromptIfStale
+    * Remove strict and warnings from prereqs
+
+    Maintainer only:
+    * Update Dockerfile and gitlab-ci.yml
+
+1.9       2018-06-11 11:59:57Z
+
+    * Add MintingProfile
+    * Maintainer only: add some basic tests
+
 1.8       2018-06-03 10:13:19Z
 
     * Add more files to exclude files

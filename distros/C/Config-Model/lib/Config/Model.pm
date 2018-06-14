@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model;
-$Config::Model::VERSION = '2.123';
+$Config::Model::VERSION = '2.124';
 use strict ;
 use warnings;
 use 5.10.1;
@@ -30,10 +30,10 @@ use Cwd;
 use Config::Model::Lister;
 
 use parent qw/Exporter/;
-our @EXPORT_OK = qw/cme/;
+our @EXPORT_OK = qw/cme initialize_log4perl/;
 
 # this class holds the version number of the package
-use vars qw(@status @level %default_property);
+use vars qw(@status @level %default_property $force_default_log);
 
 my $legacy_logger = get_logger("Model::Legacy") ;
 my $loader_logger = get_logger("Model::Loader") ;
@@ -182,8 +182,7 @@ around BUILDARGS => sub {
 # keep this as a separate sub from BUILD. So user can call it before
 # creating Config::Model object
 sub initialize_log4perl {
-    my $self = shift;
-    my $args = shift;
+    my %args = @_;
 
     my $log4perl_syst_conf_file = path('/etc/log4config-model.conf');
     # avoid undef warning when homedir is not defined (e.g. with Debian cowbuilder)
@@ -195,24 +194,31 @@ sub initialize_log4perl {
 
 
     my $log4perl_file =
-        $log4perl_user_conf_file->is_file ? $log4perl_user_conf_file
+        $force_default_log                ? $fallback_conf_file # for tests
+      : $log4perl_user_conf_file->is_file ? $log4perl_user_conf_file
       : $log4perl_syst_conf_file->is_file ? $log4perl_syst_conf_file
       :                                     $fallback_conf_file;
     my %log4perl_conf =
         map { split /\s*=\s*/,$_,2; }
         grep { chomp; ! /^\s*#/ } $log4perl_file->lines;
 
-    if (defined $args->{log_level}) {
-        $log4perl_conf{'log4perl.logger'} = $args->{log_level}.', Screen';
+    my $verbose = $args{verbose};
+    if (defined $verbose) {
+        my @loggers = ref $verbose ? @$verbose : $verbose;
+        foreach my $logger (@loggers) {
+            $log4perl_conf{"log4perl.logger.Verbose.$logger"} = "INFO, PlainMsgOnScreen";
+        }
     }
 
     Log::Log4perl::init(\%log4perl_conf);
 
+    return \%log4perl_conf; # for tests
 }
 
 sub BUILD {
     my $self = shift;
-    $self->initialize_log4perl(shift) unless Log::Log4perl->initialized();
+    my $args = shift;
+    initialize_log4perl(verbose => $args->{verbose}) unless Log::Log4perl->initialized();
 }
 
 sub show_legacy_issue {
@@ -1216,7 +1222,7 @@ sub include_one_class {
     my $include_class = shift || croak "include_class: undef include_class param";
     my $include_after = shift;
 
-    get_logger('Model')->info("class $class_name includes $include_class");
+    get_logger('Model')->debug("class $class_name includes $include_class");
 
     if (    defined $include_class
         and defined $self->{included_class}{$class_name}{$include_class} ) {
@@ -1267,7 +1273,7 @@ sub include_one_class {
                     . " (included from $include_class)" );
         }
     }
-    get_logger('Model')->info("class $class_name include $include_class done");
+    get_logger('Model')->debug("class $class_name include $include_class done");
 }
 
 # load a model from file. See comments around raw_models attribute for explanations
@@ -1828,7 +1834,7 @@ Config::Model - Create tools to validate, migrate and edit configuration files
 
 =head1 VERSION
 
-version 2.123
+version 2.124
 
 =head1 SYNOPSIS
 
@@ -2658,6 +2664,21 @@ See L<cme/Logging>
 This method can be called to load L<Log::Log4perl> configuration from
 C<~/.log4config-model>, or from L</etc/log4config-model.conf> files or from
 L<default configuration|https://github.com/dod38fr/config-model/blob/master/lib/Config/Model/log4perl.conf>.
+
+Accepts C<verbose> parameter with a list of log classes that are added
+to the log4perl configuration read above.
+
+For instance, with C<< verbose => 'Loader' >>, log4perl is initialised with
+
+ log4perl.logger.Verbose.Loader = INFO, PlainMsgOnScreen
+
+Likewise, with C<< verbose => [ 'Loader', 'Foo' ] >>,
+log4perl is initialised with:
+
+ log4perl.logger.Verbose.Loader = INFO, PlainMsgOnScreen
+ log4perl.logger.Verbose.Foo    = INFO, PlainMsgOnScreen
+
+Currently, this module supports only C<Loader> as verbose parameters.
 
 =head1 BUGS
 

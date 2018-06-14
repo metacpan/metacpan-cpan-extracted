@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Madrid
 
+0.08  2018-06-10
+      - Added test scripts (t/meta-json.t and t/meta-ymlt).
+
 0.07  2018-06-07
       - Added key 'provides' to the Makefile.PL script.
 

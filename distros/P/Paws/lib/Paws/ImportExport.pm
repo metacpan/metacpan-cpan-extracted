@@ -1,6 +1,7 @@
 package Paws::ImportExport;
   use Moose;
   sub service { 'importexport' }
+  sub signing_name { 'importexport' }
   sub version { '2010-06-01' }
   sub flattened_arrays { 0 }
   has max_attempts => (is => 'ro', isa => 'Int', default => 5);
@@ -10,7 +11,7 @@ package Paws::ImportExport;
   has retriables => (is => 'ro', isa => 'ArrayRef', default => sub { [
   ] });
 
-  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V2Signature', 'Paws::Net::QueryCaller', 'Paws::Net::XMLResponse';
+  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V2Signature', 'Paws::Net::QueryCaller';
 
   has '+region_rules' => (default => sub {
     my $regioninfo;
@@ -123,25 +124,52 @@ network and bypassing the Internet. For large data sets, AWS
 Import/Export is often faster than Internet transfer and more cost
 effective than upgrading your connectivity.
 
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/>
+
+
 =head1 METHODS
 
-=head2 CancelJob(JobId => Str, [APIVersion => Str])
+=head2 CancelJob
+
+=over
+
+=item JobId => Str
+
+=item [APIVersion => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::ImportExport::CancelJob>
 
 Returns: a L<Paws::ImportExport::CancelJobOutput> instance
 
-  This operation cancels a specified job. Only the job owner can cancel
+This operation cancels a specified job. Only the job owner can cancel
 it. The operation fails if the job has already started or is complete.
 
 
-=head2 CreateJob(JobType => Str, Manifest => Str, ValidateOnly => Bool, [APIVersion => Str, ManifestAddendum => Str])
+=head2 CreateJob
+
+=over
+
+=item JobType => Str
+
+=item Manifest => Str
+
+=item ValidateOnly => Bool
+
+=item [APIVersion => Str]
+
+=item [ManifestAddendum => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::ImportExport::CreateJob>
 
 Returns: a L<Paws::ImportExport::CreateJobOutput> instance
 
-  This operation initiates the process of scheduling an upload or
+This operation initiates the process of scheduling an upload or
 download of your data. You include in the request a manifest that
 describes the data transfer specifics. The response to the request
 includes a job ID, which you can use in other operations, a signature
@@ -149,48 +177,112 @@ that you use to identify your storage device, and the address where you
 should ship your storage device.
 
 
-=head2 GetShippingLabel(JobIds => ArrayRef[Str|Undef], [APIVersion => Str, City => Str, Company => Str, Country => Str, Name => Str, PhoneNumber => Str, PostalCode => Str, StateOrProvince => Str, Street1 => Str, Street2 => Str, Street3 => Str])
+=head2 GetShippingLabel
+
+=over
+
+=item JobIds => ArrayRef[Str|Undef]
+
+=item [APIVersion => Str]
+
+=item [City => Str]
+
+=item [Company => Str]
+
+=item [Country => Str]
+
+=item [Name => Str]
+
+=item [PhoneNumber => Str]
+
+=item [PostalCode => Str]
+
+=item [StateOrProvince => Str]
+
+=item [Street1 => Str]
+
+=item [Street2 => Str]
+
+=item [Street3 => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::ImportExport::GetShippingLabel>
 
 Returns: a L<Paws::ImportExport::GetShippingLabelOutput> instance
 
-  This operation generates a pre-paid UPS shipping label that you will
+This operation generates a pre-paid UPS shipping label that you will
 use to ship your device to AWS for processing.
 
 
-=head2 GetStatus(JobId => Str, [APIVersion => Str])
+=head2 GetStatus
+
+=over
+
+=item JobId => Str
+
+=item [APIVersion => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::ImportExport::GetStatus>
 
 Returns: a L<Paws::ImportExport::GetStatusOutput> instance
 
-  This operation returns information about a job, including where the job
+This operation returns information about a job, including where the job
 is in the processing pipeline, the status of the results, and the
 signature value associated with the job. You can only return
 information about jobs you own.
 
 
-=head2 ListJobs([APIVersion => Str, Marker => Str, MaxJobs => Int])
+=head2 ListJobs
+
+=over
+
+=item [APIVersion => Str]
+
+=item [Marker => Str]
+
+=item [MaxJobs => Int]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::ImportExport::ListJobs>
 
 Returns: a L<Paws::ImportExport::ListJobsOutput> instance
 
-  This operation returns the jobs associated with the requester. AWS
+This operation returns the jobs associated with the requester. AWS
 Import/Export lists the jobs in reverse chronological order based on
 the date of creation. For example if Job Test1 was created 2009Dec30
 and Test2 was created 2010Feb05, the ListJobs operation would return
 Test2 followed by Test1.
 
 
-=head2 UpdateJob(JobId => Str, JobType => Str, Manifest => Str, ValidateOnly => Bool, [APIVersion => Str])
+=head2 UpdateJob
+
+=over
+
+=item JobId => Str
+
+=item JobType => Str
+
+=item Manifest => Str
+
+=item ValidateOnly => Bool
+
+=item [APIVersion => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::ImportExport::UpdateJob>
 
 Returns: a L<Paws::ImportExport::UpdateJobOutput> instance
 
-  You use this operation to change the parameters specified in the
+You use this operation to change the parameters specified in the
 original manifest file by supplying a new manifest file. The manifest
 file attached to this request replaces the original manifest file. You
 can only use the operation after a CreateJob request but before the
@@ -224,9 +316,9 @@ This service class forms part of L<Paws>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

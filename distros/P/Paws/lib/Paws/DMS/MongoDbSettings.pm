@@ -6,6 +6,7 @@ package Paws::DMS::MongoDbSettings;
   has DatabaseName => (is => 'ro', isa => 'Str');
   has DocsToInvestigate => (is => 'ro', isa => 'Str');
   has ExtractDocId => (is => 'ro', isa => 'Str');
+  has KmsKeyId => (is => 'ro', isa => 'Str');
   has NestingLevel => (is => 'ro', isa => 'Str');
   has Password => (is => 'ro', isa => 'Str');
   has Port => (is => 'ro', isa => 'Int');
@@ -97,6 +98,15 @@ set to NONE.
 Default value is false.
 
 
+=head2 KmsKeyId => Str
+
+  The KMS key identifier that will be used to encrypt the connection
+parameters. If you do not specify a value for the KmsKeyId parameter,
+then AWS DMS will use your default encryption key. AWS KMS creates the
+default encryption key for your AWS account. Your AWS account has a
+different default encryption key for each AWS region.
+
+
 =head2 NestingLevel => Str
 
   Specifies either document or table mode.
@@ -135,9 +145,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::DMS>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

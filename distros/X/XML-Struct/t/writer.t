@@ -7,7 +7,7 @@ my $writer = XML::Struct::Writer->new;
 my $struct = [
     greet => { }, [
         "Hello, ",
-        [ emph => { color => "blue" } , [ "World" ] ],
+        [ emph => { color => "blue'" } , [ "World" ] ],
         "!"
     ]
 ];
@@ -15,7 +15,7 @@ my $dom = $writer->writeDocument( $struct );
 isa_ok $dom, 'XML::LibXML::Document';
 my $xml = <<'XML';
 <?xml version="1.0" encoding="UTF-8"?>
-<greet>Hello, <emph color="blue">World</emph>!</greet>
+<greet>Hello, <emph color="blue'">World</emph>!</greet>
 XML
 is $dom->serialize, $xml, 'writeDocument via DOM';
 

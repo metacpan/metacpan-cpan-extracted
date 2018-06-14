@@ -6,7 +6,7 @@ use MooseX::Role::Parameterized;
 use Mail::MtPolicyd::ConnectionPool;
 
 # ABSTRACT: role to consume connections from connection pool
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 parameter name => (
   isa => 'Str',
@@ -58,14 +58,10 @@ role {
     },
   );
 
-  has $handle_attr => (
-    is => 'ro',
-    lazy => 1,
-    default => sub {
-      my $self = shift;
-      return $self->$conn_attr->handle;
-    },
-  );
+  method $handle_attr => sub {
+    my $self = shift;
+    return $self->$conn_attr->handle;
+  };
 };
 
 1;
@@ -82,7 +78,7 @@ Mail::MtPolicyd::Role::Connection - role to consume connections from connection 
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 AUTHOR
 

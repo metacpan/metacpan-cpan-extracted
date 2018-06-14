@@ -7,13 +7,14 @@ package Paws::Pinpoint::GCMMessage;
   has IconReference => (is => 'ro', isa => 'Str');
   has ImageIconUrl => (is => 'ro', isa => 'Str');
   has ImageUrl => (is => 'ro', isa => 'Str');
-  has JsonData => (is => 'ro', isa => 'Str');
+  has Priority => (is => 'ro', isa => 'Str');
   has RawContent => (is => 'ro', isa => 'Str');
   has RestrictedPackageName => (is => 'ro', isa => 'Str');
   has SilentPush => (is => 'ro', isa => 'Bool');
   has SmallImageIconUrl => (is => 'ro', isa => 'Str');
   has Sound => (is => 'ro', isa => 'Str');
   has Substitutions => (is => 'ro', isa => 'Paws::Pinpoint::MapOfListOf__string');
+  has TimeToLive => (is => 'ro', isa => 'Int');
   has Title => (is => 'ro', isa => 'Str');
   has Url => (is => 'ro', isa => 'Str');
 1;
@@ -100,10 +101,17 @@ notification content view.
   The URL that points to an image used in the push notification.
 
 
-=head2 JsonData => Str
+=head2 Priority => Str
 
-  The data payload used for a silent push. This payload is added to the
-notifications' data.pinpoint.jsonBody' object
+  The message priority. Amazon Pinpoint uses this value to set the FCM or
+GCM priority parameter when it sends the message. Accepts the following
+values: "Normal" - Messages might be delayed. Delivery is optimized for
+battery usage on the receiving device. Use normal priority unless
+immediate delivery is required. "High" - Messages are sent immediately
+and might wake a sleeping device. The equivalent values for APNs
+messages are "5" and "10". Amazon Pinpoint accepts these values here
+and converts them. For more information, see About FCM Messages in the
+Firebase documentation.
 
 
 =head2 RawContent => Str
@@ -144,6 +152,14 @@ app. Android sound files must reside in /res/raw/
 substitutions.
 
 
+=head2 TimeToLive => Int
+
+  The length of time (in seconds) that FCM or GCM stores and attempts to
+deliver the message. If unspecified, the value defaults to the maximum,
+which is 2,419,200 seconds (28 days). Amazon Pinpoint uses this value
+to set the FCM or GCM time_to_live parameter.
+
+
 =head2 Title => Str
 
   The message title that displays above the message on the user's device.
@@ -162,9 +178,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Pinpoint>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

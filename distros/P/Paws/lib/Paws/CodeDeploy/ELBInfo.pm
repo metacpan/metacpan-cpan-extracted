@@ -43,7 +43,7 @@ traffic is routed to the load balancer.
   For blue/green deployments, the name of the load balancer that will be
 used to route traffic from original instances to replacement instances
 in a blue/green deployment. For in-place deployments, the name of the
-load balancer that instances are deregistered from, so they are not
+load balancer that instances are deregistered from so they are not
 serving traffic during a deployment, and then re-registered with after
 the deployment completes.
 
@@ -55,9 +55,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::CodeDeplo
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

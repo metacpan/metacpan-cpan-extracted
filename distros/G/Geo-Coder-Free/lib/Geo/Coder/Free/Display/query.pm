@@ -18,6 +18,7 @@ sub html {
 	my $allowed = {
 		'page' => 'query',
 		'q' => undef,	# TODO: regex of allowable name formats
+		'scantext' => undef,	# TODO: regex of allowable name formats
 		'lang' => qr/^[A-Z][A-Z]/i,
 	};
 	my %params = %{$info->params({ allow => $allowed })};
@@ -29,15 +30,39 @@ sub html {
 
 	my $geocoder = $args{'geocoder'};
 
-	my $q = $params{'q'};
+	my $rc;
+	if(my $q = $params{'q'}) {
+		$rc = $geocoder->geocode(location => $q);
 
-	return '{ }' if(!defined($q));
+		return '{ }' if(!defined($rc));
 
-	my $rc = $geocoder->geocode(location => $q);
+		delete $rc->{'md5'};
+		delete $rc->{'sequence'};
+		foreach my $key(keys %{$rc}) {
+			if(!defined($rc->{$key})) {
+				delete $rc->{$key};
+			}
+		}
 
-	return '{ }' if(!defined($rc));
+		return encode_json $rc;
+	} elsif(my $scantext = $params{'scantext'}) {
+		my @rc = $geocoder->geocode(scantext => $scantext);
 
-	return encode_json $rc;
+		return '{ }' if(scalar(@rc) == 0);
+
+		foreach my $l(@rc) {
+			delete $l->{'md5'};
+			delete $l->{'sequence'};
+			foreach my $key(keys %{$l}) {
+				if(!defined($l->{$key})) {
+					delete $l->{$key};
+				}
+			}
+		}
+		return encode_json \@rc;
+	}
+
+	return '{ }';
 }
 
 1;

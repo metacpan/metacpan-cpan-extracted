@@ -5,7 +5,7 @@ use v5.16.0;
 package Game::Tibia::Packet::Login;
 
 # ABSTRACT: Login packet support for the MMORPG Tibia
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use Carp;
 use File::ShareDir 'dist_file';
@@ -13,6 +13,9 @@ use Crypt::OpenSSL::RSA;
 use Digest::Adler32;
 use Game::Tibia::Packet;
 use Scalar::Util qw(blessed);
+
+use constant GET_CHARLIST => 0x01;
+use constant LOGIN_CHAR => 0x0A;
 
 =pod
 
@@ -34,8 +37,14 @@ Decodes Tibia Login packets into hashes and vice versa. By default uses the OTSe
 
 =cut
 
+our %params;
+sub import {
+    (undef, %params) = (shift, %params, @_);
+    die "Malformed Tibia version\n" if exists $params{tibia} && $params{tibia} !~ /^\d+$/;
+}
+
 my $otserv = Crypt::OpenSSL::RSA->new_private_key(
-    do { local $/; open my $rsa, dist_file('Game-Tibia-Packet', 'otserv.private') or die "Couldn't open private key $!"; <$rsa>; }
+    do { local $/; open my $rsa, '<', dist_file('Game-Tibia-Packet', 'otserv.private') or die "Couldn't open private key $!"; <$rsa>; }
 );
 
 =head1 METHODS AND ARGUMENTS
@@ -50,7 +59,7 @@ Constructs a new C<Game::Tibia::Packet::Login> instance of version C<$version>. 
 
 sub new {
     my $class = shift;
-    
+
     my $self = {
         packet => undef,
         rsa    => $otserv,
@@ -59,6 +68,7 @@ sub new {
     };
 
     $self->{version} //= $self->{versions}{client}{VERSION};
+    $self->{version} //= $params{tibia};
     croak 'A protocol version < 9.80 must be supplied' if !defined $self->{version} || $self->{version} >= 980;
 
     $self->{versions}{client} = Game::Tibia::Packet::version($self->{version});
@@ -71,8 +81,15 @@ sub new {
     }
 
     if (defined $self->{packet}) {
-        (my $len, $self->{os}, $self->{versions}{client}{VERSION}, $self->{versions}{spr}, $self->{versions}{dat}, $self->{versions}{pic}, my $payload)
-            = unpack 'v x(S S L3)< a*', $self->{packet};
+        (my $len, my $cmd, $self->{os}, $self->{versions}{client}{VERSION}, my $payload)
+            = unpack 'v C (S S)< a*', $self->{packet};
+
+        croak "Expected GET_CHARLIST (0x01) or LOGIN_CHAR (0x0A) packet type, but got $cmd" if $cmd ne GET_CHARLIST and $cmd ne LOGIN_CHAR;
+
+        if ($cmd == GET_CHARLIST) {
+            ($self->{versions}{spr}, $self->{versions}{dat}, $self->{versions}{pic}, $payload)
+                = unpack('(L3)< a*', $payload);
+        }
 
         if ($self->{versions}{client}{rsa}) {
             $payload = $self->{rsa}->decrypt($payload);
@@ -81,12 +98,23 @@ sub new {
         }
 
         if ($self->{versions}{client}{xtea}) {
-            ($self->{XTEA}, $payload) = unpack 'a16 a*', $payload;
+            ($self->{xtea}, $payload) = unpack 'a16 a*', $payload;
         }
 
-        my $acc_data_pattern = $self->{versions}{client}{accname} ? '(S/a S/a)<' : '(V S/a)<';
-        ($self->{account}, $self->{password}, $self->{hwinfo}, $self->{padding})
-            = unpack "$acc_data_pattern a47 a*", $payload;
+        if ($cmd == LOGIN_CHAR) {
+            ($self->{gmflag}, $payload) = unpack "C a*", $payload;
+        }
+
+        my $acc_data_pattern = $self->{versions}{client}{acc_name} ? '(S/a)<' : 'V';
+        ($self->{account}, $payload) = unpack "$acc_data_pattern a*", $payload;
+        if ($cmd == LOGIN_CHAR) {
+            ($self->{character}, $payload) = unpack "(S/a)< a*", $payload;
+        }
+        ($self->{password}, $payload) = unpack "(S/a)< a*", $payload;
+        if ($cmd == LOGIN_CHAR) {
+            ($self->{nonce}, $payload) = unpack "(a5) a*", $payload;
+        }
+        $self->{undecoded} = unpack "a*", $payload;
     }
 
     bless $self, $class;
@@ -122,16 +150,17 @@ sub finalize {
 
     my $acc_pattern = $self->{versions}{client}{acc_name} ? '(S/a)<' : 'V';
 
-    $payload .= $self->{XTEA} if $self->{versions}{client}{xtea};
+    $payload .= $self->{xtea} if $self->{versions}{client}{xtea};
+    $payload .= pack "C", $self->{gmflag} if defined $self->{gmflag};
     $payload .= pack $acc_pattern, $self->{account};
     $payload .= pack '(S/a)<', $self->{character} if defined $self->{character};
     $payload .= pack '(S/a)<', $self->{password};
-    $payload .= pack 'a47', $self->{hwinfo} if defined $self->{hwinfo} && $self->{hwinfo} ne '';
+    $payload .= pack 'a5', $self->{nonce} if defined $self->{nonce};
+    $payload .= pack 'a*', $self->{undecoded} if defined $self->{undecoded} && $self->{undecoded} ne '';
 
     if ($self->{versions}{client}{rsa}) {
         my $padding_len = 128 - length($payload);
-        $self->{padding} //= '';
-        $payload .= pack "a$padding_len", $self->{padding};
+        $payload .= pack "a$padding_len", '';
         $payload = $self->{rsa}->encrypt($payload);
     }
     $self->{packet} .= $payload;
@@ -140,11 +169,11 @@ sub finalize {
     if ($self->{versions}{client}{adler32}) {
         my $a32 = Digest::Adler32->new;
         $a32->add($self->{packet});
-        my $digest = unpack 'H*', pack 'N', unpack 'L', $a32->digest;
+        my $digest = pack "N", unpack "L", $a32->digest;
         $self->{packet} = $digest.$self->{packet};
     }
 
-    $self->{packet} = pack("S/a", $self->{packet});
+    $self->{packet} = pack("(S/a)<", $self->{packet});
 
     $self->{packet};
 }

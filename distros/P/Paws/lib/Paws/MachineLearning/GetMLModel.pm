@@ -15,21 +15,52 @@ package Paws::MachineLearning::GetMLModel;
 
 =head1 NAME
 
-Paws::MachineLearning::GetMLModel - Arguments for method GetMLModel on Paws::MachineLearning
+Paws::MachineLearning::GetMLModel - Arguments for method GetMLModel on L<Paws::MachineLearning>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method GetMLModel on the 
-Amazon Machine Learning service. Use the attributes of this class
+This class represents the parameters used for calling the method GetMLModel on the
+L<Amazon Machine Learning|Paws::MachineLearning> service. Use the attributes of this class
 as arguments to method GetMLModel.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to GetMLModel.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->GetMLModel(Att1 => $value1, Att2 => $value2, ...);
+    my $machinelearning = Paws->service('MachineLearning');
+    my $GetMLModelOutput = $machinelearning->GetMLModel(
+      MLModelId => 'MyEntityId',
+      Verbose   => 1,              # OPTIONAL
+    );
+
+    # Results:
+    my $TrainingParameters = $GetMLModelOutput->TrainingParameters;
+    my $ScoreThresholdLastUpdatedAt =
+      $GetMLModelOutput->ScoreThresholdLastUpdatedAt;
+    my $LastUpdatedAt        = $GetMLModelOutput->LastUpdatedAt;
+    my $SizeInBytes          = $GetMLModelOutput->SizeInBytes;
+    my $TrainingDataSourceId = $GetMLModelOutput->TrainingDataSourceId;
+    my $MLModelType          = $GetMLModelOutput->MLModelType;
+    my $FinishedAt           = $GetMLModelOutput->FinishedAt;
+    my $Message              = $GetMLModelOutput->Message;
+    my $CreatedAt            = $GetMLModelOutput->CreatedAt;
+    my $Name                 = $GetMLModelOutput->Name;
+    my $LogUri               = $GetMLModelOutput->LogUri;
+    my $EndpointInfo         = $GetMLModelOutput->EndpointInfo;
+    my $InputDataLocationS3  = $GetMLModelOutput->InputDataLocationS3;
+    my $Recipe               = $GetMLModelOutput->Recipe;
+    my $ComputeTime          = $GetMLModelOutput->ComputeTime;
+    my $MLModelId            = $GetMLModelOutput->MLModelId;
+    my $ScoreThreshold       = $GetMLModelOutput->ScoreThreshold;
+    my $CreatedByIamUser     = $GetMLModelOutput->CreatedByIamUser;
+    my $Status               = $GetMLModelOutput->Status;
+    my $StartedAt            = $GetMLModelOutput->StartedAt;
+    my $Schema               = $GetMLModelOutput->Schema;
+
+    # Returns a L<Paws::MachineLearning::GetMLModelOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/machinelearning/GetMLModel>
 
 =head1 ATTRIBUTES
 
@@ -57,9 +88,9 @@ This class forms part of L<Paws>, documenting arguments for method GetMLModel in
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

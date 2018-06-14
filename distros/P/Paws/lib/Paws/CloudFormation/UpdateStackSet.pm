@@ -1,11 +1,15 @@
 
 package Paws::CloudFormation::UpdateStackSet;
   use Moose;
+  has Accounts => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
+  has AdministrationRoleARN => (is => 'ro', isa => 'Str');
   has Capabilities => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
   has Description => (is => 'ro', isa => 'Str');
+  has ExecutionRoleName => (is => 'ro', isa => 'Str');
   has OperationId => (is => 'ro', isa => 'Str');
   has OperationPreferences => (is => 'ro', isa => 'Paws::CloudFormation::StackSetOperationPreferences');
   has Parameters => (is => 'ro', isa => 'ArrayRef[Paws::CloudFormation::Parameter]');
+  has Regions => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
   has StackSetName => (is => 'ro', isa => 'Str', required => 1);
   has Tags => (is => 'ro', isa => 'ArrayRef[Paws::CloudFormation::Tag]');
   has TemplateBody => (is => 'ro', isa => 'Str');
@@ -23,23 +27,109 @@ package Paws::CloudFormation::UpdateStackSet;
 
 =head1 NAME
 
-Paws::CloudFormation::UpdateStackSet - Arguments for method UpdateStackSet on Paws::CloudFormation
+Paws::CloudFormation::UpdateStackSet - Arguments for method UpdateStackSet on L<Paws::CloudFormation>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateStackSet on the 
-AWS CloudFormation service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateStackSet on the
+L<AWS CloudFormation|Paws::CloudFormation> service. Use the attributes of this class
 as arguments to method UpdateStackSet.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateStackSet.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateStackSet(Att1 => $value1, Att2 => $value2, ...);
+    my $cloudformation = Paws->service('CloudFormation');
+    my $UpdateStackSetOutput = $cloudformation->UpdateStackSet(
+      StackSetName          => 'MyStackSetName',
+      Accounts              => [ 'MyAccount', ... ],    # OPTIONAL
+      AdministrationRoleARN => 'MyRoleARN',             # OPTIONAL
+      Capabilities          => [
+        'CAPABILITY_IAM', ...    # values: CAPABILITY_IAM, CAPABILITY_NAMED_IAM
+      ],                         # OPTIONAL
+      Description          => 'MyDescription',           # OPTIONAL
+      ExecutionRoleName    => 'MyExecutionRoleName',     # OPTIONAL
+      OperationId          => 'MyClientRequestToken',    # OPTIONAL
+      OperationPreferences => {
+        RegionOrder                => [ 'MyRegion', ... ],  # OPTIONAL
+        FailureTolerancePercentage => 1,                    # max: 100; OPTIONAL
+        FailureToleranceCount      => 1,                    # OPTIONAL
+        MaxConcurrentCount         => 1,                    # min: 1, ; OPTIONAL
+        MaxConcurrentPercentage => 1,    # min: 1, max: 100; OPTIONAL
+      },    # OPTIONAL
+      Parameters => [
+        {
+          ResolvedValue    => 'MyParameterValue',    # OPTIONAL
+          ParameterKey     => 'MyParameterKey',      # OPTIONAL
+          UsePreviousValue => 1,                     # OPTIONAL
+          ParameterValue   => 'MyParameterValue',    # OPTIONAL
+        },
+        ...
+      ],                                             # OPTIONAL
+      Regions => [ 'MyRegion', ... ],                # OPTIONAL
+      Tags => [
+        {
+          Key   => 'MyTagKey',                       # min: 1, max: 128
+          Value => 'MyTagValue',                     # min: 1, max: 256
+
+        },
+        ...
+      ],                                             # OPTIONAL
+      TemplateBody        => 'MyTemplateBody',       # OPTIONAL
+      TemplateURL         => 'MyTemplateURL',        # OPTIONAL
+      UsePreviousTemplate => 1,                      # OPTIONAL
+    );
+
+    # Results:
+    my $OperationId = $UpdateStackSetOutput->OperationId;
+
+    # Returns a L<Paws::CloudFormation::UpdateStackSetOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/cloudformation/UpdateStackSet>
 
 =head1 ATTRIBUTES
+
+
+=head2 Accounts => ArrayRef[Str|Undef]
+
+The accounts in which to update associated stack instances. If you
+specify accounts, you must also specify the regions in which to update
+stack set instances.
+
+To update I<all> the stack instances associated with this stack set, do
+not specify the C<Accounts> or C<Regions> properties.
+
+If the stack set update includes changes to the template (that is, if
+the C<TemplateBody> or C<TemplateURL> properties are specified), or the
+C<Parameters> property, AWS CloudFormation marks all stack instances
+with a status of C<OUTDATED> prior to updating the stack instances in
+the specified accounts and regions. If the stack set update does not
+include changes to the template or parameters, AWS CloudFormation
+updates the stack instances in the specified accounts and regions,
+while leaving all other stack instances with their existing stack
+instance status.
+
+
+
+=head2 AdministrationRoleARN => Str
+
+The Amazon Resource Number (ARN) of the IAM role to use to update this
+stack set.
+
+Specify an IAM role only if you are using customized administrator
+roles to control which users or groups can manage specific stack sets
+within the same administrator account. For more information, see Define
+Permissions for Multiple Administrators
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacksets-prereqs.html)
+in the I<AWS CloudFormation User Guide>.
+
+If you specify a customized administrator role, AWS CloudFormation uses
+that role to update the stack. If you do not specify a customized
+administrator role, AWS CloudFormation performs the update using the
+role previously associated with the stack set, so long as you have
+permissions to perform operations on the stack set.
+
 
 
 =head2 Capabilities => ArrayRef[Str|Undef]
@@ -97,12 +187,32 @@ returns an C<InsufficientCapabilities> error.
 
 For more information, see Acknowledging IAM Resources in AWS
 CloudFormation Templates.
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-template.html#capabilities)
 
 
 
 =head2 Description => Str
 
 A brief description of updates that you are making.
+
+
+
+=head2 ExecutionRoleName => Str
+
+The name of the IAM execution role to use to update the stack set. If
+you do not specify an execution role, AWS CloudFormation uses the
+C<AWSCloudFormationStackSetExecutionRole> role for the stack set
+operation.
+
+Specify an IAM role only if you are using customized execution roles to
+control which stack resources users and groups can include in their
+stack sets.
+
+If you specify a customized execution role, AWS CloudFormation uses
+that role to update the stack. If you do not specify a customized
+execution role, AWS CloudFormation performs the update using the role
+previously associated with the stack set, so long as you have
+permissions to perform operations on the stack set.
 
 
 
@@ -134,6 +244,27 @@ operation.
 =head2 Parameters => ArrayRef[L<Paws::CloudFormation::Parameter>]
 
 A list of input parameters for the stack set template.
+
+
+
+=head2 Regions => ArrayRef[Str|Undef]
+
+The regions in which to update associated stack instances. If you
+specify regions, you must also specify accounts in which to update
+stack set instances.
+
+To update I<all> the stack instances associated with this stack set, do
+not specify the C<Accounts> or C<Regions> properties.
+
+If the stack set update includes changes to the template (that is, if
+the C<TemplateBody> or C<TemplateURL> properties are specified), or the
+C<Parameters> property, AWS CloudFormation marks all stack instances
+with a status of C<OUTDATED> prior to updating the stack instances in
+the specified accounts and regions. If the stack set update does not
+include changes to the template or parameters, AWS CloudFormation
+updates the stack instances in the specified accounts and regions,
+while leaving all other stack instances with their existing stack
+instance status.
 
 
 
@@ -191,7 +322,9 @@ an C<access denied> error, and the stack set is not updated.
 
 The structure that contains the template body, with a minimum length of
 1 byte and a maximum length of 51,200 bytes. For more information, see
-Template Anatomy in the AWS CloudFormation User Guide.
+Template Anatomy
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-anatomy.html)
+in the AWS CloudFormation User Guide.
 
 Conditional: You must specify only one of the following parameters:
 C<TemplateBody> or C<TemplateURL>E<mdash>or set C<UsePreviousTemplate>
@@ -203,8 +336,9 @@ to true.
 
 The location of the file that contains the template body. The URL must
 point to a template (maximum size: 460,800 bytes) that is located in an
-Amazon S3 bucket. For more information, see Template Anatomy in the AWS
-CloudFormation User Guide.
+Amazon S3 bucket. For more information, see Template Anatomy
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-anatomy.html)
+in the AWS CloudFormation User Guide.
 
 Conditional: You must specify only one of the following parameters:
 C<TemplateBody> or C<TemplateURL>E<mdash>or set C<UsePreviousTemplate>
@@ -230,9 +364,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateStackSe
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

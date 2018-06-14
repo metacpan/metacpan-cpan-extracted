@@ -1,3 +1,36 @@
+1.28     2018-06-12
+
+- Some tests which required support for epoch values larger than 2**32 were
+  not being skipped when the underlying Perl did not support that.
+
+
+1.27     2018-06-09
+
+- This release is identical to 1.26 except that it is a stable release, not a
+  trial.
+
+- Fixed the tests so they will not break in the year 2020. The tests were
+  passing in 2-digit years on the assumption that a year like "70" would be
+  treated as 1970, but starting in 2020 this would be treated as 2070
+  instead. Reported by Bernhard M. Wiedemann. RT #124787.
+
+- Added timelocal_modern and timegm_modern variants as optional exports. These
+  versions do not munge years at all. They treat the year value that they are
+  given exactly as-is.
+
+
+1.26     2018-05-20 (TRIAL RELEASE)
+
+- Fixed the tests so they will not break in the year 2020. The tests were
+  passing in 2-digit years on the assumption that a year like "70" would be
+  treated as 1970, but starting in 2020 this would be treated as 2070
+  instead. Reported by Bernhard M. Wiedemann. RT #124787.
+
+- Added timelocal_modern and timegm_modern variants as optional exports. These
+  versions do not munge years at all. They treat the year value that they are
+  given exactly as-is.
+
+
 1.25     2016-11-17
 
 - Reduce memory usage by only loading Config if needed and not importing from

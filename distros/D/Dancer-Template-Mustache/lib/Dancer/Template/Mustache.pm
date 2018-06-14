@@ -1,7 +1,9 @@
 package Dancer::Template::Mustache;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Wrapper for the Mustache template system
-$Dancer::Template::Mustache::VERSION = '1.0.1';
+$Dancer::Template::Mustache::VERSION = '1.1.0';
+use 5.10.0;
+
 use strict;
 use warnings;
 
@@ -14,8 +16,7 @@ use Moo;
 
 use Path::Tiny;
 
-require Dancer::Config;
-Dancer::Config->import( 'setting' );
+use Dancer::Config qw/ setting /;
 
 extends 'Dancer::Template::Abstract';
 
@@ -31,6 +32,12 @@ has _template_path => (
     },
 );
 
+has caching => (
+    is => 'ro',
+    lazy => 1,
+    default => sub { $_[0]->config->{cache_templates} // 1 },
+);
+
 my %file_template; # cache for the templates
 
 sub render {
@@ -44,6 +51,8 @@ sub render {
     my $mustache = $file_template{$template} ||= Template::Mustache->new(
         template_path => path( $self->_template_path, $template )
     );
+
+    delete $file_template{$template} unless $self->caching;
 
     return $mustache->render($tokens); 
 }
@@ -62,7 +71,7 @@ Dancer::Template::Mustache - Wrapper for the Mustache template system
 
 =head1 VERSION
 
-version 1.0.1
+version 1.1.0
 
 =head1 SYNOPSIS
 
@@ -93,6 +102,16 @@ mustached layout would look like:
     {{{ content }}}
     </body>
 
+=head1 CONFIGURATION
+
+    engines:
+      Mustache:
+        cache_templates: 1
+
+Bu default, the templates are only compiled once when first
+accessed. The caching can be disabling by setting C<cache_templates>
+to C<0>.
+
 =head1 SEE ALSO
 
 The Mustache templating system: L<http://mustache.github.com/>
@@ -106,7 +125,7 @@ Yanick Champoux <yanick@babyl.dyndns.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2014, 2012 by Yanick Champoux.
+This software is copyright (c) 2018, 2017, 2014, 2012 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

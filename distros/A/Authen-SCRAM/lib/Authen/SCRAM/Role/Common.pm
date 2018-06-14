@@ -4,7 +4,7 @@ use warnings;
 
 package Authen::SCRAM::Role::Common;
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 use Moo::Role 1.001000;
 
@@ -53,7 +53,9 @@ has _const_eq_fcn => (
 # String::Compare::ConstantTime if available or a pure-Perl fallback
 sub _build__const_eq_fcn {
     my ($self) = @_;
-    if ( eval { require String::Compare::ConstantTime; 1 } ) {
+    # XXX disable String::Compare::ConstantTime until a new version
+    # is released that fixes warnings on older perls.
+    if ( 0 && eval { require String::Compare::ConstantTime; 1 } ) {
         return \&String::Compare::ConstantTime::equals;
     }
     else {

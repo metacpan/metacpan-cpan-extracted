@@ -14,21 +14,30 @@ package Paws::Organizations::CreateOrganization;
 
 =head1 NAME
 
-Paws::Organizations::CreateOrganization - Arguments for method CreateOrganization on Paws::Organizations
+Paws::Organizations::CreateOrganization - Arguments for method CreateOrganization on L<Paws::Organizations>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateOrganization on the 
-AWS Organizations service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateOrganization on the
+L<AWS Organizations|Paws::Organizations> service. Use the attributes of this class
 as arguments to method CreateOrganization.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateOrganization.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateOrganization(Att1 => $value1, Att2 => $value2, ...);
+    my $organizations = Paws->service('Organizations');
+    my $CreateOrganizationResponse = $organizations->CreateOrganization(
+      FeatureSet => 'ALL',    # OPTIONAL
+    );
+
+    # Results:
+    my $Organization = $CreateOrganizationResponse->Organization;
+
+    # Returns a L<Paws::Organizations::CreateOrganizationResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/organizations/CreateOrganization>
 
 =head1 ATTRIBUTES
 
@@ -44,14 +53,18 @@ feature set supports different levels of functionality.
 
 I<CONSOLIDATED_BILLING>: All member accounts have their bills
 consolidated to and paid by the master account. For more information,
-see Consolidated Billing in the I<AWS Organizations User Guide>.
+see Consolidated Billing
+(http://docs.aws.amazon.com/organizations/latest/userguide/orgs_getting-started_concepts.html#feature-set-cb-only)
+in the I<AWS Organizations User Guide>.
 
 =item *
 
 I<ALL>: In addition to all the features supported by the consolidated
 billing feature set, the master account can also apply any type of
 policy to any member account in the organization. For more information,
-see All features in the I<AWS Organizations User Guide>.
+see All features
+(http://docs.aws.amazon.com/organizations/latest/userguide/orgs_getting-started_concepts.html#feature-set-all)
+in the I<AWS Organizations User Guide>.
 
 =back
 
@@ -65,9 +78,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateOrganiz
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

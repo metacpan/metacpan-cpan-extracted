@@ -3,27 +3,27 @@ abstract: 'inheritance pattern'
 author:
   - 'Igor Sverdlov <igor-sverdlov@mail.ru>'
 build_requires:
-  FindBin: 0
-  QBit::Application: 0
-  QBit::Application::Model::DB: 0
-  QBit::Application::Model::DB::mysql: 0
-  QBit::Application::Model::Multistate::DB: 0
-  QBit::Class: 0
-  Test::Deep: 0
-  Test::More: 0
-  base: 0
-  lib: 0
+  FindBin: '0'
+  QBit::Application: '0'
+  QBit::Application::Model::DB: '0'
+  QBit::Application::Model::DB::mysql: '0'
+  QBit::Application::Model::DBManager: '0'
+  QBit::Application::Model::Multistate::DB: '0'
+  QBit::Class: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  base: '0'
+  lib: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.143240'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: QBit-Base
 requires:
-  QBit::Application::Model::DBManager: 0
-  qbit: 0
-  strict: 0
-version: 0.002
+  qbit: '0'
+  strict: '0'
+version: '0.003'

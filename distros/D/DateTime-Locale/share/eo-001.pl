@@ -128,10 +128,10 @@
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
-  glibc_date_format => "%m/%d/%y",
-  glibc_datetime_format => "%a %b %e %H:%M:%S %Y",
+  glibc_date_format => "%Y-%m-%d",
+  glibc_datetime_format => "%a %d %b %Y %T %z",
   glibc_time_12_format => "%I:%M:%S %p",
-  glibc_time_format => "%H:%M:%S",
+  glibc_time_format => "%T",
   language => "Esperanto",
   month_format_abbreviated => [
     "jan",

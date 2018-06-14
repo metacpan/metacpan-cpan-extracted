@@ -20,7 +20,7 @@ use namespace::autoclean;
 
 use File::ShareDir qw( dist_file );
 
-our $VERSION = '1.20';
+our $VERSION = '1.22';
 
 #<<<
 ### :start CLDRVersion:
@@ -3524,7 +3524,7 @@ my %LocaleData = (
     ],
     first_day_of_week => 7,
     glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
-    glibc_date_format => "%d/%m/%y",
+    glibc_date_format => "%Y-%m-%d",
     glibc_datetime_format => "%a %d %b %Y %r %Z",
     glibc_time_12_format => "%I:%M:%S %p",
     glibc_time_format => "%r",
@@ -5887,6 +5887,27 @@ sub _data_for {
     return $data;
 }
 
+sub add_locale {
+    my $code = shift;
+    my $data = shift;
+
+    die "You cannot add an existing locale - $code\n"
+        if exists $Codes{$code};
+    die
+        qq{One of either the 'en_language' or 'language' keys is required to add a new locale\n}
+        if !( exists $data->{en_language} || exists $data->{language} );
+
+    my $lang
+        = ( exists $data->{en_language} )
+        ? $data->{en_language}
+        : $data->{language};
+    $Names{$lang}                            = $code;
+    $Codes{$code}                            = 1;
+    $NativeNames{ $data->{native_language} } = $code
+        if exists $data->{native_language};
+    $LocaleData{$code} = $data;
+}
+
 # ABSTRACT: Locale data generated from CLDR
 
 __END__
@@ -5901,7 +5922,7 @@ DateTime::Locale::Data - Locale data generated from CLDR
 
 =head1 VERSION
 
-version 1.20
+version 1.22
 
 =head1 DESCRIPTION
 

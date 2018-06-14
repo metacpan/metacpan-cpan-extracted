@@ -32,9 +32,11 @@
 
 static void duk_fatal_error_handler(void* udata, const char* msg)
 {
+    dTHX;
+
     /* Duk* duk = (Duk*) udata; */
     UNUSED_ARG(udata);
-    dTHX;
+
     PerlIO_printf(PerlIO_stderr(), "duktape fatal error, aborting: %s\n", msg ? msg : "*NONE*");
     abort();
 }
@@ -57,15 +59,15 @@ static Duk* create_duktape_object(pTHX_ HV* opt)
             char* kstr = 0;
             HE* entry = hv_iternext(opt);
             if (!entry) {
-                break; // no more hash keys
+                break; /* no more hash keys */
             }
             kstr = hv_iterkey(entry, &klen);
             if (!kstr || klen < 0) {
-                continue; // invalid key
+                continue; /* invalid key */
             }
             value = hv_iterval(opt, entry);
             if (!value) {
-                continue; // invalid value
+                continue; /* invalid value */
             }
             if (memcmp(kstr, DUK_OPT_NAME_GATHER_STATS, klen) == 0) {
                 duk->flags |= SvTRUE(value) ? DUK_OPT_FLAG_GATHER_STATS : 0;
@@ -96,19 +98,19 @@ static Duk* create_duktape_object(pTHX_ HV* opt)
 
     TIMEOUT_RESET(duk);
 
-    // register a bunch of native functions
+    /* register a bunch of native functions */
     pl_register_native_functions(duk);
 
-    // initialize module handling functions
+    /* initialize module handling functions */
     pl_register_module_functions(duk);
 
-    // register event loop dispatcher
+    /* register event loop dispatcher */
     pl_register_eventloop(duk);
 
-    // inline a bunch of JS functions
+    /* inline a bunch of JS functions */
     pl_register_inlined_functions(duk);
 
-    // initialize console object
+    /* initialize console object */
     pl_console_init(duk);
 
     return duk;
@@ -116,8 +118,8 @@ static Duk* create_duktape_object(pTHX_ HV* opt)
 
 static int session_dtor(pTHX_ SV* sv, MAGIC* mg)
 {
-    UNUSED_ARG(sv);
     Duk* duk = (Duk*) mg->mg_ptr;
+    UNUSED_ARG(sv);
     duk_destroy_heap(duk->ctx);
     return 0;
 }

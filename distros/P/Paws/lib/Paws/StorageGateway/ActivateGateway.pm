@@ -20,21 +20,40 @@ package Paws::StorageGateway::ActivateGateway;
 
 =head1 NAME
 
-Paws::StorageGateway::ActivateGateway - Arguments for method ActivateGateway on Paws::StorageGateway
+Paws::StorageGateway::ActivateGateway - Arguments for method ActivateGateway on L<Paws::StorageGateway>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ActivateGateway on the 
-AWS Storage Gateway service. Use the attributes of this class
+This class represents the parameters used for calling the method ActivateGateway on the
+L<AWS Storage Gateway|Paws::StorageGateway> service. Use the attributes of this class
 as arguments to method ActivateGateway.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ActivateGateway.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ActivateGateway(Att1 => $value1, Att2 => $value2, ...);
+    my $storagegateway = Paws->service('StorageGateway');
+    # To activate the gateway
+    # Activates the gateway you previously deployed on your host.
+    my $ActivateGatewayOutput = $storagegateway->ActivateGateway(
+      {
+        'GatewayRegion'     => 'us-east-1',
+        'GatewayTimezone'   => 'GMT-12:00',
+        'TapeDriveType'     => 'IBM-ULT3580-TD5',
+        'MediumChangerType' => 'AWS-Gateway-VTL',
+        'GatewayType'       => 'STORED',
+        'GatewayName'       => 'My_Gateway',
+        'ActivationKey'     => '29AV1-3OFV9-VVIUB-NKT0I-LRO6V'
+      }
+    );
+
+    # Results:
+    my $GatewayARN = $ActivateGatewayOutput->GatewayARN;
+
+    # Returns a L<Paws::StorageGateway::ActivateGatewayOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/storagegateway/ActivateGateway>
 
 =head1 ATTRIBUTES
 
@@ -50,6 +69,10 @@ parameters, however, these are merely defaults -- the arguments you
 pass to the C<ActivateGateway> API call determine the actual
 configuration of your gateway.
 
+For more information, see
+https://docs.aws.amazon.com/storagegateway/latest/userguide/get-activation-key.html
+in the Storage Gateway User Guide.
+
 
 
 =head2 B<REQUIRED> GatewayName => Str
@@ -64,10 +87,12 @@ A value that indicates the region where you want to store your data.
 The gateway region specified must be the same region as the region in
 your C<Host> header in the request. For more information about
 available regions and endpoints for AWS Storage Gateway, see Regions
-and Endpoints in the I<Amazon Web Services Glossary>.
+and Endpoints
+(http://docs.aws.amazon.com/general/latest/gr/rande.html#sg_region) in
+the I<Amazon Web Services Glossary>.
 
 Valid Values: "us-east-1", "us-east-2", "us-west-1", "us-west-2",
-"ca-central-1", "eu-west-1", "eu-central-1", "eu-west-2",
+"ca-central-1", "eu-west-1", "eu-central-1", "eu-west-2", "eu-west-3",
 "ap-northeast-1", "ap-northeast-2", "ap-southeast-1", "ap-southeast-2",
 "ap-south-1", "sa-east-1"
 
@@ -118,9 +143,9 @@ This class forms part of L<Paws>, documenting arguments for method ActivateGatew
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

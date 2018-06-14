@@ -291,6 +291,7 @@ if (! window._OQAjaxQueryLoaded)
       },
       success: function(x) {
         if (x.id) {
+          if (! $f[0].OQss) $("<input type=hidden name=OQss />").appendTo($f);
           $f[0].OQss.value=x.id;    
           $('.OQToolsCancelBut').click();
           OQnotify("report saved");
@@ -749,11 +750,11 @@ if (! window._OQAjaxQueryLoaded)
       if (this.disabled) return true;
       var val = $(this).val();
 
-      if (this.name && /^\_nf\_arg\_(.*)/.test(this.name)) {
+      if (this.name && /^\_nfarg\d+(.*)/.test(this.name)) {
         var name = RegExp.$1;
         if (val=='') {
           val = "''";
-        } else if (/\s/.test(val)) {
+        } else if (/\W/.test(val)) {
           if      (! /\"/.test(val)) val = '"'+val+'"';
           else if (! /\'/.test(val)) val = "'"+val+"'";
           else val = '"'+val.replace(/\"/g,'')+'"';
@@ -844,7 +845,7 @@ if (! window._OQAjaxQueryLoaded)
     var dat={};
     $('input,select',$form[0]).each(function(){
       // ignore named filter arguments
-      if (this.name && ! /^\_nf\_arg\_/.test(this.name)) {
+      if (this.name && ! /^\_nfarg\d+/.test(this.name)) {
         var n = this.name;
         var v = $.trim($(this).val());
         if (v=='' && !/^(show|filter|sort)$/.test(n)) {}
@@ -910,19 +911,19 @@ if (! window._OQAjaxQueryLoaded)
 
   window.OQrefresh = function(updated_uid,p1,p2,p3,p4,p5,p6,p7,p8) {
     var $f = $('form.OQform').eq(0);
-    var onSelFun = $f[0].on_select.value;
     var isClosed = false;
-    if (updated_uid && onSelFun) {
-      onSelFun = onSelFun.toString().replace(/\,.*/,'');
+
+    // get parent function to call if one exists
+    // strip away optional arguments and non word chars
+    var func = $.trim($($f[0].on_select||$f[0].on_update).val()).replace(/\,.*/,'').replace(/\W/g,'');
+    if (updated_uid && func) {
       try {
         var wo = window.opener2 || window.opener;
         var wc = window.close2 || window.close;
-        wo[onSelFun](updated_uid,p1,p2,p3,p4,p5,p6,p7,p8);
-        //wo.focus();
+        wo[func](updated_uid,p1,p2,p3,p4,p5,p6,p7,p8);
         wc();
         isClosed = true;
-      } catch(e) {
-      }
+      } catch(e) {}
     }
     if (! isClosed) {
       var dat = buildParamMap($f);

@@ -1,7 +1,7 @@
 package App::indodax;
 
-our $DATE = '2018-04-06'; # DATE
-our $VERSION = '0.023'; # VERSION
+our $DATE = '2018-06-12'; # DATE
+our $VERSION = '0.024'; # VERSION
 
 use 5.010001;
 use strict;
@@ -10,49 +10,19 @@ use Log::ger;
 
 our %SPEC;
 
-our %Canonical_Currencies = (
-    # the JSON API/TAPI still uses STR instead of XLM for Stellar Lumens
-    str => 'xlm',
-    # the JSON API/TAPI still uses DRK (DarkCoin) instead of DASH for Dash
-    drk => 'dash',
-    # the JSON API/TAPI still uses NEM instead of XEM
-    nem => 'xem',
-);
-our %Rev_Canonical_Currencies = (
-    xlm => 'str',
-    dash => 'drk',
-    xem => 'nem',
-);
+use App::cryp::Exchange::indodax;
+
+our %Canonical_Currencies = (map {lc} %{ App::cryp::Exchange::indodax->data_canonical_currencies });
+our %Rev_Canonical_Currencies = (map {lc} %{ App::cryp::Exchange::indodax->data_reverse_canonical_currencies });
 
 our @Markets = qw(idr btc);
 
-our @Market_Pairs = (
-    'btc_idr',
-    'ada_idr',
-    'bcd_idr',
-    'bch_idr',
-    'btg_idr',
-    'eth_idr',
-    'etc_idr',
-    'ignis_idr',
-    'ltc_idr',
-    'nxt_idr',
-    'ten_idr',
-    'waves_idr',
-    'xlm_idr',
-    'xrp_idr',
-    'xzc_idr',
+our @Market_Pairs = (map {
+    my $canon = $_->{name};
+    my ($basecur, $quotecur) = split m!/!, $canon;
+    lc($basecur) . '_' . lc($quotecur);
+} @{ App::cryp::Exchange::indodax->data_pairs });
 
-    'bts_btc',
-    'dash_btc',
-    'doge_btc',
-    'eth_btc',
-    'ltc_btc',
-    'nxt_btc',
-    'xlm_btc',
-    'xem_btc',
-    'xrp_btc',
-);
 our @Currencies = do {
     my %res;
     for (@Market_Pairs) { /\A(\w+)_(\w+)\z/ or die; $res{$1}++; $res{$2}++ }
@@ -284,7 +254,7 @@ sub public {
 
     _init(\%args);
     my $uri = $args{uri}; $uri = "/api$uri" unless $uri =~ m!\A/api/!; # XXX args
-    my $url = "https://www.indodax.com$uri";
+    my $url = "https://indodax.com$uri";
     [200, "OK", $indodax->_get_json($url)];
 }
 
@@ -1135,11 +1105,16 @@ App::indodax - CLI for Indodax.com
 
 =head1 VERSION
 
-This document describes version 0.023 of App::indodax (from Perl distribution App-indodax), released on 2018-04-06.
+This document describes version 0.024 of App::indodax (from Perl distribution App-indodax), released on 2018-06-12.
 
 =head1 SYNOPSIS
 
 Please see included script L<indodax>.
+
+=head1 DESCRIPTION
+
+B<DEPRECATION WARNING:> This app is being deprecated in favor of
+L<App::cryp::Exchange::indodax> and L<cryp-exchange>.
 
 =head1 FUNCTIONS
 

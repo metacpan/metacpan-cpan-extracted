@@ -1,6 +1,7 @@
 package Paws::Pinpoint::ApplicationSettingsResource;
   use Moose;
   has ApplicationId => (is => 'ro', isa => 'Str');
+  has CampaignHook => (is => 'ro', isa => 'Paws::Pinpoint::CampaignHook');
   has LastModifiedDate => (is => 'ro', isa => 'Str');
   has Limits => (is => 'ro', isa => 'Paws::Pinpoint::CampaignLimits');
   has QuietTime => (is => 'ro', isa => 'Paws::Pinpoint::QuietTime');
@@ -44,6 +45,11 @@ Application settings.
   The unique ID for the application.
 
 
+=head2 CampaignHook => L<Paws::Pinpoint::CampaignHook>
+
+  Default campaign hook.
+
+
 =head2 LastModifiedDate => Str
 
   The date that the settings were last updated in ISO 8601 format.
@@ -70,9 +76,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Pinpoint>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -16,21 +16,36 @@ package Paws::KMS::ListRetirableGrants;
 
 =head1 NAME
 
-Paws::KMS::ListRetirableGrants - Arguments for method ListRetirableGrants on Paws::KMS
+Paws::KMS::ListRetirableGrants - Arguments for method ListRetirableGrants on L<Paws::KMS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ListRetirableGrants on the 
-AWS Key Management Service service. Use the attributes of this class
+This class represents the parameters used for calling the method ListRetirableGrants on the
+L<AWS Key Management Service|Paws::KMS> service. Use the attributes of this class
 as arguments to method ListRetirableGrants.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ListRetirableGrants.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ListRetirableGrants(Att1 => $value1, Att2 => $value2, ...);
+    my $kms = Paws->service('KMS');
+    # To list grants that the specified principal can retire
+    # The following example lists the grants that the specified principal
+    # (identity) can retire.
+    my $ListGrantsResponse = $kms->ListRetirableGrants(
+      {
+        'RetiringPrincipal' => 'arn:aws:iam::111122223333:role/ExampleRole'
+      }
+    );
+
+    # Results:
+    my $Truncated = $ListGrantsResponse->Truncated;
+    my $Grants    = $ListGrantsResponse->Grants;
+
+    # Returns a L<Paws::KMS::ListGrantsResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/kms/ListRetirableGrants>
 
 =head1 ATTRIBUTES
 
@@ -59,11 +74,14 @@ truncated response you just received.
 The retiring principal for which to list grants.
 
 To specify the retiring principal, use the Amazon Resource Name (ARN)
+(http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
 of an AWS principal. Valid AWS principals include AWS accounts (root),
 IAM users, federated users, and assumed role users. For examples of the
 ARN syntax for specifying a principal, see AWS Identity and Access
-Management (IAM) in the Example ARNs section of the I<Amazon Web
-Services General Reference>.
+Management (IAM)
+(http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-iam)
+in the Example ARNs section of the I<Amazon Web Services General
+Reference>.
 
 
 
@@ -74,9 +92,9 @@ This class forms part of L<Paws>, documenting arguments for method ListRetirable
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

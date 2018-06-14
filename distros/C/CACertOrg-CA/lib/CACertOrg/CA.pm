@@ -2,7 +2,7 @@ package CACertOrg::CA;
 
 use strict;
 use vars qw( $VERSION );
-$VERSION = '20110724.004';
+$VERSION = '20110724.005';
 
 use Cwd            qw();
 use File::Spec     qw();
@@ -21,6 +21,8 @@ sub SSL_ca_file { # Stolen from Mozilla::CA
 1;
 
 __END__
+
+=encoding utf8
 
 =head1 NAME
 
@@ -69,7 +71,7 @@ L<http://www.cacert.org/index.php?id=3>
 For the bundled CACert.org CA PEM file license comes from:
 
 	http://www.cacert.org/policy/RootDistributionLicense.php
-	
+
 Root Distribution License
 
 =head2 1. Terms

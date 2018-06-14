@@ -33,7 +33,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::IAM::RoleUs
 =head1 DESCRIPTION
 
 An object that contains details about how a service-linked role is
-used.
+used, if that information is returned by the service.
 
 This data type is used as a response element in the
 GetServiceLinkedRoleDeletionStatus operation.
@@ -58,9 +58,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::IAM>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

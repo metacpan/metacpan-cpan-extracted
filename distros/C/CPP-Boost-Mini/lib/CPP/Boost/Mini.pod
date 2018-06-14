@@ -1,0 +1,22 @@
+=head1 NAME
+
+CPP::Boost::Mini - C++ Boost library (no perl interface).
+
+=cut
+
+=head1 DESCRIPTION
+
+Includes libraries: 
+callable_traits compatibility config container container_hash conversion core crc disjoint_sets hof integer io logic
+
+=head1 SYNOPSIS
+
+=head1 AUTHOR
+
+Andrew Selivanov <mraq@cpan.org>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Boost itself.
+
+=cut

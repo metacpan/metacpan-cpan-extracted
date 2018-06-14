@@ -154,6 +154,8 @@ DESCRIPTION
     `OBJECT_ID`
         Returns a unique identifier for the object.
 
+        May only be called as an instance method.
+
     `FIELDS`
         Returns a list of fields associated with the object. For the `Point3D`
         struct in the SYNPOSIS, this would be 'x', 'y', 'z'.
@@ -165,16 +167,46 @@ DESCRIPTION
         not included in `FIELDS`, and thus cannot be used in the positional
         constructor.
 
+        May be called as an instance or class method.
+
     `TYPE`
         Returns the type name of the struct, e.g. 'Point3D'.
+
+        May be called as an instance or class method.
+
+    `CLASSNAME`
+        Returns the internally used package name for the struct, e.g.
+        'MooX::Struct::__ANON__::0007'. Pretty rare you'd want to see this.
+
+        May be called as an instance or class method.
+
+    `TYPE_TINY`
+        Returns a Type::Tiny type constraint corresponding to the CLASSNAME,
+        suitable for a Moose/Moo `isa`.
+
+         package Foo {
+           use Moo;
+           use MooX::Struct Bar => [qw( $name )];
+   
+           has left_bar  => (is => 'rw', isa => Bar->TYPE_TINY);
+           has right_bar => (is => 'rw', isa => Bar->TYPE_TINY);
+   
+           ...;
+         }
+
+        May be called as an instance or class method.
 
     `TO_HASH`
         Returns a reference to an unblessed hash where the object's fields are
         the keys and the object's values are the hash values.
 
+        May only be called as an instance method.
+
     `TO_ARRAY`
         Returns a reference to an unblessed array where the object's values
         are the array items, in the same order as listed by `FIELDS`.
+
+        May only be called as an instance method.
 
     `TO_STRING`
         Joins `TO_ARRAY` with whitespace. This is not necessarily a brilliant
@@ -189,8 +221,12 @@ DESCRIPTION
             ]
          ;
 
+        May only be called as an instance method.
+
     `CLONE`
         Creates a shallow clone of the object.
+
+        May only be called as an instance method.
 
     `EXTEND`
         An exverimental feature.
@@ -219,6 +255,8 @@ DESCRIPTION
         traits to an object. Others (like the ability to add a new
         uninitialized, read-only attribute to an existing object) are less
         sensible.
+
+        May be called as an instance or class method.
 
     `BUILDARGS`
         Moo internal fu.
@@ -267,7 +305,7 @@ AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2012-2013, 2017 by Toby Inkster.
+    This software is copyright (c) 2012-2013, 2017-2018 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

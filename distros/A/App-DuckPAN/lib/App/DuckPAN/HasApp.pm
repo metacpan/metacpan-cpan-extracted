@@ -1,7 +1,7 @@
 package App::DuckPAN::HasApp;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Simple role for classes which carry an object of App::DuckPAN
-$App::DuckPAN::HasApp::VERSION = '1019';
+$App::DuckPAN::HasApp::VERSION = '1021';
 use Moo::Role;
 
 has app => (
@@ -21,7 +21,7 @@ App::DuckPAN::HasApp - Simple role for classes which carry an object of App::Duc
 
 =head1 VERSION
 
-version 1019
+version 1021
 
 =head1 AUTHOR
 

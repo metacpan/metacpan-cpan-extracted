@@ -1,7 +1,7 @@
 package App::DuckPAN::Config;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Configuration class of the duckpan client
-$App::DuckPAN::Config::VERSION = '1019';
+$App::DuckPAN::Config::VERSION = '1021';
 use Moo;
 use File::HomeDir;
 use Path::Tiny;
@@ -56,7 +56,7 @@ App::DuckPAN::Config - Configuration class of the duckpan client
 
 =head1 VERSION
 
-version 1019
+version 1021
 
 =head1 AUTHOR
 

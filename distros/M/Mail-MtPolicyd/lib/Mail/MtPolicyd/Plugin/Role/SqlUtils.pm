@@ -4,9 +4,13 @@ use strict;
 use Moose::Role;
 
 # ABSTRACT: role with support function for plugins using sql
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 requires '_db_handle';
+
+has 'mysql_engine' => (
+	is => 'rw', isa => 'Str', default => 'MyISAM',
+);
 
 sub sql_table_exists {
     my ( $self, $name ) = @_;
@@ -23,6 +27,7 @@ sub create_sql_table {
     my ( $self, $name, $definitions ) = @_;
   my $dbh = $self->_db_handle;
     my $table_name = $dbh->quote_identifier($name);
+    my $mysql_engine = $dbh->quote_identifier($self->mysql_engine);
     my $sql;
     my $driver = $dbh->{Driver}->{Name};
 
@@ -35,6 +40,9 @@ sub create_sql_table {
     }
 
     $sql =~ s/%TABLE_NAME%/$table_name/g;
+    if($driver eq 'mysql') {
+      $sql =~ s/%MYSQL_ENGINE%/$mysql_engine/g;
+    }
     $dbh->do( $sql );
     return;
 }
@@ -73,7 +81,7 @@ Mail::MtPolicyd::Plugin::Role::SqlUtils - role with support function for plugins
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 AUTHOR
 

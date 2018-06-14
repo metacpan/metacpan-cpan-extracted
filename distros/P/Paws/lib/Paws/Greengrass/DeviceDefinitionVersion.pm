@@ -31,14 +31,14 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Greengrass:
 
 =head1 DESCRIPTION
 
-Information on device definition version
+Information about a device definition version.
 
 =head1 ATTRIBUTES
 
 
 =head2 Devices => ArrayRef[L<Paws::Greengrass::Device>]
 
-  Devices in the definition version.
+  A list of devices in the definition version.
 
 
 
@@ -48,9 +48,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Greengras
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

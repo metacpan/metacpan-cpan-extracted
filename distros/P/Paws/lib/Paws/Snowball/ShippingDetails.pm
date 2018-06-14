@@ -42,13 +42,13 @@ numbers and shipping speed options.
 =head2 InboundShipment => L<Paws::Snowball::Shipment>
 
   The C<Status> and C<TrackingNumber> values for a Snowball being
-delivered to the address that you specified for a particular job.
+returned to AWS for a particular job.
 
 
 =head2 OutboundShipment => L<Paws::Snowball::Shipment>
 
   The C<Status> and C<TrackingNumber> values for a Snowball being
-returned to AWS for a particular job.
+delivered to the address that you specified for a particular job.
 
 
 =head2 ShippingOption => Str
@@ -92,9 +92,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Snowball>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

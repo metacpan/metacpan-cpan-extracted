@@ -4,7 +4,7 @@
       "Wesley Schwengle <waterkip@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
@@ -54,6 +54,8 @@
          "requires" : {
             "Carp" : "0",
             "Exporter" : "0",
+            "Getopt::Long" : "0",
+            "Pod::Usage" : "0",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
@@ -78,7 +80,7 @@
          "web" : "https://gitlab.com/waterkip/data-random-nl"
       }
    },
-   "version" : "1.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "version" : "1.4",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

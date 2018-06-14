@@ -10,41 +10,59 @@ package Paws::Greengrass::UpdateConnectivityInfo;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/greengrass/things/{ThingName}/connectivityInfo');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'PUT');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::Greengrass::UpdateConnectivityInfoResponse');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::Greengrass::UpdateConnectivityInfo - Arguments for method UpdateConnectivityInfo on Paws::Greengrass
+Paws::Greengrass::UpdateConnectivityInfo - Arguments for method UpdateConnectivityInfo on L<Paws::Greengrass>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateConnectivityInfo on the 
-AWS Greengrass service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateConnectivityInfo on the
+L<AWS Greengrass|Paws::Greengrass> service. Use the attributes of this class
 as arguments to method UpdateConnectivityInfo.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateConnectivityInfo.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateConnectivityInfo(Att1 => $value1, Att2 => $value2, ...);
+    my $greengrass = Paws->service('Greengrass');
+    my $UpdateConnectivityInfoResponse = $greengrass->UpdateConnectivityInfo(
+      ThingName        => 'My__string',
+      ConnectivityInfo => [
+        {
+          HostAddress => 'My__string',
+          Id          => 'My__string',
+          PortNumber  => 1,              # OPTIONAL
+          Metadata    => 'My__string',
+        },
+        ...
+      ],                                 # OPTIONAL
+    );
+
+    # Results:
+    my $Version = $UpdateConnectivityInfoResponse->Version;
+    my $Message = $UpdateConnectivityInfoResponse->Message;
+
+    # Returns a L<Paws::Greengrass::UpdateConnectivityInfoResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/greengrass/>
 
 =head1 ATTRIBUTES
 
 
 =head2 ConnectivityInfo => ArrayRef[L<Paws::Greengrass::ConnectivityInfo>]
 
-Connectivity info list
+A list of connectivity info.
 
 
 
 =head2 B<REQUIRED> ThingName => Str
 
-Thing Name
+The thing name.
 
 
 
@@ -55,9 +73,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateConnect
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

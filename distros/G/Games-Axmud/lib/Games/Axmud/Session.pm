@@ -758,6 +758,13 @@
             #                       'offline' mode session has finished, or an MXP crosslinking
             #                       operation is in progress)
             status                      => 'waiting',
+            # On disconnection, $self->reactDisconnect might be called before $self->doDisconnect
+            #   has finished (such as during blind mode, when the 'Disconnected' message is still
+            #   being read aloud)
+            # On the call to ->doDisconnect, this flag is set to TRUE. When the call finishes, it is
+            #   set back to FALSE. ->reactDisconnect (if called) won't do anything if this flag ist
+            #   TRUE
+            doDisconnectFlag            => FALSE,
             # On disconnection, $self->reactDisconnect is called from several places in the session
             #   code. In rare circumstances (such as the GA::Net::Telnet object returning TRUE to
             #   an ->eof() call), it might be called more than once
@@ -9731,7 +9738,7 @@
 
             if (defined $currentTab && $currentTab eq 'Current tasklist') {
 
-                # If there are currently any selected lines in the tab's Gtk2::Ex::Simple::List,
+                # If there are currently any selected lines in the tab's GA::Gtk::Simple::List,
                 #   remember them, so we can select them again as soon as the list is redrawn
                 @selectedList = $self->guiWin->notebookGetSelectedLines();
 
@@ -11039,7 +11046,14 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->doDisconnect', @_);
         }
 
+        # On disconnection, $self->reactDisconnect might be called before $self->doDisconnect has
+        #   finished (such as during blind mode, when the 'Disconnected' message is still being read
+        #   aloud). Use a flag to prevent ->reactDisconnect doing anything until this function is
+        #   finished
+        $self->ivPoke('doDisconnectFlag', TRUE);
+
         if ($self->status eq 'connecting' || $self->status eq 'connected') {
+
 
             # Terminate the connection
             $self->connectObj->close();
@@ -11113,6 +11127,9 @@
                 }
             }
         }
+
+        # Operation complete
+        $self->ivPoke('doDisconnectFlag', FALSE);
 
         return 1;
     }
@@ -11193,7 +11210,8 @@
         #               confirmation message
         #
         # Return values
-        #   'undef' on improper arguments or if this function has already been called
+        #   'undef' on improper arguments, if a call to $self->doDisconnect hasn't finished yet or
+        #       if this function has already been called
         #   1 otherwise
 
         my ($self, $flag, $check) = @_;
@@ -11204,16 +11222,23 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->reactDisconnect', @_);
         }
 
+        # On disconnection, this function might be called before $self->doDisconnect has finished
+        #   (such as during blind mode, when the 'Disconnected' message is still being read aloud).
+        #   Use a flag to prevent this
+        if ($self->doDisconnectFlag) {
+
+            return undef;
+
         # On disconnection, this function is called from several places in the session code. In
         #   rare circumstances (such as the GA::Net::Telnet object returning TRUE to an ->eof()
         #   call), it might be called more than once. Use a flag to ignore subsequent calls
-        if ($self->reactDisconnectFlag) {
+        } elsif ($self->reactDisconnectFlag) {
 
             return undef;
 
         } else {
 
-            # Ignore subsequent calls
+            # Ignore subsequent calls to this function
             $self->ivPoke('reactDisconnectFlag', TRUE);
         }
 
@@ -32241,7 +32266,7 @@
 
         # Local variables
         my (
-            $stripCmd,
+            $encodeCmd, $decodeCmd, $stripCmd,
             @charList,
         );
 
@@ -32249,6 +32274,20 @@
         if (! defined $cmd || ! defined $cage || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->dispatchCmd', @_);
+        }
+
+        # Deal with non-standard charsets
+        if (
+            $self->sessionCharSet ne $axmud::CLIENT->constCharSet
+            && $self->sessionCharSet ne 'null'
+        ) {
+            $encodeCmd = Encode::encode($self->sessionCharSet, $cmd);
+            $decodeCmd = Encode::decode($self->sessionCharSet, $encodeCmd);
+
+        } else {
+
+            $encodeCmd = $cmd;
+            $decodeCmd = $cmd;
         }
 
         # (If the server hasn't requested that the client stops echoing, or if the client didn't
@@ -32296,13 +32335,13 @@
 
                 if ($axmud::CLIENT->confirmWorldCmdFlag) {
 
-                    $self->currentTabObj->textViewObj->insertCmd($cmd);
+                    $self->currentTabObj->textViewObj->insertCmd($decodeCmd);
 
                 } elsif ($self->promptLine) {
 
                     # Send a newline character to cancel a prompt, so that the next line of text
                     #   received isn't displayed on the same line
-                    $self->currentTabObj->textViewObj->insertCmd($cmd);
+                    $self->currentTabObj->textViewObj->insertCmd($decodeCmd);
                 }
             }
 
@@ -32349,12 +32388,23 @@
             if (! $self->disableWorldCmdFlag) {
 
                 # Telnet specifies that only US-ASCII is allowed. Filter out everything else
-                $stripCmd = '';
-                foreach my $char (split(//, $cmd)) {
+                if (
+                    $self->sessionCharSet ne $axmud::CLIENT->constCharSet
+                    && $self->sessionCharSet ne 'null'
+                ) {
+                    # Exception - if using a non-standard character set, trust the Perl Encode
+                    #   module to take care of that stuff
+                    $stripCmd = $encodeCmd;
 
-                    if (ord($char) >= 0 && ord($char) <= 127) {
+                } else {
 
-                        $stripCmd .= $char;
+                    $stripCmd = '';
+                    foreach my $char (split(//, $cmd)) {
+
+                        if (ord($char) >= 0 && ord($char) <= 127) {
+
+                            $stripCmd .= $char;
+                        }
                     }
                 }
 
@@ -32435,6 +32485,14 @@
         if (! defined $inputString || ! defined $obscureString || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->dispatchPassword', @_);
+        }
+
+        # Deal with non-standard charsets
+        if (
+            $self->sessionCharSet ne $axmud::CLIENT->constCharSet
+            && $self->sessionCharSet ne 'null'
+        ) {
+            $inputString = Encode::encode($self->sessionCharSet, $inputString);
         }
 
         # If the connection is open, send the command to the world
@@ -40768,6 +40826,8 @@
         { $_[0]->{packetCount} }
     sub status
         { $_[0]->{status} }
+    sub doDisconnectFlag
+        { $_[0]->{doDisconnectFlag} }
     sub reactDisconnectFlag
         { $_[0]->{reactDisconnectFlag} }
 

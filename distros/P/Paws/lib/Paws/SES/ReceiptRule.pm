@@ -46,7 +46,8 @@ recipient address of the message, Amazon SES executes all of the
 receipt rule's actions on the message.
 
 For information about setting up receipt rules, see the Amazon SES
-Developer Guide.
+Developer Guide
+(http://docs.aws.amazon.com/ses/latest/DeveloperGuide/receiving-email-receipt-rules.html).
 
 =head1 ATTRIBUTES
 
@@ -71,7 +72,7 @@ receipt rule.
 
 =item *
 
-Contain only ASCII letters (a-z, A-Z), numbers (0-9), periods (.),
+This value can only contain ASCII letters (a-z, A-Z), numbers (0-9),
 underscores (_), or dashes (-).
 
 =item *
@@ -114,9 +115,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::SES>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

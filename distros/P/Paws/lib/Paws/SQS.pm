@@ -1,6 +1,7 @@
 package Paws::SQS;
   use Moose;
   sub service { 'sqs' }
+  sub signing_name { 'sqs' }
   sub version { '2012-11-05' }
   sub flattened_arrays { 1 }
   has max_attempts => (is => 'ro', isa => 'Int', default => 5);
@@ -11,7 +12,7 @@ package Paws::SQS;
        sub { defined $_[0]->http_status and $_[0]->http_status == 403 and $_[0]->code eq 'RequestThrottled' },
   ] });
 
-  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::QueryCaller', 'Paws::Net::XMLResponse';
+  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::QueryCaller';
 
   has '+region_rules' => (default => sub {
     my $regioninfo;
@@ -107,6 +108,11 @@ package Paws::SQS;
     my $call_object = $self->new_with_coercions('Paws::SQS::ListQueues', @_);
     return $self->caller->do_call($self, $call_object);
   }
+  sub ListQueueTags {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::SQS::ListQueueTags', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
   sub PurgeQueue {
     my $self = shift;
     my $call_object = $self->new_with_coercions('Paws::SQS::PurgeQueue', @_);
@@ -137,10 +143,20 @@ package Paws::SQS;
     my $call_object = $self->new_with_coercions('Paws::SQS::SetQueueAttributes', @_);
     return $self->caller->do_call($self, $call_object);
   }
+  sub TagQueue {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::SQS::TagQueue', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub UntagQueue {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::SQS::UntagQueue', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
   
 
 
-  sub operations { qw/AddPermission ChangeMessageVisibility ChangeMessageVisibilityBatch CreateQueue DeleteMessage DeleteMessageBatch DeleteQueue GetQueueAttributes GetQueueUrl ListDeadLetterSourceQueues ListQueues PurgeQueue ReceiveMessage RemovePermission SendMessage SendMessageBatch SetQueueAttributes / }
+  sub operations { qw/AddPermission ChangeMessageVisibility ChangeMessageVisibilityBatch CreateQueue DeleteMessage DeleteMessageBatch DeleteQueue GetQueueAttributes GetQueueUrl ListDeadLetterSourceQueues ListQueues ListQueueTags PurgeQueue ReceiveMessage RemovePermission SendMessage SendMessageBatch SetQueueAttributes TagQueue UntagQueue / }
 
 1;
 
@@ -175,13 +191,16 @@ hosted queue for storing messages as they travel between applications
 or microservices. Amazon SQS moves data between distributed application
 components and helps you decouple these components.
 
-Standard queues are available in all regions. FIFO queues are available
-in the US East (N. Virginia), US East (Ohio), US West (Oregon), and EU
-(Ireland) regions.
+Standard queues
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/standard-queues.html)
+are available in all regions. FIFO queues
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html)
+are available in the US East (N. Virginia), US East (Ohio), US West
+(Oregon), and EU (Ireland) regions.
 
-You can use AWS SDKs to access Amazon SQS using your favorite
-programming language. The SDKs perform tasks such as the following
-automatically:
+You can use AWS SDKs (http://aws.amazon.com/tools/#sdk) to access
+Amazon SQS using your favorite programming language. The SDKs perform
+tasks such as the following automatically:
 
 =over
 
@@ -205,25 +224,28 @@ B<Additional Information>
 
 =item *
 
-Amazon SQS Product Page
+Amazon SQS Product Page (http://aws.amazon.com/sqs/)
 
 =item *
 
-I<Amazon SQS Developer Guide>
+I<Amazon Simple Queue Service Developer Guide>
 
 =over
 
 =item *
 
 Making API Requests
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/MakingRequestsArticle.html)
 
 =item *
 
 Using Amazon SQS Message Attributes
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-message-attributes.html)
 
 =item *
 
 Using Amazon SQS Dead-Letter Queues
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html)
 
 =back
 
@@ -236,32 +258,54 @@ I<Amazon Web Services General Reference>
 =item *
 
 Regions and Endpoints
+(http://docs.aws.amazon.com/general/latest/gr/rande.html#sqs_region)
 
 =back
 
 =back
+
+
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/sqs-2012-11-05>
 
 
 =head1 METHODS
 
-=head2 AddPermission(Actions => ArrayRef[Str|Undef], AWSAccountIds => ArrayRef[Str|Undef], Label => Str, QueueUrl => Str)
+=head2 AddPermission
+
+=over
+
+=item Actions => ArrayRef[Str|Undef]
+
+=item AWSAccountIds => ArrayRef[Str|Undef]
+
+=item Label => Str
+
+=item QueueUrl => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::SQS::AddPermission>
 
 Returns: nothing
 
-  Adds a permission to a queue for a specific principal. This allows
-sharing access to the queue.
+Adds a permission to a queue for a specific principal
+(http://docs.aws.amazon.com/general/latest/gr/glos-chap.html#P). This
+allows sharing access to the queue.
 
 When you create a queue, you have full control access rights for the
 queue. Only you, the owner of the queue, can grant or deny permissions
 to the queue. For more information about these permissions, see Shared
-Queues in the I<Amazon SQS Developer Guide>.
+Queues
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/acp-overview.html)
+in the I<Amazon Simple Queue Service Developer Guide>.
 
 C<AddPermission> writes an Amazon-SQS-generated policy. If you want to
 write your own policy, use C< SetQueueAttributes > to upload your
 policy. For more information about writing your own policy, see Using
-The Access Policy Language in the I<Amazon SQS Developer Guide>.
+The Access Policy Language
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/AccessPolicyLanguage.html)
+in the I<Amazon Simple Queue Service Developer Guide>.
 
 Some actions take lists of parameters. These lists are specified using
 the C<param.n> notation. Values of C<n> are integers starting from 1.
@@ -272,17 +316,30 @@ C<&Attribute.1=this>
 C<&Attribute.2=that>
 
 
-=head2 ChangeMessageVisibility(QueueUrl => Str, ReceiptHandle => Str, VisibilityTimeout => Int)
+=head2 ChangeMessageVisibility
+
+=over
+
+=item QueueUrl => Str
+
+=item ReceiptHandle => Str
+
+=item VisibilityTimeout => Int
+
+
+=back
 
 Each argument is described in detail in: L<Paws::SQS::ChangeMessageVisibility>
 
 Returns: nothing
 
-  Changes the visibility timeout of a specified message in a queue to a
+Changes the visibility timeout of a specified message in a queue to a
 new value. The maximum allowed timeout value is 12 hours. Thus, you
 can't extend the timeout of a message in an existing queue to more than
 a total visibility timeout of 12 hours. For more information, see
-Visibility Timeout in the I<Amazon SQS Developer Guide>.
+Visibility Timeout
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html)
+in the I<Amazon Simple Queue Service Developer Guide>.
 
 For example, you have a message with a visibility timeout of 5 minutes.
 After 3 minutes, you call C<ChangeMessageVisiblity> with a timeout of
@@ -319,13 +376,22 @@ C<ChangeMessageVisibility> action) the next time the message is
 received.
 
 
-=head2 ChangeMessageVisibilityBatch(Entries => ArrayRef[L<Paws::SQS::ChangeMessageVisibilityBatchRequestEntry>], QueueUrl => Str)
+=head2 ChangeMessageVisibilityBatch
+
+=over
+
+=item Entries => ArrayRef[L<Paws::SQS::ChangeMessageVisibilityBatchRequestEntry>]
+
+=item QueueUrl => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::SQS::ChangeMessageVisibilityBatch>
 
 Returns: a L<Paws::SQS::ChangeMessageVisibilityBatchResult> instance
 
-  Changes the visibility timeout of multiple messages. This is a batch
+Changes the visibility timeout of multiple messages. This is a batch
 version of C< ChangeMessageVisibility.> The result of the action on
 each message is reported individually in the response. You can send up
 to 10 C< ChangeMessageVisibility > requests with each
@@ -344,13 +410,22 @@ C<&Attribute.1=this>
 C<&Attribute.2=that>
 
 
-=head2 CreateQueue(QueueName => Str, [Attributes => L<Paws::SQS::QueueAttributeMap>])
+=head2 CreateQueue
+
+=over
+
+=item QueueName => Str
+
+=item [Attributes => L<Paws::SQS::QueueAttributeMap>]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::SQS::CreateQueue>
 
 Returns: a L<Paws::SQS::CreateQueueResult> instance
 
-  Creates a new standard or FIFO queue. You can pass one or more
+Creates a new standard or FIFO queue. You can pass one or more
 attributes in the request. Keep the following caveats in mind:
 
 =over
@@ -364,8 +439,9 @@ You can't change the queue type after you create it and you can't
 convert an existing standard queue into a FIFO queue. You must either
 create a new FIFO queue for your application or delete your existing
 standard queue and recreate it as a FIFO queue. For more information,
-see Moving From a Standard Queue to a FIFO Queue in the I<Amazon SQS
-Developer Guide>.
+see Moving From a Standard Queue to a FIFO Queue
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html#FIFO-queues-moving)
+in the I<Amazon Simple Queue Service Developer Guide>.
 
 =item *
 
@@ -380,8 +456,9 @@ creating a queue with the same name.
 =back
 
 To successfully create a new queue, you must provide a queue name that
-adheres to the limits related to queues and is unique within the scope
-of your queues.
+adheres to the limits related to queues
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/limits-queues.html)
+and is unique within the scope of your queues.
 
 To get the queue URL, use the C< GetQueueUrl > action. C< GetQueueUrl >
 requires only the C<QueueName> parameter. be aware of existing queue
@@ -411,13 +488,22 @@ C<&Attribute.1=this>
 C<&Attribute.2=that>
 
 
-=head2 DeleteMessage(QueueUrl => Str, ReceiptHandle => Str)
+=head2 DeleteMessage
+
+=over
+
+=item QueueUrl => Str
+
+=item ReceiptHandle => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::SQS::DeleteMessage>
 
 Returns: nothing
 
-  Deletes the specified message from the specified queue. You specify the
+Deletes the specified message from the specified queue. You specify the
 message by using the message's I<receipt handle> and not the
 I<MessageId> you receive when you send the message. Even if the message
 is locked by another reader due to the visibility timeout setting, it
@@ -441,13 +527,22 @@ your application is idempotent, so that receiving a message more than
 once does not cause issues.
 
 
-=head2 DeleteMessageBatch(Entries => ArrayRef[L<Paws::SQS::DeleteMessageBatchRequestEntry>], QueueUrl => Str)
+=head2 DeleteMessageBatch
+
+=over
+
+=item Entries => ArrayRef[L<Paws::SQS::DeleteMessageBatchRequestEntry>]
+
+=item QueueUrl => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::SQS::DeleteMessageBatch>
 
 Returns: a L<Paws::SQS::DeleteMessageBatchResult> instance
 
-  Deletes up to ten messages from the specified queue. This is a batch
+Deletes up to ten messages from the specified queue. This is a batch
 version of C< DeleteMessage.> The result of the action on each message
 is reported individually in the response.
 
@@ -464,13 +559,20 @@ C<&Attribute.1=this>
 C<&Attribute.2=that>
 
 
-=head2 DeleteQueue(QueueUrl => Str)
+=head2 DeleteQueue
+
+=over
+
+=item QueueUrl => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::SQS::DeleteQueue>
 
 Returns: nothing
 
-  Deletes the queue specified by the C<QueueUrl>, regardless of the
+Deletes the queue specified by the C<QueueUrl>, regardless of the
 queue's contents. If the specified queue doesn't exist, Amazon SQS
 returns a successful response.
 
@@ -486,16 +588,26 @@ When you delete a queue, you must wait at least 60 seconds before
 creating a queue with the same name.
 
 
-=head2 GetQueueAttributes(QueueUrl => Str, [AttributeNames => ArrayRef[Str|Undef]])
+=head2 GetQueueAttributes
+
+=over
+
+=item QueueUrl => Str
+
+=item [AttributeNames => ArrayRef[Str|Undef]]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::SQS::GetQueueAttributes>
 
 Returns: a L<Paws::SQS::GetQueueAttributesResult> instance
 
-  Gets attributes for the specified queue.
+Gets attributes for the specified queue.
 
-To determine whether a queue is FIFO, you can check whether
-C<QueueName> ends with the C<.fifo> suffix.
+To determine whether a queue is FIFO
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html),
+you can check whether C<QueueName> ends with the C<.fifo> suffix.
 
 Some actions take lists of parameters. These lists are specified using
 the C<param.n> notation. Values of C<n> are integers starting from 1.
@@ -506,55 +618,142 @@ C<&Attribute.1=this>
 C<&Attribute.2=that>
 
 
-=head2 GetQueueUrl(QueueName => Str, [QueueOwnerAWSAccountId => Str])
+=head2 GetQueueUrl
+
+=over
+
+=item QueueName => Str
+
+=item [QueueOwnerAWSAccountId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::SQS::GetQueueUrl>
 
 Returns: a L<Paws::SQS::GetQueueUrlResult> instance
 
-  Returns the URL of an existing queue. This action provides a simple way
+Returns the URL of an existing queue. This action provides a simple way
 to retrieve the URL of an Amazon SQS queue.
 
 To access a queue that belongs to another AWS account, use the
 C<QueueOwnerAWSAccountId> parameter to specify the account ID of the
 queue's owner. The queue's owner must grant you permission to access
 the queue. For more information about shared queue access, see C<
-AddPermission > or see Shared Queues in the I<Amazon SQS Developer
-Guide>.
+AddPermission > or see Shared Queues
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/acp-overview.html)
+in the I<Amazon Simple Queue Service Developer Guide>.
 
 
-=head2 ListDeadLetterSourceQueues(QueueUrl => Str)
+=head2 ListDeadLetterSourceQueues
+
+=over
+
+=item QueueUrl => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::SQS::ListDeadLetterSourceQueues>
 
 Returns: a L<Paws::SQS::ListDeadLetterSourceQueuesResult> instance
 
-  Returns a list of your queues that have the C<RedrivePolicy> queue
+Returns a list of your queues that have the C<RedrivePolicy> queue
 attribute configured with a dead-letter queue.
 
 For more information about using dead-letter queues, see Using Amazon
-SQS Dead-Letter Queues in the I<Amazon SQS Developer Guide>.
+SQS Dead-Letter Queues
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html)
+in the I<Amazon Simple Queue Service Developer Guide>.
 
 
-=head2 ListQueues([QueueNamePrefix => Str])
+=head2 ListQueues
+
+=over
+
+=item [QueueNamePrefix => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::SQS::ListQueues>
 
 Returns: a L<Paws::SQS::ListQueuesResult> instance
 
-  Returns a list of your queues. The maximum number of queues that can be
+Returns a list of your queues. The maximum number of queues that can be
 returned is 1,000. If you specify a value for the optional
 C<QueueNamePrefix> parameter, only queues with a name that begins with
 the specified value are returned.
 
 
-=head2 PurgeQueue(QueueUrl => Str)
+=head2 ListQueueTags
+
+=over
+
+=item QueueUrl => Str
+
+
+=back
+
+Each argument is described in detail in: L<Paws::SQS::ListQueueTags>
+
+Returns: a L<Paws::SQS::ListQueueTagsResult> instance
+
+List all cost allocation tags added to the specified Amazon SQS queue.
+For an overview, see Tagging Amazon SQS Queues
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-tagging-queues.html)
+in the I<Amazon Simple Queue Service Developer Guide>.
+
+When you use queue tags, keep the following guidelines in mind:
+
+=over
+
+=item *
+
+Adding more than 50 tags to a queue isn't recommended.
+
+=item *
+
+Tags don't have any semantic meaning. Amazon SQS interprets tags as
+character strings.
+
+=item *
+
+Tags are case-sensitive.
+
+=item *
+
+A new tag with a key identical to that of an existing tag overwrites
+the existing tag.
+
+=item *
+
+Tagging API actions are limited to 5 TPS per AWS account. If your
+application requires a higher throughput, file a technical support
+request
+(https://console.aws.amazon.com/support/home#/case/create?issueType=technical).
+
+=back
+
+For a full list of tag restrictions, see Limits Related to Queues
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/limits-queues.html)
+in the I<Amazon Simple Queue Service Developer Guide>.
+
+
+=head2 PurgeQueue
+
+=over
+
+=item QueueUrl => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::SQS::PurgeQueue>
 
 Returns: nothing
 
-  Deletes the messages in a queue specified by the C<QueueURL> parameter.
+Deletes the messages in a queue specified by the C<QueueURL> parameter.
 
 When you use the C<PurgeQueue> action, you can't retrieve a message
 deleted from a queue.
@@ -567,16 +766,36 @@ messages sent to the queue before C<PurgeQueue> is called might be
 received, but are deleted within the next minute.
 
 
-=head2 ReceiveMessage(QueueUrl => Str, [AttributeNames => ArrayRef[Str|Undef], MaxNumberOfMessages => Int, MessageAttributeNames => ArrayRef[Str|Undef], ReceiveRequestAttemptId => Str, VisibilityTimeout => Int, WaitTimeSeconds => Int])
+=head2 ReceiveMessage
+
+=over
+
+=item QueueUrl => Str
+
+=item [AttributeNames => ArrayRef[Str|Undef]]
+
+=item [MaxNumberOfMessages => Int]
+
+=item [MessageAttributeNames => ArrayRef[Str|Undef]]
+
+=item [ReceiveRequestAttemptId => Str]
+
+=item [VisibilityTimeout => Int]
+
+=item [WaitTimeSeconds => Int]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::SQS::ReceiveMessage>
 
 Returns: a L<Paws::SQS::ReceiveMessageResult> instance
 
-  Retrieves one or more messages (up to 10), from the specified queue.
+Retrieves one or more messages (up to 10), from the specified queue.
 Using the C<WaitTimeSeconds> parameter enables long-poll support. For
-more information, see Amazon SQS Long Polling in the I<Amazon SQS
-Developer Guide>.
+more information, see Amazon SQS Long Polling
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-long-polling.html)
+in the I<Amazon Simple Queue Service Developer Guide>.
 
 Short poll is the default behavior where a weighted random set of
 machines is sampled on a C<ReceiveMessage> call. Thus, only the
@@ -598,7 +817,7 @@ The message body.
 =item *
 
 An MD5 digest of the message body. For information about MD5, see
-RFC1321.
+RFC1321 (https://www.ietf.org/rfc/rfc1321.txt).
 
 =item *
 
@@ -619,15 +838,17 @@ An MD5 digest of the message attributes.
 =back
 
 The receipt handle is the identifier you must provide when deleting the
-message. For more information, see Queue and Message Identifiers in the
-I<Amazon SQS Developer Guide>.
+message. For more information, see Queue and Message Identifiers
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-queue-message-identifiers.html)
+in the I<Amazon Simple Queue Service Developer Guide>.
 
 You can provide the C<VisibilityTimeout> parameter in your request. The
 parameter is applied to the messages that Amazon SQS returns in the
 response. If you don't include the parameter, the overall visibility
 timeout for the queue is used for the returned messages. For more
-information, see Visibility Timeout in the I<Amazon SQS Developer
-Guide>.
+information, see Visibility Timeout
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html)
+in the I<Amazon Simple Queue Service Developer Guide>.
 
 A message that isn't deleted or a message whose visibility isn't
 extended before the visibility timeout expires counts as a failed
@@ -639,23 +860,49 @@ calls this action, we recommend that you structure your code so that it
 can handle new attributes gracefully.
 
 
-=head2 RemovePermission(Label => Str, QueueUrl => Str)
+=head2 RemovePermission
+
+=over
+
+=item Label => Str
+
+=item QueueUrl => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::SQS::RemovePermission>
 
 Returns: nothing
 
-  Revokes any permissions in the queue policy that matches the specified
+Revokes any permissions in the queue policy that matches the specified
 C<Label> parameter. Only the owner of the queue can remove permissions.
 
 
-=head2 SendMessage(MessageBody => Str, QueueUrl => Str, [DelaySeconds => Int, MessageAttributes => L<Paws::SQS::MessageBodyAttributeMap>, MessageDeduplicationId => Str, MessageGroupId => Str])
+=head2 SendMessage
+
+=over
+
+=item MessageBody => Str
+
+=item QueueUrl => Str
+
+=item [DelaySeconds => Int]
+
+=item [MessageAttributes => L<Paws::SQS::MessageBodyAttributeMap>]
+
+=item [MessageDeduplicationId => Str]
+
+=item [MessageGroupId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::SQS::SendMessage>
 
 Returns: a L<Paws::SQS::SendMessageResult> instance
 
-  Delivers a message to the specified queue.
+Delivers a message to the specified queue.
 
 A message can include only XML, JSON, and unformatted text. The
 following Unicode characters are allowed:
@@ -664,16 +911,26 @@ C<#x9> | C<#xA> | C<#xD> | C<#x20> to C<#xD7FF> | C<#xE000> to
 C<#xFFFD> | C<#x10000> to C<#x10FFFF>
 
 Any characters not included in this list will be rejected. For more
-information, see the W3C specification for characters.
+information, see the W3C specification for characters
+(http://www.w3.org/TR/REC-xml/#charsets).
 
 
-=head2 SendMessageBatch(Entries => ArrayRef[L<Paws::SQS::SendMessageBatchRequestEntry>], QueueUrl => Str)
+=head2 SendMessageBatch
+
+=over
+
+=item Entries => ArrayRef[L<Paws::SQS::SendMessageBatchRequestEntry>]
+
+=item QueueUrl => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::SQS::SendMessageBatch>
 
 Returns: a L<Paws::SQS::SendMessageBatchResult> instance
 
-  Delivers up to ten messages to the specified queue. This is a batch
+Delivers up to ten messages to the specified queue. This is a batch
 version of C< SendMessage.> For a FIFO queue, multiple messages within
 a single batch are enqueued in the order they are sent.
 
@@ -693,7 +950,8 @@ C<#x9> | C<#xA> | C<#xD> | C<#x20> to C<#xD7FF> | C<#xE000> to
 C<#xFFFD> | C<#x10000> to C<#x10FFFF>
 
 Any characters not included in this list will be rejected. For more
-information, see the W3C specification for characters.
+information, see the W3C specification for characters
+(http://www.w3.org/TR/REC-xml/#charsets).
 
 If you don't specify the C<DelaySeconds> parameter for an entry, Amazon
 SQS uses the default value for the queue.
@@ -707,13 +965,22 @@ C<&Attribute.1=this>
 C<&Attribute.2=that>
 
 
-=head2 SetQueueAttributes(Attributes => L<Paws::SQS::QueueAttributeMap>, QueueUrl => Str)
+=head2 SetQueueAttributes
+
+=over
+
+=item Attributes => L<Paws::SQS::QueueAttributeMap>
+
+=item QueueUrl => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::SQS::SetQueueAttributes>
 
 Returns: nothing
 
-  Sets the value of one or more queue attributes. When you change a
+Sets the value of one or more queue attributes. When you change a
 queue's attributes, the change can take up to 60 seconds for most of
 the attributes to propagate throughout the Amazon SQS system. Changes
 made to the C<MessageRetentionPeriod> attribute can take up to 15
@@ -722,6 +989,118 @@ minutes.
 In the future, new attributes might be added. If you write code that
 calls this action, we recommend that you structure your code so that it
 can handle new attributes gracefully.
+
+
+=head2 TagQueue
+
+=over
+
+=item QueueUrl => Str
+
+=item Tags => L<Paws::SQS::TagMap>
+
+
+=back
+
+Each argument is described in detail in: L<Paws::SQS::TagQueue>
+
+Returns: nothing
+
+Add cost allocation tags to the specified Amazon SQS queue. For an
+overview, see Tagging Amazon SQS Queues
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-tagging-queues.html)
+in the I<Amazon Simple Queue Service Developer Guide>.
+
+When you use queue tags, keep the following guidelines in mind:
+
+=over
+
+=item *
+
+Adding more than 50 tags to a queue isn't recommended.
+
+=item *
+
+Tags don't have any semantic meaning. Amazon SQS interprets tags as
+character strings.
+
+=item *
+
+Tags are case-sensitive.
+
+=item *
+
+A new tag with a key identical to that of an existing tag overwrites
+the existing tag.
+
+=item *
+
+Tagging API actions are limited to 5 TPS per AWS account. If your
+application requires a higher throughput, file a technical support
+request
+(https://console.aws.amazon.com/support/home#/case/create?issueType=technical).
+
+=back
+
+For a full list of tag restrictions, see Limits Related to Queues
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/limits-queues.html)
+in the I<Amazon Simple Queue Service Developer Guide>.
+
+
+=head2 UntagQueue
+
+=over
+
+=item QueueUrl => Str
+
+=item TagKeys => ArrayRef[Str|Undef]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::SQS::UntagQueue>
+
+Returns: nothing
+
+Remove cost allocation tags from the specified Amazon SQS queue. For an
+overview, see Tagging Amazon SQS Queues
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-tagging-queues.html)
+in the I<Amazon Simple Queue Service Developer Guide>.
+
+When you use queue tags, keep the following guidelines in mind:
+
+=over
+
+=item *
+
+Adding more than 50 tags to a queue isn't recommended.
+
+=item *
+
+Tags don't have any semantic meaning. Amazon SQS interprets tags as
+character strings.
+
+=item *
+
+Tags are case-sensitive.
+
+=item *
+
+A new tag with a key identical to that of an existing tag overwrites
+the existing tag.
+
+=item *
+
+Tagging API actions are limited to 5 TPS per AWS account. If your
+application requires a higher throughput, file a technical support
+request
+(https://console.aws.amazon.com/support/home#/case/create?issueType=technical).
+
+=back
+
+For a full list of tag restrictions, see Limits Related to Queues
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/limits-queues.html)
+in the I<Amazon Simple Queue Service Developer Guide>.
 
 
 
@@ -739,9 +1118,9 @@ This service class forms part of L<Paws>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

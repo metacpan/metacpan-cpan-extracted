@@ -2,7 +2,7 @@ package Mail::MtPolicyd::SessionCache::Redis;
 
 use Moose;
 
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
 # ABSTRACT: a session cache adapter for redis
 
 use Time::HiRes qw(usleep);
@@ -97,7 +97,7 @@ Mail::MtPolicyd::SessionCache::Redis - a session cache adapter for redis
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 SYNOPSIS
 

@@ -5,11 +5,9 @@ use warnings;
 use Net::Azure::Authorization::SAS;
 use Net::Azure::NotificationHubs::Request;
 use JSON;
-use LWP::UserAgent;
+use HTTP::Tiny;
 use URI;
-use HTTP::Request;
 use Carp;
-use Try::Tiny;
 use String::CamelCase qw/camelize wordsplit/;
 use Class::Accessor::Lite (
     new => 0,
@@ -23,22 +21,23 @@ use Class::Accessor::Lite (
     ]],
 );
 
-our $VERSION             = "0.02";
+our $VERSION             = "0.07";
 our $DEFAULT_API_VERSION = "2015-04";
 our $DEFAULT_TIMEOUT     = 60;
 
 sub new {
     my ($class, %param) = @_;
     
-    $param{agent}         = LWP::UserAgent->new(agent => sprintf('%s/%s', $class, $VERSION));
+    $param{agent}         = HTTP::Tiny->new(agent => sprintf('%s/%s', $class, $VERSION));
     $param{serializer}    = JSON->new->utf8(1);
     $param{api_version} ||= $DEFAULT_API_VERSION;
 
     if (!defined $param{authorizer}) {
-        $param{authorizer} = try {
+        $param{authorizer} = eval {
             Net::Azure::Authorization::SAS->new(connection_string => $param{connection_string});
-        } catch {
-            croak $_;
+        };
+        if ($@) {
+            croak $@;
         };
     }
 
@@ -66,10 +65,10 @@ sub _req {
     my $data = $self->serializer->encode($payload);
     my $req  = Net::Azure::NotificationHubs::Request->new(
         POST => $uri->as_string,
-        [ 
+        { 
             'Authorization' => $auth,
             'Content-Type'  => 'application/atom+xml;charset=utf-8',
-        ],
+        },
         $data,
     );
     $req->agent($self->agent);
@@ -185,7 +184,7 @@ Set specified value to 'ServiceBusNotification-Format' header.
 
 =back
 
-head1 LICENSE
+=head1 LICENSE
 
 Copyright (C) ytnobody.
 

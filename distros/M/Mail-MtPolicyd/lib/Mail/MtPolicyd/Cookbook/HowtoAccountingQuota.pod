@@ -13,7 +13,7 @@ Mail::MtPolicyd::Cookbook::HowtoAccountingQuota - How to setup smtp level accoun
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 SMTP level accounting and quotas with mtpolicyd
 

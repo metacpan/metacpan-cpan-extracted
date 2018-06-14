@@ -1,7 +1,7 @@
 package App::DuckPAN::Cmd::Env::Cmd::Rm;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Removes the specified env variable
-$App::DuckPAN::Cmd::Env::Cmd::Rm::VERSION = '1019';
+$App::DuckPAN::Cmd::Env::Cmd::Rm::VERSION = '1021';
 use Moo;
 with qw( App::DuckPAN::Cmd::Env::Cmd );
 
@@ -28,7 +28,7 @@ App::DuckPAN::Cmd::Env::Cmd::Rm - Removes the specified env variable
 
 =head1 VERSION
 
-version 1019
+version 1021
 
 =head1 AUTHOR
 

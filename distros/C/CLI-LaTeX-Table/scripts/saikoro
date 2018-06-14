@@ -1,11 +1,12 @@
-#!/usr/bin/perl
+#!/usr/bin/perl 
 use 5.014 ; use strict ; use warnings ;
-use Getopt::Std ; getopts '~.:g:s:qy:', \my %o ; #or HELP_MESSAGE () ;
+use Getopt::Std ; getopts '/:~.:g:s:qy:', \my %o ; #or HELP_MESSAGE () ;
 use Term::ANSIColor qw[ :constants ] ; $Term::ANSIColor::AUTORESET = 1 ; 
 
 # 乱数を生成する関数設定
 sub rand_gen ( ) ; 
 
+my $osep = $o{'/'} // "\t" ; # 出力の横方向の区切り文字
 my ($r,$c) ; # 列数 と 行数
 my ($d,$u) ; # 下限 と 上限
 
@@ -19,7 +20,7 @@ sub init ( ) {
     $o{s} = defined $o{s} ? srand $o{s} : srand ; 
 
      # 列数と行数
-    ( $c, $r ) = split /[,x]+/ , $o{g} // '' , 2 ; 
+    ( $r, $c ) = split /[,x]+/ , $o{g} // '' , 2 ; 
     $c //= 1 ; # 列数の未指定値
     $r //= 12 ; # 行数の未指定値
     ( $r, $c ) = ( $c, $r ) if $o{'~'} ; 
@@ -37,7 +38,7 @@ sub init ( ) {
 
 sub main ( ) {
     for ( 1 .. $r ) { 
-        print join "\t" , map { rand_gen } 1 .. $c ;
+        print join $osep , map { rand_gen } 1 .. $c ;
         print "\n" ; 
     }
 }
@@ -46,7 +47,7 @@ sub info ( ) {
     exit 0 if $o{q} ;
     $0 =~ s|.*/||;
     print STDERR CYAN "used random seed = $o{s} ($0 -s $o{s} -g ${c}x${r} -y $d..$u" . 
-       (defined $o{'.'} ? " -. $o{'.'})" : '' ) ."\n" ;
+       (defined $o{'.'} ? " -. $o{'.'}" : '' ) .")\n" ;
 }
 
 sub VERSION_MESSAGE {}
@@ -95,13 +96,15 @@ sub HELP_MESSAGE {
 
  オプション:  
    -g N     ; Get N random variables.
-   -g N1,N2 ; Get N1 times N2 variables. N1 for horizontal, N2 for vertical.
+   -g N1,N2 ; Get N1 times N2 variables. N1 for vertical, N2 for horizontal.
    -~       ; Number specifications N1 and N2 are reversed.
    -y N1,N2 ; Limit the values in [N1,N2].  Form "-y N1..N2" is also allowed. 
 
    -. N     : Switch to continuous from discrete. N digits after decimal points by rounding.
    -q       : Switch to no secondary information that would be output to STDOUT. (Quiet)
    -s N     : Random seeed specification. Essentially the residual divided by 2^32 is used.
+
+   -/ char  : Specifies the horizontal separator character.
 
     --help : Print this online help manual of this command "'=SCRIPT='". Similar to "perldoc `which [-t] '=SCRIPT='` ".
     --help opt ..or..  --help options : Only shows the option helps. It is easy to read when you are in very necessary.
@@ -120,13 +123,15 @@ sub HELP_MESSAGE {
 
  オプション:  
    -g N     ; 乱数をN行1列の形で出力する。
-   -g N1,N2 ; 乱数をN2行N1列の形で出力する。区切り文字は , の代わりに、xでも良い。 (Get)
+   -g N1,N2 ; 乱数をN1行N2列の形で出力する。区切り文字は , の代わりに、xでも良い。 (Get)
    -~       ; 出力する行数と列数の指定を反転する。
    -y N1,N2 ; 乱数の値をn1とn2の範囲とする。 -y N1..N2 の形式も許容される。
 
    -. N     : 出力は整数ではなく、連続型の一様乱数になる。小数点以下N桁が出力される。四捨五入(sprintfに依存)。
    -q       : ランダムシードの情報を出力しない。
    -s N     : ランダムシードの指定。2^32 (約43億<10^10) で割った剰余が渡される。
+
+   -/ char  : 出力の(横方向の)区切り文字の指定
 
   --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
   --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。

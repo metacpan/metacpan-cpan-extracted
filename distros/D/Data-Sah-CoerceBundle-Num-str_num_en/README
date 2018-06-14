@@ -1,0 +1,40 @@
+NAME
+    Data::Sah::CoerceBundle::Num::str_num_en - Use Parse::Number::EN to
+    parse number
+
+VERSION
+    This document describes version 0.001 of
+    Data::Sah::CoerceBundle::Num::str_num_en (from Perl distribution
+    Data-Sah-CoerceBundle-Num-str_num_en), released on 2018-06-11.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Sah-CoerceBundle-Num-str_num_en>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Sah-CoerceBundle-Num-str_num_en>
+    .
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-CoerceBundle
+    -Num-str_num_en>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Parse::Number::EN
+
+    Parse::Number::ID and Data::Sah::CoerceBundle::Num::str_num_id
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

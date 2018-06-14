@@ -1,5 +1,11 @@
 Revision history for Perl extension RPi::DHT11
 
+1.04    2018-06-09
+        - no functional changes
+        - ensure checks and bounds are performed before running tests. Some CPAN
+          Testers were failing
+        - update Makefile.PL, and exit() if wiringPi.h is not found
+
 1.03    2017-06-27
         - no functional or documentation changes
         - add Test::More build requirement of version 1.302078. This allows us

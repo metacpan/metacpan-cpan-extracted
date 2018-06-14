@@ -3,6 +3,7 @@ package Paws::DeviceFarm::ExecutionConfiguration;
   has AccountsCleanup => (is => 'ro', isa => 'Bool', request_name => 'accountsCleanup', traits => ['NameInRequest']);
   has AppPackagesCleanup => (is => 'ro', isa => 'Bool', request_name => 'appPackagesCleanup', traits => ['NameInRequest']);
   has JobTimeoutMinutes => (is => 'ro', isa => 'Int', request_name => 'jobTimeoutMinutes', traits => ['NameInRequest']);
+  has SkipAppResign => (is => 'ro', isa => 'Bool', request_name => 'skipAppResign', traits => ['NameInRequest']);
 1;
 
 ### main pod documentation begin ###
@@ -22,7 +23,7 @@ Each attribute should be used as a named argument in the calls that expect this 
 
 As an example, if Att1 is expected to be a Paws::DeviceFarm::ExecutionConfiguration object:
 
-  $service_obj->Method(Att1 => { AccountsCleanup => $value, ..., JobTimeoutMinutes => $value  });
+  $service_obj->Method(Att1 => { AccountsCleanup => $value, ..., SkipAppResign => $value  });
 
 =head3 Results returned from an API call
 
@@ -56,6 +57,17 @@ otherwise, false.
   The number of minutes a test run will execute before it times out.
 
 
+=head2 SkipAppResign => Bool
+
+  When set to C<true>, for private devices, Device Farm will not sign
+your app again. For public devices, Device Farm always signs your apps
+again and this parameter has no effect.
+
+For more information about how Device Farm re-signs your app(s), see Do
+you modify my app? (https://aws.amazon.com/device-farm/faq/) in the
+I<AWS Device Farm FAQs>.
+
+
 
 =head1 SEE ALSO
 
@@ -63,9 +75,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::DeviceFar
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

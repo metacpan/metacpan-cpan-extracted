@@ -1,0 +1,8 @@
+Test Menu Item 1:
+    working_dir: ../../t
+    commands : 
+      - ls
+Test Menu Item 2:
+    working_dir: /../../
+    commands: 
+        - dir

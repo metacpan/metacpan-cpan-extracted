@@ -16,21 +16,38 @@ package Paws::STS::GetFederationToken;
 
 =head1 NAME
 
-Paws::STS::GetFederationToken - Arguments for method GetFederationToken on Paws::STS
+Paws::STS::GetFederationToken - Arguments for method GetFederationToken on L<Paws::STS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method GetFederationToken on the 
-AWS Security Token Service service. Use the attributes of this class
+This class represents the parameters used for calling the method GetFederationToken on the
+L<AWS Security Token Service|Paws::STS> service. Use the attributes of this class
 as arguments to method GetFederationToken.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to GetFederationToken.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->GetFederationToken(Att1 => $value1, Att2 => $value2, ...);
+    my $sts = Paws->service('STS');
+    # To get temporary credentials for a role by using GetFederationToken
+    my $GetFederationTokenResponse = $sts->GetFederationToken(
+      {
+        'Name'            => 'Bob',
+        'DurationSeconds' => 3600,
+        'Policy' =>
+'{"Version":"2012-10-17","Statement":[{"Sid":"Stmt1","Effect":"Allow","Action":"s3:*","Resource":"*"}]}'
+      }
+    );
+
+    # Results:
+    my $PackedPolicySize = $GetFederationTokenResponse->PackedPolicySize;
+    my $Credentials      = $GetFederationTokenResponse->Credentials;
+    my $FederatedUser    = $GetFederationTokenResponse->FederatedUser;
+
+    # Returns a L<Paws::STS::GetFederationTokenResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/sts/GetFederationToken>
 
 =head1 ATTRIBUTES
 
@@ -93,7 +110,8 @@ percentage how close to the upper size limit the policy is, with 100%
 equaling the maximum allowed size.
 
 For more information about how permissions work, see Permissions for
-GetFederationToken.
+GetFederationToken
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_control-access_getfederationtoken.html).
 
 
 
@@ -104,9 +122,9 @@ This class forms part of L<Paws>, documenting arguments for method GetFederation
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

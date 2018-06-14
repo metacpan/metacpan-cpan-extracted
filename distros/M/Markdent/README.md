@@ -4,7 +4,7 @@ Markdent - An event-based Markdown parser toolkit
 
 # VERSION
 
-version 0.30
+version 0.31
 
 # SYNOPSIS
 
@@ -64,7 +64,7 @@ or through the web interface at [http://rt.cpan.org](http://rt.cpan.org).  I wil
 notified, and then you'll automatically be notified of progress on
 your bug as I make changes.
 
-Bugs may be submitted at [http://rt.cpan.org/Public/Dist/Display.html?Name=Markdent](http://rt.cpan.org/Public/Dist/Display.html?Name=Markdent) or via email to [bug-markdent@rt.cpan.org](mailto:bug-markdent@rt.cpan.org).
+Bugs may be submitted at [https://github.com/houseabsolute/Markdent/issues](https://github.com/houseabsolute/Markdent/issues).
 
 I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
 

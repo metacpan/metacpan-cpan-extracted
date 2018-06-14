@@ -1,10 +1,42 @@
 ==================================================
-Changes from 1743-09-23 00:00:00 +0000 to present.
+Changes from 1744-08-28 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 1019 at 2017-07-07 20:54:50 +0000
+version 1021 at 2018-06-12 19:07:02 +0000
 -----------------------------------------
+
+  Change: ed3e9bb321afac527f8a00e8856eb78f91eb435b
+  Author: Zach Thompson <zachthompson@users.noreply.github.com>
+  Date : 2018-06-12 13:05:25 +0000
+
+    Merge pull request #392 from duckduckgo/zaahir/add-new-releaser
+
+    Add Marcos to releasers list 
+
+  Change: 1fb94725cce2b77d17825ebe4bf09fcd9130bbb9
+  Author: Zaahir Moolla <moollaza@duckduckgo.com>
+  Date : 2018-06-12 15:04:21 +0000
+
+    Add Marco to releasers list 
+
+-----------------------------------------
+version 1020 at 2018-06-12 17:36:51 +0000
+-----------------------------------------
+
+  Change: e7680737cc939955dd189dabc3165b0ca68f26b8
+  Author: Zach Thompson <zachthompson@users.noreply.github.com>
+  Date : 2018-06-12 11:36:51 +0000
+
+    Merge pull request #391 from duckduckgo/zaahir/add-new-releasers
+
+    Adding new names to releasers list 
+
+  Change: 1ad8f12d286700abf99ea2ad890fe57a57a9f253
+  Author: Zaahir Moolla <moollaza@duckduckgo.com>
+  Date : 2018-06-12 13:29:25 +0000
+
+    Add new names to releasers list 
 
   Change: bb5de8844017b86ebbe53a5e85826c64418e669b
   Author: Zach Thompson <zachthompson@users.noreply.github.com>

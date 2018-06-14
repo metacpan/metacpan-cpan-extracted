@@ -1,7 +1,7 @@
 
 package Paws::IoT::ListCertificatesByCA;
   use Moose;
-  has AscendingOrder => (is => 'ro', isa => 'Bool', traits => ['ParamInQuery'], query_name => 'ascendingOrder');
+  has AscendingOrder => (is => 'ro', isa => 'Bool', traits => ['ParamInQuery'], query_name => 'isAscendingOrder');
   has CaCertificateId => (is => 'ro', isa => 'Str', traits => ['ParamInURI'], uri_name => 'caCertificateId', required => 1);
   has Marker => (is => 'ro', isa => 'Str', traits => ['ParamInQuery'], query_name => 'marker');
   has PageSize => (is => 'ro', isa => 'Int', traits => ['ParamInQuery'], query_name => 'pageSize');
@@ -12,28 +12,40 @@ package Paws::IoT::ListCertificatesByCA;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/certificates-by-ca/{caCertificateId}');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'GET');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::IoT::ListCertificatesByCAResponse');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::IoT::ListCertificatesByCA - Arguments for method ListCertificatesByCA on Paws::IoT
+Paws::IoT::ListCertificatesByCA - Arguments for method ListCertificatesByCA on L<Paws::IoT>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ListCertificatesByCA on the 
-AWS IoT service. Use the attributes of this class
+This class represents the parameters used for calling the method ListCertificatesByCA on the
+L<AWS IoT|Paws::IoT> service. Use the attributes of this class
 as arguments to method ListCertificatesByCA.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ListCertificatesByCA.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ListCertificatesByCA(Att1 => $value1, Att2 => $value2, ...);
+    my $iot = Paws->service('IoT');
+    my $ListCertificatesByCAResponse = $iot->ListCertificatesByCA(
+      CaCertificateId => 'MyCertificateId',
+      AscendingOrder  => 1,                   # OPTIONAL
+      Marker          => 'MyMarker',          # OPTIONAL
+      PageSize        => 1,                   # OPTIONAL
+    );
+
+    # Results:
+    my $Certificates = $ListCertificatesByCAResponse->Certificates;
+    my $NextMarker   = $ListCertificatesByCAResponse->NextMarker;
+
+    # Returns a L<Paws::IoT::ListCertificatesByCAResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/iot/ListCertificatesByCA>
 
 =head1 ATTRIBUTES
 
@@ -71,9 +83,9 @@ This class forms part of L<Paws>, documenting arguments for method ListCertifica
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

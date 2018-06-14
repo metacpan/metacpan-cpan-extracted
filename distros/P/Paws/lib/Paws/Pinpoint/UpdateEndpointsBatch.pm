@@ -10,28 +10,77 @@ package Paws::Pinpoint::UpdateEndpointsBatch;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/v1/apps/{application-id}/endpoints');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'PUT');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::Pinpoint::UpdateEndpointsBatchResponse');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::Pinpoint::UpdateEndpointsBatch - Arguments for method UpdateEndpointsBatch on Paws::Pinpoint
+Paws::Pinpoint::UpdateEndpointsBatch - Arguments for method UpdateEndpointsBatch on L<Paws::Pinpoint>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateEndpointsBatch on the 
-Amazon Pinpoint service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateEndpointsBatch on the
+L<Amazon Pinpoint|Paws::Pinpoint> service. Use the attributes of this class
 as arguments to method UpdateEndpointsBatch.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateEndpointsBatch.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateEndpointsBatch(Att1 => $value1, Att2 => $value2, ...);
+    my $pinpoint = Paws->service('Pinpoint');
+    my $UpdateEndpointsBatchResponse = $pinpoint->UpdateEndpointsBatch(
+      ApplicationId        => 'My__string',
+      EndpointBatchRequest => {
+        Item => [
+          {
+            Attributes => { 'My__string' => [ 'My__string', ... ], }, # OPTIONAL
+            RequestId  => 'My__string',
+            Address    => 'My__string',
+            Location   => {
+              Region     => 'My__string',
+              Longitude  => 1,
+              Latitude   => 1,
+              PostalCode => 'My__string',
+              City       => 'My__string',
+              Country    => 'My__string',
+            },                                                        # OPTIONAL
+            Metrics     => { 'My__string' => 1, },                    # OPTIONAL
+            Id          => 'My__string',
+            ChannelType => 'GCM'
+            , # values: GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, EMAIL, BAIDU, CUSTOM; OPTIONAL
+            OptOut        => 'My__string',
+            EffectiveDate => 'My__string',
+            User          => {
+              UserAttributes => { 'My__string' => [ 'My__string', ... ], }
+              ,    # OPTIONAL
+              UserId => 'My__string',
+            },    # OPTIONAL
+            Demographic => {
+              Locale          => 'My__string',
+              Platform        => 'My__string',
+              ModelVersion    => 'My__string',
+              Model           => 'My__string',
+              Make            => 'My__string',
+              Timezone        => 'My__string',
+              AppVersion      => 'My__string',
+              PlatformVersion => 'My__string',
+            },    # OPTIONAL
+            EndpointStatus => 'My__string',
+          },
+          ...
+        ],        # OPTIONAL
+      },
+
+    );
+
+    # Results:
+    my $MessageBody = $UpdateEndpointsBatchResponse->MessageBody;
+
+    # Returns a L<Paws::Pinpoint::UpdateEndpointsBatchResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/>
 
 =head1 ATTRIBUTES
 
@@ -55,9 +104,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateEndpoin
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

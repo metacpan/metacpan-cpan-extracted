@@ -140,8 +140,8 @@
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
   glibc_date_format => "%e.%m.%Y",
   glibc_datetime_format => "%x (%a) %X %Z",
-  glibc_time_12_format => "%l,%M,%S",
-  glibc_time_format => "%k,%M,%S",
+  glibc_time_12_format => "%l:%M:%S",
+  glibc_time_format => "%k:%M:%S",
   language => "Bulgarian",
   month_format_abbreviated => [
     "\N{U+044f}\N{U+043d}\N{U+0443}",

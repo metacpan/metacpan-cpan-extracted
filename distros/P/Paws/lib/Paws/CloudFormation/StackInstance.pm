@@ -1,6 +1,7 @@
 package Paws::CloudFormation::StackInstance;
   use Moose;
   has Account => (is => 'ro', isa => 'Str');
+  has ParameterOverrides => (is => 'ro', isa => 'ArrayRef[Paws::CloudFormation::Parameter]');
   has Region => (is => 'ro', isa => 'Str');
   has StackId => (is => 'ro', isa => 'Str');
   has StackSetId => (is => 'ro', isa => 'Str');
@@ -51,6 +52,12 @@ the stack status.
 =head2 Account => Str
 
   The name of the AWS account that the stack instance is associated with.
+
+
+=head2 ParameterOverrides => ArrayRef[L<Paws::CloudFormation::Parameter>]
+
+  A list of parameters from the stack set template whose values have been
+overridden in this stack instance.
 
 
 =head2 Region => Str
@@ -125,9 +132,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::CloudForm
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -1,6 +1,7 @@
 package Paws::Support;
   use Moose;
   sub service { 'support' }
+  sub signing_name { 'support' }
   sub version { '2013-04-15' }
   sub target_prefix { 'AWSSupport_20130415' }
   sub json_version { "1.1" }
@@ -11,7 +12,7 @@ package Paws::Support;
   has retriables => (is => 'ro', isa => 'ArrayRef', default => sub { [
   ] });
 
-  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller', 'Paws::Net::JsonResponse';
+  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller';
 
   
   sub AddAttachmentsToSet {
@@ -169,8 +170,9 @@ This service enables you to manage your AWS Support cases
 programmatically. It uses HTTP methods that return results in JSON
 format.
 
-The AWS Support service also exposes a set of Trusted Advisor features.
-You can retrieve a list of checks and their descriptions, get check
+The AWS Support service also exposes a set of Trusted Advisor
+(http://aws.amazon.com/premiumsupport/trustedadvisor/) features. You
+can retrieve a list of checks and their descriptions, get check
 results, specify checks to refresh, and get the refresh status of
 checks.
 
@@ -235,22 +237,36 @@ of one or more checks.
 =back
 
 For authentication of requests, AWS Support uses Signature Version 4
-Signing Process.
+Signing Process
+(http://docs.aws.amazon.com/general/latest/gr/signature-version-4.html).
 
-See About the AWS Support API in the I<AWS Support User Guide> for
-information about how to use this service to create and manage your
-support cases, and how to call Trusted Advisor for results of checks on
-your resources.
+See About the AWS Support API
+(http://docs.aws.amazon.com/awssupport/latest/user/Welcome.html) in the
+I<AWS Support User Guide> for information about how to use this service
+to create and manage your support cases, and how to call Trusted
+Advisor for results of checks on your resources.
+
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/aws-support/>
+
 
 =head1 METHODS
 
-=head2 AddAttachmentsToSet(Attachments => ArrayRef[L<Paws::Support::Attachment>], [AttachmentSetId => Str])
+=head2 AddAttachmentsToSet
+
+=over
+
+=item Attachments => ArrayRef[L<Paws::Support::Attachment>]
+
+=item [AttachmentSetId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Support::AddAttachmentsToSet>
 
 Returns: a L<Paws::Support::AddAttachmentsToSetResponse> instance
 
-  Adds one or more attachments to an attachment set. If an
+Adds one or more attachments to an attachment set. If an
 C<attachmentSetId> is not specified, a new attachment set is created,
 and the ID of the set is returned in the response. If an
 C<attachmentSetId> is specified, the attachments are added to the
@@ -263,13 +279,26 @@ indicates when the set expires. The maximum number of attachments in a
 set is 3, and the maximum size of any attachment in the set is 5 MB.
 
 
-=head2 AddCommunicationToCase(CommunicationBody => Str, [AttachmentSetId => Str, CaseId => Str, CcEmailAddresses => ArrayRef[Str|Undef]])
+=head2 AddCommunicationToCase
+
+=over
+
+=item CommunicationBody => Str
+
+=item [AttachmentSetId => Str]
+
+=item [CaseId => Str]
+
+=item [CcEmailAddresses => ArrayRef[Str|Undef]]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Support::AddCommunicationToCase>
 
 Returns: a L<Paws::Support::AddCommunicationToCaseResponse> instance
 
-  Adds additional customer communication to an AWS Support case. You use
+Adds additional customer communication to an AWS Support case. You use
 the C<caseId> value to identify the case to add communication to. You
 can list a set of email addresses to copy on the communication using
 the C<ccEmailAddresses> value. The C<communicationBody> value contains
@@ -281,14 +310,38 @@ This operation implements a subset of the features of the AWS Support
 Center.
 
 
-=head2 CreateCase(CommunicationBody => Str, Subject => Str, [AttachmentSetId => Str, CategoryCode => Str, CcEmailAddresses => ArrayRef[Str|Undef], IssueType => Str, Language => Str, ServiceCode => Str, SeverityCode => Str])
+=head2 CreateCase
+
+=over
+
+=item CommunicationBody => Str
+
+=item Subject => Str
+
+=item [AttachmentSetId => Str]
+
+=item [CategoryCode => Str]
+
+=item [CcEmailAddresses => ArrayRef[Str|Undef]]
+
+=item [IssueType => Str]
+
+=item [Language => Str]
+
+=item [ServiceCode => Str]
+
+=item [SeverityCode => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Support::CreateCase>
 
 Returns: a L<Paws::Support::CreateCaseResponse> instance
 
-  Creates a new case in the AWS Support Center. This operation is modeled
-on the behavior of the AWS Support Center Create Case page. Its
+Creates a new case in the AWS Support Center. This operation is modeled
+on the behavior of the AWS Support Center Create Case
+(https://console.aws.amazon.com/support/home#/case/create) page. Its
 parameters require you to specify the following information:
 
 =over
@@ -321,12 +374,13 @@ DescribeSeverityLevels.
 =item *
 
 B<subject.> The B<Subject> field on the AWS Support Center Create Case
-page.
+(https://console.aws.amazon.com/support/home#/case/create) page.
 
 =item *
 
 B<communicationBody.> The B<Description> field on the AWS Support
-Center Create Case page.
+Center Create Case
+(https://console.aws.amazon.com/support/home#/case/create) page.
 
 =item *
 
@@ -341,11 +395,12 @@ English and Japanese are currently supported.
 =item *
 
 B<ccEmailAddresses.> The AWS Support Center B<CC> field on the Create
-Case page. You can list email addresses to be copied on any
-correspondence about the case. The account that opens the case is
-already identified by passing the AWS Credentials in the HTTP POST
-method or in a method or function call from one of the programming
-languages supported by an AWS SDK.
+Case (https://console.aws.amazon.com/support/home#/case/create) page.
+You can list email addresses to be copied on any correspondence about
+the case. The account that opens the case is already identified by
+passing the AWS Credentials in the HTTP POST method or in a method or
+function call from one of the programming languages supported by an AWS
+SDK (http://aws.amazon.com/tools/).
 
 =back
 
@@ -357,26 +412,56 @@ Case numbers are used by the DescribeCases operation to retrieve
 existing AWS Support cases.
 
 
-=head2 DescribeAttachment(AttachmentId => Str)
+=head2 DescribeAttachment
+
+=over
+
+=item AttachmentId => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Support::DescribeAttachment>
 
 Returns: a L<Paws::Support::DescribeAttachmentResponse> instance
 
-  Returns the attachment that has the specified ID. Attachment IDs are
+Returns the attachment that has the specified ID. Attachment IDs are
 generated by the case management system when you add an attachment to a
 case or case communication. Attachment IDs are returned in the
 AttachmentDetails objects that are returned by the
 DescribeCommunications operation.
 
 
-=head2 DescribeCases([AfterTime => Str, BeforeTime => Str, CaseIdList => ArrayRef[Str|Undef], DisplayId => Str, IncludeCommunications => Bool, IncludeResolvedCases => Bool, Language => Str, MaxResults => Int, NextToken => Str])
+=head2 DescribeCases
+
+=over
+
+=item [AfterTime => Str]
+
+=item [BeforeTime => Str]
+
+=item [CaseIdList => ArrayRef[Str|Undef]]
+
+=item [DisplayId => Str]
+
+=item [IncludeCommunications => Bool]
+
+=item [IncludeResolvedCases => Bool]
+
+=item [Language => Str]
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Support::DescribeCases>
 
 Returns: a L<Paws::Support::DescribeCasesResponse> instance
 
-  Returns a list of cases that you specify by passing one or more case
+Returns a list of cases that you specify by passing one or more case
 IDs. In addition, you can filter the cases by date by setting values
 for the C<afterTime> and C<beforeTime> request parameters. You can set
 values for the C<includeResolvedCases> and C<includeCommunications>
@@ -403,13 +488,28 @@ returned records represented by the C<CaseDetails> objects.
 
 
 
-=head2 DescribeCommunications(CaseId => Str, [AfterTime => Str, BeforeTime => Str, MaxResults => Int, NextToken => Str])
+=head2 DescribeCommunications
+
+=over
+
+=item CaseId => Str
+
+=item [AfterTime => Str]
+
+=item [BeforeTime => Str]
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Support::DescribeCommunications>
 
 Returns: a L<Paws::Support::DescribeCommunicationsResponse> instance
 
-  Returns communications (and attachments) for one or more support cases.
+Returns communications (and attachments) for one or more support cases.
 You can use the C<afterTime> and C<beforeTime> parameters to filter by
 date. You can use the C<caseId> parameter to restrict the results to a
 particular case.
@@ -424,44 +524,69 @@ cases you want displayed on each page, and use C<nextToken> to specify
 the resumption of pagination.
 
 
-=head2 DescribeServices([Language => Str, ServiceCodeList => ArrayRef[Str|Undef]])
+=head2 DescribeServices
+
+=over
+
+=item [Language => Str]
+
+=item [ServiceCodeList => ArrayRef[Str|Undef]]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Support::DescribeServices>
 
 Returns: a L<Paws::Support::DescribeServicesResponse> instance
 
-  Returns the current list of AWS services and a list of service
+Returns the current list of AWS services and a list of service
 categories that applies to each one. You then use service names and
 categories in your CreateCase requests. Each AWS service has its own
 set of categories.
 
 The service codes and category codes correspond to the values that are
 displayed in the B<Service> and B<Category> drop-down lists on the AWS
-Support Center Create Case page. The values in those fields, however,
-do not necessarily match the service codes and categories returned by
-the C<DescribeServices> request. Always use the service codes and
-categories obtained programmatically. This practice ensures that you
-always have the most recent set of service and category codes.
+Support Center Create Case
+(https://console.aws.amazon.com/support/home#/case/create) page. The
+values in those fields, however, do not necessarily match the service
+codes and categories returned by the C<DescribeServices> request.
+Always use the service codes and categories obtained programmatically.
+This practice ensures that you always have the most recent set of
+service and category codes.
 
 
-=head2 DescribeSeverityLevels([Language => Str])
+=head2 DescribeSeverityLevels
+
+=over
+
+=item [Language => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Support::DescribeSeverityLevels>
 
 Returns: a L<Paws::Support::DescribeSeverityLevelsResponse> instance
 
-  Returns the list of severity levels that you can assign to an AWS
+Returns the list of severity levels that you can assign to an AWS
 Support case. The severity level for a case is also a field in the
 CaseDetails data type included in any CreateCase request.
 
 
-=head2 DescribeTrustedAdvisorCheckRefreshStatuses(CheckIds => ArrayRef[Str|Undef])
+=head2 DescribeTrustedAdvisorCheckRefreshStatuses
+
+=over
+
+=item CheckIds => ArrayRef[Str|Undef]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Support::DescribeTrustedAdvisorCheckRefreshStatuses>
 
 Returns: a L<Paws::Support::DescribeTrustedAdvisorCheckRefreshStatusesResponse> instance
 
-  Returns the refresh status of the Trusted Advisor checks that have the
+Returns the refresh status of the Trusted Advisor checks that have the
 specified check IDs. Check IDs can be obtained by calling
 DescribeTrustedAdvisorChecks.
 
@@ -471,13 +596,22 @@ C<DescribeTrustedAdvisorCheckRefreshStatuses> operation for these
 checks causes an C<InvalidParameterValue> error.
 
 
-=head2 DescribeTrustedAdvisorCheckResult(CheckId => Str, [Language => Str])
+=head2 DescribeTrustedAdvisorCheckResult
+
+=over
+
+=item CheckId => Str
+
+=item [Language => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Support::DescribeTrustedAdvisorCheckResult>
 
 Returns: a L<Paws::Support::DescribeTrustedAdvisorCheckResultResponse> instance
 
-  Returns the results of the Trusted Advisor check that has the specified
+Returns the results of the Trusted Advisor check that has the specified
 check ID. Check IDs can be obtained by calling
 DescribeTrustedAdvisorChecks.
 
@@ -521,39 +655,60 @@ B<checkId.> The unique identifier for the check.
 
 
 
-=head2 DescribeTrustedAdvisorChecks(Language => Str)
+=head2 DescribeTrustedAdvisorChecks
+
+=over
+
+=item Language => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Support::DescribeTrustedAdvisorChecks>
 
 Returns: a L<Paws::Support::DescribeTrustedAdvisorChecksResponse> instance
 
-  Returns information about all available Trusted Advisor checks,
+Returns information about all available Trusted Advisor checks,
 including name, ID, category, description, and metadata. You must
 specify a language code; English ("en") and Japanese ("ja") are
 currently supported. The response contains a
 TrustedAdvisorCheckDescription for each check.
 
 
-=head2 DescribeTrustedAdvisorCheckSummaries(CheckIds => ArrayRef[Str|Undef])
+=head2 DescribeTrustedAdvisorCheckSummaries
+
+=over
+
+=item CheckIds => ArrayRef[Str|Undef]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Support::DescribeTrustedAdvisorCheckSummaries>
 
 Returns: a L<Paws::Support::DescribeTrustedAdvisorCheckSummariesResponse> instance
 
-  Returns the summaries of the results of the Trusted Advisor checks that
+Returns the summaries of the results of the Trusted Advisor checks that
 have the specified check IDs. Check IDs can be obtained by calling
 DescribeTrustedAdvisorChecks.
 
 The response contains an array of TrustedAdvisorCheckSummary objects.
 
 
-=head2 RefreshTrustedAdvisorCheck(CheckId => Str)
+=head2 RefreshTrustedAdvisorCheck
+
+=over
+
+=item CheckId => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Support::RefreshTrustedAdvisorCheck>
 
 Returns: a L<Paws::Support::RefreshTrustedAdvisorCheckResponse> instance
 
-  Requests a refresh of the Trusted Advisor check that has the specified
+Requests a refresh of the Trusted Advisor check that has the specified
 check ID. Check IDs can be obtained by calling
 DescribeTrustedAdvisorChecks.
 
@@ -584,13 +739,20 @@ B<checkId.> The unique identifier for the check.
 
 
 
-=head2 ResolveCase([CaseId => Str])
+=head2 ResolveCase
+
+=over
+
+=item [CaseId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Support::ResolveCase>
 
 Returns: a L<Paws::Support::ResolveCaseResponse> instance
 
-  Takes a C<caseId> and returns the initial state of the case along with
+Takes a C<caseId> and returns the initial state of the case along with
 the state of the case after the call to ResolveCase completed.
 
 
@@ -633,9 +795,9 @@ This service class forms part of L<Paws>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

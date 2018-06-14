@@ -4,6 +4,7 @@ package Paws::Lambda::UpdateFunctionCode;
   has DryRun => (is => 'ro', isa => 'Bool');
   has FunctionName => (is => 'ro', isa => 'Str', traits => ['ParamInURI'], uri_name => 'FunctionName', required => 1);
   has Publish => (is => 'ro', isa => 'Bool');
+  has RevisionId => (is => 'ro', isa => 'Str');
   has S3Bucket => (is => 'ro', isa => 'Str');
   has S3Key => (is => 'ro', isa => 'Str');
   has S3ObjectVersion => (is => 'ro', isa => 'Str');
@@ -15,28 +16,57 @@ package Paws::Lambda::UpdateFunctionCode;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/2015-03-31/functions/{FunctionName}/code');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'PUT');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::Lambda::FunctionConfiguration');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::Lambda::UpdateFunctionCode - Arguments for method UpdateFunctionCode on Paws::Lambda
+Paws::Lambda::UpdateFunctionCode - Arguments for method UpdateFunctionCode on L<Paws::Lambda>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateFunctionCode on the 
-AWS Lambda service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateFunctionCode on the
+L<AWS Lambda|Paws::Lambda> service. Use the attributes of this class
 as arguments to method UpdateFunctionCode.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateFunctionCode.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateFunctionCode(Att1 => $value1, Att2 => $value2, ...);
+    my $lambda = Paws->service('Lambda');
+    # To update a Lambda function's code
+    # This operation updates a Lambda function's code
+    my $FunctionConfiguration = $lambda->UpdateFunctionCode(
+      {
+        'S3ObjectVersion' => 1,
+        'S3Key'           => 'myKey',
+        'ZipFile'         => 'fileb://file-path/file.zip',
+        'FunctionName'    => 'myFunction',
+        'Publish'         => true,
+        'S3Bucket'        => 'myBucket'
+      }
+    );
+
+    # Results:
+    my $Timeout      = $FunctionConfiguration->Timeout;
+    my $Role         = $FunctionConfiguration->Role;
+    my $LastModified = $FunctionConfiguration->LastModified;
+    my $Version      = $FunctionConfiguration->Version;
+    my $Description  = $FunctionConfiguration->Description;
+    my $FunctionName = $FunctionConfiguration->FunctionName;
+    my $CodeSize     = $FunctionConfiguration->CodeSize;
+    my $VpcConfig    = $FunctionConfiguration->VpcConfig;
+    my $CodeSha256   = $FunctionConfiguration->CodeSha256;
+    my $FunctionArn  = $FunctionConfiguration->FunctionArn;
+    my $Handler      = $FunctionConfiguration->Handler;
+    my $Runtime      = $FunctionConfiguration->Runtime;
+    my $MemorySize   = $FunctionConfiguration->MemorySize;
+
+    # Returns a L<Paws::Lambda::FunctionConfiguration> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/lambda/UpdateFunctionCode>
 
 =head1 ATTRIBUTES
 
@@ -47,7 +77,7 @@ This boolean parameter can be used to test your request to AWS Lambda
 to update the Lambda function and publish a version as an atomic
 operation. It will do all necessary computation and validation of your
 code but will not upload it or a publish a version. Each time this
-operation is invoked, the C<CodeSha256> hash value the provided code
+operation is invoked, the C<CodeSha256> hash value of the provided code
 will also be computed and returned in the response.
 
 
@@ -70,6 +100,16 @@ characters in length.
 
 This boolean parameter can be used to request AWS Lambda to update the
 Lambda function and publish a version as an atomic operation.
+
+
+
+=head2 RevisionId => Str
+
+An optional value you can use to ensure you are updating the latest
+update of the function version or alias. If the C<RevisionID> you pass
+doesn't match the latest C<RevisionId> of the function or alias, it
+will fail with an error message, advising you to retrieve the latest
+function version or alias C<RevisionID> using either or .
 
 
 
@@ -101,8 +141,8 @@ The contents of your zip file containing your deployment package. If
 you are using the web API directly, the contents of the zip file must
 be base64-encoded. If you are using the AWS SDKs or the AWS CLI, the
 SDKs or CLI will do the encoding for you. For more information about
-creating a .zip file, see Execution Permissions in the I<AWS Lambda
-Developer Guide>.
+creating a .zip file, see Execution Permissions
+(http://docs.aws.amazon.com/lambda/latest/dg/intro-permission-model.html#lambda-intro-execution-role.html).
 
 
 
@@ -113,9 +153,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateFunctio
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

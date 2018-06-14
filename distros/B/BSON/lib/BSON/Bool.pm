@@ -6,7 +6,7 @@ package BSON::Bool;
 # ABSTRACT: Legacy BSON type wrapper for Booleans (DEPRECATED)
 
 use version;
-our $VERSION = 'v1.6.3';
+our $VERSION = 'v1.6.4';
 
 use boolean 0.45 ();
 our @ISA = qw/boolean/;
@@ -44,7 +44,7 @@ BSON::Bool - Legacy BSON type wrapper for Booleans (DEPRECATED)
 
 =head1 VERSION
 
-version v1.6.3
+version v1.6.4
 
 =head1 DESCRIPTION
 

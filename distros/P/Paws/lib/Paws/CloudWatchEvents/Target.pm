@@ -1,6 +1,7 @@
 package Paws::CloudWatchEvents::Target;
   use Moose;
   has Arn => (is => 'ro', isa => 'Str', required => 1);
+  has BatchParameters => (is => 'ro', isa => 'Paws::CloudWatchEvents::BatchParameters');
   has EcsParameters => (is => 'ro', isa => 'Paws::CloudWatchEvents::EcsParameters');
   has Id => (is => 'ro', isa => 'Str', required => 1);
   has Input => (is => 'ro', isa => 'Str');
@@ -9,6 +10,7 @@ package Paws::CloudWatchEvents::Target;
   has KinesisParameters => (is => 'ro', isa => 'Paws::CloudWatchEvents::KinesisParameters');
   has RoleArn => (is => 'ro', isa => 'Str');
   has RunCommandParameters => (is => 'ro', isa => 'Paws::CloudWatchEvents::RunCommandParameters');
+  has SqsParameters => (is => 'ro', isa => 'Paws::CloudWatchEvents::SqsParameters');
 1;
 
 ### main pod documentation begin ###
@@ -28,7 +30,7 @@ Each attribute should be used as a named argument in the calls that expect this 
 
 As an example, if Att1 is expected to be a Paws::CloudWatchEvents::Target object:
 
-  $service_obj->Method(Att1 => { Arn => $value, ..., RunCommandParameters => $value  });
+  $service_obj->Method(Att1 => { Arn => $value, ..., SqsParameters => $value  });
 
 =head3 Results returned from an API call
 
@@ -52,12 +54,21 @@ Run Command, and built-in targets.
   The Amazon Resource Name (ARN) of the target.
 
 
+=head2 BatchParameters => L<Paws::CloudWatchEvents::BatchParameters>
+
+  Contains the job definition, job name, and other parameters if the
+event target is an AWS Batch job. For more information about AWS Batch,
+see Jobs (http://docs.aws.amazon.com/batch/latest/userguide/jobs.html)
+in the I<AWS Batch User Guide>.
+
+
 =head2 EcsParameters => L<Paws::CloudWatchEvents::EcsParameters>
 
   Contains the Amazon ECS task definition and task count to be used, if
 the event target is an Amazon ECS task. For more information about
-Amazon ECS tasks, see Task Definitions in the I<Amazon EC2 Container
-Service Developer Guide>.
+Amazon ECS tasks, see Task Definitions
+(http://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_defintions.html)
+in the I<Amazon EC2 Container Service Developer Guide>.
 
 
 =head2 B<REQUIRED> Id => Str
@@ -68,9 +79,9 @@ Service Developer Guide>.
 =head2 Input => Str
 
   Valid JSON text passed to the target. In this case, nothing from the
-event itself is passed to the target. You must use JSON dot notation,
-not bracket notation. For more information, see The JavaScript Object
-Notation (JSON) Data Interchange Format.
+event itself is passed to the target. For more information, see The
+JavaScript Object Notation (JSON) Data Interchange Format
+(http://www.rfc-editor.org/rfc/rfc7159.txt).
 
 
 =head2 InputPath => Str
@@ -78,7 +89,7 @@ Notation (JSON) Data Interchange Format.
   The value of the JSONPath that is used for extracting part of the
 matched event when passing it to the target. You must use JSON dot
 notation, not bracket notation. For more information about JSON paths,
-see JSONPath.
+see JSONPath (http://goessner.net/articles/JsonPath/).
 
 
 =head2 InputTransformer => L<Paws::CloudWatchEvents::InputTransformer>
@@ -109,6 +120,11 @@ targets, you can use a different IAM role for each target.
 Command.
 
 
+=head2 SqsParameters => L<Paws::CloudWatchEvents::SqsParameters>
+
+  Contains the message group ID to use when the target is a FIFO queue.
+
+
 
 =head1 SEE ALSO
 
@@ -116,9 +132,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::CloudWatc
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

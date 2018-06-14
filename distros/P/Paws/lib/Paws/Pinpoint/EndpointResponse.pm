@@ -14,7 +14,6 @@ package Paws::Pinpoint::EndpointResponse;
   has Metrics => (is => 'ro', isa => 'Paws::Pinpoint::MapOf__double');
   has OptOut => (is => 'ro', isa => 'Str');
   has RequestId => (is => 'ro', isa => 'Str');
-  has ShardId => (is => 'ro', isa => 'Str');
   has User => (is => 'ro', isa => 'Paws::Pinpoint::EndpointUser');
 1;
 
@@ -64,13 +63,20 @@ Endpoint response
 
 =head2 Attributes => L<Paws::Pinpoint::MapOfListOf__string>
 
-  Custom attributes that your app reports to Amazon Pinpoint. You can use
-these attributes as selection criteria when you create a segment.
+  Custom attributes that describe the endpoint by associating a name with
+an array of values. For example, an attribute named "interests" might
+have the values ["science", "politics", "travel"]. You can use these
+attributes as selection criteria when you create a segment of users to
+engage with a messaging campaign. The following characters are not
+recommended in attribute names: # : ? \ /. The Amazon Pinpoint console
+does not display attributes that include these characters in the name.
+This limitation does not apply to attribute values.
 
 
 =head2 ChannelType => Str
 
-  The channel type. Valid values: GCM | APNS | SMS | EMAIL
+  The channel type. Valid values: GCM | APNS | APNS_SANDBOX | APNS_VOIP |
+APNS_VOIP_SANDBOX | ADM | SMS | EMAIL | BAIDU
 
 
 =head2 CohortId => Str
@@ -133,11 +139,6 @@ of the following values: ALL - User has opted out of all messages. NONE
   The unique ID for the most recent request to update the endpoint.
 
 
-=head2 ShardId => Str
-
-  The ShardId of endpoint.
-
-
 =head2 User => L<Paws::Pinpoint::EndpointUser>
 
   Custom user-specific attributes that your app reports to Amazon
@@ -151,9 +152,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Pinpoint>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

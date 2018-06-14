@@ -32,19 +32,19 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Greengrass:
 
 =head1 DESCRIPTION
 
-ErrorDetail
+Details about the error.
 
 =head1 ATTRIBUTES
 
 
 =head2 DetailedErrorCode => Str
 
-  Detailed Error Code
+  A detailed error code.
 
 
 =head2 DetailedErrorMessage => Str
 
-  Detailed Error Message
+  A detailed error message.
 
 
 
@@ -54,9 +54,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Greengras
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -6,7 +6,7 @@ package BSON::Time;
 # ABSTRACT: BSON type wrapper for date and time
 
 use version;
-our $VERSION = 'v1.6.3';
+our $VERSION = 'v1.6.4';
 
 use Carp qw/croak/;
 use Config;
@@ -230,13 +230,14 @@ BSON::Time - BSON type wrapper for date and time
 
 =head1 VERSION
 
-version v1.6.3
+version v1.6.4
 
 =head1 SYNOPSIS
 
     use BSON::Types ':all';
 
-    bson_time( $number );
+    bson_time();        # now
+    bson_time( $secs ); # floating point seconds since epoch
 
 =head1 DESCRIPTION
 

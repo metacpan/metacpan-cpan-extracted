@@ -8,6 +8,9 @@ use warnings;
 use LWP::UserAgent;
 use Test::More 0.88;
 
+plan skip_all =>
+	'Geo::Coder::Geocoder::US has been retracted, because the underlying web site no longer exists';
+
 my $warning;
 local $SIG{__WARN__} = sub {
     $warning = $_[0];

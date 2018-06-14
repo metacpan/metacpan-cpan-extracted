@@ -17,21 +17,28 @@ package Paws::CloudFormation::ContinueUpdateRollback;
 
 =head1 NAME
 
-Paws::CloudFormation::ContinueUpdateRollback - Arguments for method ContinueUpdateRollback on Paws::CloudFormation
+Paws::CloudFormation::ContinueUpdateRollback - Arguments for method ContinueUpdateRollback on L<Paws::CloudFormation>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ContinueUpdateRollback on the 
-AWS CloudFormation service. Use the attributes of this class
+This class represents the parameters used for calling the method ContinueUpdateRollback on the
+L<AWS CloudFormation|Paws::CloudFormation> service. Use the attributes of this class
 as arguments to method ContinueUpdateRollback.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ContinueUpdateRollback.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ContinueUpdateRollback(Att1 => $value1, Att2 => $value2, ...);
+    my $cloudformation = Paws->service('CloudFormation');
+    my $ContinueUpdateRollbackOutput = $cloudformation->ContinueUpdateRollback(
+      StackName          => 'MyStackNameOrId',
+      ClientRequestToken => 'MyClientRequestToken',         # OPTIONAL
+      ResourcesToSkip    => [ 'MyResourceToSkip', ... ],    # OPTIONAL
+      RoleARN            => 'MyRoleARN',                    # OPTIONAL
+    );
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/cloudformation/ContinueUpdateRollback>
 
 =head1 ATTRIBUTES
 
@@ -58,14 +65,16 @@ DescribeStackResources action, and view the resource status reason.
 
 Specify this property to skip rolling back resources that AWS
 CloudFormation can't successfully roll back. We recommend that you
-troubleshoot resources before skipping them. AWS CloudFormation sets
-the status of the specified resources to C<UPDATE_COMPLETE> and
-continues to roll back the stack. After the rollback is complete, the
-state of the skipped resources will be inconsistent with the state of
-the resources in the stack template. Before performing another stack
-update, you must update the stack or resources to be consistent with
-each other. If you don't, subsequent stack updates might fail, and the
-stack will become unrecoverable.
+troubleshoot
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html#troubleshooting-errors-update-rollback-failed)
+resources before skipping them. AWS CloudFormation sets the status of
+the specified resources to C<UPDATE_COMPLETE> and continues to roll
+back the stack. After the rollback is complete, the state of the
+skipped resources will be inconsistent with the state of the resources
+in the stack template. Before performing another stack update, you must
+update the stack or resources to be consistent with each other. If you
+don't, subsequent stack updates might fail, and the stack will become
+unrecoverable.
 
 Specify the minimum number of resources required to successfully roll
 back your stack. For example, a failed resource update might cause
@@ -82,7 +91,8 @@ C<DELETE_IN_PROGRESS>, C<DELETE_COMPLETE>, or C<DELETE_FAILED>.
 Don't confuse a child stack's name with its corresponding logical ID
 defined in the parent stack. For an example of a continue update
 rollback operation with nested stacks, see Using ResourcesToSkip to
-recover a nested stacks hierarchy.
+recover a nested stacks hierarchy
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-continueupdaterollback.html#nested-stacks).
 
 
 
@@ -123,9 +133,9 @@ This class forms part of L<Paws>, documenting arguments for method ContinueUpdat
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

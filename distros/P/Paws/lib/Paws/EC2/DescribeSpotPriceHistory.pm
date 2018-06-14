@@ -22,21 +22,38 @@ package Paws::EC2::DescribeSpotPriceHistory;
 
 =head1 NAME
 
-Paws::EC2::DescribeSpotPriceHistory - Arguments for method DescribeSpotPriceHistory on Paws::EC2
+Paws::EC2::DescribeSpotPriceHistory - Arguments for method DescribeSpotPriceHistory on L<Paws::EC2>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DescribeSpotPriceHistory on the 
-Amazon Elastic Compute Cloud service. Use the attributes of this class
+This class represents the parameters used for calling the method DescribeSpotPriceHistory on the
+L<Amazon Elastic Compute Cloud|Paws::EC2> service. Use the attributes of this class
 as arguments to method DescribeSpotPriceHistory.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DescribeSpotPriceHistory.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DescribeSpotPriceHistory(Att1 => $value1, Att2 => $value2, ...);
+    my $ec2 = Paws->service('EC2');
+    # To describe Spot price history for Linux/UNIX (Amazon VPC)
+    # This example returns the Spot Price history for m1.xlarge, Linux/UNIX
+    # (Amazon VPC) instances for a particular day in January.
+    my $DescribeSpotPriceHistoryResult = $ec2->DescribeSpotPriceHistory(
+      {
+        'InstanceTypes'       => ['m1.xlarge'],
+        'StartTime'           => '2014-01-06T07:08:09',
+        'EndTime'             => '2014-01-06T08:09:10',
+        'ProductDescriptions' => ['Linux/UNIX (Amazon VPC)']
+      }
+    );
+
+    # Results:
+    my $SpotPriceHistory = $DescribeSpotPriceHistoryResult->SpotPriceHistory;
+
+    # Returns a L<Paws::EC2::DescribeSpotPriceHistoryResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ec2/DescribeSpotPriceHistory>
 
 =head1 ATTRIBUTES
 
@@ -92,7 +109,7 @@ wildcards; greater than or less than comparison is not supported).
 
 =item *
 
-C<timestamp> - The timestamp of the Spot price history, in UTC format
+C<timestamp> - The time stamp of the Spot price history, in UTC format
 (for example, I<YYYY>-I<MM>-I<DD>TI<HH>:I<MM>:I<SS>Z). You can use
 wildcards (* and ?). Greater than or less than comparison is not
 supported.
@@ -104,8 +121,7 @@ supported.
 
 =head2 InstanceTypes => ArrayRef[Str|Undef]
 
-Filters the results by the specified instance types. Note that T2 and
-HS1 instance types are not supported.
+Filters the results by the specified instance types.
 
 
 
@@ -145,9 +161,9 @@ This class forms part of L<Paws>, documenting arguments for method DescribeSpotP
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -407,9 +407,6 @@ static void message_address_add_from_perl_array(pTHX_ struct message_address **f
 	domain = get_perl_hash_value(aTHX_ hash, "host", &domain_len, utf8, taint);
 	comment = get_perl_hash_value(aTHX_ hash, "comment", &comment_len, utf8, taint);
 
-	if (mailbox && !mailbox[0] && mailbox_len == 0)
-		mailbox = NULL;
-
 	if (domain && !domain[0] && domain_len == 0)
 		domain = NULL;
 

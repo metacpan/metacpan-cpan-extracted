@@ -4,19 +4,23 @@ use Moose;
 # ABSTRACT: An plugin bundle for all distributions by WATERKIP
 # KEYWORDS: author bundle distribution tool
 
-use Moose::Util::TypeConstraints qw(enum subtype where);
+use Data::Dumper;
 use List::Util qw(uniq any first);
+use Moose::Util::TypeConstraints qw(enum subtype where);
 use namespace::autoclean;
 
 # Use all the modules so we don't get weird dependency issues
 use Dist::Zilla::App::Command::xtest                  ();
 use Dist::Zilla::Plugin::CheckExtraTests              ();
+use Dist::Zilla::Plugin::ContributorsFile             ();
+use Dist::Zilla::Plugin::CopyFilesFromBuild::Filtered ();
+use Dist::Zilla::Plugin::Git::Contributors            ();
+use Dist::Zilla::Plugin::MetaProvides                 ();
 use Dist::Zilla::Plugin::MinimumPerl                  ();
 use Dist::Zilla::Plugin::PodWeaver                    ();
 use Dist::Zilla::Plugin::Prereqs::AuthorDeps          ();
 use Dist::Zilla::Plugin::PromptIfStale                ();
 use Dist::Zilla::Plugin::Repository                   ();
-use Dist::Zilla::Plugin::CopyFilesFromBuild::Filtered ();
 use Dist::Zilla::PluginBundle::Filter                 ();
 use Dist::Zilla::PluginBundle::Git::VersionManager    ();
 use Dist::Zilla::PluginBundle::TestingMania           ();
@@ -24,7 +28,7 @@ use Dist::Zilla::Role::PluginBundle                   ();
 use Dist::Zilla::Role::PluginBundle::Easy             ();
 use Dist::Zilla::Util                                 ();
 
-our $VERSION = '1.8';
+our $VERSION = '2.0';
 
 with
     'Dist::Zilla::Role::PluginBundle::Easy',
@@ -88,7 +92,7 @@ around copy_files_from_build => sub {
     my $self = shift;
     sort(uniq(
             $self->$orig(@_),
-            qw(Makefile.PL cpanfile Build.PL README)
+            qw(Makefile.PL cpanfile Build.PL README README.md CONTRIBUTORS)
     ));
 };
 
@@ -176,10 +180,9 @@ sub _warn_me {
 }
 
 sub commit_files_after_release {
-    grep { -e } sort(uniq(
-            'README.md', 'README.pod',
-            'Changes',   shift->copy_files_from_release
-    ));
+    my $self = shift;
+    grep { -e }
+        sort(uniq('README.pod', 'Changes', $self->copy_files_from_release, $self->copy_files_from_build));
 }
 
 my %removed;
@@ -209,7 +212,6 @@ sub configure {
     my $self = shift;
 
     if ($self->debug) {
-        use Data::Dumper;
         _warn_me(Dumper { payload => $self->payload, });
     }
 
@@ -241,57 +243,82 @@ sub configure {
             },
         ],
 
+        [
+            'PromptIfStale' => 'stale modules, build' =>
+                { phase => 'build', module => [$self->meta->name] }
+        ],
+        [
+            'PromptIfStale' => 'stale modules, release' => {
+                phase             => 'release',
+                check_all_plugins => 1,
+                check_all_prereqs => 1
+            }
+        ],
+
         qw(PruneCruft ManifestSkip MetaYAML MetaJSON),
 
         ['License' => { filename => $self->license }],
 
-        qw(Readme ExecDir ShareDir MakeMaker Manifest
+        ['ReadmeFromPod' => { type => 'markdown', readme => 'README.md' }],
+
+        qw(ExecDir ShareDir MakeMaker Manifest
             TestRelease PodWeaver),
 
-        ['AutoPrereqs'         => { skip       => [qw(^perl$)] }],
+        ['Git::Contributors' => { order_by => 'commits' }],
+        ['ContributorsFile'  => { filename => 'CONTRIBUTORS' }],
+
+        ['AutoPrereqs'         => { skip       => [qw(^perl$ utf8 warnings strict)] }],
         ['Prereqs::AuthorDeps' => { ':version' => '0.006' }],
         [
-            'MinimumPerl' =>
-                { ':version' => '1.006', configure_finder => ':NoFiles' }
+            'MinimumPerl' => {
+                ':version'       => '1.006',
+                configure_finder => ':NoFiles'
+            }
         ],
+        ['MetaProvides::Package'],
 
         ['CPANFile'],
 
-        [ 'CopyFilesFromBuild::Filtered' => { copy => [ $self->copy_files_from_build ] } ],
+        [
+            'CopyFilesFromBuild::Filtered' =>
+                { copy => [$self->copy_files_from_build] }
+        ],
 
-        #['Test::CPAN::Changes'],
+        [ 'Git::Check' => 'initial check' => { allow_dirty => [ $self->airplane ? 'dist.ini' : '' ] } ],
+
+        qw(Git::CheckFor::MergeConflicts),
+        ['Git::Remote::Check' => { branch => 'master', remote_branch => 'master' } ],
+        ['Git::CheckFor::CorrectBranch' =>
+                { release_branch => 'master' }
+        ],
+
+        qw(CheckPrereqsIndexed),
+
         ['Repository'],
         ['ConfirmRelease'],
 
-        #        [ 'PrereqsClean'],
+        # This plugin seems cool, but also unmaintained with downstream
+        # deps which are also unmaintained. ABORT
+        #[ 'PrereqsClean'],
 
         $self->release_option,
 
-        # Perhaps do copy files from build first?
         [
             'CopyFilesFromRelease' =>
                 { filename => [$self->copy_files_from_release] }
         ],
-
-        # Don't generate a change log from git just yet, figure out
-        # first what our workflow will be
-        #['ChangelogFromGit' => { include_message => '^release' } ],
-
-
     );
 
     if ($self->airplane) {
         _warn_me(
-            "Building in airplane mode, skipping network required modules");
+            "Building in airplane mode, skipping network required modules"
+        );
         @plugins = grep {
             my $plugin
                 = Dist::Zilla::Util->expand_config_package_name(
                 !ref($_) ? $_ : ref eq 'ARRAY' ? $_->[0] : die 'wtf');
             not exists $network_plugins{$plugin}
         } @plugins;
-
-        # allow our uncommitted dist.ini edit which sets 'airplane = 1'
-        #push @{( first { ref eq 'ARRAY' && $_->[0] eq 'Git::Check' } @plugins )->[-1]{allow_dirty}}, 'dist.ini';
 
         # halt release after pre-release checks, but before ConfirmRelease
         push @plugins, 'BlockRelease';
@@ -357,13 +384,20 @@ Dist::Zilla::PluginBundle::Author::WATERKIP - An plugin bundle for all distribut
 
 =head1 VERSION
 
-version 1.8
+version 2.0
 
 =head1 SYNOPSIS
 
 In your F<dist.ini>:
 
     [@Author::WATERKIP]
+
+=head1 DESCRIPTION
+
+This is a L<Dist::Zilla> plugin bundle. It is somewhat equal to the
+following F<dist.ini>:
+
+    TODO: Show what is done
 
 =head1 METHODS
 

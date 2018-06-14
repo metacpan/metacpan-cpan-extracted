@@ -8,7 +8,12 @@ SYNOPSIS
         use WebService::Pokemon;
     
         my $pokemon_api = WebService::Pokemon->new;
-        my $pokemon = $pokemon_api->pokemon(id => 1);
+    
+        # By id.
+        my $pokemon = $pokemon_api->resource('berry', 1);
+    
+        # By name.
+        my $pokemon = $pokemon_api->resource('berry', 'cheri');
 
 DESCRIPTION
 
@@ -72,12 +77,43 @@ METHODS
         my $pokemon_api = WebService::Pokemon->new;
         $pokemon_api->api_url('http://example.com/api/v2');
 
- resource
+  cache
 
-    Get the details of a particular resource either by id or name.
+    The cache directory of the HTTP reponses. By default, all cached data
+    is stored as files in /tmp/cache/.
+
+        # Default cache engine is file-based storage.
+        my $pokemon_api = WebService::Pokemon->new;
+    
+        # Or we define our custom cache engine with settings.
+        my $pokemon_api = WebService::Pokemon->new(
+            cache => CHI->new(
+                driver => 'File',
+                namespace => 'restcountries',
+                root_dir => $ENV{PWD} . '/tmp/cache/',
+            )
+        );
+    
+        # Or after the object was created.
+        my $pokemon_api = WebService::Pokemon->new;
+        $pokemon_api->cache(
+            cache => CHI->new(
+                driver => 'File',
+                namespace => 'restcountries',
+                root_dir => $ENV{PWD} . '/tmp/cache/',
+            )
+        );
+
+ resource($resource, [$name], [$limit], [$offset])
+
+    Get the details of a particular resource with optional id or name;
+    limit per page, or offset by the record list.
 
         # Get paginated list of available berry resource.
         my $berry = $pokemon_api->resource('berry');
+    
+        # Or by page through limit and pagination.
+        my $berry = $pokemon_api->resource('berry', undef, 60, 20);
     
         # Get by id.
         my $berry_firmness = $pokemon_api->resource('berry-firmnesses', 1);

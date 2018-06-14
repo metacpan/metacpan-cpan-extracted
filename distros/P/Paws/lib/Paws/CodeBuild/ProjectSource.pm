@@ -2,6 +2,8 @@ package Paws::CodeBuild::ProjectSource;
   use Moose;
   has Auth => (is => 'ro', isa => 'Paws::CodeBuild::SourceAuth', request_name => 'auth', traits => ['NameInRequest']);
   has Buildspec => (is => 'ro', isa => 'Str', request_name => 'buildspec', traits => ['NameInRequest']);
+  has GitCloneDepth => (is => 'ro', isa => 'Int', request_name => 'gitCloneDepth', traits => ['NameInRequest']);
+  has InsecureSsl => (is => 'ro', isa => 'Bool', request_name => 'insecureSsl', traits => ['NameInRequest']);
   has Location => (is => 'ro', isa => 'Str', request_name => 'location', traits => ['NameInRequest']);
   has Type => (is => 'ro', isa => 'Str', request_name => 'type', traits => ['NameInRequest'], required => 1);
 1;
@@ -55,6 +57,17 @@ project's source C<type> value is C<BITBUCKET> or C<GITHUB>).
 
 If this value is not specified, a build spec must be included along
 with the source code to be built.
+
+
+=head2 GitCloneDepth => Int
+
+  Information about the git clone depth for the build project.
+
+
+=head2 InsecureSsl => Bool
+
+  Enable this flag to ignore SSL warnings while connecting to the project
+source code.
 
 
 =head2 Location => Str
@@ -160,9 +173,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::CodeBuild
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

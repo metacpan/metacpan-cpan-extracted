@@ -17,21 +17,36 @@ package Paws::ECR::CompleteLayerUpload;
 
 =head1 NAME
 
-Paws::ECR::CompleteLayerUpload - Arguments for method CompleteLayerUpload on Paws::ECR
+Paws::ECR::CompleteLayerUpload - Arguments for method CompleteLayerUpload on L<Paws::ECR>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CompleteLayerUpload on the 
-Amazon EC2 Container Registry service. Use the attributes of this class
+This class represents the parameters used for calling the method CompleteLayerUpload on the
+L<Amazon EC2 Container Registry|Paws::ECR> service. Use the attributes of this class
 as arguments to method CompleteLayerUpload.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CompleteLayerUpload.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CompleteLayerUpload(Att1 => $value1, Att2 => $value2, ...);
+    my $ecr = Paws->service('ECR');
+    my $CompleteLayerUploadResponse = $ecr->CompleteLayerUpload(
+      LayerDigests   => [ 'MyLayerDigest', ... ],
+      RepositoryName => 'MyRepositoryName',
+      UploadId       => 'MyUploadId',
+      RegistryId     => 'MyRegistryId',             # OPTIONAL
+    );
+
+    # Results:
+    my $RegistryId     = $CompleteLayerUploadResponse->RegistryId;
+    my $UploadId       = $CompleteLayerUploadResponse->UploadId;
+    my $LayerDigest    = $CompleteLayerUploadResponse->LayerDigest;
+    my $RepositoryName = $CompleteLayerUploadResponse->RepositoryName;
+
+    # Returns a L<Paws::ECR::CompleteLayerUploadResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ecr/CompleteLayerUpload>
 
 =head1 ATTRIBUTES
 
@@ -70,9 +85,9 @@ This class forms part of L<Paws>, documenting arguments for method CompleteLayer
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

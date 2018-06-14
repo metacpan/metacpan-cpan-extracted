@@ -13,6 +13,7 @@ package Paws::CloudDirectory::BatchWriteOperationResponse;
   has DetachPolicy => (is => 'ro', isa => 'Paws::CloudDirectory::BatchDetachPolicyResponse');
   has DetachTypedLink => (is => 'ro', isa => 'Paws::CloudDirectory::BatchDetachTypedLinkResponse');
   has RemoveFacetFromObject => (is => 'ro', isa => 'Paws::CloudDirectory::BatchRemoveFacetFromObjectResponse');
+  has UpdateLinkAttributes => (is => 'ro', isa => 'Paws::CloudDirectory::BatchUpdateLinkAttributesResponse');
   has UpdateObjectAttributes => (is => 'ro', isa => 'Paws::CloudDirectory::BatchUpdateObjectAttributesResponse');
 1;
 
@@ -73,12 +74,15 @@ limited number of attached policies.
 =head2 AttachTypedLink => L<Paws::CloudDirectory::BatchAttachTypedLinkResponse>
 
   Attaches a typed link to a specified source and target object. For more
-information, see Typed link.
+information, see Typed link
+(http://docs.aws.amazon.com/directoryservice/latest/admin-guide/objectsandlinks.html#typedlink).
 
 
 =head2 CreateIndex => L<Paws::CloudDirectory::BatchCreateIndexResponse>
 
-  Creates an index object. See Indexing for more information.
+  Creates an index object. See Indexing
+(http://docs.aws.amazon.com/directoryservice/latest/admin-guide/cd_indexing.html)
+for more information.
 
 
 =head2 CreateObject => L<Paws::CloudDirectory::BatchCreateObjectResponse>
@@ -109,12 +113,18 @@ information, see Typed link.
 =head2 DetachTypedLink => L<Paws::CloudDirectory::BatchDetachTypedLinkResponse>
 
   Detaches a typed link from a specified source and target object. For
-more information, see Typed link.
+more information, see Typed link
+(http://docs.aws.amazon.com/directoryservice/latest/admin-guide/objectsandlinks.html#typedlink).
 
 
 =head2 RemoveFacetFromObject => L<Paws::CloudDirectory::BatchRemoveFacetFromObjectResponse>
 
   The result of a batch remove facet from object operation.
+
+
+=head2 UpdateLinkAttributes => L<Paws::CloudDirectory::BatchUpdateLinkAttributesResponse>
+
+  Represents the output of a C<BatchWrite> response operation.
 
 
 =head2 UpdateObjectAttributes => L<Paws::CloudDirectory::BatchUpdateObjectAttributesResponse>
@@ -129,9 +139,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::CloudDire
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

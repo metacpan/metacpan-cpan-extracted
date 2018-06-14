@@ -14019,7 +14019,7 @@
         %hazardHash = $self->compileRoomHazards($avoidHazardsFlag, @otherHazardList);
 
         # Create the open list, using a binomial heap
-        $openListObj = Heap::Binomial->new();
+        $openListObj = Games::Axmud::Obj::BinomialHeap->new();
         # Create a reference to a hash of nodes, in the form
         #   $nodeHash{room_object} = node
         # ...where 'room_object' is a GA::ModelObj::Room, and 'node' is a GA::Node::AStar object
@@ -14979,7 +14979,7 @@
         #   always 0) to get the shortest path between the initial and target rooms
 
         # Create the open list, using a binomial heap
-        $openListObj = Heap::Binomial->new();
+        $openListObj = Games::Axmud::Obj::BinomialHeap->new();
         # Create a reference to a hash of nodes, in the form
         #   $nodeHashRef{exit_object} = node
         # ...where 'exit_object' is a GA::Obj::Exit, and node is a GA::Node::Djikstra object
@@ -15643,7 +15643,7 @@
         #   h-score is always 0) to get the shortest path between the initial and target rooms
 
         # Create the open list, using a binomial heap
-        $openListObj = Heap::Binomial->new();
+        $openListObj = Games::Axmud::Obj::BinomialHeap->new();
         # Create a reference to a hash of nodes, in the form
         #   $hash{room_tag} = djikstra_node
         $nodeHashRef = {};

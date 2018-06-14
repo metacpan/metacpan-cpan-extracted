@@ -29,21 +29,50 @@ package Paws::DynamoDB::Scan;
 
 =head1 NAME
 
-Paws::DynamoDB::Scan - Arguments for method Scan on Paws::DynamoDB
+Paws::DynamoDB::Scan - Arguments for method Scan on L<Paws::DynamoDB>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method Scan on the 
-Amazon DynamoDB service. Use the attributes of this class
+This class represents the parameters used for calling the method Scan on the
+L<Amazon DynamoDB|Paws::DynamoDB> service. Use the attributes of this class
 as arguments to method Scan.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to Scan.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->Scan(Att1 => $value1, Att2 => $value2, ...);
+    my $dynamodb = Paws->service('DynamoDB');
+    # To scan a table
+    # This example scans the entire Music table, and then narrows the results to
+    # songs by the artist "No One You Know". For each item, only the album title
+    # and song title are returned.
+    my $ScanOutput = $dynamodb->Scan(
+      {
+        'ProjectionExpression'      => '#ST, #AT',
+        'TableName'                 => 'Music',
+        'ExpressionAttributeValues' => {
+          ':a' => {
+            'S' => 'No One You Know'
+          }
+        },
+        'ExpressionAttributeNames' => {
+          'AT' => 'AlbumTitle',
+          'ST' => 'SongTitle'
+        },
+        'FilterExpression' => 'Artist = :a'
+      }
+    );
+
+    # Results:
+    my $ConsumedCapacity = $ScanOutput->ConsumedCapacity;
+    my $ScannedCount     = $ScanOutput->ScannedCount;
+    my $Items            = $ScanOutput->Items;
+    my $Count            = $ScanOutput->Count;
+
+    # Returns a L<Paws::DynamoDB::ScanOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/dynamodb/Scan>
 
 =head1 ATTRIBUTES
 
@@ -51,16 +80,18 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 =head2 AttributesToGet => ArrayRef[Str|Undef]
 
 This is a legacy parameter. Use C<ProjectionExpression> instead. For
-more information, see AttributesToGet in the I<Amazon DynamoDB
-Developer Guide>.
+more information, see AttributesToGet
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LegacyConditionalParameters.AttributesToGet.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
 =head2 ConditionalOperator => Str
 
 This is a legacy parameter. Use C<FilterExpression> instead. For more
-information, see ConditionalOperator in the I<Amazon DynamoDB Developer
-Guide>.
+information, see ConditionalOperator
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LegacyConditionalParameters.ConditionalOperator.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 Valid values are: C<"AND">, C<"OR">
 
@@ -145,9 +176,10 @@ C<Percentile>
 
 The name of this attribute conflicts with a reserved word, so it cannot
 be used directly in an expression. (For the complete list of reserved
-words, see Reserved Words in the I<Amazon DynamoDB Developer Guide>).
-To work around this, you could specify the following for
-C<ExpressionAttributeNames>:
+words, see Reserved Words
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ReservedWords.html)
+in the I<Amazon DynamoDB Developer Guide>). To work around this, you
+could specify the following for C<ExpressionAttributeNames>:
 
 =over
 
@@ -172,7 +204,9 @@ Tokens that begin with the B<:> character are I<expression attribute
 values>, which are placeholders for the actual value at runtime.
 
 For more information on expression attribute names, see Accessing Item
-Attributes in the I<Amazon DynamoDB Developer Guide>.
+Attributes
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.AccessingItemAttributes.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
@@ -197,7 +231,9 @@ You could then use these values in an expression, such as this:
 C<ProductStatus IN (:avail, :back, :disc)>
 
 For more information on expression attribute values, see Specifying
-Conditions in the I<Amazon DynamoDB Developer Guide>.
+Conditions
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.SpecifyingConditions.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
@@ -211,8 +247,9 @@ A C<FilterExpression> is applied after the items have already been
 read; the process of filtering does not consume any additional read
 capacity units.
 
-For more information, see Filter Expressions in the I<Amazon DynamoDB
-Developer Guide>.
+For more information, see Filter Expressions
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/QueryAndScan.html#FilteringResults)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
@@ -235,8 +272,9 @@ left off. Also, if the processed data set size exceeds 1 MB before
 DynamoDB reaches this limit, it stops the operation and returns the
 matching values up to the limit, and a key in C<LastEvaluatedKey> to
 apply in a subsequent operation to continue the operation. For more
-information, see Query and Scan in the I<Amazon DynamoDB Developer
-Guide>.
+information, see Query and Scan
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/QueryAndScan.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
@@ -251,8 +289,9 @@ If no attribute names are specified, then all attributes will be
 returned. If any of the requested attributes are not found, they will
 not appear in the result.
 
-For more information, see Accessing Item Attributes in the I<Amazon
-DynamoDB Developer Guide>.
+For more information, see Accessing Item Attributes
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.AccessingItemAttributes.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
@@ -265,7 +304,9 @@ Valid values are: C<"INDEXES">, C<"TOTAL">, C<"NONE">
 =head2 ScanFilter => L<Paws::DynamoDB::FilterConditionMap>
 
 This is a legacy parameter. Use C<FilterExpression> instead. For more
-information, see ScanFilter in the I<Amazon DynamoDB Developer Guide>.
+information, see ScanFilter
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LegacyConditionalParameters.ScanFilter.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
@@ -385,9 +426,9 @@ This class forms part of L<Paws>, documenting arguments for method Scan in L<Paw
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

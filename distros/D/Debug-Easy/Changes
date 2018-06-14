@@ -268,3 +268,21 @@ Revision history for Debug-Easy
 1.21    June 06, 2018
 
         Added "%Epoch%" prefix value
+
+1.22    June 08, 2018
+
+        Make it multi-object aware.  Now you can instantiate more than one
+        instance using different file handles.
+
+1.23    June 12, 2018
+
+        It seems the Log::Fast documentation on instantiating objects is vague
+        Changed "global" to "new".
+
+2.00    June 13, 2018
+
+        I completely ditched the Log::Fast module.  It does not handle multiple
+        instances well.  This also means I had to ditch the unix sockets feature
+        However, you can assign a socket to a filehandle and restore that.
+
+        A new version was started due to this drastic change.

@@ -32,19 +32,20 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Glue::Prede
 
 =head1 DESCRIPTION
 
-A job run that preceded this one.
+A job run that was used in the predicate of a conditional trigger that
+triggered this job run.
 
 =head1 ATTRIBUTES
 
 
 =head2 JobName => Str
 
-  The name of the predecessor job.
+  The name of the job definition used by the predecessor job run.
 
 
 =head2 RunId => Str
 
-  The job-run ID of the precessor job run.
+  The job-run ID of the predecessor job run.
 
 
 
@@ -54,9 +55,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Glue>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

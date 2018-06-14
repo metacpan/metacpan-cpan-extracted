@@ -8,7 +8,7 @@ use DateTime::Locale::Util qw( parse_locale_code );
 use Params::ValidationCompiler 0.13 qw( validation_for );
 use Specio::Declare;
 
-our $VERSION = '1.20';
+our $VERSION = '1.22';
 
 my @FormatLengths;
 
@@ -101,6 +101,7 @@ sub new {
         %{$data},
         default_date_format_length => 'medium',
         default_time_format_length => 'medium',
+        locale_data                => $data
     }, $class;
 }
 
@@ -245,6 +246,10 @@ sub variant_id {
     $_[0]->variant_code;
 }
 
+sub locale_data {
+    return %{ $_[0]->{locale_data} };
+}
+
 sub STORABLE_freeze {
     my $self    = shift;
     my $cloning = shift;
@@ -283,7 +288,7 @@ DateTime::Locale::FromData - Class for locale objects instantiated from pre-defi
 
 =head1 VERSION
 
-version 1.20
+version 1.22
 
 =head1 SYNOPSIS
 
@@ -298,64 +303,103 @@ DateTime::Locale::Data module.
 
 This class provides the following methods:
 
-=over 4
-
-=item * $locale->code
+=head2 $locale->code
 
 The complete locale id, something like "en-US".
 
-=item * $locale->language_code
+=head2 $locale->language_code
 
 The language portion of the code, like "en".
 
-=item * $locale->script_code
+=head2 $locale->script_code
 
 The script portion of the code, like "Hant".
 
-=item * $locale->territory_code
+=head2 $locale->territory_code
 
 The territory portion of the code, like "US".
 
-=item * $locale->variant_code
+=head2 $locale->variant_code
 
 The variant portion of the code, like "POSIX".
 
-=item * $locale->name
+=head2 $locale->name
 
 The locale's complete name, which always includes at least a language
 component, plus optional territory and variant components. Something like
 "English United States". The value returned will always be in English.
 
-=item * $locale->language
+=head2 $locale->language
 
-=item * $locale->script
+=head2 $locale->script
 
-=item * $locale->territory
+=head2 $locale->territory
 
-=item * $locale->variant
+=head2 $locale->variant
 
 The relevant component from the locale's complete name, like "English"
 or "United States".
 
-=item * $locale->native_name
+=head2 $locale->native_name
 
 The locale's complete name in localized form as a UTF-8 string.
 
-=item * $locale->native_language
+=head2 $locale->native_language
 
-=item * $locale->native_script
+=head2 $locale->native_script
 
-=item * $locale->native_territory
+=head2 $locale->native_territory
 
-=item * $locale->native_variant
+=head2 $locale->native_variant
 
 The relevant component from the locale's complete native name as a UTF-8
 string.
 
-=back
+=head2 $locale->month_format_wide
 
-The following methods all return an array reference containing the specified
-data.
+=head2 $locale->month_format_abbreviated
+
+=head2 $locale->month_format_narrow
+
+=head2 $locale->month_stand_alone_wide
+
+=head2 $locale->month_stand_alone_abbreviated
+
+=head2 $locale->month_stand_alone_narrow
+
+=head2 $locale->day_format_wide
+
+=head2 $locale->day_format_abbreviated
+
+=head2 $locale->day_format_narrow
+
+=head2 $locale->day_stand_alone_wide
+
+=head2 $locale->day_stand_alone_abbreviated
+
+=head2 $locale->day_stand_alone_narrow
+
+=head2 $locale->quarter_format_wide
+
+=head2 $locale->quarter_format_abbreviated
+
+=head2 $locale->quarter_format_narrow
+
+=head2 $locale->quarter_stand_alone_wide
+
+=head2 $locale->quarter_stand_alone_abbreviated
+
+=head2 $locale->quarter_stand_alone_narrow
+
+=head2 $locale->am_pm_abbreviated
+
+=head2 $locale->era_wide
+
+=head2 $locale->era_abbreviated
+
+=head2 $locale->era_narrow
+
+These methods all return an array reference containing the specified data.
 
 The methods with "format" in the name should return strings that can be used a
 part of a string, like "the month of July". The stand alone values are for use
@@ -367,91 +411,34 @@ a calendar it's okay to have "T" for both Tuesday and Thursday).
 The wide name should always be the full name of thing in question. The narrow
 name should be just one or two characters.
 
-=over 4
+=head2 $locale->date_format_full
 
-=item * $locale->month_format_wide
+=head2 $locale->date_format_long
 
-=item * $locale->month_format_abbreviated
+=head2 $locale->date_format_medium
 
-=item * $locale->month_format_narrow
+=head2 $locale->date_format_short
 
-=item * $locale->month_stand_alone_wide
+=head2 $locale->time_format_full
 
-=item * $locale->month_stand_alone_abbreviated
+=head2 $locale->time_format_long
 
-=item * $locale->month_stand_alone_narrow
+=head2 $locale->time_format_medium
 
-=item * $locale->day_format_wide
+=head2 $locale->time_format_short
 
-=item * $locale->day_format_abbreviated
+=head2 $locale->datetime_format_full
 
-=item * $locale->day_format_narrow
+=head2 $locale->datetime_format_long
 
-=item * $locale->day_stand_alone_wide
+=head2 $locale->datetime_format_medium
 
-=item * $locale->day_stand_alone_abbreviated
+=head2 $locale->datetime_format_short
 
-=item * $locale->day_stand_alone_narrow
+These methods return strings appropriate for the C<< DateTime->format_cldr >>
+method.
 
-=item * $locale->quarter_format_wide
-
-=item * $locale->quarter_format_abbreviated
-
-=item * $locale->quarter_format_narrow
-
-=item * $locale->quarter_stand_alone_wide
-
-=item * $locale->quarter_stand_alone_abbreviated
-
-=item * $locale->quarter_stand_alone_narrow
-
-=item * $locale->am_pm_abbreviated
-
-=item * $locale->era_wide
-
-=item * $locale->era_abbreviated
-
-=item * $locale->era_narrow
-
-=back
-
-The following methods return strings appropriate for the
-C<< DateTime->format_cldr >> method:
-
-=over 4
-
-=item * $locale->date_format_full
-
-=item * $locale->date_format_long
-
-=item * $locale->date_format_medium
-
-=item * $locale->date_format_short
-
-=item * $locale->time_format_full
-
-=item * $locale->time_format_long
-
-=item * $locale->time_format_medium
-
-=item * $locale->time_format_short
-
-=item * $locale->datetime_format_full
-
-=item * $locale->datetime_format_long
-
-=item * $locale->datetime_format_medium
-
-=item * $locale->datetime_format_short
-
-=back
-
-A locale may also offer one or more formats for displaying part of a datetime,
-such as the year and month, or hour and minute.
-
-=over 4
-
-=item * $locale->format_for($name)
+=head2 $locale->format_for($name)
 
 These are accessed by passing a name to C<< $locale->format_for(...)  >>,
 where the name is a CLDR-style format specifier.
@@ -468,31 +455,47 @@ locale. For example, the "MMMMd" format for the "zh" locale includes the
 Chinese characters for "day" (日) and month (月), so you get something like
 "S<8月23日>".
 
-=item * $locale->available_formats
+=head2 $locale->available_formats
 
 This should return a list of all the format names that could be passed
 to C<< $locale->format_for >>.
 
-=back
+See the documentation for individual locales for details and examples of these
+formats. The format names that are available vary by locale.
 
-There are also some miscellaneous methods:
+=head2 $locale->glibc_datetime_format
 
-=over 4
+=head2 $locale->glibc_date_format
 
-=item * $locale->prefers_24_hour_time
+=head2 $locale->glibc_date_1_format
+
+=head2 $locale->glibc_time_format
+
+=head2 $locale->glibc_time_12_format
+
+These methods return strings appropriate for the C<< DateTime->strftime >>
+method. However, you are strongly encouraged to use the other format methods,
+which use the CLDR format data. They are primarily included for the benefit
+for L<DateTime::Format::Strptime>.
+
+=head2 $locale->version
+
+The CLDR version from which this locale was generated.
+
+=head2 $locale->prefers_24_hour_time
 
 Returns a boolean indicating whether or not the locale prefers 24-hour time.
 
-=item * $locale->first_day_of_week
+=head2 $locale->first_day_of_week
 
 Returns a number from 1 to 7 indicating the I<local> first day of the
 week, with Monday being 1 and Sunday being 7.
 
-=item * $locale->version
+=head2 $locale->locale_data
 
-The CLDR version from which this locale was generated.
-
-=back
+Returns the original data used to create this locale as a hash. This is here
+to facilitate creating custom locale that via
+C<DateTime::Locale->register_data_locale>.
 
 =head1 SUPPORT
 

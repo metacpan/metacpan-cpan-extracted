@@ -1,5 +1,9 @@
 Changelog for XML-Struct
 
+0.27  2018-06-09 00:42:55 CEST
+  - fix bug that prevented writing single quotes in attribute values
+  - deprecate function removeXMLAttr
+
 0.26  2015-06-09 09:53:04 CEST
   - fix builder support of Moo 1.0
   - fix encoding of empty tag in simple format as {}

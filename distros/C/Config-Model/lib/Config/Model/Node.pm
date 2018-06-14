@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Node;
-$Config::Model::Node::VERSION = '2.123';
+$Config::Model::Node::VERSION = '2.124';
 use Mouse;
 with "Config::Model::Role::NodeLoader";
 
@@ -137,7 +137,7 @@ sub BUILD {
     my $caller_class = defined $self->parent ? $self->parent->name : 'user';
 
     my $class_name = $self->config_class_name;
-    $logger->info("New $class_name requested by $caller_class");
+    $logger->debug("New $class_name requested by $caller_class");
 
     # get_model returns a cloned data structure
     $self->model( $self->config_model->get_model($class_name) );
@@ -163,7 +163,6 @@ sub create_element {
         if ( $check eq 'yes' ) {
             Config::Model::Exception::UnknownElement->throw(
                 object   => $self,
-                function => 'create_element',
                 where    => $self->location || 'configuration root',
                 element  => $element_name,
             );
@@ -924,11 +923,11 @@ sub set {
 
 sub load {
     my $self   = shift;
-    my $loader = Config::Model::Loader->new;
+    my $loader = Config::Model::Loader->new( start_node => $self );
 
     my %args = @_ eq 1 ? ( steps => $_[0] ) : @_;
     if ( defined $args{step} || defined $args{steps}) {
-        $loader->load( node => $self, %args );
+        $loader->load( %args );
     }
     else {
         Config::Model::Exception::Load->throw(
@@ -1223,7 +1222,7 @@ Config::Model::Node - Class for configuration tree node
 
 =head1 VERSION
 
-version 2.123
+version 2.124
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 package Mojo::Webqq;
 use strict;
 use Carp ();
-$Mojo::Webqq::VERSION = "2.2.0";
+$Mojo::Webqq::VERSION = "2.2.1";
 use Mojo::Webqq::Base 'Mojo::EventEmitter';
 use Mojo::Webqq::Log;
 use Mojo::Webqq::Cache;
@@ -9,6 +9,7 @@ use Time::HiRes qw(gettimeofday);
 use File::Spec ();
 use base qw(Mojo::Webqq::Model Mojo::Webqq::Client Mojo::Webqq::Plugin Mojo::Webqq::Request Mojo::Webqq::Util Mojo::Webqq::Model::Ext);
 
+has domain              => 'web2.qq.com';
 has account             => sub{ $ENV{MOJO_WEBQQ_ACCOUNT} || 'default'};
 has start_time          => time;
 has pwd                 => undef;
@@ -20,6 +21,10 @@ has http_debug          => sub{$ENV{MOJO_WEBQQ_HTTP_DEBUG} || 0 };
 has ua_debug            => sub{$_[0]->http_debug};
 has ua_debug_req_body   => sub{$_[0]->ua_debug};
 has ua_debug_res_body   => sub{$_[0]->ua_debug};
+has ua_connect_timeout      => 10;
+has ua_request_timeout      => 120;
+has ua_inactivity_timeout   => 120;
+has model_update_timeout    => 15;#sub{$_[0]->ua_request_timeout};
 has log_level           => 'info';     #debug|info|msg|warn|error|fatal
 has log_path            => undef;
 has log_encoding        => undef;      #utf8|gbk|...
@@ -30,7 +35,7 @@ has send_interval       => 3;           #全局发送消息间隔时间
 has check_account       => 0;           #是否检查预设账号与实际登录账号是否匹配
 has disable_color       => ($^O eq 'MSWin32' ? 1 : 0);           #是否禁用终端打印颜色
 has ignore_send_retcode      => sub{[1202,100100]}; #对发送消息返回这些状态码不认为发送失败，不重试
-has ignore_poll_retcode      => sub{[102,109,110,1202,100000,100012]}; #对接收消息返回这些状态码不认为接收失败，不重新登录
+has ignore_poll_retcode      => sub{[102,109,110,1202,100012]}; #对接收消息返回这些状态码不认为接收失败，不重新登录
 has ignore_poll_http_code => sub{[504,502]}; #忽略接收消息请求返回的502/504状态码，因为并不影响消息接收，以免引起恐慌
 has ignore_unknown_id   => 1; #其他设备上自己发送的消息，在webqq上会以接受消息的形式再次接收到，id还未知,是否忽略掉这种消息
 has allow_message_sync => 0; #是否允许同步来自其他设备登录账号发送的消息，由于webqq自身发送消息后也会收到服务端重复的消息，且没办法和来自其他设备的消息区分，会导致出现一些不期望的结果，比如某些插件会陷入死循环等，因此默认不开启消息同步，如果你只是用来api发送消息或者irc聊天，则开启此选项，可以同步来自其他设备的消息，体验会更好一些
@@ -145,8 +150,9 @@ has ua                      => sub {
     Mojo::UserAgent->new(
         proxy              => sub{ my $proxy = Mojo::UserAgent::Proxy->new;$proxy->detect;$proxy}->(),
         max_redirects      => 7,
-        request_timeout    => 120,
-        inactivity_timeout => 120,
+        connect_timeout    => $self->ua_connect_timeout,
+        request_timeout    => $self->ua_request_timeout,
+        inactivity_timeout => $self->ua_inactivity_timeout,
         transactor => $transactor,
     );
 };
@@ -299,7 +305,8 @@ sub new {
     });
     $self->on(model_update_fail=>sub{
         my $self = shift;
-        $self->relogin() if $self->login_type eq 'login';
+        $self->info("检测到登录状态失效(1)，尝试重新登录");
+        $self->relogin();
     });
     $self->on(before_send_message=>sub{
         my($self,$msg) = @_;

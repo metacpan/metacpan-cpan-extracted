@@ -119,7 +119,7 @@ sub geocode {
 	}
 
 	my $location = $param{location}
-		or Carp::croak("Usage: geocode(location => \$location)");
+		or Carp::croak('Usage: geocode(location => $location)');
 
 	if($location =~ /^(.+),\s*Washington\s*DC,(.+)$/) {
 		$location = "$1, Washington, DC, $2";
@@ -129,7 +129,8 @@ sub geocode {
 		return $known_locations{$location};
 	}
 
-	return unless($location =~ /,/);	# Not well formed, or an attempt to find the location of an entire country
+	# ::diag($location);
+	return unless(($location =~ /,/) || $param{'region'});	# Not well formed, or an attempt to find the location of an entire country
 
 	my $county;
 	my $state;
@@ -169,6 +170,11 @@ sub geocode {
 	} elsif($location =~ /^[\w\s-],[\w\s-]/) {
 		Carp::carp(__PACKAGE__, ": can't parse and handle $location");
 		return;
+	} elsif(($location =~ /^[\w\s-]+$/) && (my $region = $param{'region'})) {
+		$location = $location;
+		$location =~ s/^\s//g;
+		$location =~ s/\s$//g;
+		$country = uc($region);
 	} else {
 		# Carp::croak(__PACKAGE__, ' only supports towns, not full addresses');
 		return;
@@ -223,7 +229,7 @@ sub geocode {
 	my @admin2s;
 	my $region;
 	my @regions;
-	if(($country =~ /^(United States|USA|US)$/) && (length($state) > 2)) {
+	if(($country =~ /^(United States|USA|US)$/) && $state && (length($state) > 2)) {
 		if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
 			$state = $twoletterstate;
 		}
@@ -329,14 +335,49 @@ sub geocode {
 		}
 	}
 
+	my $confidence = 0.5;
+	if(my $c = $param{'region'}) {
+		$options->{'Country'} = lc($c);
+		$confidence = 0.1;
+	}
 	# This case nonsense is because DBD::CSV changes the columns to lowercase, wherease DBD::SQLite does not
 	if(wantarray) {
 		my @rc = $self->{'cities'}->selectall_hash($options);
+		if(scalar(@rc) == 0) {
+			return;
+		}
+		# ::diag(__LINE__, Data::Dumper->new([\@rc])->Dump());
 		foreach my $city(@rc) {
 			if($city->{'Latitude'}) {
 				$city->{'latitude'} = delete $city->{'Latitude'};
 				$city->{'longitude'} = delete $city->{'Longitude'};
 			}
+			if($city->{'Country'}) {
+				$city->{'country'} = uc(delete $city->{'Country'});
+			}
+			if($city->{'Region'}) {
+				$city->{'state'} = uc(delete $city->{'Region'});
+			}
+			if($city->{'City'}) {
+				$city->{'city'} = uc(delete $city->{'City'});
+				# Less likely to get false positives with long words
+				if(length($city->{'city'}) > 10) {
+					if($confidence <= 0.8) {
+						$confidence += 0.2;
+					} else {
+						$confidence = 1.0;
+					}
+				}
+			}
+			$city->{'confidence'} = $confidence;
+			my $l= $options->{'City'};
+			if($options->{'Region'}) {
+				$l .= ', ' . $options->{'Region'};
+			}
+			if($options->{'Country'}) {
+				$l .= ', ' . ucfirst($options->{'Country'});
+			}
+			$city->{'location'} = $l;
 		}
 		return @rc;
 	}
@@ -353,34 +394,14 @@ sub geocode {
 			$city = $self->{'cities'}->fetchrow_hashref($options);
 			last if(defined($city));
 		}
-		# if((!defined($city)) && defined($first)) {
-			# # e.g. Greene County, Indiana, USA
-			# my @admin2s = $self->{'admin2'}->selectall_hash(asciiname => $first);
-			# if(scalar(@admin2s) && defined($admin2s[0]->{'concatenated_codes'})) {
-				# foreach my $admin2(@admin2s) {
-					# my $concat = $admin2->{'concatenated_codes'};
-					# ::diag($concat);
-				# }
-			# }
-		# }
 	}
 
 	if(defined($city) && defined($city->{'Latitude'})) {
 		$city->{'latitude'} = delete $city->{'Latitude'};
 		$city->{'longitude'} = delete $city->{'Longitude'};
+		$city->{'confidence'} = $confidence;
 	}
 	return $city;
-	# my $rc;
-	# if(wantarray && $rc->{'otherlocations'} && $rc->{'otherlocations'}->{'loc'} &&
-	   # (ref($rc->{'otherlocations'}->{'loc'}) eq 'ARRAY')) {
-		# my @rc = @{$rc->{'otherlocations'}->{'loc'}};
-		# if(scalar(@rc)) {
-			# return @rc;
-		# }
-	# }
-	# return $rc;
-	# my @results = @{ $data || [] };
-	# wantarray ? @results : $results[0];
 }
 
 =head2 reverse_geocode

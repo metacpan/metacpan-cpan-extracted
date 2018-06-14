@@ -1,59 +1,59 @@
 $VAR1 = {
+          'htmlright' => '2',
+          'translate' => '/var/www/cgi-bin/config/translate.pl',
+          'config' => '/var/www/cgi-bin/config/settings.pl',
+          'tree' => {
+                      'navigation' => '/var/www/cgi-bin/config/tree.pl',
+                      'links' => '/var/www/cgi-bin/config/links.pl'
+                    },
           'database' => {
-                          'name' => 'lze',
-                          'CurrentUser' => 'lze',
-                          'host' => 'localhost',
-                          'user' => 'lze',
-                          'password' => '',
-                          'CurrentPass' => '',
                           'CurrentDb' => 'lze',
-                          'CurrentHost' => 'localhost'
+                          'user' => 'lze',
+                          'host' => 'localhost',
+                          'CurrentUser' => 'lze',
+                          'CurrentPass' => '',
+                          'name' => 'lze',
+                          'CurrentHost' => 'localhost',
+                          'password' => ''
                         },
-          'language' => 'en',
-          'floodtime' => 10,
-          'apacheconfig' => '/etc/apache2/sites-enabled/',
+          'actions' => '/var/www/cgi-bin/config/actions.pl',
           'cgi' => {
-                     'bin' => '/var/www/cgi-bin',
-                     'serverName' => 'http://localhost',
-                     'cookiePath' => '/',
                      'expires' => '+1y',
                      'style' => 'mysql',
+                     'title' => 'MySQL::Admin',
+                     'cookiePath' => '/',
                      'DocumentRoot' => '/var/www/html/',
-                     'title' => 'MySQL::Admin'
+                     'bin' => '/var/www/cgi-bin',
+                     'serverName' => 'http://localhost'
                    },
-          'actions' => '/var/www/cgi-bin/config/actions.pl',
+          'version' => '1.14',
+          'uploads' => {
+                         'enabled' => 1,
+                         'right' => 2,
+                         'chmod' => 438,
+                         'path' => '/var/www/html//download',
+                         'maxlength' => '2100000000000000'
+                       },
+          'defaultAction' => 'ShowDatabases',
+          'apacheconfig' => '/etc/apache2/sites-enabled/',
           'size' => '16',
-          'version' => '1.13',
+          'floodtime' => 10,
+          'news' => {
+                      'messages' => '5',
+                      'right' => 5,
+                      'captcha' => 3
+                    },
+          'language' => 'en',
+          'session' => '/var/www/cgi-bin/config/session.pl',
+          'saveTranslate' => '0',
           'admin' => {
                        'password' => 'testpass'
                      },
-          'news' => {
-                      'captcha' => 3,
-                      'messages' => '5',
-                      'right' => 5
-                    },
-          'config' => '/var/www/cgi-bin/config/settings.pl',
-          'defaultAction' => 'ShowDatabases',
-          'session' => '/var/www/cgi-bin/config/session.pl',
-          'htmlright' => '2',
-          'mod' => 'n',
-          'translate' => '/var/www/cgi-bin/config/translate.pl',
-          'saveTranslate' => '0',
           'files' => {
-                       'owner' => 'lze',
                        'group' => 'lze',
-                       'chmod' => '0755'
+                       'chmod' => '0755',
+                       'owner' => 'lze'
                      },
-          'tree' => {
-                      'links' => '/var/www/cgi-bin/config/links.pl',
-                      'navigation' => '/var/www/cgi-bin/config/tree.pl'
-                    },
-          'uploads' => {
-                         'chmod' => 438,
-                         'maxlength' => '2100000000000000',
-                         'path' => '/var/www/html//download',
-                         'right' => 2,
-                         'enabled' => 1
-                       }
+          'mod' => 'n'
         };
 $m_hrSettings =$VAR1;

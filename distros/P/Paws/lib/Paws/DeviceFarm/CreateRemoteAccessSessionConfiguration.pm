@@ -31,16 +31,15 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::DeviceFarm:
 
 =head1 DESCRIPTION
 
-Creates the configuration settings for a remote access session,
-including the device model and type.
+Configuration settings for a remote access session, including billing
+method.
 
 =head1 ATTRIBUTES
 
 
 =head2 BillingMethod => Str
 
-  Returns the billing method for purposes of configuring a remote access
-session.
+  The billing method for the remote access session.
 
 
 
@@ -50,9 +49,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::DeviceFar
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

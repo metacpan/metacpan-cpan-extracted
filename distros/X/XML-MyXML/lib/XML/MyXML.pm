@@ -1,6 +1,6 @@
 package XML::MyXML;
 # ABSTRACT: A simple-to-use XML module, for parsing and creating XML documents
-$XML::MyXML::VERSION = '1.000';
+$XML::MyXML::VERSION = '1.02';
 use strict;
 use warnings;
 use Carp;
@@ -18,7 +18,7 @@ sub _encode {
     my $string = shift;
     my $entities = shift || {};
     defined $string or $string = '';
-    my %replace = 	(
+    my %replace =   (
                     '<' => '&lt;',
                     '>' => '&gt;',
                     '&' => '&amp;',
@@ -53,7 +53,7 @@ sub _decode {
     push @capture, '&#x[0-9A-Fa-f]+;', '&#[0-9]+;';
     my $capture = "(".join("|", @capture).")";
     my @captured = $string =~ /$capture/g;
-    @captured	or return $string;
+    @captured   or return $string;
     my %conv;
     foreach my $e (@captured) {
         if (exists $conv{$e}) { next; }
@@ -104,19 +104,19 @@ sub xml_to_object {
     my $flags = shift || {};
 
     if ($flags->{file}) {
-        open my $fh, '<', $xml	or croak "Error: The file '$xml' could not be opened for reading: $!";
+        open my $fh, '<', $xml  or croak "Error: The file '$xml' could not be opened for reading: $!";
         $xml = join '', <$fh>;
         close $fh;
     }
 
     if ($flags->{bytes} or $flags->{file}) {
         my (undef, undef, $encoding) = $xml =~ /<\?xml(\s[^>]+)?\sencoding=(['"])(.*?)\2/g;
-        $encoding = 'UTF-8'		if ! defined $encoding;
+        $encoding = 'UTF-8'     if ! defined $encoding;
         if ($encoding =~ /\Autf-?8\z/i) { $encoding = 'UTF-8'; }
         eval {
             $xml = decode($encoding, $xml, Encode::FB_CROAK);
         };
-        ! $@	or croak 'Error: Input string is invalid UTF-8';
+        ! $@    or croak 'Error: Input string is invalid UTF-8';
     }
 
     my $entities = {};
@@ -324,7 +324,7 @@ sub simple_to_xml {
         close $fh;
     }
 
-    $xml = encode_utf8($xml)	if $flags->{bytes};
+    $xml = encode_utf8($xml)    if $flags->{bytes};
     return $xml;
 }
 
@@ -496,7 +496,7 @@ sub check_xml {
 
 
 package XML::MyXML::Object;
-$XML::MyXML::Object::VERSION = '1.000';
+$XML::MyXML::Object::VERSION = '1.02';
 use Carp;
 use Encode;
 use Scalar::Util qw/ weaken /;
@@ -531,11 +531,11 @@ sub cmp_element {
             ? @$desc{qw/ tag attrs /}
             : _parse_description($desc);
 
-    ! length $tag or $self->{element} =~ /(\A|\:)\Q$tag\E\z/	or return 0;
+    ! length $tag or $self->{element} =~ /(\A|\:)\Q$tag\E\z/    or return 0;
     foreach my $attr (keys %$attrs) {
         my $val = $self->attr($attr);
-        defined $val											or return 0;
-        ! defined $attrs->{$attr} or $attrs->{$attr} eq $val	or return 0;
+        defined $val                                            or return 0;
+        ! defined $attrs->{$attr} or $attrs->{$attr} eq $val    or return 0;
     }
 
     return 1;
@@ -548,7 +548,7 @@ sub children {
     $tag = '' if ! defined $tag;
 
     my @all_children = grep { defined $_->{element} } @{$self->{content}};
-    length $tag		or return @all_children;
+    length $tag     or return @all_children;
 
     ($tag, my $attrs) = _parse_description($tag);
     my $desc = { tag => $tag, attrs => $attrs };
@@ -566,7 +566,7 @@ sub path {
     my @path;
     my $orig_path = $path;
     my $start_root = $path =~ m!\A/!;
-    $path = "/" . $path		unless $start_root;
+    $path = "/" . $path     unless $start_root;
     while (length $path) {
         my $success = $path =~ s!\A/((?:[^/\[]*)?(?:\[[^\]=]+(?:=(?:\"[^"]*\"|[^"\]]*))?\])*)!!;
         my $seg = $1;
@@ -579,11 +579,11 @@ sub path {
 
     my @result = ($self);
     if ($start_root) {
-        $self->cmp_element(shift @path)		or return;
+        $self->cmp_element(shift @path)     or return;
     }
     for (my $i = 0; $i <= $#path; $i++) {
         @result = map $_->children( $path[$i] ), @result;
-        @result		or return;
+        @result     or return;
     }
     return wantarray ? @result : $result[0];
 }
@@ -686,7 +686,7 @@ sub tag {
 
     my $tag = $self->{element};
     if (defined $tag) {
-        $tag =~ s/\A.*\://	if $flags->{strip_ns};
+        $tag =~ s/\A.*\://  if $flags->{strip_ns};
         return $tag;
     } else {
         return undef;
@@ -732,7 +732,7 @@ sub to_xml {
         print $fh $xml;
         close $fh;
     }
-    $xml = encode_utf8($xml)	if $flags->{bytes};
+    $xml = encode_utf8($xml)    if $flags->{bytes};
     return $xml;
 }
 
@@ -762,7 +762,7 @@ XML::MyXML - A simple-to-use XML module, for parsing and creating XML documents
 
 =head1 VERSION
 
-version 1.000
+version 1.02
 
 =head1 SYNOPSIS
 
@@ -847,11 +847,112 @@ Optional flags: C<complete>, C<tidy>, C<indentstring>, C<save>, C<bytes>
 Produces a raw XML string from either an array reference, a hash reference or a mixed structure such as these examples:
 
     { thing => { name => 'John', location => { city => 'New York', country => 'U.S.A.' } } }
-    [ thing => [ name => 'John', location => [ city => 'New York', country => 'U.S.A.' ] ] ]
-    { thing => { name => 'John', location => [ city => 'New York', city => 'Boston', country => 'U.S.A.' ] } }
+    # <thing><name>John</name><location><country>U.S.A.</country><city>New York</city></location></thing>
 
-You can also choose attributes for your elements, in a great variety of ways, as follows. I tried to cover
-every way imaginable, so you don't need to remember a correct one.
+    [ thing => [ name => 'John', location => [ city => 'New York', country => 'U.S.A.' ] ] ]
+    # <thing><name>John</name><location><country>U.S.A.</country><city>New York</city></location></thing>
+
+    { thing => { name => 'John', location => [ city => 'New York', city => 'Boston', country => 'U.S.A.' ] } }
+    # <thing><name>John</name><location><city>New York</city><city>Boston</city><country>U.S.A.</country></location></thing>
+
+Here's a mini-tutorial on how to use this function, in which you'll also see how to set attributes.
+
+The simplest invocations are these:
+
+    simple_to_xml({target => undef})
+    # <target/>
+
+    simple_to_xml({target => 123})
+    # <target>123</target>
+
+Every set of sibling elements (such as the document itself, which is a single top-level element, or a pack of
+5 elements all children to the same parent element) is represented in the $simple_array_ref parameter as
+key-value pairs inside either a hashref or an arrayref (you can choose which).
+
+Keys represent tags+attributes of the sibling elements, whereas values represent the contents of those elements.
+
+Eg:
+
+    [
+        first => 'John',
+        last => 'Doe,'
+    ]
+
+...and...
+
+    {
+        first => 'John',
+        last => 'Doe',
+    }
+
+both translate to:
+
+    <first>John</first><last>Doe</last>
+
+A value can either be undef (to denote an empty element), or a string (to denote a string), or another
+hashref/arrayref to denote a set of children elements, like this:
+
+    {
+        person => {
+            name => {
+                first => 'John',
+                last => 'Doe'
+            }
+        }
+    }
+
+...becomes:
+
+    <person>
+        <name>
+            <first>John</first>
+            <last>Doe</last>
+        </name>
+    </person>
+
+The only difference between using an arrayref or using a hashref, is that arrayrefs preserve the
+order of the elements, and allow repetition of identical tags. So a person with many addresses, should choose to
+represent its list of addresses under an arrayref, like this:
+
+    {
+        person => [
+            name => {
+                first => 'John',
+                last => 'Doe',
+            },
+            address => {
+                country => 'Malta',
+            },
+            address => {
+                country => 'Indonesia',
+            },
+            address => {
+                country => 'China',
+            }
+        ]
+    }
+
+...which becomes:
+
+    <person>
+        <name>
+            <last>Doe</last>
+            <first>John</first>
+        </name>
+        <address>
+            <country>Malta</country>
+        </address>
+        <address>
+            <country>Indonesia</country>
+        </address>
+        <address>
+            <country>China</country>
+        </address>
+    </person>
+
+Finally, to set attributes to your elements (eg id="12") you need to replace the key with either
+a string containing attributes as well (eg: 'address id="12"'), or replace it with a reference, as the many
+items in the examples below:
 
     {thing => [
         'item id="1"' => 'chair',
@@ -863,7 +964,7 @@ every way imaginable, so you don't need to remember a correct one.
         [item => {id => 7, other => 8}, [more => 9, also => 10, but_not => undef]] => 'towel'
     ]}
 
-This produces this XML:
+...which becomes:
 
     <thing>
         <item id="1">chair</item>
@@ -875,10 +976,15 @@ This produces this XML:
         <item id="7" other="8" more="9" also="10">towel</item>
     </thing>
 
-Of course if the "simple object" is a hashref, the key cannot be a reference (hash keys are always strings), so
-if you want attributes on such an element, you need to make sure that either the containing simple object
-is an arrayref, or that the key is a string which contains its attributes like so: 'item id="1" other="2"',
-as in the previous example.
+As you see, attributes may be represented in a great variety of ways, so you don't need to remember
+the "correct" one.
+
+Of course if the "simple structure" is a hashref, the key cannot be a reference (because hash keys are always
+strings), so if you want attributes on your elements, you either need the enclosing structure to be an
+arrayref as in the example above, to allow keys to be refs which contain the attributes, or you need to
+represent the key (=tag+attrs) as a string, like this (also in the previous example): 'item id="1"'
+
+This concludes the mini-tutorial of the simple_to_xml function.
 
 All the strings in C<$simple_array_ref> need to contain characters, rather than bytes/octets. The C<bytes> optional flag only affects the produced XML string.
 
@@ -1015,6 +1121,9 @@ If you have a Github account, report your issues at
 L<https://github.com/akarelas/xml-myxml/issues>.
 I will be notified, and then you'll automatically be notified of progress on
 your bug as I make changes.
+
+You can get notified of new versions of this module for free, by email or RSS,
+at L<https://www.perlmodules.net/viewfeed/distro/XML-MyXML>
 
 =head1 AUTHOR
 

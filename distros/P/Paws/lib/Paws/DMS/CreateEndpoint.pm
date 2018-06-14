@@ -7,6 +7,7 @@ package Paws::DMS::CreateEndpoint;
   has EndpointIdentifier => (is => 'ro', isa => 'Str', required => 1);
   has EndpointType => (is => 'ro', isa => 'Str', required => 1);
   has EngineName => (is => 'ro', isa => 'Str', required => 1);
+  has ExternalTableDefinition => (is => 'ro', isa => 'Str');
   has ExtraConnectionAttributes => (is => 'ro', isa => 'Str');
   has KmsKeyId => (is => 'ro', isa => 'Str');
   has MongoDbSettings => (is => 'ro', isa => 'Paws::DMS::MongoDbSettings');
@@ -14,6 +15,7 @@ package Paws::DMS::CreateEndpoint;
   has Port => (is => 'ro', isa => 'Int');
   has S3Settings => (is => 'ro', isa => 'Paws::DMS::S3Settings');
   has ServerName => (is => 'ro', isa => 'Str');
+  has ServiceAccessRoleArn => (is => 'ro', isa => 'Str');
   has SslMode => (is => 'ro', isa => 'Str');
   has Tags => (is => 'ro', isa => 'ArrayRef[Paws::DMS::Tag]');
   has Username => (is => 'ro', isa => 'Str');
@@ -29,28 +31,85 @@ package Paws::DMS::CreateEndpoint;
 
 =head1 NAME
 
-Paws::DMS::CreateEndpoint - Arguments for method CreateEndpoint on Paws::DMS
+Paws::DMS::CreateEndpoint - Arguments for method CreateEndpoint on L<Paws::DMS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateEndpoint on the 
-AWS Database Migration Service service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateEndpoint on the
+L<AWS Database Migration Service|Paws::DMS> service. Use the attributes of this class
 as arguments to method CreateEndpoint.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateEndpoint.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateEndpoint(Att1 => $value1, Att2 => $value2, ...);
+    my $dms = Paws->service('DMS');
+    my $CreateEndpointResponse = $dms->CreateEndpoint(
+      EndpointIdentifier => 'MyString',
+      EndpointType       => 'source',
+      EngineName         => 'MyString',
+      CertificateArn     => 'MyString',    # OPTIONAL
+      DatabaseName       => 'MyString',    # OPTIONAL
+      DynamoDbSettings   => {
+        ServiceAccessRoleArn => 'MyString',
+
+      },                                   # OPTIONAL
+      ExternalTableDefinition   => 'MyString',    # OPTIONAL
+      ExtraConnectionAttributes => 'MyString',    # OPTIONAL
+      KmsKeyId                  => 'MyString',    # OPTIONAL
+      MongoDbSettings           => {
+        ServerName => 'MyString',
+        AuthMechanism =>
+          'default',    # values: default, mongodb_cr, scram_sha_1; OPTIONAL
+        KmsKeyId          => 'MyString',
+        Password          => 'MySecretString',  # OPTIONAL
+        AuthSource        => 'MyString',
+        ExtractDocId      => 'MyString',
+        Username          => 'MyString',
+        NestingLevel      => 'none',            # values: none, one; OPTIONAL
+        AuthType          => 'no',              # values: no, password; OPTIONAL
+        DocsToInvestigate => 'MyString',
+        DatabaseName      => 'MyString',
+        Port              => 1,                 # OPTIONAL
+      },    # OPTIONAL
+      Password   => 'MySecretString',    # OPTIONAL
+      Port       => 1,                   # OPTIONAL
+      S3Settings => {
+        CsvDelimiter            => 'MyString',
+        ServiceAccessRoleArn    => 'MyString',
+        CompressionType         => 'none',       # values: none, gzip; OPTIONAL
+        BucketFolder            => 'MyString',
+        BucketName              => 'MyString',
+        CsvRowDelimiter         => 'MyString',
+        ExternalTableDefinition => 'MyString',
+      },    # OPTIONAL
+      ServerName           => 'MyString',    # OPTIONAL
+      ServiceAccessRoleArn => 'MyString',    # OPTIONAL
+      SslMode              => 'none',        # OPTIONAL
+      Tags                 => [
+        {
+          Value => 'MyString',
+          Key   => 'MyString',
+        },
+        ...
+      ],                                     # OPTIONAL
+      Username => 'MyString',                # OPTIONAL
+    );
+
+    # Results:
+    my $Endpoint = $CreateEndpointResponse->Endpoint;
+
+    # Returns a L<Paws::DMS::CreateEndpointResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/dms/CreateEndpoint>
 
 =head1 ATTRIBUTES
 
 
 =head2 CertificateArn => Str
 
-The Amazon Resource Number (ARN) for the certificate.
+The Amazon Resource Name (ARN) for the certificate.
 
 
 
@@ -65,7 +124,8 @@ The name of the endpoint database.
 Settings in JSON format for the target Amazon DynamoDB endpoint. For
 more information about the available settings, see the B<Using Object
 Mapping to Migrate Data to DynamoDB> section at Using an Amazon
-DynamoDB Database as a Target for AWS Database Migration Service.
+DynamoDB Database as a Target for AWS Database Migration Service
+(http://docs.aws.amazon.com/dms/latest/userguide/CHAP_Target.DynamoDB.html).
 
 
 
@@ -86,8 +146,15 @@ Valid values are: C<"source">, C<"target">
 =head2 B<REQUIRED> EngineName => Str
 
 The type of engine for the endpoint. Valid values, depending on the
-EndPointType, include MYSQL, ORACLE, POSTGRES, MARIADB, AURORA,
-REDSHIFT, S3, SYBASE, DYNAMODB, MONGODB, and SQLSERVER.
+EndPointType, include mysql, oracle, postgres, mariadb, aurora,
+aurora-postgresql, redshift, s3, db2, azuredb, sybase, dynamodb,
+mongodb, and sqlserver.
+
+
+
+=head2 ExternalTableDefinition => Str
+
+The external table definition.
 
 
 
@@ -113,7 +180,8 @@ Settings in JSON format for the source MongoDB endpoint. For more
 information about the available settings, see the B<Configuration
 Properties When Using MongoDB as a Source for AWS Database Migration
 Service> section at Using Amazon S3 as a Target for AWS Database
-Migration Service.
+Migration Service
+(http://docs.aws.amazon.com/dms/latest/userguide/CHAP_Source.MongoDB.html).
 
 
 
@@ -131,16 +199,24 @@ The port used by the endpoint database.
 
 =head2 S3Settings => L<Paws::DMS::S3Settings>
 
-Settings in JSON format for the target S3 endpoint. For more
+Settings in JSON format for the target Amazon S3 endpoint. For more
 information about the available settings, see the B<Extra Connection
 Attributes> section at Using Amazon S3 as a Target for AWS Database
-Migration Service.
+Migration Service
+(http://docs.aws.amazon.com/dms/latest/userguide/CHAP_Target.S3.html).
 
 
 
 =head2 ServerName => Str
 
 The name of the server where the endpoint database resides.
+
+
+
+=head2 ServiceAccessRoleArn => Str
+
+The Amazon Resource Name (ARN) for the service access role you want to
+use to create the endpoint.
 
 
 
@@ -174,9 +250,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateEndpoin
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

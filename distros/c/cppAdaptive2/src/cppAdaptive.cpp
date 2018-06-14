@@ -1,14 +1,12 @@
 #include <iostream>
-//#include <fstream>   
+#include <fstream>
 #include <chrono>
-#include "dlib/matrix.h"
-// #include "omp.h"
 #include <random>
+#include <omp.h>
+#include "dlib/matrix.h"
 
 using namespace dlib;
 using namespace std;
-
-#define THREADS 2
 
 const int n_tasks          = 15;                                 
 const int n_alts           = 3;                                  
@@ -19,6 +17,7 @@ const int n_betas          = 10;
 const int n_draws          = 32;                                 
 const int n_overlap        = 2;                                  
 
+#define THREADS 4
 
 // prior mean, covariance, and precision matrices for calculating the posterior beta's
 const matrix <double, n_betas, 1>  prior_mu = {0.0};
@@ -29,6 +28,7 @@ const matrix <double, n_betas, n_betas> prior_tau = inv(prior_Sigma);
 const int n_rowsD        = n_tasks*n_alts;                       
 const int n_rowsX        = n_tasks*(n_alts-1);                   
 const int n_rowsXtask    = n_alts-1;                             
+
 
 struct {
     matrix <double, 1,n_betas>               beta;
@@ -66,6 +66,7 @@ const matrix <double, n_candidates*n_rowsXtask, 2> candidates = {
 1,-1,0,0,
 0,0,0,-1,
 0,0,1,-1};
+
 
 void str2beta(const string &input, matrix <double, n_betas, 1> &output)
 {
@@ -391,7 +392,7 @@ void createLHS( matrix <double, n_draws, n_betas> &lhs)
     for (int row=0; row<n_rows; row++)
       X(row,col)= row+1;
                 
-  for (int t=0; t<10; t++){          
+  for (int t=0; t<20; t++){          
     for (int col=0; col<n_cols; col++){
       for (int i=n_draws-1; i>0; i--){  
         int j = floor(rnd()*i);
@@ -505,7 +506,7 @@ void createLHS( matrix <double, n_draws, n_betas> &lhs)
            sum_criterion        = new_sum_criterion;
          }
       } 
-    } while (nr_loops_without_swap<200);
+    } while (nr_loops_without_swap<1000);
 
 
     if (t==0){
@@ -537,37 +538,40 @@ double NormCDFinverse(double p)
       return RationalApproximation( sqrt(-2.0*log(1-p)) );
 }
 
-// void insertDraws(const matrix<double, n_betas, n_betas> &chol_covar, const matrix<double, n_betas, 1> b_optim) 
-// { 
-// 	matrix <double, n_draws, n_betas> lhs; 
-// 	
-// 	std::ifstream input("lhs_" + to_string(n_draws) + "_" + to_string(n_betas) + ".txt"); 	
-// 	if (input) {
-// 	  // The file exists, and is open for input	
-//       for (int i=0; i<n_draws; i++)
-//         for (int j=0; j<n_betas; j++)
-//           input >> lhs(i,j); 	  	
-// 	} else { 
-// 	  createLHS(lhs); 
-//       for (int i=0;i<n_draws;i++)
-//         for (int j=0;j<n_betas;j++)
-//           lhs(i,j) = NormCDFinverse(lhs(i,j));
-//       std::ofstream output ("lhs_" + to_string(n_draws) + "_" + to_string(n_betas) + ".txt"); 
-//       for (int i=0; i<n_draws; i++){
-//         for (int j=0; j<n_betas; j++)
-//           output << lhs(i,j) << " ";
-// 		output << "\n"; 
-//       }
-//       output.close();
-// 	} 	
-// 	
-//     matrix <double> betas = lhs * chol_covar;
-//     for (int i = 0; i < n_draws; i++ )
-//       for (int j = 0; j < n_betas; j++)
-//    	    betas(i,j) += b_optim(j);
-// 	for (int i = 0; i < n_draws; i++ )
-//       draw[i].beta = rowm(betas,i);
-// }
+
+void insertDraws(const matrix<double, n_betas, n_betas> &chol_covar, const matrix<double, n_betas, 1> b_optim) 
+{ 
+	matrix <double, n_draws, n_betas> lhs; 
+	
+	std::ifstream input("lhs_" + to_string(n_draws) + "_" + to_string(n_betas) + ".txt"); 	
+	if (input) {
+	  // The file exists, and is open for input	
+      for (int i=0; i<n_draws; i++)
+        for (int j=0; j<n_betas; j++)
+          input >> lhs(i,j); 	  	
+	} else { 
+	  createLHS(lhs); 
+      for (int i=0;i<n_draws;i++)
+        for (int j=0;j<n_betas;j++)
+          lhs(i,j) = NormCDFinverse(lhs(i,j));
+      std::ofstream output ("lhs_" + to_string(n_draws) + "_" + to_string(n_betas) + ".txt"); 
+      for (int i=0; i<n_draws; i++){
+        for (int j=0; j<n_betas; j++)
+          output << lhs(i,j) << " ";
+		output << "\n"; 
+      }
+      output.close();
+	} 	
+	
+    matrix <double> betas = lhs * chol_covar;
+    for (int i = 0; i < n_draws; i++ )
+      for (int j = 0; j < n_betas; j++)
+   	    betas(i,j) += b_optim(j);
+	for (int i = 0; i < n_draws; i++ )
+      draw[i].beta = rowm(betas,i);
+}
+
+
 
 void FullEval_Pairwise(matrix<double, n_rowsX,n_betas> &X, double &efficiency)
 {
@@ -1064,7 +1068,7 @@ void cppAdaptive(const string &obsVector, string &futVector, string &betaVector,
   str2design( (obsVector + futVector), design);                                              
   design2X(design, X_overlap, X, X_likelihood, n_observed, beg_col, end_col);                
   calculatePosterior(b_optim, n_observed, X_likelihood, chol_covar);
-  //insertDraws(chol_covar, b_optim); 
+  insertDraws(chol_covar, b_optim); 
 
   // optimize all future tasks for 2 seconds 
   optimizeDesign_General(X, X_overlap, n_observed, beg_col, end_col); 
@@ -1078,25 +1082,4 @@ void cppAdaptive(const string &obsVector, string &futVector, string &betaVector,
   X2design(X, design, beg_col, end_col, n_observed);  
   design2str(design, n_observed, futVector);  
   beta2str(b_optim, betaVector);
-}
-
-
-
-
-int main()
-{
-  // THIS IS AN EXAMPLE DRIVER PROGRAM FOR CPPADAPTIVE 
-  	
-  // input 
-  string obsVector  = "313312221112123223322132223313312131221123212113221111213232";
-  string futVector  = "323133332131332223321221232122221331123313333213311113231233333322133312331123322211232222212312131221133121232212232111233332223221131132112121332212123211313111211"; 
-  string betaVector = "-0.26425,0.648666,-0.0565359,-0.373203,-0.107654,0.228433,-0.339707,0.663967,0.0600106,0.0828479";
-  int n_observed = 4;
-  
-  cppAdaptive(obsVector, futVector, betaVector, n_observed);
-
-  // cout << "betaVector: \n" << betaVector << endl;
-  // cout << "futVector: \n" << futVector << endl;
-
-  return 0;
 }

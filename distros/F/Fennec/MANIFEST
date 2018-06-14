@@ -19,8 +19,6 @@ lib/Test/Workflow/Layer.pm
 lib/Test/Workflow/Meta.pm
 lib/Test/Workflow/Test.pm
 MANIFEST			This list of files
-META.json
-META.yml
 README
 t/around_all.t
 t/before_case.t
@@ -59,3 +57,5 @@ t/Test-Isolation.t
 t/Todo.t
 t/Workflow.t
 t/Workflow_Fennec.t
+META.yml
+META.json

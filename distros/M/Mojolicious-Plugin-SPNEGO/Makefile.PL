@@ -15,6 +15,7 @@ WriteMakefile(
   LICENSE      => 'artistic_2',
   PREREQ_PM    =>  {
     'Net::LDAP::SPNEGO' => '0.1.4',
+    'IO::Socket::Timeout' => '0.32',
     'Mojolicious' => '7.01',
   },
   # TEST_REQUIRES => {

@@ -34,19 +34,19 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Greengrass:
 
 =head1 DESCRIPTION
 
-Connectivity Info
+Information about a Greengrass core's connectivity.
 
 =head1 ATTRIBUTES
 
 
 =head2 HostAddress => Str
 
-  Endpoint for the GGC. Can be an IP address or DNS.
+  The endpoint for the Greengrass core. Can be an IP address or DNS.
 
 
 =head2 Id => Str
 
-  Element Id for this entry in the list.
+  The ID of the connectivity information.
 
 
 =head2 Metadata => Str
@@ -56,7 +56,7 @@ Connectivity Info
 
 =head2 PortNumber => Int
 
-  Port of the GGC. Usually 8883.
+  The port of the Greengrass core. Usually 8883.
 
 
 
@@ -66,9 +66,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Greengras
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -1,5 +1,8 @@
 Revision history for Firefox-Marionette
 
+0.54  Mon Jun 11 13:30:00 2018
+       Coping with the little changes for Firefox 60
+
 0.53  Fri Mar 15 19:49:00 2018
        Fixed test suite.
 

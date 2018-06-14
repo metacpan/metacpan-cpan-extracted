@@ -16,21 +16,48 @@ package Paws::Rekognition::CompareFaces;
 
 =head1 NAME
 
-Paws::Rekognition::CompareFaces - Arguments for method CompareFaces on Paws::Rekognition
+Paws::Rekognition::CompareFaces - Arguments for method CompareFaces on L<Paws::Rekognition>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CompareFaces on the 
-Amazon Rekognition service. Use the attributes of this class
+This class represents the parameters used for calling the method CompareFaces on the
+L<Amazon Rekognition|Paws::Rekognition> service. Use the attributes of this class
 as arguments to method CompareFaces.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CompareFaces.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CompareFaces(Att1 => $value1, Att2 => $value2, ...);
+    my $rekognition = Paws->service('Rekognition');
+    # To compare two images
+    # This operation compares the largest face detected in the source image with
+    # each face detected in the target image.
+    my $CompareFacesResponse = $rekognition->CompareFaces(
+      {
+        'TargetImage' => {
+          'S3Object' => {
+            'Bucket' => 'mybucket',
+            'Name'   => 'mytargetimage'
+          }
+        },
+        'SimilarityThreshold' => 90,
+        'SourceImage'         => {
+          'S3Object' => {
+            'Bucket' => 'mybucket',
+            'Name'   => 'mysourceimage'
+          }
+        }
+      }
+    );
+
+    # Results:
+    my $SourceImageFace = $CompareFacesResponse->SourceImageFace;
+    my $FaceMatches     = $CompareFacesResponse->FaceMatches;
+
+    # Returns a L<Paws::Rekognition::CompareFacesResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/rekognition/CompareFaces>
 
 =head1 ATTRIBUTES
 
@@ -44,13 +71,17 @@ meet to be included in the C<FaceMatches> array.
 
 =head2 B<REQUIRED> SourceImage => L<Paws::Rekognition::Image>
 
-The source image, either as bytes or as an S3 object.
+The input image as base64-encoded bytes or an S3 object. If you use the
+AWS CLI to call Amazon Rekognition operations, passing base64-encoded
+image bytes is not supported.
 
 
 
 =head2 B<REQUIRED> TargetImage => L<Paws::Rekognition::Image>
 
-The target image, either as bytes or as an S3 object.
+The target image as base64-encoded bytes or an S3 object. If you use
+the AWS CLI to call Amazon Rekognition operations, passing
+base64-encoded image bytes is not supported.
 
 
 
@@ -61,9 +92,9 @@ This class forms part of L<Paws>, documenting arguments for method CompareFaces 
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

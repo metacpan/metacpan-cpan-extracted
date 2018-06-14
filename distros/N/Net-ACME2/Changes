@@ -1,5 +1,8 @@
 Revision history for Perl module Net::ACME2
 
+0.12 11 Jun 2018
+- Remove Types::Serialiser (thanks, Chris Novakovic!)
+
 0.11 1 Jun 2018
 - Add Types::Serialiser to Makefile.PL (thanks, Chris Novakovic!)
 

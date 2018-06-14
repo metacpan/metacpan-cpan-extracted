@@ -44,7 +44,8 @@ Defines the predicate of the trigger, which determines when it fires.
 
 =head2 Logical => Str
 
-  Currently "OR" is not supported.
+  Optional field if only one condition is listed. If multiple conditions
+are listed, then this field is required.
 
 
 
@@ -54,9 +55,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Glue>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -7,7 +7,7 @@ use Net::Azure::Authorization::SAS;
 
 subtest 'void params' => sub {
     my $hub;
-    throws_ok {$hub = Net::Azure::EventHubs->new} qr/\Aconnection_string is required/, 'throws "connection_string is required"';
+    throws_ok {$hub = Net::Azure::EventHubs->new} qr/\Aendpoint was not specified/, 'throws "endpoint was not specified"';
     is $hub, undef, 'fail to create an instance of Net::Azure::EventHubs';   
 };
 

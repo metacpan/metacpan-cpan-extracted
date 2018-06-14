@@ -1,7 +1,7 @@
 package Acme::CPANModules::PERLANCAR::Task::WorkingWithTree;
 
-our $DATE = '2018-01-09'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-06-11'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 my $text = <<'_';
 **Basics**
@@ -72,7 +72,7 @@ Acme::CPANModules::PERLANCAR::Task::WorkingWithTree - Working with tree data str
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::PERLANCAR::Task::WorkingWithTree (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2018-01-09.
+This document describes version 0.002 of Acme::CPANModules::PERLANCAR::Task::WorkingWithTree (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2018-06-11.
 
 =head1 DESCRIPTION
 

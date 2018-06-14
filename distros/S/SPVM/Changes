@@ -1,3 +1,54 @@
+0.0345 2018-06-12
+  - Support precompile subroutine in distribution
+    In this version, spvm subroutine can be precompiled before runtime.
+    
+    You can create precompiled shared library by the following command.
+    
+      perl -MSPVM::Build -e "SPVM::Build->new(build_dir => 'spvm_build')->create_shared_lib_precompile_dist('Point')";
+
+  - remove len keyword and add scalar keyword
+    SPVM don't have scalar context and list context, but Perl have them.
+    In SPVM, you can get array by
+    
+      @$values
+    
+    syntax. but this confuse you sometime
+    because
+    
+      foo(@$values);
+    
+    is seem list expansion. This is always array length in SPVM.
+    Until now I provided len keyword , but this is not Perlish syntax.
+    From now I provide scalar keyword and another array syntax.
+      
+      scalar @$values
+    
+    You can write the following subroutine call
+    
+      foo(scalar @$values);
+  - add SPVM_NATIVE_SUB macro to spvm_native, and SPVM native function defenition way is changed to the following
+      
+      // My::Example::sin
+      int32_t SPVM_NATIVE_SUB(My__Example__sin) (SPVM_ENV* env, SPVM_VALUE* args) {
+        (void)env;
+        
+        double value = sin(args[0].dval);
+        
+        args[0].dval = value;
+        
+        return 0;
+      }
+    
+    SPVM_NATIVE_SUB macro automatically expand function name to SPVM_NATIVE_My__Example__sin.
+    This is very simple way to define native function.
+    Newbie only learn SPVM_NATIVE_SUB macro and replace package name : to _ and join package name and subroutine name with __.
+    
+0.0345 2018-06-10
+  - SPVM::Build can parse distribution module and get subrutine names from it
+  - rename compile descriptor to precompile
+0.0344 2018-06-6
+  - Change native function return value.
+    native function return value must be set args[0], and return croak_flag.
 0.0343 2018-06-05
   - do inline expasion in subroutien of same precompile package
   - SPVM module loading path become same as Perl. You don't need to create SPVM/ directory.

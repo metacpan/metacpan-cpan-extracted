@@ -16,21 +16,35 @@ package Paws::EC2::DescribeSpotInstanceRequests;
 
 =head1 NAME
 
-Paws::EC2::DescribeSpotInstanceRequests - Arguments for method DescribeSpotInstanceRequests on Paws::EC2
+Paws::EC2::DescribeSpotInstanceRequests - Arguments for method DescribeSpotInstanceRequests on L<Paws::EC2>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DescribeSpotInstanceRequests on the 
-Amazon Elastic Compute Cloud service. Use the attributes of this class
+This class represents the parameters used for calling the method DescribeSpotInstanceRequests on the
+L<Amazon Elastic Compute Cloud|Paws::EC2> service. Use the attributes of this class
 as arguments to method DescribeSpotInstanceRequests.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DescribeSpotInstanceRequests.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DescribeSpotInstanceRequests(Att1 => $value1, Att2 => $value2, ...);
+    my $ec2 = Paws->service('EC2');
+    # To describe a Spot Instance request
+    # This example describes the specified Spot Instance request.
+    my $DescribeSpotInstanceRequestsResult = $ec2->DescribeSpotInstanceRequests(
+      {
+        'SpotInstanceRequestIds' => ['sir-08b93456']
+      }
+    );
+
+    # Results:
+    my $SpotInstanceRequests =
+      $DescribeSpotInstanceRequestsResult->SpotInstanceRequests;
+
+    # Returns a L<Paws::EC2::DescribeSpotInstanceRequestsResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ec2/DescribeSpotInstanceRequests>
 
 =head1 ATTRIBUTES
 
@@ -56,7 +70,7 @@ C<availability-zone-group> - The Availability Zone group.
 
 =item *
 
-C<create-time> - The time stamp when the Spot instance request was
+C<create-time> - The time stamp when the Spot Instance request was
 created.
 
 =item *
@@ -73,38 +87,43 @@ C<instance-id> - The ID of the instance that fulfilled the request.
 
 =item *
 
-C<launch-group> - The Spot instance launch group.
+C<launch-group> - The Spot Instance launch group.
 
 =item *
 
 C<launch.block-device-mapping.delete-on-termination> - Indicates
-whether the Amazon EBS volume is deleted on instance termination.
+whether the EBS volume is deleted on instance termination.
 
 =item *
 
 C<launch.block-device-mapping.device-name> - The device name for the
-Amazon EBS volume (for example, C</dev/sdh>).
+volume in the block device mapping (for example, C</dev/sdh> or
+C<xvdh>).
 
 =item *
 
-C<launch.block-device-mapping.snapshot-id> - The ID of the snapshot
-used for the Amazon EBS volume.
+C<launch.block-device-mapping.snapshot-id> - The ID of the snapshot for
+the EBS volume.
 
 =item *
 
-C<launch.block-device-mapping.volume-size> - The size of the Amazon EBS
+C<launch.block-device-mapping.volume-size> - The size of the EBS
 volume, in GiB.
 
 =item *
 
-C<launch.block-device-mapping.volume-type> - The type of the Amazon EBS
-volume: C<gp2> for General Purpose SSD, C<io1> for Provisioned IOPS
-SSD, C<st1> for Throughput Optimized HDD, C<sc1>for Cold HDD, or
-C<standard> for Magnetic.
+C<launch.block-device-mapping.volume-type> - The type of EBS volume:
+C<gp2> for General Purpose SSD, C<io1> for Provisioned IOPS SSD, C<st1>
+for Throughput Optimized HDD, C<sc1>for Cold HDD, or C<standard> for
+Magnetic.
 
 =item *
 
-C<launch.group-id> - The security group for the instance.
+C<launch.group-id> - The ID of the security group for the instance.
+
+=item *
+
+C<launch.group-name> - The name of the security group for the instance.
 
 =item *
 
@@ -127,7 +146,7 @@ with.
 =item *
 
 C<launch.monitoring-enabled> - Whether detailed monitoring is enabled
-for the Spot instance.
+for the Spot Instance.
 
 =item *
 
@@ -135,8 +154,8 @@ C<launch.ramdisk-id> - The RAM disk ID.
 
 =item *
 
-C<launched-availability-zone> - The Availability Zone in which the bid
-is launched.
+C<launched-availability-zone> - The Availability Zone in which the
+request is launched.
 
 =item *
 
@@ -184,30 +203,31 @@ instance (C<Linux/UNIX> | C<Windows>).
 
 =item *
 
-C<spot-instance-request-id> - The Spot instance request ID.
+C<spot-instance-request-id> - The Spot Instance request ID.
 
 =item *
 
-C<spot-price> - The maximum hourly price for any Spot instance launched
+C<spot-price> - The maximum hourly price for any Spot Instance launched
 to fulfill the request.
 
 =item *
 
-C<state> - The state of the Spot instance request (C<open> | C<active>
-| C<closed> | C<cancelled> | C<failed>). Spot bid status information
-can help you track your Amazon EC2 Spot instance requests. For more
-information, see Spot Bid Status in the Amazon Elastic Compute Cloud
-User Guide.
+C<state> - The state of the Spot Instance request (C<open> | C<active>
+| C<closed> | C<cancelled> | C<failed>). Spot request status
+information can help you track your Amazon EC2 Spot Instance requests.
+For more information, see Spot Request Status
+(http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/spot-bid-status.html)
+in the I<Amazon EC2 User Guide for Linux Instances>.
 
 =item *
 
 C<status-code> - The short code describing the most recent evaluation
-of your Spot instance request.
+of your Spot Instance request.
 
 =item *
 
 C<status-message> - The message explaining the status of the Spot
-instance request.
+Instance request.
 
 =item *
 
@@ -234,7 +254,7 @@ is independent of the C<tag-key> filter.
 
 =item *
 
-C<type> - The type of Spot instance request (C<one-time> |
+C<type> - The type of Spot Instance request (C<one-time> |
 C<persistent>).
 
 =item *
@@ -252,7 +272,7 @@ C<valid-until> - The end date of the request.
 
 =head2 SpotInstanceRequestIds => ArrayRef[Str|Undef]
 
-One or more Spot instance request IDs.
+One or more Spot Instance request IDs.
 
 
 
@@ -263,9 +283,9 @@ This class forms part of L<Paws>, documenting arguments for method DescribeSpotI
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

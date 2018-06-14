@@ -23,28 +23,67 @@ package Paws::Snowball::CreateCluster;
 
 =head1 NAME
 
-Paws::Snowball::CreateCluster - Arguments for method CreateCluster on Paws::Snowball
+Paws::Snowball::CreateCluster - Arguments for method CreateCluster on L<Paws::Snowball>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateCluster on the 
-Amazon Import/Export Snowball service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateCluster on the
+L<Amazon ImportE<sol>Export Snowball|Paws::Snowball> service. Use the attributes of this class
 as arguments to method CreateCluster.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateCluster.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateCluster(Att1 => $value1, Att2 => $value2, ...);
+    my $snowball = Paws->service('Snowball');
+   # To create a cluster
+   # Creates an empty cluster. Each cluster supports five nodes. You use the
+   # CreateJob action separately to create the jobs for each of these nodes. The
+   # cluster does not ship until these five node jobs have been created.
+    my $CreateClusterResult = $snowball->CreateCluster(
+      {
+        'Resources' => {
+          'S3Resources' => [
+
+            {
+              'KeyRange' => {
+
+              },
+              'BucketArn' => 'arn:aws:s3:::MyBucket'
+            }
+          ]
+        },
+        'Description' => 'MyCluster',
+        'KmsKeyARN' =>
+'arn:aws:kms:us-east-1:123456789012:key/abcd1234-12ab-34cd-56ef-123456123456',
+        'JobType'        => 'LOCAL_USE',
+        'ShippingOption' => 'SECOND_DAY',
+        'Notification'   => {
+          'NotifyAll'         => 0,
+          'JobStatesToNotify' => [
+
+          ]
+        },
+        'SnowballType' => 'EDGE',
+        'RoleARN'   => 'arn:aws:iam::123456789012:role/snowball-import-S3-role',
+        'AddressId' => 'ADID1234ab12-3eec-4eb3-9be6-9374c10eb51b'
+      }
+    );
+
+    # Results:
+    my $ClusterId = $CreateClusterResult->ClusterId;
+
+    # Returns a L<Paws::Snowball::CreateClusterResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/snowball/CreateCluster>
 
 =head1 ATTRIBUTES
 
 
 =head2 B<REQUIRED> AddressId => Str
 
-The ID for the address that you want the cluster shipped to.E<gt>
+The ID for the address that you want the cluster shipped to.
 
 
 
@@ -72,8 +111,9 @@ Valid values are: C<"IMPORT">, C<"EXPORT">, C<"LOCAL_USE">
 =head2 KmsKeyARN => Str
 
 The C<KmsKeyARN> value that you want to associate with this cluster.
-C<KmsKeyARN> values are created by using the CreateKey API action in
-AWS Key Management Service (AWS KMS).
+C<KmsKeyARN> values are created by using the CreateKey
+(http://docs.aws.amazon.com/kms/latest/APIReference/API_CreateKey.html)
+API action in AWS Key Management Service (AWS KMS).
 
 
 
@@ -95,8 +135,9 @@ Python language.
 =head2 B<REQUIRED> RoleARN => Str
 
 The C<RoleARN> that you want to associate with this cluster. C<RoleArn>
-values are created by using the CreateRole API action in AWS Identity
-and Access Management (IAM).
+values are created by using the CreateRole
+(http://docs.aws.amazon.com/IAM/latest/APIReference/API_CreateRole.html)
+API action in AWS Identity and Access Management (IAM).
 
 
 
@@ -148,9 +189,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateCluster
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

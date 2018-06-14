@@ -141,6 +141,7 @@
     use Games::Axmud::EditWin;
     use Games::Axmud::FixedWin;
     use Games::Axmud::Generic;
+    use Games::Axmud::Gtk;
     use Games::Axmud::Interface;
     use Games::Axmud::InterfaceModel;
     use Games::Axmud::ModelObj;
@@ -162,6 +163,7 @@
     use Games::Axmud::Obj::Area;
     use Games::Axmud::Obj::Atcp;
     use Games::Axmud::Obj::BasicWorld;
+    use Games::Axmud::Obj::BinomialHeap;
     use Games::Axmud::Obj::Blinker;
     use Games::Axmud::Obj::ChatContact;
     use Games::Axmud::Obj::ColourScheme;

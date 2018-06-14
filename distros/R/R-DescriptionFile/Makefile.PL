@@ -9,9 +9,6 @@ use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "R package DESCRIPTION file parser",
   "AUTHOR" => "Stephan Loyd <sloyd\@cpan.org>",
-  "BUILD_REQUIRES" => {
-    "Test::More" => "0.88"
-  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -32,9 +29,9 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test2::Plugin::NoWarnings" => 0,
     "Test2::V0" => 0,
-    "Test::More" => "0.88"
+    "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,7 +47,7 @@ my %FallbackPrereqs = (
   "Path::Tiny" => 0,
   "Test2::Plugin::NoWarnings" => 0,
   "Test2::V0" => 0,
-  "Test::More" => "0.88",
+  "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0
 );

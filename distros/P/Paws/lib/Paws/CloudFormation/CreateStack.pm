@@ -30,21 +30,75 @@ package Paws::CloudFormation::CreateStack;
 
 =head1 NAME
 
-Paws::CloudFormation::CreateStack - Arguments for method CreateStack on Paws::CloudFormation
+Paws::CloudFormation::CreateStack - Arguments for method CreateStack on L<Paws::CloudFormation>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateStack on the 
-AWS CloudFormation service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateStack on the
+L<AWS CloudFormation|Paws::CloudFormation> service. Use the attributes of this class
 as arguments to method CreateStack.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateStack.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateStack(Att1 => $value1, Att2 => $value2, ...);
+    my $cloudformation = Paws->service('CloudFormation');
+    my $CreateStackOutput = $cloudformation->CreateStack(
+      StackName    => 'MyStackName',
+      Capabilities => [
+        'CAPABILITY_IAM', ...    # values: CAPABILITY_IAM, CAPABILITY_NAMED_IAM
+      ],                         # OPTIONAL
+      ClientRequestToken          => 'MyClientRequestToken',          # OPTIONAL
+      DisableRollback             => 1,                               # OPTIONAL
+      EnableTerminationProtection => 1,                               # OPTIONAL
+      NotificationARNs            => [ 'MyNotificationARN', ... ],    # OPTIONAL
+      OnFailure                   => 'DO_NOTHING',                    # OPTIONAL
+      Parameters                  => [
+        {
+          ResolvedValue    => 'MyParameterValue',                     # OPTIONAL
+          ParameterKey     => 'MyParameterKey',                       # OPTIONAL
+          UsePreviousValue => 1,                                      # OPTIONAL
+          ParameterValue   => 'MyParameterValue',                     # OPTIONAL
+        },
+        ...
+      ],                                                              # OPTIONAL
+      ResourceTypes => [
+        'MyResourceType', ...    # min: 1, max: 256
+      ],                         # OPTIONAL
+      RoleARN               => 'MyRoleARN',    # OPTIONAL
+      RollbackConfiguration => {
+        RollbackTriggers => [
+          {
+            Arn  => 'MyArn',
+            Type => 'MyType',
+
+          },
+          ...
+        ],                                     # max: 5; OPTIONAL
+        MonitoringTimeInMinutes => 1,          # max: 180; OPTIONAL
+      },    # OPTIONAL
+      StackPolicyBody => 'MyStackPolicyBody',    # OPTIONAL
+      StackPolicyURL  => 'MyStackPolicyURL',     # OPTIONAL
+      Tags            => [
+        {
+          Value => 'MyTagValue',                 # min: 1, max: 256
+          Key   => 'MyTagKey',                   # min: 1, max: 128
+
+        },
+        ...
+      ],                                         # OPTIONAL
+      TemplateBody     => 'MyTemplateBody',      # OPTIONAL
+      TemplateURL      => 'MyTemplateURL',       # OPTIONAL
+      TimeoutInMinutes => 1,                     # OPTIONAL
+    );
+
+    # Results:
+    my $StackId = $CreateStackOutput->StackId;
+
+    # Returns a L<Paws::CloudFormation::CreateStackOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/cloudformation/CreateStack>
 
 =head1 ATTRIBUTES
 
@@ -60,12 +114,23 @@ specifying this parameter.
 
 The only valid values are C<CAPABILITY_IAM> and
 C<CAPABILITY_NAMED_IAM>. The following resources require you to specify
-this parameter: AWS::IAM::AccessKey, AWS::IAM::Group,
-AWS::IAM::InstanceProfile, AWS::IAM::Policy, AWS::IAM::Role,
-AWS::IAM::User, and AWS::IAM::UserToGroupAddition. If your stack
-template contains these resources, we recommend that you review all
-permissions associated with them and edit their permissions if
-necessary.
+this parameter: AWS::IAM::AccessKey
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-accesskey.html),
+AWS::IAM::Group
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-group.html),
+AWS::IAM::InstanceProfile
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-instanceprofile.html),
+AWS::IAM::Policy
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-policy.html),
+AWS::IAM::Role
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html),
+AWS::IAM::User
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-user.html),
+and AWS::IAM::UserToGroupAddition
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-addusertogroup.html).
+If your stack template contains these resources, we recommend that you
+review all permissions associated with them and edit their permissions
+if necessary.
 
 If you have IAM resources, you can specify either capability. If you
 have IAM resources with custom names, you must specify
@@ -73,7 +138,8 @@ C<CAPABILITY_NAMED_IAM>. If you don't specify this parameter, this
 action returns an C<InsufficientCapabilities> error.
 
 For more information, see Acknowledging IAM Resources in AWS
-CloudFormation Templates.
+CloudFormation Templates
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-template.html#capabilities).
 
 
 
@@ -116,12 +182,15 @@ Default: C<false>
 Whether to enable termination protection on the specified stack. If a
 user attempts to delete a stack with termination protection enabled,
 the operation fails and the stack remains unchanged. For more
-information, see Protecting a Stack From Being Deleted in the I<AWS
-CloudFormation User Guide>. Termination protection is disabled on
-stacks by default.
+information, see Protecting a Stack From Being Deleted
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-protect-stacks.html)
+in the I<AWS CloudFormation User Guide>. Termination protection is
+disabled on stacks by default.
 
-For nested stacks, termination protection is set on the root stack and
-cannot be changed directly on the nested stack.
+For nested stacks
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-nested-stacks.html),
+termination protection is set on the root stack and cannot be changed
+directly on the nested stack.
 
 
 
@@ -146,7 +215,9 @@ Valid values are: C<"DO_NOTHING">, C<"ROLLBACK">, C<"DELETE">
 =head2 Parameters => ArrayRef[L<Paws::CloudFormation::Parameter>]
 
 A list of C<Parameter> structures that specify input parameters for the
-stack. For more information, see the Parameter data type.
+stack. For more information, see the Parameter
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_Parameter.html)
+data type.
 
 
 
@@ -167,7 +238,8 @@ creating, the stack creation fails. By default, AWS CloudFormation
 grants permissions to all resource types. AWS Identity and Access
 Management (IAM) uses this parameter for AWS CloudFormation-specific
 condition keys in IAM policies. For more information, see Controlling
-Access with AWS Identity and Access Management.
+Access with AWS Identity and Access Management
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-template.html).
 
 
 
@@ -211,9 +283,10 @@ longer than 128 characters.
 =head2 StackPolicyBody => Str
 
 Structure containing the stack policy body. For more information, go to
-Prevent Updates to Stack Resources in the I<AWS CloudFormation User
-Guide>. You can specify either the C<StackPolicyBody> or the
-C<StackPolicyURL> parameter, but not both.
+Prevent Updates to Stack Resources
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/protect-stack-resources.html)
+in the I<AWS CloudFormation User Guide>. You can specify either the
+C<StackPolicyBody> or the C<StackPolicyURL> parameter, but not both.
 
 
 
@@ -238,7 +311,9 @@ number of 50 tags can be specified.
 
 Structure containing the template body with a minimum length of 1 byte
 and a maximum length of 51,200 bytes. For more information, go to
-Template Anatomy in the AWS CloudFormation User Guide.
+Template Anatomy
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-anatomy.html)
+in the AWS CloudFormation User Guide.
 
 Conditional: You must specify either the C<TemplateBody> or the
 C<TemplateURL> parameter, but not both.
@@ -249,8 +324,9 @@ C<TemplateURL> parameter, but not both.
 
 Location of file containing the template body. The URL must point to a
 template (max size: 460,800 bytes) that is located in an Amazon S3
-bucket. For more information, go to the Template Anatomy in the AWS
-CloudFormation User Guide.
+bucket. For more information, go to the Template Anatomy
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-anatomy.html)
+in the AWS CloudFormation User Guide.
 
 Conditional: You must specify either the C<TemplateBody> or the
 C<TemplateURL> parameter, but not both.
@@ -272,9 +348,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateStack i
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

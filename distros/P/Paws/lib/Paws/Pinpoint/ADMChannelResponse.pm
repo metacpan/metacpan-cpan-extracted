@@ -3,6 +3,7 @@ package Paws::Pinpoint::ADMChannelResponse;
   has ApplicationId => (is => 'ro', isa => 'Str');
   has CreationDate => (is => 'ro', isa => 'Str');
   has Enabled => (is => 'ro', isa => 'Bool');
+  has HasCredential => (is => 'ro', isa => 'Bool');
   has Id => (is => 'ro', isa => 'Str');
   has IsArchived => (is => 'ro', isa => 'Bool');
   has LastModifiedBy => (is => 'ro', isa => 'Str');
@@ -46,7 +47,7 @@ Amazon Device Messaging channel definition.
 
 =head2 ApplicationId => Str
 
-  Application id
+  The ID of the application to which the channel applies.
 
 
 =head2 CreationDate => Str
@@ -57,6 +58,14 @@ Amazon Device Messaging channel definition.
 =head2 Enabled => Bool
 
   If the channel is enabled for sending messages.
+
+
+=head2 HasCredential => Bool
+
+  Indicates whether the channel is configured with ADM credentials.
+Amazon Pinpoint uses your credentials to authenticate push
+notifications with ADM. Provide your credentials by setting the
+ClientId and ClientSecret attributes.
 
 
 =head2 Id => Str
@@ -96,9 +105,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Pinpoint>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

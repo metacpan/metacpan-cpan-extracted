@@ -289,7 +289,7 @@ sub _set_user_permissions ( $self, $dbh, $user_id, $permissions ) {
 
     return $roles if !$roles;
 
-    my $role_name_idx = { map { $_->{name} => $_->{id} } values $roles->%* };
+    my $role_name_idx = { map { $_->{name} => $_->{id} } values $roles->{data}->%* };
 
     my $roles_ids;
 

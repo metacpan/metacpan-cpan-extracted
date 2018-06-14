@@ -5,12 +5,17 @@ use strictures 2;
 use namespace::clean;
 
 use CHI;
+use Digest::MD5 qw(md5_hex);
 use Moo;
+use Sereal qw(encode_sereal decode_sereal);
 use Types::Standard qw(Str);
 
 with 'Role::REST::Client';
 
-our $VERSION = '0.08';
+use WebService::Pokemon::APIResourceList;
+use WebService::Pokemon::NamedAPIResource;
+
+our $VERSION = '0.09';
 
 
 has 'api_url' => (
@@ -19,14 +24,8 @@ has 'api_url' => (
     default => sub { 'https://pokeapi.co/api/v2' },
 );
 
-has 'cache_path' => (
-    isa     => Str,
-    is      => 'rw',
-    default => sub { '/tmp/cache/' },
-);
-
 has cache => (
-    is      => 'ro',
+    is      => 'rw',
     lazy    => 1,
     builder => 1,
 );
@@ -36,8 +35,8 @@ sub _build_cache {
 
     return CHI->new(
         driver => 'File',
-        namespace => 'pokemon',
-        root_dir => $self->cache_path
+        namespace => 'restcountries',
+        root_dir => '/tmp/cache/',
     );
 }
 
@@ -55,18 +54,6 @@ sub BUILD {
     return $self;
 }
 
-sub resource {
-    my ($self, $resource, $name, $limit, $offset) = @_;
-
-    my $queries;
-    if (!defined $name) {
-        $queries->{limit} = $limit || 20;
-        $queries->{offset} = $offset || 0;
-    }
-
-    return $self->_request($resource, $name, $queries);
-}
-
 sub _request {
     my ($self, $resource, $name, $queries) = @_;
 
@@ -82,18 +69,37 @@ sub _request {
     $endpoint .= "/" . $resource;
     $endpoint .= "/" . $name if (defined $name);
 
-    my $cache_decoded_content = $self->cache->get($endpoint);
-    if (defined $cache_decoded_content) {
-        my $deserializer = $self->_serializer(qq|application/json|);
+    my $response_data;
+    my $cache_key = md5_hex($endpoint . encode_sereal($queries));
 
-        return $deserializer->deserialize($cache_decoded_content);
+    my $cache_response_data = $self->cache->get($cache_key);
+    if (defined $cache_response_data) {
+        $response_data = decode_sereal($cache_response_data);
     }
     else {
         my $response = $self->get($endpoint, $queries);
-        $self->cache->set($endpoint, $response->response->decoded_content);
+        $response_data = $response->data;
 
-        return $response->data;
+        $self->cache->set($cache_key, encode_sereal($response->data));
     }
+
+    return $response_data;
+}
+
+sub resource {
+    my ($self, $resource, $id_or_name, $limit, $offset) = @_;
+
+    my $queries;
+    if (!defined $id_or_name) {
+        $queries->{limit} = $limit || 20;
+        $queries->{offset} = $offset || 0;
+
+        my $response = $self->_request($resource, $id_or_name, $queries);
+        return WebService::Pokemon::APIResourceList->new(api => $self, response => $response);
+    }
+
+    my $response = $self->_request($resource, $id_or_name, $queries);
+    return WebService::Pokemon::NamedAPIResource->new(api => $self, response => $response);
 }
 
 
@@ -112,7 +118,12 @@ from http://pokeapi.co.
     use WebService::Pokemon;
 
     my $pokemon_api = WebService::Pokemon->new;
-    my $pokemon = $pokemon_api->pokemon(id => 1);
+
+    # By id.
+    my $pokemon = $pokemon_api->resource('berry', 1);
+
+    # By name.
+    my $pokemon = $pokemon_api->resource('berry', 'cheri');
 
 =head1 DESCRIPTION
 
@@ -174,12 +185,43 @@ The URL of the API resource.
     my $pokemon_api = WebService::Pokemon->new;
     $pokemon_api->api_url('http://example.com/api/v2');
 
-=head2 resource
+=head3 cache
 
-Get the details of a particular resource either by id or name.
+The cache directory of the HTTP reponses. By default, all cached data is stored
+as files in /tmp/cache/.
+
+    # Default cache engine is file-based storage.
+    my $pokemon_api = WebService::Pokemon->new;
+
+    # Or we define our custom cache engine with settings.
+    my $pokemon_api = WebService::Pokemon->new(
+        cache => CHI->new(
+            driver => 'File',
+            namespace => 'restcountries',
+            root_dir => $ENV{PWD} . '/tmp/cache/',
+        )
+    );
+
+    # Or after the object was created.
+    my $pokemon_api = WebService::Pokemon->new;
+    $pokemon_api->cache(
+        cache => CHI->new(
+            driver => 'File',
+            namespace => 'restcountries',
+            root_dir => $ENV{PWD} . '/tmp/cache/',
+        )
+    );
+
+=head2 resource($resource, [$name], [$limit], [$offset])
+
+Get the details of a particular resource with optional id or name; limit per
+page, or offset by the record list.
 
     # Get paginated list of available berry resource.
     my $berry = $pokemon_api->resource('berry');
+
+    # Or by page through limit and pagination.
+    my $berry = $pokemon_api->resource('berry', undef, 60, 20);
 
     # Get by id.
     my $berry_firmness = $pokemon_api->resource('berry-firmnesses', 1);

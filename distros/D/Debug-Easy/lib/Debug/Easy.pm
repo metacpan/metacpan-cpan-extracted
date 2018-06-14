@@ -16,13 +16,8 @@ use constant {
 
 use DateTime;
 use Term::ANSIColor;
-use Log::Fast;
 use Time::HiRes qw(time);
 use File::Basename;
-
-# "Data::Dumper::Simple" gives better output for debugging, but at a startup cost.
-# It falls back to the default "Data::Dumper" if the "Simple" variant isn't available.
-# use Best qw(Data::Dumper::Simple Data::Dumper);
 
 use Data::Dumper;
 
@@ -33,7 +28,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION = '1.21';
+    our $VERSION = '2.00';
 
     # Inherit from Exporter to export functions and variables
     our @ISA = qw(Exporter);
@@ -57,11 +52,8 @@ for (my $count = 0 ; $count < scalar(@Levels) ; $count++) {
     $LevelLogic{$Levels[$count]} = $count;
 }
 
-our %ANSILevel;                            # Global debug level colorized messages hash.  It will be filled in later.
-our $LOG         = Log::Fast->global();    # Let's snag the Log::Fast object.
-my $MASTERSTART = time;                    # Script start timestamp.
+our $PARENT = $$; # This needs to be defined at the very beginning before new
 my ($SCRIPTNAME, $SCRIPTPATH, $suffix) = fileparse($0);
-my $PARENT      = $$;                     # Get the parent process ID
 our $TIMEZONE    = DateTime::TimeZone->new(name => 'local');
 
 =head1 NAME
@@ -119,8 +111,6 @@ Benchmarking is automatic, to make it easy to spot bottlenecks in code.  It auto
 
 It also allows multiple output levels from errors only, to warnings, to notices, to verbose information, to full on debug output.  All of this fully controllable by the coder.
 
-It is essentially a smart wrapper on top of Log::Fast to enhance it. ** See AUTHOR COMMENTS near the end of this document.
-
 Generally all you need are the defaults and you are ready to go.
 
 =head1 B<EXPORTABLE VARIABLES>
@@ -131,12 +121,13 @@ Generally all you need are the defaults and you are ready to go.
 
 =cut
 
-END {    # We spit out one last message before we die, the total execute time.
-    my $bench = colored(['bright_cyan'], sprintf('%06s', sprintf('%.02f', (time - $MASTERSTART))));
-    my $name = $SCRIPTNAME;
+sub DESTROY {    # We spit out one last message before we die, the total execute time.
+    my $self  = shift;
+    my $bench = colored(['bright_cyan'], sprintf('%06s', sprintf('%.02f', (time - $self->{'MASTERSTART'}))));
+    my $name  = $SCRIPTNAME;
     $name .= ' [child]' if ($PARENT ne $$);
-    $LOG->DEBUG(' %s%s %s', $bench, $ANSILevel{'DEBUG'}, colored(['black on_white'], "---- $name complete ----")) if (defined($ANSILevel{'DEBUG'}) && defined($LOG));
-} ## end END
+    $self->DEBUG([$bench . ' ' . colored(['black on_white'],"---- $name complete ----")]);
+}
 
 =head1 B<METHODS>
 
@@ -279,8 +270,6 @@ B<%T %S>
 
 I suggest you just use Prefix above, but here it is anyway.
 
-(See Log::Fast for specifics on these)
-
 Make this an empty string to turn it off, otherwise:
 
 =back
@@ -295,31 +284,9 @@ B<%D>
 
 =over 4
 
-=item B<Type>
-
- Output type. Possible values are: 'fh' (output to any already open filehandle) and 'unix' (output to syslog using UNIX socket).
-
-=back
-
-=over 8
-
-B<fh>
-
- When set to 'fh', you have to also set {FileHandle} to any open filehandle (like "\*STDERR", which is the default).
-
-B<unix>
-
- When set to 'unix', you have to also set {FileHandle} to a path pointing to an existing unix socket (typically it's '/dev/log').
-
-=back
-
-=over 4
-
 =item B<FileHandle>
 
- File handle to write log messages if {Type} set to 'fh' (which is the default).
-
- Syslog's UNIX socket path to write log messages if {Type} set to 'unix'.
+ File handle to write log messages.
 
 =item B<ANSILevel>
 
@@ -340,7 +307,6 @@ B<unix>
      'DEBUGMAX' => colored(['bold black on_green'], '[DEBUGMX]'),
   }
 
-
 =back
 
 =cut
@@ -356,7 +322,7 @@ sub new {
         'Type'               => 'fh',                                    # Default is a filehandle
         'Path'               => '/var/log',                              # Default path should type be unix
         'FileHandle'         => \*STDERR,                                # Default filehandle is STDERR
-        'MasterStart'        => $MASTERSTART,                            # Pull in the script start timestamp
+        'MasterStart'        => time,
         'ANY_LastStamp'      => time,                                    # Initialize main benchmark
         'ERR_LastStamp'      => time,                                    # Initialize the ERR benchmark
         'WARN_LastStamp'     => time,                                    # Initialize the WARN benchmark
@@ -364,7 +330,6 @@ sub new {
         'NOTICE_LastStamp'   => time,                                    # Initialize the NOTICE benchmark
         'DEBUG_LastStamp'    => time,                                    # Initialize the DEBUG benchmark
         'DEBUGMAX_LastStamp' => time,                                    # Initialize the DEBUGMAX benchmark
-        'LOG'                => $LOG,                                    # Pull in the global Log::Fast object.
         'Color'              => TRUE,                                    # Default to colorized output
         'DateStamp'          => colored(['yellow'], '%date%'),
         'TimeStamp'          => colored(['yellow'], '%time%'),
@@ -373,6 +338,7 @@ sub new {
         'Lines-Padding'      => -2,
         'Subroutine-Padding' => 0,
         'Line-Padding'       => 0,
+        'PARENT'             => $$,
         'Prefix'             => '%Date% %Time% %Benchmark% %Loglevel%[%Subroutine%][%Lastline%] ',
         'DEBUGMAX-Prefix'    => '%Date% %Time% %Benchmark% %Loglevel%[%Module%][%Lines%] ',
         'Filename'           => '[' . colored(['magenta'], $filename) . ']',
@@ -407,46 +373,33 @@ sub new {
 
     # This instructs the ANSIColor library to turn off coloring,
     # if the Color attribute is set to zero.
-    $ENV{'ANSI_COLORS_DISABLED'} = TRUE if ($self->{'COLOR'} =~ /0|FALSE|OFF|NO/i);
-
-    # If COLOR is FALSE, then clear color data from ANSILEVEL, as these were
-    # defined before color was turned off.
-    $self->{'ANSILEVEL'} = {
-        'ERR'      => '[ ERROR ]',
-        'WARN'     => '[WARNING]',
-        'NOTICE'   => '[NOTICE ]',
-        'INFO'     => '[ INFO  ]',
-        'DEBUG'    => '[ DEBUG ]',
-        'DEBUGMAX' => '[DEBUGMX]',
-    } if ($self->{'COLOR'} =~ /0|FALSE|OFF|NO/i);
-    %ANSILevel = %{$self->{'ANSILEVEL'}};
+    if ($self->{'COLOR'} =~ /0|FALSE|OFF|NO/i) {
+        $ENV{'ANSI_COLORS_DISABLED'} = TRUE;
+        # If COLOR is FALSE, then clear color data from ANSILEVEL, as these were
+        # defined before color was turned off.
+        $self->{'ANSILEVEL'} = {
+            'ERR'      => '[ ERROR ]',
+            'WARN'     => '[WARNING]',
+            'NOTICE'   => '[NOTICE ]',
+            'INFO'     => '[ INFO  ]',
+            'DEBUG'    => '[ DEBUG ]',
+            'DEBUGMAX' => '[DEBUGMX]',
+        };
+        $self->{'DATESTAMP'} = '%date%';
+        $self->{'TIMESTAMP'} = '%time%';
+        $self->{'EPOCH'}     = '%epoch%';
+    }
 
     foreach my $lvl (@Levels) {
         $self->{"$lvl-PREFIX"} = $self->{'PREFIX'} unless (exists($self->{"$lvl-PREFIX"}) && defined($self->{"$lvl-PREFIX"}));
     }
 
-    # The Global loglevel is set here.
-    if ($self->{'LOGLEVEL'} eq 'VERBOSE') {
-        $self->{'LOG'}->level('INFO');
-    } elsif ($self->{'LOGLEVEL'} eq 'DEBUGMAX') {
-        $self->{'LOG'}->level('DEBUG');
-    } else {
-        $self->{'LOG'}->level($self->{'LOGLEVEL'});
-    }
-
-    $self->{'LOG'}->config(    # Configure Log::Fast
-        {
-            'type'   => $self->{'TYPE'},
-            'path'   => $self->{'PATH'},
-            'prefix' => '',
-            'fh'     => $self->{'FILEHANDLE'}
-        }
-    );
-
+    my $fh = $self->{'FILEHANDLE'};
     # Signal the script has started (and logger initialized)
     my $name = $SCRIPTNAME;
     $name .= ' [child]' if ($PARENT ne $$);
-    $self->{'LOG'}->DEBUG('   %.02f%s %s', 0, $self->{'ANSILEVEL'}->{'DEBUG'}, colored(['black on_white'], "----- $name begin -----") . " (To View in 'less', use it's '-r' switch)" );
+    print $fh sprintf('   %.02f%s %s', 0, $self->{'ANSILEVEL'}->{'DEBUG'}, colored(['black on_white'], "----- $name begin -----") . " (To View in 'less', use it's '-r' switch)" ),"\n";
+
     bless($self, $class);
     return ($self);
 } ## end sub new
@@ -602,7 +555,7 @@ sub _send_to_logger {      # This actually simplifies the previous method ... se
     }
 
     $prefix =~ s/\%PID\%/$$/g;
-    $prefix =~ s/\%Loglevel\%/$ANSILevel{$level}/g;
+    $prefix =~ s/\%Loglevel\%/$self->{'ANSILevel'}->{$level}/g;
     $prefix =~ s/\%Lines\%/$cline/g;
     $prefix =~ s/\%Lastline\%/$sline/g;
     $prefix =~ s/\%Subroutine\%/$shortsub/g;
@@ -622,19 +575,22 @@ sub _send_to_logger {      # This actually simplifies the previous method ... se
     } else {
         $prefix =~ s/\%Benchmark\%/$thisBench2/g;
     }
-
+    my $fh = $self->{'FILEHANDLE'};
     if ($level eq 'INFO' && $self->{'LOGLEVEL'} eq 'VERBOSE') {    # Trap verbose flag and temporarily drop the prefix.
-        $self->{'LOG'}->INFO($msg);
+        print $fh "$msg\n";
+#        $self->{'LOG'}->INFO($msg);
     } elsif ($level eq 'DEBUGMAX') {                               # Special version of DEBUG.  Outputs as DEBUG in Log::Fast
         if ($self->{'LOGLEVEL'} eq 'DEBUGMAX') {
-            $self->{'LOG'}->DEBUG($prefix . $padding . $msg);
+            print $fh "$prefix$padding$msg\n";
+#            $self->{'LOG'}->DEBUG($prefix . $padding . $msg);
         }
     } else {
-        $self->{'LOG'}->$level($prefix . $padding . $msg);
+        print $fh "$prefix$padding$msg\n";
+#        $self->{'LOG'}->$level($prefix . $padding . $msg);
     }
 } ## end sub _send_to_logger
 
-=head2 b<ERR> or B<ERROR>
+=head2 B<ERR> or B<ERROR>
 
 Sends ERROR level debugging output to the log.  Errors are always shown.
 
@@ -792,13 +748,13 @@ OR you can use the old ExtUtils::MakeMaker method:
 
 Richard Kelsch <rich@rk-internet.com>
 
-Copyright 2013-2016 Richard Kelsch, All Rights Reserved.
+Copyright 2013-2018 Richard Kelsch, All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =head1 B<VERSION>
 
-Version 1.20    (August 17, 2017)
+Version 2.00    (June 13, 2018)
 
 =head1 B<BUGS>
 
@@ -839,10 +795,6 @@ L<http://search.cpan.org/dist/Debug-Easy/>
 
 =back
 
-=head1 B<ACKNOWLEDGEMENTS>
-
-The author of Log::Fast.  A very fine module, without which, this module would be much larger.
-
 =head1 B<AUTHOR COMMENTS>
 
 Earlier versions of this module (pre version 1.0), were difficult to code with, and not "Easy" as the name implied.  Version 1.x+ has addressed the issues brought forward by some users (and reviewers), and has made the module truely easy to use.
@@ -855,7 +807,7 @@ If you have any features you wish added, or functionality improved or changed, t
 
 =head1 B<LICENSE AND COPYRIGHT>
 
-Copyright 2013-2017 Richard Kelsch.
+Copyright 2013-2018 Richard Kelsch.
 
 This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0). You may obtain a copy of the full license at:
 

@@ -19,7 +19,7 @@ use Config::Any;
 use Term::ANSIColor qw/colored/;
 use File::chdir;
 
-our $VERSION = version->new('0.6.9');
+our $VERSION = version->new('0.6.10');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 main();
@@ -119,7 +119,7 @@ sub main {
             next if $exclude{$project};
             next if %include && !$include{$project};
             next if !tagged($conf, $opt->tag, $project, $group->repos->{$project});
-            last if !$opt->limit || $total++ >= $opt->limit;
+            last if $opt->limit && $total++ >= $opt->limit;
 
             push @threads, {
                 project => $project,
@@ -321,7 +321,7 @@ group-git - Perform operations over many git repositories at once
 
 =head1 VERSION
 
-This documentation refers to group-git version 0.6.9.
+This documentation refers to group-git version 0.6.10.
 
 =head1 SYNOPSIS
 

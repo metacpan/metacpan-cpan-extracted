@@ -3,6 +3,7 @@ package Paws::KinesisAnalytics::Output;
   has DestinationSchema => (is => 'ro', isa => 'Paws::KinesisAnalytics::DestinationSchema', required => 1);
   has KinesisFirehoseOutput => (is => 'ro', isa => 'Paws::KinesisAnalytics::KinesisFirehoseOutput');
   has KinesisStreamsOutput => (is => 'ro', isa => 'Paws::KinesisAnalytics::KinesisStreamsOutput');
+  has LambdaOutput => (is => 'ro', isa => 'Paws::KinesisAnalytics::LambdaOutput');
   has Name => (is => 'ro', isa => 'Str', required => 1);
 1;
 
@@ -40,14 +41,17 @@ in-application stream data to be written. The destination can be an
 Amazon Kinesis stream or an Amazon Kinesis Firehose delivery stream.
 
 For limits on how many destinations an application can write and other
-limitations, see Limits.
+limitations, see Limits
+(http://docs.aws.amazon.com/kinesisanalytics/latest/dev/limits.html).
 
 =head1 ATTRIBUTES
 
 
 =head2 B<REQUIRED> DestinationSchema => L<Paws::KinesisAnalytics::DestinationSchema>
 
-  
+  Describes the data format when records are written to the destination.
+For more information, see Configuring Application Output
+(http://docs.aws.amazon.com/kinesisanalytics/latest/dev/how-it-works-output.html).
 
 
 =head2 KinesisFirehoseOutput => L<Paws::KinesisAnalytics::KinesisFirehoseOutput>
@@ -59,6 +63,11 @@ destination.
 =head2 KinesisStreamsOutput => L<Paws::KinesisAnalytics::KinesisStreamsOutput>
 
   Identifies an Amazon Kinesis stream as the destination.
+
+
+=head2 LambdaOutput => L<Paws::KinesisAnalytics::LambdaOutput>
+
+  Identifies an AWS Lambda function as the destination.
 
 
 =head2 B<REQUIRED> Name => Str
@@ -73,9 +82,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::KinesisAn
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

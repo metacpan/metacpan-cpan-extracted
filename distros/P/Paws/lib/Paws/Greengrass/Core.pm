@@ -34,30 +34,30 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Greengrass:
 
 =head1 DESCRIPTION
 
-Information on the core
+Information about a core.
 
 =head1 ATTRIBUTES
 
 
 =head2 CertificateArn => Str
 
-  Certificate arn of the core.
+  The ARN of the certificate associated with the core.
 
 
 =head2 Id => Str
 
-  Element Id for this entry in the list.
+  The ID of the core.
 
 
 =head2 SyncShadow => Bool
 
-  If true, the local shadow value automatically syncs with the cloud's
-shadow state.
+  If true, the core's local shadow is automatically synced with the
+cloud.
 
 
 =head2 ThingArn => Str
 
-  Thing arn of the core.
+  The ARN of the thing which is the core.
 
 
 
@@ -67,9 +67,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Greengras
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

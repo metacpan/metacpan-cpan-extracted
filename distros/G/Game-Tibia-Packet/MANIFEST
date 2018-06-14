@@ -11,6 +11,7 @@ lib/Game/Tibia/Packet.pm
 lib/Game/Tibia/Packet/Charlist.pm
 lib/Game/Tibia/Packet/Login.pm
 share/otserv.private
+t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/charlist-810.t
@@ -21,4 +22,7 @@ t/login-860.t
 t/packet-810.t
 t/packet-860.t
 xt/author/00-compile.t
+xt/author/critic.t
 xt/author/pod-syntax.t
+xt/author/test-version.t
+xt/release/minimum-version.t

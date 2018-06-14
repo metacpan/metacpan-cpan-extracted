@@ -3,13 +3,14 @@
 # Lint xml files in parallel using xmllint and report the failure rate
 # Philip R Brenan at gmail dot com, Appa Apps Ltd, 2016
 #-------------------------------------------------------------------------------
+# podDocumentation
 # Id definitions should be processed independently of labels
 # What sort of tag is on the end of the link?
 # Report resolved, unresolved, missing links - difficult because of forking
-#+zero files selected
-# podDocumentation
+# Pass Fail statistics shopuld be repeated at bottom to be more usable on terminals
 
 package Data::Edit::Xml::Lint;
+our $VERSION = 20180610;
 require v5.16.0;
 use warnings FATAL => qw(all);
 use strict;
@@ -17,7 +18,6 @@ use Carp qw(cluck confess);
 use Data::Table::Text qw(:all);
 use Digest::SHA qw(sha256_hex);
 use Encode;
-our $VERSION = 20180530;
 
 #1 Constructor                                                                  # Construct a new linter
 
@@ -503,10 +503,15 @@ Passes: $totalNumberOfPasses\t\tFails: $totalNumberOfFails\t\tErrors: $totalErro
 ProjectStatistics
    #  Percent   Pass  Fail  Total  Project
 END
+
+  my @passingProjects; my @failingProjects;
+
   for(1..@project)                                                              # Project statistics
    {my ($project, $pass, $fail, $total, $percent) = @{$project[$_-1]};
     push @report, sprintf("%4d %8.4f   %4d  %4d  %5d  %s\n",
       $_, $percent, $pass, $fail, $total, $project);
+    push @failingProjects, $project if     $fail;
+    push @passingProjects, $project unless $fail;
    }
 
   my @filesFail = sort                                                          # Sort by number of errors, project, file name
@@ -538,6 +543,9 @@ END
     numberOfProjects =>$numberOfProjects,
     numberOfFiles    =>$numberOfFiles,
     failingFiles     =>[@filesFail],
+    failingProjects  =>[@failingProjects],
+    passingProjects  =>[@passingProjects],
+    totalErrors      =>$totalErrors,
     print            =>(join '', @report),
     projects         =>{map {$_->[0]=>$_} @project},
    }, 'Data::Edit::Xml::Lint::Report';
@@ -553,6 +561,9 @@ if (1)
   genLValueScalarMethods(qw(numberOfProjects));                                 # Number of L<projects|/project> defined - each L<project|/project> can contain zero or more L<files|/file>
   genLValueScalarMethods(qw(numberOfFiles));                                    # Number of L<files|/file> encountered
   genLValueScalarMethods(qw(failingFiles));                                     # Array of [number of errors, L<project|/project>, L<files|/file>] ordered from least to most errors
+  genLValueScalarMethods(qw(failingProjects));                                  # [Projects with xmllint errors]
+  genLValueScalarMethods(qw(passingProjects));                                  # [Projects with no xmllint errors]
+  genLValueScalarMethods(qw(totalErrors));                                      # Total number of errors
   genLValueScalarMethods(qw(projects));                                         # Hash of "project name"=>[L<project name|/project>, pass, fail, total, percent pass]
   genLValueScalarMethods(qw(print));                                            # A printable L<report|/report> of the above
  }

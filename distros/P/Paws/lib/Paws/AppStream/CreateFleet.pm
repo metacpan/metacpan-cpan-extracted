@@ -25,21 +25,55 @@ package Paws::AppStream::CreateFleet;
 
 =head1 NAME
 
-Paws::AppStream::CreateFleet - Arguments for method CreateFleet on Paws::AppStream
+Paws::AppStream::CreateFleet - Arguments for method CreateFleet on L<Paws::AppStream>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateFleet on the 
-Amazon AppStream service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateFleet on the
+L<Amazon AppStream|Paws::AppStream> service. Use the attributes of this class
 as arguments to method CreateFleet.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateFleet.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateFleet(Att1 => $value1, Att2 => $value2, ...);
+    my $appstream2 = Paws->service('AppStream');
+    my $CreateFleetResult = $appstream2->CreateFleet(
+      ComputeCapacity => {
+        DesiredInstances => 1,
+
+      },
+      ImageName                  => 'MyString',
+      InstanceType               => 'MyString',
+      Name                       => 'MyName',
+      Description                => 'MyDescription',    # OPTIONAL
+      DisconnectTimeoutInSeconds => 1,                  # OPTIONAL
+      DisplayName                => 'MyDisplayName',    # OPTIONAL
+      DomainJoinInfo             => {
+        OrganizationalUnitDistinguishedName =>
+          'MyOrganizationalUnitDistinguishedName',      # max: 2000; OPTIONAL
+        DirectoryName => 'MyDirectoryName',             # OPTIONAL
+      },    # OPTIONAL
+      EnableDefaultInternetAccess => 1,              # OPTIONAL
+      FleetType                   => 'ALWAYS_ON',    # OPTIONAL
+      MaxUserDurationInSeconds    => 1,              # OPTIONAL
+      VpcConfig                   => {
+        SecurityGroupIds => [
+          'MyString', ...                            # min: 1,
+        ],                                           # max: 5; OPTIONAL
+        SubnetIds => [
+          'MyString', ...                            # min: 1,
+        ],                                           # OPTIONAL
+      },    # OPTIONAL
+    );
+
+    # Results:
+    my $Fleet = $CreateFleetResult->Fleet;
+
+    # Returns a L<Paws::AppStream::CreateFleetResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/>
 
 =head1 ATTRIBUTES
 
@@ -52,7 +86,7 @@ The desired capacity for the fleet.
 
 =head2 Description => Str
 
-The description displayed to end users.
+The description for display.
 
 
 
@@ -67,13 +101,13 @@ Specify a value between 60 and 57600.
 
 =head2 DisplayName => Str
 
-The fleet name displayed to end users.
+The fleet name for display.
 
 
 
 =head2 DomainJoinInfo => L<Paws::AppStream::DomainJoinInfo>
 
-The information needed for streaming instances to join a domain.
+The information needed to join a Microsoft Active Directory domain.
 
 
 
@@ -85,13 +119,31 @@ Enables or disables default internet access for the fleet.
 
 =head2 FleetType => Str
 
+The fleet type.
+
+=over
+
+=item ALWAYS_ON
+
+Provides users with instant-on access to their apps. You are charged
+for all running instances in your fleet, even if no users are streaming
+apps.
+
+=item ON_DEMAND
+
+Provide users with access to applications after they connect, which
+takes one to two minutes. You are charged for instance streaming when
+users are connected and a small hourly fee for instances that are not
+streaming apps.
+
+=back
 
 
 Valid values are: C<"ALWAYS_ON">, C<"ON_DEMAND">
 
 =head2 B<REQUIRED> ImageName => Str
 
-The name of the image used by the fleet.
+The name of the image used to create the fleet.
 
 
 
@@ -213,9 +265,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateFleet i
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -23,21 +23,39 @@ package Paws::SimpleWorkflow::RegisterWorkflowType;
 
 =head1 NAME
 
-Paws::SimpleWorkflow::RegisterWorkflowType - Arguments for method RegisterWorkflowType on Paws::SimpleWorkflow
+Paws::SimpleWorkflow::RegisterWorkflowType - Arguments for method RegisterWorkflowType on L<Paws::SimpleWorkflow>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method RegisterWorkflowType on the 
-Amazon Simple Workflow Service service. Use the attributes of this class
+This class represents the parameters used for calling the method RegisterWorkflowType on the
+L<Amazon Simple Workflow Service|Paws::SimpleWorkflow> service. Use the attributes of this class
 as arguments to method RegisterWorkflowType.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to RegisterWorkflowType.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->RegisterWorkflowType(Att1 => $value1, Att2 => $value2, ...);
+    my $swf = Paws->service('SimpleWorkflow');
+    $swf->RegisterWorkflowType(
+      Domain             => 'MyDomainName',
+      Name               => 'MyName',
+      Version            => 'MyVersion',
+      DefaultChildPolicy => 'TERMINATE',      # OPTIONAL
+      DefaultExecutionStartToCloseTimeout =>
+        'MyDurationInSecondsOptional',        # OPTIONAL
+      DefaultLambdaRole => 'MyArn',           # OPTIONAL
+      DefaultTaskList   => {
+        name => 'MyName',                     # min: 1, max: 256
+
+      },    # OPTIONAL
+      DefaultTaskPriority => 'MyTaskPriority',    # OPTIONAL
+      DefaultTaskStartToCloseTimeout =>
+        'MyDurationInSecondsOptional',            # OPTIONAL
+      Description => 'MyDescription',             # OPTIONAL
+    );
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/swf/RegisterWorkflowType>
 
 =head1 ATTRIBUTES
 
@@ -101,6 +119,7 @@ functions. If you don't specify an IAM role when you start this
 workflow type, the default Lambda role is attached to the execution.
 For more information, see
 http://docs.aws.amazon.com/amazonswf/latest/developerguide/lambda-task.html
+(http://docs.aws.amazon.com/amazonswf/latest/developerguide/lambda-task.html)
 in the I<Amazon SWF Developer Guide>.
 
 
@@ -123,7 +142,9 @@ Java's C<Integer.MIN_VALUE> (-2147483648) to C<Integer.MAX_VALUE>
 (2147483647). Higher numbers indicate higher priority.
 
 For more information about setting task priority, see Setting Task
-Priority in the I<Amazon SWF Developer Guide>.
+Priority
+(http://docs.aws.amazon.com/amazonswf/latest/developerguide/programming-priority.html)
+in the I<Amazon SWF Developer Guide>.
 
 
 
@@ -184,9 +205,9 @@ This class forms part of L<Paws>, documenting arguments for method RegisterWorkf
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

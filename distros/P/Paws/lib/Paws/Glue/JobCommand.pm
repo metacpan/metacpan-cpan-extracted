@@ -32,19 +32,19 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Glue::JobCo
 
 =head1 DESCRIPTION
 
-Specifies code that executes a job.
+Specifies code executed when a job is run.
 
 =head1 ATTRIBUTES
 
 
 =head2 Name => Str
 
-  The name of this job command.
+  The name of the job command: this must be C<glueetl>.
 
 
 =head2 ScriptLocation => Str
 
-  Specifies the location of a script that executes a job.
+  Specifies the S3 path to a script that executes a job (required).
 
 
 
@@ -54,9 +54,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Glue>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

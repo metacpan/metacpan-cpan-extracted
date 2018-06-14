@@ -1,86 +1,4 @@
 package DOCSIS::ConfigFile;
-
-=head1 NAME
-
-DOCSIS::ConfigFile - Decodes and encodes DOCSIS config files
-
-=head1 VERSION
-
-0.73
-
-=head1 DESCRIPTION
-
-L<DOCSIS::ConfigFile> is a class which provides functionality to decode and
-encode L<DOCSIS|http://www.cablelabs.com> (Data over Cable Service Interface
-Specifications) config files.
-
-This module is used as a layer between any human readable data and
-the binary structure.
-
-The files are usually served using a L<TFTP server|Mojo::TFTPd>, after a
-L<cable modem|http://en.wikipedia.org/wiki/Cable_modem> or MTA (Multimedia
-Terminal Adapter) has recevied an IP address from a L<DHCP|Net::ISC::DHCPd>
-server. These files are L<binary encode|DOCSIS::ConfigFile::Encode> using a
-variety of functions, but all the data in the file are constructed by TLVs
-(type-length-value) blocks. These can be nested and concatenated.
-
-See L<DOCSIS::ConfigFile::Syminfo/CONFIGURATION TREE> for full
-set of possible parameters. Create an
-L<issue|https://github.com/jhthorsen/docsis-configfile/issues> if a parameter
-is missing or invalid.
-
-=head1 SYNOPSIS
-
-  use DOCSIS::ConfigFile qw( encode_docsis decode_docsis );
-
-  $data = decode_docsis $bytes;
-
-  $bytes = encode_docsis(
-             {
-               GlobalPrivacyEnable => 1,
-               MaxCPE              => 2,
-               NetworkAccess       => 1,
-               BaselinePrivacy => {
-                 AuthTimeout       => 10,
-                 ReAuthTimeout     => 10,
-                 AuthGraceTime     => 600,
-                 OperTimeout       => 1,
-                 ReKeyTimeout      => 1,
-                 TEKGraceTime      => 600,
-                 AuthRejectTimeout => 60,
-                 SAMapWaitTimeout  => 1,
-                 SAMapMaxRetries   => 4
-               },
-               SnmpMibObject => [
-                 {oid => "1.3.6.1.4.1.1.77.1.6.1.1.6.2",    INTEGER => 1},
-                 {oid => "1.3.6.1.4.1.1429.77.1.6.1.1.6.2", STRING  => "bootfile.bin"}
-               ],
-               VendorSpecific => {
-                 id => "0x0011ee",
-                 options => [30 => "0xff", 31 => "0x00", 32 => "0x28"]
-               }
-             }
-           );
-
-See also L<DOCSIS::ConfigFile::Syminfo/CONFIGURATION TREE>.
-
-=head1 OPTIONAL MODULE
-
-You can install the L<SNMP.pm|SNMP> module to translate between SNMP
-OID formats. With the module installed, you can define the C<SnmpMibObject>
-like the example below, instead of using numeric OIDs:
-
-  encode_docsis(
-    {
-      SnmpMibObject => [
-        {oid => "docsDevNmAccessIp.1",     IPADDRESS => "10.0.0.1"},
-        {oid => "docsDevNmAccessIpMask.1", IPADDRESS => "255.255.255.255"},
-      ]
-    },
-  );
-
-=cut
-
 use strict;
 use warnings;
 use Digest::MD5 ();
@@ -93,23 +11,9 @@ use constant DEBUG => $ENV{DOCSIS_CONFIGFILE_DEBUG} || 0;
 
 use base 'Exporter';
 
-our $VERSION = '0.73';
-our @EXPORT_OK = qw( decode_docsis encode_docsis );
+our $VERSION = '0.75';
+our @EXPORT_OK = qw(decode_docsis encode_docsis);
 our $DEPTH     = 0;
-
-=head1 FUNCTIONS
-
-=head2 decode_docsis
-
-  $data = decode_docsis($byte_string);
-  $data = decode_docsis(\$path_to_file);
-
-Used to decode a DOCSIS config file into a data structure. The output
-C<$data> can be used as input to L</encode_docsis>. Note: C<$data>
-will only contain array-refs if the DOCSIS parameter occur more than
-once.
-
-=cut
 
 sub decode_docsis {
   my $args    = ref $_[-1] eq 'HASH' ? $_[-1] : {};
@@ -154,13 +58,13 @@ sub decode_docsis {
 
     if ($syminfo->{nested}) {
       warn "[DOCSIS]@{[' 'x$DEPTH]}Decode $name [$pos, $length] with decode_docsis\n" if DEBUG;
-      local @$args{qw( blueprint end pos)} = ($syminfo->{nested}, $length + $pos, $pos);
+      local @$args{qw(blueprint end pos)} = ($syminfo->{nested}, $length + $pos, $pos);
       $value = decode_docsis($bytes, $args);
     }
     elsif (my $f = DOCSIS::ConfigFile::Decode->can($syminfo->{func})) {
       warn "[DOCSIS]@{[' 'x$DEPTH]}Decode $name [$pos, $length] with $syminfo->{func}\n" if DEBUG;
       $value = $f->(substr $bytes, $pos, $length);
-      $value = {oid => @$value{qw( oid type value )}} if $name eq 'SnmpMibObject';
+      $value = {oid => @$value{qw(oid type value)}} if $name eq 'SnmpMibObject';
     }
     else {
       die qq(Can't locate object method "$syminfo->{func}" via package "DOCSIS::ConfigFile::Decode");
@@ -181,47 +85,6 @@ sub decode_docsis {
 
   return $data;
 }
-
-=head2 encode_docsis
-
-  $byte_string = encode_docsis(\%data, \%args);
-
-Used to encode a data structure into a DOCSIS config file. Each of the keys
-in C<$data> can either hold a hash- or array-ref. An array-ref is used if
-the same DOCSIS parameter occur multiple times. These two formats will result
-in the same C<$byte_string>:
-
-  # Only one SnmpMibObject
-  encode_docsis({
-    SnmpMibObject => { # hash-ref
-      oid => "1.3.6.1.4.1.1429.77.1.6.1.1.6.2", STRING => "bootfile.bin"
-    }
-  })
-
-  # Allow one or more SnmpMibObjects
-  encode_docsis({
-    SnmpMibObject => [ # array-ref of hashes
-      { oid => "1.3.6.1.4.1.1429.77.1.6.1.1.6.2", STRING => "bootfile.bin" }
-    ]
-  })
-
-Possible C<%args>:
-
-=over 4
-
-=item * mta_algorithm
-
-This argument is required when encoding MTA config files. Can be set to
-either empty string, "sha1" or "md5".
-
-=item * shared_secret
-
-This argument is optional, but will be used as the shared secret used to
-increase security between the cable modem and CMTS.
-
-=back
-
-=cut
 
 sub encode_docsis {
   my ($data, $args) = @_;
@@ -245,13 +108,13 @@ sub encode_docsis {
     for my $item (ref $data->{$name} eq 'ARRAY' ? @{$data->{$name}} : $data->{$name}) {
       if ($syminfo->{nested}) {
         warn "[DOCSIS]@{[' 'x$DEPTH]}Encode $name with encode_docsis\n" if DEBUG;
-        local @$args{qw( blueprint )} = ($current->{$name}{nested});
+        local @$args{qw(blueprint)} = ($current->{$name}{nested});
         $value = encode_docsis($item, $args);
       }
       elsif (my $f = DOCSIS::ConfigFile::Encode->can($syminfo->{func})) {
         warn "[DOCSIS]@{[' 'x$DEPTH]}Encode $name with $syminfo->{func}\n" if DEBUG;
         if ($name eq 'SnmpMibObject') {
-          my @k = qw( type value );
+          my @k = qw(type value);
           local $item->{oid} = $item->{oid};
           $value = pack 'C*', $f->({value => {oid => delete $item->{oid}, map { shift(@k), $_ } %$item}});
         }
@@ -325,6 +188,140 @@ sub _validate {
   return $_[0];
 }
 
+1;
+
+=encoding utf8
+
+=head1 NAME
+
+DOCSIS::ConfigFile - Decodes and encodes DOCSIS config files
+
+=head1 VERSION
+
+0.75
+
+=head1 DESCRIPTION
+
+L<DOCSIS::ConfigFile> is a class which provides functionality to decode and
+encode L<DOCSIS|http://www.cablelabs.com> (Data over Cable Service Interface
+Specifications) config files.
+
+This module is used as a layer between any human readable data and
+the binary structure.
+
+The files are usually served using a L<TFTP server|Mojo::TFTPd>, after a
+L<cable modem|http://en.wikipedia.org/wiki/Cable_modem> or MTA (Multimedia
+Terminal Adapter) has recevied an IP address from a L<DHCP|Net::ISC::DHCPd>
+server. These files are L<binary encode|DOCSIS::ConfigFile::Encode> using a
+variety of functions, but all the data in the file are constructed by TLVs
+(type-length-value) blocks. These can be nested and concatenated.
+
+See L<DOCSIS::ConfigFile::Syminfo/CONFIGURATION TREE> for full
+set of possible parameters. Create an
+L<issue|https://github.com/jhthorsen/docsis-configfile/issues> if a parameter
+is missing or invalid.
+
+=head1 SYNOPSIS
+
+  use DOCSIS::ConfigFile qw(encode_docsis decode_docsis);
+
+  $data = decode_docsis $bytes;
+
+  $bytes = encode_docsis(
+             {
+               GlobalPrivacyEnable => 1,
+               MaxCPE              => 2,
+               NetworkAccess       => 1,
+               BaselinePrivacy => {
+                 AuthTimeout       => 10,
+                 ReAuthTimeout     => 10,
+                 AuthGraceTime     => 600,
+                 OperTimeout       => 1,
+                 ReKeyTimeout      => 1,
+                 TEKGraceTime      => 600,
+                 AuthRejectTimeout => 60,
+                 SAMapWaitTimeout  => 1,
+                 SAMapMaxRetries   => 4
+               },
+               SnmpMibObject => [
+                 {oid => "1.3.6.1.4.1.1.77.1.6.1.1.6.2",    INTEGER => 1},
+                 {oid => "1.3.6.1.4.1.1429.77.1.6.1.1.6.2", STRING  => "bootfile.bin"}
+               ],
+               VendorSpecific => {
+                 id => "0x0011ee",
+                 options => [30 => "0xff", 31 => "0x00", 32 => "0x28"]
+               }
+             }
+           );
+
+See also L<DOCSIS::ConfigFile::Syminfo/CONFIGURATION TREE>.
+
+=head1 OPTIONAL MODULE
+
+You can install the L<SNMP.pm|SNMP> module to translate between SNMP
+OID formats. With the module installed, you can define the C<SnmpMibObject>
+like the example below, instead of using numeric OIDs:
+
+  encode_docsis(
+    {
+      SnmpMibObject => [
+        {oid => "docsDevNmAccessIp.1",     IPADDRESS => "10.0.0.1"},
+        {oid => "docsDevNmAccessIpMask.1", IPADDRESS => "255.255.255.255"},
+      ]
+    },
+  );
+
+=head1 FUNCTIONS
+
+=head2 decode_docsis
+
+  $data = decode_docsis($byte_string);
+  $data = decode_docsis(\$path_to_file);
+
+Used to decode a DOCSIS config file into a data structure. The output
+C<$data> can be used as input to L</encode_docsis>. Note: C<$data>
+will only contain array-refs if the DOCSIS parameter occur more than
+once.
+
+=head2 encode_docsis
+
+  $byte_string = encode_docsis(\%data, \%args);
+
+Used to encode a data structure into a DOCSIS config file. Each of the keys
+in C<$data> can either hold a hash- or array-ref. An array-ref is used if
+the same DOCSIS parameter occur multiple times. These two formats will result
+in the same C<$byte_string>:
+
+  # Only one SnmpMibObject
+  encode_docsis({
+    SnmpMibObject => {
+      oid => "1.3.6.1.4.1.1429.77.1.6.1.1.6.2", STRING => "bootfile.bin"
+    }
+  })
+
+  # Allow one or more SnmpMibObjects
+  encode_docsis({
+    SnmpMibObject => [
+      {oid => "1.3.6.1.4.1.1429.77.1.6.1.1.6.2", STRING => "bootfile.bin"}
+    ]
+  })
+
+Possible C<%args>:
+
+=over 4
+
+=item * mta_algorithm
+
+This argument is required when encoding MTA config files. Can be set to
+either empty string, "sha1" or "md5".
+
+=item * shared_secret
+
+This argument is optional, but will be used as the shared secret used to
+increase security between the cable modem and CMTS.
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2014, Jan Henning Thorsen
@@ -337,5 +334,3 @@ under the same terms as Perl itself.
 Jan Henning Thorsen - C<jhthorsen@cpan.org>
 
 =cut
-
-1;

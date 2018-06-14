@@ -48,8 +48,9 @@ and can be useful for diagnostic purposes.
 
 When C<cause> is set to C<OPERATION_NOT_PERMITTED>, the decision fails
 because it lacks sufficient permissions. For details and example IAM
-policies, see Using IAM to Manage Access to Amazon SWF Workflows in the
-I<Amazon SWF Developer Guide>.
+policies, see Using IAM to Manage Access to Amazon SWF Workflows
+(http://docs.aws.amazon.com/amazonswf/latest/developerguide/swf-dev-iam.html)
+in the I<Amazon SWF Developer Guide>.
 
 
 =head2 Control => Str
@@ -97,9 +98,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::SimpleWor
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

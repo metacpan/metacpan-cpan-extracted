@@ -1,7 +1,7 @@
 package Version::Util;
 
-our $DATE = '2018-01-09'; # DATE
-our $VERSION = '0.730'; # VERSION
+our $DATE = '2018-06-10'; # DATE
+our $VERSION = '0.731'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,6 +14,8 @@ our @EXPORT_OK = qw(
                        version_eq version_ne
                        version_lt version_le version_gt version_ge
                        version_between version_in
+
+                       min_version max_version
 
                        add_version subtract_version
                );
@@ -66,6 +68,16 @@ sub version_in {
 
 sub _max2 {
     $_[0] > $_[1] ? $_[0] : $_[1];
+}
+
+sub min_version {
+    my @v = sort { version->parse($a) <=> version->parse($b) } @_;
+    @v ? $v[0] : undef;
+}
+
+sub max_version {
+    my @v = sort { version->parse($a) <=> version->parse($b) } @_;
+    @v ? $v[-1] : undef;
 }
 
 sub _add_or_subtract_version {
@@ -155,7 +167,7 @@ Version::Util - Version-number utilities
 
 =head1 VERSION
 
-This document describes version 0.730 of Version::Util (from Perl distribution Version-Util), released on 2018-01-09.
+This document describes version 0.731 of Version::Util (from Perl distribution Version-Util), released on 2018-06-10.
 
 =head1 DESCRIPTION
 
@@ -185,6 +197,10 @@ Equivalent to:
 =head2 version_between($v, $v1, $v2[, $v1b, $v2b, ...]) => BOOL
 
 =head2 version_in($v, $v1[, $v2, ...]) => BOOL
+
+=head2 min_version($v1, ...) => $max_v
+
+=head2 max_version($v1, ...) => $max_v
 
 =head2 add_version($v, $increment) => $new_v
 

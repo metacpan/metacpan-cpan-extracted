@@ -51,7 +51,8 @@ Defines a connection to a data source.
 
 =head2 ConnectionType => Str
 
-  The type of the connection.
+  The type of the connection. Currently, only JDBC is supported; SFTP is
+not supported.
 
 
 =head2 CreationTime => Str
@@ -97,9 +98,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Glue>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

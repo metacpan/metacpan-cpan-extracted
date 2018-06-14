@@ -1,10 +1,10 @@
 package Paws::EC2::ConversionTask;
   use Moose;
-  has ConversionTaskId => (is => 'ro', isa => 'Str', request_name => 'conversionTaskId', traits => ['NameInRequest'], required => 1);
+  has ConversionTaskId => (is => 'ro', isa => 'Str', request_name => 'conversionTaskId', traits => ['NameInRequest']);
   has ExpirationTime => (is => 'ro', isa => 'Str', request_name => 'expirationTime', traits => ['NameInRequest']);
   has ImportInstance => (is => 'ro', isa => 'Paws::EC2::ImportInstanceTaskDetails', request_name => 'importInstance', traits => ['NameInRequest']);
   has ImportVolume => (is => 'ro', isa => 'Paws::EC2::ImportVolumeTaskDetails', request_name => 'importVolume', traits => ['NameInRequest']);
-  has State => (is => 'ro', isa => 'Str', request_name => 'state', traits => ['NameInRequest'], required => 1);
+  has State => (is => 'ro', isa => 'Str', request_name => 'state', traits => ['NameInRequest']);
   has StatusMessage => (is => 'ro', isa => 'Str', request_name => 'statusMessage', traits => ['NameInRequest']);
   has Tags => (is => 'ro', isa => 'ArrayRef[Paws::EC2::Tag]', request_name => 'tagSet', traits => ['NameInRequest']);
 1;
@@ -42,7 +42,7 @@ This class has no description
 =head1 ATTRIBUTES
 
 
-=head2 B<REQUIRED> ConversionTaskId => Str
+=head2 ConversionTaskId => Str
 
   The ID of the conversion task.
 
@@ -65,7 +65,7 @@ about the import instance task.
 the import volume task.
 
 
-=head2 B<REQUIRED> State => Str
+=head2 State => Str
 
   The state of the conversion task.
 
@@ -87,8 +87,8 @@ This class forms part of L<Paws>, describing an object used in L<Paws::EC2>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut

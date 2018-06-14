@@ -32,22 +32,24 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::KinesisAnal
 
 =head1 DESCRIPTION
 
-An object that contains the ARN of the AWS Lambda function that is used
-to preprocess records in the stream, and the ARN of the IAM role used
-to access the AWS Lambda function.
+An object that contains the Amazon Resource Name (ARN) of the AWS
+Lambda (https://aws.amazon.com/documentation/lambda/) function that is
+used to preprocess records in the stream, and the ARN of the IAM role
+that is used to access the AWS Lambda function.
 
 =head1 ATTRIBUTES
 
 
 =head2 B<REQUIRED> ResourceARN => Str
 
-  The ARN of the AWS Lambda function that operates on records in the
-stream.
+  The ARN of the AWS Lambda
+(https://aws.amazon.com/documentation/lambda/) function that operates
+on records in the stream.
 
 
 =head2 B<REQUIRED> RoleARN => Str
 
-  The ARN of the IAM role used to access the AWS Lambda function.
+  The ARN of the IAM role that is used to access the AWS Lambda function.
 
 
 
@@ -57,9 +59,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::KinesisAn
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -7,7 +7,7 @@ use 5.010001;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Interact with cryptoexchanges",
+  "ABSTRACT" => "Interact with cryptoexchanges using a common interface",
   "AUTHOR" => "perlancar <perlancar\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -20,19 +20,23 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::cryp::exchange",
   "PREREQ_PM" => {
-    "App::indodax" => 0,
-    "Complete::Util" => "0.57",
+    "Data::Sah::Coerce::perl::float::str_num_en" => 0,
+    "Data::Sah::Coerce::perl::str::str_normalize_cryptoexchange_account" => "0.005",
     "Data::Sah::Compiler::perl::TH::bool" => 0,
+    "Data::Sah::Compiler::perl::TH::float" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
+    "DateTime::Format::ISO8601" => 0,
     "Finance::GDAX::Lite" => 0,
-    "Finance::Indodax" => 0,
+    "Finance::Indodax" => "0.011",
     "Log::Log4perl::Appender::LogGer" => 0,
     "Log::Log4perl::Layout::SimpleLayout" => 0,
     "Log::ger" => "0.023",
     "PERLANCAR::Module::List" => 0,
-    "Perinci::CmdLine::cryp" => "0.004",
+    "POSIX" => 0,
+    "Perinci::CmdLine::cryp" => "0.006",
     "Role::Tiny" => 0,
     "Role::Tiny::With" => 0,
+    "Sah::Schema::cryptoexchange::account" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -42,7 +46,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,22 +54,26 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::indodax" => 0,
-  "Complete::Util" => "0.57",
+  "Data::Sah::Coerce::perl::float::str_num_en" => 0,
+  "Data::Sah::Coerce::perl::str::str_normalize_cryptoexchange_account" => "0.005",
   "Data::Sah::Compiler::perl::TH::bool" => 0,
+  "Data::Sah::Compiler::perl::TH::float" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
+  "DateTime::Format::ISO8601" => 0,
   "File::Spec" => 0,
   "Finance::GDAX::Lite" => 0,
-  "Finance::Indodax" => 0,
+  "Finance::Indodax" => "0.011",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Log::Log4perl::Appender::LogGer" => 0,
   "Log::Log4perl::Layout::SimpleLayout" => 0,
   "Log::ger" => "0.023",
   "PERLANCAR::Module::List" => 0,
-  "Perinci::CmdLine::cryp" => "0.004",
+  "POSIX" => 0,
+  "Perinci::CmdLine::cryp" => "0.006",
   "Role::Tiny" => 0,
   "Role::Tiny::With" => 0,
+  "Sah::Schema::cryptoexchange::account" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

@@ -3,7 +3,7 @@ use warnings;
 use strict;
 
 # ABSTRACT: Tools for generating random Dutch numbers
-our $VERSION = '1.2';
+our $VERSION = '1.4';
 
 use Exporter qw(import);
 use Carp qw(croak);
@@ -136,7 +136,7 @@ Data::Random::NL - Tools for generating random Dutch numbers
 
 =head1 VERSION
 
-version 1.2
+version 1.4
 
 =head1 SYNOPSIS
 

@@ -32,10 +32,10 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::KinesisAnal
 
 =head1 DESCRIPTION
 
-When configuring application output, identifies a Amazon Kinesis stream
-as the destination. You provide the stream Amazon Resource Name (ARN)
-and also an IAM role ARN that Amazon Kinesis Analytics can use to write
-to the stream on your behalf.
+When configuring application output, identifies an Amazon Kinesis
+stream as the destination. You provide the stream Amazon Resource Name
+(ARN) and also an IAM role ARN that Amazon Kinesis Analytics can use to
+write to the stream on your behalf.
 
 =head1 ATTRIBUTES
 
@@ -59,9 +59,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::KinesisAn
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

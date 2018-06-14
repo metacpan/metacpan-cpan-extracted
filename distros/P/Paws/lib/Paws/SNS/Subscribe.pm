@@ -1,8 +1,10 @@
 
 package Paws::SNS::Subscribe;
   use Moose;
+  has Attributes => (is => 'ro', isa => 'Paws::SNS::SubscriptionAttributesMap');
   has Endpoint => (is => 'ro', isa => 'Str');
   has Protocol => (is => 'ro', isa => 'Str', required => 1);
+  has ReturnSubscriptionArn => (is => 'ro', isa => 'Bool');
   has TopicArn => (is => 'ro', isa => 'Str', required => 1);
 
   use MooseX::ClassAttribute;
@@ -16,23 +18,44 @@ package Paws::SNS::Subscribe;
 
 =head1 NAME
 
-Paws::SNS::Subscribe - Arguments for method Subscribe on Paws::SNS
+Paws::SNS::Subscribe - Arguments for method Subscribe on L<Paws::SNS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method Subscribe on the 
-Amazon Simple Notification Service service. Use the attributes of this class
+This class represents the parameters used for calling the method Subscribe on the
+L<Amazon Simple Notification Service|Paws::SNS> service. Use the attributes of this class
 as arguments to method Subscribe.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to Subscribe.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->Subscribe(Att1 => $value1, Att2 => $value2, ...);
+    my $sns = Paws->service('SNS');
+    my $SubscribeResponse = $sns->Subscribe(
+      Protocol   => 'Myprotocol',
+      TopicArn   => 'MytopicARN',
+      Attributes => { 'MyattributeName' => 'MyattributeValue', },    # OPTIONAL
+      Endpoint   => 'Myendpoint',                                    # OPTIONAL
+      ReturnSubscriptionArn => 1,                                    # OPTIONAL
+    );
+
+    # Results:
+    my $SubscriptionArn = $SubscribeResponse->SubscriptionArn;
+
+    # Returns a L<Paws::SNS::SubscribeResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/sns/Subscribe>
 
 =head1 ATTRIBUTES
+
+
+=head2 Attributes => L<Paws::SNS::SubscriptionAttributesMap>
+
+Assigns attributes to the subscription as a map of key-value pairs. You
+can assign any attribute that is supported by the
+C<SetSubscriptionAttributes> action.
+
 
 
 =head2 Endpoint => Str
@@ -129,6 +152,24 @@ function.
 
 
 
+=head2 ReturnSubscriptionArn => Bool
+
+Sets whether the response from the C<Subscribe> request includes the
+subscription ARN, even if the subscription is not yet confirmed.
+
+If you set this parameter to C<false>, the response includes the ARN
+for confirmed subscriptions, but it includes an ARN value of "pending
+subscription" for subscriptions that are not yet confirmed. A
+subscription becomes confirmed when the subscriber calls the
+C<ConfirmSubscription> action with a confirmation token.
+
+If you set this parameter to C<true>, the response includes the ARN in
+all cases, even if the subscription is not yet confirmed.
+
+The default value is C<false>.
+
+
+
 =head2 B<REQUIRED> TopicArn => Str
 
 The ARN of the topic you want to subscribe to.
@@ -142,9 +183,9 @@ This class forms part of L<Paws>, documenting arguments for method Subscribe in 
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

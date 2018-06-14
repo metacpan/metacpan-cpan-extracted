@@ -19,21 +19,36 @@ package Paws::RedShift::DescribeTags;
 
 =head1 NAME
 
-Paws::RedShift::DescribeTags - Arguments for method DescribeTags on Paws::RedShift
+Paws::RedShift::DescribeTags - Arguments for method DescribeTags on L<Paws::RedShift>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DescribeTags on the 
-Amazon Redshift service. Use the attributes of this class
+This class represents the parameters used for calling the method DescribeTags on the
+L<Amazon Redshift|Paws::RedShift> service. Use the attributes of this class
 as arguments to method DescribeTags.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DescribeTags.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DescribeTags(Att1 => $value1, Att2 => $value2, ...);
+    my $redshift = Paws->service('RedShift');
+    my $TaggedResourceListMessage = $redshift->DescribeTags(
+      Marker       => 'MyString',             # OPTIONAL
+      MaxRecords   => 1,                      # OPTIONAL
+      ResourceName => 'MyString',             # OPTIONAL
+      ResourceType => 'MyString',             # OPTIONAL
+      TagKeys      => [ 'MyString', ... ],    # OPTIONAL
+      TagValues    => [ 'MyString', ... ],    # OPTIONAL
+    );
+
+    # Results:
+    my $Marker          = $TaggedResourceListMessage->Marker;
+    my $TaggedResources = $TaggedResourceListMessage->TaggedResources;
+
+    # Returns a L<Paws::RedShift::TaggedResourceListMessage> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/redshift/DescribeTags>
 
 =head1 ATTRIBUTES
 
@@ -118,8 +133,9 @@ Snapshot copy grant
 
 For more information about Amazon Redshift resource types and
 constructing ARNs, go to Specifying Policy Elements: Actions, Effects,
-Resources, and Principals in the Amazon Redshift Cluster Management
-Guide.
+Resources, and Principals
+(http://docs.aws.amazon.com/redshift/latest/mgmt/redshift-iam-access-control-overview.html#redshift-iam-access-control-specify-actions)
+in the Amazon Redshift Cluster Management Guide.
 
 
 
@@ -152,9 +168,9 @@ This class forms part of L<Paws>, documenting arguments for method DescribeTags 
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

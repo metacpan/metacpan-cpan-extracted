@@ -16,21 +16,37 @@ package Paws::EC2::CreateNatGateway;
 
 =head1 NAME
 
-Paws::EC2::CreateNatGateway - Arguments for method CreateNatGateway on Paws::EC2
+Paws::EC2::CreateNatGateway - Arguments for method CreateNatGateway on L<Paws::EC2>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateNatGateway on the 
-Amazon Elastic Compute Cloud service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateNatGateway on the
+L<Amazon Elastic Compute Cloud|Paws::EC2> service. Use the attributes of this class
 as arguments to method CreateNatGateway.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateNatGateway.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateNatGateway(Att1 => $value1, Att2 => $value2, ...);
+    my $ec2 = Paws->service('EC2');
+   # To create a NAT gateway
+   # This example creates a NAT gateway in subnet subnet-1a2b3c4d and associates
+   # an Elastic IP address with the allocation ID eipalloc-37fc1a52 with the NAT
+   # gateway.
+    my $CreateNatGatewayResult = $ec2->CreateNatGateway(
+      {
+        'SubnetId'     => 'subnet-1a2b3c4d',
+        'AllocationId' => 'eipalloc-37fc1a52'
+      }
+    );
+
+    # Results:
+    my $NatGateway = $CreateNatGatewayResult->NatGateway;
+
+    # Returns a L<Paws::EC2::CreateNatGatewayResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ec2/CreateNatGateway>
 
 =head1 ATTRIBUTES
 
@@ -46,7 +62,8 @@ you must first disassociate it.
 =head2 ClientToken => Str
 
 Unique, case-sensitive identifier you provide to ensure the idempotency
-of the request. For more information, see How to Ensure Idempotency.
+of the request. For more information, see How to Ensure Idempotency
+(http://docs.aws.amazon.com/AWSEC2/latest/APIReference/Run_Instance_Idempotency.html).
 
 Constraint: Maximum 64 ASCII characters.
 
@@ -65,9 +82,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateNatGate
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -10,7 +10,7 @@ static duk_ret_t native_print(duk_context* ctx)
     duk_insert(ctx, 0);
     duk_join(ctx, duk_get_top(ctx) - 1);
     PerlIO_stdoutf("%s\n", duk_safe_to_string(ctx, -1));
-    return 0; // no return value
+    return 0; /* no return value */
 }
 
 /*
@@ -19,7 +19,7 @@ static duk_ret_t native_print(duk_context* ctx)
 static duk_ret_t native_now_ms(duk_context* ctx)
 {
     duk_push_number(ctx, (duk_double_t) (now_us() / 1000.0));
-    return 1; //  return value at top
+    return 1; /*  return value at top */
 }
 
 int pl_register_native_functions(Duk* duk)

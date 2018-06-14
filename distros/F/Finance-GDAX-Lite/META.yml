@@ -18,7 +18,7 @@ meta-spec:
 name: Finance-GDAX-Lite
 requires:
   Digest::SHA: '0'
-  HTTP::Tiny: '0'
+  HTTP::Tiny: '0.057'
   JSON::XS: '0'
   Log::ger: '0.023'
   MIME::Base64: '0'
@@ -31,7 +31,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-GDAX-Lite
   homepage: https://metacpan.org/release/Finance-GDAX-Lite
   repository: git://github.com/perlancar/perl-Finance-GDAX-Lite.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -289,7 +289,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.13'
+      version: '0.140'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'

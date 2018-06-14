@@ -5,7 +5,7 @@ use Moose;
 extends 'Mail::MtPolicyd::Connection';
 
 # ABSTRACT: a LDAP connection plugin for mtpolicyd
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 use Net::LDAP;
 
@@ -21,15 +21,28 @@ has 'password' => ( is => 'ro', isa => 'Maybe[Str]' );
 
 has 'starttls' => ( is => 'ro', isa => 'Bool', default => 1 );
 
-has 'handle' => ( is => 'rw', isa => 'Net::LDAP', lazy => 1,
+has 'handle' => ( is => 'ro', isa => 'Net::LDAP', lazy => 1,
     default => sub {
       my $self = shift;
       return $self->_connect_ldap;
     },
-    handles => {
-      'disconnect' => 'unbind',
-    },
+    clearer => '_clear_handle',
+    predicate => 'is_connected',
 );
+
+# if available check ->connected on underlying IO::Socket
+# and invalidate connection if unconnected
+before 'handle' => sub {
+  my $self = shift;
+  return unless $self->is_connected;
+  return unless $self->{'handle'}->can('socket');
+  my $socket = $self->{'handle'}->socket;
+  return unless $socket->isa('IO::Socket');
+  if( ! $socket->connected ) {
+    $self->_clear_handle;
+  }
+  return;
+};
 
 has 'connection_class' => ( is => 'ro', isa => 'Maybe[Str]' );
 
@@ -47,7 +60,9 @@ sub _connect_ldap {
     port => $self->port,
     keepalive => $self->keepalive,
     timeout => $self->timeout,
-    onerror => 'die',
+    onerror => sub {
+      $self->_handle_error(@_);
+    },
   ) or die ('cant connect ldap: '.$@);
 
   if( $self->starttls ) {
@@ -64,15 +79,24 @@ sub _connect_ldap {
   return $ldap;
 }
 
-sub reconnect {
-  my $self = shift;
-  $self->handle( $self->_connect_ldap );
-  return;
+sub _handle_error {
+  my ($self, $error) = @_;
+  if( $error->isa('Net::LDAP::Message') ) {
+    $error = $error->error;
+  }
+  if( $error =~ /(Broken pipe|Bad file descriptor)/ ) {
+    $self->_clear_handle;
+  }
+  die($error);
 }
+
+*reconnect = \&shutdown;
 
 sub shutdown {
   my $self = shift;
-  $self->handle->unbind;
+  # try to unbind
+  eval { $self->handle->unbind };
+  $self->_clear_handle;
   return;
 }
 
@@ -90,7 +114,7 @@ Mail::MtPolicyd::Connection::Ldap - a LDAP connection plugin for mtpolicyd
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 SYNOPSIS
 

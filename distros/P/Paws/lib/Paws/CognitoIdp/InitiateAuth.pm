@@ -1,10 +1,12 @@
 
 package Paws::CognitoIdp::InitiateAuth;
   use Moose;
+  has AnalyticsMetadata => (is => 'ro', isa => 'Paws::CognitoIdp::AnalyticsMetadataType');
   has AuthFlow => (is => 'ro', isa => 'Str', required => 1);
   has AuthParameters => (is => 'ro', isa => 'Paws::CognitoIdp::AuthParametersType');
   has ClientId => (is => 'ro', isa => 'Str', required => 1);
   has ClientMetadata => (is => 'ro', isa => 'Paws::CognitoIdp::ClientMetadataType');
+  has UserContextData => (is => 'ro', isa => 'Paws::CognitoIdp::UserContextDataType');
 
   use MooseX::ClassAttribute;
 
@@ -17,23 +19,55 @@ package Paws::CognitoIdp::InitiateAuth;
 
 =head1 NAME
 
-Paws::CognitoIdp::InitiateAuth - Arguments for method InitiateAuth on Paws::CognitoIdp
+Paws::CognitoIdp::InitiateAuth - Arguments for method InitiateAuth on L<Paws::CognitoIdp>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method InitiateAuth on the 
-Amazon Cognito Identity Provider service. Use the attributes of this class
+This class represents the parameters used for calling the method InitiateAuth on the
+L<Amazon Cognito Identity Provider|Paws::CognitoIdp> service. Use the attributes of this class
 as arguments to method InitiateAuth.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to InitiateAuth.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->InitiateAuth(Att1 => $value1, Att2 => $value2, ...);
+    my $cognito-idp = Paws->service('CognitoIdp');
+    my $InitiateAuthResponse = $cognito -idp->InitiateAuth(
+      AuthFlow          => 'USER_SRP_AUTH',
+      ClientId          => 'MyClientIdType',
+      AnalyticsMetadata => {
+        AnalyticsEndpointId => 'MyStringType',    # OPTIONAL
+      },    # OPTIONAL
+      AuthParameters => {
+        'MyStringType' => 'MyStringType',    # key: OPTIONAL, value: OPTIONAL
+      },    # OPTIONAL
+      ClientMetadata => {
+        'MyStringType' => 'MyStringType',    # key: OPTIONAL, value: OPTIONAL
+      },    # OPTIONAL
+      UserContextData => {
+        EncodedData => 'MyStringType',    # OPTIONAL
+      },    # OPTIONAL
+    );
+
+    # Results:
+    my $ChallengeParameters  = $InitiateAuthResponse->ChallengeParameters;
+    my $Session              = $InitiateAuthResponse->Session;
+    my $AuthenticationResult = $InitiateAuthResponse->AuthenticationResult;
+    my $ChallengeName        = $InitiateAuthResponse->ChallengeName;
+
+    # Returns a L<Paws::CognitoIdp::InitiateAuthResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/cognito-idp/InitiateAuth>
 
 =head1 ATTRIBUTES
+
+
+=head2 AnalyticsMetadata => L<Paws::CognitoIdp::AnalyticsMetadataType>
+
+The Amazon Pinpoint analytics metadata for collecting metrics for
+C<InitiateAuth> calls.
+
 
 
 =head2 B<REQUIRED> AuthFlow => Str
@@ -52,6 +86,11 @@ tokens.
 
 C<USER_SRP_AUTH> will take in C<USERNAME> and C<SRP_A> and return the
 SRP variables to be used for next challenge execution.
+
+=item *
+
+C<USER_PASSWORD_AUTH> will take in C<USERNAME> and C<PASSWORD> and
+return the next challenge or tokens.
 
 =back
 
@@ -74,11 +113,18 @@ token.
 
 C<CUSTOM_AUTH>: Custom authentication flow.
 
+=item *
+
+C<USER_PASSWORD_AUTH>: Non-SRP authentication flow; USERNAME and
+PASSWORD are passed directly. If a user migration Lambda trigger is
+set, this flow will invoke the user migration Lambda if the USERNAME is
+not found in the user pool.
+
 =back
 
 C<ADMIN_NO_SRP_AUTH> is not a valid value.
 
-Valid values are: C<"USER_SRP_AUTH">, C<"REFRESH_TOKEN_AUTH">, C<"REFRESH_TOKEN">, C<"CUSTOM_AUTH">, C<"ADMIN_NO_SRP_AUTH">
+Valid values are: C<"USER_SRP_AUTH">, C<"REFRESH_TOKEN_AUTH">, C<"REFRESH_TOKEN">, C<"CUSTOM_AUTH">, C<"ADMIN_NO_SRP_AUTH">, C<"USER_PASSWORD_AUTH">
 
 =head2 AuthParameters => L<Paws::CognitoIdp::AuthParametersType>
 
@@ -96,9 +142,9 @@ secret), C<DEVICE_KEY>
 
 =item *
 
-For C<REFRESH_TOKEN_AUTH/REFRESH_TOKEN>: C<USERNAME> (required),
+For C<REFRESH_TOKEN_AUTH/REFRESH_TOKEN>: C<REFRESH_TOKEN> (required),
 C<SECRET_HASH> (required if the app client is configured with a client
-secret), C<REFRESH_TOKEN> (required), C<DEVICE_KEY>
+secret), C<DEVICE_KEY>
 
 =item *
 
@@ -124,6 +170,14 @@ used to implement additional validations around authentication.
 
 
 
+=head2 UserContextData => L<Paws::CognitoIdp::UserContextDataType>
+
+Contextual data such as the user's device fingerprint, IP address, or
+location used for evaluating the risk of an unexpected event by Amazon
+Cognito advanced security.
+
+
+
 
 =head1 SEE ALSO
 
@@ -131,9 +185,9 @@ This class forms part of L<Paws>, documenting arguments for method InitiateAuth 
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

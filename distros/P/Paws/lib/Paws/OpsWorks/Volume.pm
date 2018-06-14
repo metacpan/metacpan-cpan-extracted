@@ -3,6 +3,7 @@ package Paws::OpsWorks::Volume;
   has AvailabilityZone => (is => 'ro', isa => 'Str');
   has Device => (is => 'ro', isa => 'Str');
   has Ec2VolumeId => (is => 'ro', isa => 'Str');
+  has Encrypted => (is => 'ro', isa => 'Bool');
   has InstanceId => (is => 'ro', isa => 'Str');
   has Iops => (is => 'ro', isa => 'Int');
   has MountPoint => (is => 'ro', isa => 'Str');
@@ -51,7 +52,7 @@ Describes an instance's Amazon EBS volume.
 =head2 AvailabilityZone => Str
 
   The volume Availability Zone. For more information, see Regions and
-Endpoints.
+Endpoints (http://docs.aws.amazon.com/general/latest/gr/rande.html).
 
 
 =head2 Device => Str
@@ -62,6 +63,11 @@ Endpoints.
 =head2 Ec2VolumeId => Str
 
   The Amazon EC2 volume ID.
+
+
+=head2 Encrypted => Bool
+
+  
 
 
 =head2 InstanceId => Str
@@ -92,7 +98,7 @@ Endpoints.
 =head2 Region => Str
 
   The AWS region. For more information about AWS regions, see Regions and
-Endpoints.
+Endpoints (http://docs.aws.amazon.com/general/latest/gr/rande.html).
 
 
 =head2 Size => Int
@@ -102,7 +108,8 @@ Endpoints.
 
 =head2 Status => Str
 
-  The value returned by DescribeVolumes.
+  The value returned by DescribeVolumes
+(http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-DescribeVolumes.html).
 
 
 =head2 VolumeId => Str
@@ -122,9 +129,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::OpsWorks>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

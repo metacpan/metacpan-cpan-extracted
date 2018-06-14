@@ -323,7 +323,14 @@ SKIP: {
 	}
 	ok($firefox->application_type(), "\$firefox->application_type() returns " . $firefox->application_type());
 	ok($firefox->marionette_protocol(), "\$firefox->marionette_protocol() returns " . $firefox->marionette_protocol());
-	ok($firefox->window_type() eq 'navigator:browser', "\$firefox->window_type() returns 'navigator:browser':" . $firefox->window_type());
+	TODO: {
+		local $TODO = $major_version >= 60 ? $capabilities->browser_version() . " probably does not have support for \$firefox->window_type()" : q[];
+		my $window_type;
+		eval {
+			$window_type = $firefox->window_type();
+		};
+		ok($window_type && $window_type eq 'navigator:browser', "\$firefox->window_type() returns 'navigator:browser':" . $@ );
+	}
 	ok($firefox->sleep_time_in_ms() == 1, "\$firefox->sleep_time_in_ms() is 1 millisecond");
 	my $new_x = 3;
 	my $new_y = 9;
@@ -587,7 +594,7 @@ SKIP: {
 			if (($@->isa('Firefox::Marionette::Exception')) && ($@ =~ /Only supported in Fennec.* in .* at line \d+/)) {
 				local $TODO = "Only supported in Fennec";
 				ok($screen_orientation, "\$firefox->screen_orientation() is " . $screen_orientation);
-			} elsif ($major_version < 52) {
+			} elsif (($major_version < 52) || ($major_version >= 60)) {
 				my $exception = "$@";
 				chomp $exception;
 				diag("\$firefox->screen_orientation() is unavailable in " . $firefox->browser_version() . ":$exception");
@@ -991,7 +998,7 @@ SKIP: {
 	ok($firefox->add_cookie($cookie), "\$firefox->add_cookie() adds a Firefox::Marionette::Cookie without a domain");
 	ok($firefox->find_id('search-input')->clear()->find_id('search-input')->type('Test::More'), "Sent 'Test::More' to the 'search-input' field directly to the element");
 	if (out_of_time()) {
-		skip("Running out of time.  Trying to shutdown tests as fast as possible", 31);
+		skip("Running out of time.  Trying to shutdown tests as fast as possible", 32);
 	}
 	ok($firefox->find_name('lucky')->click($element), "Clicked the \"I'm Feeling Lucky\" button");
 	diag("Going to Test::More page with a page load strategy of " . ($capabilities->page_load_strategy() || ''));

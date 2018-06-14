@@ -1,0 +1,70 @@
+{
+   "abstract" : "get module permissions from MetaCPAN API",
+   "author" : [
+      "Shoichi Kaji <skaji@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PAUSE-Permissions-MetaCPAN",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.20",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Tiny" : "0.055",
+            "IO::Socket::SSL" : "1.42",
+            "JSON::PP" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "PAUSE::Permissions::MetaCPAN" : {
+         "file" : "lib/PAUSE/Permissions/MetaCPAN.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/skaji/PAUSE-Permissions-MetaCPAN/issues"
+      },
+      "homepage" : "https://github.com/skaji/PAUSE-Permissions-MetaCPAN",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/skaji/PAUSE-Permissions-MetaCPAN.git",
+         "web" : "https://github.com/skaji/PAUSE-Permissions-MetaCPAN"
+      }
+   },
+   "version" : "0.001",
+   "x_generated_by_perl" : "v5.26.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
+   "x_static_install" : 1
+}
+

@@ -6,12 +6,12 @@ use warnings FATAL => 'all';
 use Test::More;
 
 my $min_ver = 0.44;
-eval "use Test::Map::Tube $min_ver tests => 3";
+eval "use Test::Map::Tube $min_ver tests => 4";
 plan skip_all => "Test::Map::Tube $min_ver required." if $@;
 
 use utf8;
 use Map::Tube::Barcelona;
-my $map = Map::Tube::Barcelona->new;
+my $map = new_ok('Map::Tube::Barcelona');
 
 SKIP: {
     ok_map($map) or skip "Skip map function and routes test.", 2;

@@ -45,7 +45,7 @@ Status information for your AWS managed Config rules. The status
 includes information such as the last time the rule ran, the last time
 it failed, and the related error for the last failure.
 
-This action does not return status information about custom Config
+This action does not return status information about custom AWS Config
 rules.
 
 =head1 ATTRIBUTES
@@ -133,9 +133,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Config>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

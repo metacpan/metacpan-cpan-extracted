@@ -21,6 +21,7 @@ no_index:
     - t
     - eg
 requires:
+  IO::Socket::Timeout: '0.32'
   Mojolicious: '7.01'
   Net::LDAP::SPNEGO: v0.1.4
   perl: '5.010001'
@@ -28,4 +29,4 @@ resources:
   bugtracker: https://github.com/oetiker/mojolicious-plugin-spnego/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/oetiker/mojolicious-plugin-spnego
-version: v0.3.2
+version: v0.3.7

@@ -3,22 +3,23 @@ use strict;
 use Moo;
 use List::Util qw(first);
 use Scalar::Util qw(reftype blessed);
+use Carp qw(carp);
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 has root => (
-    is => 'rw', 
+    is => 'rw',
     default => sub { 0 },
 );
 
 has attributes => (
-    is => 'rw', 
-    default => sub { 1 }, 
+    is => 'rw',
+    default => sub { 1 },
     coerce => sub { !defined $_[0] or ($_[0] and $_[0] ne 'remove') },
 );
 
 has content => (
-    is => 'rw', 
+    is => 'rw',
     default => sub { 'content' },
 );
 
@@ -29,7 +30,7 @@ has depth => (
 
 sub transform {
     my ($self, $element) = @_;
-    
+
     my $simple = $self->transform_content($element,0);
 
     # enforce root for special case <root>text</root>
@@ -49,7 +50,7 @@ sub transform_content {
     if (defined $self->depth and $depth >= $self->depth) {
         return $element;
     } elsif ( @$element == 1 ) { # empty tag
-        return { }; 
+        return { };
     }
 
     my $attributes = {};
@@ -61,7 +62,7 @@ sub transform_content {
     } else {                                 # [ $tag, \@children ]
         $children   = $element->[1];
     }
-    
+
     # no element children
     unless ( first { ref $_ } @$children ) {
         my $content = join "", @$children;
@@ -102,13 +103,16 @@ sub transform_content {
 
 sub removeXMLAttr {
     my $node = shift;
+
+    carp "removeXMLAttr is deprecated"
+        if 'XML::Struct::Simple::removeXMLAttr' ne (caller(1))[3];
+
     ref $node
         ? ( $node->[2]
-            ? [ $node->[0], [ map { removeXMLAttr($_) } @{$node->[2]} ] ]
+            ? [ $node->[0], [ map { removeXMLAttr($_,1) } @{$node->[2]} ] ]
             : [ $node->[0] ] ) # empty element
         : $node;               # text node
 }
-
 
 1;
 __END__
@@ -121,8 +125,8 @@ XML::Struct::Simple - Transform MicroXML data structures into simple (unordered)
 
 =head1 SYNOPSIS
 
-    my $micro = [ 
-        root => { xmlns => 'http://example.org/' }, 
+    my $micro = [
+        root => { xmlns => 'http://example.org/' },
         [ '!', [ x => {}, [42] ] ]
     ];
     my $converter = XML::Struct::Simple->new( root => 'record' );
@@ -139,7 +143,7 @@ attributes are converted to empty hashes.
 
 L<XML::Struct> can export the function C<simpleXML> for easy use. Function
 C<readXML> and L<XML::Struct::Reader> apply transformation to SimpleXML with
-option C<simple>. 
+option C<simple>.
 
 =head1 METHODS
 
@@ -161,7 +165,7 @@ element unmodified.
 =item root
 
 Keep the root element instead of removing. This corresponds to option
-C<KeepRoot> in L<XML::Simple>. In addition a non-numeric value can be used to 
+C<KeepRoot> in L<XML::Simple>. In addition a non-numeric value can be used to
 override the name of the root element. Disabled by default.
 
 =item attributes
@@ -185,13 +189,5 @@ Depth 0 will return the element unmodified.
 Option C<KeyAttr>, C<ForceArray>, and other fetures of L<XML::Simple> not
 supported. Options C<NsExpand> and C<NsStrip> supported in
 L<XML::LibXML::Simple> are not supported yet.
-
-=head2 FUNCTIONS
-
-=head2 removeXMLAttr( $element )
-
-Recursively remove XML attributes from XML given as array reference (MicroXML).
-
-This function is deprecated.
 
 =cut

@@ -1,51 +1,27 @@
 ==================================================
-Changes from 2015-12-04 00:00:00 +0000 to present.
+Changes from 2017-06-09 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.002 at 2016-12-03 17:13:41 +0000
+version 0.003 at 2018-06-09 21:07:43 +0000
 ------------------------------------------
 
-  Change: 397b34c56af1c98a1d1524b653950ee38a952560
+  Change: 04075f12c5f5f2f0ef0a23869ec76c45edb3a7eb
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2018-06-09 22:22:08 +0000
+
+    Merge pull request #1 from QBitFramework/remove_hacks
+
+    removed hacks + depends from QBit::Application::Model::DBManager
+    0.021 
+
+  Change: 6201e90b604a66e5f5491fa879770c320c0052a4
   Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-12-03 20:12:35 +0000
+  Date : 2018-05-27 00:34:37 +0000
 
-    Merge branch 'master' of https://github.com/QBitFramework/QBit-Base 
+    removed hacks + depends from QBit::Application::Model::DBManager
+    0.021 
 
-  Change: 64e34fc6562de06894b38f887af9260de1f89815
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-12-03 20:11:19 +0000
-
-    fix for new DBManager 
-
-------------------------------------------
-version 0.001 at 2016-11-27 21:01:12 +0000
-------------------------------------------
-
-  Change: 34306e34195daf14f41848add7800580ee2874bb
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-11-28 00:01:12 +0000
-
-    Version 0.001 
-
-  Change: fd56d114c4dbdadc1b47bb12d188b6de780a29bc
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-11-27 23:59:11 +0000
-
-    ingore build files 
-
-  Change: c187bb18b85e95e2273c595a8b6a07948db57799
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-11-27 23:53:51 +0000
-
-    redefine new 
-
-  Change: 8812744e25356b0a0ca3028684d1381e592ab3a2
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-11-27 23:23:09 +0000
-
-    first commit 
-
-================
-End of releases.
-================
+================================================
+Plus 2 releases after 2017-06-09 00:00:00 +0000.
+================================================

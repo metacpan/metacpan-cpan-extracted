@@ -3,6 +3,7 @@ package Paws::Lambda::RemovePermission;
   use Moose;
   has FunctionName => (is => 'ro', isa => 'Str', traits => ['ParamInURI'], uri_name => 'FunctionName', required => 1);
   has Qualifier => (is => 'ro', isa => 'Str', traits => ['ParamInQuery'], query_name => 'Qualifier');
+  has RevisionId => (is => 'ro', isa => 'Str', traits => ['ParamInQuery'], query_name => 'RevisionId');
   has StatementId => (is => 'ro', isa => 'Str', traits => ['ParamInURI'], uri_name => 'StatementId', required => 1);
 
   use MooseX::ClassAttribute;
@@ -11,28 +12,38 @@ package Paws::Lambda::RemovePermission;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/2015-03-31/functions/{FunctionName}/policy/{StatementId}');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'DELETE');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::API::Response');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::Lambda::RemovePermission - Arguments for method RemovePermission on Paws::Lambda
+Paws::Lambda::RemovePermission - Arguments for method RemovePermission on L<Paws::Lambda>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method RemovePermission on the 
-AWS Lambda service. Use the attributes of this class
+This class represents the parameters used for calling the method RemovePermission on the
+L<AWS Lambda|Paws::Lambda> service. Use the attributes of this class
 as arguments to method RemovePermission.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to RemovePermission.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->RemovePermission(Att1 => $value1, Att2 => $value2, ...);
+    my $lambda = Paws->service('Lambda');
+    # To remove a Lambda function's permissions
+    # This operation removes a Lambda function's permissions
+    $lambda->RemovePermission(
+      {
+        'StatementId'  => 'role-statement-id',
+        'FunctionName' => 'myFunction',
+        'Qualifier'    => 1
+      }
+    );
+
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/lambda/RemovePermission>
 
 =head1 ATTRIBUTES
 
@@ -61,6 +72,16 @@ unqualified function ARN.
 
 
 
+=head2 RevisionId => Str
+
+An optional value you can use to ensure you are updating the latest
+update of the function version or alias. If the C<RevisionID> you pass
+doesn't match the latest C<RevisionId> of the function or alias, it
+will fail with an error message, advising you to retrieve the latest
+function version or alias C<RevisionID> using either or .
+
+
+
 =head2 B<REQUIRED> StatementId => Str
 
 Statement ID of the permission to remove.
@@ -74,9 +95,9 @@ This class forms part of L<Paws>, documenting arguments for method RemovePermiss
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

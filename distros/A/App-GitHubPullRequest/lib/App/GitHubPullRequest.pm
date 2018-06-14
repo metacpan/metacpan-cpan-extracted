@@ -5,7 +5,7 @@ use warnings;
 use feature qw(say state);
 
 package App::GitHubPullRequest;
-$App::GitHubPullRequest::VERSION = '0.4.0';
+$App::GitHubPullRequest::VERSION = '0.5.0';
 # ABSTRACT: Command-line tool to query GitHub pull requests
 
 use JSON qw(decode_json encode_json);
@@ -126,7 +126,7 @@ sub checkout {
     my $pr = $self->_fetch_one($number);
 
     # Get required contributor branch info
-    my $head_repo   = $pr->{'head'}->{'repo'}->{'git_url'};
+    my $head_repo   = $pr->{'head'}->{'repo'}->{'clone_url'};
     my $head_branch = $pr->{'head'}->{'ref'};
     my $head_user   = $pr->{'head'}->{'user'}->{'login'};
 
@@ -660,7 +660,7 @@ App::GitHubPullRequest - Command-line tool to query GitHub pull requests
 
 =head1 VERSION
 
-version 0.4.0
+version 0.5.0
 
 =head1 SYNOPSIS
 
@@ -855,7 +855,7 @@ RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-GitHubPullRequest>
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-GitHubPullRequest>
 
 =item *
 
@@ -887,7 +887,7 @@ CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
 
-L<http://cpants.perl.org/dist/overview/App-GitHubPullRequest>
+L<http://cpants.cpanauthors.org/dist/App-GitHubPullRequest>
 
 =item *
 
@@ -918,7 +918,7 @@ L<http://deps.cpantesters.org/?module=App::GitHubPullRequest>
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests by email to C<bug-app-githubpullrequest at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-GitHubPullRequest>. You will be automatically notified of any
+the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=App-GitHubPullRequest>. You will be automatically notified of any
 progress on the request by the system.
 
 =head2 Source Code

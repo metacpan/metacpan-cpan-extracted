@@ -6,6 +6,7 @@ package Paws::Pinpoint::CampaignResponse;
   has DefaultState => (is => 'ro', isa => 'Paws::Pinpoint::CampaignState');
   has Description => (is => 'ro', isa => 'Str');
   has HoldoutPercent => (is => 'ro', isa => 'Int');
+  has Hook => (is => 'ro', isa => 'Paws::Pinpoint::CampaignHook');
   has Id => (is => 'ro', isa => 'Str');
   has IsPaused => (is => 'ro', isa => 'Bool');
   has LastModifiedDate => (is => 'ro', isa => 'Str');
@@ -86,6 +87,11 @@ test campaigns.
 from this campaign.
 
 
+=head2 Hook => L<Paws::Pinpoint::CampaignHook>
+
+  Campaign hook information.
+
+
 =head2 Id => Str
 
   The unique campaign ID.
@@ -160,9 +166,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Pinpoint>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

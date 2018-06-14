@@ -1,5 +1,9 @@
 Revision history for perl module Text-Amuse-Preprocessor
 
+0.53 2018-06-10
+
+ - Add support for dutch
+
 0.52 2017-12-29
 
  - Bump Text::Amuse prerequisite

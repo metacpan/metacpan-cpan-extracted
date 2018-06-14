@@ -1,6 +1,7 @@
 package Paws::Rekognition;
   use Moose;
   sub service { 'rekognition' }
+  sub signing_name { 'rekognition' }
   sub version { '2016-06-27' }
   sub target_prefix { 'RekognitionService' }
   sub json_version { "1.1" }
@@ -11,7 +12,7 @@ package Paws::Rekognition;
   has retriables => (is => 'ro', isa => 'ArrayRef', default => sub { [
   ] });
 
-  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller', 'Paws::Net::JsonResponse';
+  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller';
 
   
   sub CompareFaces {
@@ -24,6 +25,11 @@ package Paws::Rekognition;
     my $call_object = $self->new_with_coercions('Paws::Rekognition::CreateCollection', @_);
     return $self->caller->do_call($self, $call_object);
   }
+  sub CreateStreamProcessor {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Rekognition::CreateStreamProcessor', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
   sub DeleteCollection {
     my $self = shift;
     my $call_object = $self->new_with_coercions('Paws::Rekognition::DeleteCollection', @_);
@@ -32,6 +38,16 @@ package Paws::Rekognition;
   sub DeleteFaces {
     my $self = shift;
     my $call_object = $self->new_with_coercions('Paws::Rekognition::DeleteFaces', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub DeleteStreamProcessor {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Rekognition::DeleteStreamProcessor', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub DescribeStreamProcessor {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Rekognition::DescribeStreamProcessor', @_);
     return $self->caller->do_call($self, $call_object);
   }
   sub DetectFaces {
@@ -49,9 +65,44 @@ package Paws::Rekognition;
     my $call_object = $self->new_with_coercions('Paws::Rekognition::DetectModerationLabels', @_);
     return $self->caller->do_call($self, $call_object);
   }
+  sub DetectText {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Rekognition::DetectText', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
   sub GetCelebrityInfo {
     my $self = shift;
     my $call_object = $self->new_with_coercions('Paws::Rekognition::GetCelebrityInfo', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub GetCelebrityRecognition {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Rekognition::GetCelebrityRecognition', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub GetContentModeration {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Rekognition::GetContentModeration', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub GetFaceDetection {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Rekognition::GetFaceDetection', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub GetFaceSearch {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Rekognition::GetFaceSearch', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub GetLabelDetection {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Rekognition::GetLabelDetection', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub GetPersonTracking {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Rekognition::GetPersonTracking', @_);
     return $self->caller->do_call($self, $call_object);
   }
   sub IndexFaces {
@@ -69,6 +120,11 @@ package Paws::Rekognition;
     my $call_object = $self->new_with_coercions('Paws::Rekognition::ListFaces', @_);
     return $self->caller->do_call($self, $call_object);
   }
+  sub ListStreamProcessors {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Rekognition::ListStreamProcessors', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
   sub RecognizeCelebrities {
     my $self = shift;
     my $call_object = $self->new_with_coercions('Paws::Rekognition::RecognizeCelebrities', @_);
@@ -84,6 +140,46 @@ package Paws::Rekognition;
     my $call_object = $self->new_with_coercions('Paws::Rekognition::SearchFacesByImage', @_);
     return $self->caller->do_call($self, $call_object);
   }
+  sub StartCelebrityRecognition {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Rekognition::StartCelebrityRecognition', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub StartContentModeration {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Rekognition::StartContentModeration', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub StartFaceDetection {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Rekognition::StartFaceDetection', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub StartFaceSearch {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Rekognition::StartFaceSearch', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub StartLabelDetection {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Rekognition::StartLabelDetection', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub StartPersonTracking {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Rekognition::StartPersonTracking', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub StartStreamProcessor {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Rekognition::StartStreamProcessor', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub StopStreamProcessor {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Rekognition::StopStreamProcessor', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
   
   sub ListAllCollections {
     my $self = shift;
@@ -96,14 +192,17 @@ package Paws::Rekognition;
       while ($next_result->NextToken) {
         $next_result = $self->ListCollections(@_, NextToken => $next_result->NextToken);
         push @{ $result->CollectionIds }, @{ $next_result->CollectionIds };
+        push @{ $result->FaceModelVersions }, @{ $next_result->FaceModelVersions };
       }
       return $result;
     } else {
       while ($result->NextToken) {
         $callback->($_ => 'CollectionIds') foreach (@{ $result->CollectionIds });
+        $callback->($_ => 'FaceModelVersions') foreach (@{ $result->FaceModelVersions });
         $result = $self->ListCollections(@_, NextToken => $result->NextToken);
       }
       $callback->($_ => 'CollectionIds') foreach (@{ $result->CollectionIds });
+      $callback->($_ => 'FaceModelVersions') foreach (@{ $result->FaceModelVersions });
     }
 
     return undef
@@ -131,9 +230,32 @@ package Paws::Rekognition;
 
     return undef
   }
+  sub ListAllStreamProcessors {
+    my $self = shift;
+
+    my $callback = shift @_ if (ref($_[0]) eq 'CODE');
+    my $result = $self->ListStreamProcessors(@_);
+    my $next_result = $result;
+
+    if (not defined $callback) {
+      while ($next_result->NextToken) {
+        $next_result = $self->ListStreamProcessors(@_, NextToken => $next_result->NextToken);
+        push @{ $result->StreamProcessors }, @{ $next_result->StreamProcessors };
+      }
+      return $result;
+    } else {
+      while ($result->NextToken) {
+        $callback->($_ => 'StreamProcessors') foreach (@{ $result->StreamProcessors });
+        $result = $self->ListStreamProcessors(@_, NextToken => $result->NextToken);
+      }
+      $callback->($_ => 'StreamProcessors') foreach (@{ $result->StreamProcessors });
+    }
+
+    return undef
+  }
 
 
-  sub operations { qw/CompareFaces CreateCollection DeleteCollection DeleteFaces DetectFaces DetectLabels DetectModerationLabels GetCelebrityInfo IndexFaces ListCollections ListFaces RecognizeCelebrities SearchFaces SearchFacesByImage / }
+  sub operations { qw/CompareFaces CreateCollection CreateStreamProcessor DeleteCollection DeleteFaces DeleteStreamProcessor DescribeStreamProcessor DetectFaces DetectLabels DetectModerationLabels DetectText GetCelebrityInfo GetCelebrityRecognition GetContentModeration GetFaceDetection GetFaceSearch GetLabelDetection GetPersonTracking IndexFaces ListCollections ListFaces ListStreamProcessors RecognizeCelebrities SearchFaces SearchFacesByImage StartCelebrityRecognition StartContentModeration StartFaceDetection StartFaceSearch StartLabelDetection StartPersonTracking StartStreamProcessor StopStreamProcessor / }
 
 1;
 
@@ -163,20 +285,40 @@ Paws::Rekognition - Perl Interface to AWS Amazon Rekognition
 
 This is the Amazon Rekognition API reference.
 
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/rekognition-2016-06-27>
+
+
 =head1 METHODS
 
-=head2 CompareFaces(SourceImage => L<Paws::Rekognition::Image>, TargetImage => L<Paws::Rekognition::Image>, [SimilarityThreshold => Num])
+=head2 CompareFaces
+
+=over
+
+=item SourceImage => L<Paws::Rekognition::Image>
+
+=item TargetImage => L<Paws::Rekognition::Image>
+
+=item [SimilarityThreshold => Num]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Rekognition::CompareFaces>
 
 Returns: a L<Paws::Rekognition::CompareFacesResponse> instance
 
-  Compares a face in the I<source> input image with each face detected in
-the I<target> input image.
+Compares a face in the I<source> input image with each of the 100
+largest faces detected in the I<target> input image.
 
 If the source image contains multiple faces, the service detects the
 largest face and compares it with each face detected in the target
 image.
+
+You pass the input and target images either as base64-encoded image
+bytes or as a references to images in an Amazon S3 bucket. If you use
+the Amazon CLI to call Amazon Rekognition operations, passing image
+bytes is not supported. The image must be either a PNG or JPEG
+formatted file.
 
 In response, the operation returns an array of face matches ordered by
 similarity score in descending order. For each face match, the response
@@ -200,22 +342,32 @@ If the image doesn't contain Exif metadata, C<CompareFaces> returns
 orientation information for the source and target images. Use these
 values to display the images with the correct image orientation.
 
+If no faces are detected in the source or target images,
+C<CompareFaces> returns an C<InvalidParameterException> error.
+
 This is a stateless API operation. That is, data returned by this
 operation doesn't persist.
 
-For an example, see get-started-exercise-compare-faces.
+For an example, see faces-compare-images.
 
 This operation requires permissions to perform the
 C<rekognition:CompareFaces> action.
 
 
-=head2 CreateCollection(CollectionId => Str)
+=head2 CreateCollection
+
+=over
+
+=item CollectionId => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Rekognition::CreateCollection>
 
 Returns: a L<Paws::Rekognition::CreateCollectionResponse> instance
 
-  Creates a collection in an AWS Region. You can add faces to the
+Creates a collection in an AWS Region. You can add faces to the
 collection using the operation.
 
 For example, you might create collections, one for each of your
@@ -225,76 +377,203 @@ can search the collection for faces in the user-specific container.
 
 Collection names are case-sensitive.
 
-For an example, see example1.
-
 This operation requires permissions to perform the
 C<rekognition:CreateCollection> action.
 
 
-=head2 DeleteCollection(CollectionId => Str)
+=head2 CreateStreamProcessor
+
+=over
+
+=item Input => L<Paws::Rekognition::StreamProcessorInput>
+
+=item Name => Str
+
+=item Output => L<Paws::Rekognition::StreamProcessorOutput>
+
+=item RoleArn => Str
+
+=item Settings => L<Paws::Rekognition::StreamProcessorSettings>
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Rekognition::CreateStreamProcessor>
+
+Returns: a L<Paws::Rekognition::CreateStreamProcessorResponse> instance
+
+Creates an Amazon Rekognition stream processor that you can use to
+detect and recognize faces in a streaming video.
+
+Rekognition Video is a consumer of live video from Amazon Kinesis Video
+Streams. Rekognition Video sends analysis results to Amazon Kinesis
+Data Streams.
+
+You provide as input a Kinesis video stream (C<Input>) and a Kinesis
+data stream (C<Output>) stream. You also specify the face recognition
+criteria in C<Settings>. For example, the collection containing faces
+that you want to recognize. Use C<Name> to assign an identifier for the
+stream processor. You use C<Name> to manage the stream processor. For
+example, you can start processing the source video by calling with the
+C<Name> field.
+
+After you have finished analyzing a streaming video, use to stop
+processing. You can delete the stream processor by calling .
+
+
+=head2 DeleteCollection
+
+=over
+
+=item CollectionId => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Rekognition::DeleteCollection>
 
 Returns: a L<Paws::Rekognition::DeleteCollectionResponse> instance
 
-  Deletes the specified collection. Note that this operation removes all
-faces in the collection. For an example, see example1.
+Deletes the specified collection. Note that this operation removes all
+faces in the collection. For an example, see
+delete-collection-procedure.
 
 This operation requires permissions to perform the
 C<rekognition:DeleteCollection> action.
 
 
-=head2 DeleteFaces(CollectionId => Str, FaceIds => ArrayRef[Str|Undef])
+=head2 DeleteFaces
+
+=over
+
+=item CollectionId => Str
+
+=item FaceIds => ArrayRef[Str|Undef]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Rekognition::DeleteFaces>
 
 Returns: a L<Paws::Rekognition::DeleteFacesResponse> instance
 
-  Deletes faces from a collection. You specify a collection ID and an
+Deletes faces from a collection. You specify a collection ID and an
 array of face IDs to remove from the collection.
 
 This operation requires permissions to perform the
 C<rekognition:DeleteFaces> action.
 
 
-=head2 DetectFaces(Image => L<Paws::Rekognition::Image>, [Attributes => ArrayRef[Str|Undef]])
+=head2 DeleteStreamProcessor
+
+=over
+
+=item Name => Str
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Rekognition::DeleteStreamProcessor>
+
+Returns: a L<Paws::Rekognition::DeleteStreamProcessorResponse> instance
+
+Deletes the stream processor identified by C<Name>. You assign the
+value for C<Name> when you create the stream processor with . You might
+not be able to use the same name for a stream processor for a few
+seconds after calling C<DeleteStreamProcessor>.
+
+
+=head2 DescribeStreamProcessor
+
+=over
+
+=item Name => Str
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Rekognition::DescribeStreamProcessor>
+
+Returns: a L<Paws::Rekognition::DescribeStreamProcessorResponse> instance
+
+Provides information about a stream processor created by . You can get
+information about the input and output streams, the input parameters
+for the face recognition being performed, and the current status of the
+stream processor.
+
+
+=head2 DetectFaces
+
+=over
+
+=item Image => L<Paws::Rekognition::Image>
+
+=item [Attributes => ArrayRef[Str|Undef]]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Rekognition::DetectFaces>
 
 Returns: a L<Paws::Rekognition::DetectFacesResponse> instance
 
-  Detects faces within an image (JPEG or PNG) that is provided as input.
+Detects faces within an image that is provided as input.
 
-For each face detected, the operation returns face details including a
-bounding box of the face, a confidence value (that the bounding box
-contains a face), and a fixed set of attributes such as facial
-landmarks (for example, coordinates of eye and mouth), gender, presence
-of beard, sunglasses, etc.
+C<DetectFaces> detects the 100 largest faces in the image. For each
+face detected, the operation returns face details including a bounding
+box of the face, a confidence value (that the bounding box contains a
+face), and a fixed set of attributes such as facial landmarks (for
+example, coordinates of eye and mouth), gender, presence of beard,
+sunglasses, etc.
 
 The face-detection algorithm is most effective on frontal faces. For
 non-frontal or obscured faces, the algorithm may not detect the faces
 or might detect faces with lower confidence.
 
+You pass the input image either as base64-encoded image bytes or as a
+reference to an image in an Amazon S3 bucket. If you use the Amazon CLI
+to call Amazon Rekognition operations, passing image bytes is not
+supported. The image must be either a PNG or JPEG formatted file.
+
 This is a stateless API operation. That is, the operation does not
 persist any data.
 
-For an example, see get-started-exercise-detect-faces.
+For an example, see procedure-detecting-faces-in-images.
 
 This operation requires permissions to perform the
 C<rekognition:DetectFaces> action.
 
 
-=head2 DetectLabels(Image => L<Paws::Rekognition::Image>, [MaxLabels => Int, MinConfidence => Num])
+=head2 DetectLabels
+
+=over
+
+=item Image => L<Paws::Rekognition::Image>
+
+=item [MaxLabels => Int]
+
+=item [MinConfidence => Num]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Rekognition::DetectLabels>
 
 Returns: a L<Paws::Rekognition::DetectLabelsResponse> instance
 
-  Detects instances of real-world labels within an image (JPEG or PNG)
+Detects instances of real-world entities within an image (JPEG or PNG)
 provided as input. This includes objects like flower, tree, and table;
 events like wedding, graduation, and birthday party; and concepts like
-landscape, evening, and nature. For an example, see
-get-started-exercise-detect-labels.
+landscape, evening, and nature. For an example, see images-s3.
+
+C<DetectLabels> does not support the detection of activities. However,
+activity detection is supported for label detection in videos. For more
+information, see .
+
+You pass the input image as base64-encoded image bytes or as a
+reference to an image in an Amazon S3 bucket. If you use the Amazon CLI
+to call Amazon Rekognition operations, passing image bytes is not
+supported. The image must be either a PNG or JPEG formatted file.
 
 For each object, scene, and concept the API returns one or more labels.
 Each label provides the object name, and the level of confidence that
@@ -323,12 +602,11 @@ C<{Name: tulip,Confidence: 99.0562}>
 In this example, the detection algorithm more precisely identifies the
 flower as a tulip.
 
-You can provide the input image as an S3 object or as base64-encoded
-bytes. In response, the API returns an array of labels. In addition,
-the response also includes the orientation correction. Optionally, you
-can specify C<MinConfidence> to control the confidence threshold for
-the labels returned. The default is 50%. You can also add the
-C<MaxLabels> parameter to limit the number of labels returned.
+In response, the API returns an array of labels. In addition, the
+response also includes the orientation correction. Optionally, you can
+specify C<MinConfidence> to control the confidence threshold for the
+labels returned. The default is 50%. You can also add the C<MaxLabels>
+parameter to limit the number of labels returned.
 
 If the object detected is a person, the operation doesn't provide the
 same facial details that the DetectFaces operation provides.
@@ -340,13 +618,22 @@ This operation requires permissions to perform the
 C<rekognition:DetectLabels> action.
 
 
-=head2 DetectModerationLabels(Image => L<Paws::Rekognition::Image>, [MinConfidence => Num])
+=head2 DetectModerationLabels
+
+=over
+
+=item Image => L<Paws::Rekognition::Image>
+
+=item [MinConfidence => Num]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Rekognition::DetectModerationLabels>
 
 Returns: a L<Paws::Rekognition::DetectModerationLabelsResponse> instance
 
-  Detects explicit or suggestive adult content in a specified JPEG or PNG
+Detects explicit or suggestive adult content in a specified JPEG or PNG
 format image. Use C<DetectModerationLabels> to moderate images
 depending on your requirements. For example, you might want to filter
 images that contain nudity, but not images containing suggestive
@@ -354,32 +641,418 @@ content.
 
 To filter images, use the labels returned by C<DetectModerationLabels>
 to determine which types of content are appropriate. For information
-about moderation labels, see image-moderation.
+about moderation labels, see moderation.
+
+You pass the input image either as base64-encoded image bytes or as a
+reference to an image in an Amazon S3 bucket. If you use the Amazon CLI
+to call Amazon Rekognition operations, passing image bytes is not
+supported. The image must be either a PNG or JPEG formatted file.
 
 
-=head2 GetCelebrityInfo(Id => Str)
+=head2 DetectText
+
+=over
+
+=item Image => L<Paws::Rekognition::Image>
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Rekognition::DetectText>
+
+Returns: a L<Paws::Rekognition::DetectTextResponse> instance
+
+Detects text in the input image and converts it into machine-readable
+text.
+
+Pass the input image as base64-encoded image bytes or as a reference to
+an image in an Amazon S3 bucket. If you use the AWS CLI to call Amazon
+Rekognition operations, you must pass it as a reference to an image in
+an Amazon S3 bucket. For the AWS CLI, passing image bytes is not
+supported. The image must be either a .png or .jpeg formatted file.
+
+The C<DetectText> operation returns text in an array of elements,
+C<TextDetections>. Each C<TextDetection> element provides information
+about a single word or line of text that was detected in the image.
+
+A word is one or more ISO basic latin script characters that are not
+separated by spaces. C<DetectText> can detect up to 50 words in an
+image.
+
+A line is a string of equally spaced words. A line isn't necessarily a
+complete sentence. For example, a driver's license number is detected
+as a line. A line ends when there is no aligned text after it. Also, a
+line ends when there is a large gap between words, relative to the
+length of the words. This means, depending on the gap between words,
+Amazon Rekognition may detect multiple lines in text aligned in the
+same direction. Periods don't represent the end of a line. If a
+sentence spans multiple lines, the C<DetectText> operation returns
+multiple lines.
+
+To determine whether a C<TextDetection> element is a line of text or a
+word, use the C<TextDetection> object C<Type> field.
+
+To be detected, text must be within +/- 30 degrees orientation of the
+horizontal axis.
+
+For more information, see text-detection.
+
+
+=head2 GetCelebrityInfo
+
+=over
+
+=item Id => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Rekognition::GetCelebrityInfo>
 
 Returns: a L<Paws::Rekognition::GetCelebrityInfoResponse> instance
 
-  Gets the name and additional information about a celebrity based on his
+Gets the name and additional information about a celebrity based on his
 or her Rekognition ID. The additional information is returned as an
 array of URLs. If there is no additional information about the
 celebrity, this list is empty. For more information, see
-celebrity-recognition.
+get-celebrity-info-procedure.
 
 This operation requires permissions to perform the
 C<rekognition:GetCelebrityInfo> action.
 
 
-=head2 IndexFaces(CollectionId => Str, Image => L<Paws::Rekognition::Image>, [DetectionAttributes => ArrayRef[Str|Undef], ExternalImageId => Str])
+=head2 GetCelebrityRecognition
+
+=over
+
+=item JobId => Str
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+=item [SortBy => Str]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Rekognition::GetCelebrityRecognition>
+
+Returns: a L<Paws::Rekognition::GetCelebrityRecognitionResponse> instance
+
+Gets the celebrity recognition results for a Rekognition Video analysis
+started by .
+
+Celebrity recognition in a video is an asynchronous operation. Analysis
+is started by a call to which returns a job identifier (C<JobId>). When
+the celebrity recognition operation finishes, Rekognition Video
+publishes a completion status to the Amazon Simple Notification Service
+topic registered in the initial call to C<StartCelebrityRecognition>.
+To get the results of the celebrity recognition analysis, first check
+that the status value published to the Amazon SNS topic is
+C<SUCCEEDED>. If so, call C<GetCelebrityDetection> and pass the job
+identifier (C<JobId>) from the initial call to
+C<StartCelebrityDetection>. For more information, see video.
+
+C<GetCelebrityRecognition> returns detected celebrities and the time(s)
+they are detected in an array (C<Celebrities>) of objects. Each
+C<CelebrityRecognition> contains information about the celebrity in a
+object and the time, C<Timestamp>, the celebrity was detected.
+
+C<GetCelebrityRecognition> only returns the default facial attributes
+(C<BoundingBox>, C<Confidence>, C<Landmarks>, C<Pose>, and C<Quality>).
+The other facial attributes listed in the C<Face> object of the
+following response syntax are not returned. For more information, see .
+
+By default, the C<Celebrities> array is sorted by time (milliseconds
+from the start of the video). You can also sort the array by celebrity
+by specifying the value C<ID> in the C<SortBy> input parameter.
+
+The C<CelebrityDetail> object includes the celebrity identifer and
+additional information urls. If you don't store the additional
+information urls, you can get them later by calling with the celebrity
+identifer.
+
+No information is returned for faces not recognized as celebrities.
+
+Use MaxResults parameter to limit the number of labels returned. If
+there are more results than specified in C<MaxResults>, the value of
+C<NextToken> in the operation response contains a pagination token for
+getting the next set of results. To get the next page of results, call
+C<GetCelebrityDetection> and populate the C<NextToken> request
+parameter with the token value returned from the previous call to
+C<GetCelebrityRecognition>.
+
+
+=head2 GetContentModeration
+
+=over
+
+=item JobId => Str
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+=item [SortBy => Str]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Rekognition::GetContentModeration>
+
+Returns: a L<Paws::Rekognition::GetContentModerationResponse> instance
+
+Gets the content moderation analysis results for a Rekognition Video
+analysis started by .
+
+Content moderation analysis of a video is an asynchronous operation.
+You start analysis by calling . which returns a job identifier
+(C<JobId>). When analysis finishes, Rekognition Video publishes a
+completion status to the Amazon Simple Notification Service topic
+registered in the initial call to C<StartContentModeration>. To get the
+results of the content moderation analysis, first check that the status
+value published to the Amazon SNS topic is C<SUCCEEDED>. If so, call
+C<GetCelebrityDetection> and pass the job identifier (C<JobId>) from
+the initial call to C<StartCelebrityDetection>. For more information,
+see video.
+
+C<GetContentModeration> returns detected content moderation labels, and
+the time they are detected, in an array, C<ModerationLabels>, of
+objects.
+
+By default, the moderated labels are returned sorted by time, in
+milliseconds from the start of the video. You can also sort them by
+moderated label by specifying C<NAME> for the C<SortBy> input
+parameter.
+
+Since video analysis can return a large number of results, use the
+C<MaxResults> parameter to limit the number of labels returned in a
+single call to C<GetContentModeration>. If there are more results than
+specified in C<MaxResults>, the value of C<NextToken> in the operation
+response contains a pagination token for getting the next set of
+results. To get the next page of results, call C<GetContentModeration>
+and populate the C<NextToken> request parameter with the value of
+C<NextToken> returned from the previous call to
+C<GetContentModeration>.
+
+For more information, see moderation.
+
+
+=head2 GetFaceDetection
+
+=over
+
+=item JobId => Str
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Rekognition::GetFaceDetection>
+
+Returns: a L<Paws::Rekognition::GetFaceDetectionResponse> instance
+
+Gets face detection results for a Rekognition Video analysis started by
+.
+
+Face detection with Rekognition Video is an asynchronous operation. You
+start face detection by calling which returns a job identifier
+(C<JobId>). When the face detection operation finishes, Rekognition
+Video publishes a completion status to the Amazon Simple Notification
+Service topic registered in the initial call to C<StartFaceDetection>.
+To get the results of the face detection operation, first check that
+the status value published to the Amazon SNS topic is C<SUCCEEDED>. If
+so, call and pass the job identifier (C<JobId>) from the initial call
+to C<StartFaceDetection>.
+
+C<GetFaceDetection> returns an array of detected faces (C<Faces>)
+sorted by the time the faces were detected.
+
+Use MaxResults parameter to limit the number of labels returned. If
+there are more results than specified in C<MaxResults>, the value of
+C<NextToken> in the operation response contains a pagination token for
+getting the next set of results. To get the next page of results, call
+C<GetFaceDetection> and populate the C<NextToken> request parameter
+with the token value returned from the previous call to
+C<GetFaceDetection>.
+
+
+=head2 GetFaceSearch
+
+=over
+
+=item JobId => Str
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+=item [SortBy => Str]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Rekognition::GetFaceSearch>
+
+Returns: a L<Paws::Rekognition::GetFaceSearchResponse> instance
+
+Gets the face search results for Rekognition Video face search started
+by . The search returns faces in a collection that match the faces of
+persons detected in a video. It also includes the time(s) that faces
+are matched in the video.
+
+Face search in a video is an asynchronous operation. You start face
+search by calling to which returns a job identifier (C<JobId>). When
+the search operation finishes, Rekognition Video publishes a completion
+status to the Amazon Simple Notification Service topic registered in
+the initial call to C<StartFaceSearch>. To get the search results,
+first check that the status value published to the Amazon SNS topic is
+C<SUCCEEDED>. If so, call C<GetFaceSearch> and pass the job identifier
+(C<JobId>) from the initial call to C<StartFaceSearch>. For more
+information, see collections.
+
+The search results are retured in an array, C<Persons>, of objects.
+EachC<PersonMatch> element contains details about the matching faces in
+the input collection, person information (facial attributes, bounding
+boxes, and person identifer) for the matched person, and the time the
+person was matched in the video.
+
+C<GetFaceSearch> only returns the default facial attributes
+(C<BoundingBox>, C<Confidence>, C<Landmarks>, C<Pose>, and C<Quality>).
+The other facial attributes listed in the C<Face> object of the
+following response syntax are not returned. For more information, see .
+
+By default, the C<Persons> array is sorted by the time, in milliseconds
+from the start of the video, persons are matched. You can also sort by
+persons by specifying C<INDEX> for the C<SORTBY> input parameter.
+
+
+=head2 GetLabelDetection
+
+=over
+
+=item JobId => Str
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+=item [SortBy => Str]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Rekognition::GetLabelDetection>
+
+Returns: a L<Paws::Rekognition::GetLabelDetectionResponse> instance
+
+Gets the label detection results of a Rekognition Video analysis
+started by .
+
+The label detection operation is started by a call to which returns a
+job identifier (C<JobId>). When the label detection operation finishes,
+Amazon Rekognition publishes a completion status to the Amazon Simple
+Notification Service topic registered in the initial call to
+C<StartlabelDetection>. To get the results of the label detection
+operation, first check that the status value published to the Amazon
+SNS topic is C<SUCCEEDED>. If so, call and pass the job identifier
+(C<JobId>) from the initial call to C<StartLabelDetection>.
+
+C<GetLabelDetection> returns an array of detected labels (C<Labels>)
+sorted by the time the labels were detected. You can also sort by the
+label name by specifying C<NAME> for the C<SortBy> input parameter.
+
+The labels returned include the label name, the percentage confidence
+in the accuracy of the detected label, and the time the label was
+detected in the video.
+
+Use MaxResults parameter to limit the number of labels returned. If
+there are more results than specified in C<MaxResults>, the value of
+C<NextToken> in the operation response contains a pagination token for
+getting the next set of results. To get the next page of results, call
+C<GetlabelDetection> and populate the C<NextToken> request parameter
+with the token value returned from the previous call to
+C<GetLabelDetection>.
+
+
+=head2 GetPersonTracking
+
+=over
+
+=item JobId => Str
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+=item [SortBy => Str]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Rekognition::GetPersonTracking>
+
+Returns: a L<Paws::Rekognition::GetPersonTrackingResponse> instance
+
+Gets the person tracking results of a Rekognition Video analysis
+started by .
+
+The person detection operation is started by a call to
+C<StartPersonTracking> which returns a job identifier (C<JobId>). When
+the person detection operation finishes, Rekognition Video publishes a
+completion status to the Amazon Simple Notification Service topic
+registered in the initial call to C<StartPersonTracking>.
+
+To get the results of the person tracking operation, first check that
+the status value published to the Amazon SNS topic is C<SUCCEEDED>. If
+so, call and pass the job identifier (C<JobId>) from the initial call
+to C<StartPersonTracking>.
+
+C<GetPersonTracking> returns an array, C<Persons>, of tracked persons
+and the time(s) they were tracked in the video.
+
+C<GetPersonTracking> only returns the default facial attributes
+(C<BoundingBox>, C<Confidence>, C<Landmarks>, C<Pose>, and C<Quality>).
+The other facial attributes listed in the C<Face> object of the
+following response syntax are not returned. For more information, see .
+
+By default, the array is sorted by the time(s) a person is tracked in
+the video. You can sort by tracked persons by specifying C<INDEX> for
+the C<SortBy> input parameter.
+
+Use the C<MaxResults> parameter to limit the number of items returned.
+If there are more results than specified in C<MaxResults>, the value of
+C<NextToken> in the operation response contains a pagination token for
+getting the next set of results. To get the next page of results, call
+C<GetPersonTracking> and populate the C<NextToken> request parameter
+with the token value returned from the previous call to
+C<GetPersonTracking>.
+
+
+=head2 IndexFaces
+
+=over
+
+=item CollectionId => Str
+
+=item Image => L<Paws::Rekognition::Image>
+
+=item [DetectionAttributes => ArrayRef[Str|Undef]]
+
+=item [ExternalImageId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Rekognition::IndexFaces>
 
 Returns: a L<Paws::Rekognition::IndexFacesResponse> instance
 
-  Detects faces in the input image and adds them to the specified
+Detects faces in the input image and adds them to the specified
 collection.
 
 Amazon Rekognition does not save the actual faces detected. Instead,
@@ -389,7 +1062,14 @@ vector, and stores it in the back-end database. Amazon Rekognition uses
 feature vectors when performing face match and search operations using
 the and operations.
 
-If you provide the optional C<externalImageID> for the input image you
+If you are using version 1.0 of the face detection model, C<IndexFaces>
+indexes the 15 largest faces in the input image. Later versions of the
+face detection model index the 100 largest faces in the input image. To
+determine which version of the model you are using, check the the value
+of C<FaceModelVersion> in the response from C<IndexFaces>. For more
+information, see face-detection-model.
+
+If you provide the optional C<ExternalImageID> for the input image you
 provided, Amazon Rekognition associates this ID with all faces that it
 detects. When you call the operation, the response returns the external
 ID. You can use this external image ID to create a client-side index to
@@ -408,64 +1088,111 @@ facial attributes such gender. If you provide the same image, specify
 the same collection, and use the same external ID in the C<IndexFaces>
 operation, Amazon Rekognition doesn't save duplicate face metadata.
 
-For an example, see example2.
+The input image is passed either as base64-encoded image bytes or as a
+reference to an image in an Amazon S3 bucket. If you use the Amazon CLI
+to call Amazon Rekognition operations, passing image bytes is not
+supported. The image must be either a PNG or JPEG formatted file.
 
 This operation requires permissions to perform the
 C<rekognition:IndexFaces> action.
 
 
-=head2 ListCollections([MaxResults => Int, NextToken => Str])
+=head2 ListCollections
+
+=over
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Rekognition::ListCollections>
 
 Returns: a L<Paws::Rekognition::ListCollectionsResponse> instance
 
-  Returns list of collection IDs in your account. If the result is
+Returns list of collection IDs in your account. If the result is
 truncated, the response also provides a C<NextToken> that you can use
 in the subsequent request to fetch the next set of collection IDs.
 
-For an example, see example1.
+For an example, see list-collection-procedure.
 
 This operation requires permissions to perform the
 C<rekognition:ListCollections> action.
 
 
-=head2 ListFaces(CollectionId => Str, [MaxResults => Int, NextToken => Str])
+=head2 ListFaces
+
+=over
+
+=item CollectionId => Str
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Rekognition::ListFaces>
 
 Returns: a L<Paws::Rekognition::ListFacesResponse> instance
 
-  Returns metadata for faces in the specified collection. This metadata
+Returns metadata for faces in the specified collection. This metadata
 includes information such as the bounding box coordinates, the
 confidence (that the bounding box contains a face), and face ID. For an
-example, see example3.
+example, see list-faces-in-collection-procedure.
 
 This operation requires permissions to perform the
 C<rekognition:ListFaces> action.
 
 
-=head2 RecognizeCelebrities(Image => L<Paws::Rekognition::Image>)
+=head2 ListStreamProcessors
+
+=over
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Rekognition::ListStreamProcessors>
+
+Returns: a L<Paws::Rekognition::ListStreamProcessorsResponse> instance
+
+Gets a list of stream processors that you have created with .
+
+
+=head2 RecognizeCelebrities
+
+=over
+
+=item Image => L<Paws::Rekognition::Image>
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Rekognition::RecognizeCelebrities>
 
 Returns: a L<Paws::Rekognition::RecognizeCelebritiesResponse> instance
 
-  Returns an array of celebrities recognized in the input image. The
-image is passed either as base64-encoded image bytes or as a reference
-to an image in an Amazon S3 bucket. The image must be either a PNG or
-JPEG formatted file. For more information, see celebrity-recognition.
+Returns an array of celebrities recognized in the input image. For more
+information, see celebrities.
 
-C<RecognizeCelebrities> returns the 15 largest faces in the image. It
-lists recognized celebrities in the C<CelebrityFaces> list and
-unrecognized faces in the C<UnrecognizedFaces> list. The operation
-doesn't return celebrities whose face sizes are smaller than the
-largest 15 faces in the image.
+C<RecognizeCelebrities> returns the 100 largest faces in the image. It
+lists recognized celebrities in the C<CelebrityFaces> array and
+unrecognized faces in the C<UnrecognizedFaces> array.
+C<RecognizeCelebrities> doesn't return celebrities whose faces are not
+amongst the largest 100 faces in the image.
 
-For each celebrity recognized, the API returns a C<Celebrity> object.
-The C<Celebrity> object contains the celebrity name, ID, URL links to
-additional information, match confidence, and a C<ComparedFace> object
-that you can use to locate the celebrity's face on the image.
+For each celebrity recognized, the C<RecognizeCelebrities> returns a
+C<Celebrity> object. The C<Celebrity> object contains the celebrity
+name, ID, URL links to additional information, match confidence, and a
+C<ComparedFace> object that you can use to locate the celebrity's face
+on the image.
 
 Rekognition does not retain information about which images a celebrity
 has been recognized in. Your application must store this information
@@ -474,19 +1201,37 @@ celebrity. If you don't store the celebrity name or additional
 information URLs returned by C<RecognizeCelebrities>, you will need the
 ID to identify the celebrity in a call to the operation.
 
-For an example, see recognize-celebrities-tutorial.
+You pass the imput image either as base64-encoded image bytes or as a
+reference to an image in an Amazon S3 bucket. If you use the Amazon CLI
+to call Amazon Rekognition operations, passing image bytes is not
+supported. The image must be either a PNG or JPEG formatted file.
+
+For an example, see celebrities-procedure-image.
 
 This operation requires permissions to perform the
 C<rekognition:RecognizeCelebrities> operation.
 
 
-=head2 SearchFaces(CollectionId => Str, FaceId => Str, [FaceMatchThreshold => Num, MaxFaces => Int])
+=head2 SearchFaces
+
+=over
+
+=item CollectionId => Str
+
+=item FaceId => Str
+
+=item [FaceMatchThreshold => Num]
+
+=item [MaxFaces => Int]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Rekognition::SearchFaces>
 
 Returns: a L<Paws::Rekognition::SearchFacesResponse> instance
 
-  For a given input face ID, searches for matching faces in the
+For a given input face ID, searches for matching faces in the
 collection the face belongs to. You get a face ID when you add a face
 to the collection using the IndexFaces operation. The operation
 compares the features of the input face with faces in the specified
@@ -502,19 +1247,32 @@ with the metadata, the response also includes a C<confidence> value for
 each face match, indicating the confidence that the specific face
 matches the input face.
 
-For an example, see example3.
+For an example, see search-face-with-id-procedure.
 
 This operation requires permissions to perform the
 C<rekognition:SearchFaces> action.
 
 
-=head2 SearchFacesByImage(CollectionId => Str, Image => L<Paws::Rekognition::Image>, [FaceMatchThreshold => Num, MaxFaces => Int])
+=head2 SearchFacesByImage
+
+=over
+
+=item CollectionId => Str
+
+=item Image => L<Paws::Rekognition::Image>
+
+=item [FaceMatchThreshold => Num]
+
+=item [MaxFaces => Int]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Rekognition::SearchFacesByImage>
 
 Returns: a L<Paws::Rekognition::SearchFacesByImageResponse> instance
 
-  For a given input image, first detects the largest face in the image,
+For a given input image, first detects the largest face in the image,
 and then searches the specified collection for matching faces. The
 operation compares the features of the input face with faces in the
 specified collection.
@@ -527,6 +1285,11 @@ You can also call the C<DetectFaces> operation and use the bounding
 boxes in the response to make face crops, which then you can pass in to
 the C<SearchFacesByImage> operation.
 
+You pass the input image either as base64-encoded image bytes or as a
+reference to an image in an Amazon S3 bucket. If you use the Amazon CLI
+to call Amazon Rekognition operations, passing image bytes is not
+supported. The image must be either a PNG or JPEG formatted file.
+
 The response returns an array of faces that match, ordered by
 similarity score with the highest similarity first. More specifically,
 it is an array of metadata for each face match found. Along with the
@@ -536,10 +1299,268 @@ also returns the bounding box (and a confidence level that the bounding
 box contains a face) of the face that Amazon Rekognition used for the
 input image.
 
-For an example, see example3.
+For an example, see search-face-with-image-procedure.
 
 This operation requires permissions to perform the
 C<rekognition:SearchFacesByImage> action.
+
+
+=head2 StartCelebrityRecognition
+
+=over
+
+=item Video => L<Paws::Rekognition::Video>
+
+=item [ClientRequestToken => Str]
+
+=item [JobTag => Str]
+
+=item [NotificationChannel => L<Paws::Rekognition::NotificationChannel>]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Rekognition::StartCelebrityRecognition>
+
+Returns: a L<Paws::Rekognition::StartCelebrityRecognitionResponse> instance
+
+Starts asynchronous recognition of celebrities in a stored video.
+
+Rekognition Video can detect celebrities in a video must be stored in
+an Amazon S3 bucket. Use Video to specify the bucket name and the
+filename of the video. C<StartCelebrityRecognition> returns a job
+identifier (C<JobId>) which you use to get the results of the analysis.
+When celebrity recognition analysis is finished, Rekognition Video
+publishes a completion status to the Amazon Simple Notification Service
+topic that you specify in C<NotificationChannel>. To get the results of
+the celebrity recognition analysis, first check that the status value
+published to the Amazon SNS topic is C<SUCCEEDED>. If so, call and pass
+the job identifier (C<JobId>) from the initial call to
+C<StartCelebrityRecognition>. For more information, see celebrities.
+
+
+=head2 StartContentModeration
+
+=over
+
+=item Video => L<Paws::Rekognition::Video>
+
+=item [ClientRequestToken => Str]
+
+=item [JobTag => Str]
+
+=item [MinConfidence => Num]
+
+=item [NotificationChannel => L<Paws::Rekognition::NotificationChannel>]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Rekognition::StartContentModeration>
+
+Returns: a L<Paws::Rekognition::StartContentModerationResponse> instance
+
+Starts asynchronous detection of explicit or suggestive adult content
+in a stored video.
+
+Rekognition Video can moderate content in a video stored in an Amazon
+S3 bucket. Use Video to specify the bucket name and the filename of the
+video. C<StartContentModeration> returns a job identifier (C<JobId>)
+which you use to get the results of the analysis. When content
+moderation analysis is finished, Rekognition Video publishes a
+completion status to the Amazon Simple Notification Service topic that
+you specify in C<NotificationChannel>.
+
+To get the results of the content moderation analysis, first check that
+the status value published to the Amazon SNS topic is C<SUCCEEDED>. If
+so, call and pass the job identifier (C<JobId>) from the initial call
+to C<StartContentModeration>. For more information, see moderation.
+
+
+=head2 StartFaceDetection
+
+=over
+
+=item Video => L<Paws::Rekognition::Video>
+
+=item [ClientRequestToken => Str]
+
+=item [FaceAttributes => Str]
+
+=item [JobTag => Str]
+
+=item [NotificationChannel => L<Paws::Rekognition::NotificationChannel>]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Rekognition::StartFaceDetection>
+
+Returns: a L<Paws::Rekognition::StartFaceDetectionResponse> instance
+
+Starts asynchronous detection of faces in a stored video.
+
+Rekognition Video can detect faces in a video stored in an Amazon S3
+bucket. Use Video to specify the bucket name and the filename of the
+video. C<StartFaceDetection> returns a job identifier (C<JobId>) that
+you use to get the results of the operation. When face detection is
+finished, Rekognition Video publishes a completion status to the Amazon
+Simple Notification Service topic that you specify in
+C<NotificationChannel>. To get the results of the label detection
+operation, first check that the status value published to the Amazon
+SNS topic is C<SUCCEEDED>. If so, call and pass the job identifier
+(C<JobId>) from the initial call to C<StartFaceDetection>. For more
+information, see faces-video.
+
+
+=head2 StartFaceSearch
+
+=over
+
+=item CollectionId => Str
+
+=item Video => L<Paws::Rekognition::Video>
+
+=item [ClientRequestToken => Str]
+
+=item [FaceMatchThreshold => Num]
+
+=item [JobTag => Str]
+
+=item [NotificationChannel => L<Paws::Rekognition::NotificationChannel>]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Rekognition::StartFaceSearch>
+
+Returns: a L<Paws::Rekognition::StartFaceSearchResponse> instance
+
+Starts the asynchronous search for faces in a collection that match the
+faces of persons detected in a stored video.
+
+The video must be stored in an Amazon S3 bucket. Use Video to specify
+the bucket name and the filename of the video. C<StartFaceSearch>
+returns a job identifier (C<JobId>) which you use to get the search
+results once the search has completed. When searching is finished,
+Rekognition Video publishes a completion status to the Amazon Simple
+Notification Service topic that you specify in C<NotificationChannel>.
+To get the search results, first check that the status value published
+to the Amazon SNS topic is C<SUCCEEDED>. If so, call and pass the job
+identifier (C<JobId>) from the initial call to C<StartFaceSearch>. For
+more information, see collections-search-person.
+
+
+=head2 StartLabelDetection
+
+=over
+
+=item Video => L<Paws::Rekognition::Video>
+
+=item [ClientRequestToken => Str]
+
+=item [JobTag => Str]
+
+=item [MinConfidence => Num]
+
+=item [NotificationChannel => L<Paws::Rekognition::NotificationChannel>]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Rekognition::StartLabelDetection>
+
+Returns: a L<Paws::Rekognition::StartLabelDetectionResponse> instance
+
+Starts asynchronous detection of labels in a stored video.
+
+Rekognition Video can detect labels in a video. Labels are instances of
+real-world entities. This includes objects like flower, tree, and
+table; events like wedding, graduation, and birthday party; concepts
+like landscape, evening, and nature; and activities like a person
+getting out of a car or a person skiing.
+
+The video must be stored in an Amazon S3 bucket. Use Video to specify
+the bucket name and the filename of the video. C<StartLabelDetection>
+returns a job identifier (C<JobId>) which you use to get the results of
+the operation. When label detection is finished, Rekognition Video
+publishes a completion status to the Amazon Simple Notification Service
+topic that you specify in C<NotificationChannel>.
+
+To get the results of the label detection operation, first check that
+the status value published to the Amazon SNS topic is C<SUCCEEDED>. If
+so, call and pass the job identifier (C<JobId>) from the initial call
+to C<StartLabelDetection>.
+
+
+=head2 StartPersonTracking
+
+=over
+
+=item Video => L<Paws::Rekognition::Video>
+
+=item [ClientRequestToken => Str]
+
+=item [JobTag => Str]
+
+=item [NotificationChannel => L<Paws::Rekognition::NotificationChannel>]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Rekognition::StartPersonTracking>
+
+Returns: a L<Paws::Rekognition::StartPersonTrackingResponse> instance
+
+Starts the asynchronous tracking of persons in a stored video.
+
+Rekognition Video can track persons in a video stored in an Amazon S3
+bucket. Use Video to specify the bucket name and the filename of the
+video. C<StartPersonTracking> returns a job identifier (C<JobId>) which
+you use to get the results of the operation. When label detection is
+finished, Amazon Rekognition publishes a completion status to the
+Amazon Simple Notification Service topic that you specify in
+C<NotificationChannel>.
+
+To get the results of the person detection operation, first check that
+the status value published to the Amazon SNS topic is C<SUCCEEDED>. If
+so, call and pass the job identifier (C<JobId>) from the initial call
+to C<StartPersonTracking>.
+
+
+=head2 StartStreamProcessor
+
+=over
+
+=item Name => Str
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Rekognition::StartStreamProcessor>
+
+Returns: a L<Paws::Rekognition::StartStreamProcessorResponse> instance
+
+Starts processing a stream processor. You create a stream processor by
+calling . To tell C<StartStreamProcessor> which stream processor to
+start, use the value of the C<Name> field specified in the call to
+C<CreateStreamProcessor>.
+
+
+=head2 StopStreamProcessor
+
+=over
+
+=item Name => Str
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Rekognition::StopStreamProcessor>
+
+Returns: a L<Paws::Rekognition::StopStreamProcessorResponse> instance
+
+Stops a running stream processor that was created by .
 
 
 
@@ -557,7 +1578,9 @@ If passed a sub as first parameter, it will call the sub for each element found 
 
  - CollectionIds, passing the object as the first parameter, and the string 'CollectionIds' as the second parameter 
 
-If not, it will return a a L<Paws::Rekognition::ListCollectionsResponse> instance with all the C<param>s;  from all the responses. Please take into account that this mode can potentially consume vasts ammounts of memory.
+ - FaceModelVersions, passing the object as the first parameter, and the string 'FaceModelVersions' as the second parameter 
+
+If not, it will return a a L<Paws::Rekognition::ListCollectionsResponse> instance with all the C<param>s; andC<param>s;  from all the responses. Please take into account that this mode can potentially consume vasts ammounts of memory.
 
 
 =head2 ListAllFaces(sub { },CollectionId => Str, [MaxResults => Int, NextToken => Str])
@@ -572,6 +1595,18 @@ If passed a sub as first parameter, it will call the sub for each element found 
 If not, it will return a a L<Paws::Rekognition::ListFacesResponse> instance with all the C<param>s;  from all the responses. Please take into account that this mode can potentially consume vasts ammounts of memory.
 
 
+=head2 ListAllStreamProcessors(sub { },[MaxResults => Int, NextToken => Str])
+
+=head2 ListAllStreamProcessors([MaxResults => Int, NextToken => Str])
+
+
+If passed a sub as first parameter, it will call the sub for each element found in :
+
+ - StreamProcessors, passing the object as the first parameter, and the string 'StreamProcessors' as the second parameter 
+
+If not, it will return a a L<Paws::Rekognition::ListStreamProcessorsResponse> instance with all the C<param>s;  from all the responses. Please take into account that this mode can potentially consume vasts ammounts of memory.
+
+
 
 
 
@@ -581,9 +1616,9 @@ This service class forms part of L<Paws>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

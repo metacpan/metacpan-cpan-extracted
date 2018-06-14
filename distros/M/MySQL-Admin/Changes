@@ -1,11 +1,4 @@
-Revision history for Perl MySQL::Admin 1.13
-
-1.13
-    BBOCODE removed Markdown will be in place.
-    ACE Editor intergrated.
-    jquery, bootstrap require js included, compatible.
-    A few Changes for Windows and perl v5.26.1.
-
+Revision history for Perl MySQL::Admin 1.12
 1.12
    a few small fixes.
    Default date (0000-00-00) in MySQL will not work longer.

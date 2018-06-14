@@ -38,7 +38,9 @@ An execution property of a job.
 
 =head2 MaxConcurrentRuns => Int
 
-  The maximum number of concurrent runs allowed for a job.
+  The maximum number of concurrent runs allowed for the job. The default
+is 1. An error is returned when this threshold is reached. The maximum
+value you can specify is controlled by a service limit.
 
 
 
@@ -48,9 +50,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Glue>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

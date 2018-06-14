@@ -37,44 +37,46 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Greengrass:
 
 =head1 DESCRIPTION
 
-Information on the Definition
+Information about a definition.
 
 =head1 ATTRIBUTES
 
 
 =head2 Arn => Str
 
-  Arn of the definition.
+  The ARN of the definition.
 
 
 =head2 CreationTimestamp => Str
 
-  Timestamp of when the definition was created.
+  The time, in milliseconds since the epoch, when the definition was
+created.
 
 
 =head2 Id => Str
 
-  Id of the definition.
+  The ID of the definition.
 
 
 =head2 LastUpdatedTimestamp => Str
 
-  Last updated timestamp of the definition.
+  The time, in milliseconds since the epoch, when the definition was last
+updated.
 
 
 =head2 LatestVersion => Str
 
-  Last version of the definition.
+  The latest version of the definition.
 
 
 =head2 LatestVersionArn => Str
 
-  Latest version arn of the definition.
+  The ARN of the latest version of the definition.
 
 
 =head2 Name => Str
 
-  Name of the definition.
+  The name of the definition.
 
 
 
@@ -84,9 +86,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Greengras
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

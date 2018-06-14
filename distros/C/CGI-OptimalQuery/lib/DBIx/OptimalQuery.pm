@@ -876,11 +876,9 @@ sub parseFilter {
         if ($f =~ /\G\)\s*/gc) {
           last;
         }
-        elsif ($f =~ /\G(\-?\d*\.\d+)\s*\,*\s*/gc ||
-               $f =~ /\G(\-?\d+)\s*\,*\s*/gc      ||
-               $f =~ /\G\'([^\']*)\'\s*\,*\s*/gc  ||
-               $f =~ /\G\"([^\"]*)\"\s*\,*\s*/gc  ||
-               $f =~ /\G(\w+)\s*\,*\s*/gc) {
+        elsif ($f =~ /\G\'([^\']*)\'\s*\,?\s*/gc ||
+               $f =~ /\G\"([^\"]*)\"\s*\,?\s*/gc ||
+               $f =~ /\G([^\)\,]*)\s*\,?\s*/gc) {
           push @args, $1;
         } else {
           $error = "could not parse named filter arguments";
@@ -1074,6 +1072,8 @@ sub generateFilterSQL {
                   $rightSql = "$now+($num/1440)"
                 } elsif ($unit eq 'HOUR') {
                   $rightSql = "$now+($num/24)"
+                } elsif ($unit eq 'DAY') {
+                  $rightSql = "$now+$num"
                 } elsif ($unit eq 'WEEK') {
                   $rightSql = "$now+($num*7)"
                 } elsif ($unit eq 'MONTH') {
@@ -1249,7 +1249,7 @@ sub generateFilterSQL {
 
           # convert contains operator to like
           if ($operatorName =~ /contains/i) {
-            $leftSql = "LOWER($leftSql)" if ! $leftType eq 'char' || $leftType eq 'clob';
+            $leftSql = "LOWER($leftSql)" if $leftType eq 'char' || $leftType eq 'clob';
             $operator = $operatorName =~ /not/i ? "NOT LIKE" : "LIKE";
             $rval = '%'.lc($rval).'%';
           }
@@ -1385,7 +1385,8 @@ sub generateFilterSQL {
 
 
       my $sql = '(' x $numLeftParen;
-      $sql .= $filterSql;
+      # put expression in parenthesis since it may contain OR expression without parenthesis which will screw up order of operations
+      $sql .= '('.$filterSql.')';
       $sql .= ')' x $numRightParen;
 
       # glue expression

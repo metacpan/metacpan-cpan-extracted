@@ -3,11 +3,13 @@ package Paws::ApiGateway::CreateStage;
   use Moose;
   has CacheClusterEnabled => (is => 'ro', isa => 'Bool', traits => ['NameInRequest'], request_name => 'cacheClusterEnabled');
   has CacheClusterSize => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'cacheClusterSize');
+  has CanarySettings => (is => 'ro', isa => 'Paws::ApiGateway::CanarySettings', traits => ['NameInRequest'], request_name => 'canarySettings');
   has DeploymentId => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'deploymentId', required => 1);
   has Description => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'description');
   has DocumentationVersion => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'documentationVersion');
-  has RestApiId => (is => 'ro', isa => 'Str', traits => ['ParamInURI'], uri_name => 'restApiId', required => 1);
+  has RestApiId => (is => 'ro', isa => 'Str', traits => ['ParamInURI'], uri_name => 'restapi_id', required => 1);
   has StageName => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'stageName', required => 1);
+  has Tags => (is => 'ro', isa => 'Paws::ApiGateway::MapOfStringToString', traits => ['NameInRequest'], request_name => 'tags');
   has Variables => (is => 'ro', isa => 'Paws::ApiGateway::MapOfStringToString', traits => ['NameInRequest'], request_name => 'variables');
 
   use MooseX::ClassAttribute;
@@ -16,28 +18,64 @@ package Paws::ApiGateway::CreateStage;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/restapis/{restapi_id}/stages');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'POST');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::ApiGateway::Stage');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::ApiGateway::CreateStage - Arguments for method CreateStage on Paws::ApiGateway
+Paws::ApiGateway::CreateStage - Arguments for method CreateStage on L<Paws::ApiGateway>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateStage on the 
-Amazon API Gateway service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateStage on the
+L<Amazon API Gateway|Paws::ApiGateway> service. Use the attributes of this class
 as arguments to method CreateStage.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateStage.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateStage(Att1 => $value1, Att2 => $value2, ...);
+    my $apigateway = Paws->service('ApiGateway');
+    my $Stage = $apigateway->CreateStage(
+      DeploymentId        => 'MyString',
+      RestApiId           => 'MyString',
+      StageName           => 'MyString',
+      CacheClusterEnabled => 1,            # OPTIONAL
+      CacheClusterSize    => '0.5',        # OPTIONAL
+      CanarySettings      => {
+        stageVariableOverrides => { 'MyString' => 'MyString', },    # OPTIONAL
+        percentTraffic         => 1,                                # OPTIONAL
+        useStageCache          => 1,
+        deploymentId           => 'MyString',
+      },    # OPTIONAL
+      Description          => 'MyString',                       # OPTIONAL
+      DocumentationVersion => 'MyString',                       # OPTIONAL
+      Tags                 => { 'MyString' => 'MyString', },    # OPTIONAL
+      Variables            => { 'MyString' => 'MyString', },    # OPTIONAL
+    );
+
+    # Results:
+    my $Variables            = $Stage->Variables;
+    my $CacheClusterStatus   = $Stage->CacheClusterStatus;
+    my $StageName            = $Stage->StageName;
+    my $CacheClusterEnabled  = $Stage->CacheClusterEnabled;
+    my $AccessLogSettings    = $Stage->AccessLogSettings;
+    my $MethodSettings       = $Stage->MethodSettings;
+    my $Tags                 = $Stage->Tags;
+    my $ClientCertificateId  = $Stage->ClientCertificateId;
+    my $Description          = $Stage->Description;
+    my $DeploymentId         = $Stage->DeploymentId;
+    my $LastUpdatedDate      = $Stage->LastUpdatedDate;
+    my $DocumentationVersion = $Stage->DocumentationVersion;
+    my $CreatedDate          = $Stage->CreatedDate;
+    my $CanarySettings       = $Stage->CanarySettings;
+    my $CacheClusterSize     = $Stage->CacheClusterSize;
+
+    # Returns a L<Paws::ApiGateway::Stage> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/apigateway/>
 
 =head1 ATTRIBUTES
 
@@ -54,9 +92,16 @@ The stage's cache cluster size.
 
 Valid values are: C<"0.5">, C<"1.6">, C<"6.1">, C<"13.5">, C<"28.4">, C<"58.2">, C<"118">, C<"237">
 
+=head2 CanarySettings => L<Paws::ApiGateway::CanarySettings>
+
+The canary deployment settings of this stage.
+
+
+
 =head2 B<REQUIRED> DeploymentId => Str
 
-The identifier of the Deployment resource for the Stage resource.
+[Required] The identifier of the Deployment resource for the Stage
+resource.
 
 
 
@@ -74,13 +119,21 @@ The version of the associated API documentation.
 
 =head2 B<REQUIRED> RestApiId => Str
 
-The string identifier of the associated RestApi.
+[Required] The string identifier of the associated RestApi.
 
 
 
 =head2 B<REQUIRED> StageName => Str
 
-The name for the Stage resource.
+[Required] The name for the Stage resource.
+
+
+
+=head2 Tags => L<Paws::ApiGateway::MapOfStringToString>
+
+The key-value map of strings. The valid character set is
+[a-zA-Z+-=._:/]. The tag key can be up to 128 characters and must not
+start with C<aws:>. The tag value can be up to 256 characters.
 
 
 
@@ -99,9 +152,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateStage i
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

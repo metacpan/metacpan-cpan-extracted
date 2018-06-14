@@ -46,6 +46,25 @@ The parameters for an AUTOMATION task type.
 
   The parameters for the AUTOMATION task.
 
+For information about specifying and updating task parameters, see
+RegisterTaskWithMaintenanceWindow and UpdateMaintenanceWindowTask.
+
+C<LoggingInfo> has been deprecated. To specify an S3 bucket to contain
+logs, instead use the C<OutputS3BucketName> and C<OutputS3KeyPrefix>
+options in the C<TaskInvocationParameters> structure. For information
+about how Systems Manager handles these options for the supported
+Maintenance Window task types, see
+MaintenanceWindowTaskInvocationParameters.
+
+C<TaskParameters> has been deprecated. To specify parameters to pass to
+a task when it runs, instead use the C<Parameters> option in the
+C<TaskInvocationParameters> structure. For information about how
+Systems Manager handles these options for the supported Maintenance
+Window task types, see MaintenanceWindowTaskInvocationParameters.
+
+For AUTOMATION task types, Systems Manager ignores any values specified
+for these parameters.
+
 
 
 =head1 SEE ALSO
@@ -54,9 +73,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::SSM>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

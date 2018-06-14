@@ -14,10 +14,10 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 394cd7697bb540e8315bdec2fe537d68b2ed5e25 Changes
+SHA1 6b4cd282742a9fc719d97a9ed4a7180413ccb34f Changes
 SHA1 0a3224be32be8a39834f4c2d84648064fadeb559 LICENSE
-SHA1 e1ae93ca0ba911e6792e85f27f81f7041485bdce MANIFEST
-SHA1 aebd50c5f262c313573a6095801c4ebf3314f303 META.yml
+SHA1 93248660849396ce6d27056fa3d7ec52ee9aafc8 MANIFEST
+SHA1 9edb69fdd779c76b022fe8b11ee9ef20840e4f5b META.yml
 SHA1 44878594374f010abc2e1e39c6547490992fe423 Makefile.PL
 SHA1 197cd61b3ba67f4d37980aa10dbbc70c46c1466d README
 SHA1 c4f37f5f9882c56501df37fb5b1fc957c92cd3cd README.md
@@ -29,7 +29,7 @@ SHA1 9af5cf974ce21ed238f791cd4051e6b82c7e221f html/Callbacks/RT-Extension-Condit
 SHA1 13d28419e0c7f49cf3a8d1e0a94c805a1d0029d2 html/Callbacks/RT-Extension-ConditionalCustomFields/Elements/ShowCustomFields/AfterCustomFieldValue
 SHA1 6b6a9136e04f04cf37d3976c43226c1fdf5df7f0 html/Callbacks/RT-Extension-ConditionalCustomFields/Elements/ShowRecord/AfterValue
 SHA1 29ab90c3841b540a9e72d225734fd59a73027fec html/Elements/EditConditionalCustomFields
-SHA1 7925771e105818326665681fa487de7a5ad5dbc9 html/Elements/ShowConditionalCustomFields
+SHA1 f60582b29a8bfd9e2aa5254e4938f4b6f7efeb67 html/Elements/ShowConditionalCustomFields
 SHA1 9c66ff70f4dc81b1d0a0c46b3ff6381963bd47a8 html/Helpers/SelectCondition
 SHA1 707278f4ee3fa8eb21b9a2d40fe26447113244a3 inc/Module/AutoInstall.pm
 SHA1 fb87e7e7964647af0e7f6422bc7943754935dca7 inc/Module/Install.pm
@@ -47,7 +47,7 @@ SHA1 13c903897bad7f0fdd7871a4a0182ff62dfbefd5 inc/Module/Install/Substitute.pm
 SHA1 b0b3ad3cfea40b508eb61e0e5c8ea477f81f3eb1 inc/Module/Install/Win32.pm
 SHA1 b162866505fb2a1141efa422cfdc864394cb4444 inc/Module/Install/WriteAll.pm
 SHA1 1bb8b3e76788e691f83dacdee5a2c02aacf1222a inc/YAML/Tiny.pm
-SHA1 91bc3fe50c052723f2981b44685aae2927bd7d79 lib/RT/Extension/ConditionalCustomFields.pm
+SHA1 06262a9c2cd4833892836963cd1771e0a10d771a lib/RT/Extension/ConditionalCustomFields.pm
 SHA1 523c22fc9e32e87bf60a01d842335b64b2fccbea lib/RT/Extension/ConditionalCustomFields/Test.pm.in
 SHA1 4ae19b19eb25633ecfe53fa2e3b642cfe02dc26d patches/4.2-add-callbacksto-extend-customfields-capabilities.patch
 SHA1 8e0a55c5b346eb46fa59bf84d5343cec1e296753 patches/4.4.1-add-callbacks-to-extend-customfields-capabilities.patch
@@ -76,6 +76,7 @@ SHA1 a9c3cae632d920abd3908ca4cf958f6c5e335b46 xt/multivalued_ticket_display.t
 SHA1 7425d4946f48d2ca397e8680d9fe9c421e70e233 xt/multivalued_ticket_modify_list.t
 SHA1 3407ab8ee64b16d45c5bf6632cf94fca748649d9 xt/multivalued_ticket_modify_selectbox.t
 SHA1 8b1a1ab95af204432407d833419e640ff58519d2 xt/multivalued_user_summary.t
+SHA1 ba24dfca87d31f9ee4a3e8c75a2951bb8dd09dca xt/no_applied_condition.t
 SHA1 55b2a3e0fef124cc626bc712892f320e09fa3abc xt/queue_modify_dropdown.t
 SHA1 3aaa5cc48a25989af48cdea67da8aa103e29e05a xt/queue_modify_list.t
 SHA1 4ae4e2757ae25aa2d22ddc82e181a8fd7eda57c0 xt/queue_modify_selectbox.t
@@ -89,7 +90,7 @@ SHA1 a4b61af42c4db06f130ae663a77b5ebce0af701e xt/user_modify_selectbox.t
 SHA1 1bcbb4b9c3e169197a71eaf025b4c65a9b87406d xt/user_summary.t
 -----BEGIN PGP SIGNATURE-----
 
-iF0EARECAB0WIQRR24FY+Z56D/YyPs7z3XhnulP5PwUCWw1ngQAKCRDz3XhnulP5
-P3ftAJ9sonNkdgF4gXyOWV6pvsscnchQQACgteo4TL27CcO5lwH4d/whwPb6j5c=
-=368a
+iF0EARECAB0WIQRR24FY+Z56D/YyPs7z3XhnulP5PwUCWx/NbQAKCRDz3XhnulP5
+P2CEAJwLClZzX2k06+Sv2TiMFxQhuQcgIACfVcgqKH9QIU83YKWxuF8URxeljj8=
+=oqw9
 -----END PGP SIGNATURE-----

@@ -22,11 +22,11 @@ VSGDR::StaticData - Static data script support package for SSDT post-deployment 
 
 =head1 VERSION
 
-Version 0.38
+Version 0.39
 
 =cut
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 
 sub databaseName {
@@ -139,6 +139,7 @@ sub generateScript {
 
 
     my $ra_columns              = columns($dbh,$schema,$table);
+#warn Dumper $quotedSchema,$quotedTable   ; 
     my $ra_pkcolumns            = pkcolumns($dbh,$quotedSchema,$quotedTable);
 
     croak "${quotedCombinedName} doesn't appear to be a valid table"          unless scalar @{$ra_columns};
@@ -172,6 +173,9 @@ sub generateScript {
     }    
     $flatcolumnlist             =~ s{ ,\s? \z }{}msx;
     $flatvariablelist           =~ s{ ,\s? \z }{}msx;
+
+    
+#warn Dumper @{$ra_pkcolumns} ;
 
     my $reportingPKCols                 = "" ;
     my $recordExistenceCheckSQL         = "" ;
@@ -941,10 +945,16 @@ sub pkcolumns {
 
     local $_    = undef ;
     
-    my $dbh     = shift or croak 'no dbh' ;
-    my $schema  = shift or croak 'no schema' ;
-    my $table   = shift or croak 'no table' ;
+    my $dbh         = shift or croak 'no dbh' ;
+    my $qtd_schema  = shift or croak 'no schema' ;
+    my $qtd_table   = shift or croak 'no table' ;
 
+    my $schema  = $qtd_schema ;
+    my $table   = $qtd_table ;
+
+       $schema  =~ s/\A\[(.*)\]\z/$1/;
+       $table   =~ s/\A\[(.*)\]\z/$1/;
+    
     my $sth2    = $dbh->prepare( pkcolumnsSQL());
     my $rs      = $sth2->execute($schema,$table,$schema,$table);
     my $res     = $sth2->fetchall_arrayref() ;

@@ -16,7 +16,7 @@ the same terms as the Perl 5 programming language system itself.
 =cut
 
 use strict;
-use Test::More tests => 12;
+use Test::More tests => 18;
 use MooX::Struct
 	Organisation => [qw/ name employees /, company_number => [is => 'rw']],
 	Person       => [qw/ name /];
@@ -55,3 +55,6 @@ is($acme->company_number, 12345, 'accessors can be made read-write');
 
 can_ok $alice => 'OBJECT_ID';
 isnt($alice->OBJECT_ID, $bob->OBJECT_ID, 'OBJECT_ID is unique identifier');
+
+isa_ok($_->TYPE_TINY, 'Type::Tiny', '$'.lc($_->name).'->TYPE_TINY') for ($alice, $bob, $acme);
+ok($_->TYPE_TINY->check($_), '$'.lc($_->name).'->TYPE_TINY->check') for ($alice, $bob, $acme);

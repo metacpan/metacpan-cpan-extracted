@@ -1,8 +1,8 @@
 
 package Paws::ApiGateway::GetStage;
   use Moose;
-  has RestApiId => (is => 'ro', isa => 'Str', traits => ['ParamInURI'], uri_name => 'restApiId', required => 1);
-  has StageName => (is => 'ro', isa => 'Str', traits => ['ParamInURI'], uri_name => 'stageName', required => 1);
+  has RestApiId => (is => 'ro', isa => 'Str', traits => ['ParamInURI'], uri_name => 'restapi_id', required => 1);
+  has StageName => (is => 'ro', isa => 'Str', traits => ['ParamInURI'], uri_name => 'stage_name', required => 1);
 
   use MooseX::ClassAttribute;
 
@@ -10,41 +10,65 @@ package Paws::ApiGateway::GetStage;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/restapis/{restapi_id}/stages/{stage_name}');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'GET');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::ApiGateway::Stage');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::ApiGateway::GetStage - Arguments for method GetStage on Paws::ApiGateway
+Paws::ApiGateway::GetStage - Arguments for method GetStage on L<Paws::ApiGateway>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method GetStage on the 
-Amazon API Gateway service. Use the attributes of this class
+This class represents the parameters used for calling the method GetStage on the
+L<Amazon API Gateway|Paws::ApiGateway> service. Use the attributes of this class
 as arguments to method GetStage.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to GetStage.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->GetStage(Att1 => $value1, Att2 => $value2, ...);
+    my $apigateway = Paws->service('ApiGateway');
+    my $Stage = $apigateway->GetStage(
+      RestApiId => 'MyString',
+      StageName => 'MyString',
+
+    );
+
+    # Results:
+    my $Variables            = $Stage->Variables;
+    my $CacheClusterStatus   = $Stage->CacheClusterStatus;
+    my $StageName            = $Stage->StageName;
+    my $CacheClusterEnabled  = $Stage->CacheClusterEnabled;
+    my $AccessLogSettings    = $Stage->AccessLogSettings;
+    my $MethodSettings       = $Stage->MethodSettings;
+    my $Tags                 = $Stage->Tags;
+    my $ClientCertificateId  = $Stage->ClientCertificateId;
+    my $Description          = $Stage->Description;
+    my $DeploymentId         = $Stage->DeploymentId;
+    my $LastUpdatedDate      = $Stage->LastUpdatedDate;
+    my $DocumentationVersion = $Stage->DocumentationVersion;
+    my $CreatedDate          = $Stage->CreatedDate;
+    my $CanarySettings       = $Stage->CanarySettings;
+    my $CacheClusterSize     = $Stage->CacheClusterSize;
+
+    # Returns a L<Paws::ApiGateway::Stage> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/apigateway/>
 
 =head1 ATTRIBUTES
 
 
 =head2 B<REQUIRED> RestApiId => Str
 
-The string identifier of the associated RestApi.
+[Required] The string identifier of the associated RestApi.
 
 
 
 =head2 B<REQUIRED> StageName => Str
 
-The name of the Stage resource to get information about.
+[Required] The name of the Stage resource to get information about.
 
 
 
@@ -55,9 +79,9 @@ This class forms part of L<Paws>, documenting arguments for method GetStage in L
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

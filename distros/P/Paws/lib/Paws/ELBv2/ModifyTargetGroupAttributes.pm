@@ -15,21 +15,44 @@ package Paws::ELBv2::ModifyTargetGroupAttributes;
 
 =head1 NAME
 
-Paws::ELBv2::ModifyTargetGroupAttributes - Arguments for method ModifyTargetGroupAttributes on Paws::ELBv2
+Paws::ELBv2::ModifyTargetGroupAttributes - Arguments for method ModifyTargetGroupAttributes on L<Paws::ELBv2>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ModifyTargetGroupAttributes on the 
-Elastic Load Balancing service. Use the attributes of this class
+This class represents the parameters used for calling the method ModifyTargetGroupAttributes on the
+L<Elastic Load Balancing|Paws::ELBv2> service. Use the attributes of this class
 as arguments to method ModifyTargetGroupAttributes.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ModifyTargetGroupAttributes.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ModifyTargetGroupAttributes(Att1 => $value1, Att2 => $value2, ...);
+    my $elasticloadbalancing = Paws->service('ELBv2');
+    # To modify the deregistration delay timeout
+    # This example sets the deregistration delay timeout to the specified value
+    # for the specified target group.
+    my $ModifyTargetGroupAttributesOutput =
+      $elasticloadbalancing->ModifyTargetGroupAttributes(
+      {
+        'Attributes' => [
+
+          {
+            'Value' => 600,
+            'Key'   => 'deregistration_delay.timeout_seconds'
+          }
+        ],
+        'TargetGroupArn' =>
+'arn:aws:elasticloadbalancing:us-west-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067'
+      }
+      );
+
+    # Results:
+    my $Attributes = $ModifyTargetGroupAttributesOutput->Attributes;
+
+    # Returns a L<Paws::ELBv2::ModifyTargetGroupAttributesOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancing/ModifyTargetGroupAttributes>
 
 =head1 ATTRIBUTES
 
@@ -53,9 +76,9 @@ This class forms part of L<Paws>, documenting arguments for method ModifyTargetG
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -19,21 +19,37 @@ package Paws::Route53::AssociateVPCWithHostedZone;
 
 =head1 NAME
 
-Paws::Route53::AssociateVPCWithHostedZone - Arguments for method AssociateVPCWithHostedZone on Paws::Route53
+Paws::Route53::AssociateVPCWithHostedZone - Arguments for method AssociateVPCWithHostedZone on L<Paws::Route53>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method AssociateVPCWithHostedZone on the 
-Amazon Route 53 service. Use the attributes of this class
+This class represents the parameters used for calling the method AssociateVPCWithHostedZone on the
+L<Amazon Route 53|Paws::Route53> service. Use the attributes of this class
 as arguments to method AssociateVPCWithHostedZone.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to AssociateVPCWithHostedZone.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->AssociateVPCWithHostedZone(Att1 => $value1, Att2 => $value2, ...);
+    my $route53 = Paws->service('Route53');
+    my $AssociateVPCWithHostedZoneResponse =
+      $route53->AssociateVPCWithHostedZone(
+      HostedZoneId => 'MyResourceId',
+      VPC          => {
+        VPCRegion => 'us-east-1'
+        , # values: us-east-1, us-east-2, us-west-1, us-west-2, eu-west-1, eu-west-2, eu-west-3, eu-central-1, ap-southeast-1, ap-southeast-2, ap-south-1, ap-northeast-1, ap-northeast-2, ap-northeast-3, sa-east-1, ca-central-1, cn-north-1min: 1, max: 64; OPTIONAL
+        VPCId => 'MyVPCId',    # max: 1024; OPTIONAL
+      },
+      Comment => 'MyAssociateVPCComment',    # OPTIONAL
+      );
+
+    # Results:
+    my $ChangeInfo = $AssociateVPCWithHostedZoneResponse->ChangeInfo;
+
+    # Returns a L<Paws::Route53::AssociateVPCWithHostedZoneResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/route53/AssociateVPCWithHostedZone>
 
 =head1 ATTRIBUTES
 
@@ -68,9 +84,9 @@ This class forms part of L<Paws>, documenting arguments for method AssociateVPCW
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

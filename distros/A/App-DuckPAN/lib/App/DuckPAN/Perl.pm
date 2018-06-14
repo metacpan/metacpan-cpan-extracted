@@ -1,7 +1,7 @@
 package App::DuckPAN::Perl;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Perl related functionality for duckpan
-$App::DuckPAN::Perl::VERSION = '1019';
+$App::DuckPAN::Perl::VERSION = '1021';
 use Moo;
 with 'App::DuckPAN::HasApp';
 
@@ -173,15 +173,19 @@ my @POTENTIAL_AUTHORS = qw|
     ALOHAAS
     ANDREY_P
     BRAD
+    BRIANHALL
     BRIANS
     CAINE
     CRAZEDPSYC
     DDGC
+    DUENDEX
     DYLANLL
     GETTY
+    ISADDG
     JAG
     JBARRETT
     JDORW
+    KABLAMO
     MGA
     MOOLLAZA
     RSSSSL
@@ -241,7 +245,7 @@ App::DuckPAN::Perl - Perl related functionality for duckpan
 
 =head1 VERSION
 
-version 1019
+version 1021
 
 =head1 AUTHOR
 

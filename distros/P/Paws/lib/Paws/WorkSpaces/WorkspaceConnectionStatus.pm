@@ -41,8 +41,8 @@ Describes the connection status of a WorkSpace.
 
 =head2 ConnectionState => Str
 
-  The connection state of the WorkSpace. Returns UNKOWN if the WorkSpace
-is in a Stopped state.
+  The connection state of the WorkSpace. The connection state is unknown
+if the WorkSpace is stopped.
 
 
 =head2 ConnectionStateCheckTimestamp => Str
@@ -67,9 +67,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::WorkSpace
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

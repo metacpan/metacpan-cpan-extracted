@@ -20,21 +20,155 @@ package Paws::ELB::CreateLoadBalancer;
 
 =head1 NAME
 
-Paws::ELB::CreateLoadBalancer - Arguments for method CreateLoadBalancer on Paws::ELB
+Paws::ELB::CreateLoadBalancer - Arguments for method CreateLoadBalancer on L<Paws::ELB>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateLoadBalancer on the 
-Elastic Load Balancing service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateLoadBalancer on the
+L<Elastic Load Balancing|Paws::ELB> service. Use the attributes of this class
 as arguments to method CreateLoadBalancer.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateLoadBalancer.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateLoadBalancer(Att1 => $value1, Att2 => $value2, ...);
+    my $elasticloadbalancing = Paws->service('ELB');
+    # To create an HTTP load balancer in a VPC
+    # This example creates a load balancer with an HTTP listener in a VPC.
+    my $CreateAccessPointOutput = $elasticloadbalancing->CreateLoadBalancer(
+      {
+        'Subnets'          => ['subnet-15aaab61'],
+        'SecurityGroups'   => ['sg-a61988c3'],
+        'LoadBalancerName' => 'my-load-balancer',
+        'Listeners'        => [
+
+          {
+            'InstanceProtocol' => 'HTTP',
+            'LoadBalancerPort' => 80,
+            'InstancePort'     => 80,
+            'Protocol'         => 'HTTP'
+          }
+        ]
+      }
+    );
+
+    # Results:
+    my $DNSName = $CreateAccessPointOutput->DNSName;
+
+    # Returns a L<Paws::ELB::CreateAccessPointOutput> object.
+    # To create an HTTP load balancer in EC2-Classic
+    # This example creates a load balancer with an HTTP listener in EC2-Classic.
+    my $CreateAccessPointOutput = $elasticloadbalancing->CreateLoadBalancer(
+      {
+        'Listeners' => [
+
+          {
+            'Protocol'         => 'HTTP',
+            'LoadBalancerPort' => 80,
+            'InstancePort'     => 80,
+            'InstanceProtocol' => 'HTTP'
+          }
+        ],
+        'LoadBalancerName'  => 'my-load-balancer',
+        'AvailabilityZones' => ['us-west-2a']
+      }
+    );
+
+    # Results:
+    my $DNSName = $CreateAccessPointOutput->DNSName;
+
+    # Returns a L<Paws::ELB::CreateAccessPointOutput> object.
+    # To create an HTTPS load balancer in a VPC
+    # This example creates a load balancer with an HTTPS listener in a VPC.
+    my $CreateAccessPointOutput = $elasticloadbalancing->CreateLoadBalancer(
+      {
+        'Listeners' => [
+
+          {
+            'InstancePort'     => 80,
+            'LoadBalancerPort' => 80,
+            'InstanceProtocol' => 'HTTP',
+            'Protocol'         => 'HTTP'
+          },
+
+          {
+            'LoadBalancerPort' => 443,
+            'InstancePort'     => 80,
+            'SSLCertificateId' =>
+              'arn:aws:iam::123456789012:server-certificate/my-server-cert',
+            'InstanceProtocol' => 'HTTP',
+            'Protocol'         => 'HTTPS'
+          }
+        ],
+        'LoadBalancerName' => 'my-load-balancer',
+        'Subnets'          => ['subnet-15aaab61'],
+        'SecurityGroups'   => ['sg-a61988c3']
+      }
+    );
+
+    # Results:
+    my $DNSName = $CreateAccessPointOutput->DNSName;
+
+   # Returns a L<Paws::ELB::CreateAccessPointOutput> object.
+   # To create an HTTPS load balancer in EC2-Classic
+   # This example creates a load balancer with an HTTPS listener in EC2-Classic.
+    my $CreateAccessPointOutput = $elasticloadbalancing->CreateLoadBalancer(
+      {
+        'Listeners' => [
+
+          {
+            'InstanceProtocol' => 'HTTP',
+            'InstancePort'     => 80,
+            'LoadBalancerPort' => 80,
+            'Protocol'         => 'HTTP'
+          },
+
+          {
+            'Protocol'         => 'HTTPS',
+            'LoadBalancerPort' => 443,
+            'InstancePort'     => 80,
+            'SSLCertificateId' =>
+              'arn:aws:iam::123456789012:server-certificate/my-server-cert',
+            'InstanceProtocol' => 'HTTP'
+          }
+        ],
+        'LoadBalancerName'  => 'my-load-balancer',
+        'AvailabilityZones' => ['us-west-2a']
+      }
+    );
+
+    # Results:
+    my $DNSName = $CreateAccessPointOutput->DNSName;
+
+    # Returns a L<Paws::ELB::CreateAccessPointOutput> object.
+    # To create an internal load balancer
+    # This example creates an internal load balancer with an HTTP listener in a
+    # VPC.
+    my $CreateAccessPointOutput = $elasticloadbalancing->CreateLoadBalancer(
+      {
+        'LoadBalancerName' => 'my-load-balancer',
+        'Subnets'          => ['subnet-15aaab61'],
+        'SecurityGroups'   => ['sg-a61988c3'],
+        'Listeners'        => [
+
+          {
+            'InstanceProtocol' => 'HTTP',
+            'LoadBalancerPort' => 80,
+            'InstancePort'     => 80,
+            'Protocol'         => 'HTTP'
+          }
+        ],
+        'Scheme' => 'internal'
+      }
+    );
+
+    # Results:
+    my $DNSName = $CreateAccessPointOutput->DNSName;
+
+    # Returns a L<Paws::ELB::CreateAccessPointOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancing/CreateLoadBalancer>
 
 =head1 ATTRIBUTES
 
@@ -55,8 +189,9 @@ using EnableAvailabilityZonesForLoadBalancer.
 
 The listeners.
 
-For more information, see Listeners for Your Classic Load Balancer in
-the I<Classic Load Balancer Guide>.
+For more information, see Listeners for Your Classic Load Balancer
+(http://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-listener-config.html)
+in the I<Classic Load Balancer Guide>.
 
 
 
@@ -78,7 +213,9 @@ The type of a load balancer. Valid only for load balancers in a VPC.
 By default, Elastic Load Balancing creates an Internet-facing load
 balancer with a DNS name that resolves to public IP addresses. For more
 information about Internet-facing and Internal load balancers, see Load
-Balancer Scheme in the I<Elastic Load Balancing User Guide>.
+Balancer Scheme
+(http://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/how-elastic-load-balancing-works.html#load-balancer-scheme)
+in the I<Elastic Load Balancing User Guide>.
 
 Specify C<internal> to create a load balancer with a DNS name that
 resolves to private IP addresses.
@@ -104,7 +241,9 @@ C<AvailabilityZones>.
 A list of tags to assign to the load balancer.
 
 For more information about tagging your load balancer, see Tag Your
-Classic Load Balancer in the I<Classic Load Balancer Guide>.
+Classic Load Balancer
+(http://docs.aws.amazon.com/elasticloadbalancing/latest/classic/add-remove-tags.html)
+in the I<Classic Load Balancer Guide>.
 
 
 
@@ -115,9 +254,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateLoadBal
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

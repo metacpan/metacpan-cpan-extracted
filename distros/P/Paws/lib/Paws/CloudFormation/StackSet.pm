@@ -1,8 +1,11 @@
 package Paws::CloudFormation::StackSet;
   use Moose;
+  has AdministrationRoleARN => (is => 'ro', isa => 'Str');
   has Capabilities => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
   has Description => (is => 'ro', isa => 'Str');
+  has ExecutionRoleName => (is => 'ro', isa => 'Str');
   has Parameters => (is => 'ro', isa => 'ArrayRef[Paws::CloudFormation::Parameter]');
+  has StackSetARN => (is => 'ro', isa => 'Str');
   has StackSetId => (is => 'ro', isa => 'Str');
   has StackSetName => (is => 'ro', isa => 'Str');
   has Status => (is => 'ro', isa => 'Str');
@@ -27,14 +30,14 @@ Each attribute should be used as a named argument in the calls that expect this 
 
 As an example, if Att1 is expected to be a Paws::CloudFormation::StackSet object:
 
-  $service_obj->Method(Att1 => { Capabilities => $value, ..., TemplateBody => $value  });
+  $service_obj->Method(Att1 => { AdministrationRoleARN => $value, ..., TemplateBody => $value  });
 
 =head3 Results returned from an API call
 
 Use accessors for each attribute. If Att1 is expected to be an Paws::CloudFormation::StackSet object:
 
   $result = $service_obj->Method(...);
-  $result->Att1->Capabilities
+  $result->Att1->AdministrationRoleARN
 
 =head1 DESCRIPTION
 
@@ -47,6 +50,19 @@ the template requires.
 =head1 ATTRIBUTES
 
 
+=head2 AdministrationRoleARN => Str
+
+  The Amazon Resource Number (ARN) of the IAM role used to create or
+update the stack set.
+
+Use customized administrator roles to control which users or groups can
+manage specific stack sets within the same administrator account. For
+more information, see Prerequisites: Granting Permissions for Stack Set
+Operations
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacksets-prereqs.html)
+in the I<AWS CloudFormation User Guide>.
+
+
 =head2 Capabilities => ArrayRef[Str|Undef]
 
   The capabilities that are allowed in the stack set. Some stack set
@@ -54,6 +70,7 @@ templates might include resources that can affect permissions in your
 AWS accountE<mdash>for example, by creating new AWS Identity and Access
 Management (IAM) users. For more information, see Acknowledging IAM
 Resources in AWS CloudFormation Templates.
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-template.html#capabilities)
 
 
 =head2 Description => Str
@@ -62,9 +79,23 @@ Resources in AWS CloudFormation Templates.
 created or updated.
 
 
+=head2 ExecutionRoleName => Str
+
+  The name of the IAM execution role used to create or update the stack
+set.
+
+Use customized execution roles to control which stack resources users
+and groups can include in their stack sets.
+
+
 =head2 Parameters => ArrayRef[L<Paws::CloudFormation::Parameter>]
 
   A list of input parameters for a stack set.
+
+
+=head2 StackSetARN => Str
+
+  The Amazon Resource Number (ARN) of the stack set.
 
 
 =head2 StackSetId => Str
@@ -101,9 +132,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::CloudForm
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

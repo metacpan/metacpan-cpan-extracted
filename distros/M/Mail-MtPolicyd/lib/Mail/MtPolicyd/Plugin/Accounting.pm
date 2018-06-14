@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::Accounting;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
 # ABSTRACT: mtpolicyd plugin for accounting in sql tables
 
 extends 'Mail::MtPolicyd::Plugin';
@@ -89,7 +89,7 @@ has '_single_table_create' => ( is => 'ro', isa => 'HashRef', lazy => 1,
     UNIQUE KEY `time_key` (`key`, `time`),
     KEY(`key`),
     KEY(`time`)
-  ) ENGINE=MyISAM  DEFAULT CHARSET=latin1',
+  ) ENGINE=%MYSQL_ENGINE%  DEFAULT CHARSET=latin1',
         'SQLite' => 'CREATE TABLE %TABLE_NAME% (
     `id` INTEGER PRIMARY KEY AUTOINCREMENT,
     `key` VARCHAR(255) NOT NULL,
@@ -212,7 +212,7 @@ Mail::MtPolicyd::Plugin::Accounting - mtpolicyd plugin for accounting in sql tab
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 SYNOPSIS
 

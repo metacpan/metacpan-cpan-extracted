@@ -1,5 +1,8 @@
 Revision history for URL::Normalize
 
+0.39    2018-06-12
+        - Remove unneeded test script, which should fix some failing tests.
+
 0.38    2018-05-30
         - Canonicalise URLs when creating the object. Handles some issues that
           URI::Normalize solved better than this module.

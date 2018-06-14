@@ -44,22 +44,6 @@ public:
     Node * parent;
   };
 
-  struct it_recursion_node {
-    /*  this structure stores the information needed when we take the */
-    /*  right branch in searching for intervals but possibly come back */
-    /*  and check the left branch as well. */
-    it_recursion_node(Node *start_node_=NULL, 
-        size_t parentIndex_=0, 
-        bool tryRightBranch_=false)
-      : start_node (start_node_),
-        parentIndex (parentIndex_),
-        tryRightBranch (tryRightBranch_) {}
-
-    Node * start_node;
-    size_t parentIndex;
-    bool tryRightBranch;
-  } ;
-
   IntervalTree();
   ~IntervalTree();
   std::string str() const;
@@ -103,9 +87,6 @@ protected:
   bool CheckMaxHighFieldsHelper(Node * y, 
       const N currentHigh,
       bool match) const;
-private:
-  std::vector<it_recursion_node> recursionNodeStack;
-  size_t currentParent;
 };
 
 // If the symbol CHECK_INTERVAL_TREE_ASSUMPTIONS is defined then the
@@ -144,9 +125,6 @@ IntervalTree<T,N>::IntervalTree()
   root->parent = root->left = root->right = nil;
   root->key = root->high_ = root->maxHigh = std::numeric_limits<N>::max();
   root->color=BLACK;
-
-  /* the following are used for the fetch function */
-  recursionNodeStack.push_back(it_recursion_node());
 }
 
 template<typename T, typename N>
@@ -876,59 +854,16 @@ N IntervalTree<T,N>::Contain(N a1, N a2, N b1, N b2) {
 
 /*  The basic idea for the function below is to take the IntervalSearch */
 /*  function from the book and modify to find all overlapping intervals */
-/*  instead of just one.  This means that any time we take the left */
-/*  branch down the tree we must also check the right branch if and only if */
-/*  we find an overlapping interval in that left branch.  Note this is a */
-/*  recursive condition because if we go left at the root then go left */
-/*  again at the first left child and find an overlap in the left subtree */
-/*  of the left child of root we must recursively check the right subtree */
-/*  of the left child of root as well as the right child of root. */
+/*  instead of just one. */
 
 template<typename T, typename N>
 void IntervalTree<T,N>::fetch(N low, N high, std::vector<T> &enumResultStack)  {
-  typename IntervalTree<T,N>::Node* x=root->left;
-  bool stuffToDo = (x != nil);
-  
-  // Possible speed up: add min field to prune right searches //
-
-#ifdef DEBUG_ASSERT
-  assert((recursionNodeStack.size() == 1)
-         || !"recursionStack not empty when entering IntervalTree::fetch");
-#endif
-  currentParent = 0;
-
-  while(stuffToDo) {
-    if (Overlap(low,high,x->key,x->high_) ) {
-      enumResultStack.push_back(x->value());
-      recursionNodeStack[currentParent].tryRightBranch=true;
-    }
-    if(x->left->maxHigh >= low) { // implies x != nil 
-      recursionNodeStack.push_back(it_recursion_node());
-      recursionNodeStack.back().start_node = x;
-      recursionNodeStack.back().tryRightBranch = false;
-      recursionNodeStack.back().parentIndex = currentParent;
-      currentParent = recursionNodeStack.size()-1;
-      x = x->left;
-    } else {
-      x = x->right;
-    }
-    stuffToDo = (x != nil);
-    while( (!stuffToDo) && (recursionNodeStack.size() > 1) ) {
-        it_recursion_node back = recursionNodeStack.back();
-        recursionNodeStack.pop_back();
-
-        if(back.tryRightBranch) {
-          x=back.start_node->right;
-          currentParent=back.parentIndex;
-          recursionNodeStack[currentParent].tryRightBranch=true;
-          stuffToDo = ( x != nil);
-        }
-    }
+  typename std::vector<typename IntervalTree<T,N>::Node*> got;
+  fetch_node(low, high, got);
+  for (typename std::vector<typename IntervalTree<T,N>::Node*>::const_iterator 
+      i = got.begin(); i != got.end(); i++) {
+      enumResultStack.push_back((*i)->value());
   }
-#ifdef DEBUG_ASSERT
-  assert((recursionNodeStack.size() == 1)
-         || !"recursionStack not empty when exiting IntervalTree::fetch");
-#endif
 }
 
 template<typename T, typename N>
@@ -1011,97 +946,35 @@ void IntervalTree<T,N>::fetch_node(
     N high, 
     std::vector<typename IntervalTree<T,N>::Node*> &enumResultStack)  
 {
-  typename IntervalTree<T,N>::Node* x=root->left;
-  bool stuffToDo = (x != nil);
+  std::vector<IntervalTree<T,N>::Node*> stack;
+  // left first
+  stack.push_back(root->right);
+  stack.push_back(root->left);
   
-  // Possible speed up: add min field to prune right searches //
-
-#ifdef DEBUG_ASSERT
-  assert((recursionNodeStack.size() == 1)
-         || !"recursionStack not empty when entering IntervalTree::fetch");
-#endif
-  currentParent = 0;
-
-  while(stuffToDo) {
-    if (Overlap(low,high,x->key,x->high_) ) {
-      enumResultStack.push_back(x);
-      recursionNodeStack[currentParent].tryRightBranch=true;
-    }
-    if(x->left->maxHigh >= low) { // implies x != nil 
-      recursionNodeStack.push_back(it_recursion_node());
-      recursionNodeStack.back().start_node = x;
-      recursionNodeStack.back().tryRightBranch = false;
-      recursionNodeStack.back().parentIndex = currentParent;
-      currentParent = recursionNodeStack.size()-1;
-      x = x->left;
-    } else {
-      x = x->right;
-    }
-    stuffToDo = (x != nil);
-    while( (!stuffToDo) && (recursionNodeStack.size() > 1) ) {
-        it_recursion_node back = recursionNodeStack.back();
-        recursionNodeStack.pop_back();
-
-        if(back.tryRightBranch) {
-          x=back.start_node->right;
-          currentParent=back.parentIndex;
-          recursionNodeStack[currentParent].tryRightBranch=true;
-          stuffToDo = ( x != nil);
-        }
+  while (stack.size() > 0) {
+    IntervalTree<T,N>::Node* x = stack.back();
+    stack.pop_back();
+    if (x != nil) {
+      if (Overlap(low,high,x->key,x->high_) ) {
+        enumResultStack.push_back(x);
+      }
+      stack.push_back(x->right);
+      if (x->left->maxHigh >= low) {
+        stack.push_back(x->left);
+      }
     }
   }
-#ifdef DEBUG_ASSERT
-  assert((recursionNodeStack.size() == 1)
-         || !"recursionStack not empty when exiting IntervalTree::fetch");
-#endif
 }
         
 template<typename T, typename N>
 void IntervalTree<T,N>::fetch_window(N low, N high, std::vector<T> &enumResultStack)  
 {
-  typename IntervalTree<T,N>::Node* x=root->left;
-  bool stuffToDo = (x != nil);
-  
-  // Possible speed up: add min field to prune right searches //
-
-#ifdef DEBUG_ASSERT
-  assert((recursionNodeStack.size() == 1)
-         || !"recursionStack not empty when entering IntervalTree::fetch_window");
-#endif
-  currentParent = 0;
-
-  while(stuffToDo) {
-    if (Contain(low,high,x->key,x->high_) ) {
-      enumResultStack.push_back(x->value());
-      recursionNodeStack[currentParent].tryRightBranch=true;
-    }
-    if(x->left->maxHigh >= low) { // implies x != nil 
-      recursionNodeStack.push_back(it_recursion_node());
-      recursionNodeStack.back().start_node = x;
-      recursionNodeStack.back().tryRightBranch = false;
-      recursionNodeStack.back().parentIndex = currentParent;
-      currentParent = recursionNodeStack.size()-1;
-      x = x->left;
-    } else {
-      x = x->right;
-    }
-    stuffToDo = (x != nil);
-    while( (!stuffToDo) && (recursionNodeStack.size() > 1) ) {
-        it_recursion_node back = recursionNodeStack.back();
-        recursionNodeStack.pop_back();
-
-        if(back.tryRightBranch) {
-          x=back.start_node->right;
-          currentParent=back.parentIndex;
-          recursionNodeStack[currentParent].tryRightBranch=true;
-          stuffToDo = ( x != nil);
-        }
-    }
+  typename std::vector<typename IntervalTree<T,N>::Node*> got;
+  fetch_window_node(low, high, got);
+  for (typename std::vector<typename IntervalTree<T,N>::Node*>::const_iterator 
+      i = got.begin(); i != got.end(); i++) {
+      enumResultStack.push_back((*i)->value());
   }
-#ifdef DEBUG_ASSERT
-  assert((recursionNodeStack.size() == 1)
-         || !"recursionStack not empty when exiting IntervalTree::fetch");
-#endif
 }
 
 template<typename T, typename N>
@@ -1110,49 +983,24 @@ void IntervalTree<T,N>::fetch_window_node(
      N high, 
      std::vector<typename IntervalTree<T,N>::Node*> &enumResultStack)  
 {
-  typename IntervalTree<T,N>::Node* x=root->left;
-  bool stuffToDo = (x != nil);
+  std::vector<IntervalTree<T,N>::Node*> stack;
+  // left first
+  stack.push_back(root->right);
+  stack.push_back(root->left);
   
-  // Possible speed up: add min field to prune right searches //
-
-#ifdef DEBUG_ASSERT
-  assert((recursionNodeStack.size() == 1)
-         || !"recursionStack not empty when entering IntervalTree::fetch_window_node");
-#endif
-  currentParent = 0;
-
-  while(stuffToDo) {
-    if (Contain(low,high,x->key,x->high_) ) {
-      enumResultStack.push_back(x);
-      recursionNodeStack[currentParent].tryRightBranch=true;
-    }
-    if(x->left->maxHigh >= low) { // implies x != nil 
-      recursionNodeStack.push_back(it_recursion_node());
-      recursionNodeStack.back().start_node = x;
-      recursionNodeStack.back().tryRightBranch = false;
-      recursionNodeStack.back().parentIndex = currentParent;
-      currentParent = recursionNodeStack.size()-1;
-      x = x->left;
-    } else {
-      x = x->right;
-    }
-    stuffToDo = (x != nil);
-    while( (!stuffToDo) && (recursionNodeStack.size() > 1) ) {
-        it_recursion_node back = recursionNodeStack.back();
-        recursionNodeStack.pop_back();
-
-        if(back.tryRightBranch) {
-          x=back.start_node->right;
-          currentParent=back.parentIndex;
-          recursionNodeStack[currentParent].tryRightBranch=true;
-          stuffToDo = ( x != nil);
-        }
+  while (stack.size() > 0) {
+    IntervalTree<T,N>::Node* x = stack.back();
+    stack.pop_back();
+    if (x != nil) {
+      if (Contain(low,high,x->key,x->high_) ) {
+        enumResultStack.push_back(x);
+      }
+      stack.push_back(x->right);
+      if (x->left->maxHigh >= low) {
+        stack.push_back(x->left);
+      }
     }
   }
-#ifdef DEBUG_ASSERT
-  assert((recursionNodeStack.size() == 1)
-         || !"recursionStack not empty when exiting IntervalTree::fetch");
-#endif
 }
 
 template<typename T, typename N>

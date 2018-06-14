@@ -1,0 +1,82 @@
+#!perl
+
+# ABSTRACT: Generate KvK and RSIN numbers from the command line
+# PODNAME: generate_kvk
+
+use warnings;
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Random::NL qw(generate_kvk generate_rsin);
+
+my %opts = (help => 0, n => 10);
+
+{
+    local $SIG{__WARN__};
+    my $ok = eval { GetOptions(\%opts, qw(help n=i start-kvk=i start-rsin=i)); };
+    if (!$ok) {
+        die($@);
+    }
+}
+
+pod2usage(0) if ($opts{help});
+
+for (1 ... $opts{n}) {
+    printf("%s - %s $/",
+        generate_kvk($opts{'start-kvk'}),
+        generate_rsin($opts{'start-rsin'})),
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+generate_kvk - Generate KvK and RSIN numbers from the command line
+
+=head1 VERSION
+
+version 1.4
+
+=head1 SYNOPSIS
+
+    generate_kvk OPTIONS
+
+=head1 DESCRIPTION
+
+Generate KvK and RSIN numbers from the command line.
+
+=head1 OPTIONS
+
+=head2 help
+
+This help
+
+=head2 n
+
+The number of generated numbers, defaults to 10
+
+=head2 start-kvk
+
+The first number of your KVK number(s).
+
+=head2 start-rsin
+
+The first number of your RSIN number(s).
+
+=head1 AUTHOR
+
+Wesley Schwengle <waterkip@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Wesley Schwengle.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+=cut

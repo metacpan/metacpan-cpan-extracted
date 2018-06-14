@@ -399,7 +399,7 @@
         $self->addTab($notebook, '_Credits', TRUE, @axmud::CREDIT_LIST);
 
         # Load the quick help file
-        $file = $axmud::SHARE_DIR . '/../README';
+        $file = $axmud::SHARE_DIR . '/help/quick/quickhelp';
         if (! (-e $file)) {
 
             push (@helpList, 'Quick help file missing');
@@ -3952,7 +3952,7 @@
 
             # Which layout the notebook is using:
             #   'empty'     - contains nothing
-            #   'list'      - a Gtk::Ex::Simple::List on the left, and buttons on the right
+            #   'list'      - a GA::Gtk::Simple::List on the left, and buttons on the right
             #   'text'      - a Gtk2::TextView
             notebookMode                => 'empty',
             # Which kind of notebook is currently being displayed - namely, which header in the
@@ -3975,7 +3975,7 @@
             #   $notebookTagHash{tab_name} = reference_to_Gtk2::Label_of_tab
             notebookTabHash             => {},
             # Hash of data lists displayed in the notebook, in the form
-            #   $notebookDataHash{tab_name} = reference_to_Gtk2::Ex::Simple::List
+            #   $notebookDataHash{tab_name} = reference_to_GA::Gtk::Simple::List
             notebookDataHash            => {},
 
             # To access Axbasic's default data, $self->setupTreeView creates a dummy
@@ -4520,7 +4520,7 @@
         #                       ...
         #                   ]
         #
-        #   $columnListRef  - a list of columns used in the call to Gtk2::Ex::Simple::List->new, in
+        #   $columnListRef  - a list of columns used in the call to GA::Gtk::Simple::List->new, in
         #                       the format
         #                   [
         #                       'column_name' => 'type',
@@ -4532,7 +4532,7 @@
         #   $dataHashRef    - a reference to a hash. The keys are the same as the keys in
         #                       $tabListRef; the corresponding values contain a reference to a
         #                       two-dimensional list of data to be displayed in the
-        #                       Gtk::Ex::Simple::List, in the form
+        #                       GA::Gtk::Simple::List, in the form
         #                   [
         #                       [row0_cell0, row0_cell1, row0cell2...],
         #                       [row1_cell0, row1_cell1, row1cell2...],
@@ -4654,7 +4654,7 @@
             $mnemonic = shift @tabList;
 
             # Add a simple list
-            $slWidget = Gtk2::Ex::Simple::List->new(@columnList);
+            $slWidget = Games::Axmud::Gtk::Simple::List->new(@columnList);
             # Make each row double-clickable
             $slWidget->signal_connect('row_activated' => sub {
 
@@ -4953,7 +4953,7 @@
         #   (none besides $self)
         #
         # Optional arguments
-        #   @list   - The rows in the notebook's Gtk::Ex::Simple::List which should be marked as
+        #   @list   - The rows in the notebook's GA::Gtk::Simple::List which should be marked as
         #               'selected' (as if the user had clicked on them). If the list is empty,
         #               no rows are marked as 'selected'
         #
@@ -5028,7 +5028,7 @@
     sub notebookGetData {
 
         # Can be called by anything
-        # Finds the data displayed in the Gtk::Ex::Simple::List of the current notebook tab
+        # Finds the data displayed in the GA::Gtk::Simple::List of the current notebook tab
         #   (use ->notebookGetSelectedData to get only the selected data)
         #
         # Expected arguments
@@ -5037,7 +5037,7 @@
         # Return values
         #   'undef' on improper arguments
         #   Otherwise, returns the reference to the selected data, matching
-        #       Gtk::Ex::Simple::List->{data}
+        #       GA::Gtk::Simple::List->{data}
 
         my ($self, $check) = @_;
 
@@ -5057,7 +5057,7 @@
     sub notebookGetSelectedData {
 
         # Can be called by anything
-        # Gets the data displayed in the selected line of the Gtk::Ex::Simple::List of the current
+        # Gets the data displayed in the selected line of the GA::Gtk::Simple::List of the current
         #   notebook tab
         #
         # Expected arguments
@@ -5097,7 +5097,7 @@
     sub notebookGetSelectedLines {
 
         # Can be called by anything
-        # Gets a list containing the number of each selected line in the Gtk::Ex::Simple::List of
+        # Gets a list containing the number of each selected line in the GA::Gtk::Simple::List of
         #   the current notebook tab
         #
         # Expected arguments
@@ -5131,11 +5131,11 @@
     sub notebookSetSelectedLines {
 
         # Can be called by anything, but usually by $self->updateNotebook
-        # Selects lines in the Gtk::Ex::Simple::List of the current notebook tab, as if the user had
+        # Selects lines in the GA::Gtk::Simple::List of the current notebook tab, as if the user had
         #   clicked on them
         #
         # Expected arguments
-        #   @list       - List of indices in the Gtk::Ex::Simple::List to select
+        #   @list       - List of indices in the GA::Gtk::Simple::List to select
         #
         # Return values
         #   1
@@ -6235,7 +6235,7 @@
             @cageList = $self->getSortedCages($tab);
 
             # @cageList contains a sorted list of cages. Convert that list into one that can be
-            #   displayed in a Gtk2::Ex::Simple::List, in columns
+            #   displayed in a GA::Gtk::Simple::List, in columns
             foreach my $cageObj (@cageList) {
 
                 my ($flag, $listRef);
@@ -8349,7 +8349,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonAdd_prof', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -9006,7 +9006,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonAdd_template', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -9305,7 +9305,7 @@
         # Import the priority list
         @priorityList = $self->session->profPriorityList;
 
-        # Import the Gtk::Ex::Simple::List and find the currently selected line and the data it
+        # Import the GA::Gtk::Simple::List and find the currently selected line and the data it
         #   contains
         ($index, $priority, $category) = $self->profPriorityData();
         if (! defined $index) {
@@ -9373,7 +9373,7 @@
         # Import the priority list
         @priorityList = $self->session->profPriorityList;
 
-        # Import the Gtk::Ex::Simple::List and find the currently selected line and the data it
+        # Import the GA::Gtk::Simple::List and find the currently selected line and the data it
         #   contains
         ($index, $priority, $category) = $self->profPriorityData();
         if (! defined $index) {
@@ -9441,7 +9441,7 @@
         # Import the priority list
         @priorityList = $self->session->profPriorityList;
 
-        # Import the Gtk::Ex::Simple::List and find the currently selected line and the data it
+        # Import the GA::Gtk::Simple::List and find the currently selected line and the data it
         #   contains
         ($index, $priority, $category) = $self->profPriorityData();
         if (! defined $index) {
@@ -9505,7 +9505,7 @@
         # Import the priority list
         @priorityList = $self->session->profPriorityList;
 
-        # Import the Gtk::Ex::Simple::List and find the currently selected line and the data it
+        # Import the GA::Gtk::Simple::List and find the currently selected line and the data it
         #   contains
         ($index, $priority, $category) = $self->profPriorityData();
         # If the category is already marked as being in the priority list, do nothing
@@ -9569,7 +9569,7 @@
         # Import the priority list
         @priorityList = $self->session->profPriorityList;
 
-        # Import the Gtk::Ex::Simple::List and find the currently selected line and the data it
+        # Import the GA::Gtk::Simple::List and find the currently selected line and the data it
         #   contains
         ($index, $priority, $category) = $self->profPriorityData();
         # If the category is already marked as not being in the priority list, do nothing
@@ -9654,7 +9654,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonAdd_dict', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -9979,7 +9979,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonDump_dict', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -10452,7 +10452,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonSafeResume_task', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -10738,7 +10738,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonHaltAll_task', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -10833,7 +10833,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonKillAll_task', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -10928,7 +10928,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonPauseAll_task', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -11022,7 +11022,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonResetAll_task', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -11060,7 +11060,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonFreezeAll_task', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -11099,7 +11099,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonDump_task', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -11220,7 +11220,7 @@
         # Import the ordered list of global initial tasks
         @taskList = $axmud::CLIENT->initTaskOrderList;
 
-        # Import the Gtk::Ex::Simple::List and find the currently selected line and the data it
+        # Import the GA::Gtk::Simple::List and find the currently selected line and the data it
         #   contains
         ($index, $taskName) = $self->initialTaskData();
         if (! defined $index) {
@@ -11277,7 +11277,7 @@
         # Import the ordered list of global initial tasks
         @taskList = $axmud::CLIENT->initTaskOrderList;
 
-        # Import the Gtk::Ex::Simple::List and find the currently selected line and the data it
+        # Import the GA::Gtk::Simple::List and find the currently selected line and the data it
         #   contains
         ($index, $taskName) = $self->initialTaskData();
         if (! defined $index) {
@@ -11387,7 +11387,7 @@
             );
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -11426,7 +11426,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonDump_initialTask', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -11655,7 +11655,7 @@
             );
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -11694,7 +11694,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonDump_customTask', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -11734,7 +11734,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonAdd_taskPackage', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -11991,7 +11991,7 @@
             );
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -12070,7 +12070,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonHaltAll_task', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -12114,7 +12114,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonAdd_taskLabel', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -12228,7 +12228,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonEmpty_taskLabel', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -12283,7 +12283,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonReset_taskLabel', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -12337,7 +12337,7 @@
             );
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -12376,7 +12376,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonDump_taskLabel', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -12499,7 +12499,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonDump_cage', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -12556,7 +12556,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonDumpAll_cage', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -12673,7 +12673,7 @@
             );
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -12803,7 +12803,7 @@
             );
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -12874,7 +12874,7 @@
             'Custom'            => 'custom',
         );
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -12934,7 +12934,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonAddRegion_model', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -12994,7 +12994,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonAddChar_model', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -13058,7 +13058,7 @@
             );
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -13352,7 +13352,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonDump_Model', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -13388,7 +13388,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonDumpChar_model', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -13423,7 +13423,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonAdd_exitModel', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -13602,7 +13602,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonDump_exitModel', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -13643,7 +13643,7 @@
             );
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -13697,7 +13697,7 @@
             );
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -13747,7 +13747,7 @@
             );
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -13948,7 +13948,7 @@
             );
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -13986,7 +13986,7 @@
             );
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -14025,7 +14025,7 @@
             );
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -14079,7 +14079,7 @@
             );
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -14129,7 +14129,7 @@
             );
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -14238,7 +14238,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonDump20_cmdBuffer', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -14292,7 +14292,7 @@
             );
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -14339,7 +14339,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonStatus_cmdBuffer', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -14444,7 +14444,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonSave_cmdBuffer', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -14481,7 +14481,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonAdd_keycode', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -14830,7 +14830,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->buttonDump_keycode', @_);
         }
 
-        # Get the selected tab, and from there the tab's Gtk::Ex::Simple::list
+        # Get the selected tab, and from there the tab's GA::Gtk::Simple::List
         $tab = $self->notebookGetTab();
         $slWidget = $self->ivShow('notebookDataHash', $tab);
 
@@ -14848,7 +14848,7 @@
     sub profPriorityData {
 
         # Called by $self->buttonMoveTop_profPriority, $self->buttonMoveUp_profPriority, etc
-        # Works out which part of the currrent notebook's Gtk::Ex::Simple::List is selected and
+        # Works out which part of the currrent notebook's GA::Gtk::Simple::List is selected and
         #   accesses the data on the selected row
         #
         # Expected arguments
@@ -14929,7 +14929,7 @@
     sub initialTaskData {
 
         # Called by $self->buttonMoveUp_initialTask and $self->buttonMoveUp_profPriority
-        # Works out which part of the currrent notebook's Gtk::Ex::Simple::List is selected and
+        # Works out which part of the currrent notebook's GA::Gtk::Simple::List is selected and
         #   accesses the data on the selected row
         #
         # Expected arguments

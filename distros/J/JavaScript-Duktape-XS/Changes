@@ -1,3 +1,9 @@
+0.000065    2018-06-08
+            * Fix some linux warnings.
+
+0.000064    2018-06-08
+            * Avoid using stuff that will make linux compilatio fail.
+
 0.000063    2018-06-08
             * Embed all required JS code into the module.
 

@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.95';
+our $VERSION = '0.98';
 
 use File::Which qw( which );
 
@@ -35,6 +35,13 @@ sub default_jobs {
     return shift->_core_count;
 }
 
+# This is needed until
+# https://github.com/avar/dist-zilla-plugin-makemaker-awesome/pull/9 is merged
+# or some other fix is made for the underlying issue.
+has '+eumm_version' => (
+    default => '0',
+);
+
 override _build_WriteMakefile_dump => sub {
     my $self = shift;
 
@@ -42,10 +49,9 @@ override _build_WriteMakefile_dump => sub {
     return $dump unless $self->has_xs;
 
     $dump .= sprintf( <<'EOF', $self->wall_min_perl_version );
-my $gcc_warnings = $ENV{AUTHOR_TESTING} ? q{ -Wall -Werror} : q{};
+my $gcc_warnings = $ENV{AUTHOR_TESTING} && $] >= %s ? q{ -Wall -Werror} : q{};
 $WriteMakefileArgs{DEFINE}
-    = ( $WriteMakefileArgs{DEFINE} || q{} ) . $gcc_warnings
-    if $] >= %s;
+    = ( $WriteMakefileArgs{DEFINE} || q{} ) . $gcc_warnings;
 
 EOF
 
@@ -70,7 +76,7 @@ Dist::Zilla::Plugin::DROLSKY::MakeMaker - Subclasses MakeMaker::Awesome to alway
 
 =head1 VERSION
 
-version 0.95
+version 0.98
 
 =for Pod::Coverage .*
 

@@ -7,7 +7,7 @@ use utf8;
 
 BEGIN {
 	$MooX::Struct::AUTHORITY = 'cpan:TOBYINK';
-	$MooX::Struct::VERSION   = '0.016';
+	$MooX::Struct::VERSION   = '0.017';
 }
 
 use Moo 1.000;
@@ -33,6 +33,8 @@ METHODS: {
 	sub TO_HASH     { +{ map {; $_ => $_[0]->$_ } $_[0]->FIELDS } };
 	sub TO_STRING   { join q[ ], @{ $_[0]->TO_ARRAY } };
 	sub CLONE       { my $s = shift; ref($s)->new(%{$s->TO_HASH}, @_) };
+	sub CLASSNAME   { ref($_[0]) or $_[0] };
+	sub TYPE_TINY   { Types::Standard::InstanceOf->parameterize(shift->CLASSNAME) };
 };
 
 sub BUILDARGS
@@ -128,7 +130,7 @@ BEGIN {
 	{
 		no warnings;
 		our $AUTHORITY = 'cpan:TOBYINK';
-		our $VERSION   = '0.016';
+		our $VERSION   = '0.017';
 	}
 	
 	sub _uniq { my %seen; grep { not $seen{$_}++ } @_ };
@@ -631,6 +633,8 @@ available.
 
 Returns a unique identifier for the object.
 
+May only be called as an instance method.
+
 =item C<FIELDS> 
 
 Returns a list of fields associated with the object. For the C<Point3D> struct
@@ -642,19 +646,51 @@ for the positional constructor.
 Attributes inherited from roles, or from non-struct base classes are not included
 in C<FIELDS>, and thus cannot be used in the positional constructor.
 
+May be called as an instance or class method.
+
 =item C<TYPE>
 
 Returns the type name of the struct, e.g. C<< 'Point3D' >>.
+
+May be called as an instance or class method.
+
+=item C<CLASSNAME>
+
+Returns the internally used package name for the struct, e.g.
+C<< 'MooX::Struct::__ANON__::0007' >>. Pretty rare you'd want to see this.
+
+May be called as an instance or class method.
+
+=item C<TYPE_TINY>
+
+Returns a L<Type::Tiny> type constraint corresponding to the CLASSNAME,
+suitable for a Moose/Moo C<isa>.
+
+ package Foo {
+   use Moo;
+   use MooX::Struct Bar => [qw( $name )];
+   
+   has left_bar  => (is => 'rw', isa => Bar->TYPE_TINY);
+   has right_bar => (is => 'rw', isa => Bar->TYPE_TINY);
+   
+   ...;
+ }
+
+May be called as an instance or class method.
 
 =item C<TO_HASH>
 
 Returns a reference to an unblessed hash where the object's fields are the
 keys and the object's values are the hash values.
 
+May only be called as an instance method.
+
 =item C<TO_ARRAY>
 
 Returns a reference to an unblessed array where the object's values are the
 array items, in the same order as listed by C<FIELDS>.
+
+May only be called as an instance method.
 
 =item C<TO_STRING>
 
@@ -670,9 +706,13 @@ stringification, but easy enough to overload:
     ]
  ;
 
+May only be called as an instance method.
+
 =item C<CLONE>
 
 Creates a shallow clone of the object. 
+
+May only be called as an instance method.
 
 =item C<EXTEND>
 
@@ -701,6 +741,8 @@ of the existing code for processing C<use MooX::Struct>. Some subsets of
 this functionality are sane, such as the ability to add traits to an object.
 Others (like the ability to add a new uninitialized, read-only attribute to
 an existing object) are less sensible.
+
+May be called as an instance or class method.
 
 =item C<BUILDARGS>
 
@@ -759,7 +801,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2012-2013, 2017 by Toby Inkster.
+This software is copyright (c) 2012-2013, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -96,8 +96,7 @@ instructions for doing that is available here:
 https://help.github.com/articles/creating-a-pull-request
 
 If you have found a bug, but do not have an accompanying patch to fix it, you
-can submit an issue report [via the web](http://rt.cpan.org/Public/Dist/Display.html?Name=Markdent)
-or [via email](bug-markdent@rt.cpan.org.
+can submit an issue report [via the web](https://github.com/houseabsolute/Markdent/issues).
 This is a good place to send your questions about the usage of this distribution.
 
 ## Travis
@@ -127,5 +126,5 @@ commit or patch), unless you specifically request for it not to be. If you
 wish to be listed under a different name or address, you should submit a pull
 request to the .mailmap file to contain the correct mapping.
 
-This file was generated via Dist::Zilla::Plugin::GenerateFile::FromShareDir 0.013 from a
-template file originating in Dist-Zilla-PluginBundle-DROLSKY-0.89.
+This file was generated via Dist::Zilla::Plugin::GenerateFile::FromShareDir 0.014 from a
+template file originating in Dist-Zilla-PluginBundle-DROLSKY-0.97.

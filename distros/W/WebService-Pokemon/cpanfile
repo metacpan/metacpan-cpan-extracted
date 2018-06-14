@@ -1,14 +1,16 @@
 requires 'utf8';
 requires 'strictures';
+requires 'namespace::clean';
 
 requires 'CHI';
 requires 'Data::Serializer';
+requires 'Digest::MD5';
 requires 'Moo';
 requires 'JSON';
 requires 'REST::Client';
 requires 'Role::REST::Client';
+requires 'Sereal';
 requires 'Types::Standard';
-requires 'namespace::clean';
 
 on build => sub {
     requires 'Module::Build', '0.28';

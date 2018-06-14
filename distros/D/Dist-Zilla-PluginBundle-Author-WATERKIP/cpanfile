@@ -1,7 +1,10 @@
 requires "Data::Dumper" => "0";
 requires "Dist::Zilla::App::Command::xtest" => "0";
 requires "Dist::Zilla::Plugin::CheckExtraTests" => "0";
+requires "Dist::Zilla::Plugin::ContributorsFile" => "0";
 requires "Dist::Zilla::Plugin::CopyFilesFromBuild::Filtered" => "0";
+requires "Dist::Zilla::Plugin::Git::Contributors" => "0";
+requires "Dist::Zilla::Plugin::MetaProvides" => "0";
 requires "Dist::Zilla::Plugin::MinimumPerl" => "0";
 requires "Dist::Zilla::Plugin::PodWeaver" => "0";
 requires "Dist::Zilla::Plugin::Prereqs::AuthorDeps" => "0";
@@ -10,6 +13,7 @@ requires "Dist::Zilla::Plugin::Repository" => "0";
 requires "Dist::Zilla::PluginBundle::Filter" => "0";
 requires "Dist::Zilla::PluginBundle::Git::VersionManager" => "0";
 requires "Dist::Zilla::PluginBundle::TestingMania" => "0";
+requires "Dist::Zilla::Role::MintingProfile::ShareDir" => "0";
 requires "Dist::Zilla::Role::PluginBundle" => "0";
 requires "Dist::Zilla::Role::PluginBundle::Config::Slicer" => "0";
 requires "Dist::Zilla::Role::PluginBundle::Easy" => "0";
@@ -19,31 +23,30 @@ requires "List::Util" => "0";
 requires "Moose" => "0";
 requires "Moose::Util::TypeConstraints" => "0";
 requires "namespace::autoclean" => "0";
+requires "namespace::clean" => "0";
 requires "perl" => "5.010";
 
 on 'test' => sub {
   requires "File::Spec" => "0";
   requires "IO::Handle" => "0";
   requires "IPC::Open3" => "0";
+  requires "Test::Deep" => "0";
   requires "Test::More" => "0";
   requires "perl" => "5.010";
-  requires "strict" => "0";
-  requires "warnings" => "0";
 };
 
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
+  requires "File::ShareDir::Install" => "0.06";
   requires "perl" => "5.010";
 };
 
 on 'develop' => sub {
   requires "Dist::Zilla" => "5";
-  requires "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional" => "0.004";
-  requires "Dist::Zilla::Plugin::CopyFilesFromRelease" => "0";
-  requires "Dist::Zilla::Plugin::Git::Commit" => "2.020";
-  requires "Dist::Zilla::Plugin::Git::Tag" => "0";
-  requires "Dist::Zilla::Plugin::NextRelease" => "5.033";
-  requires "Dist::Zilla::Plugin::RewriteVersion::Transitional" => "0.004";
+  requires "Dist::Zilla::Plugin::Git::GatherDir" => "0";
+  requires "Dist::Zilla::Plugin::MetaNoIndex" => "0";
+  requires "Dist::Zilla::Plugin::ModuleShareDirs" => "0";
+  requires "Dist::Zilla::Plugin::lib" => "0";
   requires "Dist::Zilla::PluginBundle::Author::WATERKIP" => "0";
   requires "Pod::Coverage::TrustPod" => "0";
   requires "Software::License::Perl_5" => "0";
@@ -64,6 +67,8 @@ on 'develop' => sub {
   requires "Test::Synopsis" => "0";
   requires "Test::Vars" => "0";
   requires "Test::Version" => "1";
-  requires "strict" => "0";
-  requires "warnings" => "0";
+};
+
+on 'develop' => sub {
+  recommends "Dist::Zilla::PluginBundle::Git::VersionManager" => "0.007";
 };

@@ -21,21 +21,45 @@ package Paws::ServiceCatalog::UpdateProvisionedProduct;
 
 =head1 NAME
 
-Paws::ServiceCatalog::UpdateProvisionedProduct - Arguments for method UpdateProvisionedProduct on Paws::ServiceCatalog
+Paws::ServiceCatalog::UpdateProvisionedProduct - Arguments for method UpdateProvisionedProduct on L<Paws::ServiceCatalog>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateProvisionedProduct on the 
-AWS Service Catalog service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateProvisionedProduct on the
+L<AWS Service Catalog|Paws::ServiceCatalog> service. Use the attributes of this class
 as arguments to method UpdateProvisionedProduct.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateProvisionedProduct.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateProvisionedProduct(Att1 => $value1, Att2 => $value2, ...);
+    my $servicecatalog = Paws->service('ServiceCatalog');
+    my $UpdateProvisionedProductOutput =
+      $servicecatalog->UpdateProvisionedProduct(
+      UpdateToken            => 'MyIdempotencyToken',
+      AcceptLanguage         => 'MyAcceptLanguage',                 # OPTIONAL
+      PathId                 => 'MyId',                             # OPTIONAL
+      ProductId              => 'MyId',                             # OPTIONAL
+      ProvisionedProductId   => 'MyId',                             # OPTIONAL
+      ProvisionedProductName => 'MyProvisionedProductNameOrArn',    # OPTIONAL
+      ProvisioningArtifactId => 'MyId',                             # OPTIONAL
+      ProvisioningParameters => [
+        {
+          Key              => 'MyParameterKey',    # min: 1, max: 1000; OPTIONAL
+          Value            => 'MyParameterValue',  # max: 4096; OPTIONAL
+          UsePreviousValue => 1,                   # OPTIONAL
+        },
+        ...
+      ],                                           # OPTIONAL
+      );
+
+    # Results:
+    my $RecordDetail = $UpdateProvisionedProductOutput->RecordDetail;
+
+    # Returns a L<Paws::ServiceCatalog::UpdateProvisionedProductOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/servicecatalog/UpdateProvisionedProduct>
 
 =head1 ATTRIBUTES
 
@@ -65,44 +89,40 @@ C<zh> - Chinese
 
 =head2 PathId => Str
 
-The identifier of the path to use in the updated ProvisionedProduct
-object. This value is optional if the product has a default path, and
-is required if there is more than one path for the specified product.
+The new path identifier. This value is optional if the product has a
+default path, and required if the product has more than one path.
 
 
 
 =head2 ProductId => Str
 
-The identifier of the ProvisionedProduct object.
+The identifier of the provisioned product.
 
 
 
 =head2 ProvisionedProductId => Str
 
-The identifier of the ProvisionedProduct object to update. Specify
-either C<ProvisionedProductName> or C<ProvisionedProductId>, but not
-both.
+The identifier of the provisioned product. You cannot specify both
+C<ProvisionedProductName> and C<ProvisionedProductId>.
 
 
 
 =head2 ProvisionedProductName => Str
 
-The updated name of the ProvisionedProduct object. Specify either
-C<ProvisionedProductName> or C<ProvisionedProductId>, but not both.
+The updated name of the provisioned product. You cannot specify both
+C<ProvisionedProductName> and C<ProvisionedProductId>.
 
 
 
 =head2 ProvisioningArtifactId => Str
 
-The provisioning artifact identifier for this product. This is
-sometimes referred to as the product version.
+The identifier of the provisioning artifact.
 
 
 
 =head2 ProvisioningParameters => ArrayRef[L<Paws::ServiceCatalog::UpdateProvisioningParameter>]
 
-A list of C<ProvisioningParameter> objects used to update the
-ProvisionedProduct object.
+The new parameters.
 
 
 
@@ -120,9 +140,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateProvisi
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

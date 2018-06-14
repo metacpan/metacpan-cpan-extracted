@@ -25,21 +25,51 @@ package Paws::GameLift::UpdateMatchmakingConfiguration;
 
 =head1 NAME
 
-Paws::GameLift::UpdateMatchmakingConfiguration - Arguments for method UpdateMatchmakingConfiguration on Paws::GameLift
+Paws::GameLift::UpdateMatchmakingConfiguration - Arguments for method UpdateMatchmakingConfiguration on L<Paws::GameLift>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateMatchmakingConfiguration on the 
-Amazon GameLift service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateMatchmakingConfiguration on the
+L<Amazon GameLift|Paws::GameLift> service. Use the attributes of this class
 as arguments to method UpdateMatchmakingConfiguration.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateMatchmakingConfiguration.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateMatchmakingConfiguration(Att1 => $value1, Att2 => $value2, ...);
+    my $gamelift = Paws->service('GameLift');
+    my $UpdateMatchmakingConfigurationOutput =
+      $gamelift->UpdateMatchmakingConfiguration(
+      Name                     => 'MyMatchmakingIdStringModel',
+      AcceptanceRequired       => 1,                              # OPTIONAL
+      AcceptanceTimeoutSeconds => 1,                              # OPTIONAL
+      AdditionalPlayerCount    => 1,                              # OPTIONAL
+      CustomEventData          => 'MyCustomEventData',            # OPTIONAL
+      Description              => 'MyNonZeroAndMaxString',        # OPTIONAL
+      GameProperties           => [
+        {
+          Value => 'MyGamePropertyValue',                         # max: 96
+          Key   => 'MyGamePropertyKey',                           # max: 32
+
+        },
+        ...
+      ],                                                          # OPTIONAL
+      GameSessionData      => 'MyGameSessionData',                # OPTIONAL
+      GameSessionQueueArns => [
+        'MyArnStringModel', ...    # min: 1, max: 256
+      ],                           # OPTIONAL
+      NotificationTarget    => 'MySnsArnStringModel',           # OPTIONAL
+      RequestTimeoutSeconds => 1,                               # OPTIONAL
+      RuleSetName           => 'MyMatchmakingIdStringModel',    # OPTIONAL
+      );
+
+    # Results:
+    my $Configuration = $UpdateMatchmakingConfigurationOutput->Configuration;
+
+    # Returns a L<Paws::GameLift::UpdateMatchmakingConfigurationOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/gamelift/UpdateMatchmakingConfiguration>
 
 =head1 ATTRIBUTES
 
@@ -84,29 +114,34 @@ Descriptive label that is associated with matchmaking configuration.
 
 =head2 GameProperties => ArrayRef[L<Paws::GameLift::GameProperty>]
 
-Set of developer-defined properties for a game session, formatted as a
-set of type:value pairs. These properties are included in the
-GameSession object, which is passed to the game server with a request
-to start a new game session (see Start a Game Session). This
-information is added to the new GameSession object that is created for
-a successful match.
+Set of custom properties for a game session, formatted as key:value
+pairs. These properties are passed to a game server process in the
+GameSession object with a request to start a new game session (see
+Start a Game Session
+(http://docs.aws.amazon.com/gamelift/latest/developerguide/gamelift-sdk-server-api.html#gamelift-sdk-server-startsession)).
+This information is added to the new GameSession object that is created
+for a successful match.
 
 
 
 =head2 GameSessionData => Str
 
-Set of developer-defined game session properties, formatted as a single
-string value. This data is included in the GameSession object, which is
-passed to the game server with a request to start a new game session
-(see Start a Game Session). This information is added to the new
-GameSession object that is created for a successful match.
+Set of custom game session properties, formatted as a single string
+value. This data is passed to a game server process in the GameSession
+object with a request to start a new game session (see Start a Game
+Session
+(http://docs.aws.amazon.com/gamelift/latest/developerguide/gamelift-sdk-server-api.html#gamelift-sdk-server-startsession)).
+This information is added to the new GameSession object that is created
+for a successful match.
 
 
 
 =head2 GameSessionQueueArns => ArrayRef[Str|Undef]
 
-Amazon Resource Name (ARN) that is assigned to a game session queue and
-uniquely identifies it. Format is
+Amazon Resource Name (ARN
+(http://docs.aws.amazon.com/AmazonS3/latest/dev/s3-arn-format.html))
+that is assigned to a game session queue and uniquely identifies it.
+Format is
 C<arn:aws:gamelift:E<lt>regionE<gt>::fleet/fleet-a1234567-b8c9-0d1e-2fa3-b45c6d7e8912>.
 These queues are used when placing game sessions for matches that are
 created with this matchmaking configuration. Queues can be located in
@@ -123,7 +158,9 @@ Unique identifier for a matchmaking configuration to update.
 =head2 NotificationTarget => Str
 
 SNS topic ARN that is set up to receive matchmaking notifications. See
-Setting up Notifications for Matchmaking for more information.
+Setting up Notifications for Matchmaking
+(http://docs.aws.amazon.com/gamelift/latest/developerguide/match-notification.html)
+for more information.
 
 
 
@@ -150,9 +187,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateMatchma
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

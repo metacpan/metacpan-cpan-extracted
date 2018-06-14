@@ -1,17 +1,22 @@
-# NAME
+[![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/7736847150242974/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/7736847150242974/heads/master/)
+[![Linux Build Status](https://travis-ci.org/nigelhorne/Geo-Coder-US-Census.svg?branch=master)](https://travis-ci.org/nigelhorne/Geo-Coder-US-Census)
 
-Geo::Coder::US::Census - Provides a geocoding functionality using http:://geocoding.geo.census.gov for the US.
+# Geo::Coder::US::Census
+
+Provides a geocoding functionality for the US using http:://geocoding.geo.census.gov
 
 # VERSION
 
-Version 0.02
+Version 0.03
 
 # SYNOPSIS
 
       use Geo::Coder::US::Census;
 
-      my $geocoder = Geo::Coder::US::Census->new();
-      my $location = $geocoder->geocode(location => '4600 Silver Hill Rd., Suitland, MD, USA');
+      my $geo_coder = Geo::Coder::US::Census->new();
+      my $location = $geo_coder->geocode(location => '4600 Silver Hill Rd., Suitland, MD');
+      # Sometimes the server gives a 500 error on this
+      $location = $geo_coder->geocode(location => '4600 Silver Hill Rd., Suitland, MD, USA');
 
 # DESCRIPTION
 
@@ -21,15 +26,15 @@ Geo::Coder::US::Census provides an interface to geocoding.geo.census.gov.  Geo::
 
 ## new
 
-    $geocoder = Geo::Coder::US::Census->new();
+    $geo_coder = Geo::Coder::US::Census->new();
     my $ua = LWP::UserAgent->new();
     $ua->env_proxy(1);
-    $geocoder = Geo::Coder::US::Census->new(ua => $ua);
+    $geo_coder = Geo::Coder::US::Census->new(ua => $ua);
 
 ## geocode
 
-    $location = $geocoder->geocode(location => $location);
-    # @location = $geocoder->geocode(location => $location);
+    $location = $geo_coder->geocode(location => $location);
+    # @location = $geo_coder->geocode(location => $location);
 
     print 'Latitude: ', $location->{'latt'}, "\n";
     print 'Longitude: ', $location->{'longt'}, "\n";
@@ -40,19 +45,25 @@ Accessor method to get and set UserAgent object used internally. You
 can call _env\_proxy_ for example, to get the proxy information from
 environment variables:
 
-    $geocoder->ua()->env_proxy(1);
+    $geo_coder->ua()->env_proxy(1);
 
 You can also set your own User-Agent object:
 
-    $geocoder->ua(LWP::UserAgent::Throttled->new());
+    $geo_coder->ua(LWP::UserAgent::Throttled->new());
 
 ## reverse\_geocode
 
-    # $location = $geocoder->reverse_geocode(latlng => '37.778907,-122.39732');
+    # $location = $geo_coder->reverse_geocode(latlng => '37.778907,-122.39732');
 
 \# Similar to geocode except it expects a latitude/longitude parameter.
 
 Not supported.
+
+## run
+
+You can also run this module from the command line:
+
+    perl Census.pm 1600 Pennsylvania Avenue NW, Washington DC
 
 # AUTHOR
 
@@ -77,6 +88,6 @@ https://www.census.gov/data/developers/data-sets/Geocoding-services.html
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017 Nigel Horne.
+Copyright 2017,2018 Nigel Horne.
 
 This program is released under the following licence: GPL2

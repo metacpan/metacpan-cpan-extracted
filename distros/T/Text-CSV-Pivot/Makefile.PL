@@ -20,10 +20,8 @@ WriteMakefile(
         'File::Temp' => 0,
     },
     PREREQ_PM => {
-        'Moo'                  => '2.000000',
-        'namespace::autoclean' => '0.28',
-        'Text::CSV'            => '1.33',
-        'File::Basename'       => '2.6',
+        'Text::CSV'      => '1.33',
+        'File::Basename' => '2.6',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Text-CSV-Pivot-*' },

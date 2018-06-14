@@ -285,8 +285,9 @@ sub output {
   my %opts;
   %opts = %{ $$o{schema}{options}{$current_pack} } if exists $$o{schema}{options}{$current_pack};
 
-  $opts{httpHeader} = $$o{q}->header('text/html') if ! exists $opts{httpHeader};
-
+  if (! exists $opts{httpHeader}) {
+    $opts{httpHeader} = $$o{httpHeader}->('text/html');
+  }
 
   my $inlineCSS = "\n<style type='text/css' id='OQstyle'>";
   if (! exists $opts{htmlHeader}) {

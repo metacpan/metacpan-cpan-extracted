@@ -7,7 +7,7 @@ our @CARP_NOT = qw(XML::Struct);
 use Scalar::Util qw(blessed);
 use XML::Struct;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 has whitespace => (is => 'ro', default => sub { 0 });
 has attributes => (is => 'ro', default => sub { 1 });

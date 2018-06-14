@@ -14,21 +14,30 @@ package Paws::IAM::CreateAccountAlias;
 
 =head1 NAME
 
-Paws::IAM::CreateAccountAlias - Arguments for method CreateAccountAlias on Paws::IAM
+Paws::IAM::CreateAccountAlias - Arguments for method CreateAccountAlias on L<Paws::IAM>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateAccountAlias on the 
-AWS Identity and Access Management service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateAccountAlias on the
+L<AWS Identity and Access Management|Paws::IAM> service. Use the attributes of this class
 as arguments to method CreateAccountAlias.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateAccountAlias.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateAccountAlias(Att1 => $value1, Att2 => $value2, ...);
+    my $iam = Paws->service('IAM');
+   # To create an account alias
+   # The following command associates the alias examplecorp to your AWS account.
+    $iam->CreateAccountAlias(
+      {
+        'AccountAlias' => 'examplecorp'
+      }
+    );
+
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/iam/CreateAccountAlias>
 
 =head1 ATTRIBUTES
 
@@ -37,9 +46,10 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 
 The account alias to create.
 
-This parameter allows (per its regex pattern) a string of characters
-consisting of lowercase letters, digits, and dashes. You cannot start
-or finish with a dash, nor can you have two dashes in a row.
+This parameter allows (per its regex pattern
+(http://wikipedia.org/wiki/regex)) a string of characters consisting of
+lowercase letters, digits, and dashes. You cannot start or finish with
+a dash, nor can you have two dashes in a row.
 
 
 
@@ -50,9 +60,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateAccount
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

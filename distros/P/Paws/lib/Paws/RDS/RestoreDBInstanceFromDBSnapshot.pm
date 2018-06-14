@@ -11,6 +11,7 @@ package Paws::RDS::RestoreDBInstanceFromDBSnapshot;
   has DBSubnetGroupName => (is => 'ro', isa => 'Str');
   has Domain => (is => 'ro', isa => 'Str');
   has DomainIAMRoleName => (is => 'ro', isa => 'Str');
+  has EnableCloudwatchLogsExports => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
   has EnableIAMDatabaseAuthentication => (is => 'ro', isa => 'Bool');
   has Engine => (is => 'ro', isa => 'Str');
   has Iops => (is => 'ro', isa => 'Int');
@@ -18,11 +19,13 @@ package Paws::RDS::RestoreDBInstanceFromDBSnapshot;
   has MultiAZ => (is => 'ro', isa => 'Bool');
   has OptionGroupName => (is => 'ro', isa => 'Str');
   has Port => (is => 'ro', isa => 'Int');
+  has ProcessorFeatures => (is => 'ro', isa => 'ArrayRef[Paws::RDS::ProcessorFeature]');
   has PubliclyAccessible => (is => 'ro', isa => 'Bool');
   has StorageType => (is => 'ro', isa => 'Str');
   has Tags => (is => 'ro', isa => 'ArrayRef[Paws::RDS::Tag]');
   has TdeCredentialArn => (is => 'ro', isa => 'Str');
   has TdeCredentialPassword => (is => 'ro', isa => 'Str');
+  has UseDefaultProcessorFeatures => (is => 'ro', isa => 'Bool');
 
   use MooseX::ClassAttribute;
 
@@ -35,40 +38,85 @@ package Paws::RDS::RestoreDBInstanceFromDBSnapshot;
 
 =head1 NAME
 
-Paws::RDS::RestoreDBInstanceFromDBSnapshot - Arguments for method RestoreDBInstanceFromDBSnapshot on Paws::RDS
+Paws::RDS::RestoreDBInstanceFromDBSnapshot - Arguments for method RestoreDBInstanceFromDBSnapshot on L<Paws::RDS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method RestoreDBInstanceFromDBSnapshot on the 
-Amazon Relational Database Service service. Use the attributes of this class
+This class represents the parameters used for calling the method RestoreDBInstanceFromDBSnapshot on the
+L<Amazon Relational Database Service|Paws::RDS> service. Use the attributes of this class
 as arguments to method RestoreDBInstanceFromDBSnapshot.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to RestoreDBInstanceFromDBSnapshot.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->RestoreDBInstanceFromDBSnapshot(Att1 => $value1, Att2 => $value2, ...);
+    my $rds = Paws->service('RDS');
+    my $RestoreDBInstanceFromDBSnapshotResult =
+      $rds->RestoreDBInstanceFromDBSnapshot(
+      DBInstanceIdentifier            => 'MyString',
+      DBSnapshotIdentifier            => 'MyString',
+      AutoMinorVersionUpgrade         => 1,                      # OPTIONAL
+      AvailabilityZone                => 'MyString',             # OPTIONAL
+      CopyTagsToSnapshot              => 1,                      # OPTIONAL
+      DBInstanceClass                 => 'MyString',             # OPTIONAL
+      DBName                          => 'MyString',             # OPTIONAL
+      DBSubnetGroupName               => 'MyString',             # OPTIONAL
+      Domain                          => 'MyString',             # OPTIONAL
+      DomainIAMRoleName               => 'MyString',             # OPTIONAL
+      EnableCloudwatchLogsExports     => [ 'MyString', ... ],    # OPTIONAL
+      EnableIAMDatabaseAuthentication => 1,                      # OPTIONAL
+      Engine                          => 'MyString',             # OPTIONAL
+      Iops                            => 1,                      # OPTIONAL
+      LicenseModel                    => 'MyString',             # OPTIONAL
+      MultiAZ                         => 1,                      # OPTIONAL
+      OptionGroupName                 => 'MyString',             # OPTIONAL
+      Port                            => 1,                      # OPTIONAL
+      ProcessorFeatures               => [
+        {
+          Value => 'MyString',
+          Name  => 'MyString',
+        },
+        ...
+      ],                                                         # OPTIONAL
+      PubliclyAccessible => 1,                                   # OPTIONAL
+      StorageType        => 'MyString',                          # OPTIONAL
+      Tags               => [
+        {
+          Value => 'MyString',
+          Key   => 'MyString',
+        },
+        ...
+      ],                                                         # OPTIONAL
+      TdeCredentialArn            => 'MyString',                 # OPTIONAL
+      TdeCredentialPassword       => 'MyString',                 # OPTIONAL
+      UseDefaultProcessorFeatures => 1,                          # OPTIONAL
+      );
+
+    # Results:
+    my $DBInstance = $RestoreDBInstanceFromDBSnapshotResult->DBInstance;
+
+    # Returns a L<Paws::RDS::RestoreDBInstanceFromDBSnapshotResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/rds/RestoreDBInstanceFromDBSnapshot>
 
 =head1 ATTRIBUTES
 
 
 =head2 AutoMinorVersionUpgrade => Bool
 
-Indicates that minor version upgrades will be applied automatically to
-the DB instance during the maintenance window.
+Indicates that minor version upgrades are applied automatically to the
+DB instance during the maintenance window.
 
 
 
 =head2 AvailabilityZone => Str
 
-The EC2 Availability Zone that the database instance will be created
-in.
+The EC2 Availability Zone that the DB instance is created in.
 
 Default: A random, system-chosen Availability Zone.
 
-Constraint: You cannot specify the AvailabilityZone parameter if the
+Constraint: You can't specify the AvailabilityZone parameter if the
 MultiAZ parameter is set to C<true>.
 
 Example: C<us-east-1a>
@@ -78,20 +126,21 @@ Example: C<us-east-1a>
 =head2 CopyTagsToSnapshot => Bool
 
 True to copy all tags from the restored DB instance to snapshots of the
-DB instance; otherwise false. The default is false.
+DB instance, and otherwise false. The default is false.
 
 
 
 =head2 DBInstanceClass => Str
 
-The compute and memory capacity of the Amazon RDS DB instance.
+The compute and memory capacity of the Amazon RDS DB instance, for
+example, C<db.m4.large>. Not all DB instance classes are available in
+all AWS Regions, or for all database engines. For the full list of DB
+instance classes, and availability for your engine, see DB Instance
+Class
+(http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.DBInstanceClass.html)
+in the I<Amazon RDS User Guide.>
 
-Valid Values: C<db.t1.micro | db.m1.small | db.m1.medium | db.m1.large
-| db.m1.xlarge | db.m2.2xlarge | db.m2.4xlarge | db.m3.medium |
-db.m3.large | db.m3.xlarge | db.m3.2xlarge | db.m4.large | db.m4.xlarge
-| db.m4.2xlarge | db.m4.4xlarge | db.m4.10xlarge | db.r3.large |
-db.r3.xlarge | db.r3.2xlarge | db.r3.4xlarge | db.r3.8xlarge |
-db.t2.micro | db.t2.small | db.t2.medium | db.t2.large>
+Default: The same DBInstanceClass as the original DB instance.
 
 
 
@@ -106,7 +155,7 @@ Constraints:
 
 =item *
 
-Must contain from 1 to 63 alphanumeric characters or hyphens
+Must contain from 1 to 63 numbers, letters, or hyphens
 
 =item *
 
@@ -141,20 +190,15 @@ Constraints:
 
 =item *
 
-Must contain from 1 to 255 alphanumeric characters or hyphens
+Must match the identifier of an existing DBSnapshot.
 
 =item *
-
-First character must be a letter
-
-=item *
-
-Cannot end with a hyphen or contain two consecutive hyphens
-
-=back
 
 If you are restoring from a shared manual DB snapshot, the
 C<DBSnapshotIdentifier> must be the ARN of the shared DB snapshot.
+
+=back
+
 
 
 
@@ -162,8 +206,8 @@ C<DBSnapshotIdentifier> must be the ARN of the shared DB snapshot.
 
 The DB subnet group name to use for the new instance.
 
-Constraints: Must contain no more than 255 alphanumeric characters,
-periods, underscores, spaces, or hyphens. Must not be default.
+Constraints: If supplied, must match the name of an existing
+DBSubnetGroup.
 
 Example: C<mySubnetgroup>
 
@@ -182,10 +226,17 @@ the Directory Service.
 
 
 
+=head2 EnableCloudwatchLogsExports => ArrayRef[Str|Undef]
+
+The list of logs that the restored DB instance is to export to
+CloudWatch Logs.
+
+
+
 =head2 EnableIAMDatabaseAuthentication => Bool
 
 True to enable mapping of AWS Identity and Access Management (IAM)
-accounts to database accounts; otherwise false.
+accounts to database accounts, and otherwise false.
 
 You can enable IAM database authentication for the following database
 engines
@@ -200,10 +251,6 @@ For MySQL 5.6, minor version 5.6.34 or higher
 
 For MySQL 5.7, minor version 5.7.16 or higher
 
-=item *
-
-Aurora 5.6 or higher.
-
 =back
 
 Default: C<false>
@@ -216,12 +263,60 @@ The database engine to use for the new instance.
 
 Default: The same as source
 
-Constraint: Must be compatible with the engine of the source. You can
-restore a MariaDB 10.1 DB instance from a MySQL 5.6 snapshot.
+Constraint: Must be compatible with the engine of the source. For
+example, you can restore a MariaDB 10.1 DB instance from a MySQL 5.6
+snapshot.
 
-Valid Values: C<MySQL> | C<mariadb> | C<oracle-se1> | C<oracle-se> |
-C<oracle-ee> | C<sqlserver-ee> | C<sqlserver-se> | C<sqlserver-ex> |
-C<sqlserver-web> | C<postgres> | C<aurora>
+Valid Values:
+
+=over
+
+=item *
+
+C<mariadb>
+
+=item *
+
+C<mysql>
+
+=item *
+
+C<oracle-ee>
+
+=item *
+
+C<oracle-se2>
+
+=item *
+
+C<oracle-se1>
+
+=item *
+
+C<oracle-se>
+
+=item *
+
+C<postgres>
+
+=item *
+
+C<sqlserver-ee>
+
+=item *
+
+C<sqlserver-se>
+
+=item *
+
+C<sqlserver-ex>
+
+=item *
+
+C<sqlserver-web>
+
+=back
+
 
 
 
@@ -229,17 +324,17 @@ C<sqlserver-web> | C<postgres> | C<aurora>
 
 Specifies the amount of provisioned IOPS for the DB instance, expressed
 in I/O operations per second. If this parameter is not specified, the
-IOPS value will be taken from the backup. If this parameter is set to
-0, the new instance will be converted to a non-PIOPS instance, which
-will take additional time, though your DB instance will be available
-for connections before the conversion starts.
+IOPS value is taken from the backup. If this parameter is set to 0, the
+new instance is converted to a non-PIOPS instance. The conversion takes
+additional time, though your DB instance is available for connections
+before the conversion starts.
+
+The provisioned IOPS value must follow the requirements for your
+database engine. For more information, see Amazon RDS Provisioned IOPS
+Storage to Improve Performance
+(http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Storage.html#USER_PIOPS).
 
 Constraints: Must be an integer greater than 1000.
-
-B<SQL Server>
-
-Setting the IOPS value for the SQL Server database engine is not
-supported.
 
 
 
@@ -258,7 +353,7 @@ C<general-public-license>
 
 Specifies if the DB instance is a Multi-AZ deployment.
 
-Constraint: You cannot specify the AvailabilityZone parameter if the
+Constraint: You can't specify the AvailabilityZone parameter if the
 MultiAZ parameter is set to C<true>.
 
 
@@ -268,9 +363,8 @@ MultiAZ parameter is set to C<true>.
 The name of the option group to be used for the restored DB instance.
 
 Permanent options, such as the TDE option for Oracle Advanced Security
-TDE, cannot be removed from an option group, and that option group
-cannot be removed from a DB instance once it is associated with a DB
-instance
+TDE, can't be removed from an option group, and that option group can't
+be removed from a DB instance once it is associated with a DB instance
 
 
 
@@ -281,6 +375,13 @@ The port number on which the database accepts connections.
 Default: The same port as the original DB instance
 
 Constraints: Value must be C<1150-65535>
+
+
+
+=head2 ProcessorFeatures => ArrayRef[L<Paws::RDS::ProcessorFeature>]
+
+The number of CPU cores and the number of threads per core for the DB
+instance class of the DB instance.
 
 
 
@@ -309,10 +410,10 @@ B<VPC:> false
 =back
 
 If no DB subnet group has been specified as part of the request and the
-PubliclyAccessible value has not been set, the DB instance will be
-publicly accessible. If a specific DB subnet group has been specified
-as part of the request and the PubliclyAccessible value has not been
-set, the DB instance will be private.
+PubliclyAccessible value has not been set, the DB instance is publicly
+accessible. If a specific DB subnet group has been specified as part of
+the request and the PubliclyAccessible value has not been set, the DB
+instance is private.
 
 
 
@@ -325,7 +426,7 @@ Valid values: C<standard | gp2 | io1>
 If you specify C<io1>, you must also include a value for the C<Iops>
 parameter.
 
-Default: C<io1> if the C<Iops> parameter is specified; otherwise
+Default: C<io1> if the C<Iops> parameter is specified, otherwise
 C<standard>
 
 
@@ -338,15 +439,22 @@ C<standard>
 
 =head2 TdeCredentialArn => Str
 
-The ARN from the Key Store with which to associate the instance for TDE
+The ARN from the key store with which to associate the instance for TDE
 encryption.
 
 
 
 =head2 TdeCredentialPassword => Str
 
-The password for the given ARN from the Key Store in order to access
+The password for the given ARN from the key store in order to access
 the device.
+
+
+
+=head2 UseDefaultProcessorFeatures => Bool
+
+A value that specifies that the DB instance class of the DB instance
+uses its default processor features.
 
 
 
@@ -357,9 +465,9 @@ This class forms part of L<Paws>, documenting arguments for method RestoreDBInst
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

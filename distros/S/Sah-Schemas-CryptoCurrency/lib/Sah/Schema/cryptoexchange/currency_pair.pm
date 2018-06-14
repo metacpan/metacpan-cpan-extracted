@@ -1,16 +1,16 @@
 package Sah::Schema::cryptoexchange::currency_pair;
 
-our $DATE = '2018-06-07'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2018-06-10'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 our $schema = [str => {
     summary => 'Currency pair, e.g. LTC/USD',
     description => <<'_',
 
 Currency pair is string in the form of *currency1*/*currency2*, where
-*currency1* the traded currency and must be a known cryptocurrency code (e.g.
-LTC) while *currency2* is the base currency and must be a known fiat currency or
-a known cryptocurrency code (e.g. USD, or BTC).
+*currency1* is called the base currency and must be a known cryptocurrency code
+(e.g. LTC) while *currency2* is the quote (or price) currency and must be a
+known fiat currency or a known cryptocurrency code (e.g. USD, or BTC).
 
 Cryptocurrency code is checked against catalog in <pm:CryptoCurrency::Catalog>,
 while fiat currency code is checked against <pm:Locale::Codes::Currency_Codes>.
@@ -38,14 +38,14 @@ Sah::Schema::cryptoexchange::currency_pair - Currency pair, e.g. LTC/USD
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::Schema::cryptoexchange::currency_pair (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-06-07.
+This document describes version 0.011 of Sah::Schema::cryptoexchange::currency_pair (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-06-10.
 
 =head1 DESCRIPTION
 
 Currency pair is string in the form of I<currency1>/I<currency2>, where
-I<currency1> the traded currency and must be a known cryptocurrency code (e.g.
-LTC) while I<currency2> is the base currency and must be a known fiat currency or
-a known cryptocurrency code (e.g. USD, or BTC).
+I<currency1> is called the base currency and must be a known cryptocurrency code
+(e.g. LTC) while I<currency2> is the quote (or price) currency and must be a
+known fiat currency or a known cryptocurrency code (e.g. USD, or BTC).
 
 Cryptocurrency code is checked against catalog in L<CryptoCurrency::Catalog>,
 while fiat currency code is checked against L<Locale::Codes::Currency_Codes>.

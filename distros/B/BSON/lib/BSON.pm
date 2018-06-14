@@ -9,7 +9,7 @@ use base 'Exporter';
 our @EXPORT_OK = qw/encode decode/;
 
 use version;
-our $VERSION = 'v1.6.3';
+our $VERSION = 'v1.6.4';
 
 use Carp;
 use Config;
@@ -660,7 +660,7 @@ BSON - BSON serialization and deserialization
 
 =head1 VERSION
 
-version v1.6.3
+version v1.6.4
 
 =head1 SYNOPSIS
 
@@ -672,7 +672,7 @@ version v1.6.3
 
     my $document = {
         _id             => bson_oid(),
-        creation_time   => bson_time(),
+        creation_time   => bson_time(), # now
         zip_code        => bson_string("08544"),
         hidden          => false,
     };
@@ -1079,24 +1079,22 @@ type deserializes to.  Footnotes indicate variations or special behaviors.
     MongoDB::MinKey[d]
 
     [d] Deprecated or soon to be deprecated.
-    [1] Scalar with "NV" internal representation no "PV"
-        representation, or a string that looks like a float if the
-        'prefer_numeric' option is true.
+    [1] Scalar with "NV" internal representation or a string that looks
+        like a float if the 'prefer_numeric' option is true.
     [2] If the 'wrap_numbers' option is true, numeric types will be wrapped
         as BSON::Double, BSON::Int32 or BSON::Int64 as appropriate to ensure
         round-tripping. If the 'wrap_strings' option is true, strings will
         be wrapped as BSON::String, likewise.
-    [3] Scalar with "PV" representation and not identified as a number
-        by notes [1] or [7].
+    [3] Scalar without "NV" or "IV" representation and not identified as a
+        number by notes [1] or [7].
     [4] If 'ordered' option is set, will return a tied hash that preserves
         order (deprecated 'ixhash' option still works).
     [5] If the document appears to contain a DBRef and a 'dbref_callback'
         exists, that callback is executed with the deserialized document.
     [6] Code is serialized as CODE or CODEWSCOPE depending on whether a
         scope hashref exists in BSON::Code/MongoDB::Code.
-    [7] Scalar with "IV" internal representation and no "PV"
-        representation, or a string that looks like an integer if the
-        'prefer_numeric' option is true.
+    [7] Scalar with "IV" internal representation or a string that looks like
+        an integer if the 'prefer_numeric' option is true.
     [8] Only if the integer fits in 32 bits.
     [9] On 32-bit platforms, 64-bit integers are deserialized to
         Math::BigInt objects (even if subsequently wrapped into
@@ -1104,8 +1102,7 @@ type deserializes to.  Footnotes indicate variations or special behaviors.
 
 =head1 THREADS
 
-Threads are never recommended in Perl, but this module is thread safe for
-Perl 5.8.5 or later.  Threads are not supported on older Perls.
+Threads are never recommended in Perl, but this module is thread safe.
 
 =head1 ENVIRONMENT
 

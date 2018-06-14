@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Rinci::AddPrereqs;
 
-our $DATE = '2016-10-09'; # DATE
-our $VERSION = '0.13'; # VERSION
+our $DATE = '2018-06-11'; # DATE
+our $VERSION = '0.142'; # VERSION
 
 use 5.010001;
 use strict;
@@ -18,6 +18,8 @@ with (
 
 use Perinci::Access;
 use Perinci::Sub::Normalize qw(normalize_function_metadata);
+use PMVersions::Util qw(version_from_pmversions);
+use Version::Util qw(max_version);
 
 sub munge_files {
     my $self = shift;
@@ -56,7 +58,7 @@ sub _add_prereqs_from_func_meta {
     {
         require Perinci::Sub::Util::DepModule;
         my $mods = Perinci::Sub::Util::DepModule::get_required_dep_modules($meta);
-        $self->_add_prereq($_ => $mods->{$_}) for keys %$mods;
+        $self->_add_prereq($_ => $mods->{$_} // 0) for keys %$mods;
     }
 
     {
@@ -70,21 +72,25 @@ sub _add_prereqs_from_func_meta {
             # only)
             $e = $arg_spec->{'x.schema.entity'};
             if ($e && $cli_info) {
-                $self->_add_prereq("Perinci::Sub::ArgEntity::$e"=>0);
+                my $pkg = "Perinci::Sub::ArgEntity::$e";
+                $self->_add_prereq($pkg => version_from_pmversions($pkg) // 0);
             }
             $e = $arg_spec->{'x.schema.element_entity'};
             if ($e && $cli_info) {
-                $self->_add_prereq("Perinci::Sub::ArgEntity::$e"=>0);
+                my $pkg = "Perinci::Sub::ArgEntity::$e";
+                $self->_add_prereq($pkg => version_from_pmversions($pkg) // 0);
             }
             $e = $arg_spec->{'x.completion'};
             if ($e && $cli_info) {
                 die "x.completion must be an array" unless ref($e) eq 'ARRAY';
-                $self->_add_prereq("Perinci::Sub::XCompletion::$e->[0]"=>0);
+                my $pkg = "Perinci::Sub::XCompletion::$e->[0]";
+                $self->_add_prereq($pkg => version_from_pmversions($pkg) // 0);
             }
             $e = $arg_spec->{'x.element_completion'};
             if ($e && $cli_info) {
                 die "x.element_completion must be an array" unless ref($e) eq 'ARRAY';
-                $self->_add_prereq("Perinci::Sub::XCompletion::$e->[0]"=>0);
+                my $pkg = "Perinci::Sub::XCompletion::$e->[0]";
+                $self->_add_prereq($pkg => version_from_pmversions($pkg) // 0);
             }
 
             # from schema (coerce rule modules, etc) (cli scripts only)
@@ -103,7 +109,10 @@ sub _add_prereqs_from_func_meta {
                     } else {
                         next unless $mod->{phase} eq 'compile';
                     }
-                    $self->_add_prereq($mod->{name} => $mod->{version} // 0);
+                    $self->_add_prereq($mod->{name} => max_version(
+                        $mod->{version} // 0,
+                        version_from_pmversions($mod->{name}) // 0,
+                    ));
                 }
             }
         }
@@ -113,7 +122,7 @@ sub _add_prereqs_from_func_meta {
     {
         require Perinci::Sub::Util::PropertyModule;
         my $mods = Perinci::Sub::Util::PropertyModule::get_required_property_modules($meta);
-        $self->_add_prereq($_ => 0) for @$mods;
+        $self->_add_prereq($_ => version_from_pmversions($_) // 0) for @$mods;
     }
 }
 
@@ -179,7 +188,8 @@ sub munge_file {
                 next unless $fmetas;
                 push @metas, values %$fmetas;
             } else {
-                $self->_add_prereq($pkg => 0) unless $self->{_packages}{$pkg};
+                $self->_add_prereq($pkg => version_from_pmversions($pkg) // 0)
+                    unless $self->{_packages}{$pkg};
                 $self->log_debug(["Performing Riap request: meta => %s", $url]);
                 my $res = $pa->request(meta => $url);
                 $self->log_fatal(["Can't meta %s: %s-%s", $url, $res->[0], $res->[1]])
@@ -210,7 +220,7 @@ Dist::Zilla::Plugin::Rinci::AddPrereqs - Add prerequisites from Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.13 of Dist::Zilla::Plugin::Rinci::AddPrereqs (from Perl distribution Dist-Zilla-Plugin-Rinci-AddPrereqs), released on 2016-10-09.
+This document describes version 0.142 of Dist::Zilla::Plugin::Rinci::AddPrereqs (from Perl distribution Dist-Zilla-Plugin-Rinci-AddPrereqs), released on 2018-06-11.
 
 =head1 SYNOPSIS
 
@@ -285,7 +295,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

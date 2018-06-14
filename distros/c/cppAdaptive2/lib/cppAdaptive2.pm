@@ -1,4 +1,4 @@
-package cppAdaptive2 v2.0.2;
+package cppAdaptive2 v3.0.3;
 
 use strict;
 use warnings;
@@ -20,12 +20,12 @@ use cppAdaptive2::Inline(
 
 #include "cppAdaptive.cpp"
 
-AV* _update(char* obsVector, char* futVector, char* betaVector, int n_observed) {
+AV* _update( char* obsVector, char* futVector, char* betaVector, int n_observed ) {
     string obsVector1(obsVector);
     string futVector1(futVector);
     string betaVector1(betaVector);
 
-    cppAdaptive(obsVector1, futVector1, betaVector1, n_observed);
+    cppAdaptive( obsVector1, futVector1, betaVector1, n_observed );
 
     AV* av = newAV();
     sv_2mortal((SV*)av);
@@ -36,8 +36,16 @@ AV* _update(char* obsVector, char* futVector, char* betaVector, int n_observed) 
     return av;
 }
 CPP
-    inc               => '-I../../../../src',
-    ccflags           => '-std=c++11',
+
+    # without omp
+    # inc       => '-I../../../../src',
+    # ccflags   => '-std=c++11',
+
+    # with omp
+    inc       => '-I../../../../src',
+    ccflags   => '-std=c++11 -fopenmp -O3',
+    lddlflags => '-shared -O3 -fstack-protector-strong -fopenmp',
+
     clean_after_build => 0,
     clean_build_area  => 0,
 );
@@ -68,6 +76,8 @@ cppAdaptive2 - cppAdaptive2 XS
         '-0.26425,0.648666,-0.0565359,-0.373203,-0.107654,0.228433,-0.339707,0.663967,0.0600106,0.0828479',
         4,
     );
+
+    my ( $newFutVector, $newBetaVector ) = cppAdaptive2::update( $obsVector, $futVector, $betaVector, $n_observed );
 
 =head1 DESCRIPTION
 

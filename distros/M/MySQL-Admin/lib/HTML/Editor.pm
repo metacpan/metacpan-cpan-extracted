@@ -30,7 +30,7 @@ require Exporter;
 @HTML::Editor::EXPORT_OK   = qw(initEditor show );
 %HTML::Editor::EXPORT_TAGS = ('all' => [qw(initEditor show )]);
 
-$HTML::Editor::VERSION = '1.13';
+$HTML::Editor::VERSION = '1.14';
 
 $DefaultClass = 'HTML::Editor' unless defined $HTML::Editor::DefaultClass;
 
@@ -89,7 +89,7 @@ sub new {
 
                 headline    => "&New Message", #default : 'headline'
 
-                html     => 1 , # html enabled ? 0 for bbcode default : 0
+                html     => 1 , # html enabled ? 0 for markdown default : 0
 
                 text     => 'the body', #default : 'headline'
 

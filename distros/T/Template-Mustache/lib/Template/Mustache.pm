@@ -1,7 +1,7 @@
 package Template::Mustache;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Drawing Mustaches on Perl for fun and profit
-$Template::Mustache::VERSION = '1.2.0';
+$Template::Mustache::VERSION = '1.3.0';
 use 5.12.0;
 
 use Moo;
@@ -85,20 +85,30 @@ has_rw partials => (
     lazy => 1,
     default => sub { 
         my $self = shift;
-        
-        # TODO I can probably do better than that
-        if ( my $path = $self->partials_path ) {
-            return $self->_parse_partials( {
-                map { 
-                    my $name = $_->basename;
-                    $name =~ s/\.mustache$//;
-                    $name => $_->slurp;
-                }
-                $self->partials_path->children( qr/\.mustache$/ )
-            } );
-        }
 
-        return +{}  
+        return sub {
+            state $partials = {};
+
+            my $name = shift;
+
+            return $partials->{$name} if defined $partials->{$name};
+
+            # TODO also deal with many paths?
+
+            my $partial = '';
+
+            if ( my $path = $self->partials_path ) {
+                my $path = $self->partials_path->child($name . '.mustache');
+
+                if( $path->is_file ) {
+                    $partial = Template::Mustache->new(
+                        template_path => $path
+                    );
+                }
+            }
+
+            return $partials->{$name} = $partial;
+        }
     },
     trigger => \&_parse_partials
 );
@@ -214,7 +224,7 @@ delimiter_change_inner: '=' {
     [ split ' ', $item[4] ]
 }
 
-partial: /\s*/ opening_tag '>' /\s*/ /[-\w.]+/ /\s*/ closing_tag /\s*/ {
+partial: /\s*/ opening_tag '>' /\s*/ /[\/-\w.]+/ /\s*/ closing_tag /\s*/ {
     my $prev = $thisparser->{prev_is_standalone};
     $thisparser->{prev_is_standalone} = 0;
     my $indent = '';
@@ -372,7 +382,7 @@ Template::Mustache - Drawing Mustaches on Perl for fun and profit
 
 =head1 VERSION
 
-version 1.2.0
+version 1.3.0
 
 =head1 SYNOPSIS
 
@@ -464,6 +474,16 @@ itself.
 
 An optional hashref of partials to assign to the object. See
 the method C<partials> for more details on its format.
+
+By default, if C<partials_path> (or C<template_path> is defined,
+the template will try to resolve the partials as filenames with 
+the file extension C<.mustache>
+relative to that path.
+
+    my $mustache = Template::Mustache->new( 
+        partials => './root',
+        template => '{{ > ./my/partial }}',  # => file ./root/my/partial.mustache
+    );
 
 =back
 
@@ -638,7 +658,7 @@ sub with the name of the partial as its argument.
 
     print $Template::Mustache::GRAMMAR;
 
-The L<Parse::ReqDescent> grammar used to parse Mustache templates.
+The L<Parse::RecDescent> grammar used to parse Mustache templates.
 
 =head1 SEE ALSO
 
@@ -656,6 +676,10 @@ Specs of the I<Mustache> DSL.
 
 I<Handlebars> is another templating language heavily inspired and very similar to I<Mustache>. L<Text::Handlebars>
 is an implementation of it using L<Text::Xslate>.
+
+=item L<Mustache::Simple>
+
+Another module implementing Mustache templates.
 
 =back
 
@@ -679,7 +703,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2011 by Pieter van de Bruggen.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2011 by Pieter van de Bruggen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

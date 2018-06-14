@@ -136,7 +136,7 @@
     "nove ere",
   ],
   first_day_of_week => 1,
-  glibc_date_1_format => "%a<U002c> %e. %b %Y.  %H:%M:%S %Z\n",
+  glibc_date_1_format => "%a, %e. %b %Y.  %H:%M:%S %Z",
   glibc_date_format => "%d.%m.%Y.",
   glibc_datetime_format => "%A, %d. %B %Y. %T %Z",
   glibc_time_12_format => "%T",

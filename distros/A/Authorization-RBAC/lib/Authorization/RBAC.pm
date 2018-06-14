@@ -1,5 +1,5 @@
 package Authorization::RBAC;
-$Authorization::RBAC::VERSION = '0.10';
+$Authorization::RBAC::VERSION = '0.11';
 use utf8;
 use Moose;
 with 'MooseX::Object::Pluggable';
@@ -83,6 +83,12 @@ sub _load_backend {
 sub can_access {
   my ( $self, $roles, $objects, $additional_operations ) = @_;
 
+  my $key = $self->_get_key($roles, $objects, $additional_operations);
+  # Get cache ?
+  my $result = $self->_get_cache($key);
+
+  return $result if ( defined $result );
+
   # Check perm on all objects
   foreach my $obj (@$objects) {
 
@@ -122,12 +128,14 @@ sub can_access {
         }
         if ( ! $self->check_permission( $roles, $obj2, $ops )){
             $self->_log("return 0");
+	    $self->_set_cache($key,0);
             return 0;
         }
     }
   }
 
   $self->_log("return 1");
+  $self->_set_cache($key, 1);
   return 1;
 }
 
@@ -193,6 +201,38 @@ sub _log{
   say STDERR "[debug] $msg";
 }
 
+sub _get_cache {
+  my ( $self, $key ) = @_;
+  if ( defined $self->cache ){
+      my $res =  $self->cache->get($key);
+      my $ret = $res || '';
+      $self->_log("get cache $key : $ret");
+      return $res;
+  }
+  return
+}
+
+
+
+sub _get_key {
+  my ( $self, $roles, $objects, $additional_operations ) = @_;
+
+  # TODO : Add type of object in key <============
+  my $key .=  join('|', map { $_->name} @$roles)
+      . '-' . join('|', map { ref($_) ? $_->id : $_ } @$objects);
+      $key .= '-' . join('|', @$additional_operations) if (defined $additional_operations);
+
+  return $key;
+}
+
+sub _set_cache {
+  my ( $self, $key, $value ) = @_;
+  if ( defined $self->cache ){
+    $self->_log("set cache $key = $value");
+    $self->cache->set($key, $value);
+  }
+}
+
 =encoding utf8
 
 =head1 NAME
@@ -203,7 +243,7 @@ Authorization::RBAC - Role-Based Access Control system
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -218,6 +258,10 @@ version 0.10
     if ( $rbac->can_access($roles, $page, [ 'create_Page' ]) ){
         # Role 'member' can access to Page /page/wiki/add
     }
+
+    # add a cache
+    $rbac->cache($cache);
+
 
 =head1 DESCRIPTION
 

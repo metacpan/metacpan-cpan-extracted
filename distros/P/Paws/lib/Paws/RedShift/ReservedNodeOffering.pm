@@ -7,6 +7,7 @@ package Paws::RedShift::ReservedNodeOffering;
   has OfferingType => (is => 'ro', isa => 'Str');
   has RecurringCharges => (is => 'ro', isa => 'ArrayRef[Paws::RedShift::RecurringCharge]', request_name => 'RecurringCharge', traits => ['NameInRequest']);
   has ReservedNodeOfferingId => (is => 'ro', isa => 'Str');
+  has ReservedNodeOfferingType => (is => 'ro', isa => 'Str');
   has UsagePrice => (is => 'ro', isa => 'Num');
 1;
 
@@ -82,6 +83,11 @@ for heavy-utilization reserved nodes.
   The offering identifier.
 
 
+=head2 ReservedNodeOfferingType => Str
+
+  
+
+
 =head2 UsagePrice => Num
 
   The rate you are charged for each hour the cluster that is using the
@@ -95,9 +101,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::RedShift>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

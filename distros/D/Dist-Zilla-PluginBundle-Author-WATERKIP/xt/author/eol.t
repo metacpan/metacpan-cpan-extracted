@@ -7,6 +7,7 @@ use Test::More 0.88;
 use Test::EOL;
 
 my @files = (
+    'lib/Dist/Zilla/MintingProfile/Author/WATERKIP.pm',
     'lib/Dist/Zilla/PluginBundle/Author/WATERKIP.pm',
     't/00-compile.t',
     't/author.t'

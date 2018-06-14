@@ -14,11 +14,6 @@
    },
    "name" : "R-DescriptionFile",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Test::More" : "0.88"
-         }
-      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
@@ -46,7 +41,7 @@
             "IPC::Open3" : "0",
             "Test2::Plugin::NoWarnings" : "0",
             "Test2::V0" : "0",
-            "Test::More" : "0.88",
+            "Test::More" : "0",
             "perl" : "5.006"
          }
       }
@@ -54,7 +49,7 @@
    "provides" : {
       "R::DescriptionFile" : {
          "file" : "lib/R/DescriptionFile.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -63,7 +58,7 @@
          "url" : "https://github.com/stphnlyd/perl5-R-DescriptionFile.git"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

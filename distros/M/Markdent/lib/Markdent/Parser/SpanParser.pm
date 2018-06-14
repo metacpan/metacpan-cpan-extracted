@@ -6,7 +6,7 @@ use namespace::autoclean;
 
 use re 'eval';
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use List::AllUtils qw( uniq );
 use Markdent::Event::AutoLink;
@@ -36,9 +36,9 @@ use MooseX::StrictConstructor;
 with 'Markdent::Role::SpanParser';
 
 has __pending_events => (
-    traits => ['Array'],
-    is     => 'rw',
-    isa    => t( 'ArrayRef', of => t('EventObject') ),
+    traits   => ['Array'],
+    is       => 'rw',
+    isa      => t( 'ArrayRef', of => t('EventObject') ),
     default  => sub { [] },
     init_arg => undef,
     handles  => {
@@ -62,9 +62,9 @@ has _span_text_buffer => (
 );
 
 has _links_by_id => (
-    traits => ['Hash'],
-    is     => 'ro',
-    isa    => t( 'HashRef', of => t('ArrayRef') ),
+    traits   => ['Hash'],
+    is       => 'ro',
+    isa      => t( 'HashRef', of => t('ArrayRef') ),
     default  => sub { {} },
     init_arg => undef,
     handles  => {
@@ -985,7 +985,7 @@ Markdent::Parser::SpanParser - Span parser for standard Markdown
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 DESCRIPTION
 
@@ -1019,7 +1019,7 @@ L<Markdent::Role::AnyParser>, and L<Markdent::Role::DebugPrinter> roles.
 
 See L<Markdent> for bug reporting details.
 
-Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Markdent> or via email to L<bug-markdent@rt.cpan.org|mailto:bug-markdent@rt.cpan.org>.
+Bugs may be submitted at L<https://github.com/houseabsolute/Markdent/issues>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 

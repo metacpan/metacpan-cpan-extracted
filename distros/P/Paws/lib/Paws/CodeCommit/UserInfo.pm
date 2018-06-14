@@ -40,7 +40,8 @@ Information about the user who made a specified commit.
 
 =head2 Date => Str
 
-  The date when the specified commit was pushed to the repository.
+  The date when the specified commit was commited, in timestamp format
+with GMT offset.
 
 
 =head2 Email => Str
@@ -60,9 +61,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::CodeCommi
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

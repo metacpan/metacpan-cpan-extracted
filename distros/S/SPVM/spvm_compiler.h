@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include "spvm_base.h"
+#include "spvm_native.h"
 
 // Parser information
 struct SPVM_compiler {
@@ -102,11 +103,14 @@ struct SPVM_compiler {
   
   // Operation codes
   SPVM_OPCODE_ARRAY* opcode_array;
+  
+  SPVM_RUNTIME* runtime;
+  
+  _Bool do_compile_only;
 };
 
 SPVM_COMPILER* SPVM_COMPILER_new();
 int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler);
-SPVM_RUNTIME* SPVM_COMPILER_new_runtime(SPVM_COMPILER* compiler);
 void SPVM_COMPILER_free(SPVM_COMPILER* compiler);
 void SPVM_COMPILER_add_basic_types(SPVM_COMPILER* compiler);
 

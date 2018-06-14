@@ -46,10 +46,7 @@ Contains information about the directory.
 
 =head2 SecurityGroupId => Str
 
-  The security group identifier for the directory. If the directory was
-created before 8/1/2014, this is the identifier of the directory
-members security group that was created when the directory was created.
-If the directory was created after this date, this value is null.
+  The domain controller security group identifier for the directory.
 
 
 =head2 SubnetIds => ArrayRef[Str|Undef]
@@ -69,9 +66,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::DS>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

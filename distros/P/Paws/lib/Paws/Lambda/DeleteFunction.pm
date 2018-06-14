@@ -10,28 +10,37 @@ package Paws::Lambda::DeleteFunction;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/2015-03-31/functions/{FunctionName}');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'DELETE');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::API::Response');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::Lambda::DeleteFunction - Arguments for method DeleteFunction on Paws::Lambda
+Paws::Lambda::DeleteFunction - Arguments for method DeleteFunction on L<Paws::Lambda>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DeleteFunction on the 
-AWS Lambda service. Use the attributes of this class
+This class represents the parameters used for calling the method DeleteFunction on the
+L<AWS Lambda|Paws::Lambda> service. Use the attributes of this class
 as arguments to method DeleteFunction.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DeleteFunction.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DeleteFunction(Att1 => $value1, Att2 => $value2, ...);
+    my $lambda = Paws->service('Lambda');
+    # To delete a Lambda function
+    # This operation deletes a Lambda function
+    $lambda->DeleteFunction(
+      {
+        'Qualifier'    => 1,
+        'FunctionName' => 'myFunction'
+      }
+    );
+
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/lambda/DeleteFunction>
 
 =head1 ATTRIBUTES
 
@@ -78,9 +87,9 @@ This class forms part of L<Paws>, documenting arguments for method DeleteFunctio
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

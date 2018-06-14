@@ -35,7 +35,7 @@ on 'test' => sub {
 on 'configure' => sub {
   requires "Dist::CheckConflicts" => "0.02";
   requires "ExtUtils::MakeMaker" => "0";
-  requires "File::ShareDir::Install" => "0.06";
+  requires "File::ShareDir::Install" => "0.03";
 };
 
 on 'develop' => sub {

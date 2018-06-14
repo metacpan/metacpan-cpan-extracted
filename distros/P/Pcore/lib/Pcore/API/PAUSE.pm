@@ -77,12 +77,18 @@ sub clean ( $self, @args ) {
             else {
                 my $releases;
 
-                while ( $res->{body}->$* =~ /input type="checkbox" name="pause99_delete_files_FILE" value="([[:alnum:]-]+)?-v([[:alnum:].]+)?[.]tar[.]gz"(.+?)<\/span>/smg ) {
-                    $releases->{$1}->{$2} = undef if $3 !~ m[Scheduled for deletion]smi;
+                for my $node ( $res->tree->findnodes(q[//tbody[@class="list"]/tr]) ) {
+                    my ( $name, $ver ) = $node->findvalue(q[./td[@class="file"]]) =~ /\A(.+)-v([[:alnum:].]+)[.]tar[.]gz\z/sm;
+
+                    next if !$name;
+
+                    next if $node->findvalue(q[./td[@class="modified"]]) =~ /Scheduled for deletion/sm;
+
+                    $releases->{$name}->{$ver} = undef;
                 }
 
                 my $params = [
-                    HIDDENNAME                         => encode_utf8( $self->username ),
+                    HIDDENNAME                         => uc encode_utf8( $self->username ),
                     SUBMIT_pause99_delete_files_delete => 'Delete',
                 ];
 
@@ -110,7 +116,7 @@ sub clean ( $self, @args ) {
                 }
                 else {
                     P->http->post(
-                        'https://pause.perl.org/pause/authenquery',
+                        'https://pause.perl.org/pause/authenquery?ACTION=delete_files',
                         headers => {
                             AUTHORIZATION => $self->_auth_header,
                             CONTENT_TYPE  => 'application/x-www-form-urlencoded',
@@ -155,9 +161,9 @@ sub _pack_multipart ( $self, $body, $boundary, $name, $content, $filename = unde
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 80                   | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |
+## |    3 | 141                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 135                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    1 | 80, 81, 85           | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

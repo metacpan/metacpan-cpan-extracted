@@ -4,7 +4,7 @@
       "Jose Luis Martinez <jlmartinez@capside.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -22,6 +22,7 @@
       "develop" : {
          "requires" : {
             "Carp::Always" : "0",
+            "Data::Munge" : "0",
             "Data::Printer" : "0",
             "Devel::Cover" : "0",
             "Devel::CoverReport" : "0",
@@ -40,7 +41,11 @@
             "Furl" : "0",
             "Future::Mojo" : "0.003",
             "LWP::UserAgent" : "0",
+            "Mojo::Promise::Role::Futurify" : "0",
             "Mojolicious" : "0",
+            "Perl::Tidy" : "0",
+            "Pod::Checker" : "0",
+            "Pod::Escapes" : "0",
             "Pod::HTML2Pod" : "0",
             "Template" : "0",
             "Test::Pod" : "0"
@@ -76,7 +81,7 @@
             "URI::Template" : "0",
             "URL::Encode" : "0",
             "URL::Encode::XS" : "0",
-            "XML::Simple" : "0",
+            "XML::Simple" : "2.21",
             "perl" : "5.010001"
          },
          "suggests" : {
@@ -87,6 +92,7 @@
          "requires" : {
             "Class::Unload" : "0",
             "File::Slurper" : "0",
+            "Path::Class" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
             "Test::Timer" : "0",
@@ -106,7 +112,7 @@
          "web" : "https://github.com/pplu/aws-sdk-perl"
       }
    },
-   "version" : "0.36",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "version" : "0.37",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0222"
 }
 

@@ -16,21 +16,44 @@ package Paws::CodeDeploy::RegisterApplicationRevision;
 
 =head1 NAME
 
-Paws::CodeDeploy::RegisterApplicationRevision - Arguments for method RegisterApplicationRevision on Paws::CodeDeploy
+Paws::CodeDeploy::RegisterApplicationRevision - Arguments for method RegisterApplicationRevision on L<Paws::CodeDeploy>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method RegisterApplicationRevision on the 
-AWS CodeDeploy service. Use the attributes of this class
+This class represents the parameters used for calling the method RegisterApplicationRevision on the
+L<AWS CodeDeploy|Paws::CodeDeploy> service. Use the attributes of this class
 as arguments to method RegisterApplicationRevision.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to RegisterApplicationRevision.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->RegisterApplicationRevision(Att1 => $value1, Att2 => $value2, ...);
+    my $codedeploy = Paws->service('CodeDeploy');
+    $codedeploy->RegisterApplicationRevision(
+      ApplicationName => 'MyApplicationName',
+      Revision        => {
+        s3Location => {
+          eTag    => 'MyETag',         # OPTIONAL
+          version => 'MyVersionId',    # OPTIONAL
+          bundleType => 'tar',     # values: tar, tgz, zip, YAML, JSON; OPTIONAL
+          key        => 'MyS3Key', # OPTIONAL
+          bucket => 'MyS3Bucket',  # OPTIONAL
+        },    # OPTIONAL
+        gitHubLocation => {
+          commitId   => 'MyCommitId',      # OPTIONAL
+          repository => 'MyRepository',    # OPTIONAL
+        },    # OPTIONAL
+        revisionType => 'S3',    # values: S3, GitHub, String; OPTIONAL
+        string       => {
+          sha256  => 'MyRawStringSha256',     # OPTIONAL
+          content => 'MyRawStringContent',    # OPTIONAL
+        },    # OPTIONAL
+      },
+      Description => 'MyDescription',    # OPTIONAL
+    );
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/codedeploy/RegisterApplicationRevision>
 
 =head1 ATTRIBUTES
 
@@ -62,9 +85,9 @@ This class forms part of L<Paws>, documenting arguments for method RegisterAppli
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

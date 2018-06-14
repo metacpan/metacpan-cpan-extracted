@@ -35,35 +35,35 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Greengrass:
 
 =head1 DESCRIPTION
 
-Information on the Logger
+Information about a logger
 
 =head1 ATTRIBUTES
 
 
 =head2 Component => Str
 
-  The component that will be subject to logs
+  The component that will be subject to logging.
 
 
 =head2 Id => Str
 
-  Element Id for this entry in the list.
+  The id of the logger.
 
 
 =head2 Level => Str
 
-  The level of the logs
+  The level of the logs.
 
 
 =head2 Space => Int
 
-  Amount of hardware space, in KB, to use if file system is used for
-logging purposes.
+  The amount of file space, in KB, to use if the local file system is
+used for logging purposes.
 
 
 =head2 Type => Str
 
-  The type which will be use for log output
+  The type of log output which will be used.
 
 
 
@@ -73,9 +73,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Greengras
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

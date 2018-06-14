@@ -325,7 +325,7 @@
             emergencySaveFlag           => TRUE,
             #
             # Auto-save. Flag set to TRUE if auto-save is turned on, FALSE if not
-            autoSaveFlag                => FALSE,       # [config]
+            autoSaveFlag                => TRUE,       # [config]
             # When auto-save is turned on, the number of minutes between saves. (Each GA::Session
             #   has an ->autoSaveCheckTime IV, the time at which to do the next auto-save). Min
             #   value 1 minute; values must be integers
@@ -4782,12 +4782,18 @@
             # (Thus, a single installation of Axmud can be used by two users, one with a visual
             #   impairment and one without)
             systemAllowTTSFlag          => FALSE,                   # [config]
-            # Constant list of TTS engines that Axmud currently supports - eSpeak, Flite, Festival,
-            #   Swift (using Cepstral) and a dummy engine, 'none', which produces no speech when
-            #   specified
+            # Constant list of TTS engines that Axmud currently supports - eSpeak, espeak-ng, Flite,
+            #   Festival, Swift (using Cepstral) and a dummy engine, 'none', which produces no
+            #   speech when specified
             constTTSList                => [
-                'espeak', 'flite', 'festival', 'swift', 'none',
+                'espeak', 'esng', 'flite', 'festival', 'swift', 'none',
             ],
+            # Constant list of TTS engines that Axmud supports on this operating system
+            constTTSCompatList          => [],                      # Set below
+            # On MS Windows, the path to the eSpeak engine (if installed) depends on the age of the
+            #   system. This IV is set by $self->start to the correct path for the user's system, or
+            #   left as 'undef' if eSpeak is not installed on it
+            eSpeakPath                  => undef,
             # Allow TTS smoothing, which inserts an artificial full stop at the end of lines which
             #   don't end with one, if the next line begins with a capital letter (makes the voice
             #   sound more natural)
@@ -4799,6 +4805,12 @@
             constTtsDefaultList         => [
                 'espeak',
                     'english_rp',       # Male voice
+                    150,
+                    undef,
+                    50,
+                    undef,
+                'esng',
+                    'en',               # Male voice
                     150,
                     undef,
                     50,
@@ -4818,9 +4830,9 @@
                 'swift',
                     'David',
                     undef,
-                    1,
-                    1,
-                    1,
+                    undef,
+                    undef,
+                    undef,
                 'none',                 # Doesn't actually read anything
                     undef,
                     undef,
@@ -4834,6 +4846,7 @@
             constTtsObjHash             => {
                 # Default TTS settings
                 'espeak'                => 'espeak',    # Default for each TTS engine
+                'esng'                  => 'esng',
                 'flite'                 => 'flite',
                 'festival'              => 'festival',
                 'swift'                 => 'swift',
@@ -4858,6 +4871,7 @@
             # Constant hash of TTS configuration objects which cannot be removed
             constTtsPermObjHash         => {
                 'espeak'                => undef,
+                'esng'                  => undef,
                 'flite'                 => undef,
                 'festival'              => undef,
                 'swift'                 => undef,
@@ -4870,6 +4884,7 @@
             #   used as default values for other configuration object IVs
             constTtsFixedObjHash        => {
                 'espeak'                => undef,
+                'esng'                  => undef,
                 'flite'                 => undef,
                 'festival'              => undef,
                 'swift'                 => undef,
@@ -4983,16 +4998,16 @@
             # NB Each GA::Session contains a customisable hash, as for $self->constTtsAttribHash
             constTtsAlertAttribHash     => {
                 # Status task
-                'healthup'      => 'status_task',       # HP recovers to minimum level
-                'healthdown'    => 'status_task',       # ...falls to maximum level
-                'magicup'       => 'status_task',       # Magic points recover to minimum level
-                'magicdown'     => 'status_task',       # ...falls to maximum level
-                'energyup'      => 'status_task',       # Energy points recover to minimum level
-                'energydown'    => 'status_task',       # ...falls to maximum level
-                'guildup'       => 'status_task',       # Guild points recover to minimum level
-                'guilddown'     => 'status_task',       # ...falls to maximum level
-                'socialup'      => 'status_task',       # Social points recover to minimum level
-                'socialdown'    => 'status_task',       # ...falls to maximum level
+                'healthup'              => 'status_task',       # HP recovers to minimum level
+                'healthdown'            => 'status_task',       # ...falls to maximum level
+                'magicup'               => 'status_task',       # Magic points recover to min level
+                'magicdown'             => 'status_task',       # ...falls to maximum level
+                'energyup'              => 'status_task',       # Energy points recover to min level
+                'energydown'            => 'status_task',       # ...falls to maximum level
+                'guildup'               => 'status_task',       # Guild points recover to min level
+                'guilddown'             => 'status_task',       # ...falls to maximum level
+                'socialup'              => 'status_task',       # Social points recover to min level
+                'socialdown'            => 'status_task',       # ...falls to maximum level
                 # ...
             },
             # Hash of TTS alert attributes, initially set identical to ->constTtsAlertAttribHash,
@@ -5320,6 +5335,12 @@
         }
 
         $self->{customSoundHash}        = {%soundHash};
+
+        if ($^O eq 'MSWin32') {
+            $self->{constTTSCompatList} = ['espeak', 'esng', 'swift', 'none'];
+        } else {
+            $self->{constTTSCompatList} = [$self->constTTSList];
+        }
 
         $self->{ttsAttribHash}          = {$self->constTtsAttribHash};
         $self->{ttsFlagAttribHash}      = {$self->constTtsFlagAttribHash};
@@ -5702,10 +5723,25 @@
         $self->ivPoke('startDateString', $self->localDateString());
 
         # In Axmud blind mode, TTS is always enabled
-        # (NB Not implemented on MSWin yet)
-        if ($axmud::BLIND_MODE_FLAG && $^O ne 'MSWin32') {
+        if ($axmud::BLIND_MODE_FLAG) {
 
             $self->ivPoke('systemAllowTTSFlag', TRUE);
+        }
+
+        # On MS Windows, see if an eSpeak engine is installed, and set the IV
+        if ($^O eq 'MSWin32') {
+
+            if (-e "C:\\Program Files\\espeak\\command_line\\espeak.exe") {
+
+                $self->ivPoke('eSpeakPath', "C:\\Program Files\\espeak\\command_line\\espeak");
+
+            } elsif (-e "C:\\Program Files (x86)\\espeak\\command_line\\espeak.exe") {
+
+                $self->ivPoke(
+                    'eSpeakPath',
+                    "C:\\Program Files (x86)\\espeak\\command_line\\espeak",
+                );
+            }
         }
 
         # Load the expanded mudlist, and store the data in GA::Obj::BasicWorld objects. The data
@@ -6037,8 +6073,9 @@
                     );
                 }
             }
+        }
 
-        } elsif ($self->showSetupWizWinFlag) {
+        if ($self->showSetupWizWinFlag) {
 
             # When Axmud runs for the first time (specifically, when there is no Axmud config file)
             #   this flag will be set to TRUE, instructing us to open the Setup 'wiz' window so the
@@ -6050,7 +6087,10 @@
                 $self->addGlobalInitTask('status_task');
                 $self->addGlobalInitTask('locator_task');
 
-            } elsif ($axmud::BLIND_MODE) {
+                # Don't show the setup window twice
+                $self->set_showSetupWizWinFlag(FALSE);
+
+            } elsif ($axmud::BLIND_MODE_FLAG) {
 
                 # In Axmud blind mode, don't show the Setup window at all; instead, insert a few
                 #   tasks into the global initial tasklist, and modify a few of their settings
@@ -6084,16 +6124,22 @@
                     $taskObj->ivUndef('warningAlertSound');
                 }
 
+                # Don't show the setup window twice
+                $self->set_showSetupWizWinFlag(FALSE);
+
             } else {
 
                 # Open the setup window. When it closes, it will open the Connections window for us
                 $self->mainWin->quickFreeWin('Games::Axmud::WizWin::Setup');
+
+                # Don't show the setup window twice
+                $self->set_showSetupWizWinFlag(FALSE);
+
+                return 1;
             }
+        }
 
-            # Don't show the setup window twice
-            $self->set_showSetupWizWinFlag(FALSE);
-
-        } elsif ($axmud::BLIND_MODE_FLAG) {
+        if ($axmud::BLIND_MODE_FLAG) {
 
             # In Axmud blind mode, open a series of standard 'dialogue' windows, allowing the
             #   visually-impaired user to select/create a world and/or character
@@ -8110,8 +8156,9 @@
 
         # Local variables
         my (
-            $newWorldString, $newCharString, $choice, $connectWorld, $connectWorldObj, $connectHost,
-            $connectPort, $loginMode, $connectChar, $connectPwd, $connectAccount, $startFlag,
+            $newWorldString, $newCharString, $title, $choice, $connectWorld, $connectWorldObj,
+            $connectHost, $connectPort, $loginMode, $connectChar, $connectPwd, $connectAccount,
+            $startFlag,
             @faveList, @visitedList, @otherList, @comboList, @comboList2, @comboList3,
             %worldHash, %nameHash, %checkHash, %loginHash,
         );
@@ -8218,9 +8265,15 @@
             push (@comboList, $nameHash{$worldObj->name});
         }
 
-        # Open the 'dialogue' window
+        # Open the 'dialogue' window. Don't use the welcome message more than once
+        if (! $self->sessionCount) {
+            $title = 'Welcome to ' . $axmud::SCRIPT;
+        } else {
+            $title = 'Connect to a world';
+        }
+
         $choice = $self->mainWin->showComboDialogue(
-            "Welcome to " . $axmud::SCRIPT,
+            $title,
             "Please use your cursor keys to select a world,\n"
             . "and your tab and enter keys to click OK",
             TRUE,                       # Show only a single OK button
@@ -9120,6 +9173,23 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->startSession', @_);
         }
 
+        # In blind mode, only one session is allowed. To allow the user to use ';reconnect', and
+        #   so on, terminate the existing session which is not connected to a world before
+        #   creating a new one
+        if ($axmud::BLIND_MODE_FLAG) {
+
+            foreach my $session ($self->listSessions()) {
+
+                if (
+                    $session->status eq 'waiting'
+                    || $session->status eq 'offline'
+                    || $session->status eq 'disconnected'
+                ) {
+                    $self->stopSession($session);
+                }
+            }
+        }
+
         # Count the number of active sessions
         $actualCount = $self->ivPairs('sessionHash');
 
@@ -9218,6 +9288,9 @@
     sub stopSession {
 
         # Called by GA::Cmd::StopSession->do, $self->disablePlugin and GA::Session->del_winObj
+        # Also called by $self->startSession in blind mode, to remove the existing disconnected
+        #   session
+        #
         # Stops a GA::Session
         #
         # Expected arguments
@@ -12243,8 +12316,8 @@
 
         # Local variables
         my (
-            $cmd, $begin, $end, $rateFlag, $pitchFlag, $volumeFlag, $ttsObj, $server,
-            @lineList, @modList, @finalList,
+            $cmd, $begin, $end, $rateFlag, $pitchFlag, $volumeFlag, $ttsObj, $param,
+            @lineList, @modList, @finalList, @msWinList,
         );
 
         # Check for improper arguments
@@ -12401,191 +12474,325 @@
 
         # Prepare the system command to use. If $engine is set to the dummy engine 'none', then we
         #   don't prepare a system command at all
-        if ($engine eq 'espeak') {
 
-            # With eSpeak, we can set the voice, speed and pitch, but not rate or volume
+        # Prepare a system command on MS Windows
+        if ($^O eq 'MSWin32') {
 
-            $cmd = 'espeak "' . $text . '"';
+            if ($engine eq 'espeak') {
 
-            if (defined $voice) {
+                # With eSpeak, we can set the voice, speed and pitch, but not rate or volume
+                if (! $self->eSpeakPath) {
 
-                $cmd .= ' -v ' . $voice;
-            }
-
-            if ($self->floatCheck($speed, 10, 200)) {
-
-                $cmd .= ' -s ' . $speed;
-            }
-
-            if ($self->floatCheck($pitch, 0, 99)) {
-
-                $cmd .= ' -p ' . $pitch;
-            }
-
-        } elsif ($engine eq 'flite') {
-
-            # With Flite, we can set the voice, but not speed, rate, pitch or volume
-            $cmd = 'flite -t "' . $text . '"';
-
-            if (defined $voice) {
-
-                $cmd .= ' -voice ' . $voice;
-            }
-
-        } elsif ($engine eq 'festival') {
-
-            # When the specified engine is Festival, we try using the Festival server if possible;
-            #   otherwise, we default to using the Festival engine from the command line
-            # With Festival server, we can set the voice, rate, pitch and volume, but not speed
-            # With Festival command line, we can't set the voice, speed, rate pitch of volume
-
-            # Start the Festival server (if required)
-            if ($self->ttsFestivalServerMode eq 'waiting' && $self->ttsStartServerFlag) {
-
-                # Attempt to start the Festival server
-                $self->ttsStartServer();
-
-                # We're now waiting for the first successful connection
-                $self->set_ttsFestivalServerMode('connecting');
-            }
-
-            # Connect to the Festival server (if required)
-            if ($self->ttsFestivalServerMode eq 'connecting') {
-
-                if (! $self->ttsFestivalServerPort) {
-
-                    # Cannot connect to the server without a port
-                    $self->set_ttsFestivalServerMode('connected');
+                    # No eSpeak engine found in the system
+                    return undef;
 
                 } else {
 
-                    # Attempt to connect to the Festival server
-                    $server = IO::Socket::INET->new(
-                        Proto     => 'tcp',
-                        PeerAddr  => '127.0.0.1',
-                        PeerPort  => $self->ttsFestivalServerPort,
-                    );
-
-                    if ($server) {
-
-                        # Connected; store it as an IV
-                        $self->set_ttsFestivalServer($server);
-                        $self->set_ttsFestivalServerMode('connected');
-
-                    } elsif (! $self->ttsStartServerFlag) {
-
-                        # We didn't start the server. If the connection failed, give up after the
-                        #   first attempt (if we did start the server, keep trying)
-                        $self->set_ttsFestivalServerMode('connected');
-                    }
+                    push (@msWinList,
+                        $self->eSpeakPath,
+                        $text,
+                       );
                 }
-            }
 
-            # Prepare the system command, depending on whether we're using the Festival server, or
-            #   not
-            if ($self->ttsFestivalServer) {
+                if (defined $voice) {
 
-                # Use Festival server
-                $cmd = "(let ((utt (Utterance Text \"$text\")))";
+                    push (@msWinList, '-v', $voice);
+                }
+
+                if ($self->floatCheck($speed, 10, 200)) {
+
+                    push (@msWinList, '-s', $speed);
+                }
+
+                if ($self->floatCheck($pitch, 0, 99)) {
+
+                    push (@msWinList, '-p', $pitch);
+                }
+
+            } elsif ($engine eq 'esng') {
+
+                # With espeak-ng, we can set the voice, speed, pitch and volume, but not rate
+                push (@msWinList,
+                    "C:\\Program Files\\eSpeak NG\\espeak-ng",
+                    $text,
+                );
+
+                if (defined $voice) {
+
+                    push (@msWinList, '-v', $voice);
+                }
+
+                if ($self->floatCheck($speed, 10, 200)) {
+
+                    push (@msWinList, '-s', $speed);
+                }
+
+                if ($self->floatCheck($pitch, 0, 99)) {
+
+                    push (@msWinList, '-p', $pitch);
+                }
+
+                if ($self->floatCheck($volume, 0, 200)) {
+
+                    push (@msWinList, '-a', $volume);
+                }
+
+            } elsif ($engine eq 'flite' || $engine eq 'festival') {
+
+                # Flite not available on MS Windows
+                # Festival has been ported to MS Windows, but with little or no documentation
+                return undef;
+
+            } elsif ($engine eq 'swift') {
+
+                # With Swift on MS Windows (using Cepstral), we can set the voice, speed, pitch and
+                #   volume, but not rate
+                push (@msWinList, "C:\\Program Files\\Cepstral\\bin\\swift");
+
                 if ($voice) {
 
-                    $cmd .= " (begin ($voice)";
+                    push (@msWinList, '-n', $voice);
+                }
 
-                    if ($self->floatCheck($rate, 0.5, 2)) {
+                if ($self->floatCheck($speed, 100, 400)) {
 
-                        $cmd .= " (Parameter.set 'Duration_Stretch $rate)";
+                    $param = 'speech/rate=' . $speed
+                }
+
+                if ($self->floatCheck($pitch, 0.1, 5)) {
+
+                    if (! $param) {
+                        $param = 'speech/pitch/shift=' . $pitch;
+                    } else {
+                        $param .= ',speech/pitch/shift=' . $pitch;
+                    }
+                }
+
+                if ($self->floatCheck($volume, 0, 100)) {
+
+                    if (! $param) {
+                        $param = 'audio/volume=' . $volume;
+                    } else {
+                        $param .= ',audio/volume=' . $volume;
+                    }
+                }
+
+                if ($param) {
+
+                    push (@msWinList, '-p', $param);
+                }
+
+                push (@msWinList, $text);
+            }
+
+            # Convert the text to speech
+            if ($engine eq 'festival' && $self->ttsFestivalServer) {
+
+                # (If using Festival server, we contact it directly; otherwise use the standard
+                #   Perl system command)
+                $self->ttsFestivalServer->print($cmd);
+
+            } elsif ($configuration ne 'none') {
+
+                system (@msWinList);
+            }
+
+            # Inform the calling session (if any) which type of message was most recently converted
+            #   to speech
+            if ($session) {
+
+                $session->set_ttsLastType($type);
+            }
+
+        # Prepare a system command on Linux
+        } else {
+
+            if ($engine eq 'espeak') {
+
+                # With eSpeak, we can set the voice, speed and pitch, but not rate or volume
+                $cmd = 'espeak "' . $text . '"';
+
+                if (defined $voice) {
+
+                    $cmd .= ' -v ' . $voice;
+                }
+
+                if ($self->floatCheck($speed, 10, 200)) {
+
+                    $cmd .= ' -s ' . $speed;
+                }
+
+                if ($self->floatCheck($pitch, 0, 99)) {
+
+                    $cmd .= ' -p ' . $pitch;
+                }
+
+            } elsif ($engine eq 'esng') {
+
+                # With espeak-ng, we can set the voice, speed, pitch and volume, but not rate
+                $cmd = 'espeak-ng "' . $text . '"';
+
+                if (defined $voice) {
+
+                    $cmd .= ' -v ' . $voice;
+                }
+
+                if ($self->floatCheck($speed, 10, 200)) {
+
+                    $cmd .= ' -s ' . $speed;
+                }
+
+                if ($self->floatCheck($pitch, 0, 99)) {
+
+                    $cmd .= ' -p ' . $pitch;
+                }
+
+                if ($self->floatCheck($volume, 0, 200)) {
+
+                    $cmd .= ' -a ' . $volume;
+                }
+
+            } elsif ($engine eq 'flite') {
+
+                # With Flite, we can set the voice, but not speed, rate, pitch or volume
+                $cmd = 'flite -t "' . $text . '"';
+
+                if (defined $voice) {
+
+                    $cmd .= ' -voice ' . $voice;
+                }
+
+            } elsif ($engine eq 'festival') {
+
+                # When the specified engine is Festival, we try using the Festival server if
+                #   possible; otherwise, we default to using the Festival engine from the command
+                #   line
+                # With Festival server, we can set the voice, rate, pitch and volume, but not speed
+                # With Festival command line, we can't set the voice, speed, rate pitch of volume
+
+                # Start the Festival server (if required)
+                if ($self->ttsFestivalServerMode eq 'waiting' && $self->ttsStartServerFlag) {
+
+                    # Attempt to start the Festival server
+                    $self->ttsStartServer();
+
+                    # We're now waiting for the first successful connection
+                    $self->set_ttsFestivalServerMode('connecting');
+                }
+
+                # Connect to the Festival server (if required)
+                if ($self->ttsFestivalServerMode eq 'connecting') {
+
+                    $self->ttsConnectServer();
+                }
+
+                # Prepare the system command, depending on whether we're using the Festival server,
+                #   or not
+                if ($self->ttsFestivalServer) {
+
+                    # Use Festival server
+                    $cmd = "(let ((utt (Utterance Text \"$text\")))";
+                    if ($voice) {
+
+                        $cmd .= " (begin ($voice)";
+
+                        if ($self->floatCheck($rate, 0.5, 2)) {
+
+                            $cmd .= " (Parameter.set 'Duration_Stretch $rate)";
+                        }
+
+                        if ($self->floatCheck($volume, 0.33, 6)) {
+
+                            $cmd .= " (utt.synth utt) (utt.wave.resample utt 8000)"
+                                        . " (utt.wave.rescale utt $volume) (utt.play utt)";
+                        }
+
+                        $cmd .= ")";
                     }
 
-                    if ($self->floatCheck($volume, 0.33, 6)) {
+                    $cmd .= ")\n";
 
-                        $cmd .= " (utt.synth utt) (utt.wave.resample utt 8000)"
-                                    . " (utt.wave.rescale utt $volume) (utt.play utt)";
+                } else {
+
+                    # Don't use Festival server
+                    $cmd = 'echo ' . $text . ' | festival --tts';
+                }
+
+            } elsif ($engine eq 'swift') {
+
+                # With Swift on Linux (using Cepstral), we can set the voice, rate, pitch and
+                #   volume, but not speed
+                $begin = '';
+                $end = '';
+                if ($voice) {
+
+                    $begin .= "swift <voice name=\"$voice\">";
+                    $end = "</voice>" . $end;
+                }
+
+                # (rate, pitch and volume all share an element; only create the element if at least
+                #   one valid value is being used)
+                if ($self->floatCheck($rate, 0.5, 2)) {
+
+                    $rateFlag = TRUE;
+                }
+
+                if ($self->floatCheck($pitch, 0.1, 5)) {
+
+                    $pitchFlag = TRUE;
+                }
+
+                if ($self->floatCheck($volume, 0.33, 6)) {
+
+                    $volumeFlag = TRUE;
+                }
+
+                if ($rateFlag || $pitchFlag || $volumeFlag) {
+
+                    $begin .= "<prosody";
+                    if ($rateFlag) {
+
+                        $begin .= " rate='$rate'";
                     }
 
-                    $cmd .= ")";
+                    if ($pitchFlag) {
+
+                        $begin .= " pitch='$pitch'";
+                    }
+
+                    if ($volumeFlag) {
+
+                        $begin .= " volume='$volume'";
+                    }
+
+                    $begin .= ">";
+                    $end = "</prosody>" . $end;
                 }
 
-                $cmd .= ")\n";
-
-            } else {
-
-                # Don't use Festival server
-                $cmd = 'echo ' . $text . ' | festival --tts';
+                $cmd = $begin . $text . $end;
             }
 
-        } elsif ($engine eq 'swift') {
+            # Convert the text to speech
+            if ($engine eq 'festival' && $self->ttsFestivalServer) {
 
-            # With Swift (using Cepstral), we can set the voice, rate, pitch and volume, but not
-            #   speed
-            $begin = '';
-            $end = '';
-            if ($voice) {
+                # (If using Festival server, we contact it directly; otherwise use the standard
+                #   Perl system command)
+                $self->ttsFestivalServer->print($cmd);
 
-                $begin .= "swift <voice name=\"$voice\">";
-                $end = "</voice>" . $end;
+            } elsif ($configuration ne 'none') {
+
+                system $cmd;
             }
 
-            # (rate, pitch and volume all share an element; only create the element if at least
-            #   one valid value is being used)
-            if ($self->floatCheck($rate, 0.5, 2)) {
+            # Inform the calling session (if any) which type of message was most recently converted
+            #   to speech
+            if ($session) {
 
-                $rateFlag = TRUE;
+                $session->set_ttsLastType($type);
             }
-
-            if ($self->floatCheck($pitch, 0.1, 5)) {
-
-                $pitchFlag = TRUE;
-            }
-
-            if ($self->floatCheck($volume, 0.33, 6)) {
-
-                $volumeFlag = TRUE;
-            }
-
-            if ($rateFlag || $pitchFlag || $volumeFlag) {
-
-                $begin .= "<prosody";
-                if ($rateFlag) {
-
-                    $begin .= " rate='$rate'";
-                }
-
-                if ($pitchFlag) {
-
-                    $begin .= " pitch='$pitch'";
-                }
-
-                if ($volumeFlag) {
-
-                    $begin .= " volume='$volume'";
-                }
-
-                $begin .= ">";
-                $end = "</prosody>" . $end;
-            }
-
-            $cmd = $begin . $text . $end;
         }
 
-        # Convert the text to speech
-        if ($engine eq 'festival' && $self->ttsFestivalServer) {
-
-            # (If using Festival server, we contact it directly; otherwise use the standard
-            #   Perl system command)
-            $self->ttsFestivalServer->print($cmd);
-
-        } elsif ($configuration ne 'none') {
-
-            system $cmd;
-        }
-
-        # Inform the calling session (if any) which type of message was most recently converted to
-        #   speech
-        if ($session) {
-
-            $session->set_ttsLastType($type);
-        }
-
+        # Operation complete
         return 1;
     }
 
@@ -12610,6 +12817,61 @@
         }
 
         system "festival --server &";
+
+        return 1;
+    }
+
+    sub ttsConnectServer {
+
+        # Called by $self->tts
+        # When $self->ttsFestivalServerMode is 'connecting', actually connects to the Festival
+        #   server, changing the mode to 'connected' if successful
+        #
+        # Expected arguments
+        #   (none besides self)
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $check) = @_;
+
+        # Local variables
+        my $server;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->ttsConnectServer', @_);
+        }
+
+        if (! $self->ttsFestivalServerPort) {
+
+            # Cannot connect to the server without a port
+            $self->set_ttsFestivalServerMode('connected');
+
+        } else {
+
+            # Attempt to connect to the Festival server
+            $server = IO::Socket::INET->new(
+                Proto     => 'tcp',
+                PeerAddr  => '127.0.0.1',
+                PeerPort  => $self->ttsFestivalServerPort,
+            );
+
+            if ($server) {
+
+                # Connected; store it as an IV
+                $self->set_ttsFestivalServer($server);
+                $self->set_ttsFestivalServerMode('connected');
+
+            } elsif (! $self->ttsStartServerFlag) {
+
+                # We didn't start the server. If the connection failed, give up after
+                #   the first attempt (if we did start the server, keep trying)
+                $self->set_ttsFestivalServerMode('connected');
+            }
+        }
 
         return 1;
     }
@@ -19041,6 +19303,10 @@
         { $_[0]->{systemAllowTTSFlag} }
     sub constTTSList
         { my $self = shift; return @{$self->{constTTSList}}; }
+    sub constTTSCompatList
+        { my $self = shift; return @{$self->{constTTSCompatList}}; }
+    sub eSpeakPath
+        { $_[0]->{eSpeakPath} }
     sub ttsSmoothFlag
         { $_[0]->{ttsSmoothFlag} }
 

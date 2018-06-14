@@ -65,15 +65,15 @@ my %methods = (
 
 sub check_list
 {
-    my ( $o, $keys ) = @_;
-    ( my $func = ref($o) ) =~ s/Unix::Statgrab::sg_(\w+).*$/$1/g;
+    my ($o, $keys) = @_;
+    (my $func = ref($o)) =~ s/Unix::Statgrab::sg_(\w+).*$/$1/g;
     my @stats = $o->as_list();
-    cmp_ok( scalar @stats, "==", $o->entries );
-    for my $idx ( 0 .. $#stats )
+    cmp_ok(scalar @stats, "==", $o->entries);
+    for my $idx (0 .. $#stats)
     {
         foreach my $key (@$keys)
         {
-            ok( exists( $stats[$idx]{$key} ), "${func}[$idx]{$key}" );
+            ok(exists($stats[$idx]{$key}), "${func}[$idx]{$key}");
         }
     }
 
@@ -81,29 +81,29 @@ sub check_list
 }
 
 SKIP:
-foreach my $func ( sort keys %funcs )
+foreach my $func (sort keys %funcs)
 {
     my $sub = Unix::Statgrab->can($func);
-    ok( $sub, "Unix::Statgrab->can('$func')" ) or skip("Can't invoke unknow stats-call $func");
+    ok($sub, "Unix::Statgrab->can('$func')") or skip("Can't invoke unknow stats-call $func");
     my $o = eval { $sub->(); };
     $@ and skip "$func: " . $@, 1;
     $o or do { my $e = get_error(); skip "$func: " . $e->strperror(), 1 } while (0);
-    check_list( $o, $funcs{$func} );
-    if ( defined( $methods{$func} ) )
+    check_list($o, $funcs{$func});
+    if (defined($methods{$func}))
     {
       SKIP:
-        foreach my $inh_func ( sort keys %{ $methods{$func} } )
+        foreach my $inh_func (sort keys %{$methods{$func}})
         {
             my $inh_sub = $o->can($inh_func);
-            ok( $inh_sub, "Unix::Statgrab->can('$inh_func')" ) or next;
+            ok($inh_sub, "Unix::Statgrab->can('$inh_func')") or next;
             my $inh_s =
               $methods{$func}{$inh_func} == $funcs{$func}
-              ? sub { my $n = $sub->(); $inh_sub->( $n, $o ); }
+              ? sub { my $n = $sub->(); $inh_sub->($n, $o); }
               : sub { $inh_sub->($o); };
             my $inh_o = eval { $inh_s->(); };
             $@ or skip "$inh_func: $@", 1;
-            ok( $inh_o, "Unix::Statgrab::$func" ) or next;
-            check_list( $inh_o, $methods{$func}{$inh_func} );
+            ok($inh_o, "Unix::Statgrab::$func") or next;
+            check_list($inh_o, $methods{$func}{$inh_func});
         }
     }
 }

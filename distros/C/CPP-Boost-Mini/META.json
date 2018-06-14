@@ -1,0 +1,52 @@
+{
+   "abstract" : "C++ Boost library (no perl interface).",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CPP-Boost-Mini",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.76",
+            "ExtUtils::ParseXS" : "3.24"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.76",
+            "Panda::Install" : "v1.2.16"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Panda::Install" : "v1.2.16",
+            "perl" : "5.010000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "Test::Simple" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.67.0.2",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

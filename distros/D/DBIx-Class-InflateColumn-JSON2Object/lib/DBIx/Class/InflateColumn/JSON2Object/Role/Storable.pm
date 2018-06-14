@@ -49,7 +49,13 @@ sub pack {
             if $attribute->does(
             'DBIx::Class::InflateColumn::Trait::NoSerialize');
         my $val = $attribute->get_value($self);
-        $payload->{ $attribute->name } = $val if defined $val;
+        next unless defined $val;
+
+        my $type = $attribute->type_constraint;
+        if ($type eq 'Int' || $type eq 'Num') {
+            $val = 1 * $val;
+        }
+        $payload->{ $attribute->name } = $val;
     }
     return $payload;
 }
@@ -85,7 +91,7 @@ DBIx::Class::InflateColumn::JSON2Object::Role::Storable - simplified MooseX::Sto
 
 =head1 VERSION
 
-version 0.904
+version 0.905
 
 =head1 NAME
 

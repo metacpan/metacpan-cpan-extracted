@@ -16,21 +16,62 @@ package Paws::KinesisAnalytics::AddApplicationReferenceDataSource;
 
 =head1 NAME
 
-Paws::KinesisAnalytics::AddApplicationReferenceDataSource - Arguments for method AddApplicationReferenceDataSource on Paws::KinesisAnalytics
+Paws::KinesisAnalytics::AddApplicationReferenceDataSource - Arguments for method AddApplicationReferenceDataSource on L<Paws::KinesisAnalytics>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method AddApplicationReferenceDataSource on the 
-Amazon Kinesis Analytics service. Use the attributes of this class
+This class represents the parameters used for calling the method AddApplicationReferenceDataSource on the
+L<Amazon Kinesis Analytics|Paws::KinesisAnalytics> service. Use the attributes of this class
 as arguments to method AddApplicationReferenceDataSource.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to AddApplicationReferenceDataSource.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->AddApplicationReferenceDataSource(Att1 => $value1, Att2 => $value2, ...);
+    my $kinesisanalytics = Paws->service('KinesisAnalytics');
+    my $AddApplicationReferenceDataSourceResponse =
+      $kinesisanalytics->AddApplicationReferenceDataSource(
+      ApplicationName             => 'MyApplicationName',
+      CurrentApplicationVersionId => 1,
+      ReferenceDataSource         => {
+        ReferenceSchema => {
+          RecordFormat => {
+            RecordFormatType  => 'JSON',    # values: JSON, CSV
+            MappingParameters => {
+              CSVMappingParameters => {
+                RecordRowDelimiter    => 'MyRecordRowDelimiter',       # min: 1,
+                RecordColumnDelimiter => 'MyRecordColumnDelimiter',    # min: 1,
+
+              },    # OPTIONAL
+              JSONMappingParameters => {
+                RecordRowPath => 'MyRecordRowPath',    # min: 1,
+
+              },    # OPTIONAL
+            },    # OPTIONAL
+          },
+          RecordColumns => [
+            {
+              SqlType => 'MyRecordColumnSqlType',    # min: 1,
+              Name    => 'MyRecordColumnName',
+              Mapping => 'MyRecordColumnMapping',    # OPTIONAL
+            },
+            ...
+          ],                                         # min: 1, max: 1000
+          RecordEncoding => 'MyRecordEncoding',      # OPTIONAL
+        },
+        TableName             => 'MyInAppTableName',    # min: 1, max: 32
+        S3ReferenceDataSource => {
+          FileKey          => 'MyFileKey',              # min: 1, max: 1024
+          ReferenceRoleARN => 'MyRoleARN',              # min: 1, max: 2048
+          BucketARN        => 'MyBucketARN',            # min: 1, max: 2048
+
+        },    # OPTIONAL
+      },
+
+      );
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/kinesisanalytics/AddApplicationReferenceDataSource>
 
 =head1 ATTRIBUTES
 
@@ -69,9 +110,9 @@ This class forms part of L<Paws>, documenting arguments for method AddApplicatio
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

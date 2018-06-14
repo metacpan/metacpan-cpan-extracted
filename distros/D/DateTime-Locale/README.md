@@ -4,7 +4,7 @@ DateTime::Locale - Localization support for DateTime.pm
 
 # VERSION
 
-version 1.20
+version 1.22
 
 # SYNOPSIS
 
@@ -67,7 +67,7 @@ Eg. For the locale code `es-Latn-XX` the fallback search would be:
 If no suitable replacement is found, then an exception is thrown.
 
 The loaded locale is cached, so that **locale objects may be
-singletons**. Calling `DateTime::Locale->register()`, `DateTime::Locale->add_aliases()`, or `DateTime::Locale->remove_alias()`
+singletons**. Calling `DateTime::Locale->register_from_data`, `DateTime::Locale->add_aliases`, or `DateTime::Locale->remove_alias`
 clears the cache.
 
 ## DateTime::Locale->codes
@@ -94,6 +94,68 @@ reference if called in a scalar context.
 Returns an unsorted list of the available locale names in their native
 language, or an array reference if called in a scalar context. All native
 names use UTF-8 as appropriate.
+
+## DateTime::Locale->register\_from\_data( $locale\_data )
+
+This method allows you to register a custom locale. The data for the locale is
+specified as a hash (or hashref) where the keys match the method names given
+in `DateTime::Locale::FromData`.
+
+If you just want to make some small changes on top of an existing locale you
+can get that locale's data by calling `$locale->locale_data`.
+
+Here is an example of making a custom locale based off of `en-US`:
+
+    my $locale = DateTime::Locale->load('en-US');
+    my %data   = $locale->locale_data;
+    $data{code}               = 'en-US-CUSTOM';
+    $data{time_format_medium} = 'HH:mm:ss';
+
+    DateTime::Locale->register_from_data(%data);
+
+    # Prints 18:24:38
+    say DateTime->now( locale => 'en-US-CUSTOM' )->strftime('%X');
+
+    # Prints 6:24:38 PM
+    say DateTime->now( locale => 'en-US' )->strftime('%X');
+
+The keys that should be present in the hash are the same as the accessor
+methods provided by [DateTime::Locale::FromData](https://metacpan.org/pod/DateTime::Locale::FromData), except for the following:
+
+- The `*_code` methods
+
+    While you should provide a `code` key, the other methods like
+    `language_code` and `script_code` are determined by parsing the code.
+
+- All `id` returning methods
+
+    These are aliases for the corresponding `*code` methods.
+
+- `prefers_24_hour_time`
+
+    This is determined by looking at the short time format to see how it formats
+    hours,
+
+- `date_format_default` and `time_format_default`
+
+    These are the corresponding medium formats.
+
+- `datetime_format` and `datetime_format_default`
+
+    This is the same as the medium format.
+
+- `date_formats` and `time_formats`
+
+    These are calculated as needed.
+
+- `available_formats`
+
+    This should be provided as a hashref where the keys are things like `Gy` or
+    `MMMEd` and the values are an actual format like `"y G"` or `"E, MMM d"`.
+
+- `locale_data`
+
+    This is everything you pass in.
 
 # LOADING LOCALES IN A PRE-FORKING SYSTEM
 
@@ -167,6 +229,7 @@ Dave Rolsky <autarch@urth.org>
 
 - Karen Etheridge <ether@cpan.org>
 - Mohammad S Anwar <mohammad.anwar@yahoo.com>
+- Ryley Breiddal <rbreiddal@presinet.com>
 - Sergey Leschenko <Sergey.Leschenko@portaone.com>
 - yasu47b <nakayamayasuhiro1986@gmail.com>
 

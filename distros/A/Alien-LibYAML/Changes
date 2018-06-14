@@ -1,5 +1,14 @@
 Revision history for Alien-LibYAML
 
+2.04      2018-06-13 04:23:58 -0400
+  - Production release identical to 2.03_01
+
+2.03_01   2018-06-12 08:59:54 -0400
+  - Build dynamic libary for FFI for share installs
+
+2.02      2018-06-11 19:17:08 -0400
+  - Moved repository to the Perl5-Alien org
+
 2.01      2017-03-22 15:30:53-04:00 America/New_York
   - Specify minimum version of Path::Tiny
 

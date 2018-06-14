@@ -25,21 +25,36 @@ package Paws::OpsWorks::UpdateInstance;
 
 =head1 NAME
 
-Paws::OpsWorks::UpdateInstance - Arguments for method UpdateInstance on Paws::OpsWorks
+Paws::OpsWorks::UpdateInstance - Arguments for method UpdateInstance on L<Paws::OpsWorks>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateInstance on the 
-AWS OpsWorks service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateInstance on the
+L<AWS OpsWorks|Paws::OpsWorks> service. Use the attributes of this class
 as arguments to method UpdateInstance.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateInstance.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateInstance(Att1 => $value1, Att2 => $value2, ...);
+    my $opsworks = Paws->service('OpsWorks');
+    $opsworks->UpdateInstance(
+      InstanceId           => 'MyString',
+      AgentVersion         => 'MyString',             # OPTIONAL
+      AmiId                => 'MyString',             # OPTIONAL
+      Architecture         => 'x86_64',               # OPTIONAL
+      AutoScalingType      => 'load',                 # OPTIONAL
+      EbsOptimized         => 1,                      # OPTIONAL
+      Hostname             => 'MyString',             # OPTIONAL
+      InstallUpdatesOnBoot => 1,                      # OPTIONAL
+      InstanceType         => 'MyString',             # OPTIONAL
+      LayerIds             => [ 'MyString', ... ],    # OPTIONAL
+      Os                   => 'MyString',             # OPTIONAL
+      SshKeyName           => 'MyString',             # OPTIONAL
+    );
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/opsworks/UpdateInstance>
 
 =head1 ATTRIBUTES
 
@@ -88,7 +103,8 @@ using custom AMIs.
 
 The instance architecture. Instance types do not necessarily support
 both architectures. For a list of the architectures that are supported
-by the different instance types, see Instance Families and Types.
+by the different instance types, see Instance Families and Types
+(http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html).
 
 Valid values are: C<"x86_64">, C<"i386">
 
@@ -136,9 +152,10 @@ The instance ID.
 The instance type, such as C<t2.micro>. For a list of supported
 instance types, open the stack in the console, choose B<Instances>, and
 choose B<+ Instance>. The B<Size> list contains the currently supported
-types. For more information, see Instance Families and Types. The
-parameter values that you use to specify the various types are in the
-B<API Name> column of the B<Available Instance Types> table.
+types. For more information, see Instance Families and Types
+(http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html).
+The parameter values that you use to specify the various types are in
+the B<API Name> column of the B<Available Instance Types> table.
 
 
 
@@ -158,8 +175,9 @@ following. You cannot update an instance that is using a custom AMI.
 =item *
 
 A supported Linux operating system: An Amazon Linux version, such as
-C<Amazon Linux 2017.03>, C<Amazon Linux 2016.09>, C<Amazon Linux
-2016.03>, C<Amazon Linux 2015.09>, or C<Amazon Linux 2015.03>.
+C<Amazon Linux 2017.09>, C<Amazon Linux 2017.03>, C<Amazon Linux
+2016.09>, C<Amazon Linux 2016.03>, C<Amazon Linux 2015.09>, or C<Amazon
+Linux 2015.03>.
 
 =item *
 
@@ -184,13 +202,17 @@ Standard>, or C<Microsoft Windows Server 2012 R2 with SQL Server Web>.
 =back
 
 For more information on the supported operating systems, see AWS
-OpsWorks Stacks Operating Systems.
+OpsWorks Stacks Operating Systems
+(http://docs.aws.amazon.com/opsworks/latest/userguide/workinginstances-os.html).
 
 The default option is the current Amazon Linux version. If you set this
 parameter to C<Custom>, you must use the AmiId parameter to specify the
 custom AMI that you want to use. For more information on the supported
-operating systems, see Operating Systems. For more information on how
-to use custom AMIs with OpsWorks, see Using Custom AMIs.
+operating systems, see Operating Systems
+(http://docs.aws.amazon.com/opsworks/latest/userguide/workinginstances-os.html).
+For more information on how to use custom AMIs with OpsWorks, see Using
+Custom AMIs
+(http://docs.aws.amazon.com/opsworks/latest/userguide/workinginstances-custom-ami.html).
 
 You can specify a different Linux operating system for the updated
 stack, but you cannot change from Linux to Windows or Windows to Linux.
@@ -210,9 +232,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateInstanc
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

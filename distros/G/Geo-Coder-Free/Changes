@@ -1,5 +1,14 @@
 Revision history for Geo-Coder-Free
 
+0.11	Fri Jun  8 17:27:55 EDT 2018
+	Started work on scantext support
+	Fixed some calls in list mode which returned a scalar
+	Many WOF records were not being imported
+	Only fall back to Geo::StreetAddress::US as last resort
+	Don't include NULL fields in the JSON output
+	Better at finding venues when libpostal is not installed
+	Tighten OpenAddresses validation
+
 0.10	Fri 11 May 18:30:54 EDT 2018
 	Street numbers were not being indexed
 	Add data that I know with the GPS program on my phone

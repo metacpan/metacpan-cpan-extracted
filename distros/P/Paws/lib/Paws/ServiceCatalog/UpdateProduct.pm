@@ -24,21 +24,50 @@ package Paws::ServiceCatalog::UpdateProduct;
 
 =head1 NAME
 
-Paws::ServiceCatalog::UpdateProduct - Arguments for method UpdateProduct on Paws::ServiceCatalog
+Paws::ServiceCatalog::UpdateProduct - Arguments for method UpdateProduct on L<Paws::ServiceCatalog>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateProduct on the 
-AWS Service Catalog service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateProduct on the
+L<AWS Service Catalog|Paws::ServiceCatalog> service. Use the attributes of this class
 as arguments to method UpdateProduct.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateProduct.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateProduct(Att1 => $value1, Att2 => $value2, ...);
+    my $servicecatalog = Paws->service('ServiceCatalog');
+    my $UpdateProductOutput = $servicecatalog->UpdateProduct(
+      Id             => 'MyId',
+      AcceptLanguage => 'MyAcceptLanguage',    # OPTIONAL
+      AddTags        => [
+        {
+          Key   => 'MyTagKey',                 # min: 1, max: 128
+          Value => 'MyTagValue',               # min: 1, max: 256
+
+        },
+        ...
+      ],                                       # OPTIONAL
+      Description => 'MyProductViewShortDescription',    # OPTIONAL
+      Distributor => 'MyProductViewOwner',               # OPTIONAL
+      Name        => 'MyProductViewName',                # OPTIONAL
+      Owner       => 'MyProductViewOwner',               # OPTIONAL
+      RemoveTags  => [
+        'MyTagKey', ...                                  # min: 1, max: 128
+      ],                                                 # OPTIONAL
+      SupportDescription => 'MySupportDescription',      # OPTIONAL
+      SupportEmail       => 'MySupportEmail',            # OPTIONAL
+      SupportUrl         => 'MySupportUrl',              # OPTIONAL
+    );
+
+    # Results:
+    my $Tags              = $UpdateProductOutput->Tags;
+    my $ProductViewDetail = $UpdateProductOutput->ProductViewDetail;
+
+    # Returns a L<Paws::ServiceCatalog::UpdateProductOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/servicecatalog/UpdateProduct>
 
 =head1 ATTRIBUTES
 
@@ -68,13 +97,13 @@ C<zh> - Chinese
 
 =head2 AddTags => ArrayRef[L<Paws::ServiceCatalog::Tag>]
 
-Tags to add to the existing list of tags associated with the product.
+The tags to add to the product.
 
 
 
 =head2 Description => Str
 
-The updated text description of the product.
+The updated description of the product.
 
 
 
@@ -86,7 +115,7 @@ The updated distributor of the product.
 
 =head2 B<REQUIRED> Id => Str
 
-The identifier of the product for the update request.
+The product identifier.
 
 
 
@@ -104,8 +133,7 @@ The updated owner of the product.
 
 =head2 RemoveTags => ArrayRef[Str|Undef]
 
-Tags to remove from the existing list of tags associated with the
-product.
+The tags to remove from the product.
 
 
 
@@ -134,9 +162,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateProduct
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

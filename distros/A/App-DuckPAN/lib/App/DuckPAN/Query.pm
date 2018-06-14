@@ -1,7 +1,7 @@
 package App::DuckPAN::Query;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Main application/loop for duckpan query
-$App::DuckPAN::Query::VERSION = '1019';
+$App::DuckPAN::Query::VERSION = '1021';
 use Moo;
 use Data::Printer return_value => 'dump';
 use POE qw( Wheel::ReadLine );
@@ -157,7 +157,7 @@ App::DuckPAN::Query - Main application/loop for duckpan query
 
 =head1 VERSION
 
-version 1019
+version 1021
 
 =head1 AUTHOR
 

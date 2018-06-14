@@ -35,21 +35,52 @@ package Paws::RedShift::RestoreFromClusterSnapshot;
 
 =head1 NAME
 
-Paws::RedShift::RestoreFromClusterSnapshot - Arguments for method RestoreFromClusterSnapshot on Paws::RedShift
+Paws::RedShift::RestoreFromClusterSnapshot - Arguments for method RestoreFromClusterSnapshot on L<Paws::RedShift>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method RestoreFromClusterSnapshot on the 
-Amazon Redshift service. Use the attributes of this class
+This class represents the parameters used for calling the method RestoreFromClusterSnapshot on the
+L<Amazon Redshift|Paws::RedShift> service. Use the attributes of this class
 as arguments to method RestoreFromClusterSnapshot.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to RestoreFromClusterSnapshot.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->RestoreFromClusterSnapshot(Att1 => $value1, Att2 => $value2, ...);
+    my $redshift = Paws->service('RedShift');
+    my $RestoreFromClusterSnapshotResult =
+      $redshift->RestoreFromClusterSnapshot(
+      ClusterIdentifier                => 'MyString',
+      SnapshotIdentifier               => 'MyString',
+      AdditionalInfo                   => 'MyString',             # OPTIONAL
+      AllowVersionUpgrade              => 1,                      # OPTIONAL
+      AutomatedSnapshotRetentionPeriod => 1,                      # OPTIONAL
+      AvailabilityZone                 => 'MyString',             # OPTIONAL
+      ClusterParameterGroupName        => 'MyString',             # OPTIONAL
+      ClusterSecurityGroups            => [ 'MyString', ... ],    # OPTIONAL
+      ClusterSubnetGroupName           => 'MyString',             # OPTIONAL
+      ElasticIp                        => 'MyString',             # OPTIONAL
+      EnhancedVpcRouting               => 1,                      # OPTIONAL
+      HsmClientCertificateIdentifier   => 'MyString',             # OPTIONAL
+      HsmConfigurationIdentifier       => 'MyString',             # OPTIONAL
+      IamRoles                         => [ 'MyString', ... ],    # OPTIONAL
+      KmsKeyId                         => 'MyString',             # OPTIONAL
+      NodeType                         => 'MyString',             # OPTIONAL
+      OwnerAccount                     => 'MyString',             # OPTIONAL
+      Port                             => 1,                      # OPTIONAL
+      PreferredMaintenanceWindow       => 'MyString',             # OPTIONAL
+      PubliclyAccessible               => 1,                      # OPTIONAL
+      SnapshotClusterIdentifier        => 'MyString',             # OPTIONAL
+      VpcSecurityGroupIds              => [ 'MyString', ... ],    # OPTIONAL
+      );
+
+    # Results:
+    my $Cluster = $RestoreFromClusterSnapshotResult->Cluster;
+
+    # Returns a L<Paws::RedShift::RestoreFromClusterSnapshotResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/redshift/RestoreFromClusterSnapshot>
 
 =head1 ATTRIBUTES
 
@@ -134,7 +165,8 @@ The name of the parameter group to be associated with this cluster.
 
 Default: The default Amazon Redshift cluster parameter group. For
 information about the default parameter group, go to Working with
-Amazon Redshift Parameter Groups.
+Amazon Redshift Parameter Groups
+(http://docs.aws.amazon.com/redshift/latest/mgmt/working-with-parameter-groups.html).
 
 Constraints:
 
@@ -187,7 +219,9 @@ The elastic IP (EIP) address for the cluster.
 An option that specifies whether to create the cluster with enhanced
 VPC routing enabled. To create a cluster that uses enhanced VPC
 routing, the cluster must be in a VPC. For more information, see
-Enhanced VPC Routing in the Amazon Redshift Cluster Management Guide.
+Enhanced VPC Routing
+(http://docs.aws.amazon.com/redshift/latest/mgmt/enhanced-vpc-routing.html)
+in the Amazon Redshift Cluster Management Guide.
 
 If this option is C<true>, enhanced VPC routing is enabled.
 
@@ -237,11 +271,15 @@ Default: The node type of the cluster from which the snapshot was
 taken. You can modify this if you are using any DS node type. In that
 case, you can choose to restore into another DS node type of the same
 size. For example, you can restore ds1.8xlarge into ds2.8xlarge, or
-ds2.xlarge into ds1.xlarge. If you have a DC instance type, you must
+ds1.xlarge into ds2.xlarge. If you have a DC instance type, you must
 restore into that same instance type and size. In other words, you can
 only restore a dc1.large instance type into another dc1.large instance
-type. For more information about node types, see About Clusters and
-Nodes in the I<Amazon Redshift Cluster Management Guide>
+type or dc2.large instance type. You can't restore dc1.8xlarge to
+dc2.8xlarge. First restore to a dc1.8xlareg cluster, then resize to a
+dc2.8large cluster. For more information about node types, see About
+Clusters and Nodes
+(http://docs.aws.amazon.com/redshift/latest/mgmt/working-with-clusters.html#rs-about-clusters-and-nodes)
+in the I<Amazon Redshift Cluster Management Guide>.
 
 
 
@@ -272,7 +310,9 @@ Format: C<ddd:hh24:mi-ddd:hh24:mi>
 
 Default: The value selected for the cluster from which the snapshot was
 taken. For more information about the time blocks for each region, see
-Maintenance Windows in Amazon Redshift Cluster Management Guide.
+Maintenance Windows
+(http://docs.aws.amazon.com/redshift/latest/mgmt/working-with-clusters.html#rs-maintenance-windows)
+in Amazon Redshift Cluster Management Guide.
 
 Valid Days: Mon | Tue | Wed | Thu | Fri | Sat | Sun
 
@@ -322,9 +362,9 @@ This class forms part of L<Paws>, documenting arguments for method RestoreFromCl
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -1,5 +1,12 @@
 Revision history for Dancer-Template-Mustache
 
+1.1.0 2018-06-13
+  [ ENHANCEMENTS ]
+    - Add configuration key to disable template caching.
+
+  [ STATISTICS ]
+    - code churn: 4 files changed, 31 insertions(+), 8 deletions(-)
+
 1.0.1 2017-07-12
   - Specify minimum version for Template::Mustache (v1.0.2)
 

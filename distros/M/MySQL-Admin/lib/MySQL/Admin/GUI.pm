@@ -19,7 +19,7 @@ use Encode;
 use Fcntl qw(:flock);
 use Symbol;
 use URI::Escape;
-#ise diagnostics;
+#use diagnostics;
 use Authen::Captcha;
 use JSON::XS;
 use XML::Simple;
@@ -31,7 +31,7 @@ use vars
 @MySQL::Admin::GUI::EXPORT =
   qw( ContentHeader Body ChangeDb Unique openFile action applyRights maxlength);
 @ISA                        = qw( Exporter MySQL::Admin );
-$MySQL::Admin::GUI::VERSION = '1.07';
+$MySQL::Admin::GUI::VERSION = '1.14';
 $m_bMod_perl                = ($ENV{MOD_PERL}) ? 1 : 0;
 local $^W = 0;
 our @m_processlist;
@@ -151,7 +151,7 @@ sub ContentHeader {
 	  my $captcha = Authen::Captcha->new(data_folder   => "$m_hrSettings->{cgi}{bin}/config/",output_folder => "$m_hrSettings->{cgi}{DocumentRoot}/images");
 	  $m_nSkipCaptch = $captcha->check_code(param("captcha"), param("md5"));
          };
-        $m_nSkipCaptch = 1;# if $@;
+        $m_nSkipCaptch = 1 if $@;
         if (defined $u && defined $p && defined $ip && $m_nSkipCaptch > 0) {
             use MD5;
             my $md5 = new MD5;

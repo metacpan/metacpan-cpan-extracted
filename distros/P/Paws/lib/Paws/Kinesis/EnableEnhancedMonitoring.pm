@@ -15,21 +15,39 @@ package Paws::Kinesis::EnableEnhancedMonitoring;
 
 =head1 NAME
 
-Paws::Kinesis::EnableEnhancedMonitoring - Arguments for method EnableEnhancedMonitoring on Paws::Kinesis
+Paws::Kinesis::EnableEnhancedMonitoring - Arguments for method EnableEnhancedMonitoring on L<Paws::Kinesis>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method EnableEnhancedMonitoring on the 
-Amazon Kinesis service. Use the attributes of this class
+This class represents the parameters used for calling the method EnableEnhancedMonitoring on the
+L<Amazon Kinesis|Paws::Kinesis> service. Use the attributes of this class
 as arguments to method EnableEnhancedMonitoring.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to EnableEnhancedMonitoring.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->EnableEnhancedMonitoring(Att1 => $value1, Att2 => $value2, ...);
+    my $kinesis = Paws->service('Kinesis');
+    my $EnhancedMonitoringOutput = $kinesis->EnableEnhancedMonitoring(
+      ShardLevelMetrics => [
+        'IncomingBytes',
+        ... # values: IncomingBytes, IncomingRecords, OutgoingBytes, OutgoingRecords, WriteProvisionedThroughputExceeded, ReadProvisionedThroughputExceeded, IteratorAgeMilliseconds, ALL
+      ],
+      StreamName => 'MyStreamName',
+
+    );
+
+    # Results:
+    my $CurrentShardLevelMetrics =
+      $EnhancedMonitoringOutput->CurrentShardLevelMetrics;
+    my $DesiredShardLevelMetrics =
+      $EnhancedMonitoringOutput->DesiredShardLevelMetrics;
+    my $StreamName = $EnhancedMonitoringOutput->StreamName;
+
+    # Returns a L<Paws::Kinesis::EnhancedMonitoringOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/kinesis/EnableEnhancedMonitoring>
 
 =head1 ATTRIBUTES
 
@@ -77,9 +95,10 @@ C<ALL>
 
 =back
 
-For more information, see Monitoring the Amazon Kinesis Streams Service
-with Amazon CloudWatch in the I<Amazon Kinesis Streams Developer
-Guide>.
+For more information, see Monitoring the Amazon Kinesis Data Streams
+Service with Amazon CloudWatch
+(http://docs.aws.amazon.com/kinesis/latest/dev/monitoring-with-cloudwatch.html)
+in the I<Amazon Kinesis Data Streams Developer Guide>.
 
 
 
@@ -96,9 +115,9 @@ This class forms part of L<Paws>, documenting arguments for method EnableEnhance
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

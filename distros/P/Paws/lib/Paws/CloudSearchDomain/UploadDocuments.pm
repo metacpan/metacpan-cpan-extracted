@@ -1,7 +1,7 @@
 
 package Paws::CloudSearchDomain::UploadDocuments;
   use Moose;
-  has ContentType => (is => 'ro', isa => 'Str', traits => ['ParamInHeader'], header_name => 'contentType', required => 1);
+  has ContentType => (is => 'ro', isa => 'Str', traits => ['ParamInHeader'], header_name => 'Content-Type', required => 1);
   has Documents => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'documents', required => 1);
 
   use MooseX::ClassAttribute;
@@ -10,28 +10,41 @@ package Paws::CloudSearchDomain::UploadDocuments;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/2013-01-01/documents/batch?format=sdk');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'POST');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::CloudSearchDomain::UploadDocumentsResponse');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::CloudSearchDomain::UploadDocuments - Arguments for method UploadDocuments on Paws::CloudSearchDomain
+Paws::CloudSearchDomain::UploadDocuments - Arguments for method UploadDocuments on L<Paws::CloudSearchDomain>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UploadDocuments on the 
-Amazon CloudSearch Domain service. Use the attributes of this class
+This class represents the parameters used for calling the method UploadDocuments on the
+L<Amazon CloudSearch Domain|Paws::CloudSearchDomain> service. Use the attributes of this class
 as arguments to method UploadDocuments.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UploadDocuments.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UploadDocuments(Att1 => $value1, Att2 => $value2, ...);
+    my $cloudsearchdomain = Paws->service('CloudSearchDomain');
+    my $UploadDocumentsResponse = $cloudsearchdomain->UploadDocuments(
+      ContentType => 'application/json',
+      Documents   => 'BlobBlob',
+
+    );
+
+    # Results:
+    my $Adds     = $UploadDocumentsResponse->Adds;
+    my $Status   = $UploadDocumentsResponse->Status;
+    my $Deletes  = $UploadDocumentsResponse->Deletes;
+    my $Warnings = $UploadDocumentsResponse->Warnings;
+
+    # Returns a L<Paws::CloudSearchDomain::UploadDocumentsResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/cloudsearch/>
 
 =head1 ATTRIBUTES
 
@@ -65,9 +78,9 @@ This class forms part of L<Paws>, documenting arguments for method UploadDocumen
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

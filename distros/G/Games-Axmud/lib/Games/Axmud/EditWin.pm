@@ -438,10 +438,10 @@
 
     sub tagsTab_refreshList {
 
-        # Called by $self->tagsTab to refresh the Gtk::Ex::Simple::List and Gtk2::TextView
+        # Called by $self->tagsTab to refresh the GA::Gtk::Simple::List and Gtk2::TextView
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #   $textView, $textView2, $textView3
         #               - The Gtk2::TextViews used
@@ -639,10 +639,10 @@
 
     sub mxpTab_refreshList {
 
-        # Called by $self->mxpTab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->mxpTab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - Number of columns in the simple list
         #
         # Return values
@@ -1695,11 +1695,11 @@
     sub addCageButtons {
 
         # Called by $self->commandsTab and $self->wordsTab to create the editing buttons
-        #   beneath the Gtk::Ex::Simple::List
+        #   beneath the GA::Gtk::Simple::List
         #
         # Expected arguments
         #   $table      - The current Gtk2::Table displayed in the notebook
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $entry      - A Gtk2::Entry needed by one of the buttons
         #   $iv         - The IV being edited in this tab - 'cmdHash' or 'wordHash'
         #   $columns    - The number of columns
@@ -1794,10 +1794,10 @@
     sub refreshList {
 
         # Called by $self->commandsTab and $self->wordsTab to reset the
-        #   Gtk::Ex::Simple::List
+        #   GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #   $iv         - The IV being edited in this tab - 'cmdHash' or 'wordHash'
         #
@@ -2053,7 +2053,7 @@
 
     sub interfaces1Tab_refreshList {
 
-        # Called by $self->interfaces1Tab (etc) to reset the Gtk::Ex::Simple::List
+        # Called by $self->interfaces1Tab (etc) to reset the GA::Gtk::Simple::List
         #
         # Expected arguments
         #   (none besides $self)
@@ -2168,7 +2168,7 @@
 
     sub interfaces2Tab_refreshList {
 
-        # Called by $self->interfaces2Tab (etc) to reset the Gtk::Ex::Simple::List
+        # Called by $self->interfaces2Tab (etc) to reset the GA::Gtk::Simple::List
         #
         # Expected arguments
         #   (none besides $self)
@@ -2228,11 +2228,11 @@
     sub interfacesTab_addButtons {
 
         # Called by $self->interfaces1Tab and $self->interfaces2Tab to create the editing buttons
-        #   beneath the Gtk::Ex::Simple::List
+        #   beneath the GA::Gtk::Simple::List
         #
         # Expected arguments
         #   $table      - The current Gtk2::Table displayed in the notebook
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns
         #
         # Return values
@@ -3552,7 +3552,7 @@
 
     sub routes1Tab_refreshList {
 
-        # Called by $self->routes1Tab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->routes1Tab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
         #   (none besides $self)
@@ -3674,7 +3674,7 @@
 
     sub routes2Tab_refreshList {
 
-        # Called by $self->routes2Tab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->routes2Tab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
         #   (none besides $self)
@@ -3727,11 +3727,11 @@
     sub routesTab_addEditButtons {
 
         # Called by $self->routes1Tab and $self->routes2Tab to create the editing buttons beneath
-        #   the Gtk::Ex::Simple::List
+        #   the GA::Gtk::Simple::List
         #
         # Expected arguments
         #   $table      - The current Gtk2::Table displayed in the notebook
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns
         #
         # Return values
@@ -6813,12 +6813,12 @@
 
     sub numbersTab_refreshList {
 
-        # Called by $self->numbersTab to refresh the Gtk::Ex::Simple::List, ordering the data by
+        # Called by $self->numbersTab to refresh the GA::Gtk::Simple::List, ordering the data by
         #   each key-value pair's value (instead of ordering it by key, as usual)
         # Also called by $self->clock1Tab, ->clock2Tab and ->clock3Tab to do the same job
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #   $iv         - The IV being edited
         #
@@ -9616,7 +9616,7 @@
             'Unknown word', 'text',
         );
 
-        my $slWidget = Gtk2::Ex::Simple::List->new(@columnList);
+        my $slWidget = Games::Axmud::Gtk::Simple::List->new(@columnList);
         $slWidget->get_selection->set_mode('multiple');
 
         # Make the simple list scrollable
@@ -9719,11 +9719,11 @@
 
         # Called by $self->words2Tab
         # Adds a single button that, when clicked, runs the client command ';addword' on the
-        #   selected item(s) in the Gtk2::Ex::Simple::List displayed in this tab
+        #   selected item(s) in the GA::Gtk::Simple::List displayed in this tab
         #
         # Expected arguments
         #   $table      - The Gtk2::Table for the tab
-        #   $slWidget   - The Gtk2::Ex::Simple::List displayed
+        #   $slWidget   - The GA::Gtk::Simple::List displayed
         #   $title      - The button's title
         #   $tooltips   - Tooltips for the button
         #   $cmd        - The text of the command to send, e.g. 'addword -r' to which the selected
@@ -10034,10 +10034,10 @@
 
     sub contents3Tab_refreshList {
 
-        # Called by $self->contentsTab to refresh the Gtk::Ex::Simple::List, displaying only keys
+        # Called by $self->contentsTab to refresh the GA::Gtk::Simple::List, displaying only keys
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -10417,10 +10417,10 @@
 
     sub directions1Tab_refreshList {
 
-        # Called by $self->directions1Tab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->directions1Tab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget       - The Gtk::Ex::Simple::List
+        #   $slWidget       - The GA::Gtk::Simple::List
         #   $columns        - The number of columns in the list
         #
         # Optional arguments
@@ -11131,10 +11131,10 @@
 
     sub directions2Tab_refreshList {
 
-        # Called by $self->directions2Tab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->directions2Tab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -15169,10 +15169,10 @@
 
     sub valuesTab_refreshList {
 
-        # Called by $self->valuesTab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->valuesTab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -15280,10 +15280,10 @@
 
     sub alternativesTab_refreshList {
 
-        # Called by $self->alternativesTab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->alternativesTab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -15664,10 +15664,10 @@
 
     sub maskTab_refreshList {
 
-        # Called by $self->maskTab to reset the Gtk::Ex::Simple::List
+        # Called by $self->maskTab to reset the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget       - The Gtk::Ex::Simple::List
+        #   $slWidget       - The GA::Gtk::Simple::List
         #   $columns        - The number of columns in the list
         #
         # Return values
@@ -16814,10 +16814,10 @@
 
     sub family1Tab_refreshList {
 
-        # Called by $self->family1Tab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->family1Tab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -16863,10 +16863,10 @@
 
     sub family2Tab_refreshList {
 
-        # Called by $self->family2Tab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->family2Tab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -17554,7 +17554,7 @@
         # Resets the simple list displayed by $self->exclusiveTab
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::list
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns
         #
         # Return values
@@ -18597,10 +18597,10 @@
 
     sub room2Tab_refreshList {
 
-        # Called by $self->room2Tab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->room2Tab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -19425,10 +19425,10 @@
 
     sub exits3Tab_refreshList {
 
-        # Called by $self->exits3Tab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->exits3Tab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -19572,10 +19572,10 @@
     sub exits4Tab_refreshList {
 
         # Called by $self->exits4Tab, ->exits5Tab and ->exits6Tab to refresh the
-        #   Gtk::Ex::Simple::List
+        #   GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #   $iv         - The IV to show
         #
@@ -19877,10 +19877,10 @@
 
     sub contents1Tab_refreshList {
 
-        # Called by $self->contents1Tab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->contents1Tab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -23009,10 +23009,10 @@
 
     sub initial1Tab_refreshList {
 
-        # Called by $self->initial1Tab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->initial1Tab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - Number of columns in the simple list
         #
         # Return values
@@ -23406,10 +23406,10 @@
 
     sub initial2Tab_refreshList {
 
-        # Called by $self->initial2Tab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->initial2Tab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - Number of columns in the simple list
         #
         # Return values
@@ -24097,7 +24097,7 @@
         # Resets the simple list displayed by $self->settings2Tab
         #
         # Expected arguments
-        #   $slWidget       - The Gtk::Ex::Simple::list
+        #   $slWidget       - The GA::Gtk::Simple::List
         #   $columns        - The number of columns
         #   $reverseFlag    - If TRUE, the most recent connection is shown first. If FALSE, the
         #                       earliest connection is shown first
@@ -24985,7 +24985,7 @@
         # Resets the simple list displayed by $self->settings8Tab
         #
         # Expected arguments
-        #   $slWidget       - The Gtk::Ex::Simple::list
+        #   $slWidget       - The GA::Gtk::Simple::List
         #   $columns        - The number of columns
         #   $obscureFlag    - Flag set to TRUE if passwords should be obscured, FALSE otherwise
         #
@@ -25503,7 +25503,7 @@
         # Resets the simple list displayed by $self->settings12Tab
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::list
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns
         #
         # Return values
@@ -25788,7 +25788,7 @@
         # Resets the simple list displayed by $self->override2Tab
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::list
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns
         #
         # Return values
@@ -26004,7 +26004,7 @@
         # Resets the simple list displayed by $self->override3Tab
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::list
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns
         #
         # Return values
@@ -26486,7 +26486,7 @@
         # Resets the simple list displayed by $self->override5Tab
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::list
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns
         #
         # Return values
@@ -26878,7 +26878,7 @@
         # Resets the simple list displayed by $self->rooms1Tab
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::list
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns
         #
         # Return values
@@ -27344,7 +27344,7 @@
         # Resets the simple list displayed by $self->rooms2Tab
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::list
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns
         #   $iv         - The IV to display - one of 'verboseComponentList', 'shortComponentList'
         #                   and 'briefComponentList'
@@ -28044,7 +28044,7 @@
         # Resets the simple list displayed by $self->rooms15Tab
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::list
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns
         #
         # Return values
@@ -33492,7 +33492,7 @@
         # Resets the simple list displayed by $self->missionsTab
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::list
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns
         #
         # Return values
@@ -33770,7 +33770,7 @@
         # Resets the simple list displayed by $self->questsTab
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::list
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns
         #
         # Return values
@@ -35141,7 +35141,7 @@
         # Resets the simple list displayed by $self->settings3Tab
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::list
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns
         #
         # Return values
@@ -35449,7 +35449,7 @@
         #   $self->questsTab_resetSolvedList
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::list
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns
         #
         # Return values
@@ -35485,7 +35485,7 @@
         #   $self->questsTab_resetSolvedList
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::list
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns
         #   $worldObj   - Blessed reference of the parent world profile
         #
@@ -35739,7 +35739,7 @@
         # Resets the simple list displayed by $self->skills1Tab
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::list
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns
         #
         # Return values
@@ -37648,11 +37648,11 @@
     sub propertiesTab_refreshList {
 
         # Called by $self->propertiesTab
-        # Populates the Gtk2::Ex::Simple::List displayed in this window with all the properties
-        #   (IVs) stored in the template, except the standard ones which can't be edited in this tab
+        # Populates the GA::Gtk::Simple::List displayed in this window with all the properties (IVs)
+        #   stored in the template, except the standard ones which can't be edited in this tab
         #
         # Expected arguments
-        #   $slWidget       - The Gtk::Ex::Simple::list
+        #   $slWidget       - The GA::Gtk::Simple::list
         #   $columns        - The number of columns
         #
         # Return values
@@ -38027,11 +38027,11 @@
     sub propertiesTab_refreshList {
 
         # Called by $self->propertiesTab
-        # Populates the Gtk2::Ex::Simple::List displayed in this window with all the properties
-        #   (IVs) stored in the template, except the standard ones which can't be edited in this tab
+        # Populates the GA::Gtk::Simple::List displayed in this window with all the properties (IVs)
+        #   stored in the template, except the standard ones which can't be edited in this tab
         #
         # Expected arguments
-        #   $slWidget       - The Gtk::Ex::Simple::list
+        #   $slWidget       - The GA::Gtk::Simple::list
         #   $columns        - The number of columns
         #
         # Return values
@@ -39469,10 +39469,10 @@
 
     sub objects1Tab_refreshList {
 
-        # Called by $self->objects1Tab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->objects1Tab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -39583,10 +39583,10 @@
 
     sub objects2Tab_refreshList {
 
-        # Called by $self->objects2Tab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->objects2Tab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -39703,10 +39703,10 @@
 
     sub objects3Tab_refreshList {
 
-        # Called by $self->objects3Tab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->objects3Tab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -39873,10 +39873,10 @@
 
     sub objects4Tab_refreshList {
 
-        # Called by $self->objects4Tab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->objects4Tab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -39997,10 +39997,10 @@
 
     sub objects5Tab_refreshList {
 
-        # Called by $self->objects5Tab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->objects5Tab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -40114,10 +40114,10 @@
 
     sub objects6Tab_refreshList {
 
-        # Called by $self->objects6Tab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->objects6Tab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -40225,10 +40225,10 @@
 
     sub countsTab_refreshList {
 
-        # Called by $self->countsTab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->countsTab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -40368,11 +40368,11 @@
     sub boundaries1Tab_addButtons {
 
         # Called by $self->boundaries1Tab and ->boundaries2Tab to add editing buttons below the
-        #   Gtk::Ex::Simple::List
+        #   GA::Gtk::Simple::List
         #
         # Expected arguments
         #   $table          - The Gtk2::Table
-        #   $slWidget       - The Gtk::Ex::Simple::List
+        #   $slWidget       - The GA::Gtk::Simple::List
         #   $columns        - The number of columns in the simple list
         #
         # Optional arguments
@@ -40602,10 +40602,10 @@
     sub boundaries1Tab_refreshList {
 
         # Called by $self->boundaries1Tab, >boundaries2Tab and ->boundaries1Tab_addButtons refresh
-        #   the Gtk::Ex::Simple::List
+        #   the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Optional arguments
@@ -40835,10 +40835,10 @@
     sub boundaries3Tab_refreshList {
 
         # Called by both $self->boundaries3Tab and $self->boundaries4Tab to refresh their
-        #   Gtk::Ex::Simple::List
+        #   GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #   $iv         - The IV being accessed - 'regionPathHash' or 'safeRegionPathHash'
         #
@@ -42723,10 +42723,10 @@
     sub settings3Tab_refreshList {
 
         # Called by $self->settings3Tab, ->settings4Tab and ->settings5 Tab to refresh the
-        #   Gtk::Ex::Simple::List
+        #   GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #   $iv         - 'ttsAttribHash', 'ttsFlagAttribHash' or 'ttsAlertAttribHash'
         #
@@ -44869,10 +44869,10 @@
 
     sub actionsInventory2Tab_refreshList {
 
-        # Called by $self->actionsInventory2Tab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->actionsInventory2Tab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -45731,27 +45731,32 @@
 
         my $label2 = $self->addLabel($table, 'Voice',
             1, 6, 4, 5);
-        my $entry2 = $self->addEntryWithButton($table, 'voice', TRUE,
+#        my $entry2 = $self->addEntryWithButton($table, 'voice', TRUE,
+        my $entry2 = $self->addEntry($table, 'voice', TRUE,
             6, 12, 4, 5);
 
         my $label3 = $self->addLabel($table, 'Speed',
             1, 6, 5, 6);
-        my $entry3 = $self->addEntryWithButton($table, 'speed', TRUE,
+#        my $entry3 = $self->addEntryWithButton($table, 'speed', TRUE,
+        my $entry3 = $self->addEntry($table, 'speed', TRUE,
             6, 12, 5, 6);
 
         my $label4 = $self->addLabel($table, 'Rate',
             1, 6, 6, 7);
-        my $entry4 = $self->addEntryWithButton($table, 'rate', TRUE,
+#        my $entry4 = $self->addEntryWithButton($table, 'rate', TRUE,
+        my $entry4 = $self->addEntry($table, 'rate', TRUE,
             6, 12, 6, 7);
 
         my $label5 = $self->addLabel($table, 'Pitch',
             1, 6, 7, 8);
-        my $entry5 = $self->addEntryWithButton($table, 'pitch', TRUE,
+#        my $entry5 = $self->addEntryWithButton($table, 'pitch', TRUE,
+        my $entry5 = $self->addEntry($table, 'pitch', TRUE,
             6, 12, 7, 8);
 
         my $label6 = $self->addLabel($table, 'Volume',
             1, 6, 8, 9);
-        my $entry6 = $self->addEntryWithButton($table, 'volume', TRUE,
+#        my $entry6 = $self->addEntryWithButton($table, 'volume', TRUE,
+        my $entry6 = $self->addEntry($table, 'volume', TRUE,
             6, 12, 8, 9);
 
         my $entry7 = $self->addEntry($table, undef, TRUE,
@@ -45954,6 +45959,20 @@
             $label5->set_markup('Word pitch (value in the range 0 - 99)');
             $label6->set_markup('Volume (not available with eSpeak)');
 
+        } elsif ($engine eq 'esng') {
+
+            $entry2->set_sensitive(TRUE);
+            $entry3->set_sensitive(TRUE);
+            $entry4->set_sensitive(FALSE);
+            $entry5->set_sensitive(TRUE);
+            $entry6->set_sensitive(TRUE);
+
+            $label2->set_markup('Voice (e.g.  <b>en  es  fr</b>  )');
+            $label3->set_markup('Word speed (words per minute; value in range 10-200)');
+            $label4->set_markup('Word rate (not available with espeak-ng)');
+            $label5->set_markup('Word pitch (value in the range 0 - 99)');
+            $label6->set_markup('Volume (value in the range 0-200)');
+
         } elsif ($engine eq 'flite') {
 
             $entry2->set_sensitive(TRUE);
@@ -45984,17 +46003,34 @@
 
         } elsif ($engine eq 'swift') {
 
-            $entry2->set_sensitive(TRUE);
-            $entry3->set_sensitive(FALSE);
-            $entry4->set_sensitive(TRUE);
-            $entry5->set_sensitive(TRUE);
-            $entry6->set_sensitive(TRUE);
+            if ($^O eq 'MSWin32') {
 
-            $label2->set_markup('Voice (e.g.  <b>Allison  David</b>  )');
-            $label3->set_markup('Word speed (not available with Swift)');
-            $label4->set_markup('Word rate (value in the range 0.5 - 2)');
-            $label5->set_markup('Word pitch (value in the range 0.1 - 5)');
-            $label6->set_markup('Volume (value in the range 0.33 - 6)');
+                $entry2->set_sensitive(TRUE);
+                $entry3->set_sensitive(TRUE);
+                $entry4->set_sensitive(FALSE);
+                $entry5->set_sensitive(TRUE);
+                $entry6->set_sensitive(TRUE);
+
+                $label2->set_markup('Voice (e.g.  <b>Allison  David</b>  )');
+                $label3->set_markup('Word speed (words per minute; value in range 100-400)');
+                $label4->set_markup('Word rate (not available with Swift)');
+                $label5->set_markup('Word pitch (value in the range 0.1 - 5)');
+                $label6->set_markup('Volume (value in the range 0-100)');
+
+            } else {
+
+                $entry2->set_sensitive(TRUE);
+                $entry3->set_sensitive(FALSE);
+                $entry4->set_sensitive(TRUE);
+                $entry5->set_sensitive(TRUE);
+                $entry6->set_sensitive(TRUE);
+
+                $label2->set_markup('Voice (e.g.  <b>Allison  David</b>  )');
+                $label3->set_markup('Word speed (not available with Swift)');
+                $label4->set_markup('Word rate (value in the range 0.5 - 2)');
+                $label5->set_markup('Word pitch (value in the range 0.1 - 5)');
+                $label6->set_markup('Volume (value in the range 0.33 - 6)');
+            }
 
         } elsif ($engine eq 'none') {
 
@@ -46743,7 +46779,7 @@
         # Resets the simple list displayed by $self->internal1Tab
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::list
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns
         #
         # Return values
@@ -46889,7 +46925,7 @@
         # Resets the simple list displayed by $self->internal2Tab
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::list
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns
         #
         # Return values
@@ -47240,10 +47276,10 @@
 
     sub nameTab_refreshList {
 
-        # Called by $self->nameTab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->nameTab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -47959,10 +47995,10 @@
 
     sub stripsTab_refreshList {
 
-        # Called by $self->stripsTab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->stripsTab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget       - The Gtk::Ex::Simple::List
+        #   $slWidget       - The GA::Gtk::Simple::List
         #   $columns        - The number of columns in the list
         #   %tempObjHash    - A hash of temporary strip objects, one for each package name, so we
         #                       can access their IVs
@@ -49884,7 +49920,7 @@
         # Resets the simple list displayed by $self->file2Tab
         #
         # Expected arguments
-        #   $slWidget       - The Gtk::Ex::Simple::list
+        #   $slWidget       - The GA::Gtk::Simple::List
         #   $columns        - The number of columns
         #
         # Return values
@@ -50428,10 +50464,10 @@
 
     sub gridsTab_refreshList {
 
-        # Called by $self->gridTab to refresh the first Gtk::Ex::Simple::List
+        # Called by $self->gridTab to refresh the first GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -50816,10 +50852,10 @@
 
     sub zonesTab_refreshList {
 
-        # Called by $self->zonesTab to refresh the first Gtk::Ex::Simple::List
+        # Called by $self->zonesTab to refresh the first GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -50987,10 +51023,10 @@
 
     sub windowsTab_refreshList {
 
-        # Called by $self->windowsTab to refresh the first Gtk::Ex::Simple::List
+        # Called by $self->windowsTab to refresh the first GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -51934,10 +51970,10 @@
 
     sub model2Tab_refreshList {
 
-        # Called by $self->model2Tab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->model2Tab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -52089,10 +52125,10 @@
 
     sub model3Tab_refreshList {
 
-        # Called by $self->model3Tab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->model3Tab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -52343,10 +52379,10 @@
 
     sub model4Tab_refreshList {
 
-        # Called by $self->model4Tab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->model4Tab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -52497,10 +52533,10 @@
 
     sub model5Tab_refreshList {
 
-        # Called by $self->model5Tab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->model5Tab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values
@@ -54380,10 +54416,10 @@
 
     sub roomFlagsTab1_refreshList {
 
-        # Called by $self->roomFlags1Tab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->roomFlags1Tab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #   $sortMode   - 0 - sort room flags by priority, 1 - sort alphabetically
         #
@@ -54743,10 +54779,10 @@
 
     sub lightTab_refreshList {
 
-        # Called by $self->lightTab to refresh the Gtk::Ex::Simple::List
+        # Called by $self->lightTab to refresh the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Return values

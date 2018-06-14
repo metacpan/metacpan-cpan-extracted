@@ -44,18 +44,20 @@ Describes a destination in Amazon S3.
 
 =head2 B<REQUIRED> BucketARN => Str
 
-  The ARN of the S3 bucket.
+  The ARN of the S3 bucket. For more information, see Amazon Resource
+Names (ARNs) and AWS Service Namespaces
+(https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html).
 
 
 =head2 B<REQUIRED> BufferingHints => L<Paws::Firehose::BufferingHints>
 
-  The buffering option. If no value is specified, B<BufferingHints>
+  The buffering option. If no value is specified, C<BufferingHints>
 object default values are used.
 
 
 =head2 CloudWatchLoggingOptions => L<Paws::Firehose::CloudWatchLoggingOptions>
 
-  The CloudWatch logging options for your delivery stream.
+  The Amazon CloudWatch logging options for your delivery stream.
 
 
 =head2 B<REQUIRED> CompressionFormat => Str
@@ -73,16 +75,20 @@ no encryption.
 =head2 Prefix => Str
 
   The "YYYY/MM/DD/HH" time format prefix is automatically used for
-delivered S3 files. You can specify an extra prefix to be added in
-front of the time format prefix. If the prefix ends with a slash, it
+delivered Amazon S3 files. You can specify an extra prefix to be added
+in front of the time format prefix. If the prefix ends with a slash, it
 appears as a folder in the S3 bucket. For more information, see Amazon
-S3 Object Name Format in the I<Amazon Kinesis Firehose Developer
-Guide>.
+S3 Object Name Format
+(http://docs.aws.amazon.com/firehose/latest/dev/basic-deliver.html#s3-object-name)
+in the I<Amazon Kinesis Data Firehose Developer Guide>.
 
 
 =head2 B<REQUIRED> RoleARN => Str
 
-  The ARN of the AWS credentials.
+  The Amazon Resource Name (ARN) of the AWS credentials. For more
+information, see Amazon Resource Names (ARNs) and AWS Service
+Namespaces
+(https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html).
 
 
 
@@ -92,9 +98,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Firehose>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

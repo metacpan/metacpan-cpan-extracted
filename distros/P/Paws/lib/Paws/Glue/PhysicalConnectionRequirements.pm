@@ -40,7 +40,8 @@ Specifies the physical requirements for a connection.
 
 =head2 AvailabilityZone => Str
 
-  The connection's availability zone.
+  The connection's availability zone. This field is deprecated and has no
+effect.
 
 
 =head2 SecurityGroupIdList => ArrayRef[Str|Undef]
@@ -60,9 +61,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Glue>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

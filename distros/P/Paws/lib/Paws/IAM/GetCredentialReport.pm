@@ -13,21 +13,30 @@ package Paws::IAM::GetCredentialReport;
 
 =head1 NAME
 
-Paws::IAM::GetCredentialReport - Arguments for method GetCredentialReport on Paws::IAM
+Paws::IAM::GetCredentialReport - Arguments for method GetCredentialReport on L<Paws::IAM>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method GetCredentialReport on the 
-AWS Identity and Access Management service. Use the attributes of this class
+This class represents the parameters used for calling the method GetCredentialReport on the
+L<AWS Identity and Access Management|Paws::IAM> service. Use the attributes of this class
 as arguments to method GetCredentialReport.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to GetCredentialReport.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->GetCredentialReport(Att1 => $value1, Att2 => $value2, ...);
+    my $iam = Paws->service('IAM');
+    my $GetCredentialReportResponse = $iam->GetCredentialReport();
+
+    # Results:
+    my $Content       = $GetCredentialReportResponse->Content;
+    my $GeneratedTime = $GetCredentialReportResponse->GeneratedTime;
+    my $ReportFormat  = $GetCredentialReportResponse->ReportFormat;
+
+    # Returns a L<Paws::IAM::GetCredentialReportResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/iam/GetCredentialReport>
 
 =head1 ATTRIBUTES
 
@@ -39,9 +48,9 @@ This class forms part of L<Paws>, documenting arguments for method GetCredential
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 3c3fc24c1952e998480d97013e5fd0aee4fa83c5 Changes
+SHA1 01aee1b05e1b4fce41b71993637d4bf58c336255 HighwayHash.xs
+SHA1 793d121c96b29f681216a7ea37820f5e49f64748 MANIFEST
+SHA1 bc6e8e97764709336e114d2a4dd4a2f6059a0a03 META.json
+SHA1 223a6d09521236afab4a365ff2e22214b8ec5acd META.yml
+SHA1 5803fa408ebca6cd5ca2dc7f20a2d6e34f86c044 Makefile.PL
+SHA1 6dbfd2461bd644a8e81c9f5d6592abe462cd5907 README
+SHA1 f4a357d1c38a0d5ba19fdac1632db924d38cdb36 highwayhash/c/highwayhash.c
+SHA1 62d96f0e3ee9aaa43fd2222d8fe4b54142e6f211 highwayhash/c/highwayhash.h
+SHA1 29e9fbfd96fa76c4e2820e1fcff2daf7c63669e2 lib/Digest/HighwayHash.pm
+SHA1 93d70af7ed0503033ca4fafd576afa723395f946 perl_math_int64.c
+SHA1 927053c51d4bf1847e108708697b96afffce8bd7 perl_math_int64.h
+SHA1 b7a1aba3cbf230cd3de6d5105258587f6a8484fd ppport.h
+SHA1 586f1e813f01683c253f5aa2d864a5f32ac12de9 t/Digest-HighwayHash.t
+SHA1 c180129cdefe7e44bfb28e3905a4ed3af295b99e typemap
+-----BEGIN PGP SIGNATURE-----
+
+iQJEBAEBCgAuFiEErVNvYICb0H7KK/jxygQ1vl7Bs2IFAlscFHwQHG1hcml1c0Bp
+ZXZhbC5ybwAKCRDKBDW+XsGzYj9YD/91knT97/h1HeuZ/rcRZf8vx8ej5UyUiDEY
+YFZ7GSjKsGX0M6dtMz3KyKCx7FXajA+NrUHml6EcVZsmzj/M1XfeoQKXgzPW8KR+
+kAkw5UoZDSmsT9CIx+QdypmIShTFmaw0kI9vBHcbofXrHWs/vDnbhGcsNhVsqphT
+eNMoDAWG7xA1CSj7ugg5Ld45KK9eke5SBBAuqs5HjFDza3ZLcYqMd8D2khpJAEB6
+eVRLg+QlCcFWxYJVNHeeTuC92jUPGqTK92v9ykADs6+F3Y6hE8De//Uhy+JsI3H1
+M6UaHtTgcz7h7tXG03B/cG5U1AzihnrptfDe+QtwOQF2rjDlAqiIEvg0X23/YEJt
+fP2FSSuOuTj//aZovdziVVCKcHz7DJZ6lRUryEfau1l7rbPvI6tlo0XsBt/OdsPu
+q3Jvzwh159r5sE7I3Mdkowid7LkrfR2D2dys93G1W+TpAlN4uuKRQW2dd/hja4Fo
+Os5N6ZGXbmn+uESwMgu0zTnuqm4ckWCmh19OFbl8Fmrxa5/t6e1tZjZpZULHLkhC
+17+aboWRiO6PKjutLDcOgfVWkkt5Jrfmi8po14PKr5+FVZFPs1+H2Xpoye82aFww
+z8CJRGALj3cAR2ZrL0U9hPYaxQuVJQzyrFGfJjxT8Gjaoptx9edLfrcMHAjaL05t
+nuhQsIFlrA==
+=RcB1
+-----END PGP SIGNATURE-----

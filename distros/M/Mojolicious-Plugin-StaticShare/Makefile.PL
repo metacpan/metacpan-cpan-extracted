@@ -21,7 +21,7 @@ WriteMakefile(
     'Mojolicious' => '7.36',
     'HTTP::AcceptLanguage'=>'0.02',
     'Time::Piece'=>'1.31',
-    
+    #~ Text::Markdown::Hoedown if markdown
   },
   #~ test         => {TESTS => 't/*.t'},
   META_MERGE => {

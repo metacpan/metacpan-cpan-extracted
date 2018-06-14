@@ -16,21 +16,32 @@ package Paws::ECS::StopTask;
 
 =head1 NAME
 
-Paws::ECS::StopTask - Arguments for method StopTask on Paws::ECS
+Paws::ECS::StopTask - Arguments for method StopTask on L<Paws::ECS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method StopTask on the 
-Amazon EC2 Container Service service. Use the attributes of this class
+This class represents the parameters used for calling the method StopTask on the
+L<Amazon EC2 Container Service|Paws::ECS> service. Use the attributes of this class
 as arguments to method StopTask.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to StopTask.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->StopTask(Att1 => $value1, Att2 => $value2, ...);
+    my $ecs = Paws->service('ECS');
+    my $StopTaskResponse = $ecs->StopTask(
+      Task    => 'MyString',
+      Cluster => 'MyString',    # OPTIONAL
+      Reason  => 'MyString',    # OPTIONAL
+    );
+
+    # Results:
+    my $Task = $StopTaskResponse->Task;
+
+    # Returns a L<Paws::ECS::StopTaskResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ecs/StopTask>
 
 =head1 ATTRIBUTES
 
@@ -47,7 +58,7 @@ cluster is assumed.
 
 An optional message specified when a task is stopped. For example, if
 you are using a custom scheduler, you can use this parameter to specify
-the reason for stopping the task here, and the message will appear in
+the reason for stopping the task here, and the message appears in
 subsequent DescribeTasks API operations on this task. Up to 255
 characters are allowed in this message.
 
@@ -55,8 +66,7 @@ characters are allowed in this message.
 
 =head2 B<REQUIRED> Task => Str
 
-The task ID or full Amazon Resource Name (ARN) entry of the task to
-stop.
+The task ID or full ARN entry of the task to stop.
 
 
 
@@ -67,9 +77,9 @@ This class forms part of L<Paws>, documenting arguments for method StopTask in L
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

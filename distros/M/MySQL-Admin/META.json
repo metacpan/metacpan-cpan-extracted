@@ -33,6 +33,7 @@
             "Mail::Sendmail" : "0.79",
             "Search::Tools::UTF8" : "1.003",
             "Test::More" : "0.7",
+            "Text::Markdown::Hoedown" : "1.02",
             "URI" : "1.40",
             "XML::Simple" : "2.25",
             "XML::XSLT" : "0.48",
@@ -43,11 +44,11 @@
    "provides" : {
       "DBI::Library" : {
          "file" : "lib/DBI/Library.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       },
       "DBI::Library::Database" : {
          "file" : "lib/DBI/Library/Database.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       },
       "DBI::Library::Database::db" : {
          "file" : "lib/DBI/Library/Database.pm"
@@ -63,47 +64,51 @@
       },
       "HTML::Editor" : {
          "file" : "lib/HTML/Editor.pm",
-         "version" : "1.13"
+         "version" : "1.14"
+      },
+      "HTML::Editor::Markdown" : {
+         "file" : "lib/HTML/Editor/Markdown.pm",
+         "version" : "1.09"
       },
       "HTML::Menu::Pages" : {
          "file" : "lib/HTML/Menu/Pages.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       },
       "MySQL::Admin" : {
          "file" : "lib/MySQL/Admin.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       },
       "MySQL::Admin::Actions" : {
          "file" : "lib/MySQL/Admin/Actions.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       },
       "MySQL::Admin::Config" : {
          "file" : "lib/MySQL/Admin/Config.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       },
       "MySQL::Admin::Documentation" : {
          "file" : "lib/MySQL/Admin/Documentation.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       },
       "MySQL::Admin::GUI" : {
          "file" : "lib/MySQL/Admin/GUI.pm",
-         "version" : "1.07"
+         "version" : "1.14"
       },
       "MySQL::Admin::Session" : {
          "file" : "lib/MySQL/Admin/Session.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       },
       "MySQL::Admin::Settings" : {
          "file" : "lib/MySQL/Admin/Settings.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       },
       "MySQL::Admin::Translate" : {
          "file" : "lib/MySQL/Admin/Translate.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       },
       "Template::Quick" : {
          "file" : "lib/Template/Quick.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       }
    },
    "release_status" : "stable",
@@ -115,6 +120,6 @@
          "url" : "https://sourceforge.net/p/lindnerei/code/ci/master/tree/"
       }
    },
-   "version" : "1.13",
+   "version" : "1.14",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

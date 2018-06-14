@@ -15,21 +15,50 @@ package Paws::ElasticBeanstalk::UpdateApplicationResourceLifecycle;
 
 =head1 NAME
 
-Paws::ElasticBeanstalk::UpdateApplicationResourceLifecycle - Arguments for method UpdateApplicationResourceLifecycle on Paws::ElasticBeanstalk
+Paws::ElasticBeanstalk::UpdateApplicationResourceLifecycle - Arguments for method UpdateApplicationResourceLifecycle on L<Paws::ElasticBeanstalk>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateApplicationResourceLifecycle on the 
-AWS Elastic Beanstalk service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateApplicationResourceLifecycle on the
+L<AWS Elastic Beanstalk|Paws::ElasticBeanstalk> service. Use the attributes of this class
 as arguments to method UpdateApplicationResourceLifecycle.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateApplicationResourceLifecycle.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateApplicationResourceLifecycle(Att1 => $value1, Att2 => $value2, ...);
+    my $elasticbeanstalk = Paws->service('ElasticBeanstalk');
+    my $ApplicationResourceLifecycleDescriptionMessage =
+      $elasticbeanstalk->UpdateApplicationResourceLifecycle(
+      ApplicationName         => 'MyApplicationName',
+      ResourceLifecycleConfig => {
+        ServiceRole            => 'MyString',    # OPTIONAL
+        VersionLifecycleConfig => {
+          MaxAgeRule => {
+            Enabled            => 1,
+            DeleteSourceFromS3 => 1,
+            MaxAgeInDays       => 1,             # OPTIONAL
+          },    # OPTIONAL
+          MaxCountRule => {
+            Enabled            => 1,
+            MaxCount           => 1,    # OPTIONAL
+            DeleteSourceFromS3 => 1,
+          },    # OPTIONAL
+        },    # OPTIONAL
+      },
+
+      );
+
+    # Results:
+    my $ApplicationName =
+      $ApplicationResourceLifecycleDescriptionMessage->ApplicationName;
+    my $ResourceLifecycleConfig =
+      $ApplicationResourceLifecycleDescriptionMessage->ResourceLifecycleConfig;
+
+# Returns a L<Paws::ElasticBeanstalk::ApplicationResourceLifecycleDescriptionMessage> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/elasticbeanstalk/UpdateApplicationResourceLifecycle>
 
 =head1 ATTRIBUTES
 
@@ -53,9 +82,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateApplica
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

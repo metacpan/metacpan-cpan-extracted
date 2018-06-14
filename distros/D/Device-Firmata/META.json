@@ -1,5 +1,5 @@
 {
-   "abstract" : "Perl interface to Firmata for the arduino platform.",
+   "abstract" : "A Perl implementation of the Firmata protocol.",
    "author" : [
       "Aki Mimoto <amimoto@cpan.org>",
       "Norbert Truchsess <ntruchses@cpan.org>",
@@ -52,5 +52,6 @@
          "web" : "https://github.com/ntruchsess/perl-firmata"
       }
    },
-   "version" : "0.64"
+   "version" : "0.65",
+   "x_homepage" : "https://github.com/ntruchsess/perl-firmata/"
 }

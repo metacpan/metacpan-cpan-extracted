@@ -75,3 +75,33 @@ Revision history for Keyword-Declare
       as well as defining a (sigilless) keytype name as usual.
       (Thanks Sebastian!)
 
+
+
+0.001007  Sun Jun 10 15:18:37 2018
+
+    * Removed POD nits (Thanks, Hugo)
+
+    * Added test for ->@*, etc.
+      (Thanks, Curtis!)
+
+    * Noted that module is incompatible with Keyword::Declare 0.04
+      and updated Makefile.PL to reflect that
+      (Thanks, Matt)
+
+
+0.001008  Sun Jun 10 15:42:00 2018
+
+    * Updated Makefile.PL to require ExtUtils::MakeMaker v7
+      which supports more complex module version requirement specifications.
+
+
+0.001009  Tue Jun 12 11:32:51 2018
+
+    * Updated Makefile.PL to generate metadata that
+      ExtUtils::MakeMaker v7 is required for configuration and build
+      (Thanks, Slavin)
+
+    * Updated Makefile.PL to new minimal PPR requirement
+      (Thanks, Slavin)
+
+    * Added 'unkeyword' anti-meta-keyword to remove keywords

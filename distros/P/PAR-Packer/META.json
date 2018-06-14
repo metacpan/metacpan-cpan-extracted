@@ -75,6 +75,6 @@
       },
       "x_MailingList" : "par@perl.org"
    },
-   "version" : "1.044",
+   "version" : "1.045",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

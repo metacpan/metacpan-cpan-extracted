@@ -6,10 +6,13 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Code::TidyAll' => '0.56',
+                                      'Code::TidyAll::Plugin::SortLines::Naturally' => '0.000003',
                                       'Code::TidyAll::Plugin::Test::Vars' => '0.02',
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
+                                      'POSIX' => '0',
                                       'Parallel::ForkManager' => '1.19',
                                       'Perl::Critic' => '1.126',
                                       'Perl::Tidy' => '20160302',
@@ -29,7 +32,6 @@ do { my $x = {
                                       'Test::Spelling' => '0.12',
                                       'Test::Vars' => '0.009',
                                       'Test::Version' => '2.05',
-                                      'blib' => '1.01',
                                       'perl' => '5.006',
                                       'warnings' => '0'
                                     }
@@ -50,7 +52,6 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'POSIX' => '0',
                                    'Test::More' => '0.96',
                                    'warnings' => '0'
                                  }

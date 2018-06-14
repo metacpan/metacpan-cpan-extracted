@@ -1,0 +1,51 @@
+{
+   "abstract" : "Perform a restartable series of steps in parallel",
+   "author" : [
+      "philiprbrenan@gmail.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Edit-Conversion",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4224"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dump" : "0",
+            "Data::Table::Text" : "20180610",
+            "File::Touch" : "0",
+            "Storable" : "0",
+            "Test2::API" : "0",
+            "Test::More" : "0",
+            "Time::HiRes" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Edit::Conversion" : {
+         "file" : "lib/Data/Edit/Conversion.pm",
+         "version" : "20180610"
+      },
+      "Data::Edit::Conversion::Project" : {
+         "file" : "lib/Data/Edit/Conversion.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "20180610"
+}

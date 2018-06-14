@@ -15,21 +15,49 @@ package Paws::CloudTrail::PutEventSelectors;
 
 =head1 NAME
 
-Paws::CloudTrail::PutEventSelectors - Arguments for method PutEventSelectors on Paws::CloudTrail
+Paws::CloudTrail::PutEventSelectors - Arguments for method PutEventSelectors on L<Paws::CloudTrail>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method PutEventSelectors on the 
-AWS CloudTrail service. Use the attributes of this class
+This class represents the parameters used for calling the method PutEventSelectors on the
+L<AWS CloudTrail|Paws::CloudTrail> service. Use the attributes of this class
 as arguments to method PutEventSelectors.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to PutEventSelectors.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->PutEventSelectors(Att1 => $value1, Att2 => $value2, ...);
+    my $cloudtrail = Paws->service('CloudTrail');
+    my $PutEventSelectorsResponse = $cloudtrail->PutEventSelectors(
+      EventSelectors => [
+        {
+          ReadWriteType =>
+            'ReadOnly',    # values: ReadOnly, WriteOnly, All; OPTIONAL
+          DataResources => [
+            {
+              Type   => 'MyString',    # OPTIONAL
+              Values => [
+                'MyString', ...        # OPTIONAL
+              ],                       # OPTIONAL
+            },
+            ...
+          ],                           # OPTIONAL
+          IncludeManagementEvents => 1,    # OPTIONAL
+        },
+        ...
+      ],
+      TrailName => 'MyString',
+
+    );
+
+    # Results:
+    my $TrailARN       = $PutEventSelectorsResponse->TrailARN;
+    my $EventSelectors = $PutEventSelectorsResponse->EventSelectors;
+
+    # Returns a L<Paws::CloudTrail::PutEventSelectorsResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/cloudtrail/PutEventSelectors>
 
 =head1 ATTRIBUTES
 
@@ -85,9 +113,9 @@ This class forms part of L<Paws>, documenting arguments for method PutEventSelec
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

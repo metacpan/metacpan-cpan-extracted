@@ -3,6 +3,7 @@ package Paws::Pinpoint::WriteCampaignRequest;
   has AdditionalTreatments => (is => 'ro', isa => 'ArrayRef[Paws::Pinpoint::WriteTreatmentResource]');
   has Description => (is => 'ro', isa => 'Str');
   has HoldoutPercent => (is => 'ro', isa => 'Int');
+  has Hook => (is => 'ro', isa => 'Paws::Pinpoint::CampaignHook');
   has IsPaused => (is => 'ro', isa => 'Bool');
   has Limits => (is => 'ro', isa => 'Paws::Pinpoint::CampaignLimits');
   has MessageConfiguration => (is => 'ro', isa => 'Paws::Pinpoint::MessageConfiguration');
@@ -10,7 +11,6 @@ package Paws::Pinpoint::WriteCampaignRequest;
   has Schedule => (is => 'ro', isa => 'Paws::Pinpoint::Schedule');
   has SegmentId => (is => 'ro', isa => 'Str');
   has SegmentVersion => (is => 'ro', isa => 'Int');
-  has Trace => (is => 'ro', isa => 'Bool');
   has TreatmentDescription => (is => 'ro', isa => 'Str');
   has TreatmentName => (is => 'ro', isa => 'Str');
 1;
@@ -64,6 +64,11 @@ Used to create a campaign.
 from this campaign.
 
 
+=head2 Hook => L<Paws::Pinpoint::CampaignHook>
+
+  Campaign hook information.
+
+
 =head2 IsPaused => Bool
 
   Indicates whether the campaign is paused. A paused campaign does not
@@ -100,11 +105,6 @@ send messages unless you resume it by setting IsPaused to false.
   The version of the segment to which the campaign sends messages.
 
 
-=head2 Trace => Bool
-
-  Whether or not to enable trace logging for the campaign. Undocumented
-
-
 =head2 TreatmentDescription => Str
 
   A custom description for the treatment.
@@ -122,9 +122,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Pinpoint>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

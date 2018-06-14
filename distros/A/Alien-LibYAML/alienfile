@@ -9,12 +9,12 @@ share {
     version => qr/^yaml-([0-9\.]+)\.tar\.gz$/,
   );
   plugin Extract => 'tar.gz';
-  
+
   requires 'Path::Tiny' => '0.077';
-  
+
   patch sub {
     my($build) = @_;
-    
+
     my $pc = Path::Tiny->new('yaml-0.1.pc.in');
     if(-f $pc)
     {
@@ -23,8 +23,18 @@ share {
       });
     }
   };
-  
+
   plugin 'Build::Autoconf' => ();
+
+  ffi {
+
+    build [
+      '%{configure} --enable-shared --disable-static --libdir=%{.install.autoconf_prefix}/dynamic',
+      '%{make}',
+      '%{make} install',
+    ];
+
+  };
 
   meta->after_hook(
     gather_share => sub {

@@ -13,28 +13,105 @@ package Paws::Batch::CreateComputeEnvironment;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/v1/createcomputeenvironment');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'POST');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::Batch::CreateComputeEnvironmentResponse');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::Batch::CreateComputeEnvironment - Arguments for method CreateComputeEnvironment on Paws::Batch
+Paws::Batch::CreateComputeEnvironment - Arguments for method CreateComputeEnvironment on L<Paws::Batch>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateComputeEnvironment on the 
-AWS Batch service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateComputeEnvironment on the
+L<AWS Batch|Paws::Batch> service. Use the attributes of this class
 as arguments to method CreateComputeEnvironment.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateComputeEnvironment.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateComputeEnvironment(Att1 => $value1, Att2 => $value2, ...);
+    my $batch = Paws->service('Batch');
+    # To create a managed EC2 compute environment
+    # This example creates a managed compute environment with specific C4
+    # instance types that are launched on demand. The compute environment is
+    # called C4OnDemand.
+    my $CreateComputeEnvironmentResponse = $batch->CreateComputeEnvironment(
+      {
+        'ComputeEnvironmentName' => 'C4OnDemand',
+        'Type'                   => 'MANAGED',
+        'ServiceRole' => 'arn:aws:iam::012345678910:role/AWSBatchServiceRole',
+        'State'       => 'ENABLED',
+        'ComputeResources' => {
+          'Ec2KeyPair' => 'id_rsa',
+          'MinvCpus'   => 0,
+          'Subnets' =>
+            [ 'subnet-220c0e0a', 'subnet-1a95556d', 'subnet-978f6dce' ],
+          'InstanceTypes' => [
+            'c4.large', 'c4.xlarge', 'c4.2xlarge', 'c4.4xlarge',
+            'c4.8xlarge'
+          ],
+          'DesiredvCpus'     => 48,
+          'SecurityGroupIds' => ['sg-cf5093b2'],
+          'InstanceRole'     => 'ecsInstanceRole',
+          'Type'             => 'EC2',
+          'MaxvCpus'         => 128,
+          'Tags'             => {
+            'Name' => 'Batch Instance - C4OnDemand'
+          }
+        }
+      }
+    );
+
+    # Results:
+    my $computeEnvironmentName =
+      $CreateComputeEnvironmentResponse->computeEnvironmentName;
+    my $computeEnvironmentArn =
+      $CreateComputeEnvironmentResponse->computeEnvironmentArn;
+
+    # Returns a L<Paws::Batch::CreateComputeEnvironmentResponse> object.
+    # To create a managed EC2 Spot compute environment
+    # This example creates a managed compute environment with the M4 instance
+    # type that is launched when the Spot bid price is at or below 20% of the
+    # On-Demand price for the instance type. The compute environment is called
+    # M4Spot.
+    my $CreateComputeEnvironmentResponse = $batch->CreateComputeEnvironment(
+      {
+        'ComputeEnvironmentName' => 'M4Spot',
+        'State'                  => 'ENABLED',
+        'ServiceRole' => 'arn:aws:iam::012345678910:role/AWSBatchServiceRole',
+        'Type'        => 'MANAGED',
+        'ComputeResources' => {
+          'Ec2KeyPair'    => 'id_rsa',
+          'InstanceTypes' => ['m4'],
+          'Subnets' =>
+            [ 'subnet-220c0e0a', 'subnet-1a95556d', 'subnet-978f6dce' ],
+          'MinvCpus' => 0,
+          'SpotIamFleetRole' =>
+            'arn:aws:iam::012345678910:role/aws-ec2-spot-fleet-role',
+          'Type'             => 'SPOT',
+          'SecurityGroupIds' => ['sg-cf5093b2'],
+          'InstanceRole'     => 'ecsInstanceRole',
+          'BidPercentage'    => 20,
+          'DesiredvCpus'     => 4,
+          'Tags'             => {
+            'Name' => 'Batch Instance - M4Spot'
+          },
+          'MaxvCpus' => 128
+        }
+      }
+    );
+
+    # Results:
+    my $computeEnvironmentName =
+      $CreateComputeEnvironmentResponse->computeEnvironmentName;
+    my $computeEnvironmentArn =
+      $CreateComputeEnvironmentResponse->computeEnvironmentArn;
+
+    # Returns a L<Paws::Batch::CreateComputeEnvironmentResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/batch/CreateComputeEnvironment>
 
 =head1 ATTRIBUTES
 
@@ -42,7 +119,7 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 =head2 B<REQUIRED> ComputeEnvironmentName => Str
 
 The name for your compute environment. Up to 128 letters (uppercase and
-lowercase), numbers, and underscores are allowed.
+lowercase), numbers, hyphens, and underscores are allowed.
 
 
 
@@ -92,9 +169,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateCompute
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -21,7 +21,6 @@ WriteMakefile(
         'HTTP::Tiny::UA::Response' => 0.004,
         'JSON'                     => 2.9,
         'MIME::Base64'             => 3.11,
-        'Types::Serialiser'        => 1.0,
         'X::Tiny'                  => 0.12,
     },
     META_MERGE => {

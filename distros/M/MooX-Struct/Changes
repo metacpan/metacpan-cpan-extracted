@@ -6,6 +6,15 @@ Home page:    <https://metacpan.org/release/MooX-Struct>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Struct>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.017	2018-06-09
+
+ [ Documentation ]
+ - Better method documentation.
+
+ [ Other ]
+ - Added: CLASSNAME method.
+ - Added: TYPE_TINY method.
+
 0.016	2017-05-23
 
  [ Test Suite ]

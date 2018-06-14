@@ -33,7 +33,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Config::Com
 =head1 DESCRIPTION
 
 The number of AWS resources of a specific type that are compliant or
-noncompliant, up to a maximum of 100 for each compliance.
+noncompliant, up to a maximum of 100 for each.
 
 =head1 ATTRIBUTES
 
@@ -41,7 +41,7 @@ noncompliant, up to a maximum of 100 for each compliance.
 =head2 ComplianceSummary => L<Paws::Config::ComplianceSummary>
 
   The number of AWS resources that are compliant or noncompliant, up to a
-maximum of 100 for each compliance.
+maximum of 100 for each.
 
 
 =head2 ResourceType => Str
@@ -56,9 +56,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Config>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

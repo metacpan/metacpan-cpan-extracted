@@ -19,21 +19,47 @@ package Paws::SSM::PutComplianceItems;
 
 =head1 NAME
 
-Paws::SSM::PutComplianceItems - Arguments for method PutComplianceItems on Paws::SSM
+Paws::SSM::PutComplianceItems - Arguments for method PutComplianceItems on L<Paws::SSM>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method PutComplianceItems on the 
-Amazon Simple Systems Manager (SSM) service. Use the attributes of this class
+This class represents the parameters used for calling the method PutComplianceItems on the
+L<Amazon Simple Systems Manager (SSM)|Paws::SSM> service. Use the attributes of this class
 as arguments to method PutComplianceItems.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to PutComplianceItems.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->PutComplianceItems(Att1 => $value1, Att2 => $value2, ...);
+    my $ssm = Paws->service('SSM');
+    my $PutComplianceItemsResult = $ssm->PutComplianceItems(
+      ComplianceType   => 'MyComplianceTypeName',
+      ExecutionSummary => {
+        ExecutionTime => '1970-01-01T01:00:00',
+        ExecutionType => 'MyComplianceExecutionType',    # max: 50; OPTIONAL
+        ExecutionId   => 'MyComplianceExecutionId',      # max: 100; OPTIONAL
+      },
+      Items => [
+        {
+          Status   => 'COMPLIANT',    # values: COMPLIANT, NON_COMPLIANT
+          Severity => 'CRITICAL'
+          ,    # values: CRITICAL, HIGH, MEDIUM, LOW, INFORMATIONAL, UNSPECIFIED
+          Details => {
+            'MyAttributeName' =>
+              'MyAttributeValue',    # key: min: 1, max: 64, value: max: 4096
+          },    # OPTIONAL
+          Id    => 'MyComplianceItemId',       # min: 1, max: 100; OPTIONAL
+          Title => 'MyComplianceItemTitle',    # max: 500; OPTIONAL
+        },
+        ...
+      ],
+      ResourceId      => 'MyComplianceResourceId',
+      ResourceType    => 'MyComplianceResourceType',
+      ItemContentHash => 'MyComplianceItemContentHash',    # OPTIONAL
+    );
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ssm/PutComplianceItems>
 
 =head1 ATTRIBUTES
 
@@ -91,9 +117,9 @@ This class forms part of L<Paws>, documenting arguments for method PutCompliance
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

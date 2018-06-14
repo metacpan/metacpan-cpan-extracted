@@ -13,10 +13,10 @@ sub output {
     my $openedtool = $$o{q}->param('tool');
     my $tool = $$o{schema}{tools}{$openedtool};
     if (! $tool || ! $$tool{on_open}) {
-      $$o{output_handler}->(CGI::header('text/html')."<!DOCTYPE html>\n<html><body>could not find tool</body></html>");
+      $$o{output_handler}->($$o{httpHeader}->('text/html')."<!DOCTYPE html>\n<html><body>could not find tool</body></html>");
     } else {
       my $buf = $$tool{on_open}->($o);
-      $$o{output_handler}->(CGI::header('text/html')."<!DOCTYPE html>\n<html><body>$buf</body></html>") if $buf;
+      $$o{output_handler}->($$o{httpHeader}->('text/html')."<!DOCTYPE html>\n<html><body>$buf</body></html>") if $buf;
     }
   }
 

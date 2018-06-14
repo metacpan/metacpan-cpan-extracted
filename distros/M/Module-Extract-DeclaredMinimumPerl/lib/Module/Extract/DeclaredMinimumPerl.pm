@@ -8,9 +8,10 @@ use warnings;
 no warnings;
 
 use subs qw();
-use vars qw($VERSION);
 
-$VERSION = '1.02';
+our $VERSION = '1.021';
+
+=encoding utf8
 
 =head1 NAME
 
@@ -31,8 +32,8 @@ Extract the largest declared Perl version and returns it as a
 version object. For instance, in a script you might have:
 
   use v5.16;
-  
-This module will extract that C<v5.16> and return it. 
+
+This module will extract that C<v5.16> and return it.
 
 This module tries to handle any format that PPI will recognize, passing
 them through version.pm to normalize them.
@@ -162,7 +163,9 @@ L<Module::Extract::Use>
 
 =head1 SOURCE AVAILABILITY
 
-The source code is in Github: git://github.com/briandfoy/Module-Extract-DeclaredMinimumPerl.git
+The source code is in Github:
+
+	https://github.com/briandfoy/module-extract-declaredminimumperl
 
 =head1 AUTHOR
 
@@ -170,9 +173,9 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2011-2014, brian d foy, All Rights Reserved.
+Copyright © 2011-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+You may redistribute this under the terms of the Artistic License 2.0.
 
 =cut
 

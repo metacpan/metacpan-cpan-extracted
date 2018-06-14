@@ -2,8 +2,8 @@
 
 # FRAGMENT id=shcompgen-hint command=cryp-exchange
 
-our $DATE = '2018-06-08'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-06-13'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,27 +11,44 @@ use warnings;
 use Log::ger;
 
 use Perinci::CmdLine::cryp;
+use PERLANCAR::Module::List;
 
 my $prefix = "/App/cryp/exchange/";
+my $mods = do {
+    # if we are being called during the building of our own dist by dzil (e.g.
+    # by Pod::Weaver::Plugin::Rinci), don't include subcommands installed
+    # outside our dist. otherwise we'll be documenting and depending on
+    # extraneous subcommands.
+    local @INC = ("lib")
+        if $ENV{DZIL} &&
+            # DZP:SetEnv always sets DZIL=1 so we need to know if it's our own
+            # dist that we're building
+        (!defined($ENV{DZIL_NAME}) ||
+         $ENV{DZIL_NAME} eq 'App-cryp-exchange');
+
+    PERLANCAR::Module::List::list_modules(
+        "App::cryp::Cmd::Exchange::", {list_modules=>1});
+};
+my $subcommands = {};
+for my $mod (keys %$mods) {
+    (my $sc_name = $mod) =~ s/App::cryp::Cmd::Exchange:://;
+    $sc_name =~ s/_/-/g;
+
+    (my $url = $mod) =~ s!::!/!g;
+    $subcommands->{$sc_name} = {
+        url => "/$url/handle_cmd",
+    };
+}
 
 Perinci::CmdLine::cryp->new(
     url => $prefix,
     log => 1,
     pass_cmdline_object => 1,
     config_filename => ["cryp.conf", "cryp-exchange.conf"],
-    subcommands => {
-        # public
-        "ls-accounts"       => { url => "${prefix}list_accounts", },
-        "ls-exchanges"      => { url => "${prefix}list_exchanges", },
-        "ls-pairs"          => { url => "${prefix}list_pairs", },
-
-        # private
-        "get-order-book"    => { url => "${prefix}get_order_book", },
-        "ls-balances"       => { url => "${prefix}list_balances", },
-    },
+    subcommands => $subcommands,
 )->run;
 
-# ABSTRACT: Interact with cryptoexchanges
+# ABSTRACT: Interact with cryptoexchanges using a common interface
 # PODNAME: cryp-exchange
 
 __END__
@@ -42,11 +59,11 @@ __END__
 
 =head1 NAME
 
-cryp-exchange - Interact with cryptoexchanges
+cryp-exchange - Interact with cryptoexchanges using a common interface
 
 =head1 VERSION
 
-This document describes version 0.005 of cryp-exchange (from Perl distribution App-cryp-exchange), released on 2018-06-08.
+This document describes version 0.009 of cryp-exchange (from Perl distribution App-cryp-exchange), released on 2018-06-13.
 
 =head1 SYNOPSIS
 
@@ -54,12 +71,13 @@ Create configuration in F<~/.config/cryp-exchange.conf> (or
 F<~/.config/cryp.conf> so configuration can be shared with the other C<cryp-*>
 family of scripts):
 
- [exchange/bitcoin-indonesia]
+ ; equivalent to exchange/indodax/default
+ [exchange/indodax]
  api_key    = S6WBYR6Q-TVMTSFOA-YWK6GSNT-H0JMEK6Z-YDF5ML9Y
  api_secret = e16064aa7fb477b267fe774df62194f33583c7f46a09ad931ca2e097aeaa9c9296e1c3b2734bab71
 
  ; if you have another account on the same exchange
- [exchange/bitcoin-indonesia/wifey]
+ [exchange/indodax/wifey]
  api_key    = EKSGJUOR-ROR9K24P-Q45UBWVG-GZHANPQV-UY4Z1WBM
  api_secret = 71100dc13ffe4d082239c06b5c36fd8f0548cd97056ffa2ee491ae4dfd4f996fb468ef3c70b12073
 
@@ -68,57 +86,127 @@ family of scripts):
  api_secret     = 9B8T2nPFMRUiUIKA82txjaO09iNnJXBMVMdkDgJ0i2YambYKQY8DZAS54ERZE0sE2lzYrpTWfpU7/110xfesZluY
  api_passphrase = gdllszgwO774NN
 
+=head2 General
+
 To list supported exchanges:
 
- % cryp-exchange ls-exchanges
- % cryp-exchange ls-exchanges -l
+ % cryp-exchange exchanges
+ % cryp-exchange exchanges -l
 
 To list pairs offered in an exchange:
 
- % cryp-exchange ls-pairs bitcoin-indonesia
- % cryp-exchange ls-pairs gdax -l
+ % cryp-exchange pairs indodax/wifey
+ % cryp-exchange pairs gdax -l
 
 To list accounts:
 
- % cryp-exchange ls-accounts
- % cryp-exchange ls-accounts -l
- % cryp-exchange ls-accounts -I gdax -l ;# only accounts on gdax
- % cryp-exchange ls-accounts -X gdax -l ;# all accounts except those on gdax
+ % cryp-exchange accounts
+ % cryp-exchange accounts -l
+ % cryp-exchange accounts -I gdax -l ;# only accounts on gdax
+ % cryp-exchange accounts -X gdax -l ;# all accounts except those on gdax
+
+To view ticker (last 24h price and volume information):
+
+ % cryp-exchange ticker gdax BTC/USD
 
 To get order book:
 
- % cryp-exchange get-order-book gdax
+ % cryp-exchange orderbook gdax
+
+=head2 Balance
+
+To get account balance:
+
+ % cryp-exchange balance gdax
+ % cryp-exchange balance indodax/wifey
+
+=head2 Order
+
+To create a limit order:
+
+ # buy 100USD worth of BTC at 7000USD/BTC
+ % cryp-exchange create-limit-order gdax BTC/USD buy 7500 --quote-size 100
+
+ # buy 0.5BTC at 7000USD/BTC
+ % cryp-exchange create-limit-order gdax BTC/USD buy 7500 --base-size 0.5
+
+To get information about an order:
+
+ % cryp-exchange get-order gdax BTC/USD buy 6327a864-d2c8-4e3e-8de3-dd71921b7cd0
+
+To list open orders:
+
+ # list all open orders
+ % cryp-exchange open-orders gdax
+
+ # list open orders for a specific pair only
+ % cryp-exchange open-orders gdax BTC/USD
+
+To cancel an order:
+
+ % cryp-exchange cancel-order gdax BTC/USD buy 6327a864-d2c8-4e3e-8de3-dd71921b7cd0
 
 =head1 DESCRIPTION
 
 B<Early release. More functionality will be added in the future.>
 
-This utility (and the corresponding backend modules) provide a common interface
-to interact with various cryptocurrency exchanges: common set of subcommands
-(methods) with common arguments and result format, standardized currency codes
-(following L<CryptoCurrency::Catalog>) and pair formats (e.g. C<BTC/USD>).
+cryp-exchange is a multi-cryptoexchange CLI. This distribution provides common
+interface (as CLI as well as driver modules) to interact with different
+cryptocurrency exchanges including:
+
+=over
+
+=item * common set of subcommands (API methods)
+
+Along with common terminology, arguments, error behavior, and result format.
+
+=item * standardized currency codes and pair formats
+
+Following L<CryptoCurrency::Catalog>.
+
+=back
 
 =head1 SUBCOMMANDS
 
-=head2 B<get-order-book>
-
-Get order book on an exchange.
-
-=head2 B<ls-accounts>
+=head2 B<accounts>
 
 List exchange accounts.
 
-=head2 B<ls-balances>
+=head2 B<balance>
 
-List account balances.
+List account balance.
 
-=head2 B<ls-exchanges>
+=head2 B<cancel-order>
+
+Cancel an order.
+
+=head2 B<create-limit-order>
+
+Create a limit order.
+
+=head2 B<exchanges>
 
 List supported exchanges.
 
-=head2 B<ls-pairs>
+=head2 B<get-order>
+
+Get information about an order.
+
+=head2 B<open-orders>
+
+List open orders.
+
+=head2 B<orderbook>
+
+Get order book on an exchange.
+
+=head2 B<pairs>
 
 List pairs supported by exchange.
+
+=head2 B<ticker>
+
+Get a pair's ticker (last 24h price & volume information).
 
 =head1 OPTIONS
 
@@ -213,17 +301,149 @@ Display program's version and exit.
 
 =back
 
-=head2 Options for subcommand get-order-book
+=head2 Options for subcommand accounts
 
 =over
+
+=item B<--detail>, B<-l>
+
+=back
+
+=head2 Options for subcommand balance
+
+=over
+
+=item B<--account>=I<s>*
+
+=back
+
+=head2 Options for subcommand cancel-order
+
+=over
+
+=item B<--account>=I<s>*
+
+=item B<--buy*>
+
+Alias for --type=buy.
+
+See C<--type>.
+
+=item B<--order-id>=I<s>*
+
+=item B<--pair>=I<s>*
+
+=item B<--sell*>
+
+Alias for --type=sell.
+
+See C<--type>.
+
+=item B<--type>=I<s>*
+
+Valid values:
+
+ ["buy","sell"]
+
+=back
+
+=head2 Options for subcommand create-limit-order
+
+=over
+
+=item B<--account>=I<s>*
+
+=item B<--base-size>=I<s>
+
+Order amount, denominated in base currency (first currency of the pair).
+
+=item B<--buy*>
+
+Alias for --type=buy.
+
+See C<--type>.
+
+=item B<--pair>=I<s>*
+
+=item B<--price>=I<s>*
+
+=item B<--quote-size>=I<s>
+
+Order amount, denominated in quote currency (second currency of the pair).
+
+=item B<--sell*>
+
+Alias for --type=sell.
+
+See C<--type>.
+
+=item B<--type>=I<s>*
+
+Valid values:
+
+ ["buy","sell"]
+
+=back
+
+=head2 Options for subcommand exchanges
+
+=over
+
+=item B<--detail>, B<-l>
+
+=back
+
+=head2 Options for subcommand get-order
+
+=over
+
+=item B<--account>=I<s>*
+
+=item B<--buy*>
+
+Alias for --type=buy.
+
+See C<--type>.
+
+=item B<--order-id>=I<s>*
+
+=item B<--pair>=I<s>*
+
+=item B<--sell*>
+
+Alias for --type=sell.
+
+See C<--type>.
+
+=item B<--type>=I<s>*
+
+Valid values:
+
+ ["buy","sell"]
+
+=back
+
+=head2 Options for subcommand open-orders
+
+=over
+
+=item B<--account>=I<s>*
+
+=item B<--pair>=I<s>
+
+=back
+
+=head2 Options for subcommand orderbook
+
+=over
+
+=item B<--account>=I<s>*
 
 =item B<--buy>
 
 Alias for --type=buy.
 
 See C<--type>.
-
-=item B<--exchange>=I<s>*
 
 =item B<--pair>=I<s>*
 
@@ -241,39 +461,25 @@ Valid values:
 
 =back
 
-=head2 Options for subcommand ls-accounts
+=head2 Options for subcommand pairs
 
 =over
+
+=item B<--account>=I<s>*
 
 =item B<--detail>, B<-l>
-
-=back
-
-=head2 Options for subcommand ls-balances
-
-=over
-
-=item B<--exchange>=I<s>*
-
-=back
-
-=head2 Options for subcommand ls-exchanges
-
-=over
-
-=item B<--detail>, B<-l>
-
-=back
-
-=head2 Options for subcommand ls-pairs
-
-=over
-
-=item B<--detail>, B<-l>
-
-=item B<--exchange>=I<s>*
 
 =item B<--native>
+
+=back
+
+=head2 Options for subcommand ticker
+
+=over
+
+=item B<--account>=I<s>*
+
+=item B<--pair>=I<s>*
 
 =back
 
@@ -337,29 +543,62 @@ List of available configuration parameters:
  log_level (see --log-level)
  naked_res (see --naked-res)
 
-=head2 Configuration for subcommand get-order-book
+=head2 Configuration for subcommand accounts
 
- exchange (see --exchange)
+ detail (see --detail)
+
+=head2 Configuration for subcommand balance
+
+ account (see --account)
+
+=head2 Configuration for subcommand cancel-order
+
+ account (see --account)
+ order_id (see --order-id)
  pair (see --pair)
  type (see --type)
 
-=head2 Configuration for subcommand ls-accounts
+=head2 Configuration for subcommand create-limit-order
+
+ account (see --account)
+ base_size (see --base-size)
+ pair (see --pair)
+ price (see --price)
+ quote_size (see --quote-size)
+ type (see --type)
+
+=head2 Configuration for subcommand exchanges
 
  detail (see --detail)
 
-=head2 Configuration for subcommand ls-balances
+=head2 Configuration for subcommand get-order
 
- exchange (see --exchange)
+ account (see --account)
+ order_id (see --order-id)
+ pair (see --pair)
+ type (see --type)
 
-=head2 Configuration for subcommand ls-exchanges
+=head2 Configuration for subcommand open-orders
 
+ account (see --account)
+ pair (see --pair)
+
+=head2 Configuration for subcommand orderbook
+
+ account (see --account)
+ pair (see --pair)
+ type (see --type)
+
+=head2 Configuration for subcommand pairs
+
+ account (see --account)
  detail (see --detail)
-
-=head2 Configuration for subcommand ls-pairs
-
- detail (see --detail)
- exchange (see --exchange)
  native (see --native)
+
+=head2 Configuration for subcommand ticker
+
+ account (see --account)
+ pair (see --pair)
 
 =head1 ENVIRONMENT
 
@@ -400,6 +639,10 @@ feature.
 =head1 SEE ALSO
 
 The other C<cryp-*> scripts in the family.
+
+L<CryptoCurrency::Catalog>
+
+L<CryptoExchange::Catalog>
 
 =head1 AUTHOR
 

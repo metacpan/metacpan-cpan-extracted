@@ -31,15 +31,16 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Firehose::S
 
 =head1 DESCRIPTION
 
-Details about a Kinesis stream used as the source for a Kinesis
-Firehose delivery stream.
+Details about a Kinesis data stream used as the source for a Kinesis
+Data Firehose delivery stream.
 
 =head1 ATTRIBUTES
 
 
 =head2 KinesisStreamSourceDescription => L<Paws::Firehose::KinesisStreamSourceDescription>
 
-  The KinesisStreamSourceDescription value for the source Kinesis stream.
+  The KinesisStreamSourceDescription value for the source Kinesis data
+stream.
 
 
 
@@ -49,9 +50,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Firehose>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

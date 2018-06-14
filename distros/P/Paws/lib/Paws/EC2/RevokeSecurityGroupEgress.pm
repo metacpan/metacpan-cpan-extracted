@@ -22,29 +22,80 @@ package Paws::EC2::RevokeSecurityGroupEgress;
 
 =head1 NAME
 
-Paws::EC2::RevokeSecurityGroupEgress - Arguments for method RevokeSecurityGroupEgress on Paws::EC2
+Paws::EC2::RevokeSecurityGroupEgress - Arguments for method RevokeSecurityGroupEgress on L<Paws::EC2>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method RevokeSecurityGroupEgress on the 
-Amazon Elastic Compute Cloud service. Use the attributes of this class
+This class represents the parameters used for calling the method RevokeSecurityGroupEgress on the
+L<Amazon Elastic Compute Cloud|Paws::EC2> service. Use the attributes of this class
 as arguments to method RevokeSecurityGroupEgress.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to RevokeSecurityGroupEgress.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->RevokeSecurityGroupEgress(Att1 => $value1, Att2 => $value2, ...);
+    my $ec2 = Paws->service('EC2');
+    $ec2->RevokeSecurityGroupEgress(
+      GroupId       => 'MyString',
+      CidrIp        => 'MyString',    # OPTIONAL
+      DryRun        => 1,             # OPTIONAL
+      FromPort      => 1,             # OPTIONAL
+      IpPermissions => [
+        {
+          Ipv6Ranges => [
+            {
+              Description => 'MyString',
+              CidrIpv6    => 'MyString',
+            },
+            ...
+          ],                          # OPTIONAL
+          IpProtocol => 'MyString',
+          FromPort   => 1,
+          IpRanges   => [
+            {
+              Description => 'MyString',
+              CidrIp      => 'MyString',
+            },
+            ...
+          ],                          # OPTIONAL
+          UserIdGroupPairs => [
+            {
+              VpcId                  => 'MyString',
+              GroupName              => 'MyString',
+              PeeringStatus          => 'MyString',
+              Description            => 'MyString',
+              VpcPeeringConnectionId => 'MyString',
+              UserId                 => 'MyString',
+              GroupId                => 'MyString',
+            },
+            ...
+          ],                          # OPTIONAL
+          ToPort        => 1,
+          PrefixListIds => [
+            {
+              Description  => 'MyString',
+              PrefixListId => 'MyString',
+            },
+            ...
+          ],                          # OPTIONAL
+        },
+        ...
+      ],                              # OPTIONAL
+      IpProtocol                 => 'MyString',    # OPTIONAL
+      SourceSecurityGroupName    => 'MyString',    # OPTIONAL
+      SourceSecurityGroupOwnerId => 'MyString',    # OPTIONAL
+      ToPort                     => 1,             # OPTIONAL
+    );
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ec2/RevokeSecurityGroupEgress>
 
 =head1 ATTRIBUTES
 
 
 =head2 CidrIp => Str
 
-The CIDR IP address range. We recommend that you specify the CIDR range
-in a set of IP permissions instead.
+Not supported. Use a set of IP permissions to specify the CIDR.
 
 
 
@@ -59,9 +110,7 @@ C<DryRunOperation>. Otherwise, it is C<UnauthorizedOperation>.
 
 =head2 FromPort => Int
 
-The start of port range for the TCP and UDP protocols, or an ICMP type
-number. We recommend that you specify the port range in a set of IP
-permissions instead.
+Not supported. Use a set of IP permissions to specify the port.
 
 
 
@@ -73,39 +122,36 @@ The ID of the security group.
 
 =head2 IpPermissions => ArrayRef[L<Paws::EC2::IpPermission>]
 
-A set of IP permissions. You can't specify a destination security group
-and a CIDR IP address range.
+One or more sets of IP permissions. You can't specify a destination
+security group and a CIDR IP address range in the same set of
+permissions.
 
 
 
 =head2 IpProtocol => Str
 
-The IP protocol name or number. We recommend that you specify the
-protocol in a set of IP permissions instead.
+Not supported. Use a set of IP permissions to specify the protocol name
+or number.
 
 
 
 =head2 SourceSecurityGroupName => Str
 
-The name of a destination security group. To revoke outbound access to
-a destination security group, we recommend that you use a set of IP
-permissions instead.
+Not supported. Use a set of IP permissions to specify a destination
+security group.
 
 
 
 =head2 SourceSecurityGroupOwnerId => Str
 
-The AWS account number for a destination security group. To revoke
-outbound access to a destination security group, we recommend that you
-use a set of IP permissions instead.
+Not supported. Use a set of IP permissions to specify a destination
+security group.
 
 
 
 =head2 ToPort => Int
 
-The end of port range for the TCP and UDP protocols, or an ICMP type
-number. We recommend that you specify the port range in a set of IP
-permissions instead.
+Not supported. Use a set of IP permissions to specify the port.
 
 
 
@@ -116,9 +162,9 @@ This class forms part of L<Paws>, documenting arguments for method RevokeSecurit
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

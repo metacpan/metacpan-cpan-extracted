@@ -9,6 +9,7 @@ package Paws::Glue::DevEndpoint;
   has LastModifiedTimestamp => (is => 'ro', isa => 'Str');
   has LastUpdateStatus => (is => 'ro', isa => 'Str');
   has NumberOfNodes => (is => 'ro', isa => 'Int');
+  has PrivateAddress => (is => 'ro', isa => 'Str');
   has PublicAddress => (is => 'ro', isa => 'Str');
   has PublicKey => (is => 'ro', isa => 'Str');
   has RoleArn => (is => 'ro', isa => 'Str');
@@ -17,6 +18,7 @@ package Paws::Glue::DevEndpoint;
   has SubnetId => (is => 'ro', isa => 'Str');
   has VpcId => (is => 'ro', isa => 'Str');
   has YarnEndpointAddress => (is => 'ro', isa => 'Str');
+  has ZeppelinRemoteSparkInterpreterPort => (is => 'ro', isa => 'Int');
 1;
 
 ### main pod documentation begin ###
@@ -36,7 +38,7 @@ Each attribute should be used as a named argument in the calls that expect this 
 
 As an example, if Att1 is expected to be a Paws::Glue::DevEndpoint object:
 
-  $service_obj->Method(Att1 => { AvailabilityZone => $value, ..., YarnEndpointAddress => $value  });
+  $service_obj->Method(Att1 => { AvailabilityZone => $value, ..., ZeppelinRemoteSparkInterpreterPort => $value  });
 
 =head3 Results returned from an API call
 
@@ -73,11 +75,20 @@ scripts.
   Path to one or more Java Jars in an S3 bucket that should be loaded in
 your DevEndpoint.
 
+Please note that only pure Java/Scala libraries can currently be used
+on a DevEndpoint.
+
 
 =head2 ExtraPythonLibsS3Path => Str
 
-  Path to one or more Python libraries in an S3 bucket that should be
-loaded in your DevEndpoint.
+  Path(s) to one or more Python libraries in an S3 bucket that should be
+loaded in your DevEndpoint. Multiple values must be complete paths
+separated by a comma.
+
+Please note that only pure Python libraries can currently be used on a
+DevEndpoint. Libraries that rely on C extensions, such as the pandas
+(http://pandas.pydata.org/) Python data analysis library, are not yet
+supported.
 
 
 =head2 FailureReason => Str
@@ -97,12 +108,18 @@ loaded in your DevEndpoint.
 
 =head2 NumberOfNodes => Int
 
-  The number of nodes used by this DevEndpoint.
+  The number of AWS Glue Data Processing Units (DPUs) allocated to this
+DevEndpoint.
+
+
+=head2 PrivateAddress => Str
+
+  The private address used by this DevEndpoint.
 
 
 =head2 PublicAddress => Str
 
-  The public address used by this DevEndpoint.
+  The public VPC address used by this DevEndpoint.
 
 
 =head2 PublicKey => Str
@@ -140,6 +157,11 @@ loaded in your DevEndpoint.
   The YARN endpoint address used by this DevEndpoint.
 
 
+=head2 ZeppelinRemoteSparkInterpreterPort => Int
+
+  The Apache Zeppelin port for the remote Apache Spark interpreter.
+
+
 
 =head1 SEE ALSO
 
@@ -147,9 +169,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Glue>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

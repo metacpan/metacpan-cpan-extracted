@@ -48,18 +48,19 @@ my %WriteMakefileArgs = (
     "URI::Template" => 0,
     "URL::Encode" => 0,
     "URL::Encode::XS" => 0,
-    "XML::Simple" => 0
+    "XML::Simple" => "2.21"
   },
   "TEST_REQUIRES" => {
     "Class::Unload" => 0,
     "File::Slurper" => 0,
+    "Path::Class" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
     "Test::Timer" => 0,
     "Test::Warnings" => 0,
     "YAML" => 0
   },
-  "VERSION" => "0.36",
+  "VERSION" => "0.37",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -87,6 +88,7 @@ my %FallbackPrereqs = (
   "MooseX::Getopt" => 0,
   "Net::Amazon::Signature::V3" => 0,
   "Net::Amazon::Signature::V4" => 0,
+  "Path::Class" => 0,
   "Path::Tiny" => "0.017",
   "String::CRC32" => 0,
   "Test::Exception" => 0,
@@ -98,7 +100,7 @@ my %FallbackPrereqs = (
   "URI::Template" => 0,
   "URL::Encode" => 0,
   "URL::Encode::XS" => 0,
-  "XML::Simple" => 0,
+  "XML::Simple" => "2.21",
   "YAML" => 0
 );
 

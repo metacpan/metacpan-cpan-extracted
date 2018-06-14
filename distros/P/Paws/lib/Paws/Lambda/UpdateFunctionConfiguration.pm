@@ -8,6 +8,7 @@ package Paws::Lambda::UpdateFunctionConfiguration;
   has Handler => (is => 'ro', isa => 'Str');
   has KMSKeyArn => (is => 'ro', isa => 'Str');
   has MemorySize => (is => 'ro', isa => 'Int');
+  has RevisionId => (is => 'ro', isa => 'Str');
   has Role => (is => 'ro', isa => 'Str');
   has Runtime => (is => 'ro', isa => 'Str');
   has Timeout => (is => 'ro', isa => 'Int');
@@ -20,28 +21,61 @@ package Paws::Lambda::UpdateFunctionConfiguration;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/2015-03-31/functions/{FunctionName}/configuration');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'PUT');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::Lambda::FunctionConfiguration');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::Lambda::UpdateFunctionConfiguration - Arguments for method UpdateFunctionConfiguration on Paws::Lambda
+Paws::Lambda::UpdateFunctionConfiguration - Arguments for method UpdateFunctionConfiguration on L<Paws::Lambda>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateFunctionConfiguration on the 
-AWS Lambda service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateFunctionConfiguration on the
+L<AWS Lambda|Paws::Lambda> service. Use the attributes of this class
 as arguments to method UpdateFunctionConfiguration.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateFunctionConfiguration.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateFunctionConfiguration(Att1 => $value1, Att2 => $value2, ...);
+    my $lambda = Paws->service('Lambda');
+    # To update a Lambda function's configuration
+    # This operation updates a Lambda function's configuration
+    my $FunctionConfiguration = $lambda->UpdateFunctionConfiguration(
+      {
+        'Description'  => '',
+        'FunctionName' => 'myFunction',
+        'VpcConfig'    => {
+
+        },
+        'Role'       => 'arn:aws:iam::123456789012:role/lambda_basic_execution',
+        'Timeout'    => 123,
+        'Runtime'    => 'python2.7',
+        'MemorySize' => 128,
+        'Handler'    => 'index.handler'
+      }
+    );
+
+    # Results:
+    my $FunctionArn  = $FunctionConfiguration->FunctionArn;
+    my $Handler      = $FunctionConfiguration->Handler;
+    my $Runtime      = $FunctionConfiguration->Runtime;
+    my $MemorySize   = $FunctionConfiguration->MemorySize;
+    my $Role         = $FunctionConfiguration->Role;
+    my $Timeout      = $FunctionConfiguration->Timeout;
+    my $LastModified = $FunctionConfiguration->LastModified;
+    my $Description  = $FunctionConfiguration->Description;
+    my $Version      = $FunctionConfiguration->Version;
+    my $FunctionName = $FunctionConfiguration->FunctionName;
+    my $CodeSize     = $FunctionConfiguration->CodeSize;
+    my $VpcConfig    = $FunctionConfiguration->VpcConfig;
+    my $CodeSha256   = $FunctionConfiguration->CodeSha256;
+
+    # Returns a L<Paws::Lambda::FunctionConfiguration> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/lambda/UpdateFunctionConfiguration>
 
 =head1 ATTRIBUTES
 
@@ -49,7 +83,8 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 =head2 DeadLetterConfig => L<Paws::Lambda::DeadLetterConfig>
 
 The parent object that contains the target ARN (Amazon Resource Name)
-of an Amazon SQS queue or Amazon SNS topic.
+of an Amazon SQS queue or Amazon SNS topic. For more information, see
+dlq.
 
 
 
@@ -107,6 +142,16 @@ The value must be a multiple of 64 MB.
 
 
 
+=head2 RevisionId => Str
+
+An optional value you can use to ensure you are updating the latest
+update of the function version or alias. If the C<RevisionID> you pass
+doesn't match the latest C<RevisionId> of the function or alias, it
+will fail with an error message, advising you to retrieve the latest
+function version or alias C<RevisionID> using either or .
+
+
+
 =head2 Role => Str
 
 The Amazon Resource Name (ARN) of the IAM role that Lambda will assume
@@ -121,19 +166,18 @@ The runtime environment for the Lambda function.
 To use the Python runtime v3.6, set the value to "python3.6". To use
 the Python runtime v2.7, set the value to "python2.7". To use the
 Node.js runtime v6.10, set the value to "nodejs6.10". To use the
-Node.js runtime v4.3, set the value to "nodejs4.3". To use the Python
-runtime v3.6, set the value to "python3.6".
+Node.js runtime v4.3, set the value to "nodejs4.3". To use the .NET
+Core runtime v1.0, set the value to "dotnetcore1.0". To use the .NET
+Core runtime v2.0, set the value to "dotnetcore2.0".
 
 Node v0.10.42 is currently marked as deprecated. You must migrate
 existing functions to the newer Node.js runtime versions available on
-AWS Lambda (nodejs4.3 or nodejs6.10) as soon as possible. You can
-request a one-time extension until June 30, 2017 by going to the Lambda
-console and following the instructions provided. Failure to do so will
-result in an invalid parameter error being returned. Note that you will
-have to follow this procedure for each region that contains functions
-written in the Node v0.10.42 runtime.
+AWS Lambda (nodejs4.3 or nodejs6.10) as soon as possible. Failure to do
+so will result in an invalid parameter error being returned. Note that
+you will have to follow this procedure for each region that contains
+functions written in the Node v0.10.42 runtime.
 
-Valid values are: C<"nodejs">, C<"nodejs4.3">, C<"nodejs6.10">, C<"java8">, C<"python2.7">, C<"python3.6">, C<"dotnetcore1.0">, C<"nodejs4.3-edge">
+Valid values are: C<"nodejs">, C<"nodejs4.3">, C<"nodejs6.10">, C<"nodejs8.10">, C<"java8">, C<"python2.7">, C<"python3.6">, C<"dotnetcore1.0">, C<"dotnetcore2.0">, C<"nodejs4.3-edge">, C<"go1.x">
 
 =head2 Timeout => Int
 
@@ -163,9 +207,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateFunctio
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

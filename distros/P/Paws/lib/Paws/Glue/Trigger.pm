@@ -55,7 +55,7 @@ Information about a specific trigger.
 
 =head2 Id => Str
 
-  The trigger ID.
+  Reserved for future use.
 
 
 =head2 Name => Str
@@ -65,12 +65,16 @@ Information about a specific trigger.
 
 =head2 Predicate => L<Paws::Glue::Predicate>
 
-  The predicate of this trigger.
+  The predicate of this trigger, which defines when it will fire.
 
 
 =head2 Schedule => Str
 
-  A cron schedule expression.
+  A C<cron> expression used to specify the schedule (see Time-Based
+Schedules for Jobs and Crawlers
+(http://docs.aws.amazon.com/glue/latest/dg/monitor-data-warehouse-schedule.html).
+For example, to run something every day at 12:15 UTC, you would
+specify: C<cron(15 12 * * ? *)>.
 
 
 =head2 State => Str
@@ -90,9 +94,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Glue>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

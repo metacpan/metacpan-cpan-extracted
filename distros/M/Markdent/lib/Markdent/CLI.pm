@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use File::Slurp qw( read_file );
 
@@ -61,8 +61,8 @@ has language => (
 );
 
 has dialects => (
-    is  => 'ro',
-    isa => => t( 'ArrayRef', of => t('Str') ),
+    is            => 'ro',
+    isa           => => t( 'ArrayRef', of => t('Str') ),
     default       => sub { [] },
     documentation => 'One oe more dialects to use when parsing.',
 );

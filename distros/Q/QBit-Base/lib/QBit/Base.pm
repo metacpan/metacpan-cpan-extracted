@@ -1,5 +1,5 @@
 package QBit::Base;
-$QBit::Base::VERSION = '0.002';
+$QBit::Base::VERSION = '0.003';
 use qbit;
 
 if ($] < 5.008) {
@@ -16,6 +16,21 @@ if ($] < 5.008) {
         return $fn;
       }
 }
+
+my %KNOWN_KEYS = map {$_ => TRUE} qw(
+  __MODEL_ACCESSORS__
+  __RIGHT_GROUPS__
+  __RIGHTS__
+  __MODEL_FIELDS__
+  __DB_FILTER_DBACCESSOR__
+  __DB_FILTER__
+  __ACTIONS__
+  __BITS_HS__
+  __BITS__
+  __EMPTY_NAME__
+  __MULTISTATES__
+  __RIGHT_ACTIONS__
+  );
 
 sub import {
     my ($class, @packages) = @_;
@@ -40,6 +55,8 @@ sub import {
         my $ip_stash = package_stash($package);
 
         foreach my $meta (keys(%$ip_stash)) {
+            next unless $KNOWN_KEYS{$meta};
+
             if (exists($stash->{$meta})) {
                 if (ref($stash->{$meta}) eq 'HASH') {
                     $stash->{$meta} = clone({%{$ip_stash->{$meta}}, %{$stash->{$meta}}});
@@ -50,32 +67,9 @@ sub import {
         }
     }
 
-    require QBit::Application::Model::DBManager;
-
     {
         no strict 'refs';
         push @{"$package_heir\::ISA"}, @bases;
-
-        *{"${package_heir}::model_fields"} = sub {
-            my ($class, %fields) = @_;
-
-            my $stash = package_stash($package_heir);
-
-            QBit::Application::Model::DBManager::model_fields($package_heir, %{$stash->{'__MODEL_FIELDS__'}}, %fields);
-        };
-
-        *{"${package_heir}::model_filter"} = sub {
-            my ($class, %filter) = @_;
-
-            my $stash = package_stash($package_heir);
-
-            my %filter_def = (
-                db_accessor => $filter{'db_accessor'} // $stash->{'__DB_FILTER_DBACCESSOR__'},
-                fields => {%{$stash->{'__DB_FILTER__'}}, %{$filter{'fields'}}},
-            );
-
-            QBit::Application::Model::DBManager::model_filter($package_heir, %filter_def);
-        };
     }
 }
 

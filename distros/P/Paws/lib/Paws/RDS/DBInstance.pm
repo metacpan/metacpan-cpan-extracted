@@ -19,6 +19,7 @@ package Paws::RDS::DBInstance;
   has DBSecurityGroups => (is => 'ro', isa => 'ArrayRef[Paws::RDS::DBSecurityGroupMembership]', request_name => 'DBSecurityGroup', traits => ['NameInRequest']);
   has DBSubnetGroup => (is => 'ro', isa => 'Paws::RDS::DBSubnetGroup');
   has DomainMemberships => (is => 'ro', isa => 'ArrayRef[Paws::RDS::DomainMembership]', request_name => 'DomainMembership', traits => ['NameInRequest']);
+  has EnabledCloudwatchLogsExports => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
   has Endpoint => (is => 'ro', isa => 'Paws::RDS::Endpoint');
   has Engine => (is => 'ro', isa => 'Str');
   has EngineVersion => (is => 'ro', isa => 'Str');
@@ -39,6 +40,7 @@ package Paws::RDS::DBInstance;
   has PerformanceInsightsKMSKeyId => (is => 'ro', isa => 'Str');
   has PreferredBackupWindow => (is => 'ro', isa => 'Str');
   has PreferredMaintenanceWindow => (is => 'ro', isa => 'Str');
+  has ProcessorFeatures => (is => 'ro', isa => 'ArrayRef[Paws::RDS::ProcessorFeature]', request_name => 'ProcessorFeature', traits => ['NameInRequest']);
   has PromotionTier => (is => 'ro', isa => 'Int');
   has PubliclyAccessible => (is => 'ro', isa => 'Bool');
   has ReadReplicaDBClusterIdentifiers => (is => 'ro', isa => 'ArrayRef[Str|Undef]', request_name => 'ReadReplicaDBClusterIdentifier', traits => ['NameInRequest']);
@@ -81,32 +83,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::RDS::DBInst
 
 =head1 DESCRIPTION
 
-Contains the result of a successful invocation of the following
-actions:
-
-=over
-
-=item *
-
-CreateDBInstance
-
-=item *
-
-DeleteDBInstance
-
-=item *
-
-ModifyDBInstance
-
-=item *
-
-StopDBInstance
-
-=item *
-
-StartDBInstance
-
-=back
+Contains the details of an Amazon RDS DB instance.
 
 This data type is used as a response element in the DescribeDBInstances
 action.
@@ -116,7 +93,7 @@ action.
 
 =head2 AllocatedStorage => Int
 
-  Specifies the allocated storage size specified in gigabytes.
+  Specifies the allocated storage size specified in gibibytes.
 
 
 =head2 AutoMinorVersionUpgrade => Bool
@@ -190,9 +167,9 @@ cluster port.
 
 =head2 DbiResourceId => Str
 
-  The region-unique, immutable identifier for the DB instance. This
-identifier is found in AWS CloudTrail log entries whenever the KMS key
-for the DB instance is accessed.
+  The AWS Region-unique, immutable identifier for the DB instance. This
+identifier is found in AWS CloudTrail log entries whenever the AWS KMS
+key for the DB instance is accessed.
 
 
 =head2 DBName => Str
@@ -241,6 +218,12 @@ group.
 instance.
 
 
+=head2 EnabledCloudwatchLogsExports => ArrayRef[Str|Undef]
+
+  A list of log types that this DB instance is configured to export to
+CloudWatch Logs.
+
+
 =head2 Endpoint => L<Paws::RDS::Endpoint>
 
   Specifies the connection endpoint.
@@ -266,7 +249,7 @@ that receives the Enhanced Monitoring metrics data for the DB instance.
 =head2 IAMDatabaseAuthenticationEnabled => Bool
 
   True if mapping of AWS Identity and Access Management (IAM) accounts to
-database accounts is enabled; otherwise false.
+database accounts is enabled, and otherwise false.
 
 IAM database authentication can be enabled for the following database
 engines
@@ -302,7 +285,7 @@ see DBCluster Type.
 
 =head2 KmsKeyId => Str
 
-  If C<StorageEncrypted> is true, the KMS key identifier for the
+  If C<StorageEncrypted> is true, the AWS KMS key identifier for the
 encrypted DB instance.
 
 
@@ -331,7 +314,7 @@ metrics are collected for the DB instance.
 =head2 MonitoringRoleArn => Str
 
   The ARN for the IAM role that permits RDS to send Enhanced Monitoring
-metrics to CloudWatch Logs.
+metrics to Amazon CloudWatch Logs.
 
 
 =head2 MultiAZ => Bool
@@ -353,12 +336,15 @@ by subelements.
 
 =head2 PerformanceInsightsEnabled => Bool
 
-  
+  True if Performance Insights is enabled for the DB instance, and
+otherwise false.
 
 
 =head2 PerformanceInsightsKMSKeyId => Str
 
-  
+  The AWS KMS key identifier for encryption of Performance Insights data.
+The KMS key ID is the Amazon Resource Name (ARN), KMS key identifier,
+or the KMS key alias for the KMS encryption key.
 
 
 =head2 PreferredBackupWindow => Str
@@ -374,12 +360,19 @@ C<BackupRetentionPeriod>.
 occur, in Universal Coordinated Time (UTC).
 
 
+=head2 ProcessorFeatures => ArrayRef[L<Paws::RDS::ProcessorFeature>]
+
+  The number of CPU cores and the number of threads per core for the DB
+instance class of the DB instance.
+
+
 =head2 PromotionTier => Int
 
   A value that specifies the order in which an Aurora Replica is promoted
 to the primary instance after a failure of the existing primary
 instance. For more information, see Fault Tolerance for an Aurora DB
-Cluster.
+Cluster
+(http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Aurora.Managing.html#Aurora.Managing.FaultTolerance).
 
 
 =head2 PubliclyAccessible => Bool
@@ -407,10 +400,10 @@ B<VPC:>false
 =back
 
 If no DB subnet group has been specified as part of the request and the
-PubliclyAccessible value has not been set, the DB instance will be
-publicly accessible. If a specific DB subnet group has been specified
-as part of the request and the PubliclyAccessible value has not been
-set, the DB instance will be private.
+PubliclyAccessible value has not been set, the DB instance is publicly
+accessible. If a specific DB subnet group has been specified as part of
+the request and the PubliclyAccessible value has not been set, the DB
+instance is private.
 
 
 =head2 ReadReplicaDBClusterIdentifiers => ArrayRef[Str|Undef]
@@ -440,7 +433,7 @@ DB instance with multi-AZ support.
 =head2 StatusInfos => ArrayRef[L<Paws::RDS::DBInstanceStatusInfo>]
 
   The status of a Read Replica. If the instance is not a Read Replica,
-this will be blank.
+this is blank.
 
 
 =head2 StorageEncrypted => Bool
@@ -479,9 +472,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::RDS>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

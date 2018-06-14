@@ -4,6 +4,7 @@ package Paws::EC2::Instance;
   has Architecture => (is => 'ro', isa => 'Str', request_name => 'architecture', traits => ['NameInRequest']);
   has BlockDeviceMappings => (is => 'ro', isa => 'ArrayRef[Paws::EC2::InstanceBlockDeviceMapping]', request_name => 'blockDeviceMapping', traits => ['NameInRequest']);
   has ClientToken => (is => 'ro', isa => 'Str', request_name => 'clientToken', traits => ['NameInRequest']);
+  has CpuOptions => (is => 'ro', isa => 'Paws::EC2::CpuOptions', request_name => 'cpuOptions', traits => ['NameInRequest']);
   has EbsOptimized => (is => 'ro', isa => 'Bool', request_name => 'ebsOptimized', traits => ['NameInRequest']);
   has ElasticGpuAssociations => (is => 'ro', isa => 'ArrayRef[Paws::EC2::ElasticGpuAssociation]', request_name => 'elasticGpuAssociationSet', traits => ['NameInRequest']);
   has EnaSupport => (is => 'ro', isa => 'Bool', request_name => 'enaSupport', traits => ['NameInRequest']);
@@ -94,6 +95,11 @@ launch group.
 
   The idempotency token you provided when you launched the instance, if
 applicable.
+
+
+=head2 CpuOptions => L<Paws::EC2::CpuOptions>
+
+  The CPU options for the instance.
 
 
 =head2 EbsOptimized => Bool
@@ -224,7 +230,7 @@ for your VPC.
 
 =head2 RootDeviceName => Str
 
-  The root device name (for example, C</dev/sda1> or C</dev/xvda>).
+  The device name of the root device volume (for example, C</dev/sda1>).
 
 
 =head2 RootDeviceType => Str
@@ -245,7 +251,9 @@ NAT. This controls whether source/destination checking is enabled on
 the instance. A value of C<true> means that checking is enabled, and
 C<false> means that checking is disabled. The value must be C<false>
 for the instance to perform NAT. For more information, see NAT
-Instances in the I<Amazon Virtual Private Cloud User Guide>.
+Instances
+(http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_NAT_Instance.html)
+in the I<Amazon Virtual Private Cloud User Guide>.
 
 
 =head2 SpotInstanceRequestId => Str
@@ -302,8 +310,8 @@ This class forms part of L<Paws>, describing an object used in L<Paws::EC2>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut

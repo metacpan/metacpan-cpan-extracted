@@ -19,21 +19,33 @@ package Paws::RDS::CopyDBClusterSnapshot;
 
 =head1 NAME
 
-Paws::RDS::CopyDBClusterSnapshot - Arguments for method CopyDBClusterSnapshot on Paws::RDS
+Paws::RDS::CopyDBClusterSnapshot - Arguments for method CopyDBClusterSnapshot on L<Paws::RDS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CopyDBClusterSnapshot on the 
-Amazon Relational Database Service service. Use the attributes of this class
+This class represents the parameters used for calling the method CopyDBClusterSnapshot on the
+L<Amazon Relational Database Service|Paws::RDS> service. Use the attributes of this class
 as arguments to method CopyDBClusterSnapshot.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CopyDBClusterSnapshot.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CopyDBClusterSnapshot(Att1 => $value1, Att2 => $value2, ...);
+    my $rds = Paws->service('RDS');
+   # To copy a DB cluster snapshot
+   # The following example copies an automated snapshot of a DB cluster to a new
+   # DB cluster snapshot.
+    my $CopyDBClusterSnapshotResult = $rds->CopyDBClusterSnapshot(
+      {
+        'TargetDBClusterSnapshotIdentifier' => 'cluster-snapshot-copy-1',
+        'SourceDBClusterSnapshotIdentifier' =>
+          'rds:sample-cluster-2016-09-14-10-38'
+      }
+    );
+
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/rds/CopyDBClusterSnapshot>
 
 =head1 ATTRIBUTES
 
@@ -41,19 +53,15 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 =head2 CopyTags => Bool
 
 True to copy all tags from the source DB cluster snapshot to the target
-DB cluster snapshot; otherwise false. The default is false.
+DB cluster snapshot, and otherwise false. The default is false.
 
 
 
 =head2 KmsKeyId => Str
 
-The AWS KMS key ID for an encrypted DB cluster snapshot. The KMS key ID
-is the Amazon Resource Name (ARN), KMS key identifier, or the KMS key
-alias for the KMS encryption key.
-
-If you copy an unencrypted DB cluster snapshot and specify a value for
-the C<KmsKeyId> parameter, Amazon RDS encrypts the target DB cluster
-snapshot using the specified KMS encryption key.
+The AWS AWS KMS key ID for an encrypted DB cluster snapshot. The KMS
+key ID is the Amazon Resource Name (ARN), KMS key identifier, or the
+KMS key alias for the KMS encryption key.
 
 If you copy an encrypted DB cluster snapshot from your AWS account, you
 can specify a value for C<KmsKeyId> to encrypt the copy with a new KMS
@@ -68,8 +76,11 @@ To copy an encrypted DB cluster snapshot to another AWS Region, you
 must set C<KmsKeyId> to the KMS key ID you want to use to encrypt the
 copy of the DB cluster snapshot in the destination AWS Region. KMS
 encryption keys are specific to the AWS Region that they are created
-in, and you cannot use encryption keys from one AWS Region in another
+in, and you can't use encryption keys from one AWS Region in another
 AWS Region.
+
+If you copy an unencrypted DB cluster snapshot and specify a value for
+the C<KmsKeyId> parameter, an error is returned.
 
 
 
@@ -91,11 +102,11 @@ values:
 
 =item *
 
-C<KmsKeyId> - The KMS key identifier for the key to use to encrypt the
-copy of the DB cluster snapshot in the destination AWS Region. This is
-the same identifier for both the C<CopyDBClusterSnapshot> action that
-is called in the destination AWS Region, and the action contained in
-the pre-signed URL.
+C<KmsKeyId> - The AWS KMS key identifier for the key to use to encrypt
+the copy of the DB cluster snapshot in the destination AWS Region. This
+is the same identifier for both the C<CopyDBClusterSnapshot> action
+that is called in the destination AWS Region, and the action contained
+in the pre-signed URL.
 
 =item *
 
@@ -108,7 +119,7 @@ C<SourceDBClusterSnapshotIdentifier> - The DB cluster snapshot
 identifier for the encrypted DB cluster snapshot to be copied. This
 identifier must be in the Amazon Resource Name (ARN) format for the
 source AWS Region. For example, if you are copying an encrypted DB
-cluster snapshot from the us-west-2 region, then your
+cluster snapshot from the us-west-2 AWS Region, then your
 C<SourceDBClusterSnapshotIdentifier> looks like the following example:
 C<arn:aws:rds:us-west-2:123456789012:cluster-snapshot:aurora-cluster1-snapshot-20161115>.
 
@@ -116,7 +127,10 @@ C<arn:aws:rds:us-west-2:123456789012:cluster-snapshot:aurora-cluster1-snapshot-2
 
 To learn how to generate a Signature Version 4 signed request, see
 Authenticating Requests: Using Query Parameters (AWS Signature Version
-4) and Signature Version 4 Signing Process.
+4)
+(http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-query-string-auth.html)
+and Signature Version 4 Signing Process
+(http://docs.aws.amazon.com/general/latest/gr/signature-version-4.html).
 
 
 
@@ -125,24 +139,12 @@ Authenticating Requests: Using Query Parameters (AWS Signature Version
 The identifier of the DB cluster snapshot to copy. This parameter is
 not case-sensitive.
 
-You cannot copy an encrypted, shared DB cluster snapshot from one AWS
+You can't copy an encrypted, shared DB cluster snapshot from one AWS
 Region to another.
 
 Constraints:
 
 =over
-
-=item *
-
-Must contain from 1 to 63 alphanumeric characters or hyphens.
-
-=item *
-
-First character must be a letter.
-
-=item *
-
-Cannot end with a hyphen or contain two consecutive hyphens.
 
 =item *
 
@@ -157,7 +159,8 @@ valid DB snapshot identifier.
 
 If the source snapshot is in a different AWS Region than the copy,
 specify a valid DB cluster snapshot ARN. For more information, go to
-Copying a DB Snapshot or DB Cluster Snapshot.
+Copying a DB Snapshot or DB Cluster Snapshot
+(http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_CopySnapshot.html).
 
 =back
 
@@ -182,7 +185,7 @@ Constraints:
 
 =item *
 
-Must contain from 1 to 63 alphanumeric characters or hyphens.
+Must contain from 1 to 63 letters, numbers, or hyphens.
 
 =item *
 
@@ -205,9 +208,9 @@ This class forms part of L<Paws>, documenting arguments for method CopyDBCluster
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

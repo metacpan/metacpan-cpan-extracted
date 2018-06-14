@@ -56,9 +56,10 @@ cmp_deeply(
             }
         },
         '__MODEL_FIELDS_SORT_ORDERS__' => {
-            'id'              => 0,
-            'model_one_field' => 0,
-            'model_field'     => 0
+            'id'                           => 0,
+            'model_one_field'              => 0,
+            'model_one_field_with_depends' => 1,
+            'model_field'                  => 0
         },
         '__ACTIONS__' => {
             'action'       => 'model_action_name',
@@ -77,13 +78,21 @@ cmp_deeply(
             'model_one_field' => {
                 'db'      => 1,
                 'default' => 1
-            }
+            },
+            'model_one_field_with_depends' => {
+                'depends_on' => [qw(id)],
+                'get'        => ignore()
+            },
         },
         '__EMPTY_NAME__'   => 'model_multistate_empty_name',
         '__MODEL_FIELDS__' => {
             'model_one_field' => {
                 'db'      => 1,
                 'default' => 1
+            },
+            'model_one_field_with_depends' => {
+                'depends_on' => [qw(id)],
+                'get'        => ignore()
             },
             'id' => {
                 'pk'      => 1,
@@ -136,10 +145,11 @@ cmp_deeply(
             '1' => {'right_action' => 2}
         },
         '__MODEL_FIELDS_SORT_ORDERS__' => {
-            'model_one_field' => 0,
-            'id'              => 0,
-            'model_field'     => 0,
-            'model_two_field' => 0
+            'model_one_field'              => 0,
+            'id'                           => 0,
+            'model_field'                  => 0,
+            'model_two_field'              => 0,
+            'model_one_field_with_depends' => 1
         },
         '__ACTIONS__' => {
             'right_action' => 'model_right_action_name',
@@ -165,6 +175,10 @@ cmp_deeply(
                 'db'           => 1,
                 'check_rights' => 'view__model_one_field',
                 'default'      => 1
+            },
+            'model_one_field_with_depends' => {
+                'depends_on' => [qw(id)],
+                'get'        => ignore()
             }
         },
         '__BITS__' =>
@@ -198,6 +212,10 @@ cmp_deeply(
                 'db'           => 1,
                 'default'      => 1,
                 'check_rights' => ['view__model_one_field']
+            },
+            'model_one_field_with_depends' => {
+                'depends_on' => [qw(id)],
+                'get'        => ignore()
             },
             'model_field' => {
                 'default' => 1,

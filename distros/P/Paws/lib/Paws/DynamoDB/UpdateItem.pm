@@ -25,21 +25,58 @@ package Paws::DynamoDB::UpdateItem;
 
 =head1 NAME
 
-Paws::DynamoDB::UpdateItem - Arguments for method UpdateItem on Paws::DynamoDB
+Paws::DynamoDB::UpdateItem - Arguments for method UpdateItem on L<Paws::DynamoDB>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateItem on the 
-Amazon DynamoDB service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateItem on the
+L<Amazon DynamoDB|Paws::DynamoDB> service. Use the attributes of this class
 as arguments to method UpdateItem.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateItem.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateItem(Att1 => $value1, Att2 => $value2, ...);
+    my $dynamodb = Paws->service('DynamoDB');
+   # To update an item in a table
+   # This example updates an item in the Music table. It adds a new attribute
+   # (Year) and modifies the AlbumTitle attribute.  All of the attributes in the
+   # item, as they appear after the update, are returned in the response.
+    my $UpdateItemOutput = $dynamodb->UpdateItem(
+      {
+        'ReturnValues'             => 'ALL_NEW',
+        'ExpressionAttributeNames' => {
+          '#AT' => 'AlbumTitle',
+          '#Y'  => 'Year'
+        },
+        'UpdateExpression' => 'SET #Y = :y, #AT = :t',
+        'Key'              => {
+          'SongTitle' => {
+            'S' => 'Happy Day'
+          },
+          'Artist' => {
+            'S' => 'Acme Band'
+          }
+        },
+        'ExpressionAttributeValues' => {
+          ':y' => {
+            'N' => 2015
+          },
+          ':t' => {
+            'S' => 'Louder Than Ever'
+          }
+        },
+        'TableName' => 'Music'
+      }
+    );
+
+    # Results:
+    my $Attributes = $UpdateItemOutput->Attributes;
+
+    # Returns a L<Paws::DynamoDB::UpdateItemOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/dynamodb/UpdateItem>
 
 =head1 ATTRIBUTES
 
@@ -47,16 +84,18 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 =head2 AttributeUpdates => L<Paws::DynamoDB::AttributeUpdates>
 
 This is a legacy parameter. Use C<UpdateExpression> instead. For more
-information, see AttributeUpdates in the I<Amazon DynamoDB Developer
-Guide>.
+information, see AttributeUpdates
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LegacyConditionalParameters.AttributeUpdates.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
 =head2 ConditionalOperator => Str
 
 This is a legacy parameter. Use C<ConditionExpression> instead. For
-more information, see ConditionalOperator in the I<Amazon DynamoDB
-Developer Guide>.
+more information, see ConditionalOperator
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LegacyConditionalParameters.ConditionalOperator.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 Valid values are: C<"AND">, C<"OR">
 
@@ -88,15 +127,18 @@ Logical operators: C<AND | OR | NOT>
 =back
 
 For more information on condition expressions, see Specifying
-Conditions in the I<Amazon DynamoDB Developer Guide>.
+Conditions
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.SpecifyingConditions.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
 =head2 Expected => L<Paws::DynamoDB::ExpectedAttributeMap>
 
 This is a legacy parameter. Use C<ConditionExpression> instead. For
-more information, see Expected in the I<Amazon DynamoDB Developer
-Guide>.
+more information, see Expected
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LegacyConditionalParameters.Expected.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
@@ -137,9 +179,10 @@ C<Percentile>
 
 The name of this attribute conflicts with a reserved word, so it cannot
 be used directly in an expression. (For the complete list of reserved
-words, see Reserved Words in the I<Amazon DynamoDB Developer Guide>).
-To work around this, you could specify the following for
-C<ExpressionAttributeNames>:
+words, see Reserved Words
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ReservedWords.html)
+in the I<Amazon DynamoDB Developer Guide>). To work around this, you
+could specify the following for C<ExpressionAttributeNames>:
 
 =over
 
@@ -164,7 +207,9 @@ Tokens that begin with the B<:> character are I<expression attribute
 values>, which are placeholders for the actual value at runtime.
 
 For more information on expression attribute names, see Accessing Item
-Attributes in the I<Amazon DynamoDB Developer Guide>.
+Attributes
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.AccessingItemAttributes.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
@@ -189,7 +234,9 @@ You could then use these values in an expression, such as this:
 C<ProductStatus IN (:avail, :back, :disc)>
 
 For more information on expression attribute values, see Specifying
-Conditions in the I<Amazon DynamoDB Developer Guide>.
+Conditions
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.SpecifyingConditions.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
@@ -376,7 +423,9 @@ You can have many actions in a single expression, such as the
 following: C<SET a=:value1, b=:value2 DELETE :value3, :value4, :value5>
 
 For more information on update expressions, see Modifying Items and
-Attributes in the I<Amazon DynamoDB Developer Guide>.
+Attributes
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.Modifying.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
@@ -387,9 +436,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateItem in
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

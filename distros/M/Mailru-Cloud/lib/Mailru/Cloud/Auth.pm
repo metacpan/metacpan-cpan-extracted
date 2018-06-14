@@ -9,13 +9,14 @@ use LWP::UserAgent;
 use HTTP::Request;
 use JSON::XS;
 use URI::Escape;
-use Carp 'croak';
+use Carp qw/carp croak/;
  
-our $VERSION    = '0.02';
+our $VERSION    = '0.05';
 
 sub new {
-    my ($class) = @_;
+    my ($class, %opt) = @_;
     my $self = {};
+    $self->{debug} = $opt{-debug};
     my $ua = LWP::UserAgent->new (
                                     agent => 'Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0',
                                     cookie_jar => {},
@@ -29,23 +30,49 @@ sub login {
     $self->{login}     = $opt{-login}       || $self->{login}       || croak "You must specify -login opt for 'login' method";
     $self->{password}  = $opt{-password}    || $self->{password}    || croak "You must specify -password opt for 'login' method";
     my $ua = $self->{ua};
+    my ($res, $code);
 
-    my %param;
-    $param{Domain} = 'mail.ru';
-    $param{FailPage} = '';
-    $param{Login} = $self->{login};
-    $param{Password} = $self->{password};
-    $param{new_auth_form} = 1;
-    $param{page} ='https://cloud.mail.ru/?from=promo';
-    $param{saveauth} = 1;
-
-    my $res = $ua->post('https://auth.mail.ru/cgi-bin/auth?lang=ru_RU&from=authpopup', \%param);
-
-    my $code = $res->code;
-    if ($code eq '302' || $code eq '301' || $code eq '200') {
-        $self->__getToken() or return;
-        return $self->{authToken};
+    #Get login token
+    $res = $ua->get('https://mail.ru');
+    $code = $res->code;
+    if ($code ne '200') {
+        croak "Can't get start mail.ru page. Code: $code";
     }
+    my ($login_token) = $res->decoded_content =~ /CSRF\s*[:=]\s*"([0-9A-Za-z]+?)"/;
+    if (not $login_token) {
+        croak "Can't found login token";
+    }
+
+    #Login
+    my %param = (
+            'login'         => $self->{login},
+            'password'      => $self->{password},
+            'saveauth'      => 1,
+            'project'       => 'e.mail.ru',
+            'token'         => $login_token,
+    );
+    my %headers = (
+        'Content-type'      => 'application/x-www-form-urlencoded',
+        'Accept'            => '*/*',
+        'Accept-Encoding'   => 'gzip, deflate, br',
+        'Accept-Language'   => 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Referer'           => 'https://mail.ru/?from=logout',
+        'Origin'            => 'https://mail.ru',
+    );
+
+    $res = $ua->post('https://auth.mail.ru/jsapi/auth', \%param, %headers);
+    $code = $res->code;
+    if ($code ne '200') {
+        croak "Wrong response code from login form: $code";
+    }
+
+    my $json = decode_json($res->decoded_content);
+    if ($json->{status} eq 'fail') {
+        croak "Fail login: $json->{code}";
+    }
+
+    $self->__getToken() or return;
+    return $self->{authToken};
     return;
 }
 
@@ -57,21 +84,26 @@ sub __getToken {
 
     if ($res->is_success) {
         my $content = $res->decoded_content;
-        if ($content =~ /"csrf":"(.+?)"/) {
+        if ($content =~ /"csrf"\s*:\s*"([a-zA-Z0-9]+?)"/) {
             $self->{authToken} = $1;
-            if ($content =~ /"email":"(.+?)"/) {
+            carp "Found authToken: $self->{authToken}" if $self->{debug};
+
+            if ($content =~ /"email"\s*:\s*"(.+?)"/) {
                 $self->{email} = $1;
+                carp "Found email: $self->{email}" if $self->{debug};
                 
                 #Get BUILD
                 $self->{build} = 'hotfix_CLOUDWEB-7726_50-0-3.201710311503';
-                if ($content =~ /"BUILD":"(.+?)"/) {
+                if ($content =~ /"BUILD"\s*:\s*"(.+?)"/) {
                     $self->{build} = $1;
+                    carp "Found and use new build $self->{build}" if $self->{debug};
                 }
                 
                 #Get x-page-id
                 $self->{'x-page-id'} = 'f9jfLFeHA5';
-                if ($content =~ /"x-page-id":"(.+?)"/) {
+                if ($content =~ /"x-page-id"\s*:\s*"(.+?)"/) {
                     $self->{'x-page-id'} = $1;
+                    carp "Found and use new x-page_id $self->{build}" if $self->{debug};
                 }
 
                 #Parse free space info
@@ -100,11 +132,20 @@ sub __parseInfo {
                 'total_space'       => '',
                 'file_size_limit'   => '',
             );
-    if ($$content =~ /"space":[{].+?"used":(.+?),"total":(.+?)[}]/) {
-        $info{used_space} = $1 * 1024 * 1024;   # To bytes from Mbytes
-        $info{total_space} = $2 * 1024 * 1024;  # To bytes from Mbytes
+    if (my ($size_block) = $$content =~ /"space":\s*{([^}]*)}/s) {
+        while ($size_block =~ /"([^"]+)":\s*(\w+?)[,\s]/gm) {
+            if ($1 eq 'bytes_total') {
+                $info{total_space} = $2;
+                carp "Bytes total: $2";
+            }
+            elsif ($1 eq 'bytes_used') {
+                $info{used_space} = $2;
+                carp "Used space: $2";
+            }
+        }
     }
-    if ($$content =~ /"file_size_limit":(.+?),/) {
+
+    if ($$content =~ /"file_size_limit":\s*(.+?)[,\s]/) {
         $info{file_size_limit} = $1;
     }
     return \%info;
@@ -140,7 +181,7 @@ __END__
 B<Mailru::Cloud::Auth> - authorize on site https://cloud.mail.ru and return csrf token
 
 =head1 VERSION
-    version 0.02
+    version 0.05
 
 =head1 SYNOPSYS
     

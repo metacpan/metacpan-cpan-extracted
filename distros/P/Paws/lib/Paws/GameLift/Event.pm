@@ -48,16 +48,6 @@ debugging problems.
 
   Type of event being logged. The following events are currently in use:
 
-B<General events:>
-
-=over
-
-=item *
-
-GENERIC_EVENT -- An unspecified event has occurred.
-
-=back
-
 B<Fleet creation events:>
 
 =over
@@ -172,11 +162,23 @@ blocks of IPv4 addresses. To resolve this, change the CIDR block for
 the VPC in your AWS account. For more information on VPC peering
 failures, see
 http://docs.aws.amazon.com/AmazonVPC/latest/PeeringGuide/invalid-peering-configurations.html
+(http://docs.aws.amazon.com/AmazonVPC/latest/PeeringGuide/invalid-peering-configurations.html)
 
 =item *
 
 FLEET_VPC_PEERING_DELETED -- A VPC peering connection has been
 successfully deleted.
+
+=back
+
+B<Spot instance events:>
+
+=over
+
+=item *
+
+INSTANCE_INTERRUPTED -- A spot instance was interrupted by EC2 with a
+two-minute notification.
 
 =back
 
@@ -199,6 +201,10 @@ includes both the old and new policy setting.
 =item *
 
 FLEET_DELETED -- A request to delete a fleet was initiated.
+
+=item *
+
+GENERIC_EVENT -- An unspecified event has occurred.
 
 =back
 
@@ -240,9 +246,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::GameLift>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

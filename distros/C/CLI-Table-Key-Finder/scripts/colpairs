@@ -1,0 +1,327 @@
+#!/usr/bin/perl
+
+use 5.008 ; use strict ; use warnings ;  # List::Util は 5.8以降で core module となった。
+
+use Getopt::Std ; getopts "=q:NT" , \my %o ; 
+use Term::ANSIColor qw [ :constants color ] ; 
+use List::Util qw [ max min sum ] ; 
+use POSIX qw [ floor ceil ] ; 
+
+my @heads ; # 列名の並び
+my $pf ; 
+# $pf -> [ 列位値1 ] [ 列位値2 ] { 列1の値 . "\t" . 列2の値 } で該当する数を数える。 もしくは、
+# $pf -> [ 列位値1 ] [ 列位値2 ] { 列1の値 } { 列2の値 } で該当する数を数える。
+my $tf ; 
+# $tf -> [ 列位値1 ] [ 列位値2 ] [ 列位値3 ] { 列1の値 } { 列2の値 } { 列3の値 } で該当する数を数える。
+my $rows = 0 ; # データ部分の行の数
+
+my $quot = $o{q} // 0.5 ;
+
+sub reading ( ) ; 
+sub showing1 ( ) ; 
+sub showing2 ( ) ;
+sub showing3 ( ) ;
+sub showing4 ( ) ;
+
+reading ;  # 読取り
+showing1 unless $o{N} || $o{T} ; # 1番目の表を出力
+print "\n" ; 
+showing2 unless $o{N} || $o{T} ; # 2番目の表を出力
+
+showing3 if $o{N} ; # -Nの表を出力
+showing4 if $o{T} ; # -Tの表を出力
+
+exit 0 ; 
+
+sub reading  ( ) { 
+	if ( $o{'='} ) { 
+		my $head = <> ; 
+		chomp $head ; 
+		@heads = split /\t/ , $head , -1 ;
+	}
+
+	while ( <> ) { 
+		chomp ; 
+		my @F = split /\t/ , $_ , -1 ; 
+
+		if ( ! $o{N} && !$o{T} ) 
+		{ 
+			for my $i ( 0 .. $#F ) { 
+				for my $j ( 0 .. $#F ) { 
+					$pf -> [ $i ] [ $j ] { $F[$i] . "\t" . $F[$j] } ++ ; 
+				}
+			}
+		}
+		elsif ( ! $o{T} )
+		{ 
+			for my $i ( 0 .. $#F ) { 
+				for my $j ( 0 .. $#F ) { 
+					$pf -> [ $i ] [ $j ] { $F[$i] } { $F[$j] } ++ ; 
+				}
+			}
+		}
+		else
+		{
+			for my $i ( 0 .. $#F ) { 
+				for my $j ( 0 .. $#F ) { 
+					for my $k ( 0 .. $#F ) {
+						$tf -> [ $i ] [ $j ] [ $k ] { $F[$i] . "\t" . $F[$j] } { $F[$k] } ++ ; 
+					}
+				}
+			}
+		}
+
+
+
+		$rows ++ ;
+	}
+}
+
+sub showing1 ( ) { 
+	my $cols = @{ $pf } ; 
+	
+    @heads = ( 1 .. $cols ) unless @heads ; #defined $cols 
+	my @diag = map { scalar keys %{ $pf -> [$_][$_]}}  0 .. $cols -1 ; 
+
+	# 出力表の表頭
+	print GREEN join ("\t" , "pairs" , 1 .. $cols) , "\n" ; 
+
+	# 出力表の各行
+	my $cell ; # $cell -> [] [] 
+	for my $i ( 0 .. $cols - 1 ) { 
+		my @out = () ;
+
+		# 表側
+		push @out , color('green') . ($i+1) . color('reset') ; # 列番号
+
+		# 右上の部分
+		for my $j ( 0 .. $i -1 ) { 
+			push @out , color('blue') . sprintf ( "%2.1f" , $cell->[$i][$j] * 100 ). color('reset');
+			 #( min values %{ $pf->[$i][$j] } )  . "-" . ( max values %{ $pf->[$i][$j] } ) ; 
+		}
+		# 対角線の部分
+		push @out, color('bright_green') . (scalar keys %{$pf->[$i][$i]}) . color('reset') ; 
+
+		# 左下の部分
+		for my $j ( $i + 1 .. $cols -1 )  {
+			my $val0 =  scalar keys %{ $pf->[$i][$j] } ;
+			my $prod = $diag[$i] * $diag[$j] ;
+			my $dmin = max $diag[$i] , $diag[$j] ;
+			my $val = $val0 ;
+			$val = color('bright_yellow') . $val . color( 'reset') . ':' if $val0 == $rows ; # 組合せ数 == データ行数 
+			$val = color('yellow').$val.color('reset') . '*' if $val0 == $prod ; # 組合せ数 == 2列それぞれの全組合せ数
+			$val = color('cyan').$val.color('reset') . '-' if $val0 == $dmin ; # 組合せ数 == 2列それぞれの異なり数の少ない方
+			push @out , $val ; 
+			my $tmp = min $prod, $rows ; 
+			$cell -> [$j][$i] = $tmp == $dmin ? "nan" : ( $val0 - $dmin ) / ( $tmp  - $dmin ) ; #  スコアの計算
+		}
+		push @out , color ( 'green') . $heads [$i] . color ( 'reset') ; # 入力列の名前を追加
+		print join "\t" , @out ;
+		print "\n" ; 
+	}
+}
+
+sub showing2 ( ) { 
+	my $cols = @{ $pf } ; 
+	@heads = ( 1 .. $cols ) unless @heads ; #defined $cols
+	my @diag = map { scalar keys %{ $pf -> [$_][$_]}}  0 .. $cols -1 ;
+
+	# 出力表の表頭
+	print GREEN join ("\t" , "freq" , 1 .. $cols) , "\n" ; 
+
+	# 出力表の各行
+	my $cell ; # $cell -> [] [] 
+	for my $i ( 0 .. $cols - 1 ) { 
+		my @out = () ;
+		push @out , color('green') . ($i+1) . color('reset') ;
+
+		# 左下
+		for my $j ( 0 .. $i - 1 ) { 
+			my $val = & median (  values %{ $pf->[$i][$j] } ) ; # . "-" . ( max values %{ $pf->[$i][$j] } ) ; 
+			push @out , color('blue') . $val . color( 'reset' ) ;
+		}
+		# 対角線
+		my $val = ! defined $o{q} ? 
+		 	( min values %{ $pf->[$i][$i] } )  . "-" . ( max values %{ $pf->[$i][$i] } )  : 
+		 	median ( values %{ $pf->[$i][$i] } ) ; 
+		push @out , color('bright_green') . $val . color ( 'reset' ) ;
+
+		# 右上
+		for my $j ( $i+1 .. $cols -1 ) { 
+			my ( $val ) ; # セルの一つの値
+			$val = ( min values %{ $pf->[$i][$j] } )  . "-" . ( max values %{ $pf->[$i][$j] } ) ; 
+			push @out , $val ;
+		}
+
+		push @out , color ( 'green') . $heads [$i] . color ( 'reset') ; 
+		print join "\t" , @out ;
+		print "\n" ; 
+	}
+}
+
+
+sub showing3 ( ) { 
+	my $cols = @{ $pf } ; 
+	@heads = ( 1 .. $cols ) unless @heads ; #defined $cols
+	my @diag = map { scalar keys %{ $pf -> [$_][$_]}}  0 .. $cols -1 ;
+
+	# 出力表の表頭
+	print GREEN join ("\t" , "NonD" , 1 .. $cols) , "\n" ; 
+
+	# 出力表の各行
+	my $cell ; # $cell -> [] [] 
+	for my $i ( 0 .. $cols - 1 ) { 
+		my @out = () ;
+		push @out , color('green') . ($i+1) . color('reset') ;
+
+		# 左下
+		for my $j ( 0 .. $i - 1 ) { 
+			my $val =  nonDeterminability ( $i , $j ) ; 
+			push @out , $val ;
+		}
+		# 対角線の部分
+		push @out, color('bright_green') . (scalar keys %{$pf->[$i][$i]}) . color('reset') ; 
+
+		# 右上
+		for my $j ( $i+1 .. $cols -1 ) { 
+			my $val =  nonDeterminability ( $i , $j ) ; 
+			push @out , $val ;
+		}
+
+		push @out , color ( 'green') . $heads [$i] . color ( 'reset') ; 
+		print join "\t" , @out ;
+		print "\n" ; 
+	}
+}
+
+
+sub showing4 ( ) { 
+	my $cols = @{ $tf } ; 
+	@heads = ( 1 .. $cols ) unless @heads ; #defined $cols
+	my @diag = map { scalar keys %{ $tf -> [$_][$_][$_]}}  0 .. $cols -1 ;
+
+	# 出力表の表頭
+	print GREEN join ("\t" , "wC" , 1 .. $cols , "dis") , "\n" ; 
+
+	# 出力表の各行
+	my $cell ; # $cell -> [] [] 
+	for my $i ( 0 .. $cols - 1 ) { 
+		my @out = () ;
+		push @out , color('green') . ($i+1) . color('reset') ;
+
+		# 左下
+		for my $j ( 0 .. $i - 1 ) { 
+			push @out , color('blue') . join ( "," , whichColDet ( $i , $j , 1 ) ) . color('reset') ;#whichColDet ( $i , $j ) ; 
+		}
+		# 対角線の部分
+		#push @out, color('bright_green') . ( scalar keys %{ $tf->[$i][$i][$i] } ) . color('reset') ; 
+		my @diagD = whichColDet ( $i, $i , 0 ) ; 
+		my %seen ; $seen{$_} =  1 for @diagD ; 
+		push @out , color('bright_green') . join ( ',' , @diagD ) . color('reset') ; 
+
+		# 右上
+		for my $j ( $i+1 .. $cols -1 ) { 
+			push @out , join (',', grep { ! $seen{$_} } whichColDet ( $i , $j , 0 ) ) ; 
+		}
+
+		# さらに1列
+		push @out, color('bright_green') . ( scalar keys %{ $tf->[$i][$i][$i] } ) . color('reset') ; 
+
+		push @out , color ( 'green') . $heads [$i] . color ( 'reset') ; 
+		print join "\t" , @out ;
+		print "\n" ; 
+	}
+}
+
+sub whichColDet ( $$ $ ) { 
+
+	my $tfij = $tf ->[ $_[0] ][ $_[1] ] ; 
+	my @ret ; 
+
+	for ( 0 .. scalar @{ $tfij } -1 ) { 
+		next if $_ == $_[0] || $_ == $_[1] ;
+		my $cnt = 0 ;
+		for my $vi ( keys %{ $tfij -> [$_] } ) { 
+			$cnt ++ if 1 < scalar keys %{ $tfij -> [$_]{$vi} } ;
+		}
+		push @ret , $_ + 1 if $cnt == $_[2] ;
+	}
+	return @ret ;
+}
+
+
+sub nonDeterminability ( $$ ) { 
+	my $cnt = 0 ;
+	my $pfij = $pf ->[ $_[0] ][ $_[1] ] ; 
+
+	for ( keys %{ $pfij } ) { 
+		# print BRIGHT_RED $pfij->{$_}, " " ;
+		$cnt ++ if  1 < scalar keys %{ $pfij -> { $_ } } ; 
+	}
+	return $cnt ; 
+}
+
+sub median ( @ ) { 
+	@_ = sort { $a <=> $b } @_ ;
+	my $len = scalar @_ - 1 ; 
+	return ( $_[ floor $len * $quot ] + $_[ ceil $len * $quot ] ) / 2 ; 
+}
+
+
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+ 
+=encoding utf8 
+
+=head1 $0 
+
+ 概要: 
+  tsv 形式のデータを読み取り、あらゆる列のペアで出現した値のペアの頻度に
+  基づいた統計表を2個出力する。
+
+ 出力
+  
+	1番目の表 : 異なる値のペアがいくつあったか。
+
+	  正方行列のi行j列目の要素は、入力行のi列目とj列目を比較したときに、
+	  i <= j の場合 : 入力の第i列目と第j列目の異なる組合せがいくつあったか。
+	  i > j  の場合 : ひとつずつの列で考えた場合に実現可能な範囲のどこ(最小なら0,最大なら100)にあるか。
+
+	  右上については、全行数に等しいか(:)、あらゆる組合せが発生したか(*)、
+	  組合せの数がそれぞれの列の値の異なる数から考えて最小であったか(-)、
+	  により、それぞれ括弧内の記号をつけて、色を付けた。
+	  対角線については、明るい緑色をつけた。
+
+	2番目の表 : 出現したペアの値の頻度についての最小値と最大値
+
+	  右上については、i列とj列の値のペアで頻度表を作り、その頻度の最小と最大。
+	  左下については、それらの頻度についての中央値(median) である。
+
+	-N 
+	-T 
+
+ オプション:
+
+  -= ; 先頭行を列の並びと見なし、利用する。データは2行目からと考える。
+  -q num ; 2番目の表の対角線とそれより左下で範囲の分位点(0 <= num <= 1で位置参照)を与える。
+  -N ; ある列Aから別の列Bについて、Aの値からBの値が一意に定まらないようなAの値の個数を表示する。(Non-deternability 非決定度 )
+  -T ; 2個の列A,Bの、値のペアから、どの列Cの値が決定できるかを、行列状に表示する。右下の青い文字は、決定ができない値のペアが1個だけのものになる列Cを表す。
+
+  開発上のメモ :
+     * 他のコマンド similarcols と統合したい。
+
+
+=cut
+

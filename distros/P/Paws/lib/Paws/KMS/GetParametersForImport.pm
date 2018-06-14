@@ -16,21 +16,40 @@ package Paws::KMS::GetParametersForImport;
 
 =head1 NAME
 
-Paws::KMS::GetParametersForImport - Arguments for method GetParametersForImport on Paws::KMS
+Paws::KMS::GetParametersForImport - Arguments for method GetParametersForImport on L<Paws::KMS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method GetParametersForImport on the 
-AWS Key Management Service service. Use the attributes of this class
+This class represents the parameters used for calling the method GetParametersForImport on the
+L<AWS Key Management Service|Paws::KMS> service. Use the attributes of this class
 as arguments to method GetParametersForImport.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to GetParametersForImport.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->GetParametersForImport(Att1 => $value1, Att2 => $value2, ...);
+    my $kms = Paws->service('KMS');
+   # To retrieve the public key and import token for a customer master key (CMK)
+   # The following example retrieves the public key and import token for the
+   # specified CMK.
+    my $GetParametersForImportResponse = $kms->GetParametersForImport(
+      {
+        'KeyId'             => '1234abcd-12ab-34cd-56ef-1234567890ab',
+        'WrappingAlgorithm' => 'RSAES_OAEP_SHA_1',
+        'WrappingKeySpec'   => 'RSA_2048'
+      }
+    );
+
+    # Results:
+    my $ImportToken       = $GetParametersForImportResponse->ImportToken;
+    my $ParametersValidTo = $GetParametersForImportResponse->ParametersValidTo;
+    my $KeyId             = $GetParametersForImportResponse->KeyId;
+    my $PublicKey         = $GetParametersForImportResponse->PublicKey;
+
+    # Returns a L<Paws::KMS::GetParametersForImportResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/kms/GetParametersForImport>
 
 =head1 ATTRIBUTES
 
@@ -40,14 +59,15 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 The identifier of the CMK into which you will import key material. The
 CMK's C<Origin> must be C<EXTERNAL>.
 
-A valid identifier is the unique key ID or the Amazon Resource Name
-(ARN) of the CMK. Examples:
+Specify the key ID or the Amazon Resource Name (ARN) of the CMK.
+
+For example:
 
 =over
 
 =item *
 
-Unique key ID: C<1234abcd-12ab-34cd-56ef-1234567890ab>
+Key ID: C<1234abcd-12ab-34cd-56ef-1234567890ab>
 
 =item *
 
@@ -56,6 +76,7 @@ C<arn:aws:kms:us-east-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab>
 
 =back
 
+To get the key ID and key ARN for a CMK, use ListKeys or DescribeKey.
 
 
 
@@ -63,7 +84,9 @@ C<arn:aws:kms:us-east-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab>
 
 The algorithm you will use to encrypt the key material before importing
 it with ImportKeyMaterial. For more information, see Encrypt the Key
-Material in the I<AWS Key Management Service Developer Guide>.
+Material
+(http://docs.aws.amazon.com/kms/latest/developerguide/importing-keys-encrypt-key-material.html)
+in the I<AWS Key Management Service Developer Guide>.
 
 Valid values are: C<"RSAES_PKCS1_V1_5">, C<"RSAES_OAEP_SHA_1">, C<"RSAES_OAEP_SHA_256">
 
@@ -81,9 +104,9 @@ This class forms part of L<Paws>, documenting arguments for method GetParameters
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

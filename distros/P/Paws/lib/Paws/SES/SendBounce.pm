@@ -19,21 +19,71 @@ package Paws::SES::SendBounce;
 
 =head1 NAME
 
-Paws::SES::SendBounce - Arguments for method SendBounce on Paws::SES
+Paws::SES::SendBounce - Arguments for method SendBounce on L<Paws::SES>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method SendBounce on the 
-Amazon Simple Email Service service. Use the attributes of this class
+This class represents the parameters used for calling the method SendBounce on the
+L<Amazon Simple Email Service|Paws::SES> service. Use the attributes of this class
 as arguments to method SendBounce.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to SendBounce.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->SendBounce(Att1 => $value1, Att2 => $value2, ...);
+    my $email = Paws->service('SES');
+    my $SendBounceResponse = $email->SendBounce(
+      BounceSender             => 'MyAddress',
+      BouncedRecipientInfoList => [
+        {
+          Recipient    => 'MyAddress',
+          RecipientArn => 'MyAmazonResourceName',    # OPTIONAL
+          BounceType   => 'DoesNotExist'
+          , # values: DoesNotExist, MessageTooLarge, ExceededQuota, ContentRejected, Undefined, TemporaryFailure; OPTIONAL
+          RecipientDsnFields => {
+            Status => 'MyDsnStatus',
+            Action =>
+              'failed',  # values: failed, delayed, delivered, relayed, expanded
+            DiagnosticCode  => 'MyDiagnosticCode',    # OPTIONAL
+            RemoteMta       => 'MyRemoteMta',         # OPTIONAL
+            ExtensionFields => [
+              {
+                Name  => 'MyExtensionFieldName',
+                Value => 'MyExtensionFieldValue',
+
+              },
+              ...
+            ],                                        # OPTIONAL
+            FinalRecipient  => 'MyAddress',
+            LastAttemptDate => '1970-01-01T01:00:00',    # OPTIONAL
+          },    # OPTIONAL
+        },
+        ...
+      ],
+      OriginalMessageId => 'MyMessageId',
+      BounceSenderArn   => 'MyAmazonResourceName',    # OPTIONAL
+      Explanation       => 'MyExplanation',           # OPTIONAL
+      MessageDsn        => {
+        ReportingMta    => 'MyReportingMta',
+        ExtensionFields => [
+          {
+            Name  => 'MyExtensionFieldName',
+            Value => 'MyExtensionFieldValue',
+
+          },
+          ...
+        ],                                            # OPTIONAL
+        ArrivalDate => '1970-01-01T01:00:00',         # OPTIONAL
+      },    # OPTIONAL
+    );
+
+    # Results:
+    my $MessageId = $SendBounceResponse->MessageId;
+
+    # Returns a L<Paws::SES::SendBounceResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/email/SendBounce>
 
 =head1 ATTRIBUTES
 
@@ -60,7 +110,8 @@ This parameter is used only for sending authorization. It is the ARN of
 the identity that is associated with the sending authorization policy
 that permits you to use the address in the "From" header of the bounce.
 For more information about sending authorization, see the Amazon SES
-Developer Guide.
+Developer Guide
+(http://docs.aws.amazon.com/ses/latest/DeveloperGuide/sending-authorization.html).
 
 
 
@@ -92,9 +143,9 @@ This class forms part of L<Paws>, documenting arguments for method SendBounce in
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

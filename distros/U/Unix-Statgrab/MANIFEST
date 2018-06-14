@@ -1,3 +1,4 @@
+.perltidyrc
 Changes
 inc/Config/AutoConf/SG.pm
 lib/Unix/Statgrab.pm

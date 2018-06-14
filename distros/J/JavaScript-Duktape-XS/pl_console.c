@@ -1,15 +1,20 @@
+#include <stdarg.h>
 #include "duk_console.h"
 #include "pl_util.h"
 #include "pl_console.h"
+
+#if !defined(va_copy)
+#define va_copy(dest, src)  __va_copy(dest, src)
+#endif
 
 static int print_console_messages(duk_uint_t flags, void* data,
                                   const char* fmt, va_list ap)
 {
     dTHX;
-
-    UNUSED_ARG(data);
     PerlIO* fp = (flags & DUK_CONSOLE_TO_STDERR) ? PerlIO_stderr() : PerlIO_stdout();
     int ret = PerlIO_vprintf(fp, fmt, ap);
+
+    UNUSED_ARG(data);
     if (flags & DUK_CONSOLE_FLUSH) {
         PerlIO_flush(fp);
     }
@@ -22,6 +27,7 @@ static void save_msg(pTHX_ Duk* duk, const char* target, SV* message)
     STRLEN tlen = strlen(target);
     AV* data = 0;
     int top = 0;
+    SV* pvalue = 0;
     SV** found = hv_fetch(duk->msgs, target, tlen, 0);
     if (found) {
         SV* ref = SvRV(*found);
@@ -32,15 +38,16 @@ static void save_msg(pTHX_ Duk* duk, const char* target, SV* message)
         data = (AV*) ref;
         top = av_top_index(data);
     } else {
+        SV* ref = 0;
         data = newAV();
-        SV* ref = newRV_noinc((SV*) data);
+        ref = newRV_noinc((SV*) data);
         if (hv_store(duk->msgs, target, tlen, ref, 0)) {
             SvREFCNT_inc(ref);
         }
         top = -1;
     }
 
-    SV* pvalue = sv_2mortal(message);
+    pvalue = sv_2mortal(message);
     if (av_store(data, ++top, pvalue)) {
         SvREFCNT_inc(pvalue);
     }
@@ -66,7 +73,7 @@ static int save_console_messages(duk_uint_t flags, void* data,
 
 int pl_console_init(Duk* duk)
 {
-    // initialize console object
+    /* initialize console object */
     duk_console_init(duk->ctx, DUK_CONSOLE_PROXY_WRAPPER | DUK_CONSOLE_FLUSH);
 
     if (duk->flags & DUK_OPT_FLAG_SAVE_MESSAGES) {

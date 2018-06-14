@@ -1,6 +1,7 @@
 package Paws::AppStream::StorageConnector;
   use Moose;
   has ConnectorType => (is => 'ro', isa => 'Str', required => 1);
+  has Domains => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
   has ResourceIdentifier => (is => 'ro', isa => 'Str');
 1;
 
@@ -32,7 +33,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::AppStream::
 
 =head1 DESCRIPTION
 
-Describes a storage connector.
+Describes a connector to enable persistent storage for users.
 
 =head1 ATTRIBUTES
 
@@ -40,6 +41,11 @@ Describes a storage connector.
 =head2 B<REQUIRED> ConnectorType => Str
 
   The type of storage connector.
+
+
+=head2 Domains => ArrayRef[Str|Undef]
+
+  The names of the domains for the G Suite account.
 
 
 =head2 ResourceIdentifier => Str
@@ -54,9 +60,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::AppStream
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

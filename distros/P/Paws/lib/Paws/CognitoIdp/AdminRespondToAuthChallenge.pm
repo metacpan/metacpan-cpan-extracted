@@ -1,9 +1,11 @@
 
 package Paws::CognitoIdp::AdminRespondToAuthChallenge;
   use Moose;
+  has AnalyticsMetadata => (is => 'ro', isa => 'Paws::CognitoIdp::AnalyticsMetadataType');
   has ChallengeName => (is => 'ro', isa => 'Str', required => 1);
   has ChallengeResponses => (is => 'ro', isa => 'Paws::CognitoIdp::ChallengeResponsesType');
   has ClientId => (is => 'ro', isa => 'Str', required => 1);
+  has ContextData => (is => 'ro', isa => 'Paws::CognitoIdp::ContextDataType');
   has Session => (is => 'ro', isa => 'Str');
   has UserPoolId => (is => 'ro', isa => 'Str', required => 1);
 
@@ -18,30 +20,74 @@ package Paws::CognitoIdp::AdminRespondToAuthChallenge;
 
 =head1 NAME
 
-Paws::CognitoIdp::AdminRespondToAuthChallenge - Arguments for method AdminRespondToAuthChallenge on Paws::CognitoIdp
+Paws::CognitoIdp::AdminRespondToAuthChallenge - Arguments for method AdminRespondToAuthChallenge on L<Paws::CognitoIdp>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method AdminRespondToAuthChallenge on the 
-Amazon Cognito Identity Provider service. Use the attributes of this class
+This class represents the parameters used for calling the method AdminRespondToAuthChallenge on the
+L<Amazon Cognito Identity Provider|Paws::CognitoIdp> service. Use the attributes of this class
 as arguments to method AdminRespondToAuthChallenge.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to AdminRespondToAuthChallenge.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->AdminRespondToAuthChallenge(Att1 => $value1, Att2 => $value2, ...);
+    my $cognito-idp = Paws->service('CognitoIdp');
+    my $AdminRespondToAuthChallengeResponse =
+      $cognito -idp->AdminRespondToAuthChallenge(
+      ChallengeName     => 'SMS_MFA',
+      ClientId          => 'MyClientIdType',
+      UserPoolId        => 'MyUserPoolIdType',
+      AnalyticsMetadata => {
+        AnalyticsEndpointId => 'MyStringType',    # OPTIONAL
+      },    # OPTIONAL
+      ChallengeResponses => {
+        'MyStringType' => 'MyStringType',    # key: OPTIONAL, value: OPTIONAL
+      },    # OPTIONAL
+      ContextData => {
+        IpAddress   => 'MyStringType',    # OPTIONAL
+        HttpHeaders => [
+          {
+            headerValue => 'MyStringType',    # OPTIONAL
+            headerName  => 'MyStringType',    # OPTIONAL
+          },
+          ...
+        ],
+        ServerPath  => 'MyStringType',        # OPTIONAL
+        ServerName  => 'MyStringType',        # OPTIONAL
+        EncodedData => 'MyStringType',        # OPTIONAL
+      },    # OPTIONAL
+      Session => 'MySessionType',    # OPTIONAL
+      );
+
+    # Results:
+    my $Session = $AdminRespondToAuthChallengeResponse->Session;
+    my $ChallengeParameters =
+      $AdminRespondToAuthChallengeResponse->ChallengeParameters;
+    my $AuthenticationResult =
+      $AdminRespondToAuthChallengeResponse->AuthenticationResult;
+    my $ChallengeName = $AdminRespondToAuthChallengeResponse->ChallengeName;
+
+    # Returns a L<Paws::CognitoIdp::AdminRespondToAuthChallengeResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/cognito-idp/AdminRespondToAuthChallenge>
 
 =head1 ATTRIBUTES
 
 
+=head2 AnalyticsMetadata => L<Paws::CognitoIdp::AnalyticsMetadataType>
+
+The analytics metadata for collecting Amazon Pinpoint metrics for
+C<AdminRespondToAuthChallenge> calls.
+
+
+
 =head2 B<REQUIRED> ChallengeName => Str
 
-The challenge name. For more information, see AdminInitiateAuth.
+The challenge name. For more information, see .
 
-Valid values are: C<"SMS_MFA">, C<"PASSWORD_VERIFIER">, C<"CUSTOM_CHALLENGE">, C<"DEVICE_SRP_AUTH">, C<"DEVICE_PASSWORD_VERIFIER">, C<"ADMIN_NO_SRP_AUTH">, C<"NEW_PASSWORD_REQUIRED">
+Valid values are: C<"SMS_MFA">, C<"SOFTWARE_TOKEN_MFA">, C<"SELECT_MFA_TYPE">, C<"MFA_SETUP">, C<"PASSWORD_VERIFIER">, C<"CUSTOM_CHALLENGE">, C<"DEVICE_SRP_AUTH">, C<"DEVICE_PASSWORD_VERIFIER">, C<"ADMIN_NO_SRP_AUTH">, C<"NEW_PASSWORD_REQUIRED">
 
 =head2 ChallengeResponses => L<Paws::CognitoIdp::ChallengeResponsesType>
 
@@ -88,6 +134,14 @@ The app client ID.
 
 
 
+=head2 ContextData => L<Paws::CognitoIdp::ContextDataType>
+
+Contextual data such as the user's device fingerprint, IP address, or
+location used for evaluating the risk of an unexpected event by Amazon
+Cognito advanced security.
+
+
+
 =head2 Session => Str
 
 The session which should be passed both ways in challenge-response
@@ -112,9 +166,9 @@ This class forms part of L<Paws>, documenting arguments for method AdminRespondT
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

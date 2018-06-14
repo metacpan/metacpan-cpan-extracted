@@ -1,7 +1,7 @@
 package Sah::SchemaR::cryptocurrency::safename;
 
-our $DATE = '2018-06-07'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2018-06-10'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 our $rschema = ["str",[{description=>"\nCryptocurrency safename that is listed in <pm:CryptoCurrency::Catalog>, e.g.\nbitcoin, Ethereum-Classic, BITCOIN-PRIVATE.\n\nName will be converted to lowercase.\n\n",summary=>"Cryptocurrency safename","x.completion"=>"cryptocurrency_safename","x.perl.coerce_rules"=>["str_tolower"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::cryptocurrency::safename - Cryptocurrency safename
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::SchemaR::cryptocurrency::safename (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-06-07.
+This document describes version 0.011 of Sah::SchemaR::cryptocurrency::safename (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-06-10.
 
 =head1 DESCRIPTION
 

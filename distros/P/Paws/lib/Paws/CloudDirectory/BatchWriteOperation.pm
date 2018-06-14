@@ -13,6 +13,7 @@ package Paws::CloudDirectory::BatchWriteOperation;
   has DetachPolicy => (is => 'ro', isa => 'Paws::CloudDirectory::BatchDetachPolicy');
   has DetachTypedLink => (is => 'ro', isa => 'Paws::CloudDirectory::BatchDetachTypedLink');
   has RemoveFacetFromObject => (is => 'ro', isa => 'Paws::CloudDirectory::BatchRemoveFacetFromObject');
+  has UpdateLinkAttributes => (is => 'ro', isa => 'Paws::CloudDirectory::BatchUpdateLinkAttributes');
   has UpdateObjectAttributes => (is => 'ro', isa => 'Paws::CloudDirectory::BatchUpdateObjectAttributes');
 1;
 
@@ -73,12 +74,15 @@ limited number of attached policies.
 =head2 AttachTypedLink => L<Paws::CloudDirectory::BatchAttachTypedLink>
 
   Attaches a typed link to a specified source and target object. For more
-information, see Typed link.
+information, see Typed link
+(http://docs.aws.amazon.com/directoryservice/latest/admin-guide/objectsandlinks.html#typedlink).
 
 
 =head2 CreateIndex => L<Paws::CloudDirectory::BatchCreateIndex>
 
-  Creates an index object. See Indexing for more information.
+  Creates an index object. See Indexing
+(http://docs.aws.amazon.com/directoryservice/latest/admin-guide/cd_indexing.html)
+for more information.
 
 
 =head2 CreateObject => L<Paws::CloudDirectory::BatchCreateObject>
@@ -109,12 +113,18 @@ information, see Typed link.
 =head2 DetachTypedLink => L<Paws::CloudDirectory::BatchDetachTypedLink>
 
   Detaches a typed link from a specified source and target object. For
-more information, see Typed link.
+more information, see Typed link
+(http://docs.aws.amazon.com/directoryservice/latest/admin-guide/objectsandlinks.html#typedlink).
 
 
 =head2 RemoveFacetFromObject => L<Paws::CloudDirectory::BatchRemoveFacetFromObject>
 
   A batch operation that removes a facet from an object.
+
+
+=head2 UpdateLinkAttributes => L<Paws::CloudDirectory::BatchUpdateLinkAttributes>
+
+  Updates a given object's attributes.
 
 
 =head2 UpdateObjectAttributes => L<Paws::CloudDirectory::BatchUpdateObjectAttributes>
@@ -129,9 +139,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::CloudDire
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

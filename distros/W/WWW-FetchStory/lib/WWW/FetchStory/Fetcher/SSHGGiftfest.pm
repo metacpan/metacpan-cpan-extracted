@@ -1,5 +1,5 @@
 package WWW::FetchStory::Fetcher::SSHGGiftfest;
-$WWW::FetchStory::Fetcher::SSHGGiftfest::VERSION = '0.1902';
+$WWW::FetchStory::Fetcher::SSHGGiftfest::VERSION = '0.2002';
 use strict;
 use warnings;
 =head1 NAME
@@ -8,7 +8,7 @@ WWW::FetchStory::Fetcher::SSHGGiftfest - fetching module for WWW::FetchStory
 
 =head1 VERSION
 
-version 0.1902
+version 0.2002
 
 =head1 DESCRIPTION
 
@@ -141,8 +141,13 @@ sub parse_toc {
     {
         $info{characters} = 'Hermione Granger, Severus Snape';
     }
+    $info{category} = 'SSHG';
     $info{universe} = 'Harry Potter';
     $info{recipient} = $self->parse_recipient(%args);
+    if (!$info{recipient}) # if it fails to parse the recipient, remove them
+    {
+        delete $info{recipient};
+    }
     $info{chapters} = $self->parse_chapter_urls(%args);
 
     return %info;
@@ -173,7 +178,7 @@ sub parse_chapter_urls {
     }
     if (@chapters == 1)
     {
-	while ($content =~ m/href=["'](http:\/\/sshg-(?:mod|gifts|giftmod)\.livejournal\.com\/\d+.html)/sg)
+	while ($content =~ m/href=["'](https?:\/\/sshg-(?:mod|gifts|giftmod)\.livejournal\.com\/\d+.html)/sg)
 	{
 	    my $ch_url = $1;
 	    warn "chapter=$ch_url\n" if ($self->{verbose} > 1);

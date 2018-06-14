@@ -29,3 +29,4 @@ t/lib/TestQuery.pm
 t/lib/TestTimeLog.pm
 t/qbit_application_model_dbmanager_fields.t
 t/qbit_application_model_dbmanager_filter.t
+t/qbit_application_model_dbmanager_remove_model_fields.t

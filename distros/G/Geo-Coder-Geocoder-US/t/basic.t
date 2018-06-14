@@ -6,29 +6,15 @@ use warnings;
 use Test::More 0.40;
 
 {
-    my $warning;
+    local $@ = undef;
 
-    local $SIG{__WARN__} = sub {
-	$warning = $_[0];
+    eval {
+	require Geo::Coder::Geocoder::US;
+	1;
     };
 
-    require_ok('Geo::Coder::Geocoder::US');
-
-    my $re = qr/ \A \Q@{[
-	Geo::Coder::Geocoder::US->RETRACTION_MESSAGE() ]}\E /smx;
-
-    like $warning, $re, 'Got correct retraction message on load';
-
-    can_ok( 'Geo::Coder::Geocoder::US', qw{ new debug geocode response ua } );
-
-    $warning = undef;
-
-    my $ms = Geo::Coder::Geocoder::US->new();
-
-    isa_ok($ms, 'Geo::Coder::Geocoder::US');
-
-    like $warning, $re, 'Got correct retraction message on instantiation';
-
+    like $@, qr<Geo::Coder::Geocoder::US has been retracted,>,
+    'Attempt to load Geo::Coder::Geocoder::US throws correct exception';
 }
 
 done_testing;

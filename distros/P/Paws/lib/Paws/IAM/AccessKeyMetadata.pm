@@ -37,7 +37,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::IAM::Access
 Contains information about an AWS access key, without its secret key.
 
 This data type is used as a response element in the ListAccessKeys
-action.
+operation.
 
 =head1 ATTRIBUTES
 
@@ -70,9 +70,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::IAM>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -28,8 +28,8 @@ BEGIN {
     use_ok("Mailru::Cloud");
 }
 
-my $login                   = 'petr.davydov.80@bk.ru';
-my $password                = '@F3bHlkIS7Ou';
+my $login                   = $ENV{MAILRU_LOGIN} || 'petr.davydov.80@bk.ru';
+my $password                = $ENV{MAILRU_LOGIN} ? $ENV{MAILRU_PASSWD} : '@F3bHlkIS7Ou';
 my $uploadFile              = "$Bin/test_upload.f";
 my $download_file           = "$Bin/test_download";
 my $create_folder           = "/Test/temp" . int(rand(10000));
@@ -40,23 +40,26 @@ can_ok("Mailru::Cloud", 'new');
 my $cloud = Mailru::Cloud->new;
 isa_ok($cloud, "Mailru::Cloud");
 
-ok ($cloud->login(-login => $login, -password => $password), "Test login");
-ok ($cloud->__isLogin(), "Test login method '__isLogin'");
+SKIP: {
+    
+    my $login_status = $cloud->login(-login => $login, -password => $password);
+    skip "Skip tests. Cant login with username: $login" if not $login_status;
 
+    ok ($cloud->__isLogin(), "Test login method '__isLogin'");
 
+    test_info();
+    test_createFolder();
+    my @uploaded = test_uploadFile();
+    test_listFiles();
+    test_shareResource();
+    test_downloadFile();
 
-test_info();
-test_createFolder();
-my @uploaded = test_uploadFile();
-test_listFiles();
-test_shareResource();
-test_downloadFile();
+    test_deleteResource($_) for @uploaded;
+    test_deleteResource($create_folder);
+    test_deleteResource('/dfhdffereerer');
 
-test_deleteResource($_) for @uploaded;
-test_deleteResource($create_folder);
-test_deleteResource('/dfhdffereerer');
-
-test_emptyTrash();
+    test_emptyTrash();
+}
 
 sub test_info {
     my $info = $cloud->info;

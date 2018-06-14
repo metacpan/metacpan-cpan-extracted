@@ -39,7 +39,9 @@ This class has no description
 
 =head2 State => Str
 
-  The current state of the attachment.
+  The current state of the attachment. For an Internet gateway, the state
+is C<available> when attached to a VPC; otherwise, this value is not
+returned.
 
 
 =head2 VpcId => Str
@@ -54,8 +56,8 @@ This class forms part of L<Paws>, describing an object used in L<Paws::EC2>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut

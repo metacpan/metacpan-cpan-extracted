@@ -4,6 +4,7 @@ package Paws::CognitoIdp::CreateUserPoolClient;
   has AllowedOAuthFlows => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
   has AllowedOAuthFlowsUserPoolClient => (is => 'ro', isa => 'Bool');
   has AllowedOAuthScopes => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
+  has AnalyticsConfiguration => (is => 'ro', isa => 'Paws::CognitoIdp::AnalyticsConfigurationType');
   has CallbackURLs => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
   has ClientName => (is => 'ro', isa => 'Str', required => 1);
   has DefaultRedirectURI => (is => 'ro', isa => 'Str');
@@ -27,21 +28,66 @@ package Paws::CognitoIdp::CreateUserPoolClient;
 
 =head1 NAME
 
-Paws::CognitoIdp::CreateUserPoolClient - Arguments for method CreateUserPoolClient on Paws::CognitoIdp
+Paws::CognitoIdp::CreateUserPoolClient - Arguments for method CreateUserPoolClient on L<Paws::CognitoIdp>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateUserPoolClient on the 
-Amazon Cognito Identity Provider service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateUserPoolClient on the
+L<Amazon Cognito Identity Provider|Paws::CognitoIdp> service. Use the attributes of this class
 as arguments to method CreateUserPoolClient.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateUserPoolClient.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateUserPoolClient(Att1 => $value1, Att2 => $value2, ...);
+    my $cognito-idp = Paws->service('CognitoIdp');
+    my $CreateUserPoolClientResponse = $cognito -idp->CreateUserPoolClient(
+      ClientName        => 'MyClientNameType',
+      UserPoolId        => 'MyUserPoolIdType',
+      AllowedOAuthFlows => [
+        'code', ...    # values: code, implicit, client_credentials
+      ],               # OPTIONAL
+      AllowedOAuthFlowsUserPoolClient => 1,    # OPTIONAL
+      AllowedOAuthScopes              => [
+        'MyScopeType', ...                     # min: 1, max: 256
+      ],                                       # OPTIONAL
+      AnalyticsConfiguration => {
+        ExternalId     => 'MyStringType',
+        RoleArn        => 'MyArnType',         # min: 20, max: 2048
+        ApplicationId  => 'MyHexStringType',
+        UserDataShared => 1,
+      },    # OPTIONAL
+      CallbackURLs => [
+        'MyRedirectUrlType', ...    # min: 1, max: 1024
+      ],                            # OPTIONAL
+      DefaultRedirectURI => 'MyRedirectUrlType',    # OPTIONAL
+      ExplicitAuthFlows  => [
+        'ADMIN_NO_SRP_AUTH',
+        ... # values: ADMIN_NO_SRP_AUTH, CUSTOM_AUTH_FLOW_ONLY, USER_PASSWORD_AUTH
+      ],    # OPTIONAL
+      GenerateSecret => 1,    # OPTIONAL
+      LogoutURLs     => [
+        'MyRedirectUrlType', ...    # min: 1, max: 1024
+      ],                            # OPTIONAL
+      ReadAttributes => [
+        'MyClientPermissionType', ...    # min: 1, max: 2048
+      ],                                 # OPTIONAL
+      RefreshTokenValidity       => 1,   # OPTIONAL
+      SupportedIdentityProviders => [
+        'MyProviderNameType', ...        # min: 1, max: 32
+      ],                                 # OPTIONAL
+      WriteAttributes => [
+        'MyClientPermissionType', ...    # min: 1, max: 2048
+      ],                                 # OPTIONAL
+    );
+
+    # Results:
+    my $UserPoolClient = $CreateUserPoolClientResponse->UserPoolClient;
+
+    # Returns a L<Paws::CognitoIdp::CreateUserPoolClientResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/cognito-idp/CreateUserPoolClient>
 
 =head1 ATTRIBUTES
 
@@ -71,9 +117,41 @@ C<"phone">, C<"email">, C<"openid">, and C<"Cognito">.
 
 
 
+=head2 AnalyticsConfiguration => L<Paws::CognitoIdp::AnalyticsConfigurationType>
+
+The Amazon Pinpoint analytics configuration for collecting metrics for
+this user pool.
+
+
+
 =head2 CallbackURLs => ArrayRef[Str|Undef]
 
-A list of allowed callback URLs for the identity providers.
+A list of allowed redirect (callback) URLs for the identity providers.
+
+A redirect URI must:
+
+=over
+
+=item *
+
+Be an absolute URI.
+
+=item *
+
+Be registered with the authorization server.
+
+=item *
+
+Not use HTTP without TLS (i.e. use HTTPS instead of HTTP).
+
+=item *
+
+Not include a fragment component.
+
+=back
+
+See OAuth 2.0 - Redirection Endpoint
+(https://tools.ietf.org/html/rfc6749#section-3.1.2).
 
 
 
@@ -86,6 +164,31 @@ The client name for the user pool client you would like to create.
 =head2 DefaultRedirectURI => Str
 
 The default redirect URI. Must be in the C<CallbackURLs> list.
+
+A redirect URI must:
+
+=over
+
+=item *
+
+Be an absolute URI.
+
+=item *
+
+Be registered with the authorization server.
+
+=item *
+
+Not use HTTP without TLS (i.e. use HTTPS instead of HTTP).
+
+=item *
+
+Not include a fragment component.
+
+=back
+
+See OAuth 2.0 - Redirection Endpoint
+(https://tools.ietf.org/html/rfc6749#section-3.1.2).
 
 
 
@@ -148,9 +251,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateUserPoo
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

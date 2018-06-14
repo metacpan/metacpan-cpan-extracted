@@ -16,21 +16,34 @@ package Paws::EC2::DescribeKeyPairs;
 
 =head1 NAME
 
-Paws::EC2::DescribeKeyPairs - Arguments for method DescribeKeyPairs on Paws::EC2
+Paws::EC2::DescribeKeyPairs - Arguments for method DescribeKeyPairs on L<Paws::EC2>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DescribeKeyPairs on the 
-Amazon Elastic Compute Cloud service. Use the attributes of this class
+This class represents the parameters used for calling the method DescribeKeyPairs on the
+L<Amazon Elastic Compute Cloud|Paws::EC2> service. Use the attributes of this class
 as arguments to method DescribeKeyPairs.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DescribeKeyPairs.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DescribeKeyPairs(Att1 => $value1, Att2 => $value2, ...);
+    my $ec2 = Paws->service('EC2');
+    # To display a key pair
+    # This example displays the fingerprint for the specified key.
+    my $DescribeKeyPairsResult = $ec2->DescribeKeyPairs(
+      {
+        'KeyNames' => ['my-key-pair']
+      }
+    );
+
+    # Results:
+    my $KeyPairs = $DescribeKeyPairsResult->KeyPairs;
+
+    # Returns a L<Paws::EC2::DescribeKeyPairsResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ec2/DescribeKeyPairs>
 
 =head1 ATTRIBUTES
 
@@ -78,9 +91,9 @@ This class forms part of L<Paws>, documenting arguments for method DescribeKeyPa
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

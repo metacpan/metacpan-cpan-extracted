@@ -1,0 +1,14 @@
+.gitignore
+Build.PL
+Changes
+LICENSE
+README.md
+cpanfile
+lib/Mojolicious/Plugin/Prometheus/Role/SharedFastMmap.pm
+lib/Mojolicious/Plugin/Prometheus/Shared/FastMmap.pm
+minil.toml
+t/00_compile.t
+t/basic.t
+META.json
+META.yml
+MANIFEST

@@ -20,18 +20,18 @@
 			[% IF title %]
 				[% title %]
 			[% ELSE %]
-				Free Geocoding Website - alpha test
+				Free Geo-Coding Website - alpha test
 			[% END %]
 		</title>
 		[% IF description %]
 			<meta name="description" content="[% description %]" />
 		[% ELSE %]
-			<meta name="description" content="Coming Soon - an openaddresses.io, whosonfirst.org, Maxmind and Geonames based geocoding website" />
+			<meta name="description" content="Coming Soon - an openaddresses.io, whosonfirst.org, Maxmind and Geonames based geo-coding website" />
 		[% END %]
 		<link rel="stylesheet" href="/css/style.css">
 	</head>
 	<body onload="document.Filter.q.focus()">
-		<h1>Free Geocoding Website - alpha test</h1>
+		<h1>Free Geo-Coding Website - alpha test</h1>
 		<p>Enter the Location to Search For</p>
 		<p>
 			Only Australia, US and Canada are currently supported,
@@ -42,7 +42,7 @@
 		<form method="post" action="/cgi-bin/page.fcgi?page=query" onsubmit="return isNotEmpty(this.q)" name="Filter">
 			<input id="page" name="page" value="query" type="hidden">
 			<input id="action" name="action" value="query" type="hidden">
-			<div id="container">  
+			<div id="container">
 				<div class="cell"><input name="q" type="search" placeholder="Enter location"></div>
 				<!--
 				<div class="cell"><div class="button">Search</div></div>
@@ -55,7 +55,7 @@
 			<a href="http://www.maxmind.com">http://www.maxmind.com</a>.
 			Also thanks to
 			<a href="http://www.geonames.org">geonames</a>,
-			<a href="https://whosonfirst.org/">whosonfirst</a> and
+			<a href="https://whosonfirst.org/docs/license">whosonfirst</a>
 			<a href="https://openaddresses.io/">openaddresses</a> and
 			<a href="https://github.com/openvenues/libpostal">libpostal</a>.
 		</p>

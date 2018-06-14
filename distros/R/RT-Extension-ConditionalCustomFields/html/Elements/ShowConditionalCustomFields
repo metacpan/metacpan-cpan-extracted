@@ -20,7 +20,12 @@ jQuery(function() {
             }
         });
     } else {
-        if (jQuery.inArray(jQuery.trim(jQuery('#'+conditionedby_id+' td.value').text()), conditionedby_vals) != -1) {
+        var condition_val = jQuery('#'+conditionedby_id+' td.value');
+        if (condition_val.length) {
+            if (jQuery.inArray(jQuery.trim(condition_val.text()), conditionedby_vals) != -1) {
+                condition_met = true;
+            }
+        } else {
             condition_met = true;
         }
     }

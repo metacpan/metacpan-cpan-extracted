@@ -6,14 +6,17 @@ package Paws::DMS::Endpoint;
   has EndpointArn => (is => 'ro', isa => 'Str');
   has EndpointIdentifier => (is => 'ro', isa => 'Str');
   has EndpointType => (is => 'ro', isa => 'Str');
+  has EngineDisplayName => (is => 'ro', isa => 'Str');
   has EngineName => (is => 'ro', isa => 'Str');
   has ExternalId => (is => 'ro', isa => 'Str');
+  has ExternalTableDefinition => (is => 'ro', isa => 'Str');
   has ExtraConnectionAttributes => (is => 'ro', isa => 'Str');
   has KmsKeyId => (is => 'ro', isa => 'Str');
   has MongoDbSettings => (is => 'ro', isa => 'Paws::DMS::MongoDbSettings');
   has Port => (is => 'ro', isa => 'Int');
   has S3Settings => (is => 'ro', isa => 'Paws::DMS::S3Settings');
   has ServerName => (is => 'ro', isa => 'Str');
+  has ServiceAccessRoleArn => (is => 'ro', isa => 'Str');
   has SslMode => (is => 'ro', isa => 'Str');
   has Status => (is => 'ro', isa => 'Str');
   has Username => (is => 'ro', isa => 'Str');
@@ -86,11 +89,19 @@ with a hyphen or contain two consecutive hyphens.
   The type of endpoint.
 
 
+=head2 EngineDisplayName => Str
+
+  The expanded name for the engine name. For example, if the
+C<EngineName> parameter is "aurora," this value would be "Amazon Aurora
+MySQL."
+
+
 =head2 EngineName => Str
 
   The database engine name. Valid values, depending on the EndPointType,
-include MYSQL, ORACLE, POSTGRES, MARIADB, AURORA, REDSHIFT, S3, SYBASE,
-DYNAMODB, MONGODB, and SQLSERVER.
+include mysql, oracle, postgres, mariadb, aurora, aurora-postgresql,
+redshift, s3, db2, azuredb, sybase, sybase, dynamodb, mongodb, and
+sqlserver.
 
 
 =head2 ExternalId => Str
@@ -98,6 +109,11 @@ DYNAMODB, MONGODB, and SQLSERVER.
   Value returned by a call to CreateEndpoint that can be used for
 cross-account validation. Use it on a subsequent call to CreateEndpoint
 to create the endpoint with a cross-account.
+
+
+=head2 ExternalTableDefinition => Str
+
+  The external table definition.
 
 
 =head2 ExtraConnectionAttributes => Str
@@ -136,6 +152,11 @@ C<S3Settings> structure.
   The name of the server at the endpoint.
 
 
+=head2 ServiceAccessRoleArn => Str
+
+  The Amazon Resource Name (ARN) used by the service access IAM role.
+
+
 =head2 SslMode => Str
 
   The SSL mode used to connect to the endpoint.
@@ -163,9 +184,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::DMS>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

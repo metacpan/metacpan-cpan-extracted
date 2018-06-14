@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
 # ABSTRACT: commandline client to query a policyd server
 # PODNAME: policyd-client
 
@@ -25,7 +25,7 @@ policyd-client - commandline client to query a policyd server
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 DESCRIPTION
 

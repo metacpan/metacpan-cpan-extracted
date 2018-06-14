@@ -1,6 +1,7 @@
 package Paws::MarketplaceMetering;
   use Moose;
   sub service { 'metering.marketplace' }
+  sub signing_name { 'aws-marketplace' }
   sub version { '2016-01-14' }
   sub target_prefix { 'AWSMPMeteringService' }
   sub json_version { "1.1" }
@@ -11,7 +12,7 @@ package Paws::MarketplaceMetering;
   has retriables => (is => 'ro', isa => 'ArrayRef', default => sub { [
   ] });
 
-  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller', 'Paws::Net::JsonResponse';
+  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller';
 
   
   sub BatchMeterUsage {
@@ -100,15 +101,27 @@ obtain a CustomerIdentifier and Product Code.
 =back
 
 
+For the AWS API documentation, see L<https://docs.aws.amazon.com/marketplacemetering/latest/APIReference/Welcome.html>
+
+
 =head1 METHODS
 
-=head2 BatchMeterUsage(ProductCode => Str, UsageRecords => ArrayRef[L<Paws::MarketplaceMetering::UsageRecord>])
+=head2 BatchMeterUsage
+
+=over
+
+=item ProductCode => Str
+
+=item UsageRecords => ArrayRef[L<Paws::MarketplaceMetering::UsageRecord>]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::MarketplaceMetering::BatchMeterUsage>
 
 Returns: a L<Paws::MarketplaceMetering::BatchMeterUsageResult> instance
 
-  BatchMeterUsage is called from a SaaS application listed on the AWS
+BatchMeterUsage is called from a SaaS application listed on the AWS
 Marketplace to post metering records for a set of customers.
 
 For identical requests, the API is idempotent; requests can be retried
@@ -121,26 +134,48 @@ BatchMeterUsage.
 BatchMeterUsage can process up to 25 UsageRecords at a time.
 
 
-=head2 MeterUsage(DryRun => Bool, ProductCode => Str, Timestamp => Str, UsageDimension => Str, UsageQuantity => Int)
+=head2 MeterUsage
+
+=over
+
+=item DryRun => Bool
+
+=item ProductCode => Str
+
+=item Timestamp => Str
+
+=item UsageDimension => Str
+
+=item UsageQuantity => Int
+
+
+=back
 
 Each argument is described in detail in: L<Paws::MarketplaceMetering::MeterUsage>
 
 Returns: a L<Paws::MarketplaceMetering::MeterUsageResult> instance
 
-  API to emit metering records. For identical requests, the API is
+API to emit metering records. For identical requests, the API is
 idempotent. It simply returns the metering record ID.
 
 MeterUsage is authenticated on the buyer's AWS account, generally when
 running from an EC2 instance on the AWS Marketplace.
 
 
-=head2 ResolveCustomer(RegistrationToken => Str)
+=head2 ResolveCustomer
+
+=over
+
+=item RegistrationToken => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::MarketplaceMetering::ResolveCustomer>
 
 Returns: a L<Paws::MarketplaceMetering::ResolveCustomerResult> instance
 
-  ResolveCustomer is called by a SaaS application during the registration
+ResolveCustomer is called by a SaaS application during the registration
 process. When a buyer visits your website during the registration
 process, the buyer submits a registration token through their browser.
 The registration token is resolved through this API to obtain a
@@ -162,9 +197,9 @@ This service class forms part of L<Paws>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

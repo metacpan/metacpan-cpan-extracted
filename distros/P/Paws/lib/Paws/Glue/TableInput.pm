@@ -64,7 +64,8 @@ Structure used to create or update the table.
 
 =head2 B<REQUIRED> Name => Str
 
-  Name of the table.
+  Name of the table. For Hive compatibility, this is folded to lowercase
+when it is stored.
 
 
 =head2 Owner => Str
@@ -118,9 +119,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Glue>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -40,7 +40,8 @@ API.
 
 =head2 ConnectionType => Str
 
-  The type of connections to return.
+  The type of connections to return. Currently, only JDBC is supported;
+SFTP is not supported.
 
 
 =head2 MatchCriteria => ArrayRef[Str|Undef]
@@ -56,9 +57,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Glue>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

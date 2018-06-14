@@ -1,6 +1,7 @@
 package Paws::MarketplaceEntitlement;
   use Moose;
   sub service { 'entitlement.marketplace' }
+  sub signing_name { 'aws-marketplace' }
   sub version { '2017-01-11' }
   sub target_prefix { 'AWSMPEntitlementService' }
   sub json_version { "1.1" }
@@ -11,7 +12,7 @@ package Paws::MarketplaceEntitlement;
   has retriables => (is => 'ro', isa => 'ArrayRef', default => sub { [
   ] });
 
-  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller', 'Paws::Net::JsonResponse';
+  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller';
 
   
   sub GetEntitlements {
@@ -72,15 +73,31 @@ I<GetEntitlements>- Gets the entitlements for a Marketplace product.
 =back
 
 
+For the AWS API documentation, see L<https://docs.aws.amazon.com/marketplaceentitlement/latest/APIReference/Welcome.html>
+
+
 =head1 METHODS
 
-=head2 GetEntitlements(ProductCode => Str, [Filter => L<Paws::MarketplaceEntitlement::GetEntitlementFilters>, MaxResults => Int, NextToken => Str])
+=head2 GetEntitlements
+
+=over
+
+=item ProductCode => Str
+
+=item [Filter => L<Paws::MarketplaceEntitlement::GetEntitlementFilters>]
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::MarketplaceEntitlement::GetEntitlements>
 
 Returns: a L<Paws::MarketplaceEntitlement::GetEntitlementsResult> instance
 
-  GetEntitlements retrieves entitlement values for a given product. The
+GetEntitlements retrieves entitlement values for a given product. The
 results can be filtered based on customer identifier or product
 dimensions.
 
@@ -100,9 +117,9 @@ This service class forms part of L<Paws>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

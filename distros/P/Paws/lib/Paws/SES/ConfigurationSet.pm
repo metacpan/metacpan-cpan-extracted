@@ -35,8 +35,10 @@ The name of the configuration set.
 
 Configuration sets let you create groups of rules that you can apply to
 the emails you send using Amazon SES. For more information about using
-configuration sets, see Using Amazon SES Configuration Sets in the I<
-Amazon SES Developer Guide.>
+configuration sets, see Using Amazon SES Configuration Sets
+(http://docs.aws.amazon.com/ses/latest/DeveloperGuide/using-configuration-sets.html)
+in the Amazon SES Developer Guide
+(http://docs.aws.amazon.com/ses/latest/DeveloperGuide/).
 
 =head1 ATTRIBUTES
 
@@ -68,9 +70,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::SES>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

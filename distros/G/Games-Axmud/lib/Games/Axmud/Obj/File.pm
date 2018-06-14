@@ -8587,7 +8587,7 @@
                 $axmud::CLIENT->ivPoke('toolbarList', @buttonList);
             }
 
-        ## zonemap ################################################################################
+        ## zonemaps ###############################################################################
 
         } elsif ($self->fileType eq 'zonemaps') {
 
@@ -8689,6 +8689,41 @@
                         $zonemapObj->{modelHash} = \%newModelHash;
                         delete $zonemapObj->{zoneModelHash};
                     }
+                }
+            }
+
+        ## tts ####################################################################################
+
+        } elsif ($self->fileType eq 'tts') {
+
+            if ($version < 1_001_005) {
+
+                # This version adds support for a new TTS engine. Extremely unlikely that anyone has
+                #   created a configuration object with the same name, but we'll overwrite it, if so
+                my $obj = Games::Axmud::Obj::Tts->new(
+                    'esng',
+                    'esng',
+                    'en',
+                    150,
+                    undef,
+                    50,
+                    undef,
+                );
+
+                if ($obj) {
+
+                    $axmud::CLIENT->add_ttsObj($obj);
+                }
+
+                # Also update the default values for the TTS configuration for the swift engine, as
+                #   they use different values on MS Windows and Linux
+                $obj = $axmud::CLIENT->ivShow('ttsObjHash', 'swift');
+                if ($obj) {
+
+                    $obj->ivUndef('speed');
+                    $obj->ivUndef('rate');
+                    $obj->ivUndef('pitch');
+                    $obj->ivUndef('volume');
                 }
             }
         }

@@ -20,21 +20,39 @@ package Paws::Route53::ListGeoLocations;
 
 =head1 NAME
 
-Paws::Route53::ListGeoLocations - Arguments for method ListGeoLocations on Paws::Route53
+Paws::Route53::ListGeoLocations - Arguments for method ListGeoLocations on L<Paws::Route53>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ListGeoLocations on the 
-Amazon Route 53 service. Use the attributes of this class
+This class represents the parameters used for calling the method ListGeoLocations on the
+L<Amazon Route 53|Paws::Route53> service. Use the attributes of this class
 as arguments to method ListGeoLocations.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ListGeoLocations.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ListGeoLocations(Att1 => $value1, Att2 => $value2, ...);
+    my $route53 = Paws->service('Route53');
+    my $ListGeoLocationsResponse = $route53->ListGeoLocations(
+      MaxItems             => 'MyPageMaxItems',                  # OPTIONAL
+      StartContinentCode   => 'MyGeoLocationContinentCode',      # OPTIONAL
+      StartCountryCode     => 'MyGeoLocationCountryCode',        # OPTIONAL
+      StartSubdivisionCode => 'MyGeoLocationSubdivisionCode',    # OPTIONAL
+    );
+
+    # Results:
+    my $IsTruncated = $ListGeoLocationsResponse->IsTruncated;
+    my $GeoLocationDetailsList =
+      $ListGeoLocationsResponse->GeoLocationDetailsList;
+    my $NextContinentCode   = $ListGeoLocationsResponse->NextContinentCode;
+    my $NextCountryCode     = $ListGeoLocationsResponse->NextCountryCode;
+    my $NextSubdivisionCode = $ListGeoLocationsResponse->NextSubdivisionCode;
+    my $MaxItems            = $ListGeoLocationsResponse->MaxItems;
+
+    # Returns a L<Paws::Route53::ListGeoLocationsResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/route53/ListGeoLocations>
 
 =head1 ATTRIBUTES
 
@@ -73,7 +91,8 @@ value, enter that value in C<StartCountryCode> to return the next page
 of results.
 
 Amazon Route 53 uses the two-letter country codes that are specified in
-ISO standard 3166-1 alpha-2.
+ISO standard 3166-1 alpha-2
+(https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2).
 
 
 
@@ -98,9 +117,9 @@ This class forms part of L<Paws>, documenting arguments for method ListGeoLocati
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

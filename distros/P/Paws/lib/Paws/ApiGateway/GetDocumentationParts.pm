@@ -2,10 +2,11 @@
 package Paws::ApiGateway::GetDocumentationParts;
   use Moose;
   has Limit => (is => 'ro', isa => 'Int', traits => ['ParamInQuery'], query_name => 'limit');
-  has NameQuery => (is => 'ro', isa => 'Str', traits => ['ParamInQuery'], query_name => 'nameQuery');
+  has LocationStatus => (is => 'ro', isa => 'Str', traits => ['ParamInQuery'], query_name => 'locationStatus');
+  has NameQuery => (is => 'ro', isa => 'Str', traits => ['ParamInQuery'], query_name => 'name');
   has Path => (is => 'ro', isa => 'Str', traits => ['ParamInQuery'], query_name => 'path');
   has Position => (is => 'ro', isa => 'Str', traits => ['ParamInQuery'], query_name => 'position');
-  has RestApiId => (is => 'ro', isa => 'Str', traits => ['ParamInURI'], uri_name => 'restApiId', required => 1);
+  has RestApiId => (is => 'ro', isa => 'Str', traits => ['ParamInURI'], uri_name => 'restapi_id', required => 1);
   has Type => (is => 'ro', isa => 'Str', traits => ['ParamInQuery'], query_name => 'type');
 
   use MooseX::ClassAttribute;
@@ -14,37 +15,61 @@ package Paws::ApiGateway::GetDocumentationParts;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/restapis/{restapi_id}/documentation/parts');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'GET');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::ApiGateway::DocumentationParts');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::ApiGateway::GetDocumentationParts - Arguments for method GetDocumentationParts on Paws::ApiGateway
+Paws::ApiGateway::GetDocumentationParts - Arguments for method GetDocumentationParts on L<Paws::ApiGateway>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method GetDocumentationParts on the 
-Amazon API Gateway service. Use the attributes of this class
+This class represents the parameters used for calling the method GetDocumentationParts on the
+L<Amazon API Gateway|Paws::ApiGateway> service. Use the attributes of this class
 as arguments to method GetDocumentationParts.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to GetDocumentationParts.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->GetDocumentationParts(Att1 => $value1, Att2 => $value2, ...);
+    my $apigateway = Paws->service('ApiGateway');
+    my $DocumentationParts = $apigateway->GetDocumentationParts(
+      RestApiId      => 'MyString',
+      Limit          => 1,               # OPTIONAL
+      LocationStatus => 'DOCUMENTED',    # OPTIONAL
+      NameQuery      => 'MyString',      # OPTIONAL
+      Path           => 'MyString',      # OPTIONAL
+      Position       => 'MyString',      # OPTIONAL
+      Type           => 'API',           # OPTIONAL
+    );
+
+    # Results:
+    my $Items    = $DocumentationParts->Items;
+    my $Position = $DocumentationParts->Position;
+
+    # Returns a L<Paws::ApiGateway::DocumentationParts> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/apigateway/>
 
 =head1 ATTRIBUTES
 
 
 =head2 Limit => Int
 
-The maximum number of returned results per page.
+The maximum number of returned results per page. The default value is
+25 and the maximum value is 500.
 
 
+
+=head2 LocationStatus => Str
+
+The status of the API documentation parts to retrieve. Valid values are
+C<DOCUMENTED> for retrieving DocumentationPart resources with content
+and C<UNDOCUMENTED> for DocumentationPart resources without content.
+
+Valid values are: C<"DOCUMENTED">, C<"UNDOCUMENTED">
 
 =head2 NameQuery => Str
 
@@ -83,9 +108,9 @@ This class forms part of L<Paws>, documenting arguments for method GetDocumentat
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

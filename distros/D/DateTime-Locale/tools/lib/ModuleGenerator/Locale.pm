@@ -61,7 +61,7 @@ has _glibc_file => (
     lazy    => 1,
     builder => '_build_glibc_file',
 );
-use Devel::Confess;
+
 has _glibc_data => (
     is      => 'ro',
     isa     => t('HashRef'),
@@ -287,6 +287,7 @@ sub _extract_glibc_value ( $self, $key, $raw ) {
         or return;
 
     $val =~ s/[\\\/]\n//g;
+    $val =~ s{//}{/}g;
 
     $val =~ s/\<U([A-F\d]+)\>/chr(hex($1))/eg;
 

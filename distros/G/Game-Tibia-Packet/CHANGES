@@ -1,9 +1,43 @@
 ==================================================
-Changes from 2016-08-29 00:00:00 +0000 to present.
+Changes from 2017-06-12 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.006 at 2017-08-29 22:46:20 +0000
+version 0.007 at 2018-06-12 07:23:02 +0000
+------------------------------------------
+
+  Change: 1a985073fdeb12a0fe8cb18fc1d7a9fc23bf26cb
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-05-13 10:58:56 +0000
+
+    Fix extraction of account name 
+
+  Change: 658615c2b317fbe5b51437e90dea5290e5f2421e
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-05-10 15:58:04 +0000
+
+    Test serializing/deserializing Packet::Charlist 
+
+  Change: 020dde172c7529f105749adce6402a030581f5b2
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-05-10 15:51:44 +0000
+
+    s/XTEA/xtea/ in hash keys 
+
+  Change: 271a77412b74a8d56029bb21268f4150d0b57e6c
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-05-10 12:34:10 +0000
+
+    Fix erroneous Adler32 calculation 
+
+  Change: 749b1116c6c1452702eb787f713e8a374d11c92b
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-05-10 12:32:52 +0000
+
+    Allow specifying a global Tibia version on import 
+
+------------------------------------------
+version 0.006 at 2017-08-29 22:46:11 +0000
 ------------------------------------------
 
   Change: 61fb5bcc3b8b64733d504ecfac6aaa8f5bc9cfc0
@@ -14,72 +48,6 @@ version 0.006 at 2017-08-29 22:46:20 +0000
 
     7.61 was the first version with RSA/XTEA. 
 
-------------------------------------------
-version 0.005 at 2016-11-30 14:07:03 +0000
-------------------------------------------
-
-  Change: abf437d341ca40c8dd053e91b890207682f650fe
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2016-11-30 15:07:03 +0000
-
-    Added Perl 5.16 as requirement
-
-    Tests fail for lower versions 
-
-------------------------------------------
-version 0.004 at 2016-10-15 07:11:50 +0000
-------------------------------------------
-
-  Change: 300a60e1d32c141aea2e16aa1a04553fdcb37309
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2016-10-15 09:11:50 +0000
-
-    Fixed dependency version declarations 
-
-------------------------------------------
-version 0.003 at 2016-10-13 00:58:21 +0000
-------------------------------------------
-
-  Change: 0b18710166df5aead7e2c25a43a44443fee35100
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2016-10-13 02:58:21 +0000
-
-    G::T::P::Charlist handles info/error messages correctly now 
-
-------------------------------------------
-version 0.002 at 2016-10-12 20:36:44 +0000
-------------------------------------------
-
-  Change: b6198aa5110427c75e2a790420f69444e9ec8962
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2016-10-12 22:36:44 +0000
-
-    Added support for Login and Charlist packets
-
-    860 isn't tested. 810 works. 
-
-  Change: 6aed78e0decad23d96d43a38a29653e209508478
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2016-10-01 05:40:46 +0000
-
-    Added AutoPrereqs 
-
-  Change: 45cd6161c01be21a1467df6315fbbb25bc54f2bf
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2016-09-30 23:59:18 +0000
-
-    Added link to Wireshark module 
-
-------------------------------------------
-version 0.001 at 2016-09-30 12:23:00 +0000
-------------------------------------------
-
-  Change: 6ccc5c74d29078dfa198533da613a0675458e00d
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2016-09-30 14:23:00 +0000
-
-    Initial commit 
-
-================
-End of releases.
-================
+================================================
+Plus 5 releases after 2017-06-12 00:00:00 +0000.
+================================================

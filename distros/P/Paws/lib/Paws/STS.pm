@@ -1,6 +1,7 @@
 package Paws::STS;
   use Moose;
   sub service { 'sts' }
+  sub signing_name { 'sts' }
   sub version { '2011-06-15' }
   sub flattened_arrays { 0 }
   has max_attempts => (is => 'ro', isa => 'Int', default => 5);
@@ -10,7 +11,7 @@ package Paws::STS;
   has retriables => (is => 'ro', isa => 'ArrayRef', default => sub { [
   ] });
 
-  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::QueryCaller', 'Paws::Net::XMLResponse';
+  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::QueryCaller';
 
   has '+region_rules' => (default => sub {
     my $regioninfo;
@@ -132,7 +133,8 @@ to request temporary, limited-privilege credentials for AWS Identity
 and Access Management (IAM) users or for users that you authenticate
 (federated users). This guide provides descriptions of the STS API. For
 more detailed information about using this service, go to Temporary
-Security Credentials.
+Security Credentials
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html).
 
 As an alternative to using the API, you can use one of the AWS SDKs,
 which consist of libraries and sample code for various programming
@@ -141,18 +143,23 @@ SDKs provide a convenient way to create programmatic access to STS. For
 example, the SDKs take care of cryptographically signing requests,
 managing errors, and retrying requests automatically. For information
 about the AWS SDKs, including how to download and install them, see the
-Tools for Amazon Web Services page.
+Tools for Amazon Web Services page (http://aws.amazon.com/tools/).
 
 For information about setting up signatures and authorization through
-the API, go to Signing AWS API Requests in the I<AWS General
-Reference>. For general information about the Query API, go to Making
-Query Requests in I<Using IAM>. For information about using security
-tokens with other AWS products, go to AWS Services That Work with IAM
+the API, go to Signing AWS API Requests
+(http://docs.aws.amazon.com/general/latest/gr/signing_aws_api_requests.html)
+in the I<AWS General Reference>. For general information about the
+Query API, go to Making Query Requests
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/IAM_UsingQueryAPI.html)
+in I<Using IAM>. For information about using security tokens with other
+AWS products, go to AWS Services That Work with IAM
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/reference_aws-services-that-work-with-iam.html)
 in the I<IAM User Guide>.
 
 If you're new to AWS and need additional technical information about a
 specific AWS product, you can find the product's technical
-documentation at http://aws.amazon.com/documentation/.
+documentation at http://aws.amazon.com/documentation/
+(http://aws.amazon.com/documentation/).
 
 B<Endpoints>
 
@@ -160,10 +167,13 @@ The AWS Security Token Service (STS) has a default endpoint of
 https://sts.amazonaws.com that maps to the US East (N. Virginia)
 region. Additional regions are available and are activated by default.
 For more information, see Activating and Deactivating AWS STS in an AWS
-Region in the I<IAM User Guide>.
+Region
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_enable-regions.html)
+in the I<IAM User Guide>.
 
-For information about STS endpoints, see Regions and Endpoints in the
-I<AWS General Reference>.
+For information about STS endpoints, see Regions and Endpoints
+(http://docs.aws.amazon.com/general/latest/gr/rande.html#sts_region) in
+the I<AWS General Reference>.
 
 B<Recording API requests>
 
@@ -172,23 +182,50 @@ for your AWS account and delivers log files to an Amazon S3 bucket. By
 using information collected by CloudTrail, you can determine what
 requests were successfully made to STS, who made the request, when it
 was made, and so on. To learn more about CloudTrail, including how to
-turn it on and find your log files, see the AWS CloudTrail User Guide.
+turn it on and find your log files, see the AWS CloudTrail User Guide
+(http://docs.aws.amazon.com/awscloudtrail/latest/userguide/what_is_cloud_trail_top_level.html).
+
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/iam/>
+
 
 =head1 METHODS
 
-=head2 AssumeRole(RoleArn => Str, RoleSessionName => Str, [DurationSeconds => Int, ExternalId => Str, Policy => Str, SerialNumber => Str, TokenCode => Str])
+=head2 AssumeRole
+
+=over
+
+=item RoleArn => Str
+
+=item RoleSessionName => Str
+
+=item [DurationSeconds => Int]
+
+=item [ExternalId => Str]
+
+=item [Policy => Str]
+
+=item [SerialNumber => Str]
+
+=item [TokenCode => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::STS::AssumeRole>
 
 Returns: a L<Paws::STS::AssumeRoleResponse> instance
 
-  Returns a set of temporary security credentials (consisting of an
+Returns a set of temporary security credentials (consisting of an
 access key ID, a secret access key, and a security token) that you can
 use to access AWS resources that you might not normally have access to.
 Typically, you use C<AssumeRole> for cross-account access or
 federation. For a comparison of C<AssumeRole> with the other APIs that
 produce temporary credentials, see Requesting Temporary Security
-Credentials and Comparing the AWS STS APIs in the I<IAM User Guide>.
+Credentials
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html)
+and Comparing the AWS STS APIs
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html#stsapi_comparison)
+in the I<IAM User Guide>.
 
 B<Important:> You cannot call C<AssumeRole> by using AWS root account
 credentials; access is denied. You must use credentials for an IAM user
@@ -202,7 +239,9 @@ which account can be time consuming. Instead, you can create one set of
 long-term credentials in one account and then use temporary security
 credentials to access all the other accounts by assuming roles in those
 accounts. For more information about roles, see IAM Roles (Delegation
-and Federation) in the I<IAM User Guide>.
+and Federation)
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/roles-toplevel.html)
+in the I<IAM User Guide>.
 
 For federation, you can, for example, grant single sign-on access to
 the AWS Management Console. If you already have an identity and
@@ -213,11 +252,24 @@ C<AssumeRole> (and specify the role with the appropriate permissions)
 to get temporary security credentials for that user. With those
 temporary security credentials, you construct a sign-in URL that users
 can use to access the console. For more information, see Common
-Scenarios for Temporary Credentials in the I<IAM User Guide>.
+Scenarios for Temporary Credentials
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html#sts-introduction)
+in the I<IAM User Guide>.
 
-The temporary security credentials are valid for the duration that you
-specified when calling C<AssumeRole>, which can be from 900 seconds (15
-minutes) to a maximum of 3600 seconds (1 hour). The default is 1 hour.
+By default, the temporary security credentials created by C<AssumeRole>
+last for one hour. However, you can use the optional C<DurationSeconds>
+parameter to specify the duration of your session. You can provide a
+value from 900 seconds (15 minutes) up to the maximum session duration
+setting for the role. This setting can have a value from 1 hour to 12
+hours. To learn how to view the maximum value for your role, see View
+the Maximum Session Duration Setting for a Role
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use.html#id_roles_use_view-role-max-session)
+in the I<IAM User Guide>. The maximum session duration limit applies
+when you use the C<AssumeRole*> API operations or the C<assume-role*>
+CLI operations but does not apply when you use those operations to
+create a console URL. For more information, see Using IAM Roles
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use.html) in
+the I<IAM User Guide>.
 
 The temporary security credentials created by C<AssumeRole> can be used
 to make API calls to any AWS service with the following exception: you
@@ -236,8 +288,9 @@ permissions for the resulting temporary security credentials. You
 cannot use the passed policy to grant permissions that are in excess of
 those allowed by the access policy of the role that is being assumed.
 For more information, see Permissions for AssumeRole,
-AssumeRoleWithSAML, and AssumeRoleWithWebIdentity in the I<IAM User
-Guide>.
+AssumeRoleWithSAML, and AssumeRoleWithWebIdentity
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_control-access_assumerole.html)
+in the I<IAM User Guide>.
 
 To assume a role, your AWS account must be trusted by the role. The
 trust relationship is defined in the role's trust policy when the role
@@ -251,7 +304,13 @@ policy that allows the user to call AssumeRole on the ARN of the role
 in the other account. If the user is in the same account as the role,
 then you can either attach a policy to the user (identical to the
 previous different account user), or you can add the user as a
-principal directly in the role's trust policy
+principal directly in the role's trust policy. In this case, the trust
+policy acts as the only resource-based policy in IAM, and users in the
+same account as the role do not need explicit permission to assume the
+role. For more information about trust policies and resource-based
+policies, see IAM Policies
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html)
+in the I<IAM User Guide>.
 
 B<Using MFA with AssumeRole>
 
@@ -267,8 +326,9 @@ authentication might look like the following example.
 
 C<"Condition": {"Bool": {"aws:MultiFactorAuthPresent": true}}>
 
-For more information, see Configuring MFA-Protected API Access in the
-I<IAM User Guide> guide.
+For more information, see Configuring MFA-Protected API Access
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/MFAProtectedAPI.html)
+in the I<IAM User Guide> guide.
 
 To use MFA with C<AssumeRole>, you pass values for the C<SerialNumber>
 and C<TokenCode> parameters. The C<SerialNumber> value identifies the
@@ -276,31 +336,61 @@ user's hardware or virtual MFA device. The C<TokenCode> is the
 time-based one-time password (TOTP) that the MFA devices produces.
 
 
-=head2 AssumeRoleWithSAML(PrincipalArn => Str, RoleArn => Str, SAMLAssertion => Str, [DurationSeconds => Int, Policy => Str])
+=head2 AssumeRoleWithSAML
+
+=over
+
+=item PrincipalArn => Str
+
+=item RoleArn => Str
+
+=item SAMLAssertion => Str
+
+=item [DurationSeconds => Int]
+
+=item [Policy => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::STS::AssumeRoleWithSAML>
 
 Returns: a L<Paws::STS::AssumeRoleWithSAMLResponse> instance
 
-  Returns a set of temporary security credentials for users who have been
+Returns a set of temporary security credentials for users who have been
 authenticated via a SAML authentication response. This operation
 provides a mechanism for tying an enterprise identity store or
 directory to role-based AWS access without user-specific credentials or
 configuration. For a comparison of C<AssumeRoleWithSAML> with the other
 APIs that produce temporary credentials, see Requesting Temporary
-Security Credentials and Comparing the AWS STS APIs in the I<IAM User
-Guide>.
+Security Credentials
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html)
+and Comparing the AWS STS APIs
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html#stsapi_comparison)
+in the I<IAM User Guide>.
 
 The temporary security credentials returned by this operation consist
 of an access key ID, a secret access key, and a security token.
 Applications can use these temporary security credentials to sign calls
 to AWS services.
 
-The temporary security credentials are valid for the duration that you
-specified when calling C<AssumeRole>, or until the time specified in
-the SAML authentication response's C<SessionNotOnOrAfter> value,
-whichever is shorter. The duration can be from 900 seconds (15 minutes)
-to a maximum of 3600 seconds (1 hour). The default is 1 hour.
+By default, the temporary security credentials created by
+C<AssumeRoleWithSAML> last for one hour. However, you can use the
+optional C<DurationSeconds> parameter to specify the duration of your
+session. Your role session lasts for the duration that you specify, or
+until the time specified in the SAML authentication response's
+C<SessionNotOnOrAfter> value, whichever is shorter. You can provide a
+C<DurationSeconds> value from 900 seconds (15 minutes) up to the
+maximum session duration setting for the role. This setting can have a
+value from 1 hour to 12 hours. To learn how to view the maximum value
+for your role, see View the Maximum Session Duration Setting for a Role
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use.html#id_roles_use_view-role-max-session)
+in the I<IAM User Guide>. The maximum session duration limit applies
+when you use the C<AssumeRole*> API operations or the C<assume-role*>
+CLI operations but does not apply when you use those operations to
+create a console URL. For more information, see Using IAM Roles
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use.html) in
+the I<IAM User Guide>.
 
 The temporary security credentials created by C<AssumeRoleWithSAML> can
 be used to make API calls to any AWS service with the following
@@ -321,7 +411,9 @@ temporary security credentials. You cannot use the passed policy to
 grant permissions that are in excess of those allowed by the access
 policy of the role that is being assumed. For more information, see
 Permissions for AssumeRole, AssumeRoleWithSAML, and
-AssumeRoleWithWebIdentity in the I<IAM User Guide>.
+AssumeRoleWithWebIdentity
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_control-access_assumerole.html)
+in the I<IAM User Guide>.
 
 Before your application can call C<AssumeRoleWithSAML>, you must
 configure your SAML identity provider (IdP) to issue the claims
@@ -348,43 +440,73 @@ For more information, see the following resources:
 
 =item *
 
-About SAML 2.0-based Federation in the I<IAM User Guide>.
+About SAML 2.0-based Federation
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_saml.html)
+in the I<IAM User Guide>.
 
 =item *
 
-Creating SAML Identity Providers in the I<IAM User Guide>.
+Creating SAML Identity Providers
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_saml.html)
+in the I<IAM User Guide>.
 
 =item *
 
-Configuring a Relying Party and Claims in the I<IAM User Guide>.
+Configuring a Relying Party and Claims
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_saml_relying-party.html)
+in the I<IAM User Guide>.
 
 =item *
 
-Creating a Role for SAML 2.0 Federation in the I<IAM User Guide>.
+Creating a Role for SAML 2.0 Federation
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_saml.html)
+in the I<IAM User Guide>.
 
 =back
 
 
 
-=head2 AssumeRoleWithWebIdentity(RoleArn => Str, RoleSessionName => Str, WebIdentityToken => Str, [DurationSeconds => Int, Policy => Str, ProviderId => Str])
+=head2 AssumeRoleWithWebIdentity
+
+=over
+
+=item RoleArn => Str
+
+=item RoleSessionName => Str
+
+=item WebIdentityToken => Str
+
+=item [DurationSeconds => Int]
+
+=item [Policy => Str]
+
+=item [ProviderId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::STS::AssumeRoleWithWebIdentity>
 
 Returns: a L<Paws::STS::AssumeRoleWithWebIdentityResponse> instance
 
-  Returns a set of temporary security credentials for users who have been
+Returns a set of temporary security credentials for users who have been
 authenticated in a mobile or web application with a web identity
 provider, such as Amazon Cognito, Login with Amazon, Facebook, Google,
 or any OpenID Connect-compatible identity provider.
 
 For mobile applications, we recommend that you use Amazon Cognito. You
-can use Amazon Cognito with the AWS SDK for iOS and the AWS SDK for
-Android to uniquely identify a user and supply the user with a
-consistent identity throughout the lifetime of an application.
+can use Amazon Cognito with the AWS SDK for iOS
+(http://aws.amazon.com/sdkforios/) and the AWS SDK for Android
+(http://aws.amazon.com/sdkforandroid/) to uniquely identify a user and
+supply the user with a consistent identity throughout the lifetime of
+an application.
 
-To learn more about Amazon Cognito, see Amazon Cognito Overview in the
-I<AWS SDK for Android Developer Guide> guide and Amazon Cognito
-Overview in the I<AWS SDK for iOS Developer Guide>.
+To learn more about Amazon Cognito, see Amazon Cognito Overview
+(http://docs.aws.amazon.com/mobile/sdkforandroid/developerguide/cognito-auth.html#d0e840)
+in the I<AWS SDK for Android Developer Guide> guide and Amazon Cognito
+Overview
+(http://docs.aws.amazon.com/mobile/sdkforios/developerguide/cognito-auth.html#d0e664)
+in the I<AWS SDK for iOS Developer Guide>.
 
 Calling C<AssumeRoleWithWebIdentity> does not require the use of AWS
 security credentials. Therefore, you can distribute an application (for
@@ -395,16 +517,32 @@ long-term AWS credentials. Instead, the identity of the caller is
 validated by using a token from the web identity provider. For a
 comparison of C<AssumeRoleWithWebIdentity> with the other APIs that
 produce temporary credentials, see Requesting Temporary Security
-Credentials and Comparing the AWS STS APIs in the I<IAM User Guide>.
+Credentials
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html)
+and Comparing the AWS STS APIs
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html#stsapi_comparison)
+in the I<IAM User Guide>.
 
 The temporary security credentials returned by this API consist of an
 access key ID, a secret access key, and a security token. Applications
 can use these temporary security credentials to sign calls to AWS
 service APIs.
 
-The credentials are valid for the duration that you specified when
-calling C<AssumeRoleWithWebIdentity>, which can be from 900 seconds (15
-minutes) to a maximum of 3600 seconds (1 hour). The default is 1 hour.
+By default, the temporary security credentials created by
+C<AssumeRoleWithWebIdentity> last for one hour. However, you can use
+the optional C<DurationSeconds> parameter to specify the duration of
+your session. You can provide a value from 900 seconds (15 minutes) up
+to the maximum session duration setting for the role. This setting can
+have a value from 1 hour to 12 hours. To learn how to view the maximum
+value for your role, see View the Maximum Session Duration Setting for
+a Role
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use.html#id_roles_use_view-role-max-session)
+in the I<IAM User Guide>. The maximum session duration limit applies
+when you use the C<AssumeRole*> API operations or the C<assume-role*>
+CLI operations but does not apply when you use those operations to
+create a console URL. For more information, see Using IAM Roles
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use.html) in
+the I<IAM User Guide>.
 
 The temporary security credentials created by
 C<AssumeRoleWithWebIdentity> can be used to make API calls to any AWS
@@ -423,8 +561,9 @@ permissions for the resulting temporary security credentials. You
 cannot use the passed policy to grant permissions that are in excess of
 those allowed by the access policy of the role that is being assumed.
 For more information, see Permissions for AssumeRole,
-AssumeRoleWithSAML, and AssumeRoleWithWebIdentity in the I<IAM User
-Guide>.
+AssumeRoleWithSAML, and AssumeRoleWithWebIdentity
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_control-access_assumerole.html)
+in the I<IAM User Guide>.
 
 Before your application can call C<AssumeRoleWithWebIdentity>, you must
 have an identity token from a supported identity provider and create a
@@ -434,11 +573,13 @@ identity token. In other words, the identity provider must be specified
 in the role's trust policy.
 
 Calling C<AssumeRoleWithWebIdentity> can result in an entry in your AWS
-CloudTrail logs. The entry includes the Subject of the provided Web
-Identity Token. We recommend that you avoid using any personally
-identifiable information (PII) in this field. For example, you could
-instead use a GUID or a pairwise identifier, as suggested in the OIDC
-specification.
+CloudTrail logs. The entry includes the Subject
+(http://openid.net/specs/openid-connect-core-1_0.html#Claims) of the
+provided Web Identity Token. We recommend that you avoid using any
+personally identifiable information (PII) in this field. For example,
+you could instead use a GUID or a pairwise identifier, as suggested in
+the OIDC specification
+(http://openid.net/specs/openid-connect-core-1_0.html#SubjectIDTypes).
 
 For more information about how to use web identity federation and the
 C<AssumeRoleWithWebIdentity> API, see the following resources:
@@ -447,40 +588,54 @@ C<AssumeRoleWithWebIdentity> API, see the following resources:
 
 =item *
 
-Using Web Identity Federation APIs for Mobile Apps and Federation
-Through a Web-based Identity Provider.
+Using Web Identity Federation APIs for Mobile Apps
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_oidc_manual.html)
+and Federation Through a Web-based Identity Provider
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html#api_assumerolewithwebidentity).
 
 =item *
 
-Web Identity Federation Playground. This interactive website lets you
-walk through the process of authenticating via Login with Amazon,
-Facebook, or Google, getting temporary security credentials, and then
-using those credentials to make a request to AWS.
+Web Identity Federation Playground
+(https://web-identity-federation-playground.s3.amazonaws.com/index.html).
+This interactive website lets you walk through the process of
+authenticating via Login with Amazon, Facebook, or Google, getting
+temporary security credentials, and then using those credentials to
+make a request to AWS.
 
 =item *
 
-AWS SDK for iOS and AWS SDK for Android. These toolkits contain sample
-apps that show how to invoke the identity providers, and then how to
-use the information from these providers to get and use temporary
-security credentials.
+AWS SDK for iOS (http://aws.amazon.com/sdkforios/) and AWS SDK for
+Android (http://aws.amazon.com/sdkforandroid/). These toolkits contain
+sample apps that show how to invoke the identity providers, and then
+how to use the information from these providers to get and use
+temporary security credentials.
 
 =item *
 
-Web Identity Federation with Mobile Applications. This article
-discusses web identity federation and shows an example of how to use
-web identity federation to get access to content in Amazon S3.
+Web Identity Federation with Mobile Applications
+(http://aws.amazon.com/articles/web-identity-federation-with-mobile-applications).
+This article discusses web identity federation and shows an example of
+how to use web identity federation to get access to content in Amazon
+S3.
 
 =back
 
 
 
-=head2 DecodeAuthorizationMessage(EncodedMessage => Str)
+=head2 DecodeAuthorizationMessage
+
+=over
+
+=item EncodedMessage => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::STS::DecodeAuthorizationMessage>
 
 Returns: a L<Paws::STS::DecodeAuthorizationMessageResponse> instance
 
-  Decodes additional information about the authorization status of a
+Decodes additional information about the authorization status of a
 request from an encoded message returned in response to an AWS request.
 
 For example, if a user is not authorized to perform an action that he
@@ -508,7 +663,9 @@ The decoded message includes the following type of information:
 
 Whether the request was denied due to an explicit deny or due to the
 absence of an explicit allow. For more information, see Determining
-Whether a Request is Allowed or Denied in the I<IAM User Guide>.
+Whether a Request is Allowed or Denied
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html#policy-eval-denyallow)
+in the I<IAM User Guide>.
 
 =item *
 
@@ -530,23 +687,39 @@ The values of condition keys in the context of the user's request.
 
 
 
-=head2 GetCallerIdentity()
+=head2 GetCallerIdentity
+
+
+
+
+
 
 Each argument is described in detail in: L<Paws::STS::GetCallerIdentity>
 
 Returns: a L<Paws::STS::GetCallerIdentityResponse> instance
 
-  Returns details about the IAM identity whose credentials are used to
+Returns details about the IAM identity whose credentials are used to
 call the API.
 
 
-=head2 GetFederationToken(Name => Str, [DurationSeconds => Int, Policy => Str])
+=head2 GetFederationToken
+
+=over
+
+=item Name => Str
+
+=item [DurationSeconds => Int]
+
+=item [Policy => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::STS::GetFederationToken>
 
 Returns: a L<Paws::STS::GetFederationTokenResponse> instance
 
-  Returns a set of temporary security credentials (consisting of an
+Returns a set of temporary security credentials (consisting of an
 access key ID, a secret access key, and a security token) for a
 federated user. A typical use is in a proxy application that gets
 temporary security credentials on behalf of distributed applications
@@ -556,15 +729,19 @@ of an IAM user, this call is appropriate in contexts where those
 credentials can be safely stored, usually in a server-based
 application. For a comparison of C<GetFederationToken> with the other
 APIs that produce temporary credentials, see Requesting Temporary
-Security Credentials and Comparing the AWS STS APIs in the I<IAM User
-Guide>.
+Security Credentials
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html)
+and Comparing the AWS STS APIs
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html#stsapi_comparison)
+in the I<IAM User Guide>.
 
 If you are creating a mobile-based or browser-based app that can
 authenticate users using a web identity provider like Login with
 Amazon, Facebook, Google, or an OpenID Connect-compatible identity
-provider, we recommend that you use Amazon Cognito or
-C<AssumeRoleWithWebIdentity>. For more information, see Federation
-Through a Web-based Identity Provider.
+provider, we recommend that you use Amazon Cognito
+(http://aws.amazon.com/cognito/) or C<AssumeRoleWithWebIdentity>. For
+more information, see Federation Through a Web-based Identity Provider
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html#api_assumerolewithwebidentity).
 
 The C<GetFederationToken> action must be called by using the long-term
 AWS security credentials of an IAM user. You can also call
@@ -573,7 +750,9 @@ account, but we do not recommended it. Instead, we recommend that you
 create an IAM user for the purpose of the proxy application and then
 attach a policy to the IAM user that limits federated users to only the
 actions and resources that they need access to. For more information,
-see IAM Best Practices in the I<IAM User Guide>.
+see IAM Best Practices
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html)
+in the I<IAM User Guide>.
 
 The temporary security credentials that are obtained by using the
 long-term credentials of an IAM user are valid for the specified
@@ -642,18 +821,32 @@ has a resource-based policy that specifically allows the federated user
 to access the resource.
 
 For more information about how permissions work, see Permissions for
-GetFederationToken. For information about using C<GetFederationToken>
-to create temporary security credentials, see
-GetFederationTokenE<mdash>Federation Through a Custom Identity Broker.
+GetFederationToken
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_control-access_getfederationtoken.html).
+For information about using C<GetFederationToken> to create temporary
+security credentials, see GetFederationTokenE<mdash>Federation Through
+a Custom Identity Broker
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html#api_getfederationtoken).
 
 
-=head2 GetSessionToken([DurationSeconds => Int, SerialNumber => Str, TokenCode => Str])
+=head2 GetSessionToken
+
+=over
+
+=item [DurationSeconds => Int]
+
+=item [SerialNumber => Str]
+
+=item [TokenCode => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::STS::GetSessionToken>
 
 Returns: a L<Paws::STS::GetSessionTokenResponse> instance
 
-  Returns a set of temporary credentials for an AWS account or IAM user.
+Returns a set of temporary credentials for an AWS account or IAM user.
 The credentials consist of an access key ID, a secret access key, and a
 security token. Typically, you use C<GetSessionToken> if you want to
 use MFA to protect programmatic calls to specific AWS APIs like Amazon
@@ -664,8 +857,11 @@ from the call, IAM users can then make programmatic calls to APIs that
 require MFA authentication. If you do not supply a correct MFA code,
 then the API returns an access denied error. For a comparison of
 C<GetSessionToken> with the other APIs that produce temporary
-credentials, see Requesting Temporary Security Credentials and
-Comparing the AWS STS APIs in the I<IAM User Guide>.
+credentials, see Requesting Temporary Security Credentials
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html)
+and Comparing the AWS STS APIs
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html#stsapi_comparison)
+in the I<IAM User Guide>.
 
 The C<GetSessionToken> action must be called by using the long-term AWS
 security credentials of the AWS account or an IAM user. Credentials
@@ -695,9 +891,10 @@ C<GetCallerIdentity>.
 =back
 
 We recommend that you do not call C<GetSessionToken> with root account
-credentials. Instead, follow our best practices by creating one or more
-IAM users, giving them the necessary permissions, and using IAM users
-for everyday interaction with AWS.
+credentials. Instead, follow our best practices
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#create-iam-users)
+by creating one or more IAM users, giving them the necessary
+permissions, and using IAM users for everyday interaction with AWS.
 
 The permissions associated with the temporary security credentials
 returned by C<GetSessionToken> are based on the permissions associated
@@ -709,7 +906,9 @@ temporary credentials have the same permissions as the IAM user.
 
 For more information about using C<GetSessionToken> to create temporary
 credentials, go to Temporary Credentials for Users in Untrusted
-Environments in the I<IAM User Guide>.
+Environments
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html#api_getsessiontoken)
+in the I<IAM User Guide>.
 
 
 
@@ -727,9 +926,9 @@ This service class forms part of L<Paws>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

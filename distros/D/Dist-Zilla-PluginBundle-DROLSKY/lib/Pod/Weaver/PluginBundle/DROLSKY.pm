@@ -3,7 +3,7 @@ package Pod::Weaver::PluginBundle::DROLSKY;
 use strict;
 use warnings;
 
-our $VERSION = '0.95';
+our $VERSION = '0.98';
 
 use namespace::autoclean -also => ['_exp'];
 
@@ -308,7 +308,7 @@ Pod::Weaver::PluginBundle::DROLSKY - A plugin bundle for pod woven by DROLSKY
 
 =head1 VERSION
 
-version 0.95
+version 0.98
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,7 @@
 package Paws::CodePipeline;
   use Moose;
   sub service { 'codepipeline' }
+  sub signing_name { 'codepipeline' }
   sub version { '2015-07-09' }
   sub target_prefix { 'CodePipeline_20150709' }
   sub json_version { "1.1" }
@@ -11,7 +12,7 @@ package Paws::CodePipeline;
   has retriables => (is => 'ro', isa => 'ArrayRef', default => sub { [
   ] });
 
-  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller', 'Paws::Net::JsonResponse';
+  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller';
 
   
   sub AcknowledgeJob {
@@ -42,6 +43,16 @@ package Paws::CodePipeline;
   sub DeletePipeline {
     my $self = shift;
     my $call_object = $self->new_with_coercions('Paws::CodePipeline::DeletePipeline', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub DeleteWebhook {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::CodePipeline::DeleteWebhook', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub DeregisterWebhookWithThirdParty {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::CodePipeline::DeregisterWebhookWithThirdParty', @_);
     return $self->caller->do_call($self, $call_object);
   }
   sub DisableStageTransition {
@@ -94,6 +105,11 @@ package Paws::CodePipeline;
     my $call_object = $self->new_with_coercions('Paws::CodePipeline::ListPipelines', @_);
     return $self->caller->do_call($self, $call_object);
   }
+  sub ListWebhooks {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::CodePipeline::ListWebhooks', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
   sub PollForJobs {
     my $self = shift;
     my $call_object = $self->new_with_coercions('Paws::CodePipeline::PollForJobs', @_);
@@ -134,6 +150,16 @@ package Paws::CodePipeline;
     my $call_object = $self->new_with_coercions('Paws::CodePipeline::PutThirdPartyJobSuccessResult', @_);
     return $self->caller->do_call($self, $call_object);
   }
+  sub PutWebhook {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::CodePipeline::PutWebhook', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub RegisterWebhookWithThirdParty {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::CodePipeline::RegisterWebhookWithThirdParty', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
   sub RetryStageExecution {
     my $self = shift;
     my $call_object = $self->new_with_coercions('Paws::CodePipeline::RetryStageExecution', @_);
@@ -152,7 +178,7 @@ package Paws::CodePipeline;
   
 
 
-  sub operations { qw/AcknowledgeJob AcknowledgeThirdPartyJob CreateCustomActionType CreatePipeline DeleteCustomActionType DeletePipeline DisableStageTransition EnableStageTransition GetJobDetails GetPipeline GetPipelineExecution GetPipelineState GetThirdPartyJobDetails ListActionTypes ListPipelineExecutions ListPipelines PollForJobs PollForThirdPartyJobs PutActionRevision PutApprovalResult PutJobFailureResult PutJobSuccessResult PutThirdPartyJobFailureResult PutThirdPartyJobSuccessResult RetryStageExecution StartPipelineExecution UpdatePipeline / }
+  sub operations { qw/AcknowledgeJob AcknowledgeThirdPartyJob CreateCustomActionType CreatePipeline DeleteCustomActionType DeletePipeline DeleteWebhook DeregisterWebhookWithThirdParty DisableStageTransition EnableStageTransition GetJobDetails GetPipeline GetPipelineExecution GetPipelineState GetThirdPartyJobDetails ListActionTypes ListPipelineExecutions ListPipelines ListWebhooks PollForJobs PollForThirdPartyJobs PutActionRevision PutApprovalResult PutJobFailureResult PutJobSuccessResult PutThirdPartyJobFailureResult PutThirdPartyJobSuccessResult PutWebhook RegisterWebhookWithThirdParty RetryStageExecution StartPipelineExecution UpdatePipeline / }
 
 1;
 
@@ -187,13 +213,14 @@ B<Overview>
 This is the AWS CodePipeline API Reference. This guide provides
 descriptions of the actions and data types for AWS CodePipeline. Some
 functionality for your pipeline is only configurable through the API.
-For additional information, see the AWS CodePipeline User Guide.
+For additional information, see the AWS CodePipeline User Guide
+(http://docs.aws.amazon.com/codepipeline/latest/userguide/welcome.html).
 
 You can use the AWS CodePipeline API to work with pipelines, stages,
-actions, gates, and transitions, as described below.
+actions, and transitions, as described below.
 
 I<Pipelines> are models of automated release processes. Each pipeline
-is uniquely named, and consists of actions, gates, and stages.
+is uniquely named, and consists of stages, actions, and transitions.
 
 You can work with pipelines by calling:
 
@@ -244,18 +271,19 @@ structure of the pipeline.
 
 =back
 
-Pipelines include I<stages>, which are logical groupings of gates and
-actions. Each stage contains one or more actions that must complete
-before the next stage begins. A stage will result in success or
-failure. If a stage fails, then the pipeline stops at that stage and
-will remain stopped until either a new version of an artifact appears
-in the source location, or a user takes action to re-run the most
-recent artifact through the pipeline. You can call GetPipelineState,
-which displays the status of a pipeline, including the status of stages
-in the pipeline, or GetPipeline, which returns the entire structure of
-the pipeline, including the stages of that pipeline. For more
-information about the structure of stages and actions, also refer to
-the AWS CodePipeline Pipeline Structure Reference.
+Pipelines include I<stages>. Each stage contains one or more actions
+that must complete before the next stage begins. A stage will result in
+success or failure. If a stage fails, then the pipeline stops at that
+stage and will remain stopped until either a new version of an artifact
+appears in the source location, or a user takes action to re-run the
+most recent artifact through the pipeline. You can call
+GetPipelineState, which displays the status of a pipeline, including
+the status of stages in the pipeline, or GetPipeline, which returns the
+entire structure of the pipeline, including the stages of that
+pipeline. For more information about the structure of stages and
+actions, also refer to the AWS CodePipeline Pipeline Structure
+Reference
+(http://docs.aws.amazon.com/codepipeline/latest/userguide/pipeline-structure.html).
 
 Pipeline stages include I<actions>, which are categorized into
 categories such as source or build actions performed within a stage of
@@ -263,7 +291,35 @@ a pipeline. For example, you can use a source action to import
 artifacts into a pipeline from a source such as Amazon S3. Like stages,
 you do not work with actions directly in most cases, but you do define
 and interact with actions when working with pipeline operations such as
-CreatePipeline and GetPipelineState.
+CreatePipeline and GetPipelineState. Valid action categories are:
+
+=over
+
+=item *
+
+Source
+
+=item *
+
+Build
+
+=item *
+
+Test
+
+=item *
+
+Deploy
+
+=item *
+
+Approval
+
+=item *
+
+Invoke
+
+=back
 
 Pipelines also include I<transitions>, which allow the transition of
 artifacts from one stage to the next in a pipeline after the actions in
@@ -357,96 +413,236 @@ PutThirdPartyJobSuccessResult, which provides details of a job success.
 =back
 
 
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/codepipeline-2015-07-09>
+
+
 =head1 METHODS
 
-=head2 AcknowledgeJob(JobId => Str, Nonce => Str)
+=head2 AcknowledgeJob
+
+=over
+
+=item JobId => Str
+
+=item Nonce => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::AcknowledgeJob>
 
 Returns: a L<Paws::CodePipeline::AcknowledgeJobOutput> instance
 
-  Returns information about a specified job and whether that job has been
+Returns information about a specified job and whether that job has been
 received by the job worker. Only used for custom actions.
 
 
-=head2 AcknowledgeThirdPartyJob(ClientToken => Str, JobId => Str, Nonce => Str)
+=head2 AcknowledgeThirdPartyJob
+
+=over
+
+=item ClientToken => Str
+
+=item JobId => Str
+
+=item Nonce => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::AcknowledgeThirdPartyJob>
 
 Returns: a L<Paws::CodePipeline::AcknowledgeThirdPartyJobOutput> instance
 
-  Confirms a job worker has received the specified job. Only used for
+Confirms a job worker has received the specified job. Only used for
 partner actions.
 
 
-=head2 CreateCustomActionType(Category => Str, InputArtifactDetails => L<Paws::CodePipeline::ArtifactDetails>, OutputArtifactDetails => L<Paws::CodePipeline::ArtifactDetails>, Provider => Str, Version => Str, [ConfigurationProperties => ArrayRef[L<Paws::CodePipeline::ActionConfigurationProperty>], Settings => L<Paws::CodePipeline::ActionTypeSettings>])
+=head2 CreateCustomActionType
+
+=over
+
+=item Category => Str
+
+=item InputArtifactDetails => L<Paws::CodePipeline::ArtifactDetails>
+
+=item OutputArtifactDetails => L<Paws::CodePipeline::ArtifactDetails>
+
+=item Provider => Str
+
+=item Version => Str
+
+=item [ConfigurationProperties => ArrayRef[L<Paws::CodePipeline::ActionConfigurationProperty>]]
+
+=item [Settings => L<Paws::CodePipeline::ActionTypeSettings>]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::CreateCustomActionType>
 
 Returns: a L<Paws::CodePipeline::CreateCustomActionTypeOutput> instance
 
-  Creates a new custom action that can be used in all pipelines
+Creates a new custom action that can be used in all pipelines
 associated with the AWS account. Only used for custom actions.
 
 
-=head2 CreatePipeline(Pipeline => L<Paws::CodePipeline::PipelineDeclaration>)
+=head2 CreatePipeline
+
+=over
+
+=item Pipeline => L<Paws::CodePipeline::PipelineDeclaration>
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::CreatePipeline>
 
 Returns: a L<Paws::CodePipeline::CreatePipelineOutput> instance
 
-  Creates a pipeline.
+Creates a pipeline.
 
 
-=head2 DeleteCustomActionType(Category => Str, Provider => Str, Version => Str)
+=head2 DeleteCustomActionType
+
+=over
+
+=item Category => Str
+
+=item Provider => Str
+
+=item Version => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::DeleteCustomActionType>
 
 Returns: nothing
 
-  Marks a custom action as deleted. PollForJobs for the custom action
+Marks a custom action as deleted. PollForJobs for the custom action
 will fail after the action is marked for deletion. Only used for custom
 actions.
 
-You cannot recreate a custom action after it has been deleted unless
-you increase the version number of the action.
+To re-create a custom action after it has been deleted you must use a
+string in the version field that has never been used before. This
+string can be an incremented version number, for example. To restore a
+deleted custom action, use a JSON file that is identical to the deleted
+action, including the original string in the version field.
 
 
-=head2 DeletePipeline(Name => Str)
+=head2 DeletePipeline
+
+=over
+
+=item Name => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::DeletePipeline>
 
 Returns: nothing
 
-  Deletes the specified pipeline.
+Deletes the specified pipeline.
 
 
-=head2 DisableStageTransition(PipelineName => Str, Reason => Str, StageName => Str, TransitionType => Str)
+=head2 DeleteWebhook
+
+=over
+
+=item Name => Str
+
+
+=back
+
+Each argument is described in detail in: L<Paws::CodePipeline::DeleteWebhook>
+
+Returns: a L<Paws::CodePipeline::DeleteWebhookOutput> instance
+
+Deletes a previously created webhook by name. Deleting the webhook
+stops AWS CodePipeline from starting a pipeline every time an external
+event occurs. The API will return successfully when trying to delete a
+webhook that is already deleted. If a deleted webhook is re-created by
+calling PutWebhook with the same name, it will have a different URL.
+
+
+=head2 DeregisterWebhookWithThirdParty
+
+=over
+
+=item [WebhookName => Str]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::CodePipeline::DeregisterWebhookWithThirdParty>
+
+Returns: a L<Paws::CodePipeline::DeregisterWebhookWithThirdPartyOutput> instance
+
+Removes the connection between the webhook that was created by
+CodePipeline and the external tool with events to be detected.
+Currently only supported for webhooks that target an action type of
+GitHub.
+
+
+=head2 DisableStageTransition
+
+=over
+
+=item PipelineName => Str
+
+=item Reason => Str
+
+=item StageName => Str
+
+=item TransitionType => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::DisableStageTransition>
 
 Returns: nothing
 
-  Prevents artifacts in a pipeline from transitioning to the next stage
+Prevents artifacts in a pipeline from transitioning to the next stage
 in the pipeline.
 
 
-=head2 EnableStageTransition(PipelineName => Str, StageName => Str, TransitionType => Str)
+=head2 EnableStageTransition
+
+=over
+
+=item PipelineName => Str
+
+=item StageName => Str
+
+=item TransitionType => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::EnableStageTransition>
 
 Returns: nothing
 
-  Enables artifacts in a pipeline to transition to a stage in a pipeline.
+Enables artifacts in a pipeline to transition to a stage in a pipeline.
 
 
-=head2 GetJobDetails(JobId => Str)
+=head2 GetJobDetails
+
+=over
+
+=item JobId => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::GetJobDetails>
 
 Returns: a L<Paws::CodePipeline::GetJobDetailsOutput> instance
 
-  Returns information about a job. Only used for custom actions.
+Returns information about a job. Only used for custom actions.
 
 When this API is called, AWS CodePipeline returns temporary credentials
 for the Amazon S3 bucket used to store artifacts for the pipeline, if
@@ -455,46 +651,80 @@ artifacts. Additionally, this API returns any secret values defined for
 the action.
 
 
-=head2 GetPipeline(Name => Str, [Version => Int])
+=head2 GetPipeline
+
+=over
+
+=item Name => Str
+
+=item [Version => Int]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::GetPipeline>
 
 Returns: a L<Paws::CodePipeline::GetPipelineOutput> instance
 
-  Returns the metadata, structure, stages, and actions of a pipeline. Can
+Returns the metadata, structure, stages, and actions of a pipeline. Can
 be used to return the entire structure of a pipeline in JSON format,
 which can then be modified and used to update the pipeline structure
 with UpdatePipeline.
 
 
-=head2 GetPipelineExecution(PipelineExecutionId => Str, PipelineName => Str)
+=head2 GetPipelineExecution
+
+=over
+
+=item PipelineExecutionId => Str
+
+=item PipelineName => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::GetPipelineExecution>
 
 Returns: a L<Paws::CodePipeline::GetPipelineExecutionOutput> instance
 
-  Returns information about an execution of a pipeline, including details
+Returns information about an execution of a pipeline, including details
 about artifacts, the pipeline execution ID, and the name, version, and
 status of the pipeline.
 
 
-=head2 GetPipelineState(Name => Str)
+=head2 GetPipelineState
+
+=over
+
+=item Name => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::GetPipelineState>
 
 Returns: a L<Paws::CodePipeline::GetPipelineStateOutput> instance
 
-  Returns information about the state of a pipeline, including the stages
+Returns information about the state of a pipeline, including the stages
 and actions.
 
 
-=head2 GetThirdPartyJobDetails(ClientToken => Str, JobId => Str)
+=head2 GetThirdPartyJobDetails
+
+=over
+
+=item ClientToken => Str
+
+=item JobId => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::GetThirdPartyJobDetails>
 
 Returns: a L<Paws::CodePipeline::GetThirdPartyJobDetailsOutput> instance
 
-  Requests the details of a job for a third party action. Only used for
+Requests the details of a job for a third party action. Only used for
 partner actions.
 
 When this API is called, AWS CodePipeline returns temporary credentials
@@ -504,41 +734,102 @@ artifacts. Additionally, this API returns any secret values defined for
 the action.
 
 
-=head2 ListActionTypes([ActionOwnerFilter => Str, NextToken => Str])
+=head2 ListActionTypes
+
+=over
+
+=item [ActionOwnerFilter => Str]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::ListActionTypes>
 
 Returns: a L<Paws::CodePipeline::ListActionTypesOutput> instance
 
-  Gets a summary of all AWS CodePipeline action types associated with
+Gets a summary of all AWS CodePipeline action types associated with
 your account.
 
 
-=head2 ListPipelineExecutions(PipelineName => Str, [MaxResults => Int, NextToken => Str])
+=head2 ListPipelineExecutions
+
+=over
+
+=item PipelineName => Str
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::ListPipelineExecutions>
 
 Returns: a L<Paws::CodePipeline::ListPipelineExecutionsOutput> instance
 
-  Gets a summary of the most recent executions for a pipeline.
+Gets a summary of the most recent executions for a pipeline.
 
 
-=head2 ListPipelines([NextToken => Str])
+=head2 ListPipelines
+
+=over
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::ListPipelines>
 
 Returns: a L<Paws::CodePipeline::ListPipelinesOutput> instance
 
-  Gets a summary of all of the pipelines associated with your account.
+Gets a summary of all of the pipelines associated with your account.
 
 
-=head2 PollForJobs(ActionTypeId => L<Paws::CodePipeline::ActionTypeId>, [MaxBatchSize => Int, QueryParam => L<Paws::CodePipeline::QueryParamMap>])
+=head2 ListWebhooks
+
+=over
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::CodePipeline::ListWebhooks>
+
+Returns: a L<Paws::CodePipeline::ListWebhooksOutput> instance
+
+Gets a listing of all the webhooks in this region for this account. The
+output lists all webhooks and includes the webhook URL and ARN, as well
+the configuration for each webhook.
+
+
+=head2 PollForJobs
+
+=over
+
+=item ActionTypeId => L<Paws::CodePipeline::ActionTypeId>
+
+=item [MaxBatchSize => Int]
+
+=item [QueryParam => L<Paws::CodePipeline::QueryParamMap>]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::PollForJobs>
 
 Returns: a L<Paws::CodePipeline::PollForJobsOutput> instance
 
-  Returns information about any jobs for AWS CodePipeline to act upon.
+Returns information about any jobs for AWS CodePipeline to act upon.
+PollForJobs is only valid for action types with "Custom" in the owner
+field. If the action type contains "AWS" or "ThirdParty" in the owner
+field, the PollForJobs action returns an error.
 
 When this API is called, AWS CodePipeline returns temporary credentials
 for the Amazon S3 bucket used to store artifacts for the pipeline, if
@@ -547,13 +838,22 @@ artifacts. Additionally, this API returns any secret values defined for
 the action.
 
 
-=head2 PollForThirdPartyJobs(ActionTypeId => L<Paws::CodePipeline::ActionTypeId>, [MaxBatchSize => Int])
+=head2 PollForThirdPartyJobs
+
+=over
+
+=item ActionTypeId => L<Paws::CodePipeline::ActionTypeId>
+
+=item [MaxBatchSize => Int]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::PollForThirdPartyJobs>
 
 Returns: a L<Paws::CodePipeline::PollForThirdPartyJobsOutput> instance
 
-  Determines whether there are any third party jobs for a job worker to
+Determines whether there are any third party jobs for a job worker to
 act on. Only used for partner actions.
 
 When this API is called, AWS CodePipeline returns temporary credentials
@@ -562,93 +862,237 @@ the action requires access to that Amazon S3 bucket for input or output
 artifacts.
 
 
-=head2 PutActionRevision(ActionName => Str, ActionRevision => L<Paws::CodePipeline::ActionRevision>, PipelineName => Str, StageName => Str)
+=head2 PutActionRevision
+
+=over
+
+=item ActionName => Str
+
+=item ActionRevision => L<Paws::CodePipeline::ActionRevision>
+
+=item PipelineName => Str
+
+=item StageName => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::PutActionRevision>
 
 Returns: a L<Paws::CodePipeline::PutActionRevisionOutput> instance
 
-  Provides information to AWS CodePipeline about new revisions to a
+Provides information to AWS CodePipeline about new revisions to a
 source.
 
 
-=head2 PutApprovalResult(ActionName => Str, PipelineName => Str, Result => L<Paws::CodePipeline::ApprovalResult>, StageName => Str, Token => Str)
+=head2 PutApprovalResult
+
+=over
+
+=item ActionName => Str
+
+=item PipelineName => Str
+
+=item Result => L<Paws::CodePipeline::ApprovalResult>
+
+=item StageName => Str
+
+=item Token => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::PutApprovalResult>
 
 Returns: a L<Paws::CodePipeline::PutApprovalResultOutput> instance
 
-  Provides the response to a manual approval request to AWS CodePipeline.
+Provides the response to a manual approval request to AWS CodePipeline.
 Valid responses include Approved and Rejected.
 
 
-=head2 PutJobFailureResult(FailureDetails => L<Paws::CodePipeline::FailureDetails>, JobId => Str)
+=head2 PutJobFailureResult
+
+=over
+
+=item FailureDetails => L<Paws::CodePipeline::FailureDetails>
+
+=item JobId => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::PutJobFailureResult>
 
 Returns: nothing
 
-  Represents the failure of a job as returned to the pipeline by a job
+Represents the failure of a job as returned to the pipeline by a job
 worker. Only used for custom actions.
 
 
-=head2 PutJobSuccessResult(JobId => Str, [ContinuationToken => Str, CurrentRevision => L<Paws::CodePipeline::CurrentRevision>, ExecutionDetails => L<Paws::CodePipeline::ExecutionDetails>])
+=head2 PutJobSuccessResult
+
+=over
+
+=item JobId => Str
+
+=item [ContinuationToken => Str]
+
+=item [CurrentRevision => L<Paws::CodePipeline::CurrentRevision>]
+
+=item [ExecutionDetails => L<Paws::CodePipeline::ExecutionDetails>]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::PutJobSuccessResult>
 
 Returns: nothing
 
-  Represents the success of a job as returned to the pipeline by a job
+Represents the success of a job as returned to the pipeline by a job
 worker. Only used for custom actions.
 
 
-=head2 PutThirdPartyJobFailureResult(ClientToken => Str, FailureDetails => L<Paws::CodePipeline::FailureDetails>, JobId => Str)
+=head2 PutThirdPartyJobFailureResult
+
+=over
+
+=item ClientToken => Str
+
+=item FailureDetails => L<Paws::CodePipeline::FailureDetails>
+
+=item JobId => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::PutThirdPartyJobFailureResult>
 
 Returns: nothing
 
-  Represents the failure of a third party job as returned to the pipeline
+Represents the failure of a third party job as returned to the pipeline
 by a job worker. Only used for partner actions.
 
 
-=head2 PutThirdPartyJobSuccessResult(ClientToken => Str, JobId => Str, [ContinuationToken => Str, CurrentRevision => L<Paws::CodePipeline::CurrentRevision>, ExecutionDetails => L<Paws::CodePipeline::ExecutionDetails>])
+=head2 PutThirdPartyJobSuccessResult
+
+=over
+
+=item ClientToken => Str
+
+=item JobId => Str
+
+=item [ContinuationToken => Str]
+
+=item [CurrentRevision => L<Paws::CodePipeline::CurrentRevision>]
+
+=item [ExecutionDetails => L<Paws::CodePipeline::ExecutionDetails>]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::PutThirdPartyJobSuccessResult>
 
 Returns: nothing
 
-  Represents the success of a third party job as returned to the pipeline
+Represents the success of a third party job as returned to the pipeline
 by a job worker. Only used for partner actions.
 
 
-=head2 RetryStageExecution(PipelineExecutionId => Str, PipelineName => Str, RetryMode => Str, StageName => Str)
+=head2 PutWebhook
+
+=over
+
+=item Webhook => L<Paws::CodePipeline::WebhookDefinition>
+
+
+=back
+
+Each argument is described in detail in: L<Paws::CodePipeline::PutWebhook>
+
+Returns: a L<Paws::CodePipeline::PutWebhookOutput> instance
+
+Defines a webhook and returns a unique webhook URL generated by
+CodePipeline. This URL can be supplied to third party source hosting
+providers to call every time there's a code change. When CodePipeline
+receives a POST request on this URL, the pipeline defined in the
+webhook is started as long as the POST request satisfied the
+authentication and filtering requirements supplied when defining the
+webhook. RegisterWebhookWithThirdParty and
+DeregisterWebhookWithThirdParty APIs can be used to automatically
+configure supported third parties to call the generated webhook URL.
+
+
+=head2 RegisterWebhookWithThirdParty
+
+=over
+
+=item [WebhookName => Str]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::CodePipeline::RegisterWebhookWithThirdParty>
+
+Returns: a L<Paws::CodePipeline::RegisterWebhookWithThirdPartyOutput> instance
+
+Configures a connection between the webhook that was created and the
+external tool with events to be detected.
+
+
+=head2 RetryStageExecution
+
+=over
+
+=item PipelineExecutionId => Str
+
+=item PipelineName => Str
+
+=item RetryMode => Str
+
+=item StageName => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::RetryStageExecution>
 
 Returns: a L<Paws::CodePipeline::RetryStageExecutionOutput> instance
 
-  Resumes the pipeline execution by retrying the last failed actions in a
+Resumes the pipeline execution by retrying the last failed actions in a
 stage.
 
 
-=head2 StartPipelineExecution(Name => Str)
+=head2 StartPipelineExecution
+
+=over
+
+=item Name => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::StartPipelineExecution>
 
 Returns: a L<Paws::CodePipeline::StartPipelineExecutionOutput> instance
 
-  Starts the specified pipeline. Specifically, it begins processing the
+Starts the specified pipeline. Specifically, it begins processing the
 latest commit to the source location specified as part of the pipeline.
 
 
-=head2 UpdatePipeline(Pipeline => L<Paws::CodePipeline::PipelineDeclaration>)
+=head2 UpdatePipeline
+
+=over
+
+=item Pipeline => L<Paws::CodePipeline::PipelineDeclaration>
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CodePipeline::UpdatePipeline>
 
 Returns: a L<Paws::CodePipeline::UpdatePipelineOutput> instance
 
-  Updates a specified pipeline with edits or changes to its structure.
+Updates a specified pipeline with edits or changes to its structure.
 Use a JSON file with the pipeline structure in conjunction with
 UpdatePipeline to provide the full structure of the pipeline. Updating
 the pipeline increases the version number of the pipeline by 1.
@@ -669,9 +1113,9 @@ This service class forms part of L<Paws>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

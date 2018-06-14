@@ -1,10 +1,9 @@
 use Test::More;
 
-BEGIN {
-    use_ok 'Game::Tibia::Packet::Login';
-}
+use Game::Tibia::Packet::Login tibia => 860;
 
 my $instance = Game::Tibia::Packet::Login->new(version => 860);
+ok $instance;
 
 done_testing;
 

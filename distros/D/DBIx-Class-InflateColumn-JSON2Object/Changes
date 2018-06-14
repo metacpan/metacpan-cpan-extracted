@@ -1,5 +1,10 @@
 Revision history for DBIx-Class-InflateColumn-JSON2Object
 
+0.905   2018-06-13T11:04:05
+   - make sure Int/Nums are always returned as int/num in json (Thomas Klausner)
+   - documented fixed_class (Thomas Klausner)
+
+
 0.904   2017-05-29T09:12:17
     - specify 5.14 as minimum Perl version
 

@@ -49,8 +49,8 @@ Describes a recovery point.
   The time when the point-in-time view of the virtual tape was replicated
 for later recovery.
 
-The string format of the tape recovery point time is in the ISO8601
-extended YYYY-MM-DD'T'HH:MM:SS'Z' format.
+The default time stamp format of the tape recovery point time is in the
+ISO8601 extended YYYY-MM-DD'T'HH:MM:SS'Z' format.
 
 
 =head2 TapeSizeInBytes => Int
@@ -70,9 +70,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::StorageGa
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -45,14 +45,13 @@ struct SPVM_runtime {
   // Compiler
   SPVM_COMPILER* compiler;
   
-  // Runtime memory allocator
-  SPVM_RUNTIME_ALLOCATOR* allocator;
-  
   // Exception
   SPVM_OBJECT* exception;
   
   // Package variables
   SPVM_VALUE* package_vars;
+  
+  SPVM_VALUE* args;
   
   int32_t objects_count;
 };
@@ -61,10 +60,9 @@ SPVM_RUNTIME* SPVM_RUNTIME_new();
 void SPVM_RUNTIME_free(SPVM_RUNTIME* runtime);
 SPVM_ENV* SPVM_RUNTIME_new_env(SPVM_RUNTIME* runtime);
 
-SPVM_VALUE SPVM_RUNTIME_call_sub(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args);
-
-SPVM_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args);
-SPVM_VALUE SPVM_RUNTIME_call_sub_native(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args);
-SPVM_VALUE SPVM_RUNTIME_call_sub_precompile(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args);
+int32_t SPVM_RUNTIME_call_sub(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args);
+int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args);
+int32_t SPVM_RUNTIME_call_sub_native(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args);
+int32_t SPVM_RUNTIME_call_sub_precompile(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args);
 
 #endif

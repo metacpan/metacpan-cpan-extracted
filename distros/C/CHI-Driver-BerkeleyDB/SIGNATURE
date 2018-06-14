@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 c0776ea99a8ed98d4792df1eef2c77c0cd91f5b4 Changes
+SHA1 15aec7e49af5b44e4b22b4127f435aec1ba2f1ef LICENSE
+SHA1 5196e4639772599b52a15ed5abca7cdeea245afa MANIFEST
+SHA1 dcab05692c626fb447637b8c74c58d2bd80aeee6 MANIFEST.SKIP
+SHA1 5f76cc4e0220f28f1528c43a1634150528b132e0 META.json
+SHA1 adcdf1d043f4f648fd6d4c93be23ddaf76890809 META.yml
+SHA1 1f8390be550c487db68ae8ec32c1aef3181623c8 Makefile.PL
+SHA1 fa331b8fedb650d35b8fe74d632f9943e8ca3f19 README
+SHA1 b644283a8b9ccffb25be717b30e79c380ef27b1c lib/CHI/Driver/BerkeleyDB.pm
+SHA1 abf76b51e488eaceda11e420f7f848f8ea0cd3e0 t/00-compile.t
+SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
+SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
+SHA1 19cc343f8a85c6805bbeb02580487483a6283887 t/author-signature.t
+SHA1 b59345e5c0286e611280570a20246013d318e1df t/driver-tests.t
+SHA1 d2b8bb2d066b6fd7ed2d277cd3d305af38bbf230 t/lib/CHI/Driver/BerkeleyDB/Tests.pm
+-----BEGIN PGP SIGNATURE-----
+
+iQJFBAEBCAAvFiEE2EtuRfhGgngE8PsARAzvLrlUzY4FAlshSmIRHG1zY2hvdXRA
+Y3Bhbi5vcmcACgkQRAzvLrlUzY6jQQ/8DpKwPjuqjUG276i5MCtxOcNNereZJr3c
+aG1caMGULYlPnqrEgAf9enNnp0aI/LOmGSAdnfk+b1DB4qHALGvBBiMBiyydp6io
+VZSr9Pakoy4KMGQu+5Hr2p5OE6CjLV2l554Dp6dCngoS+QaQLJX3KESb+jYtCy48
+myfT3Fare7gRo7r8DrVq52laXSkd8tjI8X6/KBEXOjzpUccCKEN+Gj5O6Nwx+w6i
+2gp7rDeWy+Ds0KDRZFv0P6b0rB5U120wPBoVbvRnpaH24p1IPWIMbP/FkKFQLdnu
+ls0v16t7CWvbLY3z1LNEFOAy1cS218mZUnoV6pn+7uQialzf8R/DMdHAPcOx8Uxp
+NmQdjGs22lmYFHSltJTGThhlTh6wGqOdUas00kP0Tm7H1Ot3no7dApT/Gz1e6deZ
+0JQiVsjuhbziOVITxXmCZ6qsATdE3V+L3+UJrHFScB4E6wDN94+/ewDQj8EkW9cQ
+VF9ul4N9/BrZiygEjbai0IrKqVwX30M0D6KFnJGWnovHq0r+/Rrx60KPyyGP9Pmo
+U50c4bK2bWlivRPD2Q/6okbCGUxUHp8qxaRj/ZX7BThD/a18dwb4W8p3S1a0poBQ
+5Z/ZWftO6qJ18V0BsCFSMteEcYEDDNNZ1fmDtBa7Z12vWmpcHIY+l8okzFh3X7ro
+aTwc+KwyLeM=
+=Abyj
+-----END PGP SIGNATURE-----

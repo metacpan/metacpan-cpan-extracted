@@ -46,8 +46,9 @@ to trace back the chain of events leading up to this event.
 
 If C<cause> is set to C<OPERATION_NOT_PERMITTED>, the decision failed
 because the IAM role attached to the execution lacked sufficient
-permissions. For details and example IAM policies, see Lambda Tasks in
-the I<Amazon SWF Developer Guide>.
+permissions. For details and example IAM policies, see Lambda Tasks
+(http://docs.aws.amazon.com/amazonswf/latest/developerguide/lambda-task.html)
+in the I<Amazon SWF Developer Guide>.
 
 
 =head2 Message => Str
@@ -69,9 +70,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::SimpleWor
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

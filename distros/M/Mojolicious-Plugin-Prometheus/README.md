@@ -78,15 +78,17 @@ In addition to exposing the default process metrics that [Net::Prometheus](https
 this plugin will also expose
 
 - `http_requests_total`, request counter partitioned over HTTP method and HTTP response code
-- `http_request_duration_seconds`, request duration histogram partitoned over HTTP method
-- `http_request_size_bytes`, request size histogram partitoned over HTTP method
-- `http_response_size_bytes`, response size histogram partitoned over HTTP method
+- `http_request_duration_seconds`, request duration histogram partitioned over HTTP method
+- `http_request_size_bytes`, request size histogram partitioned over HTTP method
+- `http_response_size_bytes`, response size histogram partitioned over HTTP method
 
 # RUNNING UNDER HYPNOTOAD
 
 When running under a preforking daemon like [Hypnotoad](https://metacpan.org/pod/Mojo::Server::Hypnotoad), you will not get global metrics but only the metrics of each worker, randomly.
 
 The `worker` label will include the pid of the current worker so metrics can be aggregated per worker in Prometheus.
+
+If you prefer to get the global metrics from any worker, then see [Mojolicious::Plugin::Prometheus::Shared::FastMmap](https://metacpan.org/pod/Mojolicious::Plugin::Prometheus::Shared::FastMmap) for a possible solution.
 
 # AUTHOR
 
@@ -101,6 +103,7 @@ the terms of the Artistic License version 2.0.
 
 # SEE ALSO
 
+- [Mojolicious::Plugin::Prometheus::Shared::FastMmap](https://metacpan.org/pod/Mojolicious::Plugin::Prometheus::Shared::FastMmap)
 - [Net::Prometheus](https://metacpan.org/pod/Net::Prometheus)
 - [Mojolicious](https://metacpan.org/pod/Mojolicious)
 - [Mojolicious::Guides](https://metacpan.org/pod/Mojolicious::Guides)

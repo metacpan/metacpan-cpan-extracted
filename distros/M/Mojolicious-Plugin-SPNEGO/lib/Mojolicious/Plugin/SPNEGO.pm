@@ -1,8 +1,9 @@
 package Mojolicious::Plugin::SPNEGO;
 use Mojo::Base 'Mojolicious::Plugin';
 use Net::LDAP::SPNEGO;
-
-our $VERSION = '0.3.2';
+use IO::Socket::Timeout;
+use Mojo::Util qw(b64_decode);
+our $VERSION = '0.3.7';
 
 my %cCache;
 
@@ -32,11 +33,20 @@ sub register {
 
             if ($AuthBase64 and $status){
                 for ($status){
+                    my $timeout = $cfg->{timeout} // 5;
                     my $ldap = $cCache->{ldapObj} //= Net::LDAP::SPNEGO->new(
                         $cfg->{ad_server},
-                        debug=>$cfg->{ldap_debug}
+                        debug=>($cfg->{ldap_debug}//$ENV{SPNEGO_LDAP_DEBUG}//0),
+                        onerror=> sub { my $msg = shift; $c->app->log->error($msg->error);return $msg},
+                        timeout=>$timeout
                     );
+                    # Read/Write timeouts via setsockopt
+                    my $socket = $ldap->socket(sasl_layer=>0);
+                    IO::Socket::Timeout->enable_timeouts_on($socket);
+                    $socket->read_timeout($timeout);
+                    $socket->write_timeout($timeout);
                     /^Type1/ && do {
+                        $c->app->log->debug("Bind Type1 ...");
                         my $mesg = $ldap->bind_type1($AuthBase64);
                         if ($mesg->{ntlm_type2_base64}){
                             $c->res->headers->header( ($cfg->{web_proxy_mode} ? 'Proxy' : 'WWW' ) . '-Authenticate' => 'NTLM '.$mesg->{ntlm_type2_base64});
@@ -49,6 +59,7 @@ sub register {
                         delete $cCache->{ldapObj};
                     };
                     /^Type3/ && do {
+                        $c->app->log->debug("Bind Type3 as user '".$ldap->_get_user_from_ntlm_type3(b64_decode($AuthBase64))."'");
                         my $mesg = $ldap->bind_type3($AuthBase64);
                         if (my $user = $mesg->{ldap_user_entry}){
                             if (my $cb = $cfg->{auth_success_cb}){
@@ -75,7 +86,11 @@ sub register {
 
 __END__
 
-=head1 Mojolicious::Plugin::SPNEGO
+=head1 NAME
+
+Mojolicious::Plugin::SPNEGO - Provide NTLM authentication by forwarding requests to an upstram AD server.
+
+=head1 SYNOPSIS
 
  use Mojolicious::Lite;
 
@@ -140,7 +155,7 @@ or
 
 The plugin provides the following helper method:
 
-=head2 $c->ntlm_auth(ad_server => $AD_SERVER, web_proxy_mode => 1, auth_success_cb => $cb)
+=head2 $c->ntlm_auth(ad_server => $AD_SERVER, timeout=>5, ldap_debug => 0, web_proxy_mode => 1, auth_success_cb => $cb)
 
 The C<ntlm_auth> method runs an NTLM authentication dialog with the browser
 by forwarding the tokens coming from the browser to the AD server specified
@@ -159,6 +174,16 @@ to save authentication success in a cookie.
 Note that windows will only do automatic NTLM SSO with hosts in the local zone
 so you may have to add your webserver to this group of machines in the
 Internet Settings dialog.
+
+=head1 DEBUGGING
+
+You can set the L<Net::LDAP> debug level by setting the 
+C<SPNEGO_LDAP_DEBUG> environment variable.
+
+ 1   Show outgoing packets (using asn_hexdump).
+ 2   Show incoming packets (using asn_hexdump).
+ 4   Show outgoing packets (using asn_dump).
+ 8   Show incoming packets (using asn_dump).
 
 =head1 EXAMPLE
 

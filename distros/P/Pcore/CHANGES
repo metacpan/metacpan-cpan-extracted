@@ -1,3 +1,7 @@
+v0.67.1 2018-06-09T00:18:19Z
+ - pause api fixed
+ - invalid deref fixed
+
 v0.67.0 2018-06-06T18:21:46Z
  - .ini parser improved
  - PM util merged with Sys

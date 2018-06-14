@@ -17,6 +17,7 @@ do { my $x = {
                                       'Moo' => '0',
                                       'Path::Tiny' => '0',
                                       'Template::Mustache' => 'v1.0.2',
+                                      'perl' => 'v5.10.0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

@@ -41,7 +41,7 @@ This class has no description
 
   The IPv6 CIDR range. You can either specify a CIDR range or a source
 security group, not both. To specify a single IPv6 address, use the
-/128 prefix.
+/128 prefix length.
 
 
 =head2 Description => Str
@@ -60,8 +60,8 @@ This class forms part of L<Paws>, describing an object used in L<Paws::EC2>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut

@@ -27,21 +27,114 @@ package Paws::SSM::UpdateMaintenanceWindowTask;
 
 =head1 NAME
 
-Paws::SSM::UpdateMaintenanceWindowTask - Arguments for method UpdateMaintenanceWindowTask on Paws::SSM
+Paws::SSM::UpdateMaintenanceWindowTask - Arguments for method UpdateMaintenanceWindowTask on L<Paws::SSM>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateMaintenanceWindowTask on the 
-Amazon Simple Systems Manager (SSM) service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateMaintenanceWindowTask on the
+L<Amazon Simple Systems Manager (SSM)|Paws::SSM> service. Use the attributes of this class
 as arguments to method UpdateMaintenanceWindowTask.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateMaintenanceWindowTask.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateMaintenanceWindowTask(Att1 => $value1, Att2 => $value2, ...);
+    my $ssm = Paws->service('SSM');
+    my $UpdateMaintenanceWindowTaskResult = $ssm->UpdateMaintenanceWindowTask(
+      WindowId     => 'MyMaintenanceWindowId',
+      WindowTaskId => 'MyMaintenanceWindowTaskId',
+      Description  => 'MyMaintenanceWindowDescription',    # OPTIONAL
+      LoggingInfo  => {
+        S3BucketName => 'MyS3BucketName',                  # min: 3, max: 63
+        S3Region     => 'MyS3Region',                      # min: 3, max: 20
+        S3KeyPrefix  => 'MyS3KeyPrefix',                   # max: 500; OPTIONAL
+      },    # OPTIONAL
+      MaxConcurrency => 'MyMaxConcurrency',           # OPTIONAL
+      MaxErrors      => 'MyMaxErrors',                # OPTIONAL
+      Name           => 'MyMaintenanceWindowName',    # OPTIONAL
+      Priority       => 1,                            # OPTIONAL
+      Replace        => 1,                            # OPTIONAL
+      ServiceRoleArn => 'MyServiceRole',              # OPTIONAL
+      Targets        => [
+        {
+          Key => 'MyTargetKey',                  # min: 1, max: 128; OPTIONAL
+          Values => [ 'MyTargetValue', ... ],    # max: 50; OPTIONAL
+        },
+        ...
+      ],                                         # OPTIONAL
+      TaskArn                  => 'MyMaintenanceWindowTaskArn',    # OPTIONAL
+      TaskInvocationParameters => {
+        Lambda => {
+          Qualifier =>
+            'MyMaintenanceWindowLambdaQualifier',   # min: 1, max: 128; OPTIONAL
+          ClientContext => 'MyMaintenanceWindowLambdaClientContext'
+          ,    # min: 1, max: 8000; OPTIONAL
+          Payload => 'BlobMaintenanceWindowLambdaPayload', # max: 4096; OPTIONAL
+        },    # OPTIONAL
+        RunCommand => {
+          TimeoutSeconds => 1,    # min: 30, max: 2592000; OPTIONAL
+          OutputS3KeyPrefix => 'MyS3KeyPrefix', # max: 500; OPTIONAL
+          DocumentHashType  => 'Sha256',        # values: Sha256, Sha1; OPTIONAL
+          NotificationConfig => {
+            NotificationType =>
+              'Command',    # values: Command, Invocation; OPTIONAL
+            NotificationEvents => [
+              'All',
+              ... # values: All, InProgress, Success, TimedOut, Cancelled, Failed
+            ],    # OPTIONAL
+            NotificationArn => 'MyNotificationArn',    # OPTIONAL
+          },    # OPTIONAL
+          Parameters => { 'MyParameterName' => [ 'MyParameterValue', ... ], }
+          ,     # OPTIONAL
+          ServiceRoleArn     => 'MyServiceRole',
+          DocumentHash       => 'MyDocumentHash',    # max: 256; OPTIONAL
+          OutputS3BucketName => 'MyS3BucketName',    # min: 3, max: 63
+          Comment            => 'MyComment',         # max: 100; OPTIONAL
+        },    # OPTIONAL
+        StepFunctions => {
+          Name =>
+            'MyMaintenanceWindowStepFunctionsName',  # min: 1, max: 80; OPTIONAL
+          Input =>
+            'MyMaintenanceWindowStepFunctionsInput',    # max: 4096; OPTIONAL
+        },    # OPTIONAL
+        Automation => {
+          Parameters => {
+            'MyAutomationParameterKey' => [
+              'MyAutomationParameterValue', ...    # min: 1, max: 512
+            ],    # key: min: 1, max: 30, value: max: 10
+          },    # min: 1, max: 200; OPTIONAL
+          DocumentVersion => 'MyDocumentVersion',    # OPTIONAL
+        },    # OPTIONAL
+      },    # OPTIONAL
+      TaskParameters => {
+        'MyMaintenanceWindowTaskParameterName' => {
+          Values => [
+            'MyMaintenanceWindowTaskParameterValue', ...    # min: 1, max: 255
+          ],                                                # OPTIONAL
+        },    # key: min: 1, max: 255
+      },    # OPTIONAL
+    );
+
+    # Results:
+    my $Description    = $UpdateMaintenanceWindowTaskResult->Description;
+    my $WindowId       = $UpdateMaintenanceWindowTaskResult->WindowId;
+    my $WindowTaskId   = $UpdateMaintenanceWindowTaskResult->WindowTaskId;
+    my $TaskArn        = $UpdateMaintenanceWindowTaskResult->TaskArn;
+    my $Priority       = $UpdateMaintenanceWindowTaskResult->Priority;
+    my $TaskParameters = $UpdateMaintenanceWindowTaskResult->TaskParameters;
+    my $LoggingInfo    = $UpdateMaintenanceWindowTaskResult->LoggingInfo;
+    my $TaskInvocationParameters =
+      $UpdateMaintenanceWindowTaskResult->TaskInvocationParameters;
+    my $MaxConcurrency = $UpdateMaintenanceWindowTaskResult->MaxConcurrency;
+    my $ServiceRoleArn = $UpdateMaintenanceWindowTaskResult->ServiceRoleArn;
+    my $Targets        = $UpdateMaintenanceWindowTaskResult->Targets;
+    my $Name           = $UpdateMaintenanceWindowTaskResult->Name;
+    my $MaxErrors      = $UpdateMaintenanceWindowTaskResult->MaxErrors;
+
+    # Returns a L<Paws::SSM::UpdateMaintenanceWindowTaskResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ssm/UpdateMaintenanceWindowTask>
 
 =head1 ATTRIBUTES
 
@@ -55,6 +148,13 @@ The new task description to specify.
 =head2 LoggingInfo => L<Paws::SSM::LoggingInfo>
 
 The new logging location in Amazon S3 to specify.
+
+C<LoggingInfo> has been deprecated. To specify an S3 bucket to contain
+logs, instead use the C<OutputS3BucketName> and C<OutputS3KeyPrefix>
+options in the C<TaskInvocationParameters> structure. For information
+about how Systems Manager handles these options for the supported
+Maintenance Window task types, see
+MaintenanceWindowTaskInvocationParameters.
 
 
 
@@ -124,7 +224,15 @@ the fields that match the task type. All other fields should be empty.
 
 =head2 TaskParameters => L<Paws::SSM::MaintenanceWindowTaskParameters>
 
-The parameters to modify. The map has the following format:
+The parameters to modify.
+
+C<TaskParameters> has been deprecated. To specify parameters to pass to
+a task when it runs, instead use the C<Parameters> option in the
+C<TaskInvocationParameters> structure. For information about how
+Systems Manager handles these options for the supported Maintenance
+Window task types, see MaintenanceWindowTaskInvocationParameters.
+
+The map has the following format:
 
 Key: string, between 1 and 255 characters
 
@@ -151,9 +259,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateMainten
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

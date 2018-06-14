@@ -18,7 +18,7 @@ my %module_build_args = (
     "Maty\x{e1}\x{161} Kopp <matyas.kopp\@gmail.com>"
   ],
   "dist_name" => "PMLTQ-Command-printtrees",
-  "dist_version" => "0.0.1",
+  "dist_version" => "0.1.1",
   "license" => "perl",
   "module_name" => "PMLTQ::Command::printtrees",
   "recursive_test_files" => 1,

@@ -140,7 +140,7 @@
   first_day_of_week => 1,
   glibc_date_1_format => "%a %e %b %H:%M:%S %Z %Y",
   glibc_date_format => "%d.%m.%y",
-  glibc_datetime_format => "Dydd %A %d <U006d>is %B %Y %T %Z",
+  glibc_datetime_format => "Dydd %A %d mis %B %Y %T %Z",
   glibc_time_12_format => "%l:%M:%S %P %Z",
   glibc_time_format => "%T",
   language => "Welsh",

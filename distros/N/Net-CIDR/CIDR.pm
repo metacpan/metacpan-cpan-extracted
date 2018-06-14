@@ -1,6 +1,6 @@
 # Net::CIDR
 #
-# Copyright 2001-2012 Sam Varshavchik.
+# Copyright 2001-2018 Sam Varshavchik.
 #
 # with contributions from David Cantrell.
 #
@@ -50,7 +50,7 @@ use Carp;
 
 );
 
-$VERSION = "0.18";
+$VERSION = "0.19";
 
 1;
 
@@ -68,13 +68,13 @@ Net::CIDR - Manipulate IPv4/IPv6 netblocks in CIDR notation
     use Net::CIDR ':all';
 
     print join("\n",
-          Net::CIDR::range2cidr("192.68.0.0-192.68.255.255",
+          Net::CIDR::range2cidr("192.168.0.0-192.168.255.255",
 		                "10.0.0.0-10.3.255.255"))
 	       . "\n";
     #
     # Output from above:
     #
-    # 192.68.0.0/16
+    # 192.168.0.0/16
     # 10.0.0.0/14
 
     print join("\n",
@@ -88,19 +88,19 @@ Net::CIDR - Manipulate IPv4/IPv6 netblocks in CIDR notation
     # dead:beef::/32
 
     print join("\n",
-	     Net::CIDR::range2cidr("192.68.1.0-192.68.2.255"))
+	     Net::CIDR::range2cidr("192.168.1.0-192.168.2.255"))
                   . "\n";
     #
     # Output from above:
     #
-    # 192.68.1.0/24
-    # 192.68.2.0/24
+    # 192.168.1.0/24
+    # 192.168.2.0/24
 
-    print join("\n", Net::CIDR::cidr2range("192.68.0.0/16")) . "\n";
+    print join("\n", Net::CIDR::cidr2range("192.168.0.0/16")) . "\n";
     #
     # Output from above:
     #
-    # 192.68.0.0-192.68.255.255
+    # 192.168.0.0-192.168.255.255
 
     print join("\n", Net::CIDR::cidr2range("dead::beef::/46")) . "\n";
     #
@@ -108,23 +108,23 @@ Net::CIDR - Manipulate IPv4/IPv6 netblocks in CIDR notation
     #
     # dead:beef::-dead:beef:3:ffff:ffff:ffff:ffff:ffff
 
-    @list=("192.68.0.0/24");
-    @list=Net::CIDR::cidradd("192.68.1.0-192.68.1.255", @list);
+    @list=("192.168.0.0/24");
+    @list=Net::CIDR::cidradd("192.168.1.0-192.168.1.255", @list);
 
     print join("\n", @list) . "\n";
     #
     # Output from above:
     #
-    # 192.68.0.0/23
+    # 192.168.0.0/23
 
-    print join("\n", Net::CIDR::cidr2octets("192.68.0.0/22")) . "\n";
+    print join("\n", Net::CIDR::cidr2octets("192.168.0.0/22")) . "\n";
     #
     # Output from above:
     #
-    # 192.68.0
-    # 192.68.1
-    # 192.68.2
-    # 192.68.3
+    # 192.168.0
+    # 192.168.1
+    # 192.168.2
+    # 192.168.3
 
     print join("\n", Net::CIDR::cidr2octets("dead::beef::/46")) . "\n";
     #
@@ -135,28 +135,28 @@ Net::CIDR - Manipulate IPv4/IPv6 netblocks in CIDR notation
     # dead:beef:0002
     # dead:beef:0003
 
-    @list=("192.68.0.0/24");
-    print Net::CIDR::cidrlookup("192.68.0.12", @list);
+    @list=("192.168.0.0/24");
+    print Net::CIDR::cidrlookup("192.168.0.12", @list);
     #
     # Output from above:
     #
     # 1
 
-    @list = Net::CIDR::addr2cidr("192.68.0.31");
+    @list = Net::CIDR::addr2cidr("192.168.0.31");
     print join("\n", @list);
     #
     # Output from above:
     #
-    # 192.68.0.31/32
-    # 192.68.0.30/31
-    # 192.68.0.28/30
-    # 192.68.0.24/29
-    # 192.68.0.16/28
-    # 192.68.0.0/27
-    # 192.68.0.0/26
-    # 192.68.0.0/25
-    # 192.68.0.0/24
-    # 192.68.0.0/23
+    # 192.168.0.31/32
+    # 192.168.0.30/31
+    # 192.168.0.28/30
+    # 192.168.0.24/29
+    # 192.168.0.16/28
+    # 192.168.0.0/27
+    # 192.168.0.0/26
+    # 192.168.0.0/25
+    # 192.168.0.0/24
+    # 192.168.0.0/23
     # [and so on]
 
     print Net::CIDR::addrandmask2cidr("195.149.50.61", "255.255.255.248")."\n";
@@ -181,23 +181,23 @@ only one parameter and is called in scalar context.
 
 For example:
 
-    @a=Net::CIDR::range2cidr("192.68.0.0-192.68.255.255");
+    @a=Net::CIDR::range2cidr("192.168.0.0-192.168.255.255");
 
-The result is a one-element array, with $a[0] being "192.68.0.0/16".
+The result is a one-element array, with $a[0] being "192.168.0.0/16".
 range2cidr() processes each "start-finish" element in @range_list separately.
 But if invoked like so:
 
-    $a=Net::CIDR::range2cidr("192.68.0.0-192.68.255.255");
+    $a=Net::CIDR::range2cidr("192.168.0.0-192.168.255.255");
 
-The result is a scalar "192.68.0.0/16".
+The result is a scalar "192.168.0.0/16".
 
 Where each element cannot be expressed as a single CIDR netblock
 range2cidr() will generate as many CIDR netblocks as are necessary to cover
 the full range of IP addresses.  Example:
 
-    @a=Net::CIDR::range2cidr("192.68.1.0-192.68.2.255");
+    @a=Net::CIDR::range2cidr("192.168.1.0-192.168.2.255");
 
-The result is a two element array: ("192.68.1.0/24","192.68.2.0/24");
+The result is a two element array: ("192.168.1.0/24","192.168.2.0/24");
 
     @a=Net::CIDR::range2cidr(
 		   "d08c:43::-d08c:43:ffff:ffff:ffff:ffff:ffff:ffff");
@@ -213,10 +213,10 @@ range2cidr() does not merge adjacent or overlapping netblocks in
 The cidr2range() functions converts a netblock list in CIDR notation
 to a list of "start-finish" IP address ranges:
 
-    @a=Net::CIDR::cidr2range("10.0.0.0/14", "192.68.0.0/24");
+    @a=Net::CIDR::cidr2range("10.0.0.0/14", "192.168.0.0/24");
 
 The result is a two-element array:
-("10.0.0.0-10.3.255.255", "192.68.0.0-192.68.0.255").
+("10.0.0.0-10.3.255.255", "192.168.0.0-192.168.0.255").
 
     @a=Net::CIDR::cidr2range("d08c:43::/32");
 
@@ -231,10 +231,10 @@ cidr2range() does not merge adjacent or overlapping netblocks in
 The addr2cidr function takes an IP address and returns a list of all
 the CIDR netblocks it might belong to:
 
-    @a=Net::CIDR::addr2cidr('192.68.0.31');
+    @a=Net::CIDR::addr2cidr('192.168.0.31');
 
 The result is a thirtythree-element array:
-('192.68.0.31/32', '192.68.0.30/31', '192.68.0.28/30', '192.68.0.24/29',
+('192.168.0.31/32', '192.168.0.30/31', '192.168.0.28/30', '192.168.0.24/29',
  [and so on])
 consisting of all the possible subnets containing this address from
 0.0.0.0/0 to address/32.
@@ -828,10 +828,10 @@ sub _ipcmp {
 cidr2octets() takes @cidr_list and returns a list of leading octets
 representing those netblocks.  Example:
 
-    @octet_list=Net::CIDR::cidr2octets("10.0.0.0/14", "192.68.0.0/24");
+    @octet_list=Net::CIDR::cidr2octets("10.0.0.0/14", "192.168.0.0/24");
 
 The result is the following five-element array:
-("10.0", "10.1", "10.2", "10.3", "192.68.0").
+("10.0", "10.1", "10.2", "10.3", "192.168.0").
 
 For IPv6 addresses, the hexadecimal words in the resulting list are
 zero-padded:
@@ -973,11 +973,11 @@ $block is a single netblock, expressed as either "start-finish", or
 "address/prefix".
 Example:
 
-    @cidr_list=Net::CIDR::range2cidr("192.68.0.0-192.68.0.255");
+    @cidr_list=Net::CIDR::range2cidr("192.168.0.0-192.168.0.255");
     @cidr_list=Net::CIDR::cidradd("10.0.0.0/8", @cidr_list);
-    @cidr_list=Net::CIDR::cidradd("192.68.1.0-192.68.1.255", @cidr_list);
+    @cidr_list=Net::CIDR::cidradd("192.168.1.0-192.168.1.255", @cidr_list);
 
-The result is a two-element array: ("10.0.0.0/8", "192.68.0.0/23").
+The result is a two-element array: ("10.0.0.0/8", "192.168.0.0/23").
 IPv6 addresses are handled in an analogous fashion.
 
 =cut
@@ -1295,8 +1295,10 @@ sub _triml0 {
     my ($a) = @_;
 
     $a =~ s/^0+//g;
+    $a = "0" if $a eq '';
     return $a
 }
+
 =pod
 
 =head1 BUGS

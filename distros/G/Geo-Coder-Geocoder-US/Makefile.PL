@@ -21,7 +21,7 @@ my %args = (
     PL_FILES => {},	# Prevent old MakeMaker from running Build.PL
     'dist' => {COMPRESS => 'gzip', SUFFIX => 'gz'},
     AUTHOR => 'Tom Wyant (wyant at cpan dot org)',
-    ABSTRACT => 'Geocode addresses using geocoder.us',
+    ABSTRACT => 'RETRACTED. Geocode addresses using geocoder.us, which is defunct',
     realclean	=> { FILES => 'cover_db' },
 );
 

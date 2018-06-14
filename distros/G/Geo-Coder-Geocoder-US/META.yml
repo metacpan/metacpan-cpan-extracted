@@ -1,5 +1,5 @@
 ---
-abstract: 'Geocode addresses using geocoder.us'
+abstract: 'RETRACTED. Geocode addresses using geocoder.us, which is defunct'
 author:
   - 'Tom Wyant (wyant at cpan dot org)'
 build_requires:
@@ -19,7 +19,7 @@ no_index:
 provides:
   Geo::Coder::Geocoder::US:
     file: lib/Geo/Coder/Geocoder/US.pm
-    version: '0.009'
+    version: '0.010'
 requires:
   Carp: '0'
   LWP::UserAgent: '0'
@@ -32,6 +32,6 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Geocoder-US
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Geo-Coder-Geocoder-US.git
-version: '0.009'
+version: '0.010'
 x_deprecated: 1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

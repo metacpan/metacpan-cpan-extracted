@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Moose::Role;
 
@@ -28,7 +28,7 @@ Markdent::Role::SpanParser - A role for span parsers
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 DESCRIPTION
 
@@ -54,7 +54,7 @@ L<Markdent::Role::DebugPrinter> roles.
 
 See L<Markdent> for bug reporting details.
 
-Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Markdent> or via email to L<bug-markdent@rt.cpan.org|mailto:bug-markdent@rt.cpan.org>.
+Bugs may be submitted at L<https://github.com/houseabsolute/Markdent/issues>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 

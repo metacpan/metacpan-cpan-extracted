@@ -36,7 +36,7 @@ use DBI::Library qw(:all $m_dbh $m_dsn);
         qw(getIndex CurrentPass CurrentUser CurrentHost CurrentDb Driver addUser hasAcount isMember right checkPass checkSession setSid getName checkFlood GetColumns GetAttrs GetCollation GetColumnCollation GetExtra GetNull GetEngineForRow GetEngines GetCharacterSet GetDataBases GetAutoIncrement GetPrimaryKey GetAutoIncrementValue)
     ],
 );
-$DBI::Library::Database::VERSION = '1.13';
+$DBI::Library::Database::VERSION = '1.14';
 $m_nSecs                         = 10;
 
 =head1 NAME

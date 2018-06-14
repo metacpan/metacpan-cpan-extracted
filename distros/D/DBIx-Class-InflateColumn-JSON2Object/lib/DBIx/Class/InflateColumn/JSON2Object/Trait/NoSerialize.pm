@@ -25,7 +25,7 @@ DBIx::Class::InflateColumn::JSON2Object::Trait::NoSerialize - NoSerialize trait 
 
 =head1 VERSION
 
-version 0.904
+version 0.905
 
 =head1 NAME
 

@@ -36,15 +36,16 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::IAM::Access
 Contains information about the last time an AWS access key was used.
 
 This data type is used as a response element in the
-GetAccessKeyLastUsed action.
+GetAccessKeyLastUsed operation.
 
 =head1 ATTRIBUTES
 
 
 =head2 B<REQUIRED> LastUsedDate => Str
 
-  The date and time, in ISO 8601 date-time format, when the access key
-was most recently used. This field is null when:
+  The date and time, in ISO 8601 date-time format
+(http://www.iso.org/iso/iso8601), when the access key was most recently
+used. This field is null in the following situations:
 
 =over
 
@@ -68,7 +69,7 @@ There is no sign-in data associated with the user
 =head2 B<REQUIRED> Region => Str
 
   The AWS region where this access key was most recently used. This field
-is displays "N/A" when:
+is displays "N/A" in the following situations:
 
 =over
 
@@ -87,14 +88,15 @@ There is no sign-in data associated with the user
 
 =back
 
-For more information about AWS regions, see Regions and Endpoints in
-the Amazon Web Services General Reference.
+For more information about AWS regions, see Regions and Endpoints
+(http://docs.aws.amazon.com/general/latest/gr/rande.html) in the Amazon
+Web Services General Reference.
 
 
 =head2 B<REQUIRED> ServiceName => Str
 
   The name of the AWS service with which this access key was most
-recently used. This field displays "N/A" when:
+recently used. This field displays "N/A" in the following situations:
 
 =over
 
@@ -122,9 +124,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::IAM>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

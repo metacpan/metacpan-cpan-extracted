@@ -6,11 +6,16 @@ build_requires:
   Data::HexDump: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Test::HexString: '0'
   Test::More: '0'
+  blib: '1.01'
+  perl: v5.16.0
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
+  perl: v5.16.0
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -29,13 +34,13 @@ no_index:
 provides:
   Game::Tibia::Packet:
     file: lib/Game/Tibia/Packet.pm
-    version: '0.006'
+    version: '0.007'
   Game::Tibia::Packet::Charlist:
     file: lib/Game/Tibia/Packet/Charlist.pm
-    version: '0.006'
+    version: '0.007'
   Game::Tibia::Packet::Login:
     file: lib/Game/Tibia/Packet/Login.pm
-    version: '0.006'
+    version: '0.007'
 requires:
   Carp: '0'
   Crypt::ECB: v2.0.0
@@ -52,10 +57,10 @@ resources:
   bugtracker: https://github.com/athreef/Game-Tibia-Packet/issues
   homepage: https://github.com/athreef/Game-Tibia-Packet
   repository: https://github.com/athreef/Game-Tibia-Packet.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
-    version: '5.026000'
+    version: '5.026001'
   plugins:
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
@@ -209,7 +214,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.1
+          git_version: 2.16.1
           repo_root: .
       name: '@Git/Check'
       version: '2.042'
@@ -226,7 +231,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.1
+          git_version: 2.16.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -239,11 +244,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.006
+          tag: v0.007
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.1
+          git_version: 2.16.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -257,7 +262,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.1
+          git_version: 2.16.1
           repo_root: .
       name: '@Git/Push'
       version: '2.042'
@@ -273,7 +278,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.1
+          git_version: 2.16.1
           repo_root: .
       name: Git::NextVersion
       version: '2.042'
@@ -292,6 +297,40 @@ x_Dist_Zilla:
           version: '0.006'
       name: ReadmePodInRoot
       version: '0.163250'
+    -
+      class: Dist::Zilla::Plugin::MinimumPerl
+      name: MinimumPerl
+      version: '1.006'
+    -
+      class: Dist::Zilla::Plugin::Test::MinimumVersion
+      name: Test::MinimumVersion
+      version: '2.000007'
+    -
+      class: Dist::Zilla::Plugin::Test::Perl::Critic
+      name: Test::Perl::Critic
+      version: '3.001'
+    -
+      class: Dist::Zilla::Plugin::Test::Version
+      name: Test::Version
+      version: '1.09'
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          bail_out_on_fail: '0'
+          fail_on_warning: author
+          fake_home: 0
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          needs_display: 0
+          phase: test
+          script_finder:
+            - ':PerlExecFiles'
+          skips: []
+          switch: []
+      name: Test::Compile
+      version: '2.056'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

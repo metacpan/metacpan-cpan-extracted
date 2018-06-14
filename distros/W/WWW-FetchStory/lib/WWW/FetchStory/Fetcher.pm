@@ -1,5 +1,5 @@
 package WWW::FetchStory::Fetcher;
-$WWW::FetchStory::Fetcher::VERSION = '0.1902';
+$WWW::FetchStory::Fetcher::VERSION = '0.2002';
 use strict;
 use warnings;
 =head1 NAME
@@ -8,7 +8,7 @@ WWW::FetchStory::Fetcher - fetching module for WWW::FetchStory
 
 =head1 VERSION
 
-version 0.1902
+version 0.2002
 
 =head1 DESCRIPTION
 
@@ -984,7 +984,7 @@ sub derive_values {
     my %args = @_;
 
     my $today = time2str('%Y-%m-%d', time);
-    $args{info}->{fetched} = $today;
+    $args{info}->{fetch_date} = $today;
 
     my $words = $args{info}->{wordcount};
     if ($words)
@@ -1435,7 +1435,7 @@ sub build_epub {
     $epub->add_description($info->{summary});
     $epub->add_language('en');
     $epub->add_source($info->{url}, 'URL');
-    $epub->add_date($info->{fetched}, 'fetched');
+    $epub->add_date($info->{fetch_date}, 'fetched');
 
     # Add Subjects and additional Meta
     # Also build up the title-page
@@ -1451,7 +1451,7 @@ EOT
     delete $know{author};
     delete $know{summary};
     delete $know{url};
-    delete $know{fetched};
+    delete $know{fetch_date};
     delete $know{basename};
     delete $know{chapter_titles};
     delete $know{chapter_wc};

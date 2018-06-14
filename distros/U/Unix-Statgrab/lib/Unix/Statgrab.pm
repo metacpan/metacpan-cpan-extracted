@@ -65,15 +65,15 @@ my @stats = qw(
 );
 
 %EXPORT_TAGS = (
-    all       => [ qw(get_error drop_privileges), @stats, @constants_names ],
+    all       => [qw(get_error drop_privileges), @stats, @constants_names],
     stats     => [@stats],
     constants => [@constants_names],
 );
 
-@EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-@EXPORT    = ( @{ $EXPORT_TAGS{'all'} } );
+@EXPORT_OK = (@{$EXPORT_TAGS{'all'}});
+@EXPORT    = (@{$EXPORT_TAGS{'all'}});
 
-$VERSION = '0.111';
+$VERSION = '0.112';
 
 sub AUTOLOAD
 {
@@ -81,9 +81,9 @@ sub AUTOLOAD
     # XS function.
 
     my $constname;
-    ( $constname = $AUTOLOAD ) =~ s/.*:://;
+    ($constname = $AUTOLOAD) =~ s/.*:://;
     $constname eq 'constant' and croak "&Unix::Statgrab::constant not defined";
-    my ( $error, $val ) = constant($constname);
+    my ($error, $val) = constant($constname);
     $error and croak $error;
     {
         no strict 'refs';
@@ -94,70 +94,70 @@ sub AUTOLOAD
 
 bootstrap Unix::Statgrab $VERSION;
 
-sub Unix::Statgrab::sg_cpu_stats::as_list { @{$_[0]->fetchall_hashref}; }
-sub Unix::Statgrab::sg_cpu_stats::fetchall_hash { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_cpu_stats::as_list        { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_cpu_stats::fetchall_hash  { @{$_[0]->fetchall_hashref}; }
 sub Unix::Statgrab::sg_cpu_stats::fetchall_array { @{$_[0]->fetchall_arrayref}; }
-sub Unix::Statgrab::sg_cpu_stats::fetchall_table { ( $_[0]->colnames, @{$_[0]->fetchall_arrayref} ) }
+sub Unix::Statgrab::sg_cpu_stats::fetchall_table { ($_[0]->colnames, @{$_[0]->fetchall_arrayref}) }
 
-sub Unix::Statgrab::sg_cpu_percents::as_list { @{$_[0]->fetchall_hashref}; }
-sub Unix::Statgrab::sg_cpu_percents::fetchall_hash { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_cpu_percents::as_list        { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_cpu_percents::fetchall_hash  { @{$_[0]->fetchall_hashref}; }
 sub Unix::Statgrab::sg_cpu_percents::fetchall_array { @{$_[0]->fetchall_arrayref}; }
-sub Unix::Statgrab::sg_cpu_percents::fetchall_table { ( $_[0]->colnames, @{$_[0]->fetchall_arrayref} ) }
+sub Unix::Statgrab::sg_cpu_percents::fetchall_table { ($_[0]->colnames, @{$_[0]->fetchall_arrayref}) }
 
-sub Unix::Statgrab::sg_host_info::as_list { @{$_[0]->fetchall_hashref}; }
-sub Unix::Statgrab::sg_host_info::fetchall_hash { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_host_info::as_list        { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_host_info::fetchall_hash  { @{$_[0]->fetchall_hashref}; }
 sub Unix::Statgrab::sg_host_info::fetchall_array { @{$_[0]->fetchall_arrayref}; }
-sub Unix::Statgrab::sg_host_info::fetchall_table { ( $_[0]->colnames, @{$_[0]->fetchall_arrayref} ) }
+sub Unix::Statgrab::sg_host_info::fetchall_table { ($_[0]->colnames, @{$_[0]->fetchall_arrayref}) }
 
-sub Unix::Statgrab::sg_disk_io_stats::as_list { @{$_[0]->fetchall_hashref}; }
-sub Unix::Statgrab::sg_disk_io_stats::fetchall_hash { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_disk_io_stats::as_list        { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_disk_io_stats::fetchall_hash  { @{$_[0]->fetchall_hashref}; }
 sub Unix::Statgrab::sg_disk_io_stats::fetchall_array { @{$_[0]->fetchall_arrayref}; }
-sub Unix::Statgrab::sg_disk_io_stats::fetchall_table { ( $_[0]->colnames, @{$_[0]->fetchall_arrayref} ) }
+sub Unix::Statgrab::sg_disk_io_stats::fetchall_table { ($_[0]->colnames, @{$_[0]->fetchall_arrayref}) }
 
-sub Unix::Statgrab::sg_fs_stats::as_list { @{$_[0]->fetchall_hashref}; }
-sub Unix::Statgrab::sg_fs_stats::fetchall_hash { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_fs_stats::as_list        { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_fs_stats::fetchall_hash  { @{$_[0]->fetchall_hashref}; }
 sub Unix::Statgrab::sg_fs_stats::fetchall_array { @{$_[0]->fetchall_arrayref}; }
-sub Unix::Statgrab::sg_fs_stats::fetchall_table { ( $_[0]->colnames, @{$_[0]->fetchall_arrayref} ) }
+sub Unix::Statgrab::sg_fs_stats::fetchall_table { ($_[0]->colnames, @{$_[0]->fetchall_arrayref}) }
 
-sub Unix::Statgrab::sg_load_stats::as_list { @{$_[0]->fetchall_hashref}; }
-sub Unix::Statgrab::sg_load_stats::fetchall_hash { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_load_stats::as_list        { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_load_stats::fetchall_hash  { @{$_[0]->fetchall_hashref}; }
 sub Unix::Statgrab::sg_load_stats::fetchall_array { @{$_[0]->fetchall_arrayref}; }
-sub Unix::Statgrab::sg_load_stats::fetchall_table { ( $_[0]->colnames, @{$_[0]->fetchall_arrayref} ) }
+sub Unix::Statgrab::sg_load_stats::fetchall_table { ($_[0]->colnames, @{$_[0]->fetchall_arrayref}) }
 
-sub Unix::Statgrab::sg_mem_stats::as_list { @{$_[0]->fetchall_hashref}; }
-sub Unix::Statgrab::sg_mem_stats::fetchall_hash { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_mem_stats::as_list        { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_mem_stats::fetchall_hash  { @{$_[0]->fetchall_hashref}; }
 sub Unix::Statgrab::sg_mem_stats::fetchall_array { @{$_[0]->fetchall_arrayref}; }
-sub Unix::Statgrab::sg_mem_stats::fetchall_table { ( $_[0]->colnames, @{$_[0]->fetchall_arrayref} ) }
+sub Unix::Statgrab::sg_mem_stats::fetchall_table { ($_[0]->colnames, @{$_[0]->fetchall_arrayref}) }
 
-sub Unix::Statgrab::sg_swap_stats::as_list { @{$_[0]->fetchall_hashref}; }
-sub Unix::Statgrab::sg_swap_stats::fetchall_hash { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_swap_stats::as_list        { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_swap_stats::fetchall_hash  { @{$_[0]->fetchall_hashref}; }
 sub Unix::Statgrab::sg_swap_stats::fetchall_array { @{$_[0]->fetchall_arrayref}; }
-sub Unix::Statgrab::sg_swap_stats::fetchall_table { ( $_[0]->colnames, @{$_[0]->fetchall_arrayref} ) }
+sub Unix::Statgrab::sg_swap_stats::fetchall_table { ($_[0]->colnames, @{$_[0]->fetchall_arrayref}) }
 
-sub Unix::Statgrab::sg_network_io_stats::as_list { @{$_[0]->fetchall_hashref}; }
-sub Unix::Statgrab::sg_network_io_stats::fetchall_hash { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_network_io_stats::as_list        { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_network_io_stats::fetchall_hash  { @{$_[0]->fetchall_hashref}; }
 sub Unix::Statgrab::sg_network_io_stats::fetchall_array { @{$_[0]->fetchall_arrayref}; }
-sub Unix::Statgrab::sg_network_io_stats::fetchall_table { ( $_[0]->colnames, @{$_[0]->fetchall_arrayref} ) }
+sub Unix::Statgrab::sg_network_io_stats::fetchall_table { ($_[0]->colnames, @{$_[0]->fetchall_arrayref}) }
 
-sub Unix::Statgrab::sg_network_iface_stats::as_list { @{$_[0]->fetchall_hashref}; }
-sub Unix::Statgrab::sg_network_iface_stats::fetchall_hash { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_network_iface_stats::as_list        { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_network_iface_stats::fetchall_hash  { @{$_[0]->fetchall_hashref}; }
 sub Unix::Statgrab::sg_network_iface_stats::fetchall_array { @{$_[0]->fetchall_arrayref}; }
-sub Unix::Statgrab::sg_network_iface_stats::fetchall_table { ( $_[0]->colnames, @{$_[0]->fetchall_arrayref} ) }
+sub Unix::Statgrab::sg_network_iface_stats::fetchall_table { ($_[0]->colnames, @{$_[0]->fetchall_arrayref}) }
 
-sub Unix::Statgrab::sg_page_stats::as_list { @{$_[0]->fetchall_hashref}; }
-sub Unix::Statgrab::sg_page_stats::fetchall_hash { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_page_stats::as_list        { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_page_stats::fetchall_hash  { @{$_[0]->fetchall_hashref}; }
 sub Unix::Statgrab::sg_page_stats::fetchall_array { @{$_[0]->fetchall_arrayref}; }
-sub Unix::Statgrab::sg_page_stats::fetchall_table { ( $_[0]->colnames, @{$_[0]->fetchall_arrayref} ) }
+sub Unix::Statgrab::sg_page_stats::fetchall_table { ($_[0]->colnames, @{$_[0]->fetchall_arrayref}) }
 
-sub Unix::Statgrab::sg_user_stats::as_list { @{$_[0]->fetchall_hashref}; }
-sub Unix::Statgrab::sg_user_stats::fetchall_hash { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_user_stats::as_list        { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_user_stats::fetchall_hash  { @{$_[0]->fetchall_hashref}; }
 sub Unix::Statgrab::sg_user_stats::fetchall_array { @{$_[0]->fetchall_arrayref}; }
-sub Unix::Statgrab::sg_user_stats::fetchall_table { ( $_[0]->colnames, @{$_[0]->fetchall_arrayref} ) }
+sub Unix::Statgrab::sg_user_stats::fetchall_table { ($_[0]->colnames, @{$_[0]->fetchall_arrayref}) }
 
-sub Unix::Statgrab::sg_process_stats::as_list { @{$_[0]->fetchall_hashref}; }
-sub Unix::Statgrab::sg_process_stats::fetchall_hash { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_process_stats::as_list        { @{$_[0]->fetchall_hashref}; }
+sub Unix::Statgrab::sg_process_stats::fetchall_hash  { @{$_[0]->fetchall_hashref}; }
 sub Unix::Statgrab::sg_process_stats::fetchall_array { @{$_[0]->fetchall_arrayref}; }
-sub Unix::Statgrab::sg_process_stats::fetchall_table { ( $_[0]->colnames, @{$_[0]->fetchall_arrayref} ) }
+sub Unix::Statgrab::sg_process_stats::fetchall_table { ($_[0]->colnames, @{$_[0]->fetchall_arrayref}) }
 
 # Preloaded methods go here.
 
@@ -481,11 +481,20 @@ Jens Rehsack, E<lt>rehsack AT cpan.orgE<gt>
 
 Copyright (C) 2004-2005 by Tassilo von Parseval
 
-Copyright (C) 2012-2015 by Jens Rehsack
+Copyright (C) 2012-2018 by Jens Rehsack
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Lesser General Public License as published by the Free
 Software Foundation; either version 2.1 of the License, or (at your option) any
 later version.
+
+The Perl/XS part itself can be redistributed under the same terms as Perl itself.
+
+Note that - even if LGPL 2.1+ doesn't force copyleft inherits on linking,
+the re-use of API and header material requires at least the documentation
+needs to be distributed under LGPL.
+
+In case your packaging system can split, you can distribute the code under
+Perl5 license and the documentation under LGPL 2.1+
 
 =cut

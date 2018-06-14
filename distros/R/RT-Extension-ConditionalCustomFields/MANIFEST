@@ -60,6 +60,7 @@ xt/multivalued_ticket_display.t
 xt/multivalued_ticket_modify_list.t
 xt/multivalued_ticket_modify_selectbox.t
 xt/multivalued_user_summary.t
+xt/no_applied_condition.t
 xt/queue_modify_dropdown.t
 xt/queue_modify_list.t
 xt/queue_modify_selectbox.t

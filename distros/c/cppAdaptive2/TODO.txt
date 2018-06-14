@@ -13,4 +13,7 @@ gmake dist
 
 gmake tardist
 
-cpanm --test-only -v cppAdaptive2-v0.2.0.tar.gz
+cpanm --test-only -v cppAdaptive2
+
+
+https://software.intel.com/en-us/articles/installing-intel-free-libs-and-python-yum-repo

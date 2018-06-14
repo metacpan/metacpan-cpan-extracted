@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 7;
 
 WriteMakefile(
     NAME                => 'Keyword::Declare',
@@ -13,10 +13,16 @@ WriteMakefile(
     TEST_REQUIRES => {
         'Test::More'      => 0,
     },
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker' => 7,
+    },
+    BUILD_REQUIRES => {
+        'ExtUtils::MakeMaker' => 7,
+    },
     PREREQ_PM => {
-        'Keyword::Simple' => 0,
-        'PPR'             => '0.000005',
-        'List::Util'      => 1.45,
+        'PPR'                 => '0.000015',
+        'List::Util'          => 1.45,
+        'Keyword::Simple'     => '>= 0.03' . ($] < 5.018 ? ', != 0.04' : ''),
     },
     META_MERGE   => {
         no_index => {

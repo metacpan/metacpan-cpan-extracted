@@ -12,11 +12,9 @@ WriteMakefile(
     MIN_PERL_VERSION    => 5.012,
     PREREQ_PM => {
         'Test::More'       => 0,
-        'Keyword::Declare' => 0.001004,
-        ( $^V < 5.022
-            ? ('Data::Alias' => 0)
-            : ()
-        )
+        'Keyword::Simple'  => 0.003,
+        'Keyword::Declare' => 0.001009,
+        'Data::Alias'      => 1.21,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Alias-Any-*' },

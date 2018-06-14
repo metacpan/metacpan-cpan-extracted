@@ -49,6 +49,10 @@ SPVM::Test - SPVM test module
   sub DOUBLE_PRECICE : double () { return 2147483647.0; }
   
   sub main : int ($mvar : int) {
+    {
+      my $total = sum0(sum0(1, 2), sum0(3, 4));
+    }
+    
     # const
     {
       my $str1_const : const byte[] = new byte[3];
@@ -619,7 +623,18 @@ SPVM::Test - SPVM test module
     
     {
       my $nums = new int[2000000];
-      my $len = len $nums;
+      my $len = scalar @$nums;
+      my $i = 0;
+      for ($i = 0; $i < $len; $i = $i + 1) {
+        $nums->[$i] = $i;
+      }
+      print((string)$i . "\n");
+      print((string)$nums->[$i - 1] . "\n");
+    }
+
+    {
+      my $nums = new int[2000000];
+      my $len = scalar @{$nums};
       my $i = 0;
       for ($i = 0; $i < $len; $i = $i + 1) {
         $nums->[$i] = $i;

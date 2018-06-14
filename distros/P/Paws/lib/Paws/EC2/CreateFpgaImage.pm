@@ -19,21 +19,42 @@ package Paws::EC2::CreateFpgaImage;
 
 =head1 NAME
 
-Paws::EC2::CreateFpgaImage - Arguments for method CreateFpgaImage on Paws::EC2
+Paws::EC2::CreateFpgaImage - Arguments for method CreateFpgaImage on L<Paws::EC2>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateFpgaImage on the 
-Amazon Elastic Compute Cloud service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateFpgaImage on the
+L<Amazon Elastic Compute Cloud|Paws::EC2> service. Use the attributes of this class
 as arguments to method CreateFpgaImage.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateFpgaImage.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateFpgaImage(Att1 => $value1, Att2 => $value2, ...);
+    my $ec2 = Paws->service('EC2');
+    my $CreateFpgaImageResult = $ec2->CreateFpgaImage(
+      InputStorageLocation => {
+        Bucket => 'MyString',    # OPTIONAL
+        Key    => 'MyString',    # OPTIONAL
+      },
+      ClientToken         => 'MyString',    # OPTIONAL
+      Description         => 'MyString',    # OPTIONAL
+      DryRun              => 1,             # OPTIONAL
+      LogsStorageLocation => {
+        Bucket => 'MyString',               # OPTIONAL
+        Key    => 'MyString',               # OPTIONAL
+      },    # OPTIONAL
+      Name => 'MyString',    # OPTIONAL
+    );
+
+    # Results:
+    my $FpgaImageGlobalId = $CreateFpgaImageResult->FpgaImageGlobalId;
+    my $FpgaImageId       = $CreateFpgaImageResult->FpgaImageId;
+
+    # Returns a L<Paws::EC2::CreateFpgaImageResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ec2/CreateFpgaImage>
 
 =head1 ATTRIBUTES
 
@@ -42,7 +63,8 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 
 Unique, case-sensitive identifier that you provide to ensure the
 idempotency of the request. For more information, see Ensuring
-Idempotency.
+Idempotency
+(http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Run_Instance_Idempotency.html).
 
 
 
@@ -87,9 +109,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateFpgaIma
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

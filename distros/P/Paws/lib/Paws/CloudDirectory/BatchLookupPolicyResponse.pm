@@ -46,7 +46,8 @@ Represents the output of a LookupPolicy response operation.
 
   Provides list of path to policies. Policies contain C<PolicyId>,
 C<ObjectIdentifier>, and C<PolicyType>. For more information, see
-Policies.
+Policies
+(http://docs.aws.amazon.com/directoryservice/latest/admin-guide/cd_key_concepts.html#policies).
 
 
 
@@ -56,9 +57,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::CloudDire
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

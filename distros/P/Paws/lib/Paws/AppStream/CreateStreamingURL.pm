@@ -19,29 +19,44 @@ package Paws::AppStream::CreateStreamingURL;
 
 =head1 NAME
 
-Paws::AppStream::CreateStreamingURL - Arguments for method CreateStreamingURL on Paws::AppStream
+Paws::AppStream::CreateStreamingURL - Arguments for method CreateStreamingURL on L<Paws::AppStream>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateStreamingURL on the 
-Amazon AppStream service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateStreamingURL on the
+L<Amazon AppStream|Paws::AppStream> service. Use the attributes of this class
 as arguments to method CreateStreamingURL.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateStreamingURL.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateStreamingURL(Att1 => $value1, Att2 => $value2, ...);
+    my $appstream2 = Paws->service('AppStream');
+    my $CreateStreamingURLResult = $appstream2->CreateStreamingURL(
+      FleetName      => 'MyString',
+      StackName      => 'MyString',
+      UserId         => 'MyStreamingUrlUserId',
+      ApplicationId  => 'MyString',               # OPTIONAL
+      SessionContext => 'MyString',               # OPTIONAL
+      Validity       => 1,                        # OPTIONAL
+    );
+
+    # Results:
+    my $Expires      = $CreateStreamingURLResult->Expires;
+    my $StreamingURL = $CreateStreamingURLResult->StreamingURL;
+
+    # Returns a L<Paws::AppStream::CreateStreamingURLResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/>
 
 =head1 ATTRIBUTES
 
 
 =head2 ApplicationId => Str
 
-The ID of the application that must be launched after the session
-starts.
+The name of the application to launch after the session starts. This is
+the name that you specified as B<Name> in the Image Assistant.
 
 
 
@@ -53,7 +68,9 @@ The name of the fleet.
 
 =head2 SessionContext => Str
 
-The session context of the streaming URL.
+The session context. For more information, see Session Context
+(http://docs.aws.amazon.com/appstream2/latest/developerguide/managing-stacks-fleets.html#managing-stacks-fleets-parameters)
+in the I<Amazon AppStream 2.0 Developer Guide>.
 
 
 
@@ -72,7 +89,7 @@ The ID of the user.
 =head2 Validity => Int
 
 The time that the streaming URL will be valid, in seconds. Specify a
-value between 1 and 604800 seconds.
+value between 1 and 604800 seconds. The default is 60 seconds.
 
 
 
@@ -83,9 +100,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateStreami
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -20,38 +20,77 @@ package Paws::SNS::Publish;
 
 =head1 NAME
 
-Paws::SNS::Publish - Arguments for method Publish on Paws::SNS
+Paws::SNS::Publish - Arguments for method Publish on L<Paws::SNS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method Publish on the 
-Amazon Simple Notification Service service. Use the attributes of this class
+This class represents the parameters used for calling the method Publish on the
+L<Amazon Simple Notification Service|Paws::SNS> service. Use the attributes of this class
 as arguments to method Publish.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to Publish.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->Publish(Att1 => $value1, Att2 => $value2, ...);
+    my $sns = Paws->service('SNS');
+    my $PublishResponse = $sns->Publish(
+      Message           => 'Mymessage',
+      MessageAttributes => {
+        'MyString' => {
+          DataType    => 'MyString',
+          StringValue => 'MyString',
+          BinaryValue => 'BlobBinary',    # OPTIONAL
+        },
+      },    # OPTIONAL
+      MessageStructure => 'MymessageStructure',    # OPTIONAL
+      PhoneNumber      => 'MyString',              # OPTIONAL
+      Subject          => 'Mysubject',             # OPTIONAL
+      TargetArn        => 'MyString',              # OPTIONAL
+      TopicArn         => 'MytopicARN',            # OPTIONAL
+    );
+
+    # Results:
+    my $MessageId = $PublishResponse->MessageId;
+
+    # Returns a L<Paws::SNS::PublishResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/sns/Publish>
 
 =head1 ATTRIBUTES
 
 
 =head2 B<REQUIRED> Message => Str
 
-The message you want to send to the topic.
+The message you want to send.
 
-If you want to send the same message to all transport protocols,
-include the text of the message as a String value.
+If you are publishing to a topic and you want to send the same message
+to all transport protocols, include the text of the message as a String
+value. If you want to send different messages for each transport
+protocol, set the value of the C<MessageStructure> parameter to C<json>
+and use a JSON object for the C<Message> parameter.
 
-If you want to send different messages for each transport protocol, set
-the value of the C<MessageStructure> parameter to C<json> and use a
-JSON object for the C<Message> parameter.
+Constraints:
 
-Constraints: Messages must be UTF-8 encoded strings at most 256 KB in
-size (262144 bytes, not 262144 characters).
+=over
+
+=item *
+
+With the exception of SMS, messages must be UTF-8 encoded strings and
+at most 256 KB in size (262144 bytes, not 262144 characters).
+
+=item *
+
+For SMS, each message can contain up to 140 bytes, and the character
+limit depends on the encoding scheme. For example, an SMS message can
+contain 160 GSM characters, 140 ASCII characters, or 70 UCS-2
+characters. If you publish a message that exceeds the size limit,
+Amazon SNS sends it as multiple messages, each fitting within the size
+limit. Messages are not cut off in the middle of a word but on
+whole-word boundaries. The total size limit for a single SMS publish
+action is 1600 bytes.
+
+=back
 
 JSON-specific constraints:
 
@@ -136,8 +175,9 @@ send to a specific transport protocol (e.g., "http").
 
 For information about sending different messages for each protocol
 using the AWS Management Console, go to Create Different Messages for
-Each Protocol in the I<Amazon Simple Notification Service Getting
-Started Guide>.
+Each Protocol
+(http://docs.aws.amazon.com/sns/latest/gsg/Publish.html#sns-message-formatting-by-protocol)
+in the I<Amazon Simple Notification Service Getting Started Guide>.
 
 Valid value: C<json>
 
@@ -190,9 +230,9 @@ This class forms part of L<Paws>, documenting arguments for method Publish in L<
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

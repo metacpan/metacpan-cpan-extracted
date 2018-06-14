@@ -223,19 +223,46 @@ unsigned char rfc822_atext_chars[256] = {
 #define IS_ATEXT_NON_TSPECIAL(c) \
 	((rfc822_atext_chars[(int)(unsigned char)(c)] & 3) != 0)
 
-#define IS_ESCAPED_CHAR(c) ((c) == '"' || (c) == '\\' || (c) == '\'')
+/*
+   qtext           =   %d33 /             ; Printable US-ASCII
+                       %d35-91 /          ;  characters not including
+                       %d93-126 /         ;  "\" or the quote character
+                       obs-qtext
 
-/* quote with "" and escape all '\', '"' and "'" characters if need */
-static void str_append_maybe_escape(string_t *str, const char *data, size_t len, bool escape_dot)
+   obs-qtext       =   obs-NO-WS-CTL
+
+   obs-NO-WS-CTL   =   %d1-8 /            ; US-ASCII control
+                       %d11 /             ;  characters that do not
+                       %d12 /             ;  include the carriage
+                       %d14-31 /          ;  return, line feed, and
+                       %d127              ;  white space characters
+
+  So qtext is everything expects '\0', '\t', '\n', '\r', ' ', '"', '\\'.
+*/
+
+/* non-qtext characters */
+#define CHAR_NEEDS_ESCAPE(c) ((c) == '"' || (c) == '\\' || (c) == '\0' || (c) == '\t' || (c) == '\n' || (c) == '\r')
+
+/* quote with "" and escape all needed characters */
+static void str_append_maybe_escape(string_t *str, const char *data, size_t len, bool quote_dot)
 {
 	const char *p;
 	const char *end;
+
+	if (len == 0) {
+		str_append(str, "\"\"");
+		return;
+	}
+
+	/* leading or trailing dot needs to be always quoted */
+	if (data[0] == '.' || data[len-1] == '.')
+		quote_dot = true;
 
 	end = data + len;
 
 	/* see if we need to quote it */
 	for (p = data; p != end; p++) {
-		if (!IS_ATEXT(*p) && (escape_dot || *p != '.'))
+		if (!IS_ATEXT(*p) && (quote_dot || *p != '.'))
 			break;
 	}
 
@@ -246,7 +273,7 @@ static void str_append_maybe_escape(string_t *str, const char *data, size_t len,
 
 	/* see if we need to escape it */
 	for (p = data; p != end; p++) {
-		if (IS_ESCAPED_CHAR(*p))
+		if (CHAR_NEEDS_ESCAPE(*p))
 			break;
 	}
 
@@ -263,7 +290,7 @@ static void str_append_maybe_escape(string_t *str, const char *data, size_t len,
 	str_append_data(str, data, (size_t) (p - data));
 
 	for (; p != end; p++) {
-		if (IS_ESCAPED_CHAR(*p))
+		if (CHAR_NEEDS_ESCAPE(*p))
 			str_append_c(str, '\\');
 		str_append_c(str, *p);
 	}
@@ -356,6 +383,8 @@ static int rfc822_skip_lwsp(struct rfc822_parser_context *ctx)
 static int rfc822_parse_dot_atom(struct rfc822_parser_context *ctx, string_t *str)
 {
 	const unsigned char *start;
+	bool last_is_dot;
+	bool dot_problem;
 	int ret;
 
 	/*
@@ -370,6 +399,9 @@ static int rfc822_parse_dot_atom(struct rfc822_parser_context *ctx, string_t *st
 	if (ctx->data >= ctx->end || !IS_ATEXT(*ctx->data))
 		return -1;
 
+	last_is_dot = false;
+	dot_problem = false;
+
 	for (start = ctx->data++; ctx->data < ctx->end; ) {
 		if (IS_ATEXT(*ctx->data)) {
 			ctx->data++;
@@ -378,22 +410,29 @@ static int rfc822_parse_dot_atom(struct rfc822_parser_context *ctx, string_t *st
 
 		str_append_data(str, start, ctx->data - start);
 
+		if (ctx->data - start > 0)
+			last_is_dot = false;
+
 		if ((ret = rfc822_skip_lwsp(ctx)) <= 0)
-			return ret;
+			return (dot_problem && ret >= 0) ? -2 : ret;
 
 		if (*ctx->data != '.')
-			return 1;
+			return (last_is_dot || dot_problem) ? -2 : 1;
+
+		if (last_is_dot)
+			dot_problem = true;
 
 		ctx->data++;
 		str_append_c(str, '.');
+		last_is_dot = true;
 
 		if ((ret = rfc822_skip_lwsp(ctx)) <= 0)
-			return ret;
+			return (dot_problem && ret >= 0) ? -2 : ret;
 		start = ctx->data;
 	}
 
 	str_append_data(str, start, ctx->data - start);
-	return 0;
+	return dot_problem ? -2 : 0;
 }
 
 /* "quoted string" */
@@ -579,7 +618,7 @@ static int parse_local_part(struct message_address_parser_context *ctx)
 		ret = rfc822_parse_quoted_string(&ctx->parser, ctx->str);
 	else
 		ret = rfc822_parse_dot_atom(&ctx->parser, ctx->str);
-	if (ret < 0)
+	if (ret < 0 && ret != -2)
 		return -1;
 
 	ctx->addr.mailbox = str_ccopy(ctx->str);
@@ -592,7 +631,7 @@ static int parse_domain(struct message_address_parser_context *ctx)
 	int ret;
 
 	str_truncate(ctx->str, 0);
-	if ((ret = rfc822_parse_domain(&ctx->parser, ctx->str)) < 0)
+	if ((ret = rfc822_parse_domain(&ctx->parser, ctx->str)) < 0 && ret != -2)
 		return -1;
 
 	ctx->addr.domain = str_ccopy(ctx->str);
@@ -603,12 +642,14 @@ static int parse_domain(struct message_address_parser_context *ctx)
 static int parse_domain_list(struct message_address_parser_context *ctx)
 {
 	int ret;
+	bool dot_problem;
 
 	/* obs-domain-list = "@" domain *(*(CFWS / "," ) [CFWS] "@" domain) */
 	str_truncate(ctx->str, 0);
+	dot_problem = false;
 	for (;;) {
 		if (ctx->parser.data >= ctx->parser.end)
-			return 0;
+			return dot_problem ? -2 : 0;
 
 		if (*ctx->parser.data != '@')
 			break;
@@ -617,8 +658,11 @@ static int parse_domain_list(struct message_address_parser_context *ctx)
 			str_append_c(ctx->str, ',');
 
 		str_append_c(ctx->str, '@');
-		if ((ret = rfc822_parse_domain(&ctx->parser, ctx->str)) <= 0)
+		if ((ret = rfc822_parse_domain(&ctx->parser, ctx->str)) <= 0 && ret != -2)
 			return ret;
+
+		if (ret == -2)
+			dot_problem = true;
 
 		while (rfc822_skip_lwsp(&ctx->parser) > 0 &&
 		       *ctx->parser.data == ',')
@@ -626,7 +670,7 @@ static int parse_domain_list(struct message_address_parser_context *ctx)
 	}
 	ctx->addr.route = str_ccopy(ctx->str);
 	ctx->addr.route_len = str_len(ctx->str);
-	return 1;
+	return dot_problem ? -2 : 1;
 }
 
 static int parse_angle_addr(struct message_address_parser_context *ctx)
@@ -641,12 +685,14 @@ static int parse_angle_addr(struct message_address_parser_context *ctx)
 		return ret;
 
 	if (*ctx->parser.data == '@') {
-		if (parse_domain_list(ctx) <= 0 || *ctx->parser.data != ':') {
-			if (ctx->fill_missing)
+		if ((ret = parse_domain_list(ctx)) <= 0 || *ctx->parser.data != ':') {
+			if (ctx->fill_missing && ret != -2)
 				ctx->addr.route = strdup("INVALID_ROUTE");
 			ctx->addr.invalid_syntax = true;
 			if (ctx->parser.data >= ctx->parser.end)
 				return -1;
+			if (ret == -2)
+				ctx->parser.data++;
 			/* try to continue anyway */
 		} else {
 			ctx->parser.data++;
@@ -659,11 +705,19 @@ static int parse_angle_addr(struct message_address_parser_context *ctx)
 	if (*ctx->parser.data == '>') {
 		/* <> address isn't valid */
 	} else {
-		if ((ret = parse_local_part(ctx)) <= 0)
+		if ((ret = parse_local_part(ctx)) <= 0 && ret != -2)
 			return ret;
+		if (ret == -2)
+			ctx->addr.invalid_syntax = true;
+		if (ctx->parser.data >= ctx->parser.end)
+			return 0;
 		if (*ctx->parser.data == '@') {
-			if ((ret = parse_domain(ctx)) <= 0)
+			if ((ret = parse_domain(ctx)) <= 0 && ret != -2)
 				return ret;
+			if (ret == -2)
+				ctx->addr.invalid_syntax = true;
+			if (ctx->parser.data >= ctx->parser.end)
+				return 0;
 		}
 	}
 
@@ -718,7 +772,7 @@ static int parse_name_addr(struct message_address_parser_context *ctx)
 static int parse_addr_spec(struct message_address_parser_context *ctx)
 {
 	/* addr-spec       = local-part "@" domain */
-	int ret, ret2 = -2;
+	int ret, ret2 = -3;
 
 	i_assert(ctx->parser.data < ctx->parser.end);
 
@@ -736,14 +790,19 @@ static int parse_addr_spec(struct message_address_parser_context *ctx)
 	if (ret != 0 && ctx->parser.data < ctx->parser.end &&
 	    *ctx->parser.data == '@') {
 		ret2 = parse_domain(ctx);
-		if (ret2 <= 0)
+		if (ret2 <= 0 && ret != -2)
 			ret = ret2;
+		if (ret2 == -2) {
+			ctx->addr.invalid_syntax = true;
+			if (ctx->parser.data >= ctx->parser.end)
+				ret = 0;
+		}
 	}
 
 	if (ctx->parser.last_comment != NULL && str_len(ctx->parser.last_comment) > 0) {
 		ctx->addr.comment = str_ccopy(ctx->parser.last_comment);
 		ctx->addr.comment_len = str_len(ctx->parser.last_comment);
-	} else if (ret2 == -2) {
+	} else if (ret2 == -3) {
 #if 0
 		/* So far we've read user without @domain and without
 		   (Display Name). We'll assume that a single "user" (already
@@ -1163,10 +1222,7 @@ void message_address_write(char **output, size_t *output_len, const struct messa
 					str_append_data(str, addr->route, addr->route_len);
 					str_append_c(str, ':');
 				}
-				if (addr->mailbox_len == 0)
-					str_append(str, "\"\"");
-				else
-					str_append_maybe_escape(str, addr->mailbox, addr->mailbox_len, false);
+				str_append_maybe_escape(str, addr->mailbox, addr->mailbox_len, false);
 				if (addr->domain_len != 0) {
 					str_append_c(str, '@');
 					str_append_data(str, addr->domain, addr->domain_len);

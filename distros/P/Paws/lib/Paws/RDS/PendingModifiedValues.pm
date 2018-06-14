@@ -11,7 +11,9 @@ package Paws::RDS::PendingModifiedValues;
   has LicenseModel => (is => 'ro', isa => 'Str');
   has MasterUserPassword => (is => 'ro', isa => 'Str');
   has MultiAZ => (is => 'ro', isa => 'Bool');
+  has PendingCloudwatchLogsExports => (is => 'ro', isa => 'Paws::RDS::PendingCloudwatchLogsExports');
   has Port => (is => 'ro', isa => 'Int');
+  has ProcessorFeatures => (is => 'ro', isa => 'ArrayRef[Paws::RDS::ProcessorFeature]', request_name => 'ProcessorFeature', traits => ['NameInRequest']);
   has StorageType => (is => 'ro', isa => 'Str');
 1;
 
@@ -52,7 +54,7 @@ action.
 =head2 AllocatedStorage => Int
 
   Contains the new C<AllocatedStorage> size for the DB instance that will
-be applied or is in progress.
+be applied or is currently being applied.
 
 
 =head2 BackupRetentionPeriod => Int
@@ -69,13 +71,13 @@ retained.
 =head2 DBInstanceClass => Str
 
   Contains the new C<DBInstanceClass> for the DB instance that will be
-applied or is in progress.
+applied or is currently being applied.
 
 
 =head2 DBInstanceIdentifier => Str
 
   Contains the new C<DBInstanceIdentifier> for the DB instance that will
-be applied or is in progress.
+be applied or is currently being applied.
 
 
 =head2 DBSubnetGroupName => Str
@@ -91,7 +93,7 @@ be applied or is in progress.
 =head2 Iops => Int
 
   Specifies the new Provisioned IOPS value for the DB instance that will
-be applied or is being applied.
+be applied or is currently being applied.
 
 
 =head2 LicenseModel => Str
@@ -104,8 +106,8 @@ C<general-public-license>
 
 =head2 MasterUserPassword => Str
 
-  Contains the pending or in-progress change of the master credentials
-for the DB instance.
+  Contains the pending or currently-in-progress change of the master
+credentials for the DB instance.
 
 
 =head2 MultiAZ => Bool
@@ -114,9 +116,20 @@ for the DB instance.
 deployment.
 
 
+=head2 PendingCloudwatchLogsExports => L<Paws::RDS::PendingCloudwatchLogsExports>
+
+  
+
+
 =head2 Port => Int
 
   Specifies the pending port for the DB instance.
+
+
+=head2 ProcessorFeatures => ArrayRef[L<Paws::RDS::ProcessorFeature>]
+
+  The number of CPU cores and the number of threads per core for the DB
+instance class of the DB instance.
 
 
 =head2 StorageType => Str
@@ -131,9 +144,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::RDS>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

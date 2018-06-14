@@ -15,21 +15,65 @@ package Paws::ELBv2::RegisterTargets;
 
 =head1 NAME
 
-Paws::ELBv2::RegisterTargets - Arguments for method RegisterTargets on Paws::ELBv2
+Paws::ELBv2::RegisterTargets - Arguments for method RegisterTargets on L<Paws::ELBv2>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method RegisterTargets on the 
-Elastic Load Balancing service. Use the attributes of this class
+This class represents the parameters used for calling the method RegisterTargets on the
+L<Elastic Load Balancing|Paws::ELBv2> service. Use the attributes of this class
 as arguments to method RegisterTargets.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to RegisterTargets.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->RegisterTargets(Att1 => $value1, Att2 => $value2, ...);
+    my $elasticloadbalancing = Paws->service('ELBv2');
+    # To register targets with a target group
+    # This example registers the specified instances with the specified target
+    # group.
+    my $RegisterTargetsOutput = $elasticloadbalancing->RegisterTargets(
+      {
+        'TargetGroupArn' =>
+'arn:aws:elasticloadbalancing:us-west-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067',
+        'Targets' => [
+
+          {
+            'Id' => 'i-80c8dd94'
+          },
+
+          {
+            'Id' => 'i-ceddcd4d'
+          }
+        ]
+      }
+    );
+
+    # To register targets with a target group using port overrides
+    # This example registers the specified instance with the specified target
+    # group using multiple ports. This enables you to register ECS containers on
+    # the same instance as targets in the target group.
+    my $RegisterTargetsOutput = $elasticloadbalancing->RegisterTargets(
+      {
+        'Targets' => [
+
+          {
+            'Port' => 80,
+            'Id'   => 'i-80c8dd94'
+          },
+
+          {
+            'Id'   => 'i-80c8dd94',
+            'Port' => 766
+          }
+        ],
+        'TargetGroupArn' =>
+'arn:aws:elasticloadbalancing:us-west-2:123456789012:targetgroup/my-new-targets/3bb63f11dfb0faf9'
+      }
+    );
+
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancing/RegisterTargets>
 
 =head1 ATTRIBUTES
 
@@ -42,9 +86,7 @@ The Amazon Resource Name (ARN) of the target group.
 
 =head2 B<REQUIRED> Targets => ArrayRef[L<Paws::ELBv2::TargetDescription>]
 
-The targets. The default port for a target is the port for the target
-group. You can specify a port override. If a target is already
-registered, you can register it again using a different port.
+The targets.
 
 
 
@@ -55,9 +97,9 @@ This class forms part of L<Paws>, documenting arguments for method RegisterTarge
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

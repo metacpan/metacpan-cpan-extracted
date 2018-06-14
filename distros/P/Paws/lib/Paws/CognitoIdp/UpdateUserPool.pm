@@ -13,6 +13,7 @@ package Paws::CognitoIdp::UpdateUserPool;
   has SmsAuthenticationMessage => (is => 'ro', isa => 'Str');
   has SmsConfiguration => (is => 'ro', isa => 'Paws::CognitoIdp::SmsConfigurationType');
   has SmsVerificationMessage => (is => 'ro', isa => 'Str');
+  has UserPoolAddOns => (is => 'ro', isa => 'Paws::CognitoIdp::UserPoolAddOnsType');
   has UserPoolId => (is => 'ro', isa => 'Str', required => 1);
   has UserPoolTags => (is => 'ro', isa => 'Paws::CognitoIdp::UserPoolTagsType');
   has VerificationMessageTemplate => (is => 'ro', isa => 'Paws::CognitoIdp::VerificationMessageTemplateType');
@@ -28,21 +29,100 @@ package Paws::CognitoIdp::UpdateUserPool;
 
 =head1 NAME
 
-Paws::CognitoIdp::UpdateUserPool - Arguments for method UpdateUserPool on Paws::CognitoIdp
+Paws::CognitoIdp::UpdateUserPool - Arguments for method UpdateUserPool on L<Paws::CognitoIdp>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateUserPool on the 
-Amazon Cognito Identity Provider service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateUserPool on the
+L<Amazon Cognito Identity Provider|Paws::CognitoIdp> service. Use the attributes of this class
 as arguments to method UpdateUserPool.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateUserPool.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateUserPool(Att1 => $value1, Att2 => $value2, ...);
+    my $cognito-idp = Paws->service('CognitoIdp');
+    my $UpdateUserPoolResponse = $cognito -idp->UpdateUserPool(
+      UserPoolId            => 'MyUserPoolIdType',
+      AdminCreateUserConfig => {
+        UnusedAccountValidityDays => 1,    # max: 365; OPTIONAL
+        InviteMessageTemplate     => {
+          EmailSubject =>
+            'MyEmailVerificationSubjectType',    # min: 1, max: 140; OPTIONAL
+          EmailMessage =>
+            'MyEmailVerificationMessageType',    # min: 6, max: 20000; OPTIONAL
+          SMSMessage =>
+            'MySmsVerificationMessageType',      # min: 6, max: 140; OPTIONAL
+        },    # OPTIONAL
+        AllowAdminCreateUserOnly => 1,    # OPTIONAL
+      },    # OPTIONAL
+      AutoVerifiedAttributes => [
+        'phone_number', ...    # values: phone_number, email
+      ],                       # OPTIONAL
+      DeviceConfiguration => {
+        ChallengeRequiredOnNewDevice     => 1,    # OPTIONAL
+        DeviceOnlyRememberedOnUserPrompt => 1,    # OPTIONAL
+      },    # OPTIONAL
+      EmailConfiguration => {
+        SourceArn => 'MyArnType',    # min: 20, max: 2048; OPTIONAL
+        ReplyToEmailAddress => 'MyEmailAddressType',    # OPTIONAL
+      },    # OPTIONAL
+      EmailVerificationMessage => 'MyEmailVerificationMessageType',   # OPTIONAL
+      EmailVerificationSubject => 'MyEmailVerificationSubjectType',   # OPTIONAL
+      LambdaConfig             => {
+        PreSignUp           => 'MyArnType',    # min: 20, max: 2048; OPTIONAL
+        PreAuthentication   => 'MyArnType',    # min: 20, max: 2048; OPTIONAL
+        CustomMessage       => 'MyArnType',    # min: 20, max: 2048; OPTIONAL
+        PostAuthentication  => 'MyArnType',    # min: 20, max: 2048; OPTIONAL
+        PostConfirmation    => 'MyArnType',    # min: 20, max: 2048; OPTIONAL
+        UserMigration       => 'MyArnType',    # min: 20, max: 2048; OPTIONAL
+        PreTokenGeneration  => 'MyArnType',    # min: 20, max: 2048; OPTIONAL
+        DefineAuthChallenge => 'MyArnType',    # min: 20, max: 2048; OPTIONAL
+        CreateAuthChallenge => 'MyArnType',    # min: 20, max: 2048; OPTIONAL
+        VerifyAuthChallengeResponse =>
+          'MyArnType',                         # min: 20, max: 2048; OPTIONAL
+      },    # OPTIONAL
+      MfaConfiguration => 'OFF',    # OPTIONAL
+      Policies         => {
+        PasswordPolicy => {
+          RequireUppercase => 1,    # OPTIONAL
+          RequireNumbers   => 1,    # OPTIONAL
+          RequireSymbols   => 1,    # OPTIONAL
+          RequireLowercase => 1,    # OPTIONAL
+          MinimumLength    => 1,    # min: 6, max: 99; OPTIONAL
+        },    # OPTIONAL
+      },    # OPTIONAL
+      SmsAuthenticationMessage => 'MySmsVerificationMessageType',    # OPTIONAL
+      SmsConfiguration         => {
+        SnsCallerArn => 'MyArnType',       # min: 20, max: 2048; OPTIONAL
+        ExternalId   => 'MyStringType',    # OPTIONAL
+      },    # OPTIONAL
+      SmsVerificationMessage => 'MySmsVerificationMessageType',    # OPTIONAL
+      UserPoolAddOns         => {
+        AdvancedSecurityMode => 'OFF',    # values: OFF, AUDIT, ENFORCED
+
+      },    # OPTIONAL
+      UserPoolTags => {
+        'MyStringType' => 'MyStringType',    # key: OPTIONAL, value: OPTIONAL
+      },    # OPTIONAL
+      VerificationMessageTemplate => {
+        EmailMessageByLink =>
+          'MyEmailVerificationMessageByLinkType', # min: 6, max: 20000; OPTIONAL
+        EmailSubject =>
+          'MyEmailVerificationSubjectType',       # min: 1, max: 140; OPTIONAL
+        EmailSubjectByLink =>
+          'MyEmailVerificationSubjectByLinkType',   # min: 1, max: 140; OPTIONAL
+        EmailMessage =>
+          'MyEmailVerificationMessageType',    # min: 6, max: 20000; OPTIONAL
+        DefaultEmailOption => 'CONFIRM_WITH_LINK'
+        ,    # values: CONFIRM_WITH_LINK, CONFIRM_WITH_CODE; OPTIONAL
+        SmsMessage =>
+          'MySmsVerificationMessageType',    # min: 6, max: 140; OPTIONAL
+      },    # OPTIONAL
+    );
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/cognito-idp/UpdateUserPool>
 
 =head1 ATTRIBUTES
 
@@ -141,6 +221,13 @@ A container with information about the SMS verification message.
 
 
 
+=head2 UserPoolAddOns => L<Paws::CognitoIdp::UserPoolAddOnsType>
+
+Used to enable advanced security risk detection. Set the key
+C<AdvancedSecurityMode> to the value "AUDIT".
+
+
+
 =head2 B<REQUIRED> UserPoolId => Str
 
 The user pool ID for the user pool you want to update.
@@ -151,6 +238,7 @@ The user pool ID for the user pool you want to update.
 
 The cost allocation tags for the user pool. For more information, see
 Adding Cost Allocation Tags to Your User Pool
+(http://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-cost-allocation-tagging.html)
 
 
 
@@ -167,9 +255,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateUserPoo
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

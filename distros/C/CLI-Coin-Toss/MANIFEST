@@ -1,0 +1,21 @@
+Build.PL
+Changes
+lib/CLI/Coin/Toss.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+scripts/randexp
+scripts/quantile
+scripts/init.sh
+scripts/entropy
+scripts/cointoss
+scripts/cauchydist
+scripts/matrixpack
+scripts/saikoro
+scripts/poisson
+scripts/boxmuller
+META.yml
+META.json

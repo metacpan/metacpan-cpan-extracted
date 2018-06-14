@@ -48,6 +48,8 @@ hashref with the definition of punctuation characters. Each of them
 has the following keys: C<ldouble>, C<rdouble>, C<lsingle>,
 C<rsingle>, C<apos>, C<emdash>, C<endash>.
 
+C<endash> refers to a dash between digits.
+
 =cut
 
 # EM-DASH: 2014
@@ -127,6 +129,16 @@ sub characters {
                    # finnish uses short dash
                    emdash => "\x{2013}",
                    endash => "-",
+                   dash =>    "\x{2013}",
+                  },
+            nl => {
+                   ldouble => "\x{201c}",
+                   rdouble => "\x{201d}",
+                   lsingle => "\x{2018}",
+                   rsingle => "\x{2019}",
+                   apos =>    "\x{2019}",
+                   emdash =>  "\x{2013}", # en dash –
+                   endash =>  "-", # between numbers, use the hyphen
                    dash =>    "\x{2013}",
                   },
             sr => {

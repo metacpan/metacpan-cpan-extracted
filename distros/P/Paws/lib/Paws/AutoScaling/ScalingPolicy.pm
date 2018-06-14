@@ -63,7 +63,7 @@ and C<PercentChangeInCapacity>.
 
 =head2 AutoScalingGroupName => Str
 
-  The name of the Auto Scaling group associated with this scaling policy.
+  The name of the Auto Scaling group.
 
 
 =head2 Cooldown => Int
@@ -138,9 +138,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::AutoScali
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

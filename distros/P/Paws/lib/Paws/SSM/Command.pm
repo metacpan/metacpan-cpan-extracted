@@ -4,6 +4,7 @@ package Paws::SSM::Command;
   has Comment => (is => 'ro', isa => 'Str');
   has CompletedCount => (is => 'ro', isa => 'Int');
   has DocumentName => (is => 'ro', isa => 'Str');
+  has DocumentVersion => (is => 'ro', isa => 'Str');
   has ErrorCount => (is => 'ro', isa => 'Int');
   has ExpiresAfter => (is => 'ro', isa => 'Str');
   has InstanceIds => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
@@ -79,6 +80,11 @@ Undeliverable.
   The name of the document requested for execution.
 
 
+=head2 DocumentVersion => Str
+
+  The SSM document version.
+
+
 =head2 ErrorCount => Int
 
   The number of targets for which the status is Failed or Execution Timed
@@ -88,8 +94,8 @@ Out.
 =head2 ExpiresAfter => Str
 
   If this time is reached and the command has not already started
-executing, it will not execute. Calculated based on the ExpiresAfter
-user input provided as part of the SendCommand API.
+executing, it will not run. Calculated based on the ExpiresAfter user
+input provided as part of the SendCommand API.
 
 
 =head2 InstanceIds => ArrayRef[Str|Undef]
@@ -103,7 +109,8 @@ user input provided as part of the SendCommand API.
 at the same time. You can specify a number of instances, such as 10, or
 a percentage of instances, such as 10%. The default value is 50. For
 more information about how to use MaxConcurrency, see Executing a
-Command Using Systems Manager Run Command.
+Command Using Systems Manager Run Command
+(http://docs.aws.amazon.com/systems-manager/latest/userguide/run-command.html).
 
 
 =head2 MaxErrors => Str
@@ -111,8 +118,9 @@ Command Using Systems Manager Run Command.
   The maximum number of errors allowed before the system stops sending
 the command to additional targets. You can specify a number of errors,
 such as 10, or a percentage or errors, such as 10%. The default value
-is 50. For more information about how to use MaxErrors, see Executing a
-Command Using Systems Manager Run Command.
+is 0. For more information about how to use MaxErrors, see Executing a
+Command Using Systems Manager Run Command
+(http://docs.aws.amazon.com/systems-manager/latest/userguide/run-command.html).
 
 
 =head2 NotificationConfig => L<Paws::SSM::NotificationConfig>
@@ -168,7 +176,9 @@ sending notifications about command status changes.
 information than Status because it includes states resulting from error
 and concurrency control parameters. StatusDetails can show different
 results than Status. For more information about these statuses, see Run
-Command Status. StatusDetails can be one of the following values:
+Command Status
+(http://docs.aws.amazon.com/systems-manager/latest/userguide/monitor-about-status.html).
+StatusDetails can be one of the following values:
 
 =over
 
@@ -241,9 +251,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::SSM>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

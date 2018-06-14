@@ -1,7 +1,7 @@
 package Acme::CPANModules::PERLANCAR::NonMooseStyleClassBuilder;
 
-our $DATE = '2018-01-09'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-06-11'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 our $LIST = {
     summary => 'Non-Moose-style class builders',
@@ -47,7 +47,7 @@ Acme::CPANModules::PERLANCAR::NonMooseStyleClassBuilder - Non-Moose-style class 
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::PERLANCAR::NonMooseStyleClassBuilder (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2018-01-09.
+This document describes version 0.002 of Acme::CPANModules::PERLANCAR::NonMooseStyleClassBuilder (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2018-06-11.
 
 =head1 DESCRIPTION
 

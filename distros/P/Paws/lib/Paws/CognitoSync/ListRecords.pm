@@ -15,28 +15,51 @@ package Paws::CognitoSync::ListRecords;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/identitypools/{IdentityPoolId}/identities/{IdentityId}/datasets/{DatasetName}/records');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'GET');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::CognitoSync::ListRecordsResponse');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::CognitoSync::ListRecords - Arguments for method ListRecords on Paws::CognitoSync
+Paws::CognitoSync::ListRecords - Arguments for method ListRecords on L<Paws::CognitoSync>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ListRecords on the 
-Amazon Cognito Sync service. Use the attributes of this class
+This class represents the parameters used for calling the method ListRecords on the
+L<Amazon Cognito Sync|Paws::CognitoSync> service. Use the attributes of this class
 as arguments to method ListRecords.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ListRecords.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ListRecords(Att1 => $value1, Att2 => $value2, ...);
+    my $cognito-sync = Paws->service('CognitoSync');
+    my $ListRecordsResponse = $cognito -sync->ListRecords(
+      DatasetName      => 'MyDatasetName',
+      IdentityId       => 'MyIdentityId',
+      IdentityPoolId   => 'MyIdentityPoolId',
+      LastSyncCount    => 1,                       # OPTIONAL
+      MaxResults       => 1,                       # OPTIONAL
+      NextToken        => 'MyString',              # OPTIONAL
+      SyncSessionToken => 'MySyncSessionToken',    # OPTIONAL
+    );
+
+    # Results:
+    my $DatasetExists = $ListRecordsResponse->DatasetExists;
+    my $DatasetDeletedAfterRequestedSyncCount =
+      $ListRecordsResponse->DatasetDeletedAfterRequestedSyncCount;
+    my $Records            = $ListRecordsResponse->Records;
+    my $SyncSessionToken   = $ListRecordsResponse->SyncSessionToken;
+    my $NextToken          = $ListRecordsResponse->NextToken;
+    my $Count              = $ListRecordsResponse->Count;
+    my $LastModifiedBy     = $ListRecordsResponse->LastModifiedBy;
+    my $MergedDatasetNames = $ListRecordsResponse->MergedDatasetNames;
+    my $DatasetSyncCount   = $ListRecordsResponse->DatasetSyncCount;
+
+    # Returns a L<Paws::CognitoSync::ListRecordsResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/cognito-sync/ListRecords>
 
 =head1 ATTRIBUTES
 
@@ -95,9 +118,9 @@ This class forms part of L<Paws>, documenting arguments for method ListRecords i
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

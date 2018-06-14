@@ -1,7 +1,7 @@
 package App::DuckPAN::Cmd::Env::Cmd::Get;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Gets the specified env variable
-$App::DuckPAN::Cmd::Env::Cmd::Get::VERSION = '1019';
+$App::DuckPAN::Cmd::Env::Cmd::Get::VERSION = '1021';
 use Moo;
 with qw( App::DuckPAN::Cmd::Env::Cmd );
 
@@ -27,7 +27,7 @@ App::DuckPAN::Cmd::Env::Cmd::Get - Gets the specified env variable
 
 =head1 VERSION
 
-version 1019
+version 1021
 
 =head1 AUTHOR
 

@@ -11,28 +11,39 @@ package Paws::LexModels::GetIntents;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/intents/');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'GET');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::LexModels::GetIntentsResponse');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::LexModels::GetIntents - Arguments for method GetIntents on Paws::LexModels
+Paws::LexModels::GetIntents - Arguments for method GetIntents on L<Paws::LexModels>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method GetIntents on the 
-Amazon Lex Model Building Service service. Use the attributes of this class
+This class represents the parameters used for calling the method GetIntents on the
+L<Amazon Lex Model Building Service|Paws::LexModels> service. Use the attributes of this class
 as arguments to method GetIntents.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to GetIntents.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->GetIntents(Att1 => $value1, Att2 => $value2, ...);
+    my $models.lex = Paws->service('LexModels');
+    my $GetIntentsResponse = $models . lex->GetIntents(
+      MaxResults   => 1,                 # OPTIONAL
+      NameContains => 'MyIntentName',    # OPTIONAL
+      NextToken    => 'MyNextToken',     # OPTIONAL
+    );
+
+    # Results:
+    my $NextToken = $GetIntentsResponse->NextToken;
+    my $Intents   = $GetIntentsResponse->Intents;
+
+    # Returns a L<Paws::LexModels::GetIntentsResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/lex/>
 
 =head1 ATTRIBUTES
 
@@ -68,9 +79,9 @@ This class forms part of L<Paws>, documenting arguments for method GetIntents in
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

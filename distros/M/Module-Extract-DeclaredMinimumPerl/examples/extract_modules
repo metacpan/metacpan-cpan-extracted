@@ -102,7 +102,7 @@ brian d foy C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009 by brian d foy <bdfoy@cpan.org>
+Copyright © 2009-2015, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You can use this script under the same terms as Perl itself.
 

@@ -14,28 +14,36 @@ package Paws::Config::StartConfigRulesEvaluation;
 
 =head1 NAME
 
-Paws::Config::StartConfigRulesEvaluation - Arguments for method StartConfigRulesEvaluation on Paws::Config
+Paws::Config::StartConfigRulesEvaluation - Arguments for method StartConfigRulesEvaluation on L<Paws::Config>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method StartConfigRulesEvaluation on the 
-AWS Config service. Use the attributes of this class
+This class represents the parameters used for calling the method StartConfigRulesEvaluation on the
+L<AWS Config|Paws::Config> service. Use the attributes of this class
 as arguments to method StartConfigRulesEvaluation.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to StartConfigRulesEvaluation.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->StartConfigRulesEvaluation(Att1 => $value1, Att2 => $value2, ...);
+    my $config = Paws->service('Config');
+    my $StartConfigRulesEvaluationResponse =
+      $config->StartConfigRulesEvaluation(
+      ConfigRuleNames => [
+        'MyStringWithCharLimit64', ...    # min: 1, max: 64
+      ],                                  # OPTIONAL
+      );
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/config/StartConfigRulesEvaluation>
 
 =head1 ATTRIBUTES
 
 
 =head2 ConfigRuleNames => ArrayRef[Str|Undef]
 
-The list of names of Config rules that you want to run evaluations for.
+The list of names of AWS Config rules that you want to run evaluations
+for.
 
 
 
@@ -46,9 +54,9 @@ This class forms part of L<Paws>, documenting arguments for method StartConfigRu
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

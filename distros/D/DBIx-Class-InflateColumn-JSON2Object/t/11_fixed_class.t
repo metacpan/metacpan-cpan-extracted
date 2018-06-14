@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 use Test::More;
 use lib 't';
+use strict;
+use warnings;
 use utf8;
 use Encode;
 binmode( STDERR, ":utf8" );
@@ -75,6 +77,7 @@ subtest 'insert object with undef boolean' => sub {
     my $obj = testlib::Object::Fixed->new({
         text=>'Rumkugeln',
         amount=>42,
+        weight=>42.42,
         flag=>undef
     });
 
@@ -83,8 +86,25 @@ subtest 'insert object with undef boolean' => sub {
 
     my ($via_dbi) = $dbh->selectrow_array("select fixed_class from test where id = ?",undef, $id);
     like($via_dbi,qr/"text":"Rumkugeln"/,'string');
+    like($via_dbi,qr/"weight":42.42/,'num');
     like($via_dbi,qr/"flag":false/,'bool');
 };
 
+subtest 'handle int/num passed as string' => sub {
+    my $row = $schema->resultset('Test')->find($id);
+
+    my $obj = testlib::Object::Fixed->new({
+        text=>'MakeGoHappy',
+        amount=>"2",
+        weight=>"10.5",
+        flag=>0
+    });
+    $row->update({fixed_class=>$obj});
+
+    my $fresh = $schema->resultset('Test')->find($id);
+    my $raw = $fresh->get_column('fixed_class');
+    like($raw,qr/"amount":2/,'raw int');
+    like($raw,qr/"weight":10.5/,'num');
+};
 
 done_testing();

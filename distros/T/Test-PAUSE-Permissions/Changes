@@ -1,5 +1,8 @@
 Revision history for Test-PAUSE-Permissions
 
+0.07 2018/06/10
+  - add metacpan option to use MetaCPAN permission API
+
 0.06 2016/04/22
   - added strict mode to prevent accidental addition of an indexable
     module (for a large team)

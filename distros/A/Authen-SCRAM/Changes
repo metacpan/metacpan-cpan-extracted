@@ -1,5 +1,13 @@
 Revision history for Authen-SCRAM
 
+0.010     2018-06-13 09:47:13-04:00 America/New_York
+
+    [Changed]
+
+    - Removed String::Compare::ConstantTime as a dependency. This
+      is a temporary measure until warnings on older Perls are
+      addressed and released.
+
 0.009     2018-03-26 15:33:59-04:00 America/New_York
 
     [Fixed]

@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 require Exporter;
 use AutoLoader;
@@ -76,7 +76,7 @@ Set::IntervalTree - Perform range-based lookups on sets of ranges
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 

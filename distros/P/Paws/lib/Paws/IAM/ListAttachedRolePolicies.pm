@@ -17,21 +17,35 @@ package Paws::IAM::ListAttachedRolePolicies;
 
 =head1 NAME
 
-Paws::IAM::ListAttachedRolePolicies - Arguments for method ListAttachedRolePolicies on Paws::IAM
+Paws::IAM::ListAttachedRolePolicies - Arguments for method ListAttachedRolePolicies on L<Paws::IAM>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ListAttachedRolePolicies on the 
-AWS Identity and Access Management service. Use the attributes of this class
+This class represents the parameters used for calling the method ListAttachedRolePolicies on the
+L<AWS Identity and Access Management|Paws::IAM> service. Use the attributes of this class
 as arguments to method ListAttachedRolePolicies.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ListAttachedRolePolicies.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ListAttachedRolePolicies(Att1 => $value1, Att2 => $value2, ...);
+    my $iam = Paws->service('IAM');
+    my $ListAttachedRolePoliciesResponse = $iam->ListAttachedRolePolicies(
+      RoleName   => 'MyroleNameType',
+      Marker     => 'MymarkerType',        # OPTIONAL
+      MaxItems   => 1,                     # OPTIONAL
+      PathPrefix => 'MypolicyPathType',    # OPTIONAL
+    );
+
+    # Results:
+    my $IsTruncated      = $ListAttachedRolePoliciesResponse->IsTruncated;
+    my $Marker           = $ListAttachedRolePoliciesResponse->Marker;
+    my $AttachedPolicies = $ListAttachedRolePoliciesResponse->AttachedPolicies;
+
+    # Returns a L<Paws::IAM::ListAttachedRolePoliciesResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/iam/ListAttachedRolePolicies>
 
 =head1 ATTRIBUTES
 
@@ -66,11 +80,13 @@ The path prefix for filtering the results. This parameter is optional.
 If it is not included, it defaults to a slash (/), listing all
 policies.
 
-This paramater allows (per its regex pattern) a string of characters
-consisting of either a forward slash (/) by itself or a string that
-must begin and end with forward slashes, containing any ASCII character
-from the ! (\u0021) thru the DEL character (\u007F), including most
-punctuation characters, digits, and upper and lowercased letters.
+This parameter allows (per its regex pattern
+(http://wikipedia.org/wiki/regex)) a string of characters consisting of
+either a forward slash (/) by itself or a string that must begin and
+end with forward slashes. In addition, it can contain any ASCII
+character from the ! (\u0021) through the DEL character (\u007F),
+including most punctuation characters, digits, and upper and lowercased
+letters.
 
 
 
@@ -79,9 +95,10 @@ punctuation characters, digits, and upper and lowercased letters.
 The name (friendly name, not ARN) of the role to list attached policies
 for.
 
-This parameter allows (per its regex pattern) a string of characters
-consisting of upper and lowercase alphanumeric characters with no
-spaces. You can also include any of the following characters: _+=,.@-
+This parameter allows (per its regex pattern
+(http://wikipedia.org/wiki/regex)) a string of characters consisting of
+upper and lowercase alphanumeric characters with no spaces. You can
+also include any of the following characters: _+=,.@-
 
 
 
@@ -92,9 +109,9 @@ This class forms part of L<Paws>, documenting arguments for method ListAttachedR
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

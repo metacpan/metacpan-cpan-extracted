@@ -20,21 +20,39 @@ package Paws::SQS::ReceiveMessage;
 
 =head1 NAME
 
-Paws::SQS::ReceiveMessage - Arguments for method ReceiveMessage on Paws::SQS
+Paws::SQS::ReceiveMessage - Arguments for method ReceiveMessage on L<Paws::SQS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ReceiveMessage on the 
-Amazon Simple Queue Service service. Use the attributes of this class
+This class represents the parameters used for calling the method ReceiveMessage on the
+L<Amazon Simple Queue Service|Paws::SQS> service. Use the attributes of this class
 as arguments to method ReceiveMessage.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ReceiveMessage.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ReceiveMessage(Att1 => $value1, Att2 => $value2, ...);
+    my $sqs = Paws->service('SQS');
+    my $ReceiveMessageResult = $sqs->ReceiveMessage(
+      QueueUrl       => 'MyString',
+      AttributeNames => [
+        'SenderId',
+        ... # values: SenderId, SentTimestamp, ApproximateReceiveCount, ApproximateFirstReceiveTimestamp
+      ],    # OPTIONAL
+      MaxNumberOfMessages     => 1,                                   # OPTIONAL
+      MessageAttributeNames   => [ 'MyMessageAttributeName', ... ],   # OPTIONAL
+      ReceiveRequestAttemptId => 'MyString',                          # OPTIONAL
+      VisibilityTimeout       => 1,                                   # OPTIONAL
+      WaitTimeSeconds         => 1,                                   # OPTIONAL
+    );
+
+    # Results:
+    my $Messages = $ReceiveMessageResult->Messages;
+
+    # Returns a L<Paws::SQS::ReceiveMessageResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/sqs/ReceiveMessage>
 
 =head1 ATTRIBUTES
 
@@ -53,7 +71,8 @@ C<All> - Returns all values.
 =item *
 
 C<ApproximateFirstReceiveTimestamp> - Returns the time the message was
-first received from the queue (epoch time in milliseconds).
+first received from the queue (epoch time
+(http://en.wikipedia.org/wiki/Unix_time) in milliseconds).
 
 =item *
 
@@ -81,7 +100,7 @@ C<ABCDE1F2GH3I4JK5LMNOP:i-a123b456>.
 =item *
 
 C<SentTimestamp> - Returns the time the message was sent to the queue
-(epoch time in milliseconds).
+(epoch time (http://en.wikipedia.org/wiki/Unix_time) in milliseconds).
 
 =item *
 
@@ -265,8 +284,9 @@ C<ReceiveRequestAttemptId> if none of the messages have been modified
 During a visibility timeout, subsequent calls with the same
 C<ReceiveRequestAttemptId> return the same messages and receipt
 handles. If a retry occurs within the deduplication interval, it resets
-the visibility timeout. For more information, see Visibility Timeout in
-the I<Amazon Simple Queue Service Developer Guide>.
+the visibility timeout. For more information, see Visibility Timeout
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html)
+in the I<Amazon Simple Queue Service Developer Guide>.
 
 If a caller of the C<ReceiveMessage> action is still processing
 messages when the visibility timeout expires and messages become
@@ -301,8 +321,9 @@ C<A-Z>, C<0-9>) and punctuation
 (C<!"#$%&'()*+,-./:;E<lt>=E<gt>?@[\]^_`{|}~>).
 
 For best practices of using C<ReceiveRequestAttemptId>, see Using the
-ReceiveRequestAttemptId Request Parameter in the I<Amazon Simple Queue
-Service Developer Guide>.
+ReceiveRequestAttemptId Request Parameter
+(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queue-recommendations.html#using-receiverequestattemptid-request-parameter)
+in the I<Amazon Simple Queue Service Developer Guide>.
 
 
 
@@ -331,9 +352,9 @@ This class forms part of L<Paws>, documenting arguments for method ReceiveMessag
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

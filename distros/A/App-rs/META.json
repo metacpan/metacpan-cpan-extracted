@@ -1,5 +1,5 @@
 {
-   "abstract" : "package manager of RSLinux",
+   "abstract" : "The package manager for RSLinux and the first reference counting CPAN client",
    "author" : [
       "Yang Bo <rslovers@yandex.com>"
    ],
@@ -43,5 +43,5 @@
          "web" : "https://github.com/057a3dd61f99517a3afea0051a49cb27994f94d/rslinux"
       }
    },
-   "version" : "v1.1.1"
+   "version" : "v2.1.1"
 }

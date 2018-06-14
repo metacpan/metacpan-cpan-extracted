@@ -1,50 +1,4 @@
 package DOCSIS::ConfigFile::Decode;
-
-=head1 NAME
-
-DOCSIS::ConfigFile::Decode - Decode functions for a DOCSIS config-file
-
-=head1 SYNOPSIS
-
-    {
-        oid => $str,
-        type => $str,
-        value = $str,
-    } = snmp_object($binary_str);
-
-    $bigint_object = bigint($binary_str);
-    $int = int($binary_str);
-    $uint = uint($binary_str);
-    $ushort = ushort($binary_str);
-    $uchar = uchar($binary_str);
-
-    (
-        '0x001337' => [
-            {
-                type => 24, # vendor specific type
-                value => 42, # vendor specific value
-                length => 1, # the length of the value meassured in bytes
-            },
-            ...
-        ],
-    ) = vendorspec($binary_str);
-
-    $ip_str = ip($binary_str);
-    $hex_str = ether($binary_str);
-    $uint = ether($binary_str);
-    $str = string($binary_str);
-    $hex_str = string($binary_str);
-    $hex_str = hexstr($binary_str);
-    $hex_str = mic($binary_str);
-
-=head1 DESCRIPTION
-
-This module has functions which is used to decode binary data
-into either plain strings or complex data structures, dependent
-on the function called.
-
-=cut
-
 use strict;
 use warnings;
 use bytes;
@@ -64,15 +18,6 @@ our %SNMP_TYPE = (
   0x44 => ['OPAQUE',    \&uint],
   0x46 => ['COUNTER64', \&bigint],
 );
-
-=head1 FUNCTIONS
-
-=head2 snmp_object
-
-Will take a binary string and decode it into a complex
-datastructure, with "oid", "type" and "value".
-
-=cut
 
 sub snmp_object {
   my $bin = $_[0];
@@ -169,14 +114,6 @@ sub _truncate_and_unpack {
   }
 }
 
-=head2 bigint
-
- $bigint_obj = bigint($bytestring);
-
-Returns a C<Math::BigInt> object.
-
-=cut
-
 sub bigint {
   my @bytes    = unpack 'C*', _test_length(int => $_[0]);
   my $negative = $bytes[0] & 0x80;
@@ -196,13 +133,6 @@ sub bigint {
   return $int64;
 }
 
-=head2 int
-
-Will unpack the input string and return an integer, from -2147483648
-to 2147483647.
-
-=cut
-
 sub int {
   my @bytes    = unpack 'C*', _test_length(int => $_[0], 'int');
   my $negative = $bytes[0] & 0x80;
@@ -221,12 +151,6 @@ sub int {
   return $int;
 }
 
-=head2 uint
-
-Will unpack the input string and return an integer, from 0 to 4294967295.
-
-=cut
-
 sub uint {
   my @bytes = unpack 'C*', _test_length(uint => $_[0], 'int');
   my $value = 0;
@@ -236,32 +160,13 @@ sub uint {
   return $value;
 }
 
-=head2 ushort
-
-Will unpack the input string and return a short integer, from 0 to 65535.
-
-=cut
-
 sub ushort {
   return unpack 'n', _test_length(ushort => $_[0], 'short int');
 }
 
-=head2 uchar
-
-Will unpack the input string and return a short integer, from 0 to 255.
-
-=cut
-
 sub uchar {
   return unpack 'C', _test_length(uchar => $_[0], 'char');
 }
-
-=head2 vendorspec
-
-Will unpack the input string and return a complex datastructure,
-representing the vendor specific data.
-
-=cut
 
 sub vendorspec {
   my $bin = $_[0] || '';
@@ -300,22 +205,9 @@ sub vendorspec {
   return $vendor, \@ret;
 }
 
-=head2 ip
-
-Will unpack the input string and return a human readable IPv4 address.
-
-=cut
-
 sub ip {
   return inet_ntoa($_[0]) || confess 'inet_ntoa(...) failed to unpack binary string';
 }
-
-=head2 ether
-
-Will unpack the input string and return a MAC address in this format:
-"00112233" or "00112233445566".
-
-=cut
 
 sub ether {
   my $bin    = $_[0];
@@ -327,14 +219,6 @@ sub ether {
 
   return join '', unpack 'H2' x $length, $bin;
 }
-
-=head2 string
-
-Returns human-readable string, where special characters are "uri encoded".
-Example: "%" = "%25" and " " = "%20". It can also return the value from
-L</hexstr> if it starts with a weird character, such as C<\x00>.
-
-=cut
 
 sub string {
 
@@ -350,54 +234,21 @@ sub string {
   }
 }
 
-=head2 stringz
-
-Same as string above. However this string is zero-terminated in encoded
-form, but this function remove the last "\0" seen in the string.
-
-=cut
-
 sub stringz {
   my $str = string(@_);
   $str =~ s/%00$//;
   return $str;
 }
 
-=head2 hexstr
-
-Will unpack the input string and a string with leading "0x", followed
-by hexidesimal characters.
-
-=cut
-
 sub hexstr {
   return '0x' . join '', unpack 'H*', $_[0];
 }
 
-=head2 mic
-
-Returns a value, printed as hex.
-
-=cut
-
 sub mic {&hexstr}
-
-=head2 no_value
-
-This method will return an empty string. It is used by DOCSIS types, which
-has zero length.
-
-=cut
 
 sub no_value {
   return '';
 }
-
-=head2 vendor
-
-Will byte-encode a complex vendorspec datastructure.
-
-=cut
 
 sub vendor {
   my $bin = shift || '';
@@ -447,10 +298,128 @@ sub _test_length {
   return $_[1];
 }
 
+1;
+
+=encoding utf8
+
+=head1 NAME
+
+DOCSIS::ConfigFile::Decode - Decode functions for a DOCSIS config-file
+
+=head1 SYNOPSIS
+
+    {
+        oid => $str,
+        type => $str,
+        value = $str,
+    } = snmp_object($binary_str);
+
+    $bigint_object = bigint($binary_str);
+    $int = int($binary_str);
+    $uint = uint($binary_str);
+    $ushort = ushort($binary_str);
+    $uchar = uchar($binary_str);
+
+    (
+        '0x001337' => [
+            {
+                type => 24, # vendor specific type
+                value => 42, # vendor specific value
+                length => 1, # the length of the value meassured in bytes
+            },
+            ...
+        ],
+    ) = vendorspec($binary_str);
+
+    $ip_str = ip($binary_str);
+    $hex_str = ether($binary_str);
+    $uint = ether($binary_str);
+    $str = string($binary_str);
+    $hex_str = string($binary_str);
+    $hex_str = hexstr($binary_str);
+    $hex_str = mic($binary_str);
+
+=head1 DESCRIPTION
+
+This module has functions which is used to decode binary data
+into either plain strings or complex data structures, dependent
+on the function called.
+
+=head1 FUNCTIONS
+
+=head2 snmp_object
+
+Will take a binary string and decode it into a complex
+datastructure, with "oid", "type" and "value".
+
+=head2 bigint
+
+ $bigint_obj = bigint($bytestring);
+
+Returns a C<Math::BigInt> object.
+
+=head2 int
+
+Will unpack the input string and return an integer, from -2147483648
+to 2147483647.
+
+=head2 uint
+
+Will unpack the input string and return an integer, from 0 to 4294967295.
+
+=head2 ushort
+
+Will unpack the input string and return a short integer, from 0 to 65535.
+
+=head2 uchar
+
+Will unpack the input string and return a short integer, from 0 to 255.
+
+=head2 vendorspec
+
+Will unpack the input string and return a complex datastructure,
+representing the vendor specific data.
+
+=head2 ip
+
+Will unpack the input string and return a human readable IPv4 address.
+
+=head2 ether
+
+Will unpack the input string and return a MAC address in this format:
+"00112233" or "00112233445566".
+
+=head2 string
+
+Returns human-readable string, where special characters are "uri encoded".
+Example: "%" = "%25" and " " = "%20". It can also return the value from
+L</hexstr> if it starts with a weird character, such as C<\x00>.
+
+=head2 stringz
+
+Same as string above. However this string is zero-terminated in encoded
+form, but this function remove the last "\0" seen in the string.
+
+=head2 hexstr
+
+Will unpack the input string and a string with leading "0x", followed
+by hexidesimal characters.
+
+=head2 mic
+
+Returns a value, printed as hex.
+
+=head2 no_value
+
+This method will return an empty string. It is used by DOCSIS types, which
+has zero length.
+
+=head2 vendor
+
+Will byte-encode a complex vendorspec datastructure.
+
 =head1 AUTHOR
 
 Jan Henning Thorsen - C<jhthorsen@cpan.org>
 
 =cut
-
-1;

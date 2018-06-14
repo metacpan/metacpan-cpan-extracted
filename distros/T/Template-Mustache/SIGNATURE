@@ -14,34 +14,37 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 6c05dea2fe6b8527edd99f3c6f05d76cd88cbb4a CONTRIBUTORS
-SHA1 9913bcf89d8236329b4996ec6f841d152e9c2414 Changes
+SHA1 1965d069baec9cd20dc7c56828755024dea00f1c CONTRIBUTORS
+SHA1 5a3fd68d009a7da687ff850ea19cc992d7328ca0 Changes
 SHA1 ec51b54652836e34dd092b3b3859e9a62fdfcfaa INSTALL
-SHA1 2333024934d973f21da2041a9dcd7cd64e973175 LICENSE
-SHA1 566945372e3814a87c2708a301e210f5b29a8321 MANIFEST
-SHA1 cc80ac5381e4a8bf833edda08a71b3209316cdb4 META.json
-SHA1 c6527df67d2a38389a6e6226e3416a7f920dd51a META.yml
-SHA1 45d396e676f893518562c8377fe14a1637093205 Makefile.PL
-SHA1 8baf6be71bc2a2228a36b3009d780758fc8656dc README.mkdn
-SHA1 876071351855e99430ce2cf39bcbbe42e2a59d6c bin/mustache.pl
+SHA1 3926c31fe9faa880e4bf454f92ed3e5b23b4f5fc LICENSE
+SHA1 f729b5bca1c08856ac174923069ff33ae95aa7d0 MANIFEST
+SHA1 943c37f5876a7c01474667912a69fccf5b66ef33 META.json
+SHA1 afacfaa8c79bdd46b89d64b42a2dbba1454de944 META.yml
+SHA1 239b96177bc68206f1d0ef7ab7ed2ec0418d0dab Makefile.PL
+SHA1 5887f5935a8c94189cbf98c92903617cbfd008d0 README.mkdn
+SHA1 5ddf32e75e88a9b6f09ae4b1acc6251ae03c6c7f bin/mustache.pl
 SHA1 30d7f4e4cf5a7cf757c6fc1485260d9845b50044 contrib/benchmark.pl
 SHA1 1c1016c6e0a1a934f6f53a7c10b0d942f6d4a317 contrib/gen_grammar.pl
 SHA1 d9154b85be1fba96bbe9604c704575ceaa550994 contrib/print_graph.pl
-SHA1 cb4d790b8d9d29cee7adc5d1c1165438761f8f95 cpanfile
-SHA1 9257842e230c2b26da5444dc11184877673effb1 doap.xml
-SHA1 a5e9257ce14cfd1b10def31ee4e0578c08d4909f lib/Template/Mustache.pm
-SHA1 f325d792f197f901be5c5fab160d07171f892d4f lib/Template/Mustache/Parser.pm
-SHA1 b5f90d15b2c4282299d8d086b5ebb76643923455 lib/Template/Mustache/Token/Partial.pm
-SHA1 c7205dea434bc4e5d5abbb54f132e4683181f349 lib/Template/Mustache/Token/Section.pm
-SHA1 fd2adb1bc1830b32aee13853fbd9e3485c15f582 lib/Template/Mustache/Token/Template.pm
-SHA1 792be6b102541ec9858176d649e15dc2291e8b6b lib/Template/Mustache/Token/Variable.pm
-SHA1 ec700a25fd2b2ec228b5ff9a0ace3e3bc9891d68 lib/Template/Mustache/Token/Verbatim.pm
-SHA1 a695ef4fa720c07b0101befdc3e59d14ac934967 lib/Template/Mustache/Trait.pm
+SHA1 1d86079439e79689a160c74f67acea204757512e cpanfile
+SHA1 5582fa9a27c4073d85966228d98977553b4f9bbf doap.xml
+SHA1 f7074f75e7b8f66d4a5205e96a7c3baf2cd2296f lib/Template/Mustache.pm
+SHA1 5de56ef7955cb45beaf8b69ebf5943ff531c238d lib/Template/Mustache/Parser.pm
+SHA1 c2f051c63fe1f04e4c6b434c8435143e2be21608 lib/Template/Mustache/Token/Partial.pm
+SHA1 ac1b67101329c8b8dfdb64b5231a3f53403a641b lib/Template/Mustache/Token/Section.pm
+SHA1 469f239e93bde76858c4937d1283ff5ada57b4b3 lib/Template/Mustache/Token/Template.pm
+SHA1 7e5d25279b8e6c751b0c91048b7741e9dc27cfb7 lib/Template/Mustache/Token/Variable.pm
+SHA1 1ade16d6502dc900e8434cd53a5cd1f609f606e2 lib/Template/Mustache/Token/Verbatim.pm
+SHA1 ef0a9b03a188019e3fd9ca77cadae4cd42efae88 lib/Template/Mustache/Trait.pm
 SHA1 5c3178fb2a44b640b9f968e0955727cfa9e0e3f3 t/00-compile.t
-SHA1 99f9690a528375fba6cbe234dbc19cfa72c43e8a t/00-report-prereqs.dd
+SHA1 ce8ed245f5ff1e97eb4a2ff0881932ae2327a8ee t/00-report-prereqs.dd
 SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
 SHA1 767abd548c23a1b6560a83e7665c3a46e714acb7 t/001_spec_compatibility.t
 SHA1 eeccc992a1383dac5187ee1b8ac25e4600a56f9c t/basic.t
+SHA1 a0b3afd6a86cf8fd1bedb3a573c524e68becf251 t/corpus/partials/list1.mustache
+SHA1 0807b14ffbce6995e259de5efd2b19874d6c14bd t/corpus/partials/list2.mustache
+SHA1 07be109561b47e15d58b02e290bee2fd33cba935 t/corpus/partials/sub/list3.mustache
 SHA1 7287ded1c5a72996c9e2888e6e1c6a7dd4c0a874 t/lambdas_receive_render_helper.t
 SHA1 59f0c4bab0ac10e270fe979f5c1f8d3575d3ab3c t/moose-trait.t
 SHA1 148a021381cb1b377489839ec9562f50e87b53f3 t/parse_errors.t
@@ -50,7 +53,7 @@ SHA1 142b8a0080628f47fe4d3f663aba64996bee97a8 t/read_data_from_classes.t
 SHA1 f6e7141a519b6f07a547eb85e117057c6f6a3fc9 t/read_data_from_hashes.t
 SHA1 ab79d0761a72e76ac87b1a45022506003ce87625 t/read_data_from_instances.t
 SHA1 7003e683c64d5cbb57141c2258183b2c488daff4 t/read_data_from_subclass.t
-SHA1 e08036ac23d9952f62f43f27670377fcf2ec5c84 t/read_partials_from_file_system.t
+SHA1 6ff1202453936042d9f7a679126582a495c43cbd t/read_partials_from_file_system.t
 SHA1 ba0941047652a5ee22d89c70579b2cf3dc5ac3e0 t/read_partials_from_hashes.t
 SHA1 6c22439fd770d9d61a8d556b5b9792892d3c2845 t/read_partials_from_partial_method.t
 SHA1 9c0f2f55c6af0df83b6bdff4766eacc460592901 t/read_partials_from_subs.t
@@ -61,7 +64,7 @@ SHA1 ccfd69e89272d3c8414d526e679df27bf61e1cbd t/variable-resolution.t
 SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
 
-iEYEARECAAYFAloTcSMACgkQ34Hwf+GwC4xAbwCgwos2gQkRD9eXu0uIZIQo0XS6
-7PoAoIZ/BGGnt7PBTK1cIxHMZWdfYmib
-=accz
+iEYEARECAAYFAlsh0Z0ACgkQ34Hwf+GwC4y5fACg7qAukvhm1MrlCftb/nLhRCSh
+O7IAoNUOEGOTvc7IfJ7ckBpucVp5/RkS
+=VYMI
 -----END PGP SIGNATURE-----

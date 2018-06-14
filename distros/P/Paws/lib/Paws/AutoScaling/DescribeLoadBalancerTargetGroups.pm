@@ -16,21 +16,37 @@ package Paws::AutoScaling::DescribeLoadBalancerTargetGroups;
 
 =head1 NAME
 
-Paws::AutoScaling::DescribeLoadBalancerTargetGroups - Arguments for method DescribeLoadBalancerTargetGroups on Paws::AutoScaling
+Paws::AutoScaling::DescribeLoadBalancerTargetGroups - Arguments for method DescribeLoadBalancerTargetGroups on L<Paws::AutoScaling>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DescribeLoadBalancerTargetGroups on the 
-Auto Scaling service. Use the attributes of this class
+This class represents the parameters used for calling the method DescribeLoadBalancerTargetGroups on the
+L<Auto Scaling|Paws::AutoScaling> service. Use the attributes of this class
 as arguments to method DescribeLoadBalancerTargetGroups.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DescribeLoadBalancerTargetGroups.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DescribeLoadBalancerTargetGroups(Att1 => $value1, Att2 => $value2, ...);
+    my $autoscaling = Paws->service('AutoScaling');
+    # To describe the target groups for an Auto Scaling group
+    # This example describes the target groups attached to the specified Auto
+    # Scaling group.
+    my $DescribeLoadBalancerTargetGroupsResponse =
+      $autoscaling->DescribeLoadBalancerTargetGroups(
+      {
+        'AutoScalingGroupName' => 'my-auto-scaling-group'
+      }
+      );
+
+    # Results:
+    my $LoadBalancerTargetGroups =
+      $DescribeLoadBalancerTargetGroupsResponse->LoadBalancerTargetGroups;
+
+# Returns a L<Paws::AutoScaling::DescribeLoadBalancerTargetGroupsResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/autoscaling/DescribeLoadBalancerTargetGroups>
 
 =head1 ATTRIBUTES
 
@@ -44,7 +60,7 @@ The name of the Auto Scaling group.
 =head2 MaxRecords => Int
 
 The maximum number of items to return with this call. The default value
-is 50 and the maximum value is 100.
+is 100 and the maximum value is 100.
 
 
 
@@ -62,9 +78,9 @@ This class forms part of L<Paws>, documenting arguments for method DescribeLoadB
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -1,3 +1,49 @@
+0.37
+ - Big refactor of all result handling for all services
+ - Support for credential_process in credential handlers
+   https://docs.aws.amazon.com/cli/latest/topic/config-vars.html#sourcing-credentials-from-external-processes
+ - Better docu generation (osoriano)
+ - Documentation update: Now POD contains links from the botocore documentation in services and methods
+ - Bump XML::Simple dependency to 2.21 (mla)
+ - Documentation improvement: Link back to Service class from method parameters classes (castaway)
+ - Documentation improvement: New way of rendering parameters to methods (avoids very long method signatures in TOCs). This
+   also fixes the fact that search.cpan.org didn't like very long lines in its TOC, so was not putting some methods in the
+   TOC (castaway)
+ - Documentation improvement: Synopsis for methods now has relevant examples for each method call with hints about the size of parameters, if they're optional, etc. (castaway)
+ - Json services will now return the code of the exception as the message of the exception if no message was found (instead
+   of 'unrecognized error format')
+ - Some services were signing requests with the incorrect strings. Pricing, Opsworks, MarketplaceMetering, MarketplaceEntitlement,
+   MarketplaceCommerceAnalytics, DynamoDBStreams, CloudHSMv2, ApplicationAutoScaling and AutoScalingPlans now sign correctly. (autarch)
+ - New API: EKS
+ - New API: Neptune
+ - New API: MediaTailor
+ - New API: Pricing
+ - New API: CostExplorer
+ - New API: Translate
+ - New API: ServerlessRepo
+ - New APIs: SageMaker and SageMakerRuntime
+ - New APIs: MediaConvert, MediaLive, MediaPackage, MediaStore, MediaStoreData
+ - New APIs: KinesisVideo, KinesisVideoMedia, KinesisVideoArchivedMedia
+ - New API: MQ
+ - New API: ResourceGroups
+ - New API: GuardDuty
+ - New API: Comprehend
+ - New API: Cloud9
+ - New API: AppSync
+ - New API: AlexaForBusiness
+ - New API: ServiceDiscovery
+ - New API: WorkMail
+ - New API: Transcribe
+ - New API: AutoScalingPlans
+ - New API: Connect
+ - New API: ACMCPA
+ - New API: FMS
+ - New API: SecretsManager
+ - New API: IoTAnalytics
+ - New APIs: IoT1ClickDevices and IOT1ClickProjects
+ - New API: PerformanceInsights
+ - API updates for any service up to the date of release
+
 0.36 03 Nov 2017
  - Fix Bug: #210: S3 PutObject was not working: the Content-MD5 header was not 
             calculated correctly (glenveegee)

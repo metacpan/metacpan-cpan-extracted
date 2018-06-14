@@ -1,0 +1,80 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+load_module($_) for qw(DOCSIS::ConfigFile YAML::PP);
+run(@ARGV);
+
+sub load_module {
+  eval "require $_[-1];1" or die "You need to install $_. Example:\n\n\$ cpanm -n $_\n\n";
+}
+
+sub run {
+  my $self = bless {}, __PACKAGE__;
+  while (@_) {
+    my $arg = shift;
+    @$self{qw(action file)} = (run_decode => shift) if $arg =~ /^-d/;
+    @$self{qw(action file)} = (run_encode => shift) if $arg =~ /^-e/;
+    $self->{output} = shift if $arg =~ /^-o/;
+    $self->{config} = shift if $arg =~ /^-c/;
+  }
+
+  die $self->usage unless $self->{action};
+  $self->can($self->{action})->($self);
+}
+
+sub run_encode {
+  my $self = shift;
+  die "File missing.\n" unless $self->{file};
+  my $args = $self->{config} ? YAML::PP->new->load_file($self->{config}) : {};
+  my $data = YAML::PP->new->load_file($self->{file});
+  $self->_write(DOCSIS::ConfigFile::encode_docsis($data, $args));
+}
+
+sub run_decode {
+  my $self = shift;
+  die "File missing.\n" unless $self->{file};
+  $self->_write(YAML::PP->new->dump_string(DOCSIS::ConfigFile::decode_docsis(\$self->{file})));
+}
+
+sub usage {
+  my $self = shift;
+  return <<"HERE";
+# Decode file to YAML
+
+docsis-configfile -d path/to/binary.file > out.yaml
+docsis-configfile -d path/to/binary.file -o out.yaml
+
+# Encode YAML file
+
+docsis-configfile -e path/to/yaml.file > out.bin
+docsis-configfile -e path/to/yaml.file -o out.bin
+docsis-configfile -e path/to/yaml.file -c myconfig.yaml
+
+# Example myconfig.yaml
+
+---
+mta_algorithm: sha1
+shared_secret: supersecretstring
+
+# Options
+
+  -e in.yaml     - YAML DOCSIS file to encode
+  -d in.bin      - Binary DOCSIS file to decode
+  -o out.file    - Which file to write output to. Default is to write to STDOUT
+  -c config.yaml - Extra config parameters for encoding
+
+# See also
+
+See https://metacpan.org/pod/DOCSIS::ConfigFile for more information.
+
+HERE
+}
+
+sub _write {
+  my ($self, $data) = @_;
+  return print $data unless $self->{output};
+  open my $FH, '>', $self->{output} or die "Can't write to $self->{output}: $!\n";
+  my $written = syswrite $FH, $data;
+  die "Can't write to $self->{output}: $!\n" unless defined $written and $written != length $data;
+}

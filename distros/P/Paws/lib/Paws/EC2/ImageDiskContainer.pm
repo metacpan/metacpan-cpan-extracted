@@ -55,7 +55,7 @@ This class has no description
 
   The format of the disk image being imported.
 
-Valid values: C<RAW> | C<VHD> | C<VMDK> | C<OVA>
+Valid values: C<VHD> | C<VMDK> | C<OVA>
 
 
 =head2 SnapshotId => Str
@@ -81,8 +81,8 @@ This class forms part of L<Paws>, describing an object used in L<Paws::EC2>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut

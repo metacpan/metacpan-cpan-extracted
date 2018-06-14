@@ -1,0 +1,20 @@
+source_testml_dir: ../../testml-tml
+local_testml_dir: ./testml
+test_file_template: |
+  use strict;
+  use lib -e 't' ? 't' : 'test';
+  use TestML1;
+  use TestML1::Compiler::Lite;
+  use TestML1Bridge;
+
+  TestML1->new(
+      testml => '[% file %]',
+      bridge => 'TestML1Bridge',
+      compiler => 'TestML1::Compiler::Lite',
+  )->run;
+test_file_prefix: testml-lite-
+include_testml_files:
+- arguments.tml
+- basic.tml
+- exceptions.tml
+- semicolons.tml

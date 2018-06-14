@@ -33,24 +33,27 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::KinesisAnal
 
 =head1 DESCRIPTION
 
-This class has no description
+Provides a description of an Amazon S3 data source, including the
+Amazon Resource Name (ARN) of the S3 bucket, the ARN of the IAM role
+that is used to access the bucket, and the name of the S3 object that
+contains the data.
 
 =head1 ATTRIBUTES
 
 
 =head2 B<REQUIRED> BucketARN => Str
 
-  
+  ARN of the S3 bucket that contains the data.
 
 
 =head2 B<REQUIRED> FileKey => Str
 
-  
+  The name of the object that contains the data.
 
 
 =head2 B<REQUIRED> RoleARN => Str
 
-  
+  IAM ARN of the role used to access the data.
 
 
 
@@ -60,9 +63,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::KinesisAn
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

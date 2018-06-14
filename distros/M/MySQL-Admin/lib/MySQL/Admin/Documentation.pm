@@ -12,7 +12,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT = qw(help readPod);
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 sub help{
   pod2usage(1) ;

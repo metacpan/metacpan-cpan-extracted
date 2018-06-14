@@ -14,28 +14,48 @@ package Paws::Lambda::Invoke;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/2015-03-31/functions/{FunctionName}/invocations');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'POST');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::Lambda::InvocationResponse');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::Lambda::Invoke - Arguments for method Invoke on Paws::Lambda
+Paws::Lambda::Invoke - Arguments for method Invoke on L<Paws::Lambda>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method Invoke on the 
-AWS Lambda service. Use the attributes of this class
+This class represents the parameters used for calling the method Invoke on the
+L<AWS Lambda|Paws::Lambda> service. Use the attributes of this class
 as arguments to method Invoke.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to Invoke.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->Invoke(Att1 => $value1, Att2 => $value2, ...);
+    my $lambda = Paws->service('Lambda');
+    # To invoke a Lambda function
+    # This operation invokes a Lambda function
+    my $InvocationResponse = $lambda->Invoke(
+      {
+        'InvocationType' => 'Event',
+        'FunctionName'   => 'MyFunction',
+        'Qualifier'      => 1,
+        'Payload'        => 'fileb://file-path/input.json',
+        'LogType'        => 'Tail',
+        'ClientContext'  => 'MyApp'
+      }
+    );
+
+    # Results:
+    my $StatusCode    = $InvocationResponse->StatusCode;
+    my $FunctionError = $InvocationResponse->FunctionError;
+    my $LogResult     = $InvocationResponse->LogResult;
+    my $Payload       = $InvocationResponse->Payload;
+
+    # Returns a L<Paws::Lambda::InvocationResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/lambda/Invoke>
 
 =head1 ATTRIBUTES
 
@@ -45,10 +65,12 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 Using the C<ClientContext> you can pass client-specific information to
 the Lambda function you are invoking. You can then process the client
 information in your Lambda function as you choose through the context
-variable. For an example of a C<ClientContext> JSON, see PutEvents in
-the I<Amazon Mobile Analytics API Reference and User Guide>.
+variable. For an example of a C<ClientContext> JSON, see PutEvents
+(http://docs.aws.amazon.com/mobileanalytics/latest/ug/PutEvents.html)
+in the I<Amazon Mobile Analytics API Reference and User Guide>.
 
-The ClientContext JSON must be base64-encoded.
+The ClientContext JSON must be base64-encoded and has a maximum size of
+3583 bytes.
 
 
 
@@ -116,9 +138,9 @@ This class forms part of L<Paws>, documenting arguments for method Invoke in L<P
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

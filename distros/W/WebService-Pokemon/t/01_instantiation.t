@@ -6,17 +6,21 @@ use Test::More;
 
 use WebService::Pokemon;
 
-my $pokemon;
+my $api;
 
-$pokemon = WebService::Pokemon->new;
-is(ref $pokemon, 'WebService::Pokemon', 'expect object instantiate through new');
-is($pokemon->api_url, 'https://pokeapi.co/api/v2', 'expect API URL match');
-is($pokemon->cache_path, '/tmp/cache/', 'expect cache_path match');
+$api = WebService::Pokemon->new;
+is(ref $api, 'WebService::Pokemon', 'expect object instantiate through new');
+is($api->api_url, 'https://pokeapi.co/api/v2', 'expect API URL match');
 
-$pokemon = WebService::Pokemon->new(api_url => 'http://localhost/api/v2');
-is($pokemon->api_url, 'http://localhost/api/v2', 'expect new API URL match');
+$api = WebService::Pokemon->new(api_url => 'http://localhost/api/v2');
+is($api->api_url, 'http://localhost/api/v2', 'expect new API URL match');
 
-$pokemon = WebService::Pokemon->new(cache_path => '/tmp/new-cache/');
-is($pokemon->cache_path, '/tmp/new-cache/', 'expect new cache path match');
+my $cacher = CHI->new(
+    driver => 'File',
+    namespace => 'restcountries',
+    root_dir => $ENV{PWD} . '/t/cache/',
+);
+$api->cache($cacher);
+is($api->cache->root_dir, $ENV{PWD} . '/t/cache/', 'expect cache engine set correctly');
 
 done_testing;

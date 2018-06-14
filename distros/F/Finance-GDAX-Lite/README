@@ -2,8 +2,8 @@ NAME
     Finance::GDAX::Lite - Client API library for GDAX (lite edition)
 
 VERSION
-    This document describes version 0.001 of Finance::GDAX::Lite (from Perl
-    distribution Finance-GDAX-Lite), released on 2018-02-14.
+    This document describes version 0.002 of Finance::GDAX::Lite (from Perl
+    distribution Finance-GDAX-Lite), released on 2018-06-11.
 
 SYNOPSIS
      use Finance::GDAX::Lite;
@@ -52,10 +52,10 @@ SYNOPSIS
 
 DESCRIPTION
     <https://gdax.com> is a US cryptocurrency exchange. This module provides
-    a Perl wrapper for its API. This module is an alternative to
-    Finance::GDAX::API and is more lightweight/barebones (no objects, Moose,
-    etc). Please peruse the GDAX API reference to see which API endpoints
-    are available.
+    a Perl wrapper for GDAX's API. This module is an alternative to
+    Finance::GDAX::API and is more lightweight/barebones (no entity objects,
+    Moose, etc). Please peruse the GDAX API reference to see which API
+    endpoints are available.
 
 METHODS
   new

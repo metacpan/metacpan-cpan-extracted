@@ -17,21 +17,35 @@ package Paws::EC2::DescribeSpotFleetRequests;
 
 =head1 NAME
 
-Paws::EC2::DescribeSpotFleetRequests - Arguments for method DescribeSpotFleetRequests on Paws::EC2
+Paws::EC2::DescribeSpotFleetRequests - Arguments for method DescribeSpotFleetRequests on L<Paws::EC2>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DescribeSpotFleetRequests on the 
-Amazon Elastic Compute Cloud service. Use the attributes of this class
+This class represents the parameters used for calling the method DescribeSpotFleetRequests on the
+L<Amazon Elastic Compute Cloud|Paws::EC2> service. Use the attributes of this class
 as arguments to method DescribeSpotFleetRequests.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DescribeSpotFleetRequests.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DescribeSpotFleetRequests(Att1 => $value1, Att2 => $value2, ...);
+    my $ec2 = Paws->service('EC2');
+    # To describe a Spot fleet request
+    # This example describes the specified Spot fleet request.
+    my $DescribeSpotFleetRequestsResponse = $ec2->DescribeSpotFleetRequests(
+      {
+        'SpotFleetRequestIds' => ['sfr-73fbd2ce-aa30-494c-8788-1cee4EXAMPLE']
+      }
+    );
+
+    # Results:
+    my $SpotFleetRequestConfigs =
+      $DescribeSpotFleetRequestsResponse->SpotFleetRequestConfigs;
+
+    # Returns a L<Paws::EC2::DescribeSpotFleetRequestsResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ec2/DescribeSpotFleetRequests>
 
 =head1 ATTRIBUTES
 
@@ -62,7 +76,7 @@ The token for the next set of results.
 
 =head2 SpotFleetRequestIds => ArrayRef[Str|Undef]
 
-The IDs of the Spot fleet requests.
+The IDs of the Spot Fleet requests.
 
 
 
@@ -73,9 +87,9 @@ This class forms part of L<Paws>, documenting arguments for method DescribeSpotF
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

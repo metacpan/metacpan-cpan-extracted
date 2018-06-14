@@ -2,13 +2,14 @@ package CPAN::PackageDetails::Entries;
 use strict;
 use warnings;
 
-use vars qw($VERSION);
-$VERSION = '0.26';
+our $VERSION = '0.261';
 
 use Carp;
 use version;
 
 sub DESTROY { }
+
+=encoding utf8
 
 =head1 NAME
 
@@ -107,7 +108,7 @@ sub count {
 	return $count;
 	}
 
-=item entries 
+=item entries
 
 DEPRECATED: use C<get_hash>
 
@@ -440,7 +441,7 @@ sub get_entries_by_path {
 
 This source is in Github:
 
-	http://github.com/briandfoy/cpan-packagedetails
+	https://github.com/briandfoy/cpan-packagedetails
 
 =head1 AUTHOR
 
@@ -448,9 +449,9 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2009-2014, brian d foy, All Rights Reserved.
+Copyright © 2009-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+You may redistribute this under the terms of the Artistic License 2.0.
 
 =cut
 

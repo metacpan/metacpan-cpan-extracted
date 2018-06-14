@@ -1,6 +1,7 @@
 package Paws::DMS::SupportedEndpointType;
   use Moose;
   has EndpointType => (is => 'ro', isa => 'Str');
+  has EngineDisplayName => (is => 'ro', isa => 'Str');
   has EngineName => (is => 'ro', isa => 'Str');
   has SupportsCDC => (is => 'ro', isa => 'Bool');
 1;
@@ -43,11 +44,19 @@ This class has no description
   The type of endpoint.
 
 
+=head2 EngineDisplayName => Str
+
+  The expanded name for the engine name. For example, if the
+C<EngineName> parameter is "aurora," this value would be "Amazon Aurora
+MySQL."
+
+
 =head2 EngineName => Str
 
   The database engine name. Valid values, depending on the EndPointType,
-include MYSQL, ORACLE, POSTGRES, MARIADB, AURORA, REDSHIFT, S3, SYBASE,
-DYNAMODB, MONGODB, and SQLSERVER.
+include mysql, oracle, postgres, mariadb, aurora, aurora-postgresql,
+redshift, s3, db2, azuredb, sybase, sybase, dynamodb, mongodb, and
+sqlserver.
 
 
 =head2 SupportsCDC => Bool
@@ -62,9 +71,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::DMS>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

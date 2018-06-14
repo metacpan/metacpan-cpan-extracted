@@ -1,0 +1,4 @@
+Revision history for CPP::Boost::Mini.
+
+1.67.0 2018-06-13
+    Initial version with header only Boost 1.67.0 libraries: callable_traits compatibility config container container_hash conversion core crc disjoint_sets hof integer io logic 

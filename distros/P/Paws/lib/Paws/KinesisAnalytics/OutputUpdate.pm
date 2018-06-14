@@ -3,6 +3,7 @@ package Paws::KinesisAnalytics::OutputUpdate;
   has DestinationSchemaUpdate => (is => 'ro', isa => 'Paws::KinesisAnalytics::DestinationSchema');
   has KinesisFirehoseOutputUpdate => (is => 'ro', isa => 'Paws::KinesisAnalytics::KinesisFirehoseOutputUpdate');
   has KinesisStreamsOutputUpdate => (is => 'ro', isa => 'Paws::KinesisAnalytics::KinesisStreamsOutputUpdate');
+  has LambdaOutputUpdate => (is => 'ro', isa => 'Paws::KinesisAnalytics::LambdaOutputUpdate');
   has NameUpdate => (is => 'ro', isa => 'Str');
   has OutputId => (is => 'ro', isa => 'Str', required => 1);
 1;
@@ -43,18 +44,25 @@ C<OutputId>.
 
 =head2 DestinationSchemaUpdate => L<Paws::KinesisAnalytics::DestinationSchema>
 
-  
+  Describes the data format when records are written to the destination.
+For more information, see Configuring Application Output
+(http://docs.aws.amazon.com/kinesisanalytics/latest/dev/how-it-works-output.html).
 
 
 =head2 KinesisFirehoseOutputUpdate => L<Paws::KinesisAnalytics::KinesisFirehoseOutputUpdate>
 
-  Describes a Amazon Kinesis Firehose delivery stream as the destination
+  Describes an Amazon Kinesis Firehose delivery stream as the destination
 for the output.
 
 
 =head2 KinesisStreamsOutputUpdate => L<Paws::KinesisAnalytics::KinesisStreamsOutputUpdate>
 
   Describes an Amazon Kinesis stream as the destination for the output.
+
+
+=head2 LambdaOutputUpdate => L<Paws::KinesisAnalytics::LambdaOutputUpdate>
+
+  Describes an AWS Lambda function as the destination for the output.
 
 
 =head2 NameUpdate => Str
@@ -76,9 +84,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::KinesisAn
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

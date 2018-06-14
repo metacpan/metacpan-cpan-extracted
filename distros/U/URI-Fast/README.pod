@@ -33,6 +33,8 @@ parameter.
 
 =head1 EXPORTED SUBROUTINES
 
+Subroutines are exported on demand.
+
 =head2 uri
 
 Accepts a URI string, minimally parses it, and returns a C<URI::Fast> object.
@@ -47,6 +49,10 @@ be percent-encoded when modified.
 
 Behaves (hopefully) identically to L<URI::Split>, but roughly twice as fast.
 
+=head2 encode/decode
+
+See L</ENCODING>.
+
 =head1 ATTRIBUTES
 
 Unless otherwise specified, all attributes serve as full accessors, allowing
@@ -57,7 +63,7 @@ its value.
 
 =head2 scheme
 
-Defaults to C<file> if not present in the URI string.
+Gets or sets the scheme portion of the URI (e.g. C<http>), excluding C<://>.
 
 =head2 auth
 

@@ -16,21 +16,35 @@ package Paws::DataPipeline::PollForTask;
 
 =head1 NAME
 
-Paws::DataPipeline::PollForTask - Arguments for method PollForTask on Paws::DataPipeline
+Paws::DataPipeline::PollForTask - Arguments for method PollForTask on L<Paws::DataPipeline>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method PollForTask on the 
-AWS Data Pipeline service. Use the attributes of this class
+This class represents the parameters used for calling the method PollForTask on the
+L<AWS Data Pipeline|Paws::DataPipeline> service. Use the attributes of this class
 as arguments to method PollForTask.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to PollForTask.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->PollForTask(Att1 => $value1, Att2 => $value2, ...);
+    my $datapipeline = Paws->service('DataPipeline');
+    my $PollForTaskOutput = $datapipeline->PollForTask(
+      WorkerGroup      => 'Mystring',
+      Hostname         => 'Myid',       # OPTIONAL
+      InstanceIdentity => {
+        document  => 'Mystring',        # max: 1024
+        signature => 'Mystring',        # max: 1024
+      },    # OPTIONAL
+    );
+
+    # Results:
+    my $TaskObject = $PollForTaskOutput->TaskObject;
+
+    # Returns a L<Paws::DataPipeline::PollForTaskOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/datapipeline/PollForTask>
 
 =head1 ATTRIBUTES
 
@@ -46,10 +60,12 @@ The public DNS name of the calling task runner.
 Identity information for the EC2 instance that is hosting the task
 runner. You can get this value from the instance using
 C<http://169.254.169.254/latest/meta-data/instance-id>. For more
-information, see Instance Metadata in the I<Amazon Elastic Compute
-Cloud User Guide.> Passing in this value proves that your task runner
-is running on an EC2 instance, and ensures the proper AWS Data Pipeline
-service charges are applied to your pipeline.
+information, see Instance Metadata
+(http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AESDG-chapter-instancedata.html)
+in the I<Amazon Elastic Compute Cloud User Guide.> Passing in this
+value proves that your task runner is running on an EC2 instance, and
+ensures the proper AWS Data Pipeline service charges are applied to
+your pipeline.
 
 
 
@@ -70,9 +86,9 @@ This class forms part of L<Paws>, documenting arguments for method PollForTask i
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

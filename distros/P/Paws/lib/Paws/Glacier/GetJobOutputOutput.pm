@@ -1,12 +1,12 @@
 
 package Paws::Glacier::GetJobOutputOutput;
   use Moose;
-  has AcceptRanges => (is => 'ro', isa => 'Str', traits => ['ParamInHeader'], header_name => 'acceptRanges');
-  has ArchiveDescription => (is => 'ro', isa => 'Str', traits => ['ParamInHeader'], header_name => 'archiveDescription');
+  has AcceptRanges => (is => 'ro', isa => 'Str', traits => ['ParamInHeader'], header_name => 'Accept-Ranges');
+  has ArchiveDescription => (is => 'ro', isa => 'Str', traits => ['ParamInHeader'], header_name => 'x-amz-archive-description');
   has Body => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'body');
-  has Checksum => (is => 'ro', isa => 'Str', traits => ['ParamInHeader'], header_name => 'checksum');
-  has ContentRange => (is => 'ro', isa => 'Str', traits => ['ParamInHeader'], header_name => 'contentRange');
-  has ContentType => (is => 'ro', isa => 'Str', traits => ['ParamInHeader'], header_name => 'contentType');
+  has Checksum => (is => 'ro', isa => 'Str', traits => ['ParamInHeader'], header_name => 'x-amz-sha256-tree-hash');
+  has ContentRange => (is => 'ro', isa => 'Str', traits => ['ParamInHeader'], header_name => 'Content-Range');
+  has ContentType => (is => 'ro', isa => 'Str', traits => ['ParamInHeader'], header_name => 'Content-Type');
   has Status => (is => 'ro', isa => 'Int', traits => ['NameInRequest'], request_name => 'status');
   use MooseX::ClassAttribute;
   class_has _stream_param => (is => 'ro', default => 'Body');
@@ -24,7 +24,8 @@ Paws::Glacier::GetJobOutputOutput
 
 =head2 AcceptRanges => Str
 
-Indicates the range units accepted. For more information, see RFC2616.
+Indicates the range units accepted. For more information, see RFC2616
+(http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html).
 
 
 =head2 ArchiveDescription => Str

@@ -63,7 +63,8 @@ Represents a collection of related data organized in columns and rows.
 
 =head2 DatabaseName => Str
 
-  Name of the metadata database where the table metadata resides.
+  Name of the metadata database where the table metadata resides. For
+Hive compatibility, this must be all lowercase.
 
 
 =head2 Description => Str
@@ -84,7 +85,8 @@ may not be reliable.
 
 =head2 B<REQUIRED> Name => Str
 
-  Name of the table.
+  Name of the table. For Hive compatibility, this must be entirely
+lowercase.
 
 
 =head2 Owner => Str
@@ -143,9 +145,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Glue>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

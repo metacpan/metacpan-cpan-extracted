@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.20';
+our $VERSION = '1.22';
 
 use DateTime::Locale::Data;
 use DateTime::Locale::FromData;
@@ -69,6 +69,24 @@ sub _register {
     $NativeNameToCode{ $p{native_complete_name} } = $id;
 
     $Class{$id} = $p{class} if defined exists $p{class};
+}
+
+sub register_from_data {
+    shift;
+
+    %LoadCache = ();
+
+    my %p = ref $_[0] ? %{ $_[0] } : @_;
+
+    my $code = $p{code};
+
+    die q{'\@' or '=' are not allowed in locale codes}
+        if $code =~ /[\@=]/;
+
+    $code =~ s/_/-/g;
+
+    DateTime::Locale::Data::add_locale( $code, \%p );
+    return $LoadCache{$code} = DateTime::Locale::FromData->new( \%p );
 }
 
 sub add_aliases {
@@ -362,7 +380,7 @@ DateTime::Locale - Localization support for DateTime.pm
 
 =head1 VERSION
 
-version 1.20
+version 1.22
 
 =head1 SYNOPSIS
 
@@ -425,8 +443,8 @@ Eg. For the locale code C<es-Latn-XX> the fallback search would be:
 If no suitable replacement is found, then an exception is thrown.
 
 The loaded locale is cached, so that B<locale objects may be
-singletons>. Calling C<< DateTime::Locale->register() >>, C<<
-DateTime::Locale->add_aliases() >>, or C<< DateTime::Locale->remove_alias() >>
+singletons>. Calling C<< DateTime::Locale->register_from_data >>, C<<
+DateTime::Locale->add_aliases >>, or C<< DateTime::Locale->remove_alias >>
 clears the cache.
 
 =head2 DateTime::Locale->codes
@@ -453,6 +471,72 @@ reference if called in a scalar context.
 Returns an unsorted list of the available locale names in their native
 language, or an array reference if called in a scalar context. All native
 names use UTF-8 as appropriate.
+
+=head2 DateTime::Locale->register_from_data( $locale_data )
+
+This method allows you to register a custom locale. The data for the locale is
+specified as a hash (or hashref) where the keys match the method names given
+in C<DateTime::Locale::FromData>.
+
+If you just want to make some small changes on top of an existing locale you
+can get that locale's data by calling C<< $locale->locale_data >>.
+
+Here is an example of making a custom locale based off of C<en-US>:
+
+  my $locale = DateTime::Locale->load('en-US');
+  my %data   = $locale->locale_data;
+  $data{code}               = 'en-US-CUSTOM';
+  $data{time_format_medium} = 'HH:mm:ss';
+
+  DateTime::Locale->register_from_data(%data);
+
+  # Prints 18:24:38
+  say DateTime->now( locale => 'en-US-CUSTOM' )->strftime('%X');
+
+  # Prints 6:24:38 PM
+  say DateTime->now( locale => 'en-US' )->strftime('%X');
+
+The keys that should be present in the hash are the same as the accessor
+methods provided by L<DateTime::Locale::FromData>, except for the following:
+
+=over 4
+
+=item The C<*_code> methods
+
+While you should provide a C<code> key, the other methods like
+C<language_code> and C<script_code> are determined by parsing the code.
+
+=item All C<id> returning methods
+
+These are aliases for the corresponding C<*code> methods.
+
+=item C<prefers_24_hour_time>
+
+This is determined by looking at the short time format to see how it formats
+hours,
+
+=item C<date_format_default> and C<time_format_default>
+
+These are the corresponding medium formats.
+
+=item C<datetime_format> and C<datetime_format_default>
+
+This is the same as the medium format.
+
+=item C<date_formats> and C<time_formats>
+
+These are calculated as needed.
+
+=item C<available_formats>
+
+This should be provided as a hashref where the keys are things like C<Gy> or
+C<MMMEd> and the values are an actual format like C<"y G"> or C<"E, MMM d">.
+
+=item C<locale_data>
+
+This is everything you pass in.
+
+=back
 
 =head1 LOADING LOCALES IN A PRE-FORKING SYSTEM
 
@@ -524,7 +608,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Mohammad S Anwar Sergey Leschenko yasu47b
+=for stopwords Karen Etheridge Mohammad S Anwar Ryley Breiddal Sergey Leschenko yasu47b
 
 =over 4
 
@@ -535,6 +619,10 @@ Karen Etheridge <ether@cpan.org>
 =item *
 
 Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=item *
+
+Ryley Breiddal <rbreiddal@presinet.com>
 
 =item *
 

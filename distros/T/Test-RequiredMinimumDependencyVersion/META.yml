@@ -1,0 +1,50 @@
+---
+abstract: 'Require a minimum version for your dependencies'
+author:
+  - 'Sven Kirmess <sven.kirmess@kzone.ch>'
+build_requires:
+  Cwd: '0'
+  FindBin: '0'
+  POSIX: '0'
+  Test::Builder::Tester: '0'
+  Test::Fatal: '0'
+  Test::MockModule: '0'
+  Test::More: '0.88'
+  Test::TempDir::Tiny: '0.017'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-RequiredMinimumDependencyVersion
+no_index:
+  directory:
+    - corpus
+    - t
+    - xt
+provides:
+  Test::RequiredMinimumDependencyVersion:
+    file: lib/Test/RequiredMinimumDependencyVersion.pm
+    version: '0.001'
+requires:
+  Carp: '0'
+  File::Find: '0'
+  Perl::PrereqScanner: '0'
+  Test::Builder: '0'
+  perl: '5.006'
+  strict: '0'
+  version: '0.77'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/skirmess/Test-RequiredMinimumDependencyVersion/issues
+  homepage: https://github.com/skirmess/Test-RequiredMinimumDependencyVersion
+  repository: https://github.com/skirmess/Test-RequiredMinimumDependencyVersion.git
+version: '0.001'
+x_generated_by_perl: v5.24.0
+x_serialization_backend: 'YAML::Tiny version 1.70'

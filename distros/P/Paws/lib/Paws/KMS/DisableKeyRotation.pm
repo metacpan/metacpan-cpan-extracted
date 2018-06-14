@@ -14,43 +14,57 @@ package Paws::KMS::DisableKeyRotation;
 
 =head1 NAME
 
-Paws::KMS::DisableKeyRotation - Arguments for method DisableKeyRotation on Paws::KMS
+Paws::KMS::DisableKeyRotation - Arguments for method DisableKeyRotation on L<Paws::KMS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DisableKeyRotation on the 
-AWS Key Management Service service. Use the attributes of this class
+This class represents the parameters used for calling the method DisableKeyRotation on the
+L<AWS Key Management Service|Paws::KMS> service. Use the attributes of this class
 as arguments to method DisableKeyRotation.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DisableKeyRotation.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DisableKeyRotation(Att1 => $value1, Att2 => $value2, ...);
+    my $kms = Paws->service('KMS');
+    # To disable automatic rotation of key material
+    # The following example disables automatic annual rotation of the key
+    # material for the specified CMK.
+    $kms->DisableKeyRotation(
+      {
+        'KeyId' => '1234abcd-12ab-34cd-56ef-1234567890ab'
+      }
+    );
+
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/kms/DisableKeyRotation>
 
 =head1 ATTRIBUTES
 
 
 =head2 B<REQUIRED> KeyId => Str
 
-A unique identifier for the customer master key. This value can be a
-globally unique identifier or the fully specified ARN to a key.
+A unique identifier for the customer master key (CMK).
+
+Specify the key ID or the Amazon Resource Name (ARN) of the CMK.
+
+For example:
 
 =over
 
 =item *
 
-Key ARN Example -
-arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012
+Key ID: C<1234abcd-12ab-34cd-56ef-1234567890ab>
 
 =item *
 
-Globally Unique Key ID Example - 12345678-1234-1234-1234-123456789012
+Key ARN:
+C<arn:aws:kms:us-east-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab>
 
 =back
 
+To get the key ID and key ARN for a CMK, use ListKeys or DescribeKey.
 
 
 
@@ -61,9 +75,9 @@ This class forms part of L<Paws>, documenting arguments for method DisableKeyRot
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

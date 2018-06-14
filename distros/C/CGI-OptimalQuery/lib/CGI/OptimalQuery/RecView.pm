@@ -41,7 +41,7 @@ sub output {
     $opts{useAjax}=($opts{useAjax}) ? 1 : 0;
   }
 
-  $opts{httpHeader} = $$o{q}->header(-type=>'text/html',-expires=>'now')
+  $opts{httpHeader} = $$o{httpHeader}->(-type=>'text/html',-expires=>'now')
     unless exists $opts{httpHeader};
   $opts{htmlFooter} = "</body>\n</html>\n"
     unless exists $opts{htmlFooter};

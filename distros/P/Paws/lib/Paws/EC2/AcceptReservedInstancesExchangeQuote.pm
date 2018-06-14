@@ -16,21 +16,39 @@ package Paws::EC2::AcceptReservedInstancesExchangeQuote;
 
 =head1 NAME
 
-Paws::EC2::AcceptReservedInstancesExchangeQuote - Arguments for method AcceptReservedInstancesExchangeQuote on Paws::EC2
+Paws::EC2::AcceptReservedInstancesExchangeQuote - Arguments for method AcceptReservedInstancesExchangeQuote on L<Paws::EC2>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method AcceptReservedInstancesExchangeQuote on the 
-Amazon Elastic Compute Cloud service. Use the attributes of this class
+This class represents the parameters used for calling the method AcceptReservedInstancesExchangeQuote on the
+L<Amazon Elastic Compute Cloud|Paws::EC2> service. Use the attributes of this class
 as arguments to method AcceptReservedInstancesExchangeQuote.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to AcceptReservedInstancesExchangeQuote.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->AcceptReservedInstancesExchangeQuote(Att1 => $value1, Att2 => $value2, ...);
+    my $ec2 = Paws->service('EC2');
+    my $AcceptReservedInstancesExchangeQuoteResult =
+      $ec2->AcceptReservedInstancesExchangeQuote(
+      ReservedInstanceIds  => [ 'MyString', ... ],
+      DryRun               => 1,                     # OPTIONAL
+      TargetConfigurations => [
+        {
+          OfferingId    => 'MyString',
+          InstanceCount => 1,                        # OPTIONAL
+        },
+        ...
+      ],                                             # OPTIONAL
+      );
+
+    # Results:
+    my $ExchangeId = $AcceptReservedInstancesExchangeQuoteResult->ExchangeId;
+
+    # Returns a L<Paws::EC2::AcceptReservedInstancesExchangeQuoteResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ec2/AcceptReservedInstancesExchangeQuote>
 
 =head1 ATTRIBUTES
 
@@ -46,15 +64,15 @@ C<DryRunOperation>. Otherwise, it is C<UnauthorizedOperation>.
 
 =head2 B<REQUIRED> ReservedInstanceIds => ArrayRef[Str|Undef]
 
-The IDs of the Convertible Reserved Instances to exchange for other
-Convertible Reserved Instances of the same or higher value.
+The IDs of the Convertible Reserved Instances to exchange for another
+Convertible Reserved Instance of the same or higher value.
 
 
 
 =head2 TargetConfigurations => ArrayRef[L<Paws::EC2::TargetConfigurationRequest>]
 
-The configurations of the Convertible Reserved Instance offerings that
-you are purchasing in this exchange.
+The configuration of the target Convertible Reserved Instance to
+exchange for your current Convertible Reserved Instances.
 
 
 
@@ -65,9 +83,9 @@ This class forms part of L<Paws>, documenting arguments for method AcceptReserve
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

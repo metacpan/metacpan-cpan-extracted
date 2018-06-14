@@ -33,24 +33,24 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::AppStream::
 
 =head1 DESCRIPTION
 
-This class has no description
+Describes a resource error.
 
 =head1 ATTRIBUTES
 
 
 =head2 ErrorCode => Str
 
-  
+  The error code.
 
 
 =head2 ErrorMessage => Str
 
-  
+  The error message.
 
 
 =head2 ErrorTimestamp => Str
 
-  
+  The time the error occurred.
 
 
 
@@ -60,9 +60,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::AppStream
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

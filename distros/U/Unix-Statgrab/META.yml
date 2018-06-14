@@ -7,7 +7,7 @@ build_requires:
   Test::More: '0.9'
 configure_requires:
   Capture::Tiny: '0.06'
-  Config::AutoConf: '0.308'
+  Config::AutoConf: '0.317'
   ExtUtils::CBuilder: '0.27'
   ExtUtils::Constant: '0.21'
   ExtUtils::MakeMaker: '0'
@@ -16,8 +16,8 @@ configure_requires:
   Text::ParseWords: '0'
   parent: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.14, CPAN::Meta::Converter version 2.150005'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -36,7 +36,6 @@ resources:
   MailingList: "mailto:users@i-scream.org'"
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Unix-Statgrab
   homepage: https://metacpan.org/release/Unix-Statgrab
-  license: http://dev.perl.org/licenses/
   repository: https://github.com/i-scream/Unix-Statgrab.git
-version: '0.111'
+version: '0.112'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

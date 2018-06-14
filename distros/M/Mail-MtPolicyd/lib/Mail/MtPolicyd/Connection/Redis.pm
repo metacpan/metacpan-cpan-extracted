@@ -2,7 +2,7 @@ package Mail::MtPolicyd::Connection::Redis;
 
 use Moose;
 
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
 # ABSTRACT: a mtpolicy connection for redis databases
 
 extends 'Mail::MtPolicyd::Connection';
@@ -11,14 +11,33 @@ use Redis;
 
 
 has 'server' => ( is => 'ro', isa => 'Str', default => '127.0.0.1:6379' );
+has 'sock' => ( is => 'ro', isa => 'Maybe[Str]' );
+has 'sentinels' => ( is => 'ro', isa => 'Maybe[Str]' );
+has '_sentinels' => (
+  is => 'ro',
+  isa => 'ArrayRef[Str]',
+  lazy => 1,
+  default => sub { [ split(/ \s*,\s*/, shift->sentinels ) ] },
+);
+has 'service' => ( is => 'ro', isa => 'Maybe[Str]' );
+
 has 'debug' => ( is => 'ro', isa => 'Bool', default => 0 );
 has 'password' => ( is => 'ro', isa => 'Maybe[Str]' );
 has 'db' => ( is => 'ro', isa => 'Int', default => 0 );
 
 sub _create_handle {
   my $self = shift;
+  my %server = ( 'server' => $self->server );
+  if( defined $self->sentinels && $self->service ) {
+    %server = (
+      'sentinels' => $self->_sentinels,
+      service => $self->service
+    );
+  } elsif( defined $self->sock ) {
+    %server = ( 'sock' => $self->sock );
+  }
   my $redis = Redis->new(
-    'server' => $self->server,
+    %server,
     'debug' => $self->debug,
     defined $self->password ? ( 'password' => $self->password ) : (),
   );
@@ -61,12 +80,18 @@ Mail::MtPolicyd::Connection::Redis - a mtpolicy connection for redis databases
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 SYNOPSIS
 
   <Connection redis>
     server = "127.0.0.1:6379"
+    # or
+    # sock = "/path/to/sock"
+    # or
+    # sentinels = "127.0.0.1:12345,127.0.0.1:23456"
+    # service = "mymaster"
+
     db = 0
     # password = "secret"
   </Connection>
@@ -75,9 +100,26 @@ version 2.02
 
 =over
 
-=item server (default: 127.0.0.1:6379)
+=item server (default: '127.0.0.1:6379')
 
-The redis server to connect.
+Connect to redis server with TCP/IP.
+
+Format: <host>:<port>
+
+=item sock (default: undef)
+
+Connect to redis server UNIX domain socket.
+
+Specify the path to the UNIX domain socket.
+
+=item sentinels (default: undef)
+
+Specify a comma separated list of sentinel instances to contact
+for finding the master for the service specified by "service" below.
+
+=item service (default: undef)
+
+Specify the service to ask the sentinel servers for.
 
 =item debug (default: 0)
 

@@ -1,7 +1,7 @@
 package App::DuckPAN::Cmd::Install;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Install the distribution in current directory
-$App::DuckPAN::Cmd::Install::VERSION = '1019';
+$App::DuckPAN::Cmd::Install::VERSION = '1021';
 use Moo;
 with qw( App::DuckPAN::Cmd );
 
@@ -32,7 +32,7 @@ App::DuckPAN::Cmd::Install - Install the distribution in current directory
 
 =head1 VERSION
 
-version 1019
+version 1021
 
 =head1 AUTHOR
 

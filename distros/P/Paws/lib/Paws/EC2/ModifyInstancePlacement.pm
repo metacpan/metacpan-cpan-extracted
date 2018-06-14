@@ -2,6 +2,7 @@
 package Paws::EC2::ModifyInstancePlacement;
   use Moose;
   has Affinity => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'affinity' );
+  has GroupName => (is => 'ro', isa => 'Str');
   has HostId => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'hostId' );
   has InstanceId => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'instanceId' , required => 1);
   has Tenancy => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'tenancy' );
@@ -17,34 +18,59 @@ package Paws::EC2::ModifyInstancePlacement;
 
 =head1 NAME
 
-Paws::EC2::ModifyInstancePlacement - Arguments for method ModifyInstancePlacement on Paws::EC2
+Paws::EC2::ModifyInstancePlacement - Arguments for method ModifyInstancePlacement on L<Paws::EC2>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ModifyInstancePlacement on the 
-Amazon Elastic Compute Cloud service. Use the attributes of this class
+This class represents the parameters used for calling the method ModifyInstancePlacement on the
+L<Amazon Elastic Compute Cloud|Paws::EC2> service. Use the attributes of this class
 as arguments to method ModifyInstancePlacement.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ModifyInstancePlacement.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ModifyInstancePlacement(Att1 => $value1, Att2 => $value2, ...);
+    my $ec2 = Paws->service('EC2');
+    my $ModifyInstancePlacementResult = $ec2->ModifyInstancePlacement(
+      InstanceId => 'MyString',
+      Affinity   => 'default',      # OPTIONAL
+      GroupName  => 'MyString',     # OPTIONAL
+      HostId     => 'MyString',     # OPTIONAL
+      Tenancy    => 'dedicated',    # OPTIONAL
+    );
+
+    # Results:
+    my $Return = $ModifyInstancePlacementResult->Return;
+
+    # Returns a L<Paws::EC2::ModifyInstancePlacementResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ec2/ModifyInstancePlacement>
 
 =head1 ATTRIBUTES
 
 
 =head2 Affinity => Str
 
-The new affinity setting for the instance.
+The affinity setting for the instance.
 
 Valid values are: C<"default">, C<"host">
 
+=head2 GroupName => Str
+
+The name of the placement group in which to place the instance. For
+spread placement groups, the instance must have a tenancy of
+C<default>. For cluster placement groups, the instance must have a
+tenancy of C<default> or C<dedicated>.
+
+To remove an instance from a placement group, specify an empty string
+("").
+
+
+
 =head2 HostId => Str
 
-The ID of the Dedicated Host that the instance will have affinity with.
+The ID of the Dedicated Host with which to associate the instance.
 
 
 
@@ -56,7 +82,7 @@ The ID of the instance that you are modifying.
 
 =head2 Tenancy => Str
 
-The tenancy of the instance that you are modifying.
+The tenancy for the instance.
 
 Valid values are: C<"dedicated">, C<"host">
 
@@ -67,9 +93,9 @@ This class forms part of L<Paws>, documenting arguments for method ModifyInstanc
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

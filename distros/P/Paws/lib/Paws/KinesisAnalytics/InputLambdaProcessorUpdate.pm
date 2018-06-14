@@ -40,13 +40,15 @@ preprocess the records in the stream.
 
 =head2 ResourceARNUpdate => Str
 
-  The ARN of the new AWS Lambda function that is used to preprocess the
-records in the stream.
+  The Amazon Resource Name (ARN) of the new AWS Lambda
+(https://aws.amazon.com/documentation/lambda/) function that is used to
+preprocess the records in the stream.
 
 
 =head2 RoleARNUpdate => Str
 
-  The ARN of the new IAM role used to access the AWS Lambda function.
+  The ARN of the new IAM role that is used to access the AWS Lambda
+function.
 
 
 
@@ -56,9 +58,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::KinesisAn
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

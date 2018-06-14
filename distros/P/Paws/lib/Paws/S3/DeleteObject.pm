@@ -21,21 +21,36 @@ package Paws::S3::DeleteObject;
 
 =head1 NAME
 
-Paws::S3::DeleteObject - Arguments for method DeleteObject on Paws::S3
+Paws::S3::DeleteObject - Arguments for method DeleteObject on L<Paws::S3>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DeleteObject on the 
-Amazon Simple Storage Service service. Use the attributes of this class
+This class represents the parameters used for calling the method DeleteObject on the
+L<Amazon Simple Storage Service|Paws::S3> service. Use the attributes of this class
 as arguments to method DeleteObject.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DeleteObject.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DeleteObject(Att1 => $value1, Att2 => $value2, ...);
+    my $s3 = Paws->service('S3');
+    my $DeleteObjectOutput = $s3->DeleteObject(
+      Bucket       => 'MyBucketName',
+      Key          => 'MyObjectKey',
+      MFA          => 'MyMFA',                # OPTIONAL
+      RequestPayer => 'requester',            # OPTIONAL
+      VersionId    => 'MyObjectVersionId',    # OPTIONAL
+    );
+
+    # Results:
+    my $DeleteMarker   = $DeleteObjectOutput->DeleteMarker;
+    my $RequestCharged = $DeleteObjectOutput->RequestCharged;
+    my $VersionId      = $DeleteObjectOutput->VersionId;
+
+    # Returns a L<Paws::S3::DeleteObjectOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/s3/DeleteObject>
 
 =head1 ATTRIBUTES
 
@@ -78,9 +93,9 @@ This class forms part of L<Paws>, documenting arguments for method DeleteObject 
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

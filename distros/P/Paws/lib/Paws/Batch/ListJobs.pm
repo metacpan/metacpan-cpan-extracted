@@ -1,7 +1,8 @@
 
 package Paws::Batch::ListJobs;
   use Moose;
-  has JobQueue => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'jobQueue', required => 1);
+  has ArrayJobId => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'arrayJobId');
+  has JobQueue => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'jobQueue');
   has JobStatus => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'jobStatus');
   has MaxResults => (is => 'ro', isa => 'Int', traits => ['NameInRequest'], request_name => 'maxResults');
   has NextToken => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'nextToken');
@@ -12,33 +13,66 @@ package Paws::Batch::ListJobs;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/v1/listjobs');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'POST');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::Batch::ListJobsResponse');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::Batch::ListJobs - Arguments for method ListJobs on Paws::Batch
+Paws::Batch::ListJobs - Arguments for method ListJobs on L<Paws::Batch>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ListJobs on the 
-AWS Batch service. Use the attributes of this class
+This class represents the parameters used for calling the method ListJobs on the
+L<AWS Batch|Paws::Batch> service. Use the attributes of this class
 as arguments to method ListJobs.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ListJobs.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ListJobs(Att1 => $value1, Att2 => $value2, ...);
+    my $batch = Paws->service('Batch');
+    # To list running jobs
+    # This example lists the running jobs in the HighPriority job queue.
+    my $ListJobsResponse = $batch->ListJobs(
+      {
+        'JobQueue' => 'HighPriority'
+      }
+    );
+
+    # Results:
+    my $jobSummaryList = $ListJobsResponse->jobSummaryList;
+
+    # Returns a L<Paws::Batch::ListJobsResponse> object.
+    # To list submitted jobs
+    # This example lists jobs in the HighPriority job queue that are in the
+    # SUBMITTED job status.
+    my $ListJobsResponse = $batch->ListJobs(
+      {
+        'JobStatus' => 'SUBMITTED',
+        'JobQueue'  => 'HighPriority'
+      }
+    );
+
+    # Results:
+    my $jobSummaryList = $ListJobsResponse->jobSummaryList;
+
+    # Returns a L<Paws::Batch::ListJobsResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/batch/ListJobs>
 
 =head1 ATTRIBUTES
 
 
-=head2 B<REQUIRED> JobQueue => Str
+=head2 ArrayJobId => Str
+
+The job ID for an array job. Specifying an array job ID with this
+parameter lists all child jobs from within the specified array.
+
+
+
+=head2 JobQueue => Str
 
 The name or full Amazon Resource Name (ARN) of the job queue with which
 to list jobs.
@@ -86,9 +120,9 @@ This class forms part of L<Paws>, documenting arguments for method ListJobs in L
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

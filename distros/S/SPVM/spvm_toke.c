@@ -78,7 +78,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               
               // change :: to / and add ".spvm"
               int32_t module_path_base_length = (int32_t)(strlen(package_name) + 6);
-              char* module_path_base = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, module_path_base_length);
+              char* module_path_base = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, module_path_base_length + 1);
               const char* bufptr_orig = package_name;
               char* bufptr_to = module_path_base;
               while (*bufptr_orig) {
@@ -108,7 +108,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   
                   // File name
                   int32_t file_name_length = (int32_t)(strlen(include_path) + 1 + strlen(module_path_base));
-                  cur_file = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, file_name_length);
+                  cur_file = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, file_name_length + 1);
                   sprintf(cur_file, "%s/%s", include_path, module_path_base);
                   cur_file[file_name_length] = '\0';
                   
@@ -573,13 +573,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           yylvalp->opval = op;
         return '~';
       }
-      case '@': {
-        compiler->bufptr++;
-        SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_ARRAY_LENGTH);
-        yylvalp->opval = op;
-        
-        return ARRAY_LENGTH;
-      }
       case '\'': {
         compiler->bufptr++;
         
@@ -658,7 +651,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         char* str;
         int32_t str_length = 0;
         if (*(compiler->bufptr) == '"') {
-          str = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, 0);
+          str = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, 1);
           str[0] = '\0';
           compiler->bufptr++;
         }
@@ -689,7 +682,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
 
           compiler->bufptr++;
           
-          str = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, str_tmp_len);
+          str = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, str_tmp_len + 1);
           {
             char* char_ptr = (char*)cur_token_ptr;
             while (char_ptr != compiler->bufptr - 1) {
@@ -777,7 +770,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           }
           
           int32_t str_len = (compiler->bufptr - cur_token_ptr);
-          char* var_name = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, str_len);
+          char* var_name = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, str_len + 1);
           memcpy(var_name, cur_token_ptr, str_len);
           var_name[str_len] = '\0';
 
@@ -1034,7 +1027,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             keyword = found_name;
           }
           else {
-            keyword = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, str_len);
+            keyword = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, str_len + 1);
             memcpy(keyword, cur_token_ptr, str_len);
             keyword[str_len] = '\0';
             SPVM_HASH_insert(compiler->name_symtable, keyword, str_len, keyword);
@@ -1061,12 +1054,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 else if (strcmp(keyword, "const") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_CONST);
                   return CONST;
-                }
-                else if (strcmp(keyword, "compile") == 0) {
-                  SPVM_OP* op_descriptor = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_COMPILE, compiler->cur_file, compiler->cur_line);
-                  yylvalp->opval = op_descriptor;
-                  
-                  return DESCRIPTOR;
                 }
                 break;
               case 'd' :
@@ -1152,13 +1139,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_LAST);
                   return LAST;
                 }
-                else if (strcmp(keyword, "len") == 0) {
-                  compiler->bufptr++;
-                  SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_ARRAY_LENGTH);
-                  yylvalp->opval = op;
-                  
-                  return ARRAY_LENGTH;
-                }
                 else if (strcmp(keyword, "lt") == 0) {
                   SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_STRING_LT);
                   yylvalp->opval = op;
@@ -1234,6 +1214,12 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   
                   return DESCRIPTOR;
                 }
+                else if (strcmp(keyword, "precompile") == 0) {
+                  SPVM_OP* op_descriptor = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_PRECOMPILE, compiler->cur_file, compiler->cur_line);
+                  yylvalp->opval = op_descriptor;
+                  
+                  return DESCRIPTOR;
+                }
                 break;
               case 'r' :
                 if (strcmp(keyword, "return") == 0) {
@@ -1263,6 +1249,13 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 else if (strcmp(keyword, "short") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_SHORT);
                   return SHORT;
+                }
+                else if (strcmp(keyword, "scalar") == 0) {
+                  compiler->bufptr++;
+                  SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_SCALAR);
+                  yylvalp->opval = op;
+                  
+                  return SCALAR;
                 }
                 break;
               case 'u' :

@@ -22,21 +22,48 @@ package Paws::CloudWatch::GetMetricStatistics;
 
 =head1 NAME
 
-Paws::CloudWatch::GetMetricStatistics - Arguments for method GetMetricStatistics on Paws::CloudWatch
+Paws::CloudWatch::GetMetricStatistics - Arguments for method GetMetricStatistics on L<Paws::CloudWatch>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method GetMetricStatistics on the 
-Amazon CloudWatch service. Use the attributes of this class
+This class represents the parameters used for calling the method GetMetricStatistics on the
+L<Amazon CloudWatch|Paws::CloudWatch> service. Use the attributes of this class
 as arguments to method GetMetricStatistics.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to GetMetricStatistics.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->GetMetricStatistics(Att1 => $value1, Att2 => $value2, ...);
+    my $monitoring = Paws->service('CloudWatch');
+    my $GetMetricStatisticsOutput = $monitoring->GetMetricStatistics(
+      EndTime    => '1970-01-01T01:00:00',
+      MetricName => 'MyMetricName',
+      Namespace  => 'MyNamespace',
+      Period     => 1,
+      StartTime  => '1970-01-01T01:00:00',
+      Dimensions => [
+        {
+          Name  => 'MyDimensionName',     # min: 1, max: 255
+          Value => 'MyDimensionValue',    # min: 1, max: 255
+
+        },
+        ...
+      ],                                  # OPTIONAL
+      ExtendedStatistics => [ 'MyExtendedStatistic', ... ],    # OPTIONAL
+      Statistics => [
+        'SampleCount', ... # values: SampleCount, Average, Sum, Minimum, Maximum
+      ],                   # OPTIONAL
+      Unit => 'Seconds',   # OPTIONAL
+    );
+
+    # Results:
+    my $Datapoints = $GetMetricStatisticsOutput->Datapoints;
+    my $Label      = $GetMetricStatisticsOutput->Label;
+
+    # Returns a L<Paws::CloudWatch::GetMetricStatisticsOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/monitoring/GetMetricStatistics>
 
 =head1 ATTRIBUTES
 
@@ -49,9 +76,12 @@ combination of dimensions as a separate metric. If a specific
 combination of dimensions was not published, you can't retrieve
 statistics for it. You must specify the same dimensions that were used
 when the metrics were created. For an example, see Dimension
-Combinations in the I<Amazon CloudWatch User Guide>. For more
-information about specifying dimensions, see Publishing Metrics in the
-I<Amazon CloudWatch User Guide>.
+Combinations
+(http://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html#dimension-combinations)
+in the I<Amazon CloudWatch User Guide>. For more information about
+specifying dimensions, see Publishing Metrics
+(http://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html)
+in the I<Amazon CloudWatch User Guide>.
 
 
 
@@ -176,8 +206,9 @@ C<ExtendedStatistics>, but not both.
 =head2 Unit => Str
 
 The unit for a given metric. Metrics may be reported in multiple units.
-Not supplying a unit results in all units being returned. If the metric
-only ever reports one unit, specifying a unit has no effect.
+Not supplying a unit results in all units being returned. If you
+specify only a unit that the metric does not report, the results of the
+call are null.
 
 Valid values are: C<"Seconds">, C<"Microseconds">, C<"Milliseconds">, C<"Bytes">, C<"Kilobytes">, C<"Megabytes">, C<"Gigabytes">, C<"Terabytes">, C<"Bits">, C<"Kilobits">, C<"Megabits">, C<"Gigabits">, C<"Terabits">, C<"Percent">, C<"Count">, C<"Bytes/Second">, C<"Kilobytes/Second">, C<"Megabytes/Second">, C<"Gigabytes/Second">, C<"Terabytes/Second">, C<"Bits/Second">, C<"Kilobits/Second">, C<"Megabits/Second">, C<"Gigabits/Second">, C<"Terabits/Second">, C<"Count/Second">, C<"None">
 
@@ -188,9 +219,9 @@ This class forms part of L<Paws>, documenting arguments for method GetMetricStat
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

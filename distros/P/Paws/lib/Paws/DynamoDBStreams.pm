@@ -1,6 +1,7 @@
 package Paws::DynamoDBStreams;
   use Moose;
   sub service { 'streams.dynamodb' }
+  sub signing_name { 'dynamodb' }
   sub version { '2012-08-10' }
   sub target_prefix { 'DynamoDBStreams_20120810' }
   sub json_version { "1.0" }
@@ -11,7 +12,7 @@ package Paws::DynamoDBStreams;
   has retriables => (is => 'ro', isa => 'ArrayRef', default => sub { [
   ] });
 
-  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller', 'Paws::Net::JsonResponse';
+  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller';
 
   
   sub DescribeStream {
@@ -69,18 +70,33 @@ Amazon DynamoDB
 
 Amazon DynamoDB Streams provides API actions for accessing streams and
 processing stream records. To learn more about application development
-with Streams, see Capturing Table Activity with DynamoDB Streams in the
-Amazon DynamoDB Developer Guide.
+with Streams, see Capturing Table Activity with DynamoDB Streams
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html)
+in the Amazon DynamoDB Developer Guide.
+
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/dynamodb/>
+
 
 =head1 METHODS
 
-=head2 DescribeStream(StreamArn => Str, [ExclusiveStartShardId => Str, Limit => Int])
+=head2 DescribeStream
+
+=over
+
+=item StreamArn => Str
+
+=item [ExclusiveStartShardId => Str]
+
+=item [Limit => Int]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::DynamoDBStreams::DescribeStream>
 
 Returns: a L<Paws::DynamoDBStreams::DescribeStreamOutput> instance
 
-  Returns information about a stream, including the current status of the
+Returns information about a stream, including the current status of the
 stream, its Amazon Resource Name (ARN), the composition of its shards,
 and its corresponding DynamoDB table.
 
@@ -95,13 +111,22 @@ C<EndingSequenceNumber> are present, then that shard is closed and can
 no longer receive more data.
 
 
-=head2 GetRecords(ShardIterator => Str, [Limit => Int])
+=head2 GetRecords
+
+=over
+
+=item ShardIterator => Str
+
+=item [Limit => Int]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::DynamoDBStreams::GetRecords>
 
 Returns: a L<Paws::DynamoDBStreams::GetRecordsOutput> instance
 
-  Retrieves the stream records from a given shard.
+Retrieves the stream records from a given shard.
 
 Specify a shard iterator using the C<ShardIterator> parameter. The
 shard iterator specifies the position in the shard from which you want
@@ -115,13 +140,26 @@ C<GetRecords> can retrieve a maximum of 1 MB of data or 1000 stream
 records, whichever comes first.
 
 
-=head2 GetShardIterator(ShardId => Str, ShardIteratorType => Str, StreamArn => Str, [SequenceNumber => Str])
+=head2 GetShardIterator
+
+=over
+
+=item ShardId => Str
+
+=item ShardIteratorType => Str
+
+=item StreamArn => Str
+
+=item [SequenceNumber => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::DynamoDBStreams::GetShardIterator>
 
 Returns: a L<Paws::DynamoDBStreams::GetShardIteratorOutput> instance
 
-  Returns a shard iterator. A shard iterator provides information about
+Returns a shard iterator. A shard iterator provides information about
 how to retrieve the stream records from within a shard. Use the shard
 iterator in a subsequent C<GetRecords> request to read the stream
 records from the shard.
@@ -130,13 +168,24 @@ A shard iterator expires 15 minutes after it is returned to the
 requester.
 
 
-=head2 ListStreams([ExclusiveStartStreamArn => Str, Limit => Int, TableName => Str])
+=head2 ListStreams
+
+=over
+
+=item [ExclusiveStartStreamArn => Str]
+
+=item [Limit => Int]
+
+=item [TableName => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::DynamoDBStreams::ListStreams>
 
 Returns: a L<Paws::DynamoDBStreams::ListStreamsOutput> instance
 
-  Returns an array of stream ARNs associated with the current account and
+Returns an array of stream ARNs associated with the current account and
 endpoint. If the C<TableName> parameter is present, then C<ListStreams>
 will return only the streams ARNs for that table.
 
@@ -158,9 +207,9 @@ This service class forms part of L<Paws>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

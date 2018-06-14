@@ -1,5 +1,9 @@
 Revision history for Group-Git
 
+0.6.10   2018-06-10
+        Updating for release of version 0.6.10
+        Fixed --limit logic (Ivan Wills)
+
 0.6.9   2018-06-04
         Updating for release of version 0.6.9
         Fixed bad switching of directories (Ivan Wills)

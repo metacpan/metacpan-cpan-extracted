@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Instance;
-$Config::Model::Instance::VERSION = '2.123';
+$Config::Model::Instance::VERSION = '2.124';
 #use Scalar::Util qw(weaken) ;
 use strict;
 
@@ -389,9 +389,9 @@ sub modify {
 
 sub load {
     my $self   = shift;
-    my $loader = Config::Model::Loader->new;
+    my $loader = Config::Model::Loader->new( start_node => $self->{tree} );
     my %args   = @_ eq 1 ? ( step => $_[0] ) : @_;
-    $loader->load( node => $self->{tree}, %args );
+    $loader->load( %args );
     return $self;
 }
 
@@ -658,7 +658,7 @@ Config::Model::Instance - Instance of configuration tree
 
 =head1 VERSION
 
-version 2.123
+version 2.124
 
 =head1 SYNOPSIS
 

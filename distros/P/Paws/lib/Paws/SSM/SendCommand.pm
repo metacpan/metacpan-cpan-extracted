@@ -5,6 +5,7 @@ package Paws::SSM::SendCommand;
   has DocumentHash => (is => 'ro', isa => 'Str');
   has DocumentHashType => (is => 'ro', isa => 'Str');
   has DocumentName => (is => 'ro', isa => 'Str', required => 1);
+  has DocumentVersion => (is => 'ro', isa => 'Str');
   has InstanceIds => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
   has MaxConcurrency => (is => 'ro', isa => 'Str');
   has MaxErrors => (is => 'ro', isa => 'Str');
@@ -28,21 +29,59 @@ package Paws::SSM::SendCommand;
 
 =head1 NAME
 
-Paws::SSM::SendCommand - Arguments for method SendCommand on Paws::SSM
+Paws::SSM::SendCommand - Arguments for method SendCommand on L<Paws::SSM>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method SendCommand on the 
-Amazon Simple Systems Manager (SSM) service. Use the attributes of this class
+This class represents the parameters used for calling the method SendCommand on the
+L<Amazon Simple Systems Manager (SSM)|Paws::SSM> service. Use the attributes of this class
 as arguments to method SendCommand.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to SendCommand.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->SendCommand(Att1 => $value1, Att2 => $value2, ...);
+    my $ssm = Paws->service('SSM');
+    my $SendCommandResult = $ssm->SendCommand(
+      DocumentName       => 'MyDocumentARN',
+      Comment            => 'MyComment',                # OPTIONAL
+      DocumentHash       => 'MyDocumentHash',           # OPTIONAL
+      DocumentHashType   => 'Sha256',                   # OPTIONAL
+      DocumentVersion    => 'MyDocumentVersion',        # OPTIONAL
+      InstanceIds        => [ 'MyInstanceId', ... ],    # OPTIONAL
+      MaxConcurrency     => 'MyMaxConcurrency',         # OPTIONAL
+      MaxErrors          => 'MyMaxErrors',              # OPTIONAL
+      NotificationConfig => {
+        NotificationArn => 'MyNotificationArn',         # OPTIONAL
+        NotificationType   => 'Command', # values: Command, Invocation; OPTIONAL
+        NotificationEvents => [
+          'All',
+          ...    # values: All, InProgress, Success, TimedOut, Cancelled, Failed
+        ],       # OPTIONAL
+      },    # OPTIONAL
+      OutputS3BucketName => 'MyS3BucketName',    # OPTIONAL
+      OutputS3KeyPrefix  => 'MyS3KeyPrefix',     # OPTIONAL
+      OutputS3Region     => 'MyS3Region',        # OPTIONAL
+      Parameters => { 'MyParameterName' => [ 'MyParameterValue', ... ], }
+      ,                                          # OPTIONAL
+      ServiceRoleArn => 'MyServiceRole',         # OPTIONAL
+      Targets        => [
+        {
+          Values => [ 'MyTargetValue', ... ],    # max: 50; OPTIONAL
+          Key => 'MyTargetKey',                  # min: 1, max: 128; OPTIONAL
+        },
+        ...
+      ],                                         # OPTIONAL
+      TimeoutSeconds => 1,                       # OPTIONAL
+    );
+
+    # Results:
+    my $Command = $SendCommandResult->Command;
+
+    # Returns a L<Paws::SSM::SendCommandResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ssm/SendCommand>
 
 =head1 ATTRIBUTES
 
@@ -78,13 +117,21 @@ be a public document or a custom document.
 
 
 
+=head2 DocumentVersion => Str
+
+The SSM document version to use in the request. You can specify
+Default, Latest, or a specific version number.
+
+
+
 =head2 InstanceIds => ArrayRef[Str|Undef]
 
 The instance IDs where the command should execute. You can specify a
 maximum of 50 IDs. If you prefer not to list individual instance IDs,
 you can instead send commands to a fleet of instances using the Targets
 parameter, which accepts EC2 tags. For more information about how to
-use Targets, see Sending Commands to a Fleet.
+use Targets, see Sending Commands to a Fleet
+(http://docs.aws.amazon.com/systems-manager/latest/userguide/send-commands-multiple.html).
 
 
 
@@ -93,7 +140,8 @@ use Targets, see Sending Commands to a Fleet.
 (Optional) The maximum number of instances that are allowed to execute
 the command at the same time. You can specify a number such as 10 or a
 percentage such as 10%. The default value is 50. For more information
-about how to use MaxConcurrency, see Using Concurrency Controls.
+about how to use MaxConcurrency, see Using Concurrency Controls
+(http://docs.aws.amazon.com/systems-manager/latest/userguide/send-commands-velocity.html).
 
 
 
@@ -103,8 +151,9 @@ The maximum number of errors allowed without the command failing. When
 the command fails one more time beyond the value of MaxErrors, the
 systems stops sending the command to additional targets. You can
 specify a number like 10 or a percentage like 10%. The default value is
-50. For more information about how to use MaxErrors, see Using Error
-Controls.
+0. For more information about how to use MaxErrors, see Using Error
+Controls
+(http://docs.aws.amazon.com/systems-manager/latest/userguide/send-commands-maxerrors.html).
 
 
 
@@ -154,14 +203,15 @@ The IAM role that Systems Manager uses to send notifications.
 (Optional) An array of search criteria that targets instances using a
 Key,Value combination that you specify. Targets is required if you
 don't provide one or more instance IDs in the call. For more
-information about how to use Targets, see Sending Commands to a Fleet.
+information about how to use Targets, see Sending Commands to a Fleet
+(http://docs.aws.amazon.com/systems-manager/latest/userguide/send-commands-multiple.html).
 
 
 
 =head2 TimeoutSeconds => Int
 
 If this time is reached and the command has not already started
-executing, it will not execute.
+executing, it will not run.
 
 
 
@@ -172,9 +222,9 @@ This class forms part of L<Paws>, documenting arguments for method SendCommand i
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

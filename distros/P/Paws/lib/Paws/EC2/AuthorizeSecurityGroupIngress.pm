@@ -23,21 +23,74 @@ package Paws::EC2::AuthorizeSecurityGroupIngress;
 
 =head1 NAME
 
-Paws::EC2::AuthorizeSecurityGroupIngress - Arguments for method AuthorizeSecurityGroupIngress on Paws::EC2
+Paws::EC2::AuthorizeSecurityGroupIngress - Arguments for method AuthorizeSecurityGroupIngress on L<Paws::EC2>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method AuthorizeSecurityGroupIngress on the 
-Amazon Elastic Compute Cloud service. Use the attributes of this class
+This class represents the parameters used for calling the method AuthorizeSecurityGroupIngress on the
+L<Amazon Elastic Compute Cloud|Paws::EC2> service. Use the attributes of this class
 as arguments to method AuthorizeSecurityGroupIngress.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to AuthorizeSecurityGroupIngress.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->AuthorizeSecurityGroupIngress(Att1 => $value1, Att2 => $value2, ...);
+    my $ec2 = Paws->service('EC2');
+    $ec2->AuthorizeSecurityGroupIngress(
+      CidrIp        => 'MyString',    # OPTIONAL
+      DryRun        => 1,             # OPTIONAL
+      FromPort      => 1,             # OPTIONAL
+      GroupId       => 'MyString',    # OPTIONAL
+      GroupName     => 'MyString',    # OPTIONAL
+      IpPermissions => [
+        {
+          IpProtocol => 'MyString',
+          Ipv6Ranges => [
+            {
+              CidrIpv6    => 'MyString',
+              Description => 'MyString',
+            },
+            ...
+          ],                          # OPTIONAL
+          PrefixListIds => [
+            {
+              PrefixListId => 'MyString',
+              Description  => 'MyString',
+            },
+            ...
+          ],                          # OPTIONAL
+          ToPort           => 1,
+          UserIdGroupPairs => [
+            {
+              GroupId                => 'MyString',
+              UserId                 => 'MyString',
+              VpcPeeringConnectionId => 'MyString',
+              GroupName              => 'MyString',
+              Description            => 'MyString',
+              PeeringStatus          => 'MyString',
+              VpcId                  => 'MyString',
+            },
+            ...
+          ],    # OPTIONAL
+          IpRanges => [
+            {
+              CidrIp      => 'MyString',
+              Description => 'MyString',
+            },
+            ...
+          ],    # OPTIONAL
+          FromPort => 1,
+        },
+        ...
+      ],        # OPTIONAL
+      IpProtocol                 => 'MyString',    # OPTIONAL
+      SourceSecurityGroupName    => 'MyString',    # OPTIONAL
+      SourceSecurityGroupOwnerId => 'MyString',    # OPTIONAL
+      ToPort                     => 1,             # OPTIONAL
+    );
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ec2/AuthorizeSecurityGroupIngress>
 
 =head1 ATTRIBUTES
 
@@ -85,20 +138,22 @@ request.
 
 =head2 IpPermissions => ArrayRef[L<Paws::EC2::IpPermission>]
 
-A set of IP permissions. Can be used to specify multiple rules in a
-single command.
+One or more sets of IP permissions. Can be used to specify multiple
+rules in a single command.
 
 
 
 =head2 IpProtocol => Str
 
 The IP protocol name (C<tcp>, C<udp>, C<icmp>) or number (see Protocol
-Numbers). (VPC only) Use C<-1> to specify all protocols. If you specify
-C<-1>, or a protocol number other than C<tcp>, C<udp>, C<icmp>, or
-C<58> (ICMPv6), traffic on all ports is allowed, regardless of any
-ports you specify. For C<tcp>, C<udp>, and C<icmp>, you must specify a
-port range. For protocol C<58> (ICMPv6), you can optionally specify a
-port range; if you don't, traffic for all types and codes is allowed.
+Numbers
+(http://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml)).
+(VPC only) Use C<-1> to specify all protocols. If you specify C<-1>, or
+a protocol number other than C<tcp>, C<udp>, C<icmp>, or C<58>
+(ICMPv6), traffic on all ports is allowed, regardless of any ports you
+specify. For C<tcp>, C<udp>, and C<icmp>, you must specify a port
+range. For protocol C<58> (ICMPv6), you can optionally specify a port
+range; if you don't, traffic for all types and codes is allowed.
 
 
 
@@ -116,10 +171,10 @@ EC2-VPC, the source security group must be in the same VPC.
 
 =head2 SourceSecurityGroupOwnerId => Str
 
-[EC2-Classic] The AWS account number for the source security group, if
-the source security group is in a different account. You can't specify
-this parameter in combination with the following parameters: the CIDR
-IP address range, the IP protocol, the start of the port range, and the
+[EC2-Classic] The AWS account ID for the source security group, if the
+source security group is in a different account. You can't specify this
+parameter in combination with the following parameters: the CIDR IP
+address range, the IP protocol, the start of the port range, and the
 end of the port range. Creates rules that grant full ICMP, UDP, and TCP
 access. To create a rule with a specific IP protocol and port range,
 use a set of IP permissions instead.
@@ -142,9 +197,9 @@ This class forms part of L<Paws>, documenting arguments for method AuthorizeSecu
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

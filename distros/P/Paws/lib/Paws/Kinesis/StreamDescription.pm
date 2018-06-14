@@ -59,7 +59,7 @@ C<NONE>: Do not encrypt the records in the stream.
 =item *
 
 C<KMS>: Use server-side encryption on the records in the stream using a
-customer-managed KMS key.
+customer-managed AWS KMS key.
 
 =back
 
@@ -77,8 +77,38 @@ customer-managed KMS key.
 
 =head2 KeyId => Str
 
-  The GUID for the customer-managed KMS key used for encryption on the
-stream.
+  The GUID for the customer-managed AWS KMS key to use for encryption.
+This value can be a globally unique identifier, a fully specified ARN
+to either an alias or a key, or an alias name prefixed by "alias/".You
+can also use a master key owned by Kinesis Data Streams by specifying
+the alias C<aws/kinesis>.
+
+=over
+
+=item *
+
+Key ARN example:
+C<arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012>
+
+=item *
+
+Alias ARN example:
+C<arn:aws:kms:us-east-1:123456789012:alias/MyAliasName>
+
+=item *
+
+Globally unique key ID example: C<12345678-1234-1234-1234-123456789012>
+
+=item *
+
+Alias name example: C<alias/MyAliasName>
+
+=item *
+
+Master key owned by Kinesis Data Streams: C<alias/aws/kinesis>
+
+=back
+
 
 
 =head2 B<REQUIRED> RetentionPeriodHours => Int
@@ -115,13 +145,14 @@ one of the following states:
 
 =item *
 
-C<CREATING> - The stream is being created. Amazon Kinesis immediately
-returns and sets C<StreamStatus> to C<CREATING>.
+C<CREATING> - The stream is being created. Kinesis Data Streams
+immediately returns and sets C<StreamStatus> to C<CREATING>.
 
 =item *
 
 C<DELETING> - The stream is being deleted. The specified stream is in
-the C<DELETING> state until Amazon Kinesis completes the deletion.
+the C<DELETING> state until Kinesis Data Streams completes the
+deletion.
 
 =item *
 
@@ -146,9 +177,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Kinesis>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

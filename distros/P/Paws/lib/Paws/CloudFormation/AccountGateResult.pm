@@ -45,7 +45,8 @@ function returns C<FAILED>, CloudFormation cancels the operation in
 that account and region, and sets the stack set operation result status
 for that account and region to C<FAILED>.
 
-For more information, see Configuring a target account gate.
+For more information, see Configuring a target account gate
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacksets-account-gating.html).
 
 =head1 ATTRIBUTES
 
@@ -116,9 +117,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::CloudForm
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

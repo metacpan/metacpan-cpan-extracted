@@ -2,12 +2,14 @@
 package Paws::RDS::CreateDBCluster;
   use Moose;
   has AvailabilityZones => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
+  has BacktrackWindow => (is => 'ro', isa => 'Int');
   has BackupRetentionPeriod => (is => 'ro', isa => 'Int');
   has CharacterSetName => (is => 'ro', isa => 'Str');
   has DatabaseName => (is => 'ro', isa => 'Str');
   has DBClusterIdentifier => (is => 'ro', isa => 'Str', required => 1);
   has DBClusterParameterGroupName => (is => 'ro', isa => 'Str');
   has DBSubnetGroupName => (is => 'ro', isa => 'Str');
+  has EnableCloudwatchLogsExports => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
   has EnableIAMDatabaseAuthentication => (is => 'ro', isa => 'Bool');
   has Engine => (is => 'ro', isa => 'Str', required => 1);
   has EngineVersion => (is => 'ro', isa => 'Str');
@@ -35,21 +37,40 @@ package Paws::RDS::CreateDBCluster;
 
 =head1 NAME
 
-Paws::RDS::CreateDBCluster - Arguments for method CreateDBCluster on Paws::RDS
+Paws::RDS::CreateDBCluster - Arguments for method CreateDBCluster on L<Paws::RDS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateDBCluster on the 
-Amazon Relational Database Service service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateDBCluster on the
+L<Amazon Relational Database Service|Paws::RDS> service. Use the attributes of this class
 as arguments to method CreateDBCluster.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateDBCluster.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateDBCluster(Att1 => $value1, Att2 => $value2, ...);
+    my $rds = Paws->service('RDS');
+    # To create a DB cluster
+    # This example creates a DB cluster.
+    my $CreateDBClusterResult = $rds->CreateDBCluster(
+      {
+        'AvailabilityZones'           => ['us-east-1a'],
+        'DBClusterParameterGroupName' => 'mydbclusterparametergroup',
+        'MasterUserPassword'          => 'mypassword',
+        'EngineVersion'               => '5.6.10a',
+        'DatabaseName'                => 'myauroradb',
+        'StorageEncrypted'            => true,
+        'Engine'                      => 'aurora',
+        'BackupRetentionPeriod'       => 1,
+        'Port'                        => 3306,
+        'MasterUsername'              => 'myuser',
+        'DBClusterIdentifier'         => 'mydbcluster'
+      }
+    );
+
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/rds/CreateDBCluster>
 
 =head1 ATTRIBUTES
 
@@ -57,8 +78,30 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 =head2 AvailabilityZones => ArrayRef[Str|Undef]
 
 A list of EC2 Availability Zones that instances in the DB cluster can
-be created in. For information on regions and Availability Zones, see
-Regions and Availability Zones.
+be created in. For information on AWS Regions and Availability Zones,
+see Regions and Availability Zones
+(http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html).
+
+
+
+=head2 BacktrackWindow => Int
+
+The target backtrack window, in seconds. To disable backtracking, set
+this value to 0.
+
+Default: 0
+
+Constraints:
+
+=over
+
+=item *
+
+If specified, this value must be set to a number from 0 to 259,200 (72
+hours).
+
+=back
+
 
 
 
@@ -108,7 +151,7 @@ Constraints:
 
 =item *
 
-Must contain from 1 to 63 alphanumeric characters or hyphens.
+Must contain from 1 to 63 letters, numbers, or hyphens.
 
 =item *
 
@@ -127,8 +170,7 @@ Example: C<my-cluster1>
 =head2 DBClusterParameterGroupName => Str
 
 The name of the DB cluster parameter group to associate with this DB
-cluster. If this argument is omitted, C<default.aurora5.6> will be
-used.
+cluster. If this argument is omitted, C<default.aurora5.6> is used.
 
 Constraints:
 
@@ -136,15 +178,8 @@ Constraints:
 
 =item *
 
-Must be 1 to 255 alphanumeric characters
-
-=item *
-
-First character must be a letter
-
-=item *
-
-Cannot end with a hyphen or contain two consecutive hyphens
+If supplied, must match the name of an existing
+DBClusterParameterGroup.
 
 =back
 
@@ -155,18 +190,24 @@ Cannot end with a hyphen or contain two consecutive hyphens
 
 A DB subnet group to associate with this DB cluster.
 
-Constraints: Must contain no more than 255 alphanumeric characters,
-periods, underscores, spaces, or hyphens. Must not be default.
+Constraints: Must match the name of an existing DBSubnetGroup. Must not
+be default.
 
 Example: C<mySubnetgroup>
 
 
 
+=head2 EnableCloudwatchLogsExports => ArrayRef[Str|Undef]
+
+The list of log types that need to be enabled for exporting to
+CloudWatch Logs.
+
+
+
 =head2 EnableIAMDatabaseAuthentication => Bool
 
-A Boolean value that is true to enable mapping of AWS Identity and
-Access Management (IAM) accounts to database accounts, and otherwise
-false.
+True to enable mapping of AWS Identity and Access Management (IAM)
+accounts to database accounts, and otherwise false.
 
 Default: C<false>
 
@@ -176,7 +217,9 @@ Default: C<false>
 
 The name of the database engine to be used for this DB cluster.
 
-Valid Values: C<aurora>
+Valid Values: C<aurora> (for MySQL 5.6-compatible Aurora),
+C<aurora-mysql> (for MySQL 5.7-compatible Aurora), and
+C<aurora-postgresql>
 
 
 
@@ -184,15 +227,19 @@ Valid Values: C<aurora>
 
 The version number of the database engine to use.
 
-B<Aurora>
+B<Aurora MySQL>
 
-Example: C<5.6.10a>
+Example: C<5.6.10a>, C<5.7.12>
+
+B<Aurora PostgreSQL>
+
+Example: C<9.6.3>
 
 
 
 =head2 KmsKeyId => Str
 
-The KMS key identifier for an encrypted DB cluster.
+The AWS KMS key identifier for an encrypted DB cluster.
 
 The KMS key identifier is the Amazon Resource Name (ARN) for the KMS
 encryption key. If you are creating a DB cluster with the same AWS
@@ -238,7 +285,7 @@ Constraints:
 
 =item *
 
-Must be 1 to 16 alphanumeric characters.
+Must be 1 to 16 letters or numbers.
 
 =item *
 
@@ -267,8 +314,8 @@ Constraints: Must contain from 8 to 41 characters.
 A value that indicates that the DB cluster should be associated with
 the specified option group.
 
-Permanent options cannot be removed from an option group. The option
-group cannot be removed from a DB cluster once it is associated with a
+Permanent options can't be removed from an option group. The option
+group can't be removed from a DB cluster once it is associated with a
 DB cluster.
 
 
@@ -278,7 +325,8 @@ DB cluster.
 The port number on which the instances in the DB cluster accept
 connections.
 
-Default: C<3306>
+Default: C<3306> if engine is set as aurora or C<5432> if set to
+aurora-postgresql.
 
 
 
@@ -288,9 +336,11 @@ The daily time range during which automated backups are created if
 automated backups are enabled using the C<BackupRetentionPeriod>
 parameter.
 
-Default: A 30-minute window selected at random from an 8-hour block of
-time per AWS Region. To see the time blocks available, see Adjusting
-the Preferred Maintenance Window in the I<Amazon RDS User Guide.>
+The default is a 30-minute window selected at random from an 8-hour
+block of time for each AWS Region. To see the time blocks available,
+see Adjusting the Preferred Maintenance Window
+(http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/AdjustingTheMaintenanceWindow.html)
+in the I<Amazon RDS User Guide.>
 
 Constraints:
 
@@ -302,7 +352,7 @@ Must be in the format C<hh24:mi-hh24:mi>.
 
 =item *
 
-Times should be in Universal Coordinated Time (UTC).
+Must be in Universal Coordinated Time (UTC).
 
 =item *
 
@@ -324,12 +374,14 @@ Universal Coordinated Time (UTC).
 
 Format: C<ddd:hh24:mi-ddd:hh24:mi>
 
-Default: A 30-minute window selected at random from an 8-hour block of
-time per AWS Region, occurring on a random day of the week. To see the
-time blocks available, see Adjusting the Preferred Maintenance Window
+The default is a 30-minute window selected at random from an 8-hour
+block of time for each AWS Region, occurring on a random day of the
+week. To see the time blocks available, see Adjusting the Preferred
+Maintenance Window
+(http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/AdjustingTheMaintenanceWindow.html)
 in the I<Amazon RDS User Guide.>
 
-Valid Days: Mon, Tue, Wed, Thu, Fri, Sat, Sun
+Valid Days: Mon, Tue, Wed, Thu, Fri, Sat, Sun.
 
 Constraints: Minimum 30-minute window.
 
@@ -339,7 +391,7 @@ Constraints: Minimum 30-minute window.
 
 A URL that contains a Signature Version 4 signed request for the
 C<CreateDBCluster> action to be called in the source AWS Region where
-the DB cluster will be replicated from. You only need to specify
+the DB cluster is replicated from. You only need to specify
 C<PreSignedUrl> when you are performing cross-region replication from
 an encrypted DB cluster.
 
@@ -353,11 +405,11 @@ The pre-signed URL request must contain the following parameter values:
 
 =item *
 
-C<KmsKeyId> - The KMS key identifier for the key to use to encrypt the
-copy of the DB cluster in the destination AWS Region. This should refer
-to the same KMS key for both the C<CreateDBCluster> action that is
-called in the destination AWS Region, and the action contained in the
-pre-signed URL.
+C<KmsKeyId> - The AWS KMS key identifier for the key to use to encrypt
+the copy of the DB cluster in the destination AWS Region. This should
+refer to the same KMS key for both the C<CreateDBCluster> action that
+is called in the destination AWS Region, and the action contained in
+the pre-signed URL.
 
 =item *
 
@@ -370,14 +422,17 @@ C<ReplicationSourceIdentifier> - The DB cluster identifier for the
 encrypted DB cluster to be copied. This identifier must be in the
 Amazon Resource Name (ARN) format for the source AWS Region. For
 example, if you are copying an encrypted DB cluster from the us-west-2
-region, then your C<ReplicationSourceIdentifier> would look like
+AWS Region, then your C<ReplicationSourceIdentifier> would look like
 Example: C<arn:aws:rds:us-west-2:123456789012:cluster:aurora-cluster1>.
 
 =back
 
 To learn how to generate a Signature Version 4 signed request, see
 Authenticating Requests: Using Query Parameters (AWS Signature Version
-4) and Signature Version 4 Signing Process.
+4)
+(http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-query-string-auth.html)
+and Signature Version 4 Signing Process
+(http://docs.aws.amazon.com/general/latest/gr/signature-version-4.html).
 
 
 
@@ -413,9 +468,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateDBClust
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

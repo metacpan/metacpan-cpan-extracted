@@ -1,3 +1,21 @@
+1.22     2018-06-08
+
+- Update the glibc source data to the data from glibc 2.27.
+
+- Added documentation for this glibc data.
+
+- Reformatted the DateTime::Locale::FromData docs.
+
+
+1.21     2018-06-08
+
+- Added a new DateTime::Local->register_from_data method. This replaces the
+  old custom locale registration system with something much simpler. Instead
+  of providing a new class you simply provide a hash of data for the locale
+  and it becomes available for use via DateTime::Local->load. Implemented by
+  Ryley Breiddal. PR #21. Addresse GH #19.
+
+
 1.20     2018-05-06
 
 - Fix test failures on Windows. Reported by Adrian Devries. GH #23.

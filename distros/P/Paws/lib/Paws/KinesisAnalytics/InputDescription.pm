@@ -40,7 +40,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::KinesisAnal
 =head1 DESCRIPTION
 
 Describes the application input configuration. For more information,
-see Configuring Application Input.
+see Configuring Application Input
+(http://docs.aws.amazon.com/kinesisanalytics/latest/dev/how-it-works-input.html).
 
 =head1 ATTRIBUTES
 
@@ -86,16 +87,16 @@ stream.
 =head2 KinesisFirehoseInputDescription => L<Paws::KinesisAnalytics::KinesisFirehoseInputDescription>
 
   If an Amazon Kinesis Firehose delivery stream is configured as a
-streaming source, provides the Firehose delivery stream's Amazon
-Resource Name (ARN) and an IAM role that enables Amazon Kinesis
-Analytics to access the stream on your behalf.
+streaming source, provides the delivery stream's ARN and an IAM role
+that enables Amazon Kinesis Analytics to access the stream on your
+behalf.
 
 
 =head2 KinesisStreamsInputDescription => L<Paws::KinesisAnalytics::KinesisStreamsInputDescription>
 
   If an Amazon Kinesis stream is configured as streaming source, provides
-Amazon Kinesis stream's ARN and an IAM role that enables Amazon Kinesis
-Analytics to access the stream on your behalf.
+Amazon Kinesis stream's Amazon Resource Name (ARN) and an IAM role that
+enables Amazon Kinesis Analytics to access the stream on your behalf.
 
 
 =head2 NamePrefix => Str
@@ -110,9 +111,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::KinesisAn
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

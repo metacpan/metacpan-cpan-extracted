@@ -17469,7 +17469,7 @@
 
         # Task parameters
         #
-        # Table object handling the Gtk2::Ex::Simple::List
+        # Table object handling the GA::Gtk::Simple::List
         $self->{slTableObj}             = undef;
         # A hash of scripts displayed in the window, in the form
         #   $fileHash{script_name} = full_file_path

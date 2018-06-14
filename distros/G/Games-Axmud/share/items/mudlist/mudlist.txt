@@ -1,4 +1,4 @@
-# Axmud list of all worlds, created Thu May 31, 2018
+# Axmud list of all worlds, created Fri Jun 8, 2018
 
 Aabahran, The Forsaken Lands
 aabahran
@@ -378,6 +378,13 @@ q.geek.nz
 0
 English
 
+Arx, After the Reckoning
+arxmush
+play.arxmush.org
+3000
+0
+English
+
 Ascii
 asciimush
 teenymush.dynu.net
@@ -713,6 +720,13 @@ burningmud.com
 4000
 0
 English
+
+Bylins Mud
+bylins
+bylins.su
+4000
+0
+Russian
 
 Carinus
 carinus
@@ -2513,6 +2527,13 @@ intermush.pennmush.org
 0
 English
 
+Intrepid
+intrepid
+intrepidmud.com
+4020
+0
+English
+
 Islands of Myth
 iomyth
 islandsofmyth.org
@@ -3591,6 +3612,13 @@ puggy.mushpark.com
 0
 English
 
+Ragnarok
+ragnarokmud
+rag.com
+2222
+0
+English
+
 Roma Aeterna Mux
 ramux
 romagame.pw
@@ -3911,6 +3939,13 @@ shangrila
 shangrilamux.com
 9999
 1
+English
+
+SharpMOO
+sharpmoo
+sharpmoo.com
+4000
+0
 English
 
 Shattered Kingdoms
@@ -4603,6 +4638,13 @@ Turiel
 turiel
 Turiel.kydance.net
 6669
+0
+English
+
+The Turning Point III
+turningpoint
+tp.org
+9999
 0
 English
 

@@ -29,21 +29,123 @@ package Paws::CloudFormation::UpdateStack;
 
 =head1 NAME
 
-Paws::CloudFormation::UpdateStack - Arguments for method UpdateStack on Paws::CloudFormation
+Paws::CloudFormation::UpdateStack - Arguments for method UpdateStack on L<Paws::CloudFormation>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateStack on the 
-AWS CloudFormation service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateStack on the
+L<AWS CloudFormation|Paws::CloudFormation> service. Use the attributes of this class
 as arguments to method UpdateStack.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateStack.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateStack(Att1 => $value1, Att2 => $value2, ...);
+    my $cloudformation = Paws->service('CloudFormation');
+    # To update an AWS CloudFormation stack
+    # This example updates the template and input parameters for the specified
+    # stack.
+    my $UpdateStackOutput = $cloudformation->UpdateStack(
+      {
+        'ResourceTypes' => [
+
+        ],
+        'TemplateURL' => 'https://s3.amazonaws.com/example/updated.template',
+        'Tags'        => [
+
+        ],
+        'StackName'        => 'MyStack',
+        'NotificationARNs' => [
+
+        ],
+        'Parameters' => [
+
+          {
+            'ParameterValue' => 'ExampleKeyPair',
+            'ParameterKey'   => 'KeyPairName'
+          },
+
+          {
+            'ParameterValue' => 'ExampleSubnetID1, ExampleSubnetID2',
+            'ParameterKey'   => 'SubnetIDs'
+          }
+        ]
+      }
+    );
+
+    # Results:
+    my $StackId = $UpdateStackOutput->StackId;
+
+   # Returns a L<Paws::CloudFormation::UpdateStackOutput> object.
+   # To update an AWS CloudFormation stack
+   # This example updates only the the specified parameter value for the
+   # specified stack. If you don't specify a parameter value, AWS CloudFormation
+   # uses the default value from the template.
+    my $UpdateStackOutput = $cloudformation->UpdateStack(
+      {
+        'Parameters' => [
+
+          {
+            'UsePreviousValue' => true,
+            'ParameterKey'     => 'KeyPairName'
+          },
+
+          {
+            'ParameterKey'   => 'SubnetIDs',
+            'ParameterValue' => 'SampleSubnetID1, UpdatedSampleSubnetID2'
+          }
+        ],
+        'NotificationARNs' => [
+
+        ],
+        'TemplateURL'   => 'https://s3.amazonaws.com/example/updated.template',
+        'ResourceTypes' => [
+
+        ],
+        'Tags' => [
+
+        ],
+        'StackName' => 'MyStack'
+      }
+    );
+
+    # Results:
+    my $StackId = $UpdateStackOutput->StackId;
+
+    # Returns a L<Paws::CloudFormation::UpdateStackOutput> object.
+    # To update an AWS CloudFormation stack
+    # This example adds two stack notification topics to the specified stack.
+    my $UpdateStackOutput = $cloudformation->UpdateStack(
+      {
+        'ResourceTypes' => [
+
+        ],
+        'StackName'   => 'MyStack',
+        'TemplateURL' => 'https://s3.amazonaws.com/example/updated.template',
+        'UsePreviousTemplate' => true,
+        'Capabilities'        => [
+
+        ],
+        'NotificationARNs' => [
+          'arn:aws:sns:use-east-1:123456789012:mytopic1',
+          'arn:aws:sns:us-east-1:123456789012:mytopic2'
+        ],
+        'Tags' => [
+
+        ],
+        'Parameters' => [
+
+        ]
+      }
+    );
+
+    # Results:
+    my $StackId = $UpdateStackOutput->StackId;
+
+    # Returns a L<Paws::CloudFormation::UpdateStackOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/cloudformation/UpdateStack>
 
 =head1 ATTRIBUTES
 
@@ -59,12 +161,23 @@ specifying this parameter.
 
 The only valid values are C<CAPABILITY_IAM> and
 C<CAPABILITY_NAMED_IAM>. The following resources require you to specify
-this parameter: AWS::IAM::AccessKey, AWS::IAM::Group,
-AWS::IAM::InstanceProfile, AWS::IAM::Policy, AWS::IAM::Role,
-AWS::IAM::User, and AWS::IAM::UserToGroupAddition. If your stack
-template contains these resources, we recommend that you review all
-permissions associated with them and edit their permissions if
-necessary.
+this parameter: AWS::IAM::AccessKey
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-accesskey.html),
+AWS::IAM::Group
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-group.html),
+AWS::IAM::InstanceProfile
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-instanceprofile.html),
+AWS::IAM::Policy
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-policy.html),
+AWS::IAM::Role
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html),
+AWS::IAM::User
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-user.html),
+and AWS::IAM::UserToGroupAddition
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-addusertogroup.html).
+If your stack template contains these resources, we recommend that you
+review all permissions associated with them and edit their permissions
+if necessary.
 
 If you have IAM resources, you can specify either capability. If you
 have IAM resources with custom names, you must specify
@@ -72,7 +185,8 @@ C<CAPABILITY_NAMED_IAM>. If you don't specify this parameter, this
 action returns an C<InsufficientCapabilities> error.
 
 For more information, see Acknowledging IAM Resources in AWS
-CloudFormation Templates.
+CloudFormation Templates
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-template.html#capabilities).
 
 
 
@@ -111,7 +225,9 @@ list to remove all notification topics.
 =head2 Parameters => ArrayRef[L<Paws::CloudFormation::Parameter>]
 
 A list of C<Parameter> structures that specify input parameters for the
-stack. For more information, see the Parameter data type.
+stack. For more information, see the Parameter
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_Parameter.html)
+data type.
 
 
 
@@ -126,7 +242,8 @@ updating, the stack update fails. By default, AWS CloudFormation grants
 permissions to all resource types. AWS Identity and Access Management
 (IAM) uses this parameter for AWS CloudFormation-specific condition
 keys in IAM policies. For more information, see Controlling Access with
-AWS Identity and Access Management.
+AWS Identity and Access Management
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-template.html).
 
 
 
@@ -233,7 +350,9 @@ removes all associated tags.
 
 Structure containing the template body with a minimum length of 1 byte
 and a maximum length of 51,200 bytes. (For more information, go to
-Template Anatomy in the AWS CloudFormation User Guide.)
+Template Anatomy
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-anatomy.html)
+in the AWS CloudFormation User Guide.)
 
 Conditional: You must specify only one of the following parameters:
 C<TemplateBody>, C<TemplateURL>, or set the C<UsePreviousTemplate> to
@@ -245,7 +364,9 @@ C<true>.
 
 Location of file containing the template body. The URL must point to a
 template that is located in an Amazon S3 bucket. For more information,
-go to Template Anatomy in the AWS CloudFormation User Guide.
+go to Template Anatomy
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-anatomy.html)
+in the AWS CloudFormation User Guide.
 
 Conditional: You must specify only one of the following parameters:
 C<TemplateBody>, C<TemplateURL>, or set the C<UsePreviousTemplate> to
@@ -271,9 +392,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateStack i
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -81,13 +81,19 @@ compute environment. You can specify the short name or full Amazon
 Resource Name (ARN) of an instance profile. For example,
 C<ecsInstanceRole> or
 C<arn:aws:iam::E<lt>aws_account_idE<gt>:instance-profile/ecsInstanceRole>.
-For more information, see Amazon ECS Instance Role in the I<AWS Batch
-User Guide>.
+For more information, see Amazon ECS Instance Role
+(http://docs.aws.amazon.com/batch/latest/userguide/instance_IAM_role.html)
+in the I<AWS Batch User Guide>.
 
 
 =head2 B<REQUIRED> InstanceTypes => ArrayRef[Str|Undef]
 
-  The instances types that may launched.
+  The instances types that may be launched. You can specify instance
+families to launch any instance type within those families (for
+example, C<c4> or C<p3>), or you can specify specific sizes within a
+family (such as C<c4.8xlarge>). You can also choose C<optimal> to pick
+instance types (from the latest C, M, and R instance families) on the
+fly that match the demand of your job queues.
 
 
 =head2 B<REQUIRED> MaxvCpus => Int
@@ -135,9 +141,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Batch>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

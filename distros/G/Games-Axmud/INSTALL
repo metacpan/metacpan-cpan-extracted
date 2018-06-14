@@ -15,7 +15,8 @@ The easiest way to use Axmud on Windows is to download and run the Windows
 installer from the Axmud website.
 
 The installer contains everything you need to run Axmud, including a copy of 
-Strawberry Perl and all the required modules and libraries.
+Strawberry Perl, a text-to-speech engine and all the required modules and
+libraries.
 
 Users who already have Strawberry Perl and/or ActivePerl installed on their
 system can install Axmud manually using any of the following methods. 

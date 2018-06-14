@@ -2,8 +2,8 @@ NAME
     Version::Util - Version-number utilities
 
 VERSION
-    This document describes version 0.730 of Version::Util (from Perl
-    distribution Version-Util), released on 2018-01-09.
+    This document describes version 0.731 of Version::Util (from Perl
+    distribution Version-Util), released on 2018-06-10.
 
 DESCRIPTION
     This module provides several convenient functions related to version
@@ -23,6 +23,8 @@ FUNCTIONS
   version_ge($v1, $v2) => BOOL
   version_between($v, $v1, $v2[, $v1b, $v2b, ...]) => BOOL
   version_in($v, $v1[, $v2, ...]) => BOOL
+  min_version($v1, ...) => $max_v
+  max_version($v1, ...) => $max_v
   add_version($v, $increment) => $new_v
     Add $increment to version $v. Both increment and version must match:
 

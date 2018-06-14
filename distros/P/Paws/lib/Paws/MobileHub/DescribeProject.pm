@@ -10,28 +10,37 @@ package Paws::MobileHub::DescribeProject;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/project');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'GET');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::MobileHub::DescribeProjectResult');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::MobileHub::DescribeProject - Arguments for method DescribeProject on Paws::MobileHub
+Paws::MobileHub::DescribeProject - Arguments for method DescribeProject on L<Paws::MobileHub>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DescribeProject on the 
-AWS Mobile service. Use the attributes of this class
+This class represents the parameters used for calling the method DescribeProject on the
+L<AWS Mobile|Paws::MobileHub> service. Use the attributes of this class
 as arguments to method DescribeProject.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DescribeProject.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DescribeProject(Att1 => $value1, Att2 => $value2, ...);
+    my $mobile = Paws->service('MobileHub');
+    my $DescribeProjectResult = $mobile->DescribeProject(
+      ProjectId         => 'MyProjectId',
+      SyncFromResources => 1,               # OPTIONAL
+    );
+
+    # Results:
+    my $Details = $DescribeProjectResult->Details;
+
+    # Returns a L<Paws::MobileHub::DescribeProjectResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/mobile-hub/>
 
 =head1 ATTRIBUTES
 
@@ -57,9 +66,9 @@ This class forms part of L<Paws>, documenting arguments for method DescribeProje
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

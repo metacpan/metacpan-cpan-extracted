@@ -1,0 +1,41 @@
+---
+abstract: 'Very simple Menu For Console commands Platform Agnostic'
+author:
+  - 'Michael Mueller <michael@muellers.net.au>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.1, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-ConMenu
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::ConMenu:
+    file: lib/App/ConMenu.pm
+    version: '1.00'
+requires:
+  File::HomeDir: '0'
+  Term::ANSIScreen: '0'
+  YAML::Tiny: '0'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/code4pay/App-ConMenu/issues
+  homepage: https://github.com/code4pay/App-ConMenu
+  repository: git://github.com/code4pay/App-ConMenu.git
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

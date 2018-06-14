@@ -6,7 +6,7 @@ use XML::Struct::Reader;
 use XML::Struct::Writer;
 use XML::Struct::Simple;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(readXML writeXML simpleXML removeXMLAttr textValues);
 
@@ -67,15 +67,15 @@ XML-Struct - Represent XML as data structure preserving element order
 
 # Status
 
-[![Build Status](https://travis-ci.org/nichtich/XML-Struct.png)](https://travis-ci.org/nichtich/XML-Struct)
-[![Coverage Status](https://coveralls.io/repos/nichtich/XML-Struct/badge.png)](https://coveralls.io/r/nichtich/XML-Struct)
+[![Build Status](https://travis-ci.org/nichtich/XML-Struct.svg)](https://travis-ci.org/nichtich/XML-Struct)
+[![Coverage Status](https://coveralls.io/repos/nichtich/XML-Struct/badge.svg)](https://coveralls.io/r/nichtich/XML-Struct)
 [![Kwalitee Score](http://cpants.cpanauthors.org/dist/XML-Struct.png)](http://cpants.cpanauthors.org/dist/XML-Struct)
 
 =end markdown
 
 =head1 SYNOPSIS
 
-    use XML::Struct qw(readXML writeXML simpleXML removeXMLAttr);
+    use XML::Struct qw(readXML writeXML simpleXML);
 
     my $xml = readXML( "input.xml" );
     # [ root => { xmlns => 'http://example.org/' }, [ '!', [ x => {}, [42] ] ] ]
@@ -86,9 +86,6 @@ XML-Struct - Represent XML as data structure preserving element order
 
     my $simple = simpleXML( $xml, root => 'record' );
     # { record => { xmlns => 'http://example.org/', x => 42 } }
-
-    my $xml2 = removeXMLAttr($xml);
-    # [ root => [ '!', [ x => [42] ] ] ]
 
 =head1 DESCRIPTION
 
@@ -105,7 +102,8 @@ L<MicroXML|http://www.w3.org/community/microxml/>, a simplified subset of XML.
 If your XML documents don't contain relevant attributes, you can also choose
 to map to this format:
 
-   [ $name => \@children ]
+   [ $name => \@children ]   # element without attributes
+   [ $name ]                 # empty tag without attributes
 
 Both parsing (with L<XML::Struct::Reader> or function C<readXML>) and
 serializing (with L<XML::Struct::Writer> or function C<writeXML>) are fully
@@ -142,22 +140,26 @@ The following functions are exported on request:
 =head2 readXML( $source [, %options ] )
 
 Read an XML document with L<XML::Struct::Reader>. The type of source (string,
-filename, URL, IO Handle...) is detected automatically. Options not known to
-XML::Struct::Reader are passed to L<XML::LibXML::Reader>.
+filename, URL, IO Handle...) is detected automatically. See
+L<XML::Struct::Reader> for options. Options not known to XML::Struct::Reader
+are passed to L<XML::LibXML::Reader>.
 
 =head2 writeXML( $xml [, %options ] )
 
-Write an XML document/element with L<XML::Struct::Writer>.
+Write an XML document/element with L<XML::Struct::Writer>. See
+L<XML::Struct::Writer> for options.
 
 =head2 simpleXML( $element [, %options ] )
 
 Transform an XML document/element into simple key-value format as known from
-L<XML::Simple>. See L<XML::Struct::Simple> for configuration options.
+L<XML::Simple>. See L<XML::Struct::Simple> for options.
 
 =head2 removeXMLAttr( $element )
 
 Transform XML structure with attributes to XML structure without attributes.
 The function does not modify the passed element but creates a modified copy.
+
+I<this function is deprecated and will be removed in a future release!>
 
 =head1 EXAMPLE
 

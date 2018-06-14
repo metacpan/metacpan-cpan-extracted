@@ -1,3 +1,13 @@
+0.58     2018-06-08
+
+- Re-release to fix the generated Makefile.PL. We do not want to try to build
+  the XS code with compiler warnings enabled except on Perl 5.24+. There are
+  unavoidable warnings with older Perls. If you tried to install this distro
+  in an environment where AUTHOR_TESTING was set, these warnings would be
+  enabled, along with "-Werror", causing the build to fail
+  completely. Reported by Olaf Alders. GH #3.
+
+
 0.57     2018-05-26
 
 - Fix C compiler warnings. Reported by Jim Keenan. GH #2.

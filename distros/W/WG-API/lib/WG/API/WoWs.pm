@@ -10,13 +10,13 @@ WG::API::WoWs - Moduled for work with Wargaming.net Public API for Worlf of Wars
 
 =head1 VERSION
 
-Version v0.8.6
+Version v0.8.8
 
 =cut
 
-our $VERSION = 'v0.8.6';
+our $VERSION = 'v0.8.8';
 
-use constant api_uri => 'api.worldofwarships.ru/wows';
+use constant api_uri => '//api.worldofwarships.ru/';
 
 =head1 SYNOPSIS
 
@@ -46,33 +46,51 @@ Params:
 
 =head2 Account
 
-=head3 B<account_list( [ %params ] )>
+=over 1
+
+=item B<account_list( [ %params ] )>
 
 Method returns partial list of players. The list is filtered by initial characters of user name and sorted alphabetically.
+
+=over 2
+
+=item I<required fields:>
+
+    search - Player name search string. Parameter "type" defines minimum length and type of search. Using the exact search type, you can enter several names, separated with commas. Maximum length: 24.
+
+=back
 
 =cut
 
 sub account_list {
     my $self = shift;
 
-    return $self->_request( 'get', 'account/list', [ 'language', 'fields', 'type', 'search', 'limit' ], ['search'],
+    return $self->_request( 'get', 'wows/account/list/', [ 'language', 'fields', 'type', 'search', 'limit' ], ['search'],
         @_ );
 }
 
-=head3 B<account_info( [ %params ] )>
+=item B<account_info( [ %params ] )>
 
 Method returns player details. Players may hide their game profiles, use field hidden_profile for determination.
+
+=over 2
+
+=item I<required fields:>
+
+    account_id - Account ID. Max limit is 100. Min value is 1.
+
+=back
 
 =cut
 
 sub account_info {
     my $self = shift;
 
-    return $self->_request( 'get', 'account/info', [ 'language', 'fields', 'access_token', 'extra', 'account_id' ],
+    return $self->_request( 'get', 'wows/account/info/', [ 'language', 'fields', 'access_token', 'extra', 'account_id' ],
         ['account_id'], @_ );
 }
 
-=head3 B<account_achievements( [ %params ] )>
+=item B<account_achievements( [ %params ] )>
 
 Method returns information about players' achievements. Accounts with hidden game profiles are excluded from response. Hidden profiles are listed in the field meta.hidden.
 
@@ -81,28 +99,63 @@ Method returns information about players' achievements. Accounts with hidden gam
 sub account_achievements {
     my $self = shift;
 
-    return $self->_request( 'get', 'account/achievements', [ 'language', 'fields', 'account_id' ], ['account_id'], @_ );
+    return $self->_request( 'get', 'wows/account/achievements/', [ 'language', 'fields', 'account_id', 'access_token' ], ['account_id'], @_ );
 }
+
+=item B<account_statsbydate( [ %params ] )>
+
+Method returns statistics slices by dates in specified time span.
+
+=over 2
+
+=item I<required fields:>
+
+    account_id - Account ID. Max limit is 100. Min value is 1.
+
+=back
+
+=cut
+
+sub account_statsbydate {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wows/account/statsbydate/', [ 'language', 'fields', 'dates', 'access_token', 'extra', 'account_id' ],
+        ['account_id'], @_ );
+}
+
+=back
 
 =head2 Warships
 
-=head3 B<ships_stats( [ %params ] )>
+=over 1
+
+=item B<ships_stats( [ %params ] )>
 
 Method returns general statistics for each ship of a player. Accounts with hidden game profiles are excluded from response. Hidden profiles are listed in the field meta.hidden.
+
+=over 2
+
+=item I<required fields:>
+
+    account_id - Account ID. Max limit is 100. Min value is 1.
+
+=back
 
 =cut
 
 sub ships_stats {
     my $self = shift;
 
-    return $self->_request( 'get', 'ships/stats',
+    return $self->_request( 'get', 'wows/ships/stats/',
         [ 'language', 'fields', 'access_token', 'extra', 'account_id', 'ship_id', 'in_garage' ],
         ['account_id'], @_ );
 }
 
+=back
+
 =head1 BUGS
 
-Please report any bugs or feature requests to C<cynovg at cpan.org>, or through the web interface at L<https://github.com/cynovg/WG-API/issues>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to C<cynovg at cpan.org>, or through the web interface at L<https://gitlab.com/cynovg/WG-API/issues>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
@@ -116,7 +169,7 @@ You can also look for information at:
 
 =item * RT: GitHub's request tracker (report bugs here)
 
-L<https://github.com/cynovg/WG-API/issues>
+L<https://gitlab.com/cynovg/WG-API/issues>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
@@ -128,7 +181,7 @@ L<http://cpanratings.perl.org/d/WG-API>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/WG-API/>
+L<https://metacpan.org/pod/WG::API>
 
 =back
 

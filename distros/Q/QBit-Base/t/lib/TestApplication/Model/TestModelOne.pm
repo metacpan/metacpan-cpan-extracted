@@ -20,7 +20,11 @@ __PACKAGE__->register_rights(
 );
 
 __PACKAGE__->model_fields(
-    model_one_field => {db => TRUE, default => TRUE},
+    model_one_field              => {db => TRUE, default => TRUE},
+    model_one_field_with_depends => {
+        depends_on => [qw(id)],
+        get        => sub {$_[1]->{'id'}}
+    }
 );
 
 __PACKAGE__->model_filter(

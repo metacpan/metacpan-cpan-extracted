@@ -38,7 +38,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::IAM::Signin
 Contains information about an X.509 signing certificate.
 
 This data type is used as a response element in the
-UploadSigningCertificate and ListSigningCertificates actions.
+UploadSigningCertificate and ListSigningCertificates operations.
 
 =head1 ATTRIBUTES
 
@@ -55,8 +55,8 @@ UploadSigningCertificate and ListSigningCertificates actions.
 
 =head2 B<REQUIRED> Status => Str
 
-  The status of the signing certificate. C<Active> means the key is valid
-for API calls, while C<Inactive> means it is not.
+  The status of the signing certificate. C<Active> means that the key is
+valid for API calls, while C<Inactive> means it is not.
 
 
 =head2 UploadDate => Str
@@ -76,9 +76,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::IAM>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

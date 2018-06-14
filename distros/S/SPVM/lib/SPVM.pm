@@ -16,14 +16,9 @@ use Encode 'encode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0344';
+our $VERSION = '0.0346';
 
-our $COMPILER;
-our $API;
-our @PACKAGE_INFOS;
-our %PACKAGE_INFO_SYMTABLE;
-our $BUILD_DIR;
-our $INITIALIZED;
+our $ENV;
 our $BUILD;
 
 require XSLoader;
@@ -32,43 +27,31 @@ XSLoader::load('SPVM', $VERSION);
 sub import {
   my ($class, $package_name) = @_;
   
-  unless ($INITIALIZED) {
-    $BUILD = SPVM::Build->new;
-    $BUILD_DIR = $ENV{SPVM_BUILD_DIR};
-    if (defined $BUILD_DIR) {
+  unless ($BUILD) {
+    my $build_dir = $ENV{SPVM_BUILD_DIR};
+    if (defined $build_dir) {
       # Remove traling slash
-      $BUILD_DIR = File::Spec->catdir(File::Spec->splitdir($BUILD_DIR));
+      $build_dir = File::Spec->catdir(File::Spec->splitdir($build_dir));
     }
-    
-    $INITIALIZED = 1;
+    $BUILD = SPVM::Build->new(build_dir => $build_dir);
   }
 
   # Add package informations
   if (defined $package_name) {
-    unless ($SPVM::PACKAGE_INFO_SYMTABLE{$package_name}) {
-      my ($file, $line) = (caller)[1, 2];
-
-      my $package_info = {
-        name => $package_name,
-        file => $file,
-        line => $line
-      };
-      push @SPVM::PACKAGE_INFOS, $package_info;
-      
-      $SPVM::PACKAGE_INFO_SYMTABLE{$package_name} = 1;
-      
-      return $package_info;
-    }
+    my ($file, $line) = (caller)[1, 2];
+    my $package_info = {
+      name => $package_name,
+      file => $file,
+      line => $line
+    };
+    push @{$BUILD->{package_infos}}, $package_info;
   }
-  
-  return;
 }
 
 # Compile SPVM source code just after compile-time of Perl
 CHECK {
-  
-  unless ($ENV{SPVM_NO_COMPILE}) {
-    my $compile_success = $BUILD->compile_spvm();
+  if ($BUILD) {
+    my $compile_success = $BUILD->build_spvm();
     unless ($compile_success) {
       croak("SPVM compile error");
     }
@@ -385,7 +368,7 @@ Use SPVM Module from Perl
   
   print $total . "\n";
 
-See also L<SPVM::Document::PerlAPI>.
+See also L<SPVM::Document::SPVMAPI>.
 
 =head2 C Extension using SPVM
 
@@ -400,10 +383,10 @@ SPVM Module:
 
 C Source File;
 
-  // lib/MyMathNative.inline/MyMathNative.c
+  // lib/MyMathNative.native/MyMathNative.c
   #include <spvm_native.h>
 
-  int32_t SPVM__MyMathNative__sum(SPVM_ENV* env, SPVM_VALUE* args) {
+  int32_t SPVM_NATIVE_SUB(MyMathNative__sum) (SPVM_ENV* env, SPVM_VALUE* args) {
     
     // First argument
     void* sp_nums = args[0].oval;
@@ -423,7 +406,11 @@ C Source File;
       }
     }
     
-    return total;
+    // Return value is set to args[0]
+    args[0].ival = total;
+    
+    // If function success, return 0
+    return 0;
   }
 
 Use Extension Module from Perl:
@@ -442,7 +429,7 @@ Use Extension Module from Perl:
   
   print $total . "\n";
 
-See also L<SPVM::Document::Extension>, L<SPVM::Document::NativeAPI>.
+See also L<SPVM::Document::Extension>, L<SPVM::Document::NativeInterface>.
 
 =head1 STANDARD FUNCTIONS
 
@@ -452,20 +439,19 @@ print, warn, time
 
 =head1 STANDARD MODULES
 
-L<SPVM::CORE>, L<SPVM::Byte>, L<SPVM::Short>, L<SPVM::Int>, L<SPVM::Long>, L<SPVM::Float>, L<SPVM::Double>, L<SPVM::Bool>,
-L<SPVM::Math>, L<SPVM::IO>
+L<SPVM::CORE>, L<SPVM::Byte>, L<SPVM::Short>, L<SPVM::Int>, L<SPVM::Long>, L<SPVM::Float>, L<SPVM::Double>, L<SPVM::Bool>
 
-=head1 PERL API
+=head1 SPVM API
 
-L<SPVM::Document::PerlAPI>
+L<SPVM::Document::SPVMAPI>
 
-=head1 Native API
+=head1 Native Interface
 
-L<SPVM::Document::NativeAPI>
+L<SPVM::Document::NativeInterface>
 
-=head1 Specification
+=head1 Language
 
-L<SPVM::Document::Specification>
+L<SPVM::Document::Language>
 
 =head1 SUPPORT
 

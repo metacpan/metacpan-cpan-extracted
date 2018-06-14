@@ -2,7 +2,7 @@ package Mail::MtPolicyd::SessionCache::Base;
 
 use Moose;
 
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
 # ABSTRACT: base class for session cache adapters
 
 sub retrieve_session {
@@ -39,7 +39,7 @@ Mail::MtPolicyd::SessionCache::Base - base class for session cache adapters
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 AUTHOR
 

@@ -32,21 +32,63 @@ package Paws::OpsWorks::CreateStack;
 
 =head1 NAME
 
-Paws::OpsWorks::CreateStack - Arguments for method CreateStack on Paws::OpsWorks
+Paws::OpsWorks::CreateStack - Arguments for method CreateStack on L<Paws::OpsWorks>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateStack on the 
-AWS OpsWorks service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateStack on the
+L<AWS OpsWorks|Paws::OpsWorks> service. Use the attributes of this class
 as arguments to method CreateStack.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateStack.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateStack(Att1 => $value1, Att2 => $value2, ...);
+    my $opsworks = Paws->service('OpsWorks');
+    my $CreateStackResult = $opsworks->CreateStack(
+      DefaultInstanceProfileArn => 'MyString',
+      Name                      => 'MyString',
+      Region                    => 'MyString',
+      ServiceRoleArn            => 'MyString',
+      AgentVersion              => 'MyString',    # OPTIONAL
+      Attributes                => {
+        'Color' => 'MyString',                    # key: values: Color
+      },    # OPTIONAL
+      ChefConfiguration => {
+        BerkshelfVersion => 'MyString',
+        ManageBerkshelf  => 1,            # OPTIONAL
+      },    # OPTIONAL
+      ConfigurationManager => {
+        Version => 'MyString',
+        Name    => 'MyString',
+      },    # OPTIONAL
+      CustomCookbooksSource => {
+        Url      => 'MyString',
+        Type     => 'git',        # values: git, svn, archive, s3; OPTIONAL
+        SshKey   => 'MyString',
+        Username => 'MyString',
+        Revision => 'MyString',
+        Password => 'MyString',
+      },    # OPTIONAL
+      CustomJson                => 'MyString',    # OPTIONAL
+      DefaultAvailabilityZone   => 'MyString',    # OPTIONAL
+      DefaultOs                 => 'MyString',    # OPTIONAL
+      DefaultRootDeviceType     => 'ebs',         # OPTIONAL
+      DefaultSshKeyName         => 'MyString',    # OPTIONAL
+      DefaultSubnetId           => 'MyString',    # OPTIONAL
+      HostnameTheme             => 'MyString',    # OPTIONAL
+      UseCustomCookbooks        => 1,             # OPTIONAL
+      UseOpsworksSecurityGroups => 1,             # OPTIONAL
+      VpcId                     => 'MyString',    # OPTIONAL
+    );
+
+    # Results:
+    my $StackId = $CreateStackResult->StackId;
+
+    # Returns a L<Paws::OpsWorks::CreateStackResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/opsworks/CreateStack>
 
 =head1 ATTRIBUTES
 
@@ -95,7 +137,8 @@ attributes.
 
 A C<ChefConfiguration> object that specifies whether to enable
 Berkshelf and the Berkshelf version on Chef 11.10 stacks. For more
-information, see Create a New Stack.
+information, see Create a New Stack
+(http://docs.aws.amazon.com/opsworks/latest/userguide/workingstacks-creating.html).
 
 
 
@@ -124,14 +167,16 @@ format:
 C<"{\"key1\": \"value1\", \"key2\": \"value2\",...}">
 
 For more information on custom JSON, see Use Custom JSON to Modify the
-Stack Configuration Attributes.
+Stack Configuration Attributes
+(http://docs.aws.amazon.com/opsworks/latest/userguide/workingstacks-json.html).
 
 
 
 =head2 DefaultAvailabilityZone => Str
 
 The stack's default Availability Zone, which must be in the specified
-region. For more information, see Regions and Endpoints. If you also
+region. For more information, see Regions and Endpoints
+(http://docs.aws.amazon.com/general/latest/gr/rande.html). If you also
 specify a value for C<DefaultSubnetId>, the subnet must be in the same
 zone. For more information, see the C<VpcId> parameter description.
 
@@ -141,7 +186,8 @@ zone. For more information, see the C<VpcId> parameter description.
 
 The Amazon Resource Name (ARN) of an IAM profile that is the default
 profile for all of the stack's EC2 instances. For more information
-about IAM ARNs, see Using Identifiers.
+about IAM ARNs, see Using Identifiers
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/Using_Identifiers.html).
 
 
 
@@ -156,8 +202,9 @@ create the instance. You can specify one of the following.
 =item *
 
 A supported Linux operating system: An Amazon Linux version, such as
-C<Amazon Linux 2017.03>, C<Amazon Linux 2016.09>, C<Amazon Linux
-2016.03>, C<Amazon Linux 2015.09>, or C<Amazon Linux 2015.03>.
+C<Amazon Linux 2017.09>, C<Amazon Linux 2017.03>, C<Amazon Linux
+2016.09>, C<Amazon Linux 2016.03>, C<Amazon Linux 2015.09>, or C<Amazon
+Linux 2015.03>.
 
 =item *
 
@@ -182,13 +229,15 @@ Standard>, or C<Microsoft Windows Server 2012 R2 with SQL Server Web>.
 =item *
 
 A custom AMI: C<Custom>. You specify the custom AMI you want to use
-when you create instances. For more information, see Using Custom AMIs.
+when you create instances. For more information, see Using Custom AMIs
+(http://docs.aws.amazon.com/opsworks/latest/userguide/workinginstances-custom-ami.html).
 
 =back
 
 The default option is the current Amazon Linux version. For more
 information on the supported operating systems, see AWS OpsWorks Stacks
-Operating Systems.
+Operating Systems
+(http://docs.aws.amazon.com/opsworks/latest/userguide/workinginstances-os.html).
 
 
 
@@ -197,7 +246,8 @@ Operating Systems.
 The default root device type. This value is the default for all
 instances in the stack, but you can override it when you create an
 instance. The default option is C<instance-store>. For more
-information, see Storage for the Root Device.
+information, see Storage for the Root Device
+(http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ComponentsAMIs.html#storage-for-the-root-device).
 
 Valid values are: C<"ebs">, C<"instance-store">
 
@@ -207,9 +257,13 @@ A default Amazon EC2 key pair name. The default value is none. If you
 specify a key pair name, AWS OpsWorks installs the public key on the
 instance and you can use the private key with an SSH client to log in
 to the instance. For more information, see Using SSH to Communicate
-with an Instance and Managing SSH Access. You can override this setting
-by specifying a different key pair, or no key pair, when you create an
-instance.
+with an Instance
+(http://docs.aws.amazon.com/opsworks/latest/userguide/workinginstances-ssh.html)
+and Managing SSH Access
+(http://docs.aws.amazon.com/opsworks/latest/userguide/security-ssh-access.html).
+You can override this setting by specifying a different key pair, or no
+key pair, when you create an instance
+(http://docs.aws.amazon.com/opsworks/latest/userguide/workinginstances-add.html).
 
 
 
@@ -295,7 +349,8 @@ The stack name.
 =head2 B<REQUIRED> Region => Str
 
 The stack's AWS region, such as "ap-south-1". For more information
-about Amazon regions, see Regions and Endpoints.
+about Amazon regions, see Regions and Endpoints
+(http://docs.aws.amazon.com/general/latest/gr/rande.html).
 
 
 
@@ -304,7 +359,8 @@ about Amazon regions, see Regions and Endpoints.
 The stack's AWS Identity and Access Management (IAM) role, which allows
 AWS OpsWorks Stacks to work with AWS resources on your behalf. You must
 set this parameter to the Amazon Resource Name (ARN) for an existing
-IAM role. For more information about IAM ARNs, see Using Identifiers.
+IAM role. For more information about IAM ARNs, see Using Identifiers
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/Using_Identifiers.html).
 
 
 
@@ -345,7 +401,8 @@ that need custom settings.
 
 =back
 
-For more information, see Create a New Stack.
+For more information, see Create a New Stack
+(http://docs.aws.amazon.com/opsworks/latest/userguide/workingstacks-creating.html).
 
 
 
@@ -391,8 +448,11 @@ You must specify a value for C<DefaultSubnetId>.
 =back
 
 For more information on how to use AWS OpsWorks Stacks with a VPC, see
-Running a Stack in a VPC. For more information on default VPC and
-EC2-Classic, see Supported Platforms.
+Running a Stack in a VPC
+(http://docs.aws.amazon.com/opsworks/latest/userguide/workingstacks-vpc.html).
+For more information on default VPC and EC2-Classic, see Supported
+Platforms
+(http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-supported-platforms.html).
 
 
 
@@ -403,9 +463,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateStack i
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -17,21 +17,40 @@ package Paws::DataPipeline::CreatePipeline;
 
 =head1 NAME
 
-Paws::DataPipeline::CreatePipeline - Arguments for method CreatePipeline on Paws::DataPipeline
+Paws::DataPipeline::CreatePipeline - Arguments for method CreatePipeline on L<Paws::DataPipeline>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreatePipeline on the 
-AWS Data Pipeline service. Use the attributes of this class
+This class represents the parameters used for calling the method CreatePipeline on the
+L<AWS Data Pipeline|Paws::DataPipeline> service. Use the attributes of this class
 as arguments to method CreatePipeline.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreatePipeline.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreatePipeline(Att1 => $value1, Att2 => $value2, ...);
+    my $datapipeline = Paws->service('DataPipeline');
+    my $CreatePipelineOutput = $datapipeline->CreatePipeline(
+      Name        => 'Myid',
+      UniqueId    => 'Myid',
+      Description => 'Mystring',    # OPTIONAL
+      Tags        => [
+        {
+          value => 'MytagValue',    # max: 256
+          key   => 'MytagKey',      # min: 1, max: 128
+
+        },
+        ...
+      ],                            # OPTIONAL
+    );
+
+    # Results:
+    my $PipelineId = $CreatePipelineOutput->PipelineId;
+
+    # Returns a L<Paws::DataPipeline::CreatePipelineOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/datapipeline/CreatePipeline>
 
 =head1 ATTRIBUTES
 
@@ -54,7 +73,9 @@ assigns each pipeline a unique pipeline identifier.
 
 A list of tags to associate with the pipeline at creation. Tags let you
 control access to pipelines. For more information, see Controlling User
-Access to Pipelines in the I<AWS Data Pipeline Developer Guide>.
+Access to Pipelines
+(http://docs.aws.amazon.com/datapipeline/latest/DeveloperGuide/dp-control-access.html)
+in the I<AWS Data Pipeline Developer Guide>.
 
 
 
@@ -82,9 +103,9 @@ This class forms part of L<Paws>, documenting arguments for method CreatePipelin
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

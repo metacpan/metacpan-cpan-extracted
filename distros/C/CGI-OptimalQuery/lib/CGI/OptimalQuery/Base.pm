@@ -50,6 +50,7 @@ sub new {
     or confess "couldn't find q in schema!";
   $$o{output_handler} = $$o{schema}{output_handler};
   $$o{error_handler} = $$o{schema}{error_handler};
+  $$o{httpHeader} = $$o{schema}{httpHeader};
 
   # check for required attributes
   confess "specified select is not a hash ref!"
@@ -313,7 +314,11 @@ sub get_title        { $_[0]{schema}{title} }
 sub get_filter       { $_[0]->sth->filter_descr() }
 sub get_sort         { $_[0]->sth->sort_descr() }
 sub get_query        { $_[0]{query}     }
-sub get_nice_name    { $_[0]{schema}{select}{$_[1]}[2] }
+sub get_nice_name    {
+  my ($o, $colAlias) = @_;
+  return $$o{schema}{select}{$colAlias}[2]
+    || join(' ', map { ucfirst } split /[\ \_]+/, $colAlias);
+}
 sub get_num_usersel_cols { scalar @{$_[0]{show}} }
 sub get_usersel_cols { $_[0]{show} }
 

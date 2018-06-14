@@ -13,21 +13,30 @@ package Paws::Config::GetComplianceSummaryByConfigRule;
 
 =head1 NAME
 
-Paws::Config::GetComplianceSummaryByConfigRule - Arguments for method GetComplianceSummaryByConfigRule on Paws::Config
+Paws::Config::GetComplianceSummaryByConfigRule - Arguments for method GetComplianceSummaryByConfigRule on L<Paws::Config>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method GetComplianceSummaryByConfigRule on the 
-AWS Config service. Use the attributes of this class
+This class represents the parameters used for calling the method GetComplianceSummaryByConfigRule on the
+L<AWS Config|Paws::Config> service. Use the attributes of this class
 as arguments to method GetComplianceSummaryByConfigRule.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to GetComplianceSummaryByConfigRule.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->GetComplianceSummaryByConfigRule(Att1 => $value1, Att2 => $value2, ...);
+    my $config = Paws->service('Config');
+    my $GetComplianceSummaryByConfigRuleResponse =
+      $config->GetComplianceSummaryByConfigRule();
+
+    # Results:
+    my $ComplianceSummary =
+      $GetComplianceSummaryByConfigRuleResponse->ComplianceSummary;
+
+   # Returns a L<Paws::Config::GetComplianceSummaryByConfigRuleResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/config/GetComplianceSummaryByConfigRule>
 
 =head1 ATTRIBUTES
 
@@ -39,9 +48,9 @@ This class forms part of L<Paws>, documenting arguments for method GetCompliance
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

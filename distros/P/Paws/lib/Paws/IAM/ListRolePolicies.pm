@@ -16,21 +16,34 @@ package Paws::IAM::ListRolePolicies;
 
 =head1 NAME
 
-Paws::IAM::ListRolePolicies - Arguments for method ListRolePolicies on Paws::IAM
+Paws::IAM::ListRolePolicies - Arguments for method ListRolePolicies on L<Paws::IAM>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ListRolePolicies on the 
-AWS Identity and Access Management service. Use the attributes of this class
+This class represents the parameters used for calling the method ListRolePolicies on the
+L<AWS Identity and Access Management|Paws::IAM> service. Use the attributes of this class
 as arguments to method ListRolePolicies.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ListRolePolicies.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ListRolePolicies(Att1 => $value1, Att2 => $value2, ...);
+    my $iam = Paws->service('IAM');
+    my $ListRolePoliciesResponse = $iam->ListRolePolicies(
+      RoleName => 'MyroleNameType',
+      Marker   => 'MymarkerType',     # OPTIONAL
+      MaxItems => 1,                  # OPTIONAL
+    );
+
+    # Results:
+    my $IsTruncated = $ListRolePoliciesResponse->IsTruncated;
+    my $Marker      = $ListRolePoliciesResponse->Marker;
+    my $PolicyNames = $ListRolePoliciesResponse->PolicyNames;
+
+    # Returns a L<Paws::IAM::ListRolePoliciesResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/iam/ListRolePolicies>
 
 =head1 ATTRIBUTES
 
@@ -63,9 +76,10 @@ the service where to continue from.
 
 The name of the role to list policies for.
 
-This parameter allows (per its regex pattern) a string of characters
-consisting of upper and lowercase alphanumeric characters with no
-spaces. You can also include any of the following characters: _+=,.@-
+This parameter allows (per its regex pattern
+(http://wikipedia.org/wiki/regex)) a string of characters consisting of
+upper and lowercase alphanumeric characters with no spaces. You can
+also include any of the following characters: _+=,.@-
 
 
 
@@ -76,9 +90,9 @@ This class forms part of L<Paws>, documenting arguments for method ListRolePolic
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

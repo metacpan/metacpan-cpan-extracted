@@ -40,8 +40,9 @@ This class has no description
 
 =head2 AllowDnsResolutionFromRemoteVpc => Bool
 
-  If true, enables a local VPC to resolve public DNS hostnames to private
-IP addresses when queried from instances in the peer VPC.
+  If true, the public DNS hostnames of instances in the specified VPC
+resolve to private IP addresses when queried from instances in the peer
+VPC.
 
 
 =head2 AllowEgressFromLocalClassicLinkToRemoteVpc => Bool
@@ -64,8 +65,8 @@ This class forms part of L<Paws>, describing an object used in L<Paws::EC2>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut

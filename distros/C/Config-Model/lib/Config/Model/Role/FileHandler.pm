@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Role::FileHandler;
-$Config::Model::Role::FileHandler::VERSION = '2.123';
+$Config::Model::Role::FileHandler::VERSION = '2.124';
 # ABSTRACT: role to read or write configuration files
 
 use strict;
@@ -39,6 +39,9 @@ sub get_tuned_config_dir {
     my $dir = $args{os_config_dir}{$^O} || $args{config_dir} || $self->config_dir || '';
     if ( $dir =~ /^~/ ) {
         # because of tests, we can't rely on Path::Tiny's tilde processing
+        # TODO: should this be my_config ? May be once this is done:
+        # https://github.com/perl5-utils/File-HomeDir/pull/5/files
+        # beware of compat and migration issues
         my $home = $__test_home || File::HomeDir->my_home;
         $dir =~ s/^~/$home/;
     }
@@ -62,7 +65,7 @@ Config::Model::Role::FileHandler - role to read or write configuration files
 
 =head1 VERSION
 
-version 2.123
+version 2.124
 
 =head1 SYNOPSIS
 

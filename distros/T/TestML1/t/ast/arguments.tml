@@ -1,0 +1,87 @@
+--- !!perl/hash:TestML1::Function
+namespace:
+  TestML: !!perl/hash:TestML1::Str
+    value: '0.1.0'
+
+statements:
+- !!perl/hash:TestML1::Assignment
+  name: Plan
+  expr: !!perl/hash:TestML1::Num
+    value: 3
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Expression
+    calls:
+    - !!perl/hash:TestML1::Point
+      name: what
+    - !!perl/hash:TestML1::Call
+      name: combine
+      args:
+      - !!perl/hash:TestML1::Point
+        name: who
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Point
+      name: greeting
+  points:
+  - what
+  - who
+  - greeting
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Expression
+    calls:
+    - !!perl/hash:TestML1::Point
+      name: what
+    - !!perl/hash:TestML1::Call
+      name: combine
+      args:
+      - !!perl/hash:TestML1::Str
+        value: and
+      - !!perl/hash:TestML1::Point
+        name: else
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Point
+      name: greeting
+  points:
+  - what
+  - else
+  - greeting
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Expression
+    calls:
+    - !!perl/hash:TestML1::Point
+      name: what
+    - !!perl/hash:TestML1::Call
+      name: combine
+      args:
+      - !!perl/hash:TestML1::Str
+        value: and
+      - !!perl/hash:TestML1::Expression
+        calls:
+        - !!perl/hash:TestML1::Point
+          name: else
+        - !!perl/hash:TestML1::Call
+          name: uppercase
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Point
+      name: upper_greeting
+  points:
+  - what
+  - else
+  - upper_greeting
+
+data:
+- !!perl/hash:TestML1::Block
+  label: Dear John
+  points:
+    what: Dear
+    who: John
+    greeting: Dear John
+- !!perl/hash:TestML1::Block
+  label: Greetings and Salutations
+  points:
+    what: Greetings
+    else: Salutations
+    greeting: Greetings and Salutations
+    upper_greeting: Greetings and SALUTATIONS

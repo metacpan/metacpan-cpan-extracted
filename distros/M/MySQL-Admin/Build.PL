@@ -311,9 +311,10 @@ my $inctance = $class->new(
 	      'perl'                 => '5.006000',
     	  'Search::Tools::UTF8'  => '>=1.003',
     	  'Authen::Captcha'      => '>=1.024',
-           'Frontier::RPC2' => '>=0.06',
-           'XML::XSLT' => '>=0.48',
-		    'Mail::Sendmail'      => '>=0.79'
+          'Frontier::RPC2' => '>=0.06',
+          'XML::XSLT' => '>=0.48',
+		  'Mail::Sendmail'      => '>=0.79',
+		  'Text::Markdown::Hoedown' => '>=1.02'
 	      },
   ($] >= 5.005 ? (AUTHOR => 'Dirk Lindner <dirk.lze@gmail.com>') : ()),
   dist_abstract      => 'Just a MySQL administration Web-App and CMS System',
@@ -504,7 +505,7 @@ $m_hrSettings = {
             style        => 'mysql',
            },
     language    => 'en',
-    version     => '1.13',
+    version     => '1.14',
     session     => "$inctance->{properties}{cgi}/config/session.pl",
     actions     => "$inctance->{properties}{cgi}/config/actions.pl",
     translate   => "$inctance->{properties}{cgi}/config/translate.pl",

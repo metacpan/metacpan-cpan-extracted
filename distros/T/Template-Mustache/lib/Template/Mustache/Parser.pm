@@ -5,7 +5,7 @@
 
 package Template::Mustache::Parser;
 our $AUTHORITY = 'cpan:YANICK';
-$Template::Mustache::Parser::VERSION = '1.2.0';
+$Template::Mustache::Parser::VERSION = '1.3.0';
 
 use Parse::RecDescent;
 { my $ERRORS;
@@ -13,7 +13,7 @@ use Parse::RecDescent;
 
 package Parse::RecDescent::Template::Mustache::Parser;
 our $AUTHORITY = 'cpan:YANICK';
-$Parse::RecDescent::Template::Mustache::Parser::VERSION = '1.2.0';
+$Parse::RecDescent::Template::Mustache::Parser::VERSION = '1.3.0';
 
 use strict;
 use vars qw($skip $AUTOLOAD  );
@@ -2833,7 +2833,7 @@ sub Parse::RecDescent::Template::Mustache::Parser::partial
     while (!$_matched && !$commit)
     {
         
-        Parse::RecDescent::_trace(q{Trying production: [/\\s*/ opening_tag '>' /\\s*/ /[-\\w.]+/ /\\s*/ closing_tag /\\s*/]},
+        Parse::RecDescent::_trace(q{Trying production: [/\\s*/ opening_tag '>' /\\s*/ /[\\/-\\w.]+/ /\\s*/ closing_tag /\\s*/]},
                       Parse::RecDescent::_tracefirst($_[1]),
                       q{partial},
                       $tracelevel)
@@ -2958,15 +2958,15 @@ sub Parse::RecDescent::Template::Mustache::Parser::partial
         push @item, $item{__PATTERN2__}=$current_match;
         
 
-        Parse::RecDescent::_trace(q{Trying terminal: [/[-\\w.]+/]}, Parse::RecDescent::_tracefirst($text),
+        Parse::RecDescent::_trace(q{Trying terminal: [/[\\/-\\w.]+/]}, Parse::RecDescent::_tracefirst($text),
                       q{partial},
                       $tracelevel)
                         if defined $::RD_TRACE;
         undef $lastsep;
-        $expectation->is(q{/[-\\w.]+/})->at($text);
+        $expectation->is(q{/[\\/-\\w.]+/})->at($text);
         
 
-        unless ($text =~ s/\A($skip)/$lastsep=$1 and ""/e and   $text =~ m/\A(?:[-\w.]+)/)
+        unless ($text =~ s/\A($skip)/$lastsep=$1 and ""/e and   $text =~ m/\A(?:[\/-\w.]+)/)
         {
             $text = $lastsep . $text if defined $lastsep;
             $expectation->failed();
@@ -3111,7 +3111,7 @@ sub Parse::RecDescent::Template::Mustache::Parser::partial
         $item{__ACTION1__}=$_tok;
         
 
-        Parse::RecDescent::_trace(q{>>Matched production: [/\\s*/ opening_tag '>' /\\s*/ /[-\\w.]+/ /\\s*/ closing_tag /\\s*/]<<},
+        Parse::RecDescent::_trace(q{>>Matched production: [/\\s*/ opening_tag '>' /\\s*/ /[\\/-\\w.]+/ /\\s*/ closing_tag /\\s*/]<<},
                       Parse::RecDescent::_tracefirst($text),
                       q{partial},
                       $tracelevel)
@@ -6416,13 +6416,13 @@ package Template::Mustache::Parser;
                                                                                                 'rdelim' => '/'
                                                                                               }, 'Parse::RecDescent::Token' ),
                                                                                        bless( {
-                                                                                                'description' => '/[-\\\\w.]+/',
+                                                                                                'description' => '/[\\\\/-\\\\w.]+/',
                                                                                                 'hashname' => '__PATTERN3__',
                                                                                                 'ldelim' => '/',
                                                                                                 'line' => 41,
                                                                                                 'lookahead' => 0,
                                                                                                 'mod' => '',
-                                                                                                'pattern' => '[-\\w.]+',
+                                                                                                'pattern' => '[\\/-\\w.]+',
                                                                                                 'rdelim' => '/'
                                                                                               }, 'Parse::RecDescent::Token' ),
                                                                                        bless( {
@@ -7214,7 +7214,7 @@ Template::Mustache::Parser
 
 =head1 VERSION
 
-version 1.2.0
+version 1.3.0
 
 =head1 AUTHORS
 
@@ -7236,7 +7236,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2011 by Pieter van de Bruggen.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2011 by Pieter van de Bruggen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

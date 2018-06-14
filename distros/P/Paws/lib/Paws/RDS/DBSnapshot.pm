@@ -17,6 +17,7 @@ package Paws::RDS::DBSnapshot;
   has OptionGroupName => (is => 'ro', isa => 'Str');
   has PercentProgress => (is => 'ro', isa => 'Int');
   has Port => (is => 'ro', isa => 'Int');
+  has ProcessorFeatures => (is => 'ro', isa => 'ArrayRef[Paws::RDS::ProcessorFeature]', request_name => 'ProcessorFeature', traits => ['NameInRequest']);
   has SnapshotCreateTime => (is => 'ro', isa => 'Str');
   has SnapshotType => (is => 'ro', isa => 'Str');
   has SourceDBSnapshotIdentifier => (is => 'ro', isa => 'Str');
@@ -56,20 +57,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::RDS::DBSnap
 
 =head1 DESCRIPTION
 
-Contains the result of a successful invocation of the following
-actions:
-
-=over
-
-=item *
-
-CreateDBSnapshot
-
-=item *
-
-DeleteDBSnapshot
-
-=back
+Contains the details of an Amazon RDS DB snapshot.
 
 This data type is used as a response element in the DescribeDBSnapshots
 action.
@@ -79,7 +67,7 @@ action.
 
 =head2 AllocatedStorage => Int
 
-  Specifies the allocated storage size in gigabytes (GB).
+  Specifies the allocated storage size in gibibytes (GiB).
 
 
 =head2 AvailabilityZone => Str
@@ -122,7 +110,7 @@ snapshot was created from.
 =head2 IAMDatabaseAuthenticationEnabled => Bool
 
   True if mapping of AWS Identity and Access Management (IAM) accounts to
-database accounts is enabled; otherwise false.
+database accounts is enabled, and otherwise false.
 
 
 =head2 InstanceCreateTime => Str
@@ -139,8 +127,8 @@ DB instance at the time of the snapshot.
 
 =head2 KmsKeyId => Str
 
-  If C<Encrypted> is true, the KMS key identifier for the encrypted DB
-snapshot.
+  If C<Encrypted> is true, the AWS KMS key identifier for the encrypted
+DB snapshot.
 
 
 =head2 LicenseModel => Str
@@ -167,6 +155,12 @@ snapshot.
 
   Specifies the port that the database engine was listening on at the
 time of the snapshot.
+
+
+=head2 ProcessorFeatures => ArrayRef[L<Paws::RDS::ProcessorFeature>]
+
+  The number of CPU cores and the number of threads per core for the DB
+instance class of the DB instance when the DB snapshot was created.
 
 
 =head2 SnapshotCreateTime => Str
@@ -228,9 +222,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::RDS>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

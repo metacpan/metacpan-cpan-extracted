@@ -1,5 +1,18 @@
 Revision history for WG-API
 
+v0.8.8 2018-06-12T13:13:18Z
+
+  - replace link from search.cpan to metacpan
+  - use URI for query builder
+  - use language in requests
+  - add requires field to pod
+
+v0.8.7 2018-06-10T19:54:21Z
+
+  - Release after merged request into master
+  - Actualize methods
+  - Change link from github to gitla
+
 v0.8.6 2018-06-01T14:12:00Z
 
   - migrate to gitlab.com

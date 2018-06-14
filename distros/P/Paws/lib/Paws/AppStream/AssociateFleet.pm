@@ -15,21 +15,27 @@ package Paws::AppStream::AssociateFleet;
 
 =head1 NAME
 
-Paws::AppStream::AssociateFleet - Arguments for method AssociateFleet on Paws::AppStream
+Paws::AppStream::AssociateFleet - Arguments for method AssociateFleet on L<Paws::AppStream>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method AssociateFleet on the 
-Amazon AppStream service. Use the attributes of this class
+This class represents the parameters used for calling the method AssociateFleet on the
+L<Amazon AppStream|Paws::AppStream> service. Use the attributes of this class
 as arguments to method AssociateFleet.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to AssociateFleet.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->AssociateFleet(Att1 => $value1, Att2 => $value2, ...);
+    my $appstream2 = Paws->service('AppStream');
+    my $AssociateFleetResult = $appstream2->AssociateFleet(
+      FleetName => 'MyString',
+      StackName => 'MyString',
+
+    );
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/>
 
 =head1 ATTRIBUTES
 
@@ -53,9 +59,9 @@ This class forms part of L<Paws>, documenting arguments for method AssociateFlee
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

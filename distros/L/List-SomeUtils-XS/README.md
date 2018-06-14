@@ -4,7 +4,7 @@ List::SomeUtils::XS - XS implementation for List::SomeUtils
 
 # VERSION
 
-version 0.57
+version 0.58
 
 # DESCRIPTION
 

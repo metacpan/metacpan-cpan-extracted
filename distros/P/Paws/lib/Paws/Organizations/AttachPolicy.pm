@@ -15,21 +15,27 @@ package Paws::Organizations::AttachPolicy;
 
 =head1 NAME
 
-Paws::Organizations::AttachPolicy - Arguments for method AttachPolicy on Paws::Organizations
+Paws::Organizations::AttachPolicy - Arguments for method AttachPolicy on L<Paws::Organizations>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method AttachPolicy on the 
-AWS Organizations service. Use the attributes of this class
+This class represents the parameters used for calling the method AttachPolicy on the
+L<AWS Organizations|Paws::Organizations> service. Use the attributes of this class
 as arguments to method AttachPolicy.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to AttachPolicy.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->AttachPolicy(Att1 => $value1, Att2 => $value2, ...);
+    my $organizations = Paws->service('Organizations');
+    $organizations->AttachPolicy(
+      PolicyId => 'MyPolicyId',
+      TargetId => 'MyPolicyTargetId',
+
+    );
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/organizations/AttachPolicy>
 
 =head1 ATTRIBUTES
 
@@ -40,8 +46,9 @@ The unique identifier (ID) of the policy that you want to attach to the
 target. You can get the ID for the policy by calling the ListPolicies
 operation.
 
-The regex pattern for a policy ID string requires "p-" followed by from
-8 to 128 lower-case letters or digits.
+The regex pattern (http://wikipedia.org/wiki/regex) for a policy ID
+string requires "p-" followed by from 8 to 128 lower-case letters or
+digits.
 
 
 
@@ -51,7 +58,8 @@ The unique identifier (ID) of the root, OU, or account that you want to
 attach the policy to. You can get the ID by calling the ListRoots,
 ListOrganizationalUnitsForParent, or ListAccounts operations.
 
-The regex pattern for a target ID string requires one of the following:
+The regex pattern (http://wikipedia.org/wiki/regex) for a target ID
+string requires one of the following:
 
 =over
 
@@ -83,9 +91,9 @@ This class forms part of L<Paws>, documenting arguments for method AttachPolicy 
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -10,28 +10,37 @@ package Paws::Pinpoint::GetApps;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/v1/apps');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'GET');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::Pinpoint::GetAppsResponse');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::Pinpoint::GetApps - Arguments for method GetApps on Paws::Pinpoint
+Paws::Pinpoint::GetApps - Arguments for method GetApps on L<Paws::Pinpoint>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method GetApps on the 
-Amazon Pinpoint service. Use the attributes of this class
+This class represents the parameters used for calling the method GetApps on the
+L<Amazon Pinpoint|Paws::Pinpoint> service. Use the attributes of this class
 as arguments to method GetApps.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to GetApps.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->GetApps(Att1 => $value1, Att2 => $value2, ...);
+    my $pinpoint = Paws->service('Pinpoint');
+    my $GetAppsResponse = $pinpoint->GetApps(
+      PageSize => 'My__string',    # OPTIONAL
+      Token    => 'My__string',    # OPTIONAL
+    );
+
+    # Results:
+    my $ApplicationsResponse = $GetAppsResponse->ApplicationsResponse;
+
+    # Returns a L<Paws::Pinpoint::GetAppsResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/>
 
 =head1 ATTRIBUTES
 
@@ -55,9 +64,9 @@ This class forms part of L<Paws>, documenting arguments for method GetApps in L<
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

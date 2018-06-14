@@ -32,7 +32,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Glue::Crawl
 
 =head1 DESCRIPTION
 
-Specifies crawler targets.
+Specifies data stores to crawl.
 
 =head1 ATTRIBUTES
 
@@ -44,7 +44,7 @@ Specifies crawler targets.
 
 =head2 S3Targets => ArrayRef[L<Paws::Glue::S3Target>]
 
-  Specifies targets in AWS S3.
+  Specifies Amazon S3 targets.
 
 
 
@@ -54,9 +54,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Glue>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

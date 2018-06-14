@@ -15,21 +15,34 @@ package Paws::IAM::GetGroupPolicy;
 
 =head1 NAME
 
-Paws::IAM::GetGroupPolicy - Arguments for method GetGroupPolicy on Paws::IAM
+Paws::IAM::GetGroupPolicy - Arguments for method GetGroupPolicy on L<Paws::IAM>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method GetGroupPolicy on the 
-AWS Identity and Access Management service. Use the attributes of this class
+This class represents the parameters used for calling the method GetGroupPolicy on the
+L<AWS Identity and Access Management|Paws::IAM> service. Use the attributes of this class
 as arguments to method GetGroupPolicy.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to GetGroupPolicy.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->GetGroupPolicy(Att1 => $value1, Att2 => $value2, ...);
+    my $iam = Paws->service('IAM');
+    my $GetGroupPolicyResponse = $iam->GetGroupPolicy(
+      GroupName  => 'MygroupNameType',
+      PolicyName => 'MypolicyNameType',
+
+    );
+
+    # Results:
+    my $PolicyDocument = $GetGroupPolicyResponse->PolicyDocument;
+    my $PolicyName     = $GetGroupPolicyResponse->PolicyName;
+    my $GroupName      = $GetGroupPolicyResponse->GroupName;
+
+    # Returns a L<Paws::IAM::GetGroupPolicyResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/iam/GetGroupPolicy>
 
 =head1 ATTRIBUTES
 
@@ -38,9 +51,10 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 
 The name of the group the policy is associated with.
 
-This parameter allows (per its regex pattern) a string of characters
-consisting of upper and lowercase alphanumeric characters with no
-spaces. You can also include any of the following characters: =,.@-
+This parameter allows (per its regex pattern
+(http://wikipedia.org/wiki/regex)) a string of characters consisting of
+upper and lowercase alphanumeric characters with no spaces. You can
+also include any of the following characters: _+=,.@-
 
 
 
@@ -48,9 +62,10 @@ spaces. You can also include any of the following characters: =,.@-
 
 The name of the policy document to get.
 
-This parameter allows (per its regex pattern) a string of characters
-consisting of upper and lowercase alphanumeric characters with no
-spaces. You can also include any of the following characters: =,.@-+
+This parameter allows (per its regex pattern
+(http://wikipedia.org/wiki/regex)) a string of characters consisting of
+upper and lowercase alphanumeric characters with no spaces. You can
+also include any of the following characters: _+=,.@-
 
 
 
@@ -61,9 +76,9 @@ This class forms part of L<Paws>, documenting arguments for method GetGroupPolic
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

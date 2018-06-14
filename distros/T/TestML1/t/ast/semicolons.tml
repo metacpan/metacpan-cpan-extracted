@@ -1,0 +1,30 @@
+--- !!perl/hash:TestML1::Function
+namespace:
+  TestML: !!perl/hash:TestML1::Str
+    value: 0.1.0
+statements:
+- !!perl/hash:TestML1::Assignment
+  name: Plan
+  expr: !!perl/hash:TestML1::Num
+    value: 3
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Str
+      value: one
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Str
+      value: one
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Str
+    value: two
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Str
+      value: two
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Str
+    value: three
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Str
+      value: three

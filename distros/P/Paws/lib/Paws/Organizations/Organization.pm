@@ -50,7 +50,9 @@ controlled with policies .
   The Amazon Resource Name (ARN) of an organization.
 
 For more information about ARNs in Organizations, see ARN Formats
-Supported by Organizations in the I<AWS Organizations User Guide>.
+Supported by Organizations
+(http://docs.aws.amazon.com/organizations/latest/userguide/orgs_permissions.html#orgs-permissions-arns)
+in the I<AWS Organizations User Guide>.
 
 
 =head2 AvailablePolicyTypes => ArrayRef[L<Paws::Organizations::PolicyTypeSummary>]
@@ -58,6 +60,11 @@ Supported by Organizations in the I<AWS Organizations User Guide>.
   A list of policy types that are enabled for this organization. For
 example, if your organization has all features enabled, then service
 control policies (SCPs) are included in the list.
+
+Even if a policy type is shown as available in the organization, you
+can separately enable and disable them at the root level by using
+EnablePolicyType and DisablePolicyType. Use ListRoots to see the status
+of a policy type in that root.
 
 
 =head2 FeatureSet => Str
@@ -67,15 +74,18 @@ organization. If set to "ALL", then all features are enabled and
 policies can be applied to accounts in the organization. If set to
 "CONSOLIDATED_BILLING", then only consolidated billing functionality is
 available. For more information, see Enabling All Features in Your
-Organization in the I<AWS Organizations User Guide>.
+Organization
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/orgs_manage_org_support-all-features.html)
+in the I<AWS Organizations User Guide>.
 
 
 =head2 Id => Str
 
   The unique identifier (ID) of an organization.
 
-The regex pattern for an organization ID string requires "o-" followed
-by from 10 to 32 lower-case letters or digits.
+The regex pattern (http://wikipedia.org/wiki/regex) for an organization
+ID string requires "o-" followed by from 10 to 32 lower-case letters or
+digits.
 
 
 =head2 MasterAccountArn => Str
@@ -84,7 +94,9 @@ by from 10 to 32 lower-case letters or digits.
 master account for the organization.
 
 For more information about ARNs in Organizations, see ARN Formats
-Supported by Organizations in the I<AWS Organizations User Guide>.
+Supported by Organizations
+(http://docs.aws.amazon.com/organizations/latest/userguide/orgs_permissions.html#orgs-permissions-arns)
+in the I<AWS Organizations User Guide>.
 
 
 =head2 MasterAccountEmail => Str
@@ -97,7 +109,8 @@ designated as the master account for the organization.
 
   The unique identifier (ID) of the master account of an organization.
 
-The regex pattern for an account ID string requires exactly 12 digits.
+The regex pattern (http://wikipedia.org/wiki/regex) for an account ID
+string requires exactly 12 digits.
 
 
 
@@ -107,9 +120,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Organizat
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

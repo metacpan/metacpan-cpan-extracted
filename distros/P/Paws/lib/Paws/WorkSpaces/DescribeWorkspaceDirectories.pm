@@ -15,36 +15,48 @@ package Paws::WorkSpaces::DescribeWorkspaceDirectories;
 
 =head1 NAME
 
-Paws::WorkSpaces::DescribeWorkspaceDirectories - Arguments for method DescribeWorkspaceDirectories on Paws::WorkSpaces
+Paws::WorkSpaces::DescribeWorkspaceDirectories - Arguments for method DescribeWorkspaceDirectories on L<Paws::WorkSpaces>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DescribeWorkspaceDirectories on the 
-Amazon WorkSpaces service. Use the attributes of this class
+This class represents the parameters used for calling the method DescribeWorkspaceDirectories on the
+L<Amazon WorkSpaces|Paws::WorkSpaces> service. Use the attributes of this class
 as arguments to method DescribeWorkspaceDirectories.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DescribeWorkspaceDirectories.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DescribeWorkspaceDirectories(Att1 => $value1, Att2 => $value2, ...);
+    my $workspaces = Paws->service('WorkSpaces');
+    my $DescribeWorkspaceDirectoriesResult =
+      $workspaces->DescribeWorkspaceDirectories(
+      DirectoryIds => [ 'MyDirectoryId', ... ],    # OPTIONAL
+      NextToken => 'MyPaginationToken',            # OPTIONAL
+      );
+
+    # Results:
+    my $NextToken   = $DescribeWorkspaceDirectoriesResult->NextToken;
+    my $Directories = $DescribeWorkspaceDirectoriesResult->Directories;
+
+    # Returns a L<Paws::WorkSpaces::DescribeWorkspaceDirectoriesResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/workspaces/DescribeWorkspaceDirectories>
 
 =head1 ATTRIBUTES
 
 
 =head2 DirectoryIds => ArrayRef[Str|Undef]
 
-An array of strings that contains the directory identifiers to retrieve
-information for. If this member is null, all directories are retrieved.
+The identifiers of the directories. If the value is null, all
+directories are retrieved.
 
 
 
 =head2 NextToken => Str
 
-The C<NextToken> value from a previous call to this operation. Pass
-null if this is the first call.
+The token for the next set of results. (You received this token from a
+previous call.)
 
 
 
@@ -55,9 +67,9 @@ This class forms part of L<Paws>, documenting arguments for method DescribeWorks
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

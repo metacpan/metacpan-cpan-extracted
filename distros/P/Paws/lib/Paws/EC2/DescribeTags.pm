@@ -17,21 +17,40 @@ package Paws::EC2::DescribeTags;
 
 =head1 NAME
 
-Paws::EC2::DescribeTags - Arguments for method DescribeTags on Paws::EC2
+Paws::EC2::DescribeTags - Arguments for method DescribeTags on L<Paws::EC2>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DescribeTags on the 
-Amazon Elastic Compute Cloud service. Use the attributes of this class
+This class represents the parameters used for calling the method DescribeTags on the
+L<Amazon Elastic Compute Cloud|Paws::EC2> service. Use the attributes of this class
 as arguments to method DescribeTags.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DescribeTags.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DescribeTags(Att1 => $value1, Att2 => $value2, ...);
+    my $ec2 = Paws->service('EC2');
+    # To describe the tags for a single resource
+    # This example describes the tags for the specified instance.
+    my $DescribeTagsResult = $ec2->DescribeTags(
+      {
+        'Filters' => [
+
+          {
+            'Name'   => 'resource-id',
+            'Values' => ['i-1234567890abcdef8']
+          }
+        ]
+      }
+    );
+
+    # Results:
+    my $Tags = $DescribeTagsResult->Tags;
+
+    # Returns a L<Paws::EC2::DescribeTagsResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ec2/DescribeTags>
 
 =head1 ATTRIBUTES
 
@@ -62,11 +81,12 @@ C<resource-id> - The resource ID.
 =item *
 
 C<resource-type> - The resource type (C<customer-gateway> |
-C<dhcp-options> | C<image> | C<instance> | C<internet-gateway> |
-C<network-acl> | C<network-interface> | C<reserved-instances> |
+C<dhcp-options> | C<elastic-ip> | C<fpga-image> | C<image> |
+C<instance> | C<internet-gateway> | C<launch-template> | C<natgateway>
+| C<network-acl> | C<network-interface> | C<reserved-instances> |
 C<route-table> | C<security-group> | C<snapshot> |
 C<spot-instances-request> | C<subnet> | C<volume> | C<vpc> |
-C<vpn-connection> | C<vpn-gateway>).
+C<vpc-peering-connection> | C<vpn-connection> | C<vpn-gateway>).
 
 =item *
 
@@ -98,9 +118,9 @@ This class forms part of L<Paws>, documenting arguments for method DescribeTags 
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

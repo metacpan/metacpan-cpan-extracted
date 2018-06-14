@@ -1,6 +1,7 @@
 package Paws::IoTData;
   use Moose;
   sub service { 'data.iot' }
+  sub signing_name { 'iotdata' }
   sub version { '2015-05-28' }
   sub flattened_arrays { 0 }
   has max_attempts => (is => 'ro', isa => 'Int', default => 5);
@@ -10,7 +11,7 @@ package Paws::IoTData;
   has retriables => (is => 'ro', isa => 'ArrayRef', default => sub { [
   ] });
 
-  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::RestJsonCaller', 'Paws::Net::RestJsonResponse';
+  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::RestJsonCaller';
 
   
   sub DeleteThingShadow {
@@ -74,54 +75,95 @@ retrieve, update, and delete thing shadows. A thing shadow is a
 persistent representation of your things and their state in the AWS
 cloud.
 
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/iot/>
+
+
 =head1 METHODS
 
-=head2 DeleteThingShadow(ThingName => Str)
+=head2 DeleteThingShadow
+
+=over
+
+=item ThingName => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::IoTData::DeleteThingShadow>
 
 Returns: a L<Paws::IoTData::DeleteThingShadowResponse> instance
 
-  Deletes the thing shadow for the specified thing.
+Deletes the thing shadow for the specified thing.
 
-For more information, see DeleteThingShadow in the I<AWS IoT Developer
-Guide>.
+For more information, see DeleteThingShadow
+(http://docs.aws.amazon.com/iot/latest/developerguide/API_DeleteThingShadow.html)
+in the I<AWS IoT Developer Guide>.
 
 
-=head2 GetThingShadow(ThingName => Str)
+=head2 GetThingShadow
+
+=over
+
+=item ThingName => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::IoTData::GetThingShadow>
 
 Returns: a L<Paws::IoTData::GetThingShadowResponse> instance
 
-  Gets the thing shadow for the specified thing.
+Gets the thing shadow for the specified thing.
 
-For more information, see GetThingShadow in the I<AWS IoT Developer
-Guide>.
+For more information, see GetThingShadow
+(http://docs.aws.amazon.com/iot/latest/developerguide/API_GetThingShadow.html)
+in the I<AWS IoT Developer Guide>.
 
 
-=head2 Publish(Topic => Str, [Payload => Str, Qos => Int])
+=head2 Publish
+
+=over
+
+=item Topic => Str
+
+=item [Payload => Str]
+
+=item [Qos => Int]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::IoTData::Publish>
 
 Returns: nothing
 
-  Publishes state information.
+Publishes state information.
 
-For more information, see HTTP Protocol in the I<AWS IoT Developer
-Guide>.
+For more information, see HTTP Protocol
+(http://docs.aws.amazon.com/iot/latest/developerguide/protocols.html#http)
+in the I<AWS IoT Developer Guide>.
 
 
-=head2 UpdateThingShadow(Payload => Str, ThingName => Str)
+=head2 UpdateThingShadow
+
+=over
+
+=item Payload => Str
+
+=item ThingName => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::IoTData::UpdateThingShadow>
 
 Returns: a L<Paws::IoTData::UpdateThingShadowResponse> instance
 
-  Updates the thing shadow for the specified thing.
+Updates the thing shadow for the specified thing.
 
-For more information, see UpdateThingShadow in the I<AWS IoT Developer
-Guide>.
+For more information, see UpdateThingShadow
+(http://docs.aws.amazon.com/iot/latest/developerguide/API_UpdateThingShadow.html)
+in the I<AWS IoT Developer Guide>.
 
 
 
@@ -139,9 +181,9 @@ This service class forms part of L<Paws>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -1,3 +1,8 @@
+0.003   2018-06-09 (PERLANCAR)
+
+        - [build] Rebuild to set minimum dependencies [RT#125528].
+
+
 0.002   2018-06-07 (PERLANCAR)
 
 	- [test] Delete copied test from another dist, add our own test

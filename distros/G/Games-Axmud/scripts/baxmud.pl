@@ -41,8 +41,8 @@ use vars qw(
 );
 
 $SCRIPT = 'Axmud';              # Name used in system messages
-$VERSION = '1.1.0';             # Version number for this client
-$DATE = '31 May 2018';
+$VERSION = '1.1.012';           # Version number for this client
+$DATE = '8 Jun 2018';
 $NAME_SHORT = 'axmud';          # Lower-case version of $SCRIPT; same as the package name above
 $NAME_ARTICLE = 'an Axmud';     # Name with an article
 $BASIC_NAME = 'Axbasic';        # Name of Axmud's built-in scripting library
@@ -166,9 +166,12 @@ use Time::HiRes qw(gettimeofday);
 
 # Internal dependencies
 use Games::Axmud;
-use Gtk2::Ex::Simple::List;     # packaged inside /lib so Axmud will work in MS Windows
-use Heap::Binomial;             # packaged inside /lib so Axmud will work in MS Windows
 use Language::Axbasic;
+use Language::Axbasic::Expression;  # Due to way original Language::Basic was written,
+use Language::Axbasic::Function;    #   quickest way to integrate it is to 'use' all the Axbasic
+use Language::Axbasic::Statement;   #   source code files here
+use Language::Axbasic::Subroutine;
+use Language::Axbasic::Variable;
 
 # All files required after the Axmud script has been compiled are stored in /share
 $SHARE_DIR = File::ShareDir::dist_dir('Games-Axmud');

@@ -19,21 +19,36 @@ package Paws::SimpleWorkflow::ListWorkflowTypes;
 
 =head1 NAME
 
-Paws::SimpleWorkflow::ListWorkflowTypes - Arguments for method ListWorkflowTypes on Paws::SimpleWorkflow
+Paws::SimpleWorkflow::ListWorkflowTypes - Arguments for method ListWorkflowTypes on L<Paws::SimpleWorkflow>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ListWorkflowTypes on the 
-Amazon Simple Workflow Service service. Use the attributes of this class
+This class represents the parameters used for calling the method ListWorkflowTypes on the
+L<Amazon Simple Workflow Service|Paws::SimpleWorkflow> service. Use the attributes of this class
 as arguments to method ListWorkflowTypes.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ListWorkflowTypes.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ListWorkflowTypes(Att1 => $value1, Att2 => $value2, ...);
+    my $swf = Paws->service('SimpleWorkflow');
+    my $WorkflowTypeInfos = $swf->ListWorkflowTypes(
+      Domain             => 'MyDomainName',
+      RegistrationStatus => 'REGISTERED',
+      MaximumPageSize    => 1,                # OPTIONAL
+      Name               => 'MyName',         # OPTIONAL
+      NextPageToken      => 'MyPageToken',    # OPTIONAL
+      ReverseOrder       => 1,                # OPTIONAL
+    );
+
+    # Results:
+    my $NextPageToken = $WorkflowTypeInfos->NextPageToken;
+    my $TypeInfos     = $WorkflowTypeInfos->TypeInfos;
+
+    # Returns a L<Paws::SimpleWorkflow::WorkflowTypeInfos> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/swf/ListWorkflowTypes>
 
 =head1 ATTRIBUTES
 
@@ -96,9 +111,9 @@ This class forms part of L<Paws>, documenting arguments for method ListWorkflowT
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

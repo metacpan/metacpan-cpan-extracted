@@ -2,9 +2,11 @@
 package Paws::RDS::RestoreDBClusterFromSnapshot;
   use Moose;
   has AvailabilityZones => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
+  has BacktrackWindow => (is => 'ro', isa => 'Int');
   has DatabaseName => (is => 'ro', isa => 'Str');
   has DBClusterIdentifier => (is => 'ro', isa => 'Str', required => 1);
   has DBSubnetGroupName => (is => 'ro', isa => 'Str');
+  has EnableCloudwatchLogsExports => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
   has EnableIAMDatabaseAuthentication => (is => 'ro', isa => 'Bool');
   has Engine => (is => 'ro', isa => 'Str', required => 1);
   has EngineVersion => (is => 'ro', isa => 'Str');
@@ -26,21 +28,33 @@ package Paws::RDS::RestoreDBClusterFromSnapshot;
 
 =head1 NAME
 
-Paws::RDS::RestoreDBClusterFromSnapshot - Arguments for method RestoreDBClusterFromSnapshot on Paws::RDS
+Paws::RDS::RestoreDBClusterFromSnapshot - Arguments for method RestoreDBClusterFromSnapshot on L<Paws::RDS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method RestoreDBClusterFromSnapshot on the 
-Amazon Relational Database Service service. Use the attributes of this class
+This class represents the parameters used for calling the method RestoreDBClusterFromSnapshot on the
+L<Amazon Relational Database Service|Paws::RDS> service. Use the attributes of this class
 as arguments to method RestoreDBClusterFromSnapshot.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to RestoreDBClusterFromSnapshot.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->RestoreDBClusterFromSnapshot(Att1 => $value1, Att2 => $value2, ...);
+    my $rds = Paws->service('RDS');
+    # To restore an Amazon Aurora DB cluster from a DB cluster snapshot
+    # The following example restores an Amazon Aurora DB cluster from a DB
+    # cluster snapshot.
+    my $RestoreDBClusterFromSnapshotResult = $rds->RestoreDBClusterFromSnapshot(
+      {
+        'SnapshotIdentifier'  => 'sample-cluster-snapshot1',
+        'Engine'              => 'aurora',
+        'DBClusterIdentifier' => 'restored-cluster1'
+      }
+    );
+
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/rds/RestoreDBClusterFromSnapshot>
 
 =head1 ATTRIBUTES
 
@@ -49,6 +63,27 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 
 Provides the list of EC2 Availability Zones that instances in the
 restored DB cluster can be created in.
+
+
+
+=head2 BacktrackWindow => Int
+
+The target backtrack window, in seconds. To disable backtracking, set
+this value to 0.
+
+Default: 0
+
+Constraints:
+
+=over
+
+=item *
+
+If specified, this value must be set to a number from 0 to 259,200 (72
+hours).
+
+=back
+
 
 
 
@@ -69,7 +104,7 @@ Constraints:
 
 =item *
 
-Must contain from 1 to 255 alphanumeric characters or hyphens
+Must contain from 1 to 63 letters, numbers, or hyphens
 
 =item *
 
@@ -89,18 +124,24 @@ Example: C<my-snapshot-id>
 
 The name of the DB subnet group to use for the new DB cluster.
 
-Constraints: Must contain no more than 255 alphanumeric characters,
-periods, underscores, spaces, or hyphens. Must not be default.
+Constraints: If supplied, must match the name of an existing
+DBSubnetGroup.
 
 Example: C<mySubnetgroup>
 
 
 
+=head2 EnableCloudwatchLogsExports => ArrayRef[Str|Undef]
+
+The list of logs that the restored DB cluster is to export to
+CloudWatch Logs.
+
+
+
 =head2 EnableIAMDatabaseAuthentication => Bool
 
-A Boolean value that is true to enable mapping of AWS Identity and
-Access Management (IAM) accounts to database accounts, and otherwise
-false.
+True to enable mapping of AWS Identity and Access Management (IAM)
+accounts to database accounts, and otherwise false.
 
 Default: C<false>
 
@@ -124,8 +165,8 @@ The version of the database engine to use for the new DB cluster.
 
 =head2 KmsKeyId => Str
 
-The KMS key identifier to use when restoring an encrypted DB cluster
-from a DB snapshot or DB cluster snapshot.
+The AWS KMS key identifier to use when restoring an encrypted DB
+cluster from a DB snapshot or DB cluster snapshot.
 
 The KMS key identifier is the Amazon Resource Name (ARN) for the KMS
 encryption key. If you are restoring a DB cluster with the same AWS
@@ -185,15 +226,7 @@ Constraints:
 
 =item *
 
-Must contain from 1 to 63 alphanumeric characters or hyphens
-
-=item *
-
-First character must be a letter
-
-=item *
-
-Cannot end with a hyphen or contain two consecutive hyphens
+Must match the identifier of an existing Snapshot.
 
 =back
 
@@ -219,9 +252,9 @@ This class forms part of L<Paws>, documenting arguments for method RestoreDBClus
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

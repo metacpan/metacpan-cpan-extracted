@@ -1,9 +1,11 @@
 ---
-abstract: 'Provides a geocoding functionality using free databases'
+abstract: 'Provides a Geo-Coding functionality using free databases'
 author:
   - 'Nigel Horne <njh@bandsman.co.uk>'
 build_requires:
   App::csv2sqlite: '0'
+  CHI: '0'
+  CHI::Driver::RawMemory: '0'
   File::Basename: '0'
   File::Copy: '0'
   File::Spec: '0'
@@ -40,6 +42,7 @@ requires:
   File::pfopen: '0.02'
   Geo::StreetAddress::US: '0'
   Gzip::Faster: '0'
+  List::MoreUtils: '0'
   Locale::CA: '0'
   Locale::Country: '0'
   Locale::SubCountry: '0'
@@ -47,10 +50,9 @@ requires:
   Module::Info: '0'
   Storable: '0'
   Text::CSV: '0'
-  Text::xSV::Slurp: '0'
   perl: '5.006002'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Free
   repository: git://github.com/nigelhorne/Geo-Coder-Free.git
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -11,28 +11,74 @@ package Paws::Pinpoint::UpdateEndpoint;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/v1/apps/{application-id}/endpoints/{endpoint-id}');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'PUT');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::Pinpoint::UpdateEndpointResponse');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::Pinpoint::UpdateEndpoint - Arguments for method UpdateEndpoint on Paws::Pinpoint
+Paws::Pinpoint::UpdateEndpoint - Arguments for method UpdateEndpoint on L<Paws::Pinpoint>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateEndpoint on the 
-Amazon Pinpoint service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateEndpoint on the
+L<Amazon Pinpoint|Paws::Pinpoint> service. Use the attributes of this class
 as arguments to method UpdateEndpoint.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateEndpoint.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateEndpoint(Att1 => $value1, Att2 => $value2, ...);
+    my $pinpoint = Paws->service('Pinpoint');
+    my $UpdateEndpointResponse = $pinpoint->UpdateEndpoint(
+      ApplicationId   => 'My__string',
+      EndpointId      => 'My__string',
+      EndpointRequest => {
+        Attributes => { 'My__string' => [ 'My__string', ... ], },    # OPTIONAL
+        RequestId  => 'My__string',
+        Address    => 'My__string',
+        Metrics    => {
+          'My__string' => 1,    # , value: OPTIONAL
+        },    # OPTIONAL
+        Location => {
+          Longitude  => 1,              # OPTIONAL
+          Region     => 'My__string',
+          PostalCode => 'My__string',
+          Latitude   => 1,              # OPTIONAL
+          City       => 'My__string',
+          Country    => 'My__string',
+        },    # OPTIONAL
+        ChannelType => 'GCM'
+        , # values: GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, EMAIL, BAIDU, CUSTOM; OPTIONAL
+        OptOut        => 'My__string',
+        EffectiveDate => 'My__string',
+        Demographic   => {
+          Model           => 'My__string',
+          Timezone        => 'My__string',
+          Make            => 'My__string',
+          AppVersion      => 'My__string',
+          PlatformVersion => 'My__string',
+          Locale          => 'My__string',
+          Platform        => 'My__string',
+          ModelVersion    => 'My__string',
+        },    # OPTIONAL
+        User => {
+          UserId         => 'My__string',
+          UserAttributes => { 'My__string' => [ 'My__string', ... ], }
+          ,    # OPTIONAL
+        },    # OPTIONAL
+        EndpointStatus => 'My__string',
+      },
+
+    );
+
+    # Results:
+    my $MessageBody = $UpdateEndpointResponse->MessageBody;
+
+    # Returns a L<Paws::Pinpoint::UpdateEndpointResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/>
 
 =head1 ATTRIBUTES
 
@@ -62,9 +108,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateEndpoin
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -2,14 +2,20 @@ use strict;
 use warnings;
 use utf8;
 
+use CHI;
 use Test::More;
 
 use WebService::Pokemon;
 
 my ($got, $expect) = ('', '');
 
-my $api = WebService::Pokemon->new;
-$api->cache_path($ENV{PWD} . '/t/cache');
+my $api = WebService::Pokemon->new(
+    cache => CHI->new(
+        driver => 'File',
+        namespace => 'restcountries',
+        root_dir => $ENV{PWD} . '/t/cache/',
+    )
+);
 
 $expect = undef;
 $got = $api->_request();

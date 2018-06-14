@@ -40,21 +40,62 @@ package Paws::RedShift::CreateCluster;
 
 =head1 NAME
 
-Paws::RedShift::CreateCluster - Arguments for method CreateCluster on Paws::RedShift
+Paws::RedShift::CreateCluster - Arguments for method CreateCluster on L<Paws::RedShift>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateCluster on the 
-Amazon Redshift service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateCluster on the
+L<Amazon Redshift|Paws::RedShift> service. Use the attributes of this class
 as arguments to method CreateCluster.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateCluster.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateCluster(Att1 => $value1, Att2 => $value2, ...);
+    my $redshift = Paws->service('RedShift');
+    my $CreateClusterResult = $redshift->CreateCluster(
+      ClusterIdentifier                => 'MyString',
+      MasterUserPassword               => 'MyString',
+      MasterUsername                   => 'MyString',
+      NodeType                         => 'MyString',
+      AdditionalInfo                   => 'MyString',             # OPTIONAL
+      AllowVersionUpgrade              => 1,                      # OPTIONAL
+      AutomatedSnapshotRetentionPeriod => 1,                      # OPTIONAL
+      AvailabilityZone                 => 'MyString',             # OPTIONAL
+      ClusterParameterGroupName        => 'MyString',             # OPTIONAL
+      ClusterSecurityGroups            => [ 'MyString', ... ],    # OPTIONAL
+      ClusterSubnetGroupName           => 'MyString',             # OPTIONAL
+      ClusterType                      => 'MyString',             # OPTIONAL
+      ClusterVersion                   => 'MyString',             # OPTIONAL
+      DBName                           => 'MyString',             # OPTIONAL
+      ElasticIp                        => 'MyString',             # OPTIONAL
+      Encrypted                        => 1,                      # OPTIONAL
+      EnhancedVpcRouting               => 1,                      # OPTIONAL
+      HsmClientCertificateIdentifier   => 'MyString',             # OPTIONAL
+      HsmConfigurationIdentifier       => 'MyString',             # OPTIONAL
+      IamRoles                         => [ 'MyString', ... ],    # OPTIONAL
+      KmsKeyId                         => 'MyString',             # OPTIONAL
+      NumberOfNodes                    => 1,                      # OPTIONAL
+      Port                             => 1,                      # OPTIONAL
+      PreferredMaintenanceWindow       => 'MyString',             # OPTIONAL
+      PubliclyAccessible               => 1,                      # OPTIONAL
+      Tags                             => [
+        {
+          Key   => 'MyString',
+          Value => 'MyString',
+        },
+        ...
+      ],                                                          # OPTIONAL
+      VpcSecurityGroupIds => [ 'MyString', ... ],                 # OPTIONAL
+    );
+
+    # Results:
+    my $Cluster = $CreateClusterResult->Cluster;
+
+    # Returns a L<Paws::RedShift::CreateClusterResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/redshift/CreateCluster>
 
 =head1 ATTRIBUTES
 
@@ -155,6 +196,7 @@ The name of the parameter group to be associated with this cluster.
 Default: The default Amazon Redshift cluster parameter group. For
 information about the default parameter group, go to Working with
 Amazon Redshift Parameter Groups
+(http://docs.aws.amazon.com/redshift/latest/mgmt/working-with-parameter-groups.html)
 
 Constraints:
 
@@ -236,8 +278,9 @@ created.
 
 To create additional databases after the cluster is created, connect to
 the cluster with a SQL client and use SQL commands to create a
-database. For more information, go to Create a Database in the Amazon
-Redshift Database Developer Guide.
+database. For more information, go to Create a Database
+(http://docs.aws.amazon.com/redshift/latest/dg/t_creating_database.html)
+in the Amazon Redshift Database Developer Guide.
 
 Default: C<dev>
 
@@ -256,8 +299,9 @@ Must contain only lowercase letters.
 =item *
 
 Cannot be a word that is reserved by the service. A list of reserved
-words can be found in Reserved Words in the Amazon Redshift Database
-Developer Guide.
+words can be found in Reserved Words
+(http://docs.aws.amazon.com/redshift/latest/dg/r_pg_keywords.html) in
+the Amazon Redshift Database Developer Guide.
 
 =back
 
@@ -271,7 +315,9 @@ The Elastic IP (EIP) address for the cluster.
 Constraints: The cluster must be provisioned in EC2-VPC and
 publicly-accessible through an Internet gateway. For more information
 about provisioning clusters in EC2-VPC, go to Supported Platforms to
-Launch Your Cluster in the Amazon Redshift Cluster Management Guide.
+Launch Your Cluster
+(http://docs.aws.amazon.com/redshift/latest/mgmt/working-with-clusters.html#cluster-platforms)
+in the Amazon Redshift Cluster Management Guide.
 
 
 
@@ -288,7 +334,9 @@ Default: false
 An option that specifies whether to create the cluster with enhanced
 VPC routing enabled. To create a cluster that uses enhanced VPC
 routing, the cluster must be in a VPC. For more information, see
-Enhanced VPC Routing in the Amazon Redshift Cluster Management Guide.
+Enhanced VPC Routing
+(http://docs.aws.amazon.com/redshift/latest/mgmt/enhanced-vpc-routing.html)
+in the Amazon Redshift Cluster Management Guide.
 
 If this option is C<true>, enhanced VPC routing is enabled.
 
@@ -340,7 +388,8 @@ Constraints:
 
 =item *
 
-Must be 1 - 128 alphanumeric characters.
+Must be 1 - 128 alphanumeric characters. The user name can't be
+C<PUBLIC>.
 
 =item *
 
@@ -349,7 +398,9 @@ First character must be a letter.
 =item *
 
 Cannot be a reserved word. A list of reserved words can be found in
-Reserved Words in the Amazon Redshift Database Developer Guide.
+Reserved Words
+(http://docs.aws.amazon.com/redshift/latest/dg/r_pg_keywords.html) in
+the Amazon Redshift Database Developer Guide.
 
 =back
 
@@ -394,11 +445,13 @@ Can be any printable ASCII character (ASCII code 33 to 126) except '
 =head2 B<REQUIRED> NodeType => Str
 
 The node type to be provisioned for the cluster. For information about
-node types, go to Working with Clusters in the I<Amazon Redshift
-Cluster Management Guide>.
+node types, go to Working with Clusters
+(http://docs.aws.amazon.com/redshift/latest/mgmt/working-with-clusters.html#how-many-nodes)
+in the I<Amazon Redshift Cluster Management Guide>.
 
-Valid Values: C<ds1.xlarge> | C<ds1.8xlarge> | C<ds2.xlarge> |
-C<ds2.8xlarge> | C<dc1.large> | C<dc1.8xlarge>.
+Valid Values: C<ds2.xlarge> | C<ds2.8xlarge> | C<ds2.xlarge> |
+C<ds2.8xlarge> | C<dc1.large> | C<dc1.8xlarge> | C<dc2.large> |
+C<dc2.8xlarge>
 
 
 
@@ -408,8 +461,9 @@ The number of compute nodes in the cluster. This parameter is required
 when the B<ClusterType> parameter is specified as C<multi-node>.
 
 For information about determining how many nodes you need, go to
-Working with Clusters in the I<Amazon Redshift Cluster Management
-Guide>.
+Working with Clusters
+(http://docs.aws.amazon.com/redshift/latest/mgmt/working-with-clusters.html#how-many-nodes)
+in the I<Amazon Redshift Cluster Management Guide>.
 
 If you don't specify this parameter, you get a single-node cluster.
 When requesting a multi-node cluster, you must specify the number of
@@ -445,7 +499,9 @@ Format: C<ddd:hh24:mi-ddd:hh24:mi>
 Default: A 30-minute window selected at random from an 8-hour block of
 time per region, occurring on a random day of the week. For more
 information about the time blocks for each region, see Maintenance
-Windows in Amazon Redshift Cluster Management Guide.
+Windows
+(http://docs.aws.amazon.com/redshift/latest/mgmt/working-with-clusters.html#rs-maintenance-windows)
+in Amazon Redshift Cluster Management Guide.
 
 Valid Days: Mon | Tue | Wed | Thu | Fri | Sat | Sun
 
@@ -481,9 +537,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateCluster
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

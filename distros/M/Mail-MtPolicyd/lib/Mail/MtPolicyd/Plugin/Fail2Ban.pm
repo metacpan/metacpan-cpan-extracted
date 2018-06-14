@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::Fail2Ban;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
 # ABSTRACT: mtpolicyd plugin to block an address with fail2ban
 
 
@@ -89,7 +89,7 @@ Mail::MtPolicyd::Plugin::Fail2Ban - mtpolicyd plugin to block an address with fa
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 DESCRIPTION
 

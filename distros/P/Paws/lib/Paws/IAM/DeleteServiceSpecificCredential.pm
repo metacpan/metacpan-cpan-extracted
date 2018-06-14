@@ -15,21 +15,26 @@ package Paws::IAM::DeleteServiceSpecificCredential;
 
 =head1 NAME
 
-Paws::IAM::DeleteServiceSpecificCredential - Arguments for method DeleteServiceSpecificCredential on Paws::IAM
+Paws::IAM::DeleteServiceSpecificCredential - Arguments for method DeleteServiceSpecificCredential on L<Paws::IAM>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DeleteServiceSpecificCredential on the 
-AWS Identity and Access Management service. Use the attributes of this class
+This class represents the parameters used for calling the method DeleteServiceSpecificCredential on the
+L<AWS Identity and Access Management|Paws::IAM> service. Use the attributes of this class
 as arguments to method DeleteServiceSpecificCredential.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DeleteServiceSpecificCredential.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DeleteServiceSpecificCredential(Att1 => $value1, Att2 => $value2, ...);
+    my $iam = Paws->service('IAM');
+    $iam->DeleteServiceSpecificCredential(
+      ServiceSpecificCredentialId => 'MyserviceSpecificCredentialId',
+      UserName                    => 'MyuserNameType',                # OPTIONAL
+    );
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/iam/DeleteServiceSpecificCredential>
 
 =head1 ATTRIBUTES
 
@@ -39,8 +44,9 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 The unique identifier of the service-specific credential. You can get
 this value by calling ListServiceSpecificCredentials.
 
-This parameter allows (per its regex pattern) a string of characters
-that can consist of any upper or lowercased letter or digit.
+This parameter allows (per its regex pattern
+(http://wikipedia.org/wiki/regex)) a string of characters that can
+consist of any upper or lowercased letter or digit.
 
 
 
@@ -50,9 +56,10 @@ The name of the IAM user associated with the service-specific
 credential. If this value is not specified, then the operation assumes
 the user whose credentials are used to call the operation.
 
-This parameter allows (per its regex pattern) a string of characters
-consisting of upper and lowercase alphanumeric characters with no
-spaces. You can also include any of the following characters: =,.@-
+This parameter allows (per its regex pattern
+(http://wikipedia.org/wiki/regex)) a string of characters consisting of
+upper and lowercase alphanumeric characters with no spaces. You can
+also include any of the following characters: _+=,.@-
 
 
 
@@ -63,9 +70,9 @@ This class forms part of L<Paws>, documenting arguments for method DeleteService
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

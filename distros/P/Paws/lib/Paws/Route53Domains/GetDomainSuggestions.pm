@@ -16,21 +16,33 @@ package Paws::Route53Domains::GetDomainSuggestions;
 
 =head1 NAME
 
-Paws::Route53Domains::GetDomainSuggestions - Arguments for method GetDomainSuggestions on Paws::Route53Domains
+Paws::Route53Domains::GetDomainSuggestions - Arguments for method GetDomainSuggestions on L<Paws::Route53Domains>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method GetDomainSuggestions on the 
-Amazon Route 53 Domains service. Use the attributes of this class
+This class represents the parameters used for calling the method GetDomainSuggestions on the
+L<Amazon Route 53 Domains|Paws::Route53Domains> service. Use the attributes of this class
 as arguments to method GetDomainSuggestions.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to GetDomainSuggestions.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->GetDomainSuggestions(Att1 => $value1, Att2 => $value2, ...);
+    my $route53domains = Paws->service('Route53Domains');
+    my $GetDomainSuggestionsResponse = $route53domains->GetDomainSuggestions(
+      DomainName      => 'MyDomainName',
+      OnlyAvailable   => 1,
+      SuggestionCount => 1,
+
+    );
+
+    # Results:
+    my $SuggestionsList = $GetDomainSuggestionsResponse->SuggestionsList;
+
+    # Returns a L<Paws::Route53Domains::GetDomainSuggestionsResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/route53domains/GetDomainSuggestions>
 
 =head1 ATTRIBUTES
 
@@ -40,8 +52,9 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 A domain name that you want to use as the basis for a list of possible
 domain names. The domain name must contain a top-level domain (TLD),
 such as .com, that Amazon Route 53 supports. For a list of TLDs, see
-Domains that You Can Register with Amazon Route 53 in the I<Amazon
-Route 53 Developer Guide>.
+Domains that You Can Register with Amazon Route 53
+(http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/registrar-tld-list.html)
+in the I<Amazon Route 53 Developer Guide>.
 
 
 
@@ -69,9 +82,9 @@ This class forms part of L<Paws>, documenting arguments for method GetDomainSugg
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

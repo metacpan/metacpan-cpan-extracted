@@ -31,7 +31,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Route53Doma
 
 =head1 DESCRIPTION
 
-This class has no description
+A complex type that contains information about whether the specified
+domain can be transferred to Amazon Route 53.
 
 =head1 ATTRIBUTES
 
@@ -48,9 +49,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Route53Do
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

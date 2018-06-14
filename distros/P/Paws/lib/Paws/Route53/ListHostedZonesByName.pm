@@ -19,21 +19,38 @@ package Paws::Route53::ListHostedZonesByName;
 
 =head1 NAME
 
-Paws::Route53::ListHostedZonesByName - Arguments for method ListHostedZonesByName on Paws::Route53
+Paws::Route53::ListHostedZonesByName - Arguments for method ListHostedZonesByName on L<Paws::Route53>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ListHostedZonesByName on the 
-Amazon Route 53 service. Use the attributes of this class
+This class represents the parameters used for calling the method ListHostedZonesByName on the
+L<Amazon Route 53|Paws::Route53> service. Use the attributes of this class
 as arguments to method ListHostedZonesByName.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ListHostedZonesByName.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ListHostedZonesByName(Att1 => $value1, Att2 => $value2, ...);
+    my $route53 = Paws->service('Route53');
+    my $ListHostedZonesByNameResponse = $route53->ListHostedZonesByName(
+      DNSName      => 'MyDNSName',         # OPTIONAL
+      HostedZoneId => 'MyResourceId',      # OPTIONAL
+      MaxItems     => 'MyPageMaxItems',    # OPTIONAL
+    );
+
+    # Results:
+    my $NextDNSName      = $ListHostedZonesByNameResponse->NextDNSName;
+    my $MaxItems         = $ListHostedZonesByNameResponse->MaxItems;
+    my $HostedZones      = $ListHostedZonesByNameResponse->HostedZones;
+    my $NextHostedZoneId = $ListHostedZonesByNameResponse->NextHostedZoneId;
+    my $HostedZoneId     = $ListHostedZonesByNameResponse->HostedZoneId;
+    my $DNSName          = $ListHostedZonesByNameResponse->DNSName;
+    my $IsTruncated      = $ListHostedZonesByNameResponse->IsTruncated;
+
+    # Returns a L<Paws::Route53::ListHostedZonesByNameResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/route53/ListHostedZonesByName>
 
 =head1 ATTRIBUTES
 
@@ -83,9 +100,9 @@ This class forms part of L<Paws>, documenting arguments for method ListHostedZon
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -1,15 +1,19 @@
-# Changes for Module::Extract::DeclaredMinimumPerl
-1.01 - Tue Nov  1 13:00:05 2011
-	* A first shot at Module::Extract::DeclaredMinimumPerl, a
-	module to extract the maximum declared minimum perl version
+Revision history for Perl module Module::Extract::DeclaredMinimumPerl
 
-1.02 - Fri Jan  3 13:54:27 2014
+1.021 2018-06-09T13:01:54Z
+	* Change to Artistic License 2.0.
+
+1.02 - 2014-01-03
 	* Get rid of MYMETA
 
-1.01_02 - Tue Nov 22 15:39:50 2011
+1.01_02 - 2011-11-22
 	* Adjust the test to check the return value of version->parse
 	before I use it for the expected value in the tests
 
-1.01_01 - Wed Nov  2 06:50:25 2011
+1.01_01 - 2011-11-02
 	* A small fix to the test suite
+
+1.01 - 2011-11-01
+	* A first shot at Module::Extract::DeclaredMinimumPerl, a
+	module to extract the maximum declared minimum perl version
 

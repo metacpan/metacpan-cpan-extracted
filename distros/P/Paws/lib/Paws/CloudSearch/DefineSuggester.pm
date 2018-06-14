@@ -15,21 +15,40 @@ package Paws::CloudSearch::DefineSuggester;
 
 =head1 NAME
 
-Paws::CloudSearch::DefineSuggester - Arguments for method DefineSuggester on Paws::CloudSearch
+Paws::CloudSearch::DefineSuggester - Arguments for method DefineSuggester on L<Paws::CloudSearch>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DefineSuggester on the 
-Amazon CloudSearch service. Use the attributes of this class
+This class represents the parameters used for calling the method DefineSuggester on the
+L<Amazon CloudSearch|Paws::CloudSearch> service. Use the attributes of this class
 as arguments to method DefineSuggester.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DefineSuggester.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DefineSuggester(Att1 => $value1, Att2 => $value2, ...);
+    my $cloudsearch = Paws->service('CloudSearch');
+    my $DefineSuggesterResponse = $cloudsearch->DefineSuggester(
+      DomainName => 'MyDomainName',
+      Suggester  => {
+        DocumentSuggesterOptions => {
+          SourceField    => 'MyFieldName',   # min: 1, max: 64
+          SortExpression => 'MyString',      # OPTIONAL
+          FuzzyMatching  => 'none',          # values: none, low, high; OPTIONAL
+        },
+        SuggesterName => 'MyStandardName',    # min: 1, max: 64
+
+      },
+
+    );
+
+    # Results:
+    my $Suggester = $DefineSuggesterResponse->Suggester;
+
+    # Returns a L<Paws::CloudSearch::DefineSuggesterResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/>
 
 =head1 ATTRIBUTES
 
@@ -53,9 +72,9 @@ This class forms part of L<Paws>, documenting arguments for method DefineSuggest
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

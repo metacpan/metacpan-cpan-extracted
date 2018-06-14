@@ -49,7 +49,7 @@ OrderableDBInstanceOption
 
 =head2 Name => Str
 
-  The name of the availability zone.
+  The name of the Availability Zone.
 
 
 
@@ -59,9 +59,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::RDS>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

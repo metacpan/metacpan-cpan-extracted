@@ -17,21 +17,30 @@ package Paws::RDS::DescribeDBInstances;
 
 =head1 NAME
 
-Paws::RDS::DescribeDBInstances - Arguments for method DescribeDBInstances on Paws::RDS
+Paws::RDS::DescribeDBInstances - Arguments for method DescribeDBInstances on L<Paws::RDS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DescribeDBInstances on the 
-Amazon Relational Database Service service. Use the attributes of this class
+This class represents the parameters used for calling the method DescribeDBInstances on the
+L<Amazon Relational Database Service|Paws::RDS> service. Use the attributes of this class
 as arguments to method DescribeDBInstances.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DescribeDBInstances.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DescribeDBInstances(Att1 => $value1, Att2 => $value2, ...);
+    my $rds = Paws->service('RDS');
+    # To list DB instance settings
+    # This example lists settings for the specified DB instance.
+    my $DBInstanceMessage = $rds->DescribeDBInstances(
+      {
+        'DBInstanceIdentifier' => 'mymysqlinstance'
+      }
+    );
+
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/rds/DescribeDBInstances>
 
 =head1 ATTRIBUTES
 
@@ -48,15 +57,7 @@ Constraints:
 
 =item *
 
-Must contain from 1 to 63 alphanumeric characters or hyphens
-
-=item *
-
-First character must be a letter
-
-=item *
-
-Cannot end with a hyphen or contain two consecutive hyphens
+If supplied, must match the identifier of an existing DBInstance.
 
 =back
 
@@ -75,7 +76,7 @@ Supported filters:
 
 C<db-cluster-id> - Accepts DB cluster identifiers and DB cluster Amazon
 Resource Names (ARNs). The results list will only include information
-about the DB instances associated with the DB Clusters identified by
+about the DB instances associated with the DB clusters identified by
 these ARNs.
 
 =item *
@@ -118,9 +119,9 @@ This class forms part of L<Paws>, documenting arguments for method DescribeDBIns
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

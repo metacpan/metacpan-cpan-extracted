@@ -5,7 +5,6 @@ package Paws::Pinpoint::DirectMessageConfiguration;
   has BaiduMessage => (is => 'ro', isa => 'Paws::Pinpoint::BaiduMessage');
   has DefaultMessage => (is => 'ro', isa => 'Paws::Pinpoint::DefaultMessage');
   has DefaultPushNotificationMessage => (is => 'ro', isa => 'Paws::Pinpoint::DefaultPushNotificationMessage');
-  has EmailMessage => (is => 'ro', isa => 'Paws::Pinpoint::EmailMessage');
   has GCMMessage => (is => 'ro', isa => 'Paws::Pinpoint::GCMMessage');
   has SMSMessage => (is => 'ro', isa => 'Paws::Pinpoint::SMSMessage');
 1;
@@ -71,11 +70,6 @@ notification message.
   The default push notification message for all push channels.
 
 
-=head2 EmailMessage => L<Paws::Pinpoint::EmailMessage>
-
-  The message to Email channels. Overrides the default message.
-
-
 =head2 GCMMessage => L<Paws::Pinpoint::GCMMessage>
 
   The message to GCM channels. Overrides the default push notification
@@ -94,9 +88,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Pinpoint>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

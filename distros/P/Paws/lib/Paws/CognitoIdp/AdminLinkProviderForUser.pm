@@ -16,21 +16,37 @@ package Paws::CognitoIdp::AdminLinkProviderForUser;
 
 =head1 NAME
 
-Paws::CognitoIdp::AdminLinkProviderForUser - Arguments for method AdminLinkProviderForUser on Paws::CognitoIdp
+Paws::CognitoIdp::AdminLinkProviderForUser - Arguments for method AdminLinkProviderForUser on L<Paws::CognitoIdp>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method AdminLinkProviderForUser on the 
-Amazon Cognito Identity Provider service. Use the attributes of this class
+This class represents the parameters used for calling the method AdminLinkProviderForUser on the
+L<Amazon Cognito Identity Provider|Paws::CognitoIdp> service. Use the attributes of this class
 as arguments to method AdminLinkProviderForUser.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to AdminLinkProviderForUser.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->AdminLinkProviderForUser(Att1 => $value1, Att2 => $value2, ...);
+    my $cognito-idp = Paws->service('CognitoIdp');
+    my $AdminLinkProviderForUserResponse =
+      $cognito -idp->AdminLinkProviderForUser(
+      DestinationUser => {
+        ProviderName => 'MyProviderNameType',    # min: 1, max: 32; OPTIONAL
+        ProviderAttributeValue => 'MyStringType',    # OPTIONAL
+        ProviderAttributeName  => 'MyStringType',    # OPTIONAL
+      },
+      SourceUser => {
+        ProviderName => 'MyProviderNameType',        # min: 1, max: 32; OPTIONAL
+        ProviderAttributeValue => 'MyStringType',    # OPTIONAL
+        ProviderAttributeName  => 'MyStringType',    # OPTIONAL
+      },
+      UserPoolId => 'MyStringType',
+
+      );
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/cognito-idp/AdminLinkProviderForUser>
 
 =head1 ATTRIBUTES
 
@@ -44,9 +60,14 @@ Facebook user). If the user doesn't exist, an exception is thrown. This
 is the user that is returned when the new user (with the linked
 identity provider attribute) signs in.
 
-The C<ProviderAttributeValue> for the C<DestinationUser> must match the
-username for the user in the user pool. The C<ProviderAttributeName>
-will always be ignored.
+For a native username + password user, the C<ProviderAttributeValue>
+for the C<DestinationUser> should be the username in the user pool. For
+a federated user, it should be the provider-specific C<user_id>.
+
+The C<ProviderAttributeName> of the C<DestinationUser> is ignored.
+
+The C<ProviderName> should be set to C<Cognito> for users in Cognito
+user pools.
 
 
 
@@ -89,9 +110,9 @@ This class forms part of L<Paws>, documenting arguments for method AdminLinkProv
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

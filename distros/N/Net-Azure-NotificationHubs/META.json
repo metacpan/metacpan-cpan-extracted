@@ -6,7 +6,7 @@
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v2.4.1",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -44,13 +44,10 @@
          "requires" : {
             "Carp" : "0",
             "Class::Accessor::Lite" : "0",
-            "HTTP::Message" : "0",
-            "HTTP::Request" : "0",
+            "HTTP::Tiny" : "0",
             "JSON" : "0",
-            "LWP::Protocol::https" : "0",
-            "LWP::UserAgent" : "0",
-            "Net::Azure::Authorization::SAS" : "0",
-            "Try::Tiny" : "0",
+            "Net::Azure::Authorization::SAS" : "0.03",
+            "Net::SSLeay" : "0",
             "URI" : "0",
             "perl" : "5.008001"
          }
@@ -65,7 +62,7 @@
    "provides" : {
       "Net::Azure::NotificationHubs" : {
          "file" : "lib/Net/Azure/NotificationHubs.pm",
-         "version" : "0.02"
+         "version" : "0.07"
       },
       "Net::Azure::NotificationHubs::Request" : {
          "file" : "lib/Net/Azure/NotificationHubs/Request.pm"
@@ -85,6 +82,10 @@
          "web" : "https://github.com/ytnobody/p5-Net-Azure-NotifcationHubs"
       }
    },
-   "version" : "0.02",
-   "x_authority" : "cpan:YTURTLE"
+   "version" : "0.07",
+   "x_authority" : "cpan:YTURTLE",
+   "x_contributors" : [
+      "azuma.satoshi <azuma.satoshi@colon.ne.jp>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ]
 }

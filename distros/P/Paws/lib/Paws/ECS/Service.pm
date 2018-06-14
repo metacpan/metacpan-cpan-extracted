@@ -6,14 +6,19 @@ package Paws::ECS::Service;
   has Deployments => (is => 'ro', isa => 'ArrayRef[Paws::ECS::Deployment]', request_name => 'deployments', traits => ['NameInRequest']);
   has DesiredCount => (is => 'ro', isa => 'Int', request_name => 'desiredCount', traits => ['NameInRequest']);
   has Events => (is => 'ro', isa => 'ArrayRef[Paws::ECS::ServiceEvent]', request_name => 'events', traits => ['NameInRequest']);
+  has HealthCheckGracePeriodSeconds => (is => 'ro', isa => 'Int', request_name => 'healthCheckGracePeriodSeconds', traits => ['NameInRequest']);
+  has LaunchType => (is => 'ro', isa => 'Str', request_name => 'launchType', traits => ['NameInRequest']);
   has LoadBalancers => (is => 'ro', isa => 'ArrayRef[Paws::ECS::LoadBalancer]', request_name => 'loadBalancers', traits => ['NameInRequest']);
+  has NetworkConfiguration => (is => 'ro', isa => 'Paws::ECS::NetworkConfiguration', request_name => 'networkConfiguration', traits => ['NameInRequest']);
   has PendingCount => (is => 'ro', isa => 'Int', request_name => 'pendingCount', traits => ['NameInRequest']);
   has PlacementConstraints => (is => 'ro', isa => 'ArrayRef[Paws::ECS::PlacementConstraint]', request_name => 'placementConstraints', traits => ['NameInRequest']);
   has PlacementStrategy => (is => 'ro', isa => 'ArrayRef[Paws::ECS::PlacementStrategy]', request_name => 'placementStrategy', traits => ['NameInRequest']);
+  has PlatformVersion => (is => 'ro', isa => 'Str', request_name => 'platformVersion', traits => ['NameInRequest']);
   has RoleArn => (is => 'ro', isa => 'Str', request_name => 'roleArn', traits => ['NameInRequest']);
   has RunningCount => (is => 'ro', isa => 'Int', request_name => 'runningCount', traits => ['NameInRequest']);
   has ServiceArn => (is => 'ro', isa => 'Str', request_name => 'serviceArn', traits => ['NameInRequest']);
   has ServiceName => (is => 'ro', isa => 'Str', request_name => 'serviceName', traits => ['NameInRequest']);
+  has ServiceRegistries => (is => 'ro', isa => 'ArrayRef[Paws::ECS::ServiceRegistry]', request_name => 'serviceRegistries', traits => ['NameInRequest']);
   has Status => (is => 'ro', isa => 'Str', request_name => 'status', traits => ['NameInRequest']);
   has TaskDefinition => (is => 'ro', isa => 'Str', request_name => 'taskDefinition', traits => ['NameInRequest']);
 1;
@@ -58,7 +63,7 @@ Details on a service within a cluster
 
 =head2 CreatedAt => Str
 
-  The Unix timestamp for when the service was created.
+  The Unix time stamp for when the service was created.
 
 
 =head2 DeploymentConfiguration => L<Paws::ECS::DeploymentConfiguration>
@@ -85,11 +90,38 @@ created with CreateService, and it can be modified with UpdateService.
 events are displayed.
 
 
+=head2 HealthCheckGracePeriodSeconds => Int
+
+  The period of time, in seconds, that the Amazon ECS service scheduler
+ignores unhealthy Elastic Load Balancing target health checks after a
+task has first started.
+
+
+=head2 LaunchType => Str
+
+  The launch type on which your service is running.
+
+
 =head2 LoadBalancers => ArrayRef[L<Paws::ECS::LoadBalancer>]
 
   A list of Elastic Load Balancing load balancer objects, containing the
 load balancer name, the container name (as it appears in a container
 definition), and the container port to access from the load balancer.
+
+Services with tasks that use the C<awsvpc> network mode (for example,
+those with the Fargate launch type) only support Application Load
+Balancers and Network Load Balancers; Classic Load Balancers are not
+supported. Also, when you create any target groups for these services,
+you must choose C<ip> as the target type, not C<instance>, because
+tasks that use the C<awsvpc> network mode are associated with an
+elastic network interface, not an Amazon EC2 instance.
+
+
+=head2 NetworkConfiguration => L<Paws::ECS::NetworkConfiguration>
+
+  The VPC subnet and security group configuration for tasks that receive
+their own Elastic Network Interface by using the C<awsvpc> networking
+mode.
 
 
 =head2 PendingCount => Int
@@ -108,11 +140,19 @@ definition), and the container port to access from the load balancer.
 placed.
 
 
+=head2 PlatformVersion => Str
+
+  The platform version on which your task is running. For more
+information, see AWS Fargate Platform Versions
+(http://docs.aws.amazon.com/AmazonECS/latest/developerguide/platform_versions.html)
+in the I<Amazon Elastic Container Service Developer Guide>.
+
+
 =head2 RoleArn => Str
 
-  The Amazon Resource Name (ARN) of the IAM role associated with the
-service that allows the Amazon ECS container agent to register
-container instances with an Elastic Load Balancing load balancer.
+  The ARN of the IAM role associated with the service that allows the
+Amazon ECS container agent to register container instances with an
+Elastic Load Balancing load balancer.
 
 
 =head2 RunningCount => Int
@@ -122,10 +162,10 @@ container instances with an Elastic Load Balancing load balancer.
 
 =head2 ServiceArn => Str
 
-  The Amazon Resource Name (ARN) that identifies the service. The ARN
-contains the C<arn:aws:ecs> namespace, followed by the region of the
-service, the AWS account ID of the service owner, the C<service>
-namespace, and then the service name. For example,
+  The ARN that identifies the service. The ARN contains the
+C<arn:aws:ecs> namespace, followed by the region of the service, the
+AWS account ID of the service owner, the C<service> namespace, and then
+the service name. For example,
 C<arn:aws:ecs:I<region>:I<012345678910>:service/I<my-service> >.
 
 
@@ -135,6 +175,11 @@ C<arn:aws:ecs:I<region>:I<012345678910>:service/I<my-service> >.
 numbers, hyphens, and underscores are allowed. Service names must be
 unique within a cluster, but you can have similarly named services in
 multiple clusters within a region or across multiple regions.
+
+
+=head2 ServiceRegistries => ArrayRef[L<Paws::ECS::ServiceRegistry>]
+
+  
 
 
 =head2 Status => Str
@@ -157,9 +202,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::ECS>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

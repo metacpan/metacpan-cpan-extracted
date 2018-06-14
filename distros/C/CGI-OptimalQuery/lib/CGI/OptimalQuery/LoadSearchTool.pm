@@ -72,7 +72,7 @@ sub on_init {
   # request to delete a saved search
   if ($delete_id) {
     $$o{dbh}->do("DELETE FROM oq_saved_search WHERE user_id=? AND id=?", undef, $$o{schema}{savedSearchUserID}, $delete_id);
-    $$o{output_handler}->(CGI::header('text/html')."report deleted");
+    $$o{output_handler}->($$o{httpHeader}->('text/html')."report deleted");
     return undef;
   }
 

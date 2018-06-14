@@ -12,10 +12,10 @@ my @uris = (
 
 ok(uri($_), 'uri') foreach @uris;
 
-is uri(undef), 'file://', 'undef';
-is uri(''), 'file://', 'empty string';
+is uri(undef), '', 'undef';
+is uri(''), '', 'empty string';
 
-is uri('/foo')->scheme, 'file', 'default file scheme';
+is uri('/foo')->scheme, '', 'missing scheme';
 is uri('http://'), 'http://', 'non-file scheme w/o host';
 is uri('http://test'), 'http://test', 'auth w/ invalid host';
 

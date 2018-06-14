@@ -4,15 +4,9 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
-   "keywords" : [
-      "ppi",
-      "parsing",
-      "static-analysis",
-      "modules"
-   ],
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -21,36 +15,49 @@
    "name" : "Module-Extract-DeclaredMinimumPerl",
    "no_index" : {
       "directory" : [
+         "t",
+         "inc",
          "corpus"
       ]
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : 0
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "PPI" : 0,
-            "Test::More" : 0,
-            "Test::Output" : 0,
-            "feature" : 0,
-            "perl" : "5.006",
-            "version" : 0
+            "PPI" : "0",
+            "Test::More" : "0",
+            "Test::Output" : "0",
+            "feature" : "0",
+            "perl" : "5.010",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/module-extract-declaredminimumperl/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/module-extract-declaredminimumperl",
       "repository" : {
-         "url" : "git://github.com/briandfoy/module-extract-declaredminimumperl.git"
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/module-extract-declaredminimumperl.git",
+         "web" : "https://github.com/briandfoy/module-extract-declaredminimumperl"
       }
    },
-   "version" : "1.02"
+   "version" : "1.021",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

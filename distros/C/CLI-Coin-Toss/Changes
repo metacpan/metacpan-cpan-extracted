@@ -1,0 +1,10 @@
+Revision history for CLI-Coin-Toss
+
+0.33    2018-06-11.
+		Changed the switch "-q" into "-1".
+        Added the CLI "matrixpack". 
+
+
+0.32    2018-06-11.
+        This replaces "cli-numbers-random-0.01" uploaded 2018-05-23 and deleted later.
+

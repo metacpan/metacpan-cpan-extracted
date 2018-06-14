@@ -1,7 +1,7 @@
 package App::DuckPAN::Cmd::Env;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Env command class
-$App::DuckPAN::Cmd::Env::VERSION = '1019';
+$App::DuckPAN::Cmd::Env::VERSION = '1021';
 use Moo;
 use MooX::Cmd;
 
@@ -67,7 +67,7 @@ App::DuckPAN::Cmd::Env - Env command class
 
 =head1 VERSION
 
-version 1019
+version 1021
 
 =head1 AUTHOR
 

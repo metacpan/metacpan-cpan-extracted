@@ -1,5 +1,25 @@
 Revision history for Perl extension File-ShareDir
 
+1.106	2018-06-10
+    - Add support for overriding the resolved path for a given
+      Module or Dist (Thanks to Kent Fredric <kentnl@cpan.org>)
+    - Fix RT#84914: _dist_file_new lacks return check (Thanks to
+      Alex Peters <lxp@cpan.org>) -- fixes RT#40158, too.
+    - Fix RT#60431: common @INC traversal code
+      Phillip Moore <w.phillip.moore@gmail.com> requested for
+      easier overriding in controlled environments an extraction
+      of @INC traversal in one subroutine.
+      The provided patch has been applied with minor modifications,
+      thanks Phillip!
+    - Fix RT#63548: State explicit how developers can use
+      File::ShareDir even in development phase out-of-the-box
+    - Fix RT#18042: Windows style path errors (Thanks to Barbie
+      <barbie@missbarbell.co.uk>)
+    - Improve infrastructure of distribution (toolchain, perltidy,
+      perlcritic, Devel::Cover, ...)
+    - deploy with most recent File::ShareDir::Install (v0.12-6-g29a6ff7
+      aka 0.13)
+
 1.104	2017-06-29
     - Fix RT#120833: Fails tests when no "." in @INC reported by Kent
       Fredric <kentnlATcpan.org>.

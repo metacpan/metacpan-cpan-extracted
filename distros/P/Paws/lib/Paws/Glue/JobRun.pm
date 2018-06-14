@@ -5,13 +5,16 @@ package Paws::Glue::JobRun;
   has Attempt => (is => 'ro', isa => 'Int');
   has CompletedOn => (is => 'ro', isa => 'Str');
   has ErrorMessage => (is => 'ro', isa => 'Str');
+  has ExecutionTime => (is => 'ro', isa => 'Int');
   has Id => (is => 'ro', isa => 'Str');
   has JobName => (is => 'ro', isa => 'Str');
   has JobRunState => (is => 'ro', isa => 'Str');
   has LastModifiedOn => (is => 'ro', isa => 'Str');
+  has NotificationProperty => (is => 'ro', isa => 'Paws::Glue::NotificationProperty');
   has PredecessorRuns => (is => 'ro', isa => 'ArrayRef[Paws::Glue::Predecessor]');
   has PreviousRunId => (is => 'ro', isa => 'Str');
   has StartedOn => (is => 'ro', isa => 'Str');
+  has Timeout => (is => 'ro', isa => 'Int');
   has TriggerName => (is => 'ro', isa => 'Str');
 1;
 
@@ -50,17 +53,35 @@ Contains information about a job run.
 
 =head2 AllocatedCapacity => Int
 
-  The amount of infrastructure capacity allocated to this job run.
+  The number of AWS Glue data processing units (DPUs) allocated to this
+JobRun. From 2 to 100 DPUs can be allocated; the default is 10. A DPU
+is a relative measure of processing power that consists of 4 vCPUs of
+compute capacity and 16 GB of memory. For more information, see the AWS
+Glue pricing page (https://aws.amazon.com/glue/pricing/).
 
 
 =head2 Arguments => L<Paws::Glue::GenericMap>
 
-  The job arguments associated with this run.
+  The job arguments associated with this run. These override equivalent
+default arguments set for the job.
+
+You can specify arguments here that your own job-execution script
+consumes, as well as arguments that AWS Glue itself consumes.
+
+For information about how to specify and consume your own job
+arguments, see the Calling AWS Glue APIs in Python
+(http://docs.aws.amazon.com/glue/latest/dg/aws-glue-programming-python-calling.html)
+topic in the developer guide.
+
+For information about the key-value pairs that AWS Glue consumes to set
+up your job, see the Special Parameters Used by AWS Glue
+(http://docs.aws.amazon.com/glue/latest/dg/aws-glue-programming-etl-glue-arguments.html)
+topic in the developer guide.
 
 
 =head2 Attempt => Int
 
-  The number or the attempt to run this job.
+  The number of the attempt to run this job.
 
 
 =head2 CompletedOn => Str
@@ -73,6 +94,11 @@ Contains information about a job run.
   An error message associated with this job run.
 
 
+=head2 ExecutionTime => Int
+
+  The amount of time (in seconds) that the job run consumed resources.
+
+
 =head2 Id => Str
 
   The ID of this job run.
@@ -80,7 +106,7 @@ Contains information about a job run.
 
 =head2 JobName => Str
 
-  The name of the job being run.
+  The name of the job definition being used in this run.
 
 
 =head2 JobRunState => Str
@@ -93,6 +119,11 @@ Contains information about a job run.
   The last time this job run was modified.
 
 
+=head2 NotificationProperty => L<Paws::Glue::NotificationProperty>
+
+  Specifies configuration properties of a job run notification.
+
+
 =head2 PredecessorRuns => ArrayRef[L<Paws::Glue::Predecessor>]
 
   A list of predecessors to this job run.
@@ -100,7 +131,8 @@ Contains information about a job run.
 
 =head2 PreviousRunId => Str
 
-  The ID of the previous run of this job.
+  The ID of the previous run of this job. For example, the JobRunId
+specified in the StartJobRun action.
 
 
 =head2 StartedOn => Str
@@ -108,9 +140,14 @@ Contains information about a job run.
   The date and time at which this job run was started.
 
 
+=head2 Timeout => Int
+
+  The job run timeout in minutes.
+
+
 =head2 TriggerName => Str
 
-  The name of the trigger for this job run.
+  The name of the trigger that started this job run.
 
 
 
@@ -120,9 +157,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Glue>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

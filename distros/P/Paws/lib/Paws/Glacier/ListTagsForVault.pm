@@ -10,28 +10,41 @@ package Paws::Glacier::ListTagsForVault;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/{accountId}/vaults/{vaultName}/tags');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'GET');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::Glacier::ListTagsForVaultOutput');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::Glacier::ListTagsForVault - Arguments for method ListTagsForVault on Paws::Glacier
+Paws::Glacier::ListTagsForVault - Arguments for method ListTagsForVault on L<Paws::Glacier>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ListTagsForVault on the 
-Amazon Glacier service. Use the attributes of this class
+This class represents the parameters used for calling the method ListTagsForVault on the
+L<Amazon Glacier|Paws::Glacier> service. Use the attributes of this class
 as arguments to method ListTagsForVault.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ListTagsForVault.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ListTagsForVault(Att1 => $value1, Att2 => $value2, ...);
+    my $glacier = Paws->service('Glacier');
+    # To list the tags for a vault
+    # The example lists all the tags attached to the vault examplevault.
+    my $ListTagsForVaultOutput = $glacier->ListTagsForVault(
+      {
+        'VaultName' => 'examplevault',
+        'AccountId' => '-'
+      }
+    );
+
+    # Results:
+    my $Tags = $ListTagsForVaultOutput->Tags;
+
+    # Returns a L<Paws::Glacier::ListTagsForVaultOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/glacier/>
 
 =head1 ATTRIBUTES
 
@@ -59,9 +72,9 @@ This class forms part of L<Paws>, documenting arguments for method ListTagsForVa
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -1,7 +1,7 @@
 package Sah::SchemaR::cryptoexchange::code;
 
-our $DATE = '2018-06-07'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2018-06-10'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 our $rschema = ["str",[{summary=>"Cryptocurrency exchange code","x.completion"=>"cryptoexchange_code","x.perl.coerce_rules"=>["str_toupper"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::cryptoexchange::code - Cryptocurrency exchange code
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::SchemaR::cryptoexchange::code (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-06-07.
+This document describes version 0.011 of Sah::SchemaR::cryptoexchange::code (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-06-10.
 
 =head1 DESCRIPTION
 

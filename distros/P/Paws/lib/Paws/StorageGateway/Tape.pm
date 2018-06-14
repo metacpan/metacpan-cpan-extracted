@@ -1,5 +1,6 @@
 package Paws::StorageGateway::Tape;
   use Moose;
+  has KMSKey => (is => 'ro', isa => 'Str');
   has Progress => (is => 'ro', isa => 'Num');
   has TapeARN => (is => 'ro', isa => 'Str');
   has TapeBarcode => (is => 'ro', isa => 'Str');
@@ -27,20 +28,25 @@ Each attribute should be used as a named argument in the calls that expect this 
 
 As an example, if Att1 is expected to be a Paws::StorageGateway::Tape object:
 
-  $service_obj->Method(Att1 => { Progress => $value, ..., VTLDevice => $value  });
+  $service_obj->Method(Att1 => { KMSKey => $value, ..., VTLDevice => $value  });
 
 =head3 Results returned from an API call
 
 Use accessors for each attribute. If Att1 is expected to be an Paws::StorageGateway::Tape object:
 
   $result = $service_obj->Method(...);
-  $result->Att1->Progress
+  $result->Att1->KMSKey
 
 =head1 DESCRIPTION
 
 Describes a virtual tape object.
 
 =head1 ATTRIBUTES
+
+
+=head2 KMSKey => Str
+
+  
 
 
 =head2 Progress => Num
@@ -78,7 +84,7 @@ Range: 0 (not started) to 100 (complete).
 
 =head2 TapeUsedInBytes => Int
 
-  The size, in bytes, of data written to the virtual tape.
+  The size, in bytes, of data stored on the virtual tape.
 
 This value is not available for tapes created prior to May 13, 2015.
 
@@ -96,9 +102,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::StorageGa
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -1,0 +1,8 @@
+Revision history for Const-Dual
+
+0.02    Sun Jun 10 22:00:00 2018 +0300
+        * Documentation improved (thanks to tobyink <https://github.com/tobyink> for the hint).
+        * Tests updated to work with older Scalar::Util versions.
+
+0.01    Fri Jun 8 19:38:19 2018 +0300
+        Initial version.

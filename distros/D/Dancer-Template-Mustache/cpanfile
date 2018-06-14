@@ -3,6 +3,7 @@ requires "FindBin" => "0";
 requires "Moo" => "0";
 requires "Path::Tiny" => "0";
 requires "Template::Mustache" => "v1.0.2";
+requires "perl" => "v5.10.0";
 requires "strict" => "0";
 requires "warnings" => "0";
 

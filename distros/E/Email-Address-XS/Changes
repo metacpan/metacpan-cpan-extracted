@@ -1,5 +1,14 @@
 Revision history for Perl extension Email::Address::XS.
 
+1.04  Sat Jun 09 18:20:28 2018
+	- fix docevot parser to disallow leading dot in dot-atom
+	- fix generating and validating email addresses with empty user part
+	- fix generating email address with leading or trailing dot in user part
+	- try to parse invalid email addresses and mark them as invalid
+	- when generating address do not escape an apostrophe character
+	- fix formatting email addresses which contain nul bytes, TAB, LF or CR
+	- fix formatting comments which contain nul bytes
+
 1.03  Thu Mar 15 21:55:30 2018
 	- update dovecot parser from dovecot version 2.3.0.1
 	- fix reading from uninitialized memory when formatting invalid address without user or host part

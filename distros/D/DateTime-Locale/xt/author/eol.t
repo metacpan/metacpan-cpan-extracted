@@ -761,6 +761,7 @@ my @files = (
     't/09version-check.t',
     't/10code-case-insensitive.t',
     't/11load-name.t',
+    't/12register_from_data.t',
     't/zzz-check-breaks.t'
 );
 

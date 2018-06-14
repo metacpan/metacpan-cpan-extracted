@@ -80,5 +80,4 @@ on 'develop' => sub {
   requires "Test::Spelling" => "0.12";
   requires "Test::Vars" => "0.009";
   requires "Test::Version" => "2.05";
-  requires "WebService::Validator::HTML::W3C" => "0";
 };

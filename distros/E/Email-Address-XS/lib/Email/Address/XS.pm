@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use Carp;
 
@@ -18,7 +18,7 @@ XSLoader::load(__PACKAGE__, $VERSION);
 
 =head1 NAME
 
-Email::Address::XS - Parse and format RFC 2822 email addresses and groups
+Email::Address::XS - Parse and format RFC 5322 email addresses and groups
 
 =head1 SYNOPSIS
 
@@ -69,12 +69,14 @@ Email::Address::XS - Parse and format RFC 2822 email addresses and groups
 
 =head1 DESCRIPTION
 
-This module implements L<RFC 2822|https://tools.ietf.org/html/rfc2822>
+This module implements L<RFC 5322|https://tools.ietf.org/html/rfc5322>
 parser and formatter of email addresses and groups. It parses an input
 string from email headers which contain a list of email addresses or
 a groups of email addresses (like From, To, Cc, Bcc, Reply-To, Sender,
 ...). Also it can generate a string value for those headers from a
-list of email addresses objects.
+list of email addresses objects. Module is backward compatible with
+L<RFC 2822|https://tools.ietf.org/html/rfc2822> and
+L<RFC 822|https://tools.ietf.org/html/rfc822>.
 
 Parser and formatter functionality is implemented in XS and uses
 shared code from Dovecot IMAP server.
@@ -93,7 +95,7 @@ C<Email::Address> occurrence with C<Email::Address::XS> is sufficient.
 
 So unlike L<Email::Address|Email::Address>, this module does not use
 regular expressions for parsing but instead native XS implementation
-parses input string sequentially according to RFC 2822 grammar.
+parses input string sequentially according to RFC 5322 grammar.
 
 Additionally it has support also for named groups and so can be use
 instead of L<the Email::Address::List module|Email::Address::List>.
@@ -140,13 +142,12 @@ sub format_email_addresses {
 =item format_email_groups
 
   use Email::Address::XS qw(format_email_groups);
-  my $undef = undef;
 
   my $winstons_address = Email::Address::XS->new(phrase => 'Winston Smith', user => 'winston.smith', host => 'recdep.minitrue');
   my $julias_address = Email::Address::XS->new('Julia', 'julia@ficdep.minitrue');
   my $users_address = Email::Address::XS->new(address => 'user@oceania');
 
-  my $groups_string = format_email_groups('Brotherhood' => [ $winstons_address, $julias_address ], $undef => [ $users_address ]);
+  my $groups_string = format_email_groups('Brotherhood' => [ $winstons_address, $julias_address ], undef() => [ $users_address ]);
   print $groups_string;
   # Brotherhood: "Winston Smith" <winston.smith@recdep.minitrue>, Julia <julia@ficdep.minitrue>;, user@oceania
 
@@ -182,11 +183,10 @@ sub parse_email_addresses {
 =item parse_email_groups
 
   use Email::Address::XS qw(parse_email_groups);
-  my $undef = undef;
 
   my $string = 'Brotherhood: "Winston Smith" <winston.smith@recdep.minitrue>, Julia <julia@ficdep.minitrue>;, user@oceania, undisclosed-recipients:;';
   my @groups = parse_email_groups($string);
-  # @groups now contains list ('Brotherhood' => [ $winstons_object, $julias_object ], $undef => [ $users_object ], 'undisclosed-recipients' => [])
+  # @groups now contains list ('Brotherhood' => [ $winstons_object, $julias_object ], undef() => [ $users_object ], 'undisclosed-recipients' => [])
 
 Like L<C<parse_email_addresses>|/parse_email_addresses> but this
 function returns a list of pairs: a group display name and a
@@ -402,7 +402,7 @@ sub is_valid {
 	my ($self) = @_;
 	my $user = $self->user();
 	my $host = $self->host();
-	return (defined $user and length $user and defined $host and length $host and not $self->{invalid});
+	return (defined $user and defined $host and length $host and not $self->{invalid});
 }
 
 =item phrase
@@ -429,9 +429,6 @@ sub phrase {
 Accessor and mutator for the unescaped user (local/mailbox) part of
 an address.
 
-Since version 1.03 this method checks if setting a new value is syntactically
-valid (if it is non-empty string). If not undef is set and returned.
-
 =cut
 
 sub user {
@@ -439,11 +436,7 @@ sub user {
 	return $self->{user} unless @args;
 	delete $self->{cached_address} if exists $self->{cached_address};
 	delete $self->{invalid} if exists $self->{invalid};
-	if (defined $args[0] and length $args[0]) {
-		return $self->{user} = $args[0];
-	} else {
-		return $self->{user} = undef;
-	}
+	return $self->{user} = $args[0];
 }
 
 =item host
@@ -504,7 +497,7 @@ sub address {
 		$user = $self->user();
 		$host = $self->host();
 	}
-	if ( defined $user and defined $host and length $user and length $host ) {
+	if ( defined $user and defined $host and length $host ) {
 		return $self->{cached_address} = compose_address($user, $host);
 	} else {
 		return $self->{cached_address} = undef;
@@ -530,10 +523,11 @@ sub comment {
 	return $self->{comment} = undef unless defined $args[0];
 	my $count = 0;
 	my $cleaned = $args[0];
-	$cleaned =~ s/(?:\\.|[^\(\)])//g;
+	$cleaned =~ s/(?:\\.|[^\(\)\x00])//g;
 	foreach ( split //, $cleaned ) {
 		$count++ if $_ eq '(';
 		$count-- if $_ eq ')';
+		$count = -1 if $_ eq "\x00";
 		last if $count < 0;
 	}
 	return $self->{comment} = undef if $count != 0;
@@ -558,7 +552,7 @@ sub name {
 	my $comment = $self->comment();
 	return $comment if defined $comment and length $comment;
 	my $user = $self->user();
-	return $user if defined $user and length $user;
+	return $user if defined $user;
 	return '';
 }
 
@@ -660,6 +654,7 @@ sub enable_cache {
 
 L<RFC 822|https://tools.ietf.org/html/rfc822>,
 L<RFC 2822|https://tools.ietf.org/html/rfc2822>,
+L<RFC 5322|https://tools.ietf.org/html/rfc5322>,
 L<Email::MIME::Header::AddressList>,
 L<Email::Address>,
 L<Email::Address::List>,

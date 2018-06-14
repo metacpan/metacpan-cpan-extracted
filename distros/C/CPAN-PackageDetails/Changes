@@ -1,110 +1,110 @@
-Changes for CPAN::PackageDetails
+Revision history for Perl module CPAN::PackageDetails
 
-0.26 - Fri Jan  3 17:51:32 2014
+0.26 - 2014-01-03
 	* Get rid of MYMETA
 
-0.25_05 - Mon Apr 18 17:15:56 2011
+0.25_05 - 2011-04-18
 	* rjbs made the columns in the packages file line up (mostly)
 
-0.25_04 - Wed Aug 25 18:14:46 2010
-	* Added disallow_alpha_versions. add_entry will complain and not 
+0.25_04 - 2010-08-25
+	* Added disallow_alpha_versions. add_entry will complain and not
 	add alpha versions, and as_unique_sorted_list will ignore them.
 	* Add warnings to add_entry and as_unique_sorted_list when
 	version.pm thinks it's run into a bad version string.
 
-0.25_03 - Tue Apr 20 14:57:51 2010
+0.25_03 - 2010-04-20
 	* Add DBM::Deep as a pre-requisite
 
-0.25_02 - Sun Apr 11 15:58:48 2010
+0.25_02 - 2010-04-11
 	* You can now use a DBM::Deep object as the packages object
 	so you can parse a 02packages file and keep the result. Let's
 	see how CPAN Testers like it first, though.
 
-0.25 - Mon Dec 28 09:22:48 2009
-	* This version notes that you need at least version.pm 
+0.25 - 2009-12-28
+	* This version notes that you need at least version.pm
 	0.77 to handle the version parsing.
 
-0.2401 - Mon Nov 30 15:12:51 2009
+0.2401 - 2009-11-30
 	* *::Entries->add_entry now croaks if you pass it a package
 	that doesn't look like a valid Perl namespace.
 
-0.24 - Fri Nov 20 05:52:50 2009
+0.24 - 2009-11-20
 	* I got the check_file tests named backward. Now they are
 	right side up.
 
-0.23 - Thu Nov 19 22:04:35 2009
+0.23 - 2009-11-19
 	* Re-jiggered the error reporting from check_file. Now
-	you get back a reference that gives you a lot more 
+	you get back a reference that gives you a lot more
 	information. You should call check_file in an eval
 	then look for the error object in $@.
 
-0.22 - Wed Nov 18 19:21:56 2009
-	* check_file() now dies with a reference if it encounters 
+0.22 - 2009-11-18
+	* check_file() now dies with a reference if it encounters
 	a problem so you have greater control over error
 	handling.
 
-0.21_07 - Tue Nov 17 03:03:56 2009
-	* Fix the version sorting in as_unique_sorted_list. 
+0.21_07 - 2009-11-17
+	* Fix the version sorting in as_unique_sorted_list.
 	I'm using version.pm against my better judgement,
 	and that's all messed up with Module::Build.
 
-0.21_02 - Sun Aug 16 20:03:44 CDT 2009
+0.21_02 - 2009-08-16
 	* add the check_file() routine to compare a 02packages to a
 	repo to see if it matches: all file in the repo in 02packages,
 	all files in 02packages in the repo, etc.
 	* I reorganized the code so all the classes are in separate
 	files. Things are so much easier now, and the dispatching
 	is much easier to follow.
-	
-0.20 - Fri Jul 17 03:47:00 2009
+
+0.20 - 2009-07-17
 	* Write to a temporary file first, then rename to the final
 	name so parallel runs don't write to the same file.
 
-0.19 - Wed Jun 10 18:42:10 2009
-	* Improve performance a bit by re-jiggering the internal 
+0.19 - 2009-06-10
+	* Improve performance a bit by re-jiggering the internal
 	data structure for easier data slicing
 	* Add the allow_packages_only_once configuration option
 	and the already_added() method to allow better performance
 	by remembering less.
 
-0.18 - Thu Mar 12 05:59:37 2009
+0.18 - 2009-03-12
 	* Fixed a problem counting the number of entries that would be
 	in the file
 	* Now you can get a list of just the highest version of any
 	package that you add
 
-0.17_03 - Thu Mar  5 04:33:46 2009
+0.17_03 - 2009-03-05
 	* ->as_unique_sorted_list() returns just the latest version for
 	each package name, no matter what you've added.
-	* Now that I can get the unique list, I can fix the line 
+	* Now that I can get the unique list, I can fix the line
 	count in the header.
 
-0.17 - Fri Feb 13 14:29:33 2009
+0.17 - 2009-02-13
 	* Format the date the way CPAN.pm expects it, despite the
 	locale of the user. Everyone should upgrade to this version.
 
-0.15 - Mon Nov 10 07:58:39 2008
+0.15 - 2008-11-10
 	* Sort the package names in the output
 
-0.13 - Wed Nov  5 02:13:53 2008
+0.13 - 2008-11-05
 	* Put in the literal "undef" as a placeholder for columns
 	with null data (such as modules without versions)
 
-0.12 - Fri Oct 31 07:55:02 2008
+0.12 - 2008-10-31
 	* Bump to release version
 
-0.11_03 - Mon Oct 27 15:04:50 2008
+0.11_03 - 2008-10-27
 	* Use IO::Compress::Zlib instead of PerlIO::gzip, which doesn't
 	work on Windows.
 
-0.11_02 - Mon Oct 27 13:17:32 2008
+0.11_02 - 2008-10-27
 	* Add the new test files to the MANIFEST so they show up
 	in the dist :)
 
-0.11_01 - Fri Oct 24 10:08:23 2008
+0.11_01 - 2008-10-24
 	* Re-organized some of the methods and improved the docs,
 	added even more tests
 
-0.10_01 - Fri Oct 24 07:21:20 2008
+0.10_01 - 2008-10-24
 	* Initial release: You can create or read 02packages.details.txt.gz.
 

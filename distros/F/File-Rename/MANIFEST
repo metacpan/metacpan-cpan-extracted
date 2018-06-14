@@ -7,10 +7,12 @@ README
 t/File-Rename.t
 t/File-Rename-E.t
 t/File-Rename-files.t
+t/File-Rename-import.t
 t/File-Rename-no-order.t
 t/File-Rename-script.t
 t/File-Rename-list.t
 t/File-Rename-list-null.t
+t/File-Rename-require.t
 t/File-Rename-V.t
 t/pod.t
 t/pod-coverage.t

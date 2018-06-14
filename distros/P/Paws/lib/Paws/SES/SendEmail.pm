@@ -22,21 +22,65 @@ package Paws::SES::SendEmail;
 
 =head1 NAME
 
-Paws::SES::SendEmail - Arguments for method SendEmail on Paws::SES
+Paws::SES::SendEmail - Arguments for method SendEmail on L<Paws::SES>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method SendEmail on the 
-Amazon Simple Email Service service. Use the attributes of this class
+This class represents the parameters used for calling the method SendEmail on the
+L<Amazon Simple Email Service|Paws::SES> service. Use the attributes of this class
 as arguments to method SendEmail.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to SendEmail.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->SendEmail(Att1 => $value1, Att2 => $value2, ...);
+    my $email = Paws->service('SES');
+    # SendEmail
+    # The following example sends a formatted email:
+    my $SendEmailResponse = $email->SendEmail(
+      {
+        'Source'           => 'sender@example.com',
+        'ReplyToAddresses' => [
+
+        ],
+        'SourceArn'     => '',
+        'ReturnPathArn' => '',
+        'ReturnPath'    => '',
+        'Message'       => {
+          'Body' => {
+            'Text' => {
+              'Charset' => 'UTF-8',
+              'Data'    => 'This is the message body in text format.'
+            },
+            'Html' => {
+              'Data' =>
+'This message body contains HTML formatting. It can, for example, contain links like this one: <a class="ulink" href="http://docs.aws.amazon.com/ses/latest/DeveloperGuide" target="_blank">Amazon SES Developer Guide</a>.',
+              'Charset' => 'UTF-8'
+            }
+          },
+          'Subject' => {
+            'Charset' => 'UTF-8',
+            'Data'    => 'Test email'
+          }
+        },
+        'Destination' => {
+          'CcAddresses' => ['recipient3@example.com'],
+          'ToAddresses' =>
+            [ 'recipient1@example.com', 'recipient2@example.com' ],
+          'BccAddresses' => [
+
+          ]
+        }
+      }
+    );
+
+    # Results:
+    my $MessageId = $SendEmailResponse->MessageId;
+
+    # Returns a L<Paws::SES::SendEmailResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/email/SendEmail>
 
 =head1 ATTRIBUTES
 
@@ -95,7 +139,8 @@ C<arn:aws:ses:us-east-1:123456789012:identity/example.com>, and the
 C<ReturnPath> to be C<feedback@example.com>.
 
 For more information about sending authorization, see the Amazon SES
-Developer Guide.
+Developer Guide
+(http://docs.aws.amazon.com/ses/latest/DeveloperGuide/sending-authorization.html).
 
 
 
@@ -104,18 +149,28 @@ Developer Guide.
 The email address that is sending the email. This email address must be
 either individually verified with Amazon SES, or from a domain that has
 been verified with Amazon SES. For information about verifying
-identities, see the Amazon SES Developer Guide.
+identities, see the Amazon SES Developer Guide
+(http://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-addresses-and-domains.html).
 
 If you are sending on behalf of another user and have been permitted to
 do so by a sending authorization policy, then you must also specify the
 C<SourceArn> parameter. For more information about sending
-authorization, see the Amazon SES Developer Guide.
+authorization, see the Amazon SES Developer Guide
+(http://docs.aws.amazon.com/ses/latest/DeveloperGuide/sending-authorization.html).
 
-In all cases, the email address must be 7-bit ASCII. If the text must
-contain any other characters, then you must use MIME encoded-word
-syntax (RFC 2047) instead of a literal string. MIME encoded-word syntax
-uses the following form: C<=?charset?encoding?encoded-text?=>. For more
-information, see RFC 2047.
+Amazon SES does not support the SMTPUTF8 extension, as described in
+RFC6531 (https://tools.ietf.org/html/rfc6531). For this reason, the
+I<local part> of a source email address (the part of the email address
+that precedes the @ sign) may only contain 7-bit ASCII characters
+(https://en.wikipedia.org/wiki/Email_address#Local-part). If the
+I<domain part> of an address (the part after the @ sign) contains
+non-ASCII characters, they must be encoded using Punycode, as described
+in RFC3492 (https://tools.ietf.org/html/rfc3492.html). The sender name
+(also known as the I<friendly name>) may contain non-ASCII characters.
+These characters must be encoded using MIME encoded-word syntax, as
+described in RFC 2047 (https://tools.ietf.org/html/rfc2047). MIME
+encoded-word syntax uses the following form:
+C<=?charset?encoding?encoded-text?=>.
 
 
 
@@ -134,7 +189,8 @@ C<arn:aws:ses:us-east-1:123456789012:identity/example.com>, and the
 C<Source> to be C<user@example.com>.
 
 For more information about sending authorization, see the Amazon SES
-Developer Guide.
+Developer Guide
+(http://docs.aws.amazon.com/ses/latest/DeveloperGuide/sending-authorization.html).
 
 
 
@@ -154,9 +210,9 @@ This class forms part of L<Paws>, documenting arguments for method SendEmail in 
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

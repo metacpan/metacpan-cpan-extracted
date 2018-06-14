@@ -4,6 +4,7 @@ package Paws::SSM::CommandInvocation;
   has CommandPlugins => (is => 'ro', isa => 'ArrayRef[Paws::SSM::CommandPlugin]');
   has Comment => (is => 'ro', isa => 'Str');
   has DocumentName => (is => 'ro', isa => 'Str');
+  has DocumentVersion => (is => 'ro', isa => 'Str');
   has InstanceId => (is => 'ro', isa => 'Str');
   has InstanceName => (is => 'ro', isa => 'Str');
   has NotificationConfig => (is => 'ro', isa => 'Paws::SSM::NotificationConfig');
@@ -75,6 +76,11 @@ description of what the command should do.
   The document name that was requested for execution.
 
 
+=head2 DocumentVersion => Str
+
+  The SSM document version.
+
+
 =head2 InstanceId => Str
 
   The instance ID in which this invocation was requested.
@@ -133,7 +139,9 @@ instance targeted by the command). StatusDetails includes more
 information than Status because it includes states resulting from error
 and concurrency control parameters. StatusDetails can show different
 results than Status. For more information about these statuses, see Run
-Command Status. StatusDetails can be one of the following values:
+Command Status
+(http://docs.aws.amazon.com/systems-manager/latest/userguide/monitor-about-status.html).
+StatusDetails can be one of the following values:
 
 =over
 
@@ -209,9 +217,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::SSM>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

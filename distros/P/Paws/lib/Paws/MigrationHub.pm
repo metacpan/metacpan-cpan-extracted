@@ -1,6 +1,7 @@
 package Paws::MigrationHub;
   use Moose;
   sub service { 'mgh' }
+  sub signing_name { 'mgh' }
   sub version { '2017-05-31' }
   sub target_prefix { 'AWSMigrationHub' }
   sub json_version { "1.1" }
@@ -11,7 +12,7 @@ package Paws::MigrationHub;
   has retriables => (is => 'ro', isa => 'ArrayRef', default => sub { [
   ] });
 
-  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller', 'Paws::Net::JsonResponse';
+  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller';
 
   
   sub AssociateCreatedArtifact {
@@ -125,17 +126,35 @@ Paws::MigrationHub - Perl Interface to AWS AWS Migration Hub
 
 =head1 DESCRIPTION
 
+The AWS Migration Hub API methods help to obtain server and application
+migration status and integrate your resource-specific migration tool by
+providing a programmatic interface to Migration Hub.
+
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/migrationhub/>
 
 
 =head1 METHODS
 
-=head2 AssociateCreatedArtifact(CreatedArtifact => L<Paws::MigrationHub::CreatedArtifact>, MigrationTaskName => Str, ProgressUpdateStream => Str, [DryRun => Bool])
+=head2 AssociateCreatedArtifact
+
+=over
+
+=item CreatedArtifact => L<Paws::MigrationHub::CreatedArtifact>
+
+=item MigrationTaskName => Str
+
+=item ProgressUpdateStream => Str
+
+=item [DryRun => Bool]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::MigrationHub::AssociateCreatedArtifact>
 
 Returns: a L<Paws::MigrationHub::AssociateCreatedArtifactResult> instance
 
-  Associates a created artifact of an AWS cloud resource, the target
+Associates a created artifact of an AWS cloud resource, the target
 receiving the migration, with the migration task performed by a
 migration tool. This API has the following traits:
 
@@ -161,23 +180,45 @@ EC2 instance, or DMS endpoint, etc.
 
 
 
-=head2 AssociateDiscoveredResource(DiscoveredResource => L<Paws::MigrationHub::DiscoveredResource>, MigrationTaskName => Str, ProgressUpdateStream => Str, [DryRun => Bool])
+=head2 AssociateDiscoveredResource
+
+=over
+
+=item DiscoveredResource => L<Paws::MigrationHub::DiscoveredResource>
+
+=item MigrationTaskName => Str
+
+=item ProgressUpdateStream => Str
+
+=item [DryRun => Bool]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::MigrationHub::AssociateDiscoveredResource>
 
 Returns: a L<Paws::MigrationHub::AssociateDiscoveredResourceResult> instance
 
-  Associates a discovered resource ID from Application Discovery Service
+Associates a discovered resource ID from Application Discovery Service
 (ADS) with a migration task.
 
 
-=head2 CreateProgressUpdateStream(ProgressUpdateStreamName => Str, [DryRun => Bool])
+=head2 CreateProgressUpdateStream
+
+=over
+
+=item ProgressUpdateStreamName => Str
+
+=item [DryRun => Bool]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::MigrationHub::CreateProgressUpdateStream>
 
 Returns: a L<Paws::MigrationHub::CreateProgressUpdateStreamResult> instance
 
-  Creates a progress update stream which is an AWS resource used for
+Creates a progress update stream which is an AWS resource used for
 access control as well as a namespace for migration task names that is
 implicitly linked to your AWS account. It must uniquely identify the
 migration tool as it is used for all updates made by the tool; however,
@@ -185,13 +226,22 @@ it does not need to be unique for each AWS account because it is scoped
 to the AWS account.
 
 
-=head2 DeleteProgressUpdateStream(ProgressUpdateStreamName => Str, [DryRun => Bool])
+=head2 DeleteProgressUpdateStream
+
+=over
+
+=item ProgressUpdateStreamName => Str
+
+=item [DryRun => Bool]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::MigrationHub::DeleteProgressUpdateStream>
 
 Returns: a L<Paws::MigrationHub::DeleteProgressUpdateStreamResult> instance
 
-  Deletes a progress update stream, including all of its tasks, which was
+Deletes a progress update stream, including all of its tasks, which was
 previously created as an AWS resource used for access control. This API
 has the following traits:
 
@@ -204,9 +254,9 @@ stream name (same as a C<CreateProgressUpdateStream> call).
 
 =item *
 
-The call will return, and a background process will asynchronously be
-doing the actual delete of the stream and all of its resources (tasks,
-associated resources, resource attributes, created artifacts).
+The call will return, and a background process will asynchronously
+delete the stream and all of its resources (tasks, associated
+resources, resource attributes, created artifacts).
 
 =item *
 
@@ -231,32 +281,61 @@ succeed, and that stream will be an entirely new logical resource
 
 
 
-=head2 DescribeApplicationState(ApplicationId => Str)
+=head2 DescribeApplicationState
+
+=over
+
+=item ApplicationId => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::MigrationHub::DescribeApplicationState>
 
 Returns: a L<Paws::MigrationHub::DescribeApplicationStateResult> instance
 
-  Gets the migration status of an application.
+Gets the migration status of an application.
 
 
-=head2 DescribeMigrationTask(MigrationTaskName => Str, ProgressUpdateStream => Str)
+=head2 DescribeMigrationTask
+
+=over
+
+=item MigrationTaskName => Str
+
+=item ProgressUpdateStream => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::MigrationHub::DescribeMigrationTask>
 
 Returns: a L<Paws::MigrationHub::DescribeMigrationTaskResult> instance
 
-  Retrieves a list of all attributes associated with a specific migration
+Retrieves a list of all attributes associated with a specific migration
 task.
 
 
-=head2 DisassociateCreatedArtifact(CreatedArtifactName => Str, MigrationTaskName => Str, ProgressUpdateStream => Str, [DryRun => Bool])
+=head2 DisassociateCreatedArtifact
+
+=over
+
+=item CreatedArtifactName => Str
+
+=item MigrationTaskName => Str
+
+=item ProgressUpdateStream => Str
+
+=item [DryRun => Bool]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::MigrationHub::DisassociateCreatedArtifact>
 
 Returns: a L<Paws::MigrationHub::DisassociateCreatedArtifactResult> instance
 
-  Disassociates a created artifact of an AWS resource with a migration
+Disassociates a created artifact of an AWS resource with a migration
 task performed by a migration tool that was previously associated. This
 API has the following traits:
 
@@ -282,23 +361,47 @@ EC2 instance, or RDS instance, etc.
 
 
 
-=head2 DisassociateDiscoveredResource(ConfigurationId => Str, MigrationTaskName => Str, ProgressUpdateStream => Str, [DryRun => Bool])
+=head2 DisassociateDiscoveredResource
+
+=over
+
+=item ConfigurationId => Str
+
+=item MigrationTaskName => Str
+
+=item ProgressUpdateStream => Str
+
+=item [DryRun => Bool]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::MigrationHub::DisassociateDiscoveredResource>
 
 Returns: a L<Paws::MigrationHub::DisassociateDiscoveredResourceResult> instance
 
-  Disassociate an Application Discovery Service (ADS) discovered resource
+Disassociate an Application Discovery Service (ADS) discovered resource
 from a migration task.
 
 
-=head2 ImportMigrationTask(MigrationTaskName => Str, ProgressUpdateStream => Str, [DryRun => Bool])
+=head2 ImportMigrationTask
+
+=over
+
+=item MigrationTaskName => Str
+
+=item ProgressUpdateStream => Str
+
+=item [DryRun => Bool]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::MigrationHub::ImportMigrationTask>
 
 Returns: a L<Paws::MigrationHub::ImportMigrationTaskResult> instance
 
-  Registers a new migration task which represents a server, database,
+Registers a new migration task which represents a server, database,
 etc., being migrated to AWS by a migration tool.
 
 This API is a prerequisite to calling the C<NotifyMigrationTaskState>
@@ -306,13 +409,26 @@ API as the migration tool must first register the migration task with
 Migration Hub.
 
 
-=head2 ListCreatedArtifacts(MigrationTaskName => Str, ProgressUpdateStream => Str, [MaxResults => Int, NextToken => Str])
+=head2 ListCreatedArtifacts
+
+=over
+
+=item MigrationTaskName => Str
+
+=item ProgressUpdateStream => Str
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::MigrationHub::ListCreatedArtifacts>
 
 Returns: a L<Paws::MigrationHub::ListCreatedArtifactsResult> instance
 
-  Lists the created artifacts attached to a given migration task in an
+Lists the created artifacts attached to a given migration task in an
 update stream. This API has the following traits:
 
 =over
@@ -334,22 +450,46 @@ Lists created artifacts in a paginated interface.
 
 
 
-=head2 ListDiscoveredResources(MigrationTaskName => Str, ProgressUpdateStream => Str, [MaxResults => Int, NextToken => Str])
+=head2 ListDiscoveredResources
+
+=over
+
+=item MigrationTaskName => Str
+
+=item ProgressUpdateStream => Str
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::MigrationHub::ListDiscoveredResources>
 
 Returns: a L<Paws::MigrationHub::ListDiscoveredResourcesResult> instance
 
-  Lists discovered resources associated with the given C<MigrationTask>.
+Lists discovered resources associated with the given C<MigrationTask>.
 
 
-=head2 ListMigrationTasks([MaxResults => Int, NextToken => Str, ResourceName => Str])
+=head2 ListMigrationTasks
+
+=over
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+=item [ResourceName => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::MigrationHub::ListMigrationTasks>
 
 Returns: a L<Paws::MigrationHub::ListMigrationTasksResult> instance
 
-  Lists all, or filtered by resource name, migration tasks associated
+Lists all, or filtered by resource name, migration tasks associated
 with the user account making this call. This API has the following
 traits:
 
@@ -372,35 +512,72 @@ Lists migration tasks in a paginated interface.
 
 
 
-=head2 ListProgressUpdateStreams([MaxResults => Int, NextToken => Str])
+=head2 ListProgressUpdateStreams
+
+=over
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::MigrationHub::ListProgressUpdateStreams>
 
 Returns: a L<Paws::MigrationHub::ListProgressUpdateStreamsResult> instance
 
-  Lists progress update streams associated with the user account making
+Lists progress update streams associated with the user account making
 this call.
 
 
-=head2 NotifyApplicationState(ApplicationId => Str, Status => Str, [DryRun => Bool])
+=head2 NotifyApplicationState
+
+=over
+
+=item ApplicationId => Str
+
+=item Status => Str
+
+=item [DryRun => Bool]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::MigrationHub::NotifyApplicationState>
 
 Returns: a L<Paws::MigrationHub::NotifyApplicationStateResult> instance
 
-  Sets the migration state of an application. For a given application
+Sets the migration state of an application. For a given application
 identified by the value passed to C<ApplicationId>, its status is set
 or updated by passing one of three values to C<Status>: C<NOT_STARTED |
 IN_PROGRESS | COMPLETED>.
 
 
-=head2 NotifyMigrationTaskState(MigrationTaskName => Str, NextUpdateSeconds => Int, ProgressUpdateStream => Str, Task => L<Paws::MigrationHub::Task>, UpdateDateTime => Str, [DryRun => Bool])
+=head2 NotifyMigrationTaskState
+
+=over
+
+=item MigrationTaskName => Str
+
+=item NextUpdateSeconds => Int
+
+=item ProgressUpdateStream => Str
+
+=item Task => L<Paws::MigrationHub::Task>
+
+=item UpdateDateTime => Str
+
+=item [DryRun => Bool]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::MigrationHub::NotifyMigrationTaskState>
 
 Returns: a L<Paws::MigrationHub::NotifyMigrationTaskStateResult> instance
 
-  Notifies Migration Hub of the current status, progress, or other detail
+Notifies Migration Hub of the current status, progress, or other detail
 regarding a migration task. This API has the following traits:
 
 =over
@@ -424,16 +601,33 @@ namespace for each migration tool.
 
 
 
-=head2 PutResourceAttributes(MigrationTaskName => Str, ProgressUpdateStream => Str, ResourceAttributeList => ArrayRef[L<Paws::MigrationHub::ResourceAttribute>], [DryRun => Bool])
+=head2 PutResourceAttributes
+
+=over
+
+=item MigrationTaskName => Str
+
+=item ProgressUpdateStream => Str
+
+=item ResourceAttributeList => ArrayRef[L<Paws::MigrationHub::ResourceAttribute>]
+
+=item [DryRun => Bool]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::MigrationHub::PutResourceAttributes>
 
 Returns: a L<Paws::MigrationHub::PutResourceAttributesResult> instance
 
-  Provides identifying details of the resource being migrated so that it
+Provides identifying details of the resource being migrated so that it
 can be associated in the Application Discovery Service (ADS)'s
 repository. This association occurs asynchronously after
 C<PutResourceAttributes> returns.
+
+=over
+
+=item *
 
 Keep in mind that subsequent calls to PutResourceAttributes will
 override previously stored attributes. For example, if it is first
@@ -441,9 +635,18 @@ called with a MAC address, but later, it is desired to I<add> an IP
 address, it will then be required to call it with I<both> the IP and
 MAC addresses to prevent overiding the MAC address.
 
+=item *
+
+Note the instructions regarding the special use case of the
+C<ResourceAttributeList>
+(https://docs.aws.amazon.com/migrationhub/latest/ug/API_PutResourceAttributes.html#migrationhub-PutResourceAttributes-request-ResourceAttributeList)
+parameter when specifying any "VM" related value.
+
+=back
+
 Because this is an asynchronous call, it will always return 200,
 whether an association occurs or not. To confirm if an association was
-found based on the provided details, call C<ListAssociatedResource>.
+found based on the provided details, call C<ListDiscoveredResources>.
 
 
 
@@ -461,9 +664,9 @@ This service class forms part of L<Paws>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

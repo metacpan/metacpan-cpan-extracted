@@ -1,6 +1,7 @@
 package Paws::ApplicationAutoScaling;
   use Moose;
   sub service { 'autoscaling' }
+  sub signing_name { 'application-autoscaling' }
   sub version { '2016-02-06' }
   sub target_prefix { 'AnyScaleFrontendService' }
   sub json_version { "1.1" }
@@ -11,12 +12,17 @@ package Paws::ApplicationAutoScaling;
   has retriables => (is => 'ro', isa => 'ArrayRef', default => sub { [
   ] });
 
-  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller', 'Paws::Net::JsonResponse';
+  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller';
 
   
   sub DeleteScalingPolicy {
     my $self = shift;
     my $call_object = $self->new_with_coercions('Paws::ApplicationAutoScaling::DeleteScalingPolicy', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub DeleteScheduledAction {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::ApplicationAutoScaling::DeleteScheduledAction', @_);
     return $self->caller->do_call($self, $call_object);
   }
   sub DeregisterScalableTarget {
@@ -39,9 +45,19 @@ package Paws::ApplicationAutoScaling;
     my $call_object = $self->new_with_coercions('Paws::ApplicationAutoScaling::DescribeScalingPolicies', @_);
     return $self->caller->do_call($self, $call_object);
   }
+  sub DescribeScheduledActions {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::ApplicationAutoScaling::DescribeScheduledActions', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
   sub PutScalingPolicy {
     my $self = shift;
     my $call_object = $self->new_with_coercions('Paws::ApplicationAutoScaling::PutScalingPolicy', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub PutScheduledAction {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::ApplicationAutoScaling::PutScheduledAction', @_);
     return $self->caller->do_call($self, $call_object);
   }
   sub RegisterScalableTarget {
@@ -121,7 +137,7 @@ package Paws::ApplicationAutoScaling;
   }
 
 
-  sub operations { qw/DeleteScalingPolicy DeregisterScalableTarget DescribeScalableTargets DescribeScalingActivities DescribeScalingPolicies PutScalingPolicy RegisterScalableTarget / }
+  sub operations { qw/DeleteScalingPolicy DeleteScheduledAction DeregisterScalableTarget DescribeScalableTargets DescribeScalingActivities DescribeScalingPolicies DescribeScheduledActions PutScalingPolicy PutScheduledAction RegisterScalableTarget / }
 
 1;
 
@@ -149,9 +165,9 @@ Paws::ApplicationAutoScaling - Perl Interface to AWS Application Auto Scaling
 
 =head1 DESCRIPTION
 
-With Application Auto Scaling, you can automatically scale your AWS
-resources. The experience similar to that of Auto Scaling. You can use
-Application Auto Scaling to accomplish the following tasks:
+With Application Auto Scaling, you can configure automatic scaling for
+your scalable AWS resources. You can use Application Auto Scaling to
+accomplish the following tasks:
 
 =over
 
@@ -165,6 +181,10 @@ Scale your resources in response to CloudWatch alarms
 
 =item *
 
+Schedule one-time or recurring scaling actions
+
+=item *
+
 View the history of your scaling events
 
 =back
@@ -175,45 +195,88 @@ Application Auto Scaling can scale the following AWS resources:
 
 =item *
 
-Amazon ECS services. For more information, see Service Auto Scaling in
-the I<Amazon EC2 Container Service Developer Guide>.
+Amazon ECS services. For more information, see Service Auto Scaling
+(http://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-auto-scaling.html)
+in the I<Amazon Elastic Container Service Developer Guide>.
 
 =item *
 
 Amazon EC2 Spot fleets. For more information, see Automatic Scaling for
-Spot Fleet in the I<Amazon EC2 User Guide>.
+Spot Fleet
+(http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/fleet-auto-scaling.html)
+in the I<Amazon EC2 User Guide>.
 
 =item *
 
 Amazon EMR clusters. For more information, see Using Automatic Scaling
-in Amazon EMR in the I<Amazon EMR Management Guide>.
+in Amazon EMR
+(http://docs.aws.amazon.com/ElasticMapReduce/latest/ManagementGuide/emr-automatic-scaling.html)
+in the I<Amazon EMR Management Guide>.
 
 =item *
 
 AppStream 2.0 fleets. For more information, see Fleet Auto Scaling for
-Amazon AppStream 2.0 in the I<Amazon AppStream 2.0 Developer Guide>.
+Amazon AppStream 2.0
+(http://docs.aws.amazon.com/appstream2/latest/developerguide/autoscaling.html)
+in the I<Amazon AppStream 2.0 Developer Guide>.
 
 =item *
 
 Provisioned read and write capacity for Amazon DynamoDB tables and
 global secondary indexes. For more information, see Managing Throughput
-Capacity Automatically with DynamoDB Auto Scaling in the I<Amazon
-DynamoDB Developer Guide>.
+Capacity Automatically with DynamoDB Auto Scaling
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/AutoScaling.html)
+in the I<Amazon DynamoDB Developer Guide>.
+
+=item *
+
+Amazon Aurora Replicas. For more information, see Using Amazon Aurora
+Auto Scaling with Aurora Replicas
+(http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Aurora.Integrating.AutoScaling.html).
+
+=item *
+
+Amazon SageMaker endpoints. For more information, see Automatically
+Scaling Amazon SageMaker Models
+(http://docs.aws.amazon.com/sagemaker/latest/dg/endpoint-auto-scaling.html).
 
 =back
 
+To configure automatic scaling for multiple resources across multiple
+services, use AWS Auto Scaling to create a scaling plan for your
+application. For more information, see AWS Auto Scaling
+(http://aws.amazon.com/autoscaling).
+
 For a list of supported regions, see AWS Regions and Endpoints:
-Application Auto Scaling in the I<AWS General Reference>.
+Application Auto Scaling
+(http://docs.aws.amazon.com/general/latest/gr/rande.html#as-app_region)
+in the I<AWS General Reference>.
+
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/>
+
 
 =head1 METHODS
 
-=head2 DeleteScalingPolicy(PolicyName => Str, ResourceId => Str, ScalableDimension => Str, ServiceNamespace => Str)
+=head2 DeleteScalingPolicy
+
+=over
+
+=item PolicyName => Str
+
+=item ResourceId => Str
+
+=item ScalableDimension => Str
+
+=item ServiceNamespace => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::ApplicationAutoScaling::DeleteScalingPolicy>
 
 Returns: a L<Paws::ApplicationAutoScaling::DeleteScalingPolicyResponse> instance
 
-  Deletes the specified Application Auto Scaling scaling policy.
+Deletes the specified Application Auto Scaling scaling policy.
 
 Deleting a policy deletes the underlying alarm action, but does not
 delete the CloudWatch alarm associated with the scaling policy, even if
@@ -223,13 +286,46 @@ To create a scaling policy or update an existing one, see
 PutScalingPolicy.
 
 
-=head2 DeregisterScalableTarget(ResourceId => Str, ScalableDimension => Str, ServiceNamespace => Str)
+=head2 DeleteScheduledAction
+
+=over
+
+=item ResourceId => Str
+
+=item ScheduledActionName => Str
+
+=item ServiceNamespace => Str
+
+=item [ScalableDimension => Str]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::ApplicationAutoScaling::DeleteScheduledAction>
+
+Returns: a L<Paws::ApplicationAutoScaling::DeleteScheduledActionResponse> instance
+
+Deletes the specified Application Auto Scaling scheduled action.
+
+
+=head2 DeregisterScalableTarget
+
+=over
+
+=item ResourceId => Str
+
+=item ScalableDimension => Str
+
+=item ServiceNamespace => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::ApplicationAutoScaling::DeregisterScalableTarget>
 
 Returns: a L<Paws::ApplicationAutoScaling::DeregisterScalableTargetResponse> instance
 
-  Deregisters a scalable target.
+Deregisters a scalable target.
 
 Deregistering a scalable target deletes the scaling policies that are
 associated with it.
@@ -238,14 +334,28 @@ To create a scalable target or update an existing one, see
 RegisterScalableTarget.
 
 
-=head2 DescribeScalableTargets(ServiceNamespace => Str, [MaxResults => Int, NextToken => Str, ResourceIds => ArrayRef[Str|Undef], ScalableDimension => Str])
+=head2 DescribeScalableTargets
+
+=over
+
+=item ServiceNamespace => Str
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+=item [ResourceIds => ArrayRef[Str|Undef]]
+
+=item [ScalableDimension => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::ApplicationAutoScaling::DescribeScalableTargets>
 
 Returns: a L<Paws::ApplicationAutoScaling::DescribeScalableTargetsResponse> instance
 
-  Provides descriptive information about the scalable targets in the
-specified namespace.
+Gets information about the scalable targets in the specified namespace.
 
 You can filter the results using the C<ResourceIds> and
 C<ScalableDimension> parameters.
@@ -255,13 +365,28 @@ RegisterScalableTarget. If you are no longer using a scalable target,
 you can deregister it using DeregisterScalableTarget.
 
 
-=head2 DescribeScalingActivities(ServiceNamespace => Str, [MaxResults => Int, NextToken => Str, ResourceId => Str, ScalableDimension => Str])
+=head2 DescribeScalingActivities
+
+=over
+
+=item ServiceNamespace => Str
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+=item [ResourceId => Str]
+
+=item [ScalableDimension => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::ApplicationAutoScaling::DescribeScalingActivities>
 
 Returns: a L<Paws::ApplicationAutoScaling::DescribeScalingActivitiesResponse> instance
 
-  Provides descriptive information about the scaling activities in the
+Provides descriptive information about the scaling activities in the
 specified namespace from the previous six weeks.
 
 You can filter the results using the C<ResourceId> and
@@ -273,14 +398,30 @@ service namespace, see DescribeScalingPolicies. To create a scaling
 policy or update an existing one, see PutScalingPolicy.
 
 
-=head2 DescribeScalingPolicies(ServiceNamespace => Str, [MaxResults => Int, NextToken => Str, PolicyNames => ArrayRef[Str|Undef], ResourceId => Str, ScalableDimension => Str])
+=head2 DescribeScalingPolicies
+
+=over
+
+=item ServiceNamespace => Str
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+=item [PolicyNames => ArrayRef[Str|Undef]]
+
+=item [ResourceId => Str]
+
+=item [ScalableDimension => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::ApplicationAutoScaling::DescribeScalingPolicies>
 
 Returns: a L<Paws::ApplicationAutoScaling::DescribeScalingPoliciesResponse> instance
 
-  Provides descriptive information about the scaling policies in the
-specified namespace.
+Describes the scaling policies for the specified service namespace.
 
 You can filter the results using the C<ResourceId>,
 C<ScalableDimension>, and C<PolicyNames> parameters.
@@ -290,19 +431,71 @@ PutScalingPolicy. If you are no longer using a scaling policy, you can
 delete it using DeleteScalingPolicy.
 
 
-=head2 PutScalingPolicy(PolicyName => Str, ResourceId => Str, ScalableDimension => Str, ServiceNamespace => Str, [PolicyType => Str, StepScalingPolicyConfiguration => L<Paws::ApplicationAutoScaling::StepScalingPolicyConfiguration>, TargetTrackingScalingPolicyConfiguration => L<Paws::ApplicationAutoScaling::TargetTrackingScalingPolicyConfiguration>])
+=head2 DescribeScheduledActions
+
+=over
+
+=item ServiceNamespace => Str
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+=item [ResourceId => Str]
+
+=item [ScalableDimension => Str]
+
+=item [ScheduledActionNames => ArrayRef[Str|Undef]]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::ApplicationAutoScaling::DescribeScheduledActions>
+
+Returns: a L<Paws::ApplicationAutoScaling::DescribeScheduledActionsResponse> instance
+
+Describes the scheduled actions for the specified service namespace.
+
+You can filter the results using the C<ResourceId>,
+C<ScalableDimension>, and C<ScheduledActionNames> parameters.
+
+To create a scheduled action or update an existing one, see
+PutScheduledAction. If you are no longer using a scheduled action, you
+can delete it using DeleteScheduledAction.
+
+
+=head2 PutScalingPolicy
+
+=over
+
+=item PolicyName => Str
+
+=item ResourceId => Str
+
+=item ScalableDimension => Str
+
+=item ServiceNamespace => Str
+
+=item [PolicyType => Str]
+
+=item [StepScalingPolicyConfiguration => L<Paws::ApplicationAutoScaling::StepScalingPolicyConfiguration>]
+
+=item [TargetTrackingScalingPolicyConfiguration => L<Paws::ApplicationAutoScaling::TargetTrackingScalingPolicyConfiguration>]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::ApplicationAutoScaling::PutScalingPolicy>
 
 Returns: a L<Paws::ApplicationAutoScaling::PutScalingPolicyResponse> instance
 
-  Creates or updates a policy for an Application Auto Scaling scalable
+Creates or updates a policy for an Application Auto Scaling scalable
 target.
 
 Each scalable target is identified by a service namespace, resource ID,
 and scalable dimension. A scaling policy applies to the scalable target
 identified by those three attributes. You cannot create a scaling
-policy without first registering a scalable target using
+policy until you register the scalable target using
 RegisterScalableTarget.
 
 To update a policy, specify its policy name and the parameters that you
@@ -314,21 +507,84 @@ DescribeScalingPolicies. If you are no longer using a scaling policy,
 you can delete it using DeleteScalingPolicy.
 
 
-=head2 RegisterScalableTarget(ResourceId => Str, ScalableDimension => Str, ServiceNamespace => Str, [MaxCapacity => Int, MinCapacity => Int, RoleARN => Str])
+=head2 PutScheduledAction
+
+=over
+
+=item ResourceId => Str
+
+=item ScheduledActionName => Str
+
+=item ServiceNamespace => Str
+
+=item [EndTime => Str]
+
+=item [ScalableDimension => Str]
+
+=item [ScalableTargetAction => L<Paws::ApplicationAutoScaling::ScalableTargetAction>]
+
+=item [Schedule => Str]
+
+=item [StartTime => Str]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::ApplicationAutoScaling::PutScheduledAction>
+
+Returns: a L<Paws::ApplicationAutoScaling::PutScheduledActionResponse> instance
+
+Creates or updates a scheduled action for an Application Auto Scaling
+scalable target.
+
+Each scalable target is identified by a service namespace, resource ID,
+and scalable dimension. A scheduled action applies to the scalable
+target identified by those three attributes. You cannot create a
+scheduled action until you register the scalable target using
+RegisterScalableTarget.
+
+To update an action, specify its name and the parameters that you want
+to change. If you don't specify start and end times, the old values are
+deleted. Any other parameters that you don't specify are not changed by
+this update request.
+
+You can view the scheduled actions using DescribeScheduledActions. If
+you are no longer using a scheduled action, you can delete it using
+DeleteScheduledAction.
+
+
+=head2 RegisterScalableTarget
+
+=over
+
+=item ResourceId => Str
+
+=item ScalableDimension => Str
+
+=item ServiceNamespace => Str
+
+=item [MaxCapacity => Int]
+
+=item [MinCapacity => Int]
+
+=item [RoleARN => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::ApplicationAutoScaling::RegisterScalableTarget>
 
 Returns: a L<Paws::ApplicationAutoScaling::RegisterScalableTargetResponse> instance
 
-  Registers or updates a scalable target. A scalable target is a resource
+Registers or updates a scalable target. A scalable target is a resource
 that Application Auto Scaling can scale out or scale in. After you have
 registered a scalable target, you can use this operation to update the
-minimum and maximum values for your scalable dimension.
+minimum and maximum values for its scalable dimension.
 
 After you register a scalable target, you can create and apply scaling
 policies using PutScalingPolicy. You can view the scaling policies for
-a service namespace using DescribeScalableTargets. If you are no longer
-using a scalable target, you can deregister it using
+a service namespace using DescribeScalableTargets. If you no longer
+need a scalable target, you can deregister it using
 DeregisterScalableTarget.
 
 
@@ -383,9 +639,9 @@ This service class forms part of L<Paws>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

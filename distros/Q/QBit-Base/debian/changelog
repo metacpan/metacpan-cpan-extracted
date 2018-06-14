@@ -1,3 +1,10 @@
+libqbit-base-perl (0.003) raring; urgency=low
+
+  * removed hacks + depends from QBit::Application::Model::DBManager
+    0.021
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 10 Jun 2018 00:07:43 +0300
+
 libqbit-base-perl (0.002) raring; urgency=low
 
   * fix for new DBManager

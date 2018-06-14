@@ -10,28 +10,56 @@ package Paws::Pinpoint::UpdateApplicationSettings;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/v1/apps/{application-id}/settings');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'PUT');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::Pinpoint::UpdateApplicationSettingsResponse');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::Pinpoint::UpdateApplicationSettings - Arguments for method UpdateApplicationSettings on Paws::Pinpoint
+Paws::Pinpoint::UpdateApplicationSettings - Arguments for method UpdateApplicationSettings on L<Paws::Pinpoint>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateApplicationSettings on the 
-Amazon Pinpoint service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateApplicationSettings on the
+L<Amazon Pinpoint|Paws::Pinpoint> service. Use the attributes of this class
 as arguments to method UpdateApplicationSettings.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateApplicationSettings.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateApplicationSettings(Att1 => $value1, Att2 => $value2, ...);
+    my $pinpoint = Paws->service('Pinpoint');
+    my $UpdateApplicationSettingsResponse =
+      $pinpoint->UpdateApplicationSettings(
+      ApplicationId                   => 'My__string',
+      WriteApplicationSettingsRequest => {
+        QuietTime => {
+          Start => 'My__string',
+          End   => 'My__string',
+        },    # OPTIONAL
+        CampaignHook => {
+          WebUrl             => 'My__string',
+          LambdaFunctionName => 'My__string',
+          Mode => 'DELIVERY',    # values: DELIVERY, FILTER; OPTIONAL
+        },    # OPTIONAL
+        Limits => {
+          Total             => 1,    # OPTIONAL
+          Daily             => 1,    # OPTIONAL
+          MaximumDuration   => 1,    # OPTIONAL
+          MessagesPerSecond => 1,    # OPTIONAL
+        },    # OPTIONAL
+      },
+
+      );
+
+    # Results:
+    my $ApplicationSettingsResource =
+      $UpdateApplicationSettingsResponse->ApplicationSettingsResource;
+
+    # Returns a L<Paws::Pinpoint::UpdateApplicationSettingsResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/>
 
 =head1 ATTRIBUTES
 
@@ -55,9 +83,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateApplica
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

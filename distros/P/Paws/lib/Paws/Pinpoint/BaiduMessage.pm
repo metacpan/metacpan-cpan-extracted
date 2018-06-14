@@ -6,7 +6,6 @@ package Paws::Pinpoint::BaiduMessage;
   has IconReference => (is => 'ro', isa => 'Str');
   has ImageIconUrl => (is => 'ro', isa => 'Str');
   has ImageUrl => (is => 'ro', isa => 'Str');
-  has JsonData => (is => 'ro', isa => 'Str');
   has RawContent => (is => 'ro', isa => 'Str');
   has SilentPush => (is => 'ro', isa => 'Bool');
   has SmallImageIconUrl => (is => 'ro', isa => 'Str');
@@ -89,12 +88,6 @@ notification content view.
   The URL that points to an image used in the push notification.
 
 
-=head2 JsonData => Str
-
-  The data payload used for a silent push. This payload is added to the
-notifications' data.pinpoint.jsonBody' object
-
-
 =head2 RawContent => Str
 
   The Raw JSON formatted string to be used as the payload. This value
@@ -145,9 +138,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Pinpoint>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

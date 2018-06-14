@@ -43,8 +43,9 @@ Describes a lifecycle hook, which tells Auto Scaling that you want to
 perform an action whenever it launches instances or whenever it
 terminates instances.
 
-For more information, see Auto Scaling Lifecycle Hooks in the I<Auto
-Scaling User Guide>.
+For more information, see Auto Scaling Lifecycle Hooks
+(http://docs.aws.amazon.com/autoscaling/latest/userguide/lifecycle-hooks.html)
+in the I<Auto Scaling User Guide>.
 
 =head1 ATTRIBUTES
 
@@ -116,9 +117,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::AutoScali
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

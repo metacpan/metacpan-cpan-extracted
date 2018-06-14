@@ -5,6 +5,7 @@ package Paws::LexModels::PutBot;
   has Checksum => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'checksum');
   has ChildDirected => (is => 'ro', isa => 'Bool', traits => ['NameInRequest'], request_name => 'childDirected', required => 1);
   has ClarificationPrompt => (is => 'ro', isa => 'Paws::LexModels::Prompt', traits => ['NameInRequest'], request_name => 'clarificationPrompt');
+  has CreateVersion => (is => 'ro', isa => 'Bool', traits => ['NameInRequest'], request_name => 'createVersion');
   has Description => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'description');
   has IdleSessionTTLInSeconds => (is => 'ro', isa => 'Int', traits => ['NameInRequest'], request_name => 'idleSessionTTLInSeconds');
   has Intents => (is => 'ro', isa => 'ArrayRef[Paws::LexModels::Intent]', traits => ['NameInRequest'], request_name => 'intents');
@@ -19,28 +20,90 @@ package Paws::LexModels::PutBot;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/bots/{name}/versions/$LATEST');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'PUT');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::LexModels::PutBotResponse');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::LexModels::PutBot - Arguments for method PutBot on Paws::LexModels
+Paws::LexModels::PutBot - Arguments for method PutBot on L<Paws::LexModels>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method PutBot on the 
-Amazon Lex Model Building Service service. Use the attributes of this class
+This class represents the parameters used for calling the method PutBot on the
+L<Amazon Lex Model Building Service|Paws::LexModels> service. Use the attributes of this class
 as arguments to method PutBot.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to PutBot.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->PutBot(Att1 => $value1, Att2 => $value2, ...);
+    my $models.lex = Paws->service('LexModels');
+    my $PutBotResponse = $models . lex->PutBot(
+      ChildDirected  => 1,
+      Locale         => 'en-US',
+      Name           => 'MyBotName',
+      AbortStatement => {
+        messages => [
+          {
+            contentType => 'PlainText', # values: PlainText, SSML, CustomPayload
+            content     => 'MyContentString',    # min: 1, max: 1000
+            groupNumber => 1,                    # min: 1, max: 5; OPTIONAL
+          },
+          ...
+        ],                                       # min: 1, max: 15
+        responseCard => 'MyResponseCard',        # min: 1, max: 50000; OPTIONAL
+      },    # OPTIONAL
+      Checksum            => 'MyString',    # OPTIONAL
+      ClarificationPrompt => {
+        messages => [
+          {
+            contentType => 'PlainText', # values: PlainText, SSML, CustomPayload
+            content     => 'MyContentString',    # min: 1, max: 1000
+            groupNumber => 1,                    # min: 1, max: 5; OPTIONAL
+          },
+          ...
+        ],                                       # min: 1, max: 15
+        maxAttempts  => 1,                       # min: 1, max: 5
+        responseCard => 'MyResponseCard',        # min: 1, max: 50000; OPTIONAL
+      },    # OPTIONAL
+      CreateVersion           => 1,                  # OPTIONAL
+      Description             => 'MyDescription',    # OPTIONAL
+      IdleSessionTTLInSeconds => 1,                  # OPTIONAL
+      Intents                 => [
+        {
+          intentVersion => 'MyVersion',              # min: 1, max: 64
+          intentName    => 'MyIntentName',           # min: 1, max: 100
+
+        },
+        ...
+      ],                                             # OPTIONAL
+      ProcessBehavior => 'SAVE',                     # OPTIONAL
+      VoiceId         => 'MyString',                 # OPTIONAL
+    );
+
+    # Results:
+    my $IdleSessionTTLInSeconds = $PutBotResponse->IdleSessionTTLInSeconds;
+    my $CreateVersion           = $PutBotResponse->CreateVersion;
+    my $Description             = $PutBotResponse->Description;
+    my $LastUpdatedDate         = $PutBotResponse->LastUpdatedDate;
+    my $ClarificationPrompt     = $PutBotResponse->ClarificationPrompt;
+    my $Name                    = $PutBotResponse->Name;
+    my $Locale                  = $PutBotResponse->Locale;
+    my $AbortStatement          = $PutBotResponse->AbortStatement;
+    my $CreatedDate             = $PutBotResponse->CreatedDate;
+    my $VoiceId                 = $PutBotResponse->VoiceId;
+    my $ChildDirected           = $PutBotResponse->ChildDirected;
+    my $Version                 = $PutBotResponse->Version;
+    my $Intents                 = $PutBotResponse->Intents;
+    my $Checksum                = $PutBotResponse->Checksum;
+    my $Status                  = $PutBotResponse->Status;
+    my $FailureReason           = $PutBotResponse->FailureReason;
+
+    # Returns a L<Paws::LexModels::PutBotResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/lex/>
 
 =head1 ATTRIBUTES
 
@@ -106,7 +169,7 @@ application that is directed in whole or in part, to children under age
 COPPA. For information regarding the use of Amazon Lex in connection
 with websites, programs, or other applications that are directed or
 targeted, in whole or in part, to children under age 13, see the Amazon
-Lex FAQ.
+Lex FAQ. (https://aws.amazon.com/lex/faqs#data-security)
 
 
 
@@ -122,6 +185,12 @@ When you create a clarification prompt, make sure that it suggests the
 correct response from the user. for example, for a bot that orders
 pizza and drinks, you might create this clarification prompt: "What
 would you like to do? You can say 'Order a pizza' or 'Order a drink.'"
+
+
+
+=head2 CreateVersion => Bool
+
+
 
 
 
@@ -168,7 +237,7 @@ must be compatible with the locale of the bot.
 
 The default is C<en-US>.
 
-Valid values are: C<"en-US">
+Valid values are: C<"en-US">, C<"en-GB">, C<"de-DE">
 
 =head2 B<REQUIRED> Name => Str
 
@@ -178,11 +247,11 @@ The name of the bot. The name is I<not> case sensitive.
 
 =head2 ProcessBehavior => Str
 
-If you set the C<processBehavior> element to C<Build>, Amazon Lex
-builds the bot so that it can be run. If you set the element to
-C<Save>Amazon Lex saves the bot, but doesn't build it.
+If you set the C<processBehavior> element to C<BUILD>, Amazon Lex
+builds the bot so that it can be run. If you set the element to C<SAVE>
+Amazon Lex saves the bot, but doesn't build it.
 
-If you don't specify this value, the default value is C<Save>.
+If you don't specify this value, the default value is C<BUILD>.
 
 Valid values are: C<"SAVE">, C<"BUILD">
 
@@ -191,7 +260,8 @@ Valid values are: C<"SAVE">, C<"BUILD">
 The Amazon Polly voice ID that you want Amazon Lex to use for voice
 interactions with the user. The locale configured for the voice must
 match the locale of the bot. For more information, see Available Voices
-in the I<Amazon Polly Developer Guide>.
+(http://docs.aws.amazon.com/polly/latest/dg/voicelist.html) in the
+I<Amazon Polly Developer Guide>.
 
 
 
@@ -202,9 +272,9 @@ This class forms part of L<Paws>, documenting arguments for method PutBot in L<P
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

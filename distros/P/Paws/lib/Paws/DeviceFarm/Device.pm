@@ -8,9 +8,11 @@ package Paws::DeviceFarm::Device;
   has FormFactor => (is => 'ro', isa => 'Str', request_name => 'formFactor', traits => ['NameInRequest']);
   has HeapSize => (is => 'ro', isa => 'Int', request_name => 'heapSize', traits => ['NameInRequest']);
   has Image => (is => 'ro', isa => 'Str', request_name => 'image', traits => ['NameInRequest']);
+  has Instances => (is => 'ro', isa => 'ArrayRef[Paws::DeviceFarm::DeviceInstance]', request_name => 'instances', traits => ['NameInRequest']);
   has Manufacturer => (is => 'ro', isa => 'Str', request_name => 'manufacturer', traits => ['NameInRequest']);
   has Memory => (is => 'ro', isa => 'Int', request_name => 'memory', traits => ['NameInRequest']);
   has Model => (is => 'ro', isa => 'Str', request_name => 'model', traits => ['NameInRequest']);
+  has ModelId => (is => 'ro', isa => 'Str', request_name => 'modelId', traits => ['NameInRequest']);
   has Name => (is => 'ro', isa => 'Str', request_name => 'name', traits => ['NameInRequest']);
   has Os => (is => 'ro', isa => 'Str', request_name => 'os', traits => ['NameInRequest']);
   has Platform => (is => 'ro', isa => 'Str', request_name => 'platform', traits => ['NameInRequest']);
@@ -109,6 +111,11 @@ TABLET: The tablet form factor.
   The device's image name.
 
 
+=head2 Instances => ArrayRef[L<Paws::DeviceFarm::DeviceInstance>]
+
+  The instances belonging to this device.
+
+
 =head2 Manufacturer => Str
 
   The device's manufacturer name.
@@ -122,6 +129,11 @@ TABLET: The tablet form factor.
 =head2 Model => Str
 
   The device's model name.
+
+
+=head2 ModelId => Str
+
+  The device's model ID.
 
 
 =head2 Name => Str
@@ -183,9 +195,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::DeviceFar
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

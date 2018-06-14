@@ -32,7 +32,6 @@ subtest 'with path, payload and api_version' => sub {
     my $payload = {name => 'oreore', age => 35};
     my $req = $hub->_req('/foo', $payload, api_version => '2015-01');
     isa_ok $req, 'Net::Azure::NotificationHubs::Request';
-    isa_ok $req, 'HTTP::Request';
     is $req->method, 'POST', 'request method is "POST"';
     is $req->uri->path, '/foo', 'request path is "/foo"';
     is_deeply {$req->uri->query_form}, {api_version => '2015-01'}, 'query params is api_version: "2015-01"';
@@ -45,7 +44,6 @@ subtest 'with path, payload' => sub {
     my $payload = {name => 'oreore', age => 35};
     my $req = $hub->_req('/foo', $payload);
     isa_ok $req, 'Net::Azure::NotificationHubs::Request';
-    isa_ok $req, 'HTTP::Request';
     is $req->method, 'POST', 'request method is "POST"';
     is $req->uri->path, '/foo', 'request path is "/foo"';
     is_deeply {$req->uri->query_form}, {api_version => $hub->api_version}, 'query params is api_version: "2015-01"';
@@ -64,7 +62,6 @@ subtest 'strange instance with path, payload' => sub {
     my $payload = {name => 'oreore', age => 35};
     my $req = $hub->_req('/foo', $payload);
     isa_ok $req, 'Net::Azure::NotificationHubs::Request';
-    isa_ok $req, 'HTTP::Request';
     is $req->method, 'POST', 'request method is "POST"';
     is $req->uri->path, '/foo', 'request path is "/foo"';
     is_deeply {$req->uri->query_form}, {api_version => ''}, 'query params is api_version: null';
@@ -72,7 +69,5 @@ subtest 'strange instance with path, payload' => sub {
     is $req->header('Authorization'), $hub->authorizer->token($req->uri->as_string), 'Authorization header is generated completely';
     is_deeply $hub->serializer->decode($req->content), $payload, 'Content is a payload data that encoded to JSON format';   
 };
-
-
 
 done_testing;

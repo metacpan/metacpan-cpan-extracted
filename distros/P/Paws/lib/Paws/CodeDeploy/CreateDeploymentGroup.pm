@@ -28,21 +28,142 @@ package Paws::CodeDeploy::CreateDeploymentGroup;
 
 =head1 NAME
 
-Paws::CodeDeploy::CreateDeploymentGroup - Arguments for method CreateDeploymentGroup on Paws::CodeDeploy
+Paws::CodeDeploy::CreateDeploymentGroup - Arguments for method CreateDeploymentGroup on L<Paws::CodeDeploy>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateDeploymentGroup on the 
-AWS CodeDeploy service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateDeploymentGroup on the
+L<AWS CodeDeploy|Paws::CodeDeploy> service. Use the attributes of this class
 as arguments to method CreateDeploymentGroup.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateDeploymentGroup.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateDeploymentGroup(Att1 => $value1, Att2 => $value2, ...);
+    my $codedeploy = Paws->service('CodeDeploy');
+    my $CreateDeploymentGroupOutput = $codedeploy->CreateDeploymentGroup(
+      ApplicationName     => 'MyApplicationName',
+      DeploymentGroupName => 'MyDeploymentGroupName',
+      ServiceRoleArn      => 'MyRole',
+      AlarmConfiguration  => {
+        alarms => [
+          {
+            name => 'MyAlarmName',    # OPTIONAL
+          },
+          ...
+        ],                            # OPTIONAL
+        ignorePollAlarmFailure => 1,  # OPTIONAL
+        enabled                => 1,  # OPTIONAL
+      },    # OPTIONAL
+      AutoRollbackConfiguration => {
+        events => [
+          'DEPLOYMENT_FAILURE',
+          ... # values: DEPLOYMENT_FAILURE, DEPLOYMENT_STOP_ON_ALARM, DEPLOYMENT_STOP_ON_REQUEST
+        ],    # OPTIONAL
+        enabled => 1,    # OPTIONAL
+      },    # OPTIONAL
+      AutoScalingGroups => [ 'MyAutoScalingGroupName', ... ],    # OPTIONAL
+      BlueGreenDeploymentConfiguration => {
+        terminateBlueInstancesOnDeploymentSuccess => {
+          terminationWaitTimeInMinutes => 1,                     # OPTIONAL
+          action => 'TERMINATE',    # values: TERMINATE, KEEP_ALIVE; OPTIONAL
+        },    # OPTIONAL
+        deploymentReadyOption => {
+          waitTimeInMinutes => 1,                      # OPTIONAL
+          actionOnTimeout   => 'CONTINUE_DEPLOYMENT'
+          ,    # values: CONTINUE_DEPLOYMENT, STOP_DEPLOYMENT; OPTIONAL
+        },    # OPTIONAL
+        greenFleetProvisioningOption => {
+          action => 'DISCOVER_EXISTING'
+          ,    # values: DISCOVER_EXISTING, COPY_AUTO_SCALING_GROUP; OPTIONAL
+        },    # OPTIONAL
+      },    # OPTIONAL
+      DeploymentConfigName => 'MyDeploymentConfigName',    # OPTIONAL
+      DeploymentStyle      => {
+        deploymentOption => 'WITH_TRAFFIC_CONTROL'
+        ,    # values: WITH_TRAFFIC_CONTROL, WITHOUT_TRAFFIC_CONTROL; OPTIONAL
+        deploymentType => 'IN_PLACE',   # values: IN_PLACE, BLUE_GREEN; OPTIONAL
+      },    # OPTIONAL
+      Ec2TagFilters => [
+        {
+          Value => 'MyValue',    # OPTIONAL
+          Key   => 'MyKey',      # OPTIONAL
+          Type =>
+            'KEY_ONLY',  # values: KEY_ONLY, VALUE_ONLY, KEY_AND_VALUE; OPTIONAL
+        },
+        ...
+      ],                 # OPTIONAL
+      Ec2TagSet => {
+        ec2TagSetList => [
+          [
+            {
+              Value => 'MyValue',    # OPTIONAL
+              Key   => 'MyKey',      # OPTIONAL
+              Type  => 'KEY_ONLY'
+              ,    # values: KEY_ONLY, VALUE_ONLY, KEY_AND_VALUE; OPTIONAL
+            },
+            ...
+          ],
+          ...
+        ],         # OPTIONAL
+      },    # OPTIONAL
+      LoadBalancerInfo => {
+        elbInfoList => [
+          {
+            name => 'MyELBName',    # OPTIONAL
+          },
+          ...
+        ],                          # OPTIONAL
+        targetGroupInfoList => [
+          {
+            name => 'MyTargetGroupName',    # OPTIONAL
+          },
+          ...
+        ],                                  # OPTIONAL
+      },    # OPTIONAL
+      OnPremisesInstanceTagFilters => [
+        {
+          Key => 'MyKey',    # OPTIONAL
+          Type =>
+            'KEY_ONLY',  # values: KEY_ONLY, VALUE_ONLY, KEY_AND_VALUE; OPTIONAL
+          Value => 'MyValue',    # OPTIONAL
+        },
+        ...
+      ],                         # OPTIONAL
+      OnPremisesTagSet => {
+        onPremisesTagSetList => [
+          [
+            {
+              Key  => 'MyKey',     # OPTIONAL
+              Type => 'KEY_ONLY'
+              ,    # values: KEY_ONLY, VALUE_ONLY, KEY_AND_VALUE; OPTIONAL
+              Value => 'MyValue',    # OPTIONAL
+            },
+            ...
+          ],
+          ...
+        ],                           # OPTIONAL
+      },    # OPTIONAL
+      TriggerConfigurations => [
+        {
+          triggerTargetArn => 'MyTriggerTargetArn',    # OPTIONAL
+          triggerName      => 'MyTriggerName',         # OPTIONAL
+          triggerEvents    => [
+            'DeploymentStart',
+            ... # values: DeploymentStart, DeploymentSuccess, DeploymentFailure, DeploymentStop, DeploymentRollback, DeploymentReady, InstanceStart, InstanceSuccess, InstanceFailure, InstanceReady
+          ],    # OPTIONAL
+        },
+        ...
+      ],        # OPTIONAL
+    );
+
+    # Results:
+    my $DeploymentGroupId = $CreateDeploymentGroupOutput->DeploymentGroupId;
+
+    # Returns a L<Paws::CodeDeploy::CreateDeploymentGroupOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/codedeploy/CreateDeploymentGroup>
 
 =head1 ATTRIBUTES
 
@@ -92,8 +213,9 @@ It is used if a configuration isn't specified for the deployment or the
 deployment group.
 
 For more information about the predefined deployment configurations in
-AWS CodeDeploy, see Working with Deployment Groups in AWS CodeDeploy in
-the AWS CodeDeploy User Guide.
+AWS CodeDeploy, see Working with Deployment Groups in AWS CodeDeploy
+(http://docs.aws.amazon.com/codedeploy/latest/userguide/deployment-configurations.html)
+in the AWS CodeDeploy User Guide.
 
 
 
@@ -161,6 +283,7 @@ behalf when interacting with AWS services.
 
 Information about triggers to create when the deployment group is
 created. For examples, see Create a Trigger for an AWS CodeDeploy Event
+(http://docs.aws.amazon.com/codedeploy/latest/userguide/how-to-notify-sns.html)
 in the AWS CodeDeploy User Guide.
 
 
@@ -172,9 +295,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateDeploym
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

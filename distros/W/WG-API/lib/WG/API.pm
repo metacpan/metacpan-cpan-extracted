@@ -11,11 +11,11 @@ WG::API - Module for work with Wargaming.net Public API
 
 =head1 VERSION
 
-Version v0.8.6
+Version v0.8.8
 
 =cut
 
-our $VERSION = 'v0.8.6';
+our $VERSION = 'v0.8.8';
 
 =head1 SYNOPSIS
 
@@ -58,6 +58,7 @@ Returns a WoT instance
 
 =cut
 
+#@returns WG::API::WoT
 sub wot {
     my $self = shift;
 
@@ -79,6 +80,7 @@ Returns A WoWp instance
 
 =cut
 
+#@returns WG::API::WoWp
 sub wowp {
     my $self = shift;
 
@@ -100,6 +102,7 @@ Returns a WoWs instance
 
 =cut
 
+#@returns WG::API::WoWs
 sub wows {
     my $self = shift;
 
@@ -121,6 +124,7 @@ Returns a NET instance
 
 =cut
 
+#@returns WG::API::NET
 sub net {
     my $self = shift;
 
@@ -142,6 +146,7 @@ Return a Auth instance
 
 =cut
 
+#@returns WG::API::Auth
 sub auth {
     my $self = shift;
 
@@ -155,7 +160,7 @@ sub auth {
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<cynovg at cpan.org>, or through the web interface at L<https://github.com/cynovg/WG-API/issues>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to C<cynovg at cpan.org>, or through the web interface at L<https://gitlab.com/cynovg/WG-API/issues>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
@@ -169,7 +174,7 @@ You can also look for information at:
 
 =item * RT: GitHub's request tracker (report bugs here)
 
-L<https://github.com/cynovg/WG-API/issues>
+L<https://gitlab.com/cynovg/WG-API/issues>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
@@ -181,7 +186,7 @@ L<http://cpanratings.perl.org/d/WG-API>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/WG-API/>
+L<https://metacpan.org/pod/WG::API>
 
 =back
 

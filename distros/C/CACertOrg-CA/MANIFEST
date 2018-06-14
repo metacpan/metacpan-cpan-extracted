@@ -1,13 +1,15 @@
 Changes
+INSTALL.SKIP
 lib/CACertOrg/CA.pm
 lib/CACertOrg/CA/root.crt
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-README
+README.pod
 t/check_cert.t
 t/load.t
 t/test_manifest
+xt/changes.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

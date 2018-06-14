@@ -14,22 +14,24 @@ use Geo::StreetAddress::US;
 
 =head1 NAME
 
-Geo::Coder::US::Census - Provides a geocoding functionality for the US using http:://geocoding.geo.census.gov
+Geo::Coder::US::Census - Provides a Geo-Coding functionality for the US using http:://geocoding.geo.census.gov
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
       use Geo::Coder::US::Census;
 
-      my $geocoder = Geo::Coder::US::Census->new();
-      my $location = $geocoder->geocode(location => '4600 Silver Hill Rd., Suitland, MD, USA');
+      my $geo_coder = Geo::Coder::US::Census->new();
+      my $location = $geo_coder->geocode(location => '4600 Silver Hill Rd., Suitland, MD');
+      # Sometimes the server gives a 500 error on this
+      $location = $geo_coder->geocode(location => '4600 Silver Hill Rd., Suitland, MD, USA');
 
 =head1 DESCRIPTION
 
@@ -39,10 +41,10 @@ Geo::Coder::US::Census provides an interface to geocoding.geo.census.gov.  Geo::
 
 =head2 new
 
-    $geocoder = Geo::Coder::US::Census->new();
+    $geo_coder = Geo::Coder::US::Census->new();
     my $ua = LWP::UserAgent->new();
     $ua->env_proxy(1);
-    $geocoder = Geo::Coder::US::Census->new(ua => $ua);
+    $geo_coder = Geo::Coder::US::Census->new(ua => $ua);
 
 =cut
 
@@ -57,8 +59,8 @@ sub new {
 
 =head2 geocode
 
-    $location = $geocoder->geocode(location => $location);
-    # @location = $geocoder->geocode(location => $location);
+    $location = $geo_coder->geocode(location => $location);
+    # @location = $geo_coder->geocode(location => $location);
 
     print 'Latitude: ', $location->{'latt'}, "\n";
     print 'Longitude: ', $location->{'longt'}, "\n";
@@ -67,23 +69,35 @@ sub new {
 
 sub geocode {
 	my $self = shift;
-
 	my %param;
-	if (@_ % 2 == 0) {
+
+	if(ref($_[0]) eq 'HASH') {
+		%param = %{$_[0]};
+	} elsif(ref($_[0])) {
+		Carp::croak('Usage: geocode(location => $location)');
+	} elsif(@_ % 2 == 0) {
 		%param = @_;
 	} else {
 		$param{location} = shift;
 	}
 
 	my $location = $param{location}
-		or Carp::croak("Usage: geocode(location => \$location)");
+		or Carp::croak('Usage: geocode(location => $location)');
 
 	if (Encode::is_utf8($location)) {
 		$location = Encode::encode_utf8($location);
 	}
 
-	if($location =~ /,?(.+)\s*(United States|US|USA)$/i) {
+	if($location =~ /,?(.+),\s*(United States|US|USA)$/i) {
 		$location = $1;
+	}
+
+	# Remove county from the string, if that's included
+	# Assumes not more than one town in a state with the same name
+	# in different counties - but the census Geo-Coding doesn't support that
+	# anyway
+	if($location =~ /^(\d+\s+[\w\s]+),\s*([\w\s]+),\s*[\w\s]+,\s*([A-Za-z]+)$/) {
+		$location = "$1, $2, $3";
 	}
 
 	my $uri = URI->new("https://$self->{host}");
@@ -103,14 +117,14 @@ sub geocode {
 	}
 	$query_parameters{'city'} = $hr->{'city'};
 	$query_parameters{'state'} = $hr->{'state'};
-	
+
 	$uri->query_form(%query_parameters);
 	my $url = $uri->as_string();
 
 	my $res = $self->{ua}->get($url);
 
 	if($res->is_error()) {
-		Carp::croak("geocoding.geo.census.gov API returned error: " . $res->status_line());
+		Carp::croak("$url API returned error: " . $res->status_line());
 		return;
 	}
 
@@ -127,11 +141,11 @@ Accessor method to get and set UserAgent object used internally. You
 can call I<env_proxy> for example, to get the proxy information from
 environment variables:
 
-  $geocoder->ua()->env_proxy(1);
+  $geo_coder->ua()->env_proxy(1);
 
 You can also set your own User-Agent object:
 
-  $geocoder->ua(LWP::UserAgent::Throttled->new());
+  $geo_coder->ua(LWP::UserAgent::Throttled->new());
 
 =cut
 
@@ -145,7 +159,7 @@ sub ua {
 
 =head2 reverse_geocode
 
-    # $location = $geocoder->reverse_geocode(latlng => '37.778907,-122.39732');
+    # $location = $geo_coder->reverse_geocode(latlng => '37.778907,-122.39732');
 
 # Similar to geocode except it expects a latitude/longitude parameter.
 
@@ -154,21 +168,45 @@ Not supported.
 =cut
 
 sub reverse_geocode {
-	my $self = shift;
+	# my $self = shift;
 
-	my %param;
-	if (@_ % 2 == 0) {
-		%param = @_;
-	} else {
-		$param{latlng} = shift;
-	}
+	# my %param;
+	# if (@_ % 2 == 0) {
+		# %param = @_;
+	# } else {
+		# $param{latlng} = shift;
+	# }
 
 	# my $latlng = $param{latlng}
 		# or Carp::croak("Usage: reverse_geocode(latlng => \$latlng)");
 
 	# return $self->geocode(location => $latlng, reverse => 1);
 	Carp::croak('Reverse geocode is not supported');
-};
+}
+
+=head2 run
+
+You can also run this module from the command line:
+
+    perl Census.pm 1600 Pennsylvania Avenue NW, Washington DC
+
+=cut
+
+__PACKAGE__->run(@ARGV) unless caller();
+
+sub run {
+	require Data::Dumper;
+
+	my $class = shift;
+
+	my $location = join(' ', @_);
+
+	my @rc = $class->new()->geocode($location);
+
+	die "$0: geocoding failed" unless(scalar(@rc));
+
+	print Data::Dumper->new([\@rc])->Dump();
+}
 
 =head1 AUTHOR
 
@@ -193,7 +231,7 @@ https://www.census.gov/data/developers/data-sets/Geocoding-services.html
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Nigel Horne.
+Copyright 2017,2018 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

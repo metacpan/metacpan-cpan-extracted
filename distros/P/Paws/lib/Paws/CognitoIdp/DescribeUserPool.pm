@@ -14,21 +14,31 @@ package Paws::CognitoIdp::DescribeUserPool;
 
 =head1 NAME
 
-Paws::CognitoIdp::DescribeUserPool - Arguments for method DescribeUserPool on Paws::CognitoIdp
+Paws::CognitoIdp::DescribeUserPool - Arguments for method DescribeUserPool on L<Paws::CognitoIdp>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DescribeUserPool on the 
-Amazon Cognito Identity Provider service. Use the attributes of this class
+This class represents the parameters used for calling the method DescribeUserPool on the
+L<Amazon Cognito Identity Provider|Paws::CognitoIdp> service. Use the attributes of this class
 as arguments to method DescribeUserPool.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DescribeUserPool.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DescribeUserPool(Att1 => $value1, Att2 => $value2, ...);
+    my $cognito-idp = Paws->service('CognitoIdp');
+    my $DescribeUserPoolResponse = $cognito -idp->DescribeUserPool(
+      UserPoolId => 'MyUserPoolIdType',
+
+    );
+
+    # Results:
+    my $UserPool = $DescribeUserPoolResponse->UserPool;
+
+    # Returns a L<Paws::CognitoIdp::DescribeUserPoolResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/cognito-idp/DescribeUserPool>
 
 =head1 ATTRIBUTES
 
@@ -46,9 +56,9 @@ This class forms part of L<Paws>, documenting arguments for method DescribeUserP
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

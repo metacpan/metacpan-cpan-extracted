@@ -3,6 +3,7 @@ package Paws::CloudDirectory::ListPublishedSchemaArns;
   use Moose;
   has MaxResults => (is => 'ro', isa => 'Int');
   has NextToken => (is => 'ro', isa => 'Str');
+  has SchemaArn => (is => 'ro', isa => 'Str');
 
   use MooseX::ClassAttribute;
 
@@ -10,28 +11,40 @@ package Paws::CloudDirectory::ListPublishedSchemaArns;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/amazonclouddirectory/2017-01-11/schema/published');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'POST');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::CloudDirectory::ListPublishedSchemaArnsResponse');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::CloudDirectory::ListPublishedSchemaArns - Arguments for method ListPublishedSchemaArns on Paws::CloudDirectory
+Paws::CloudDirectory::ListPublishedSchemaArns - Arguments for method ListPublishedSchemaArns on L<Paws::CloudDirectory>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ListPublishedSchemaArns on the 
-Amazon CloudDirectory service. Use the attributes of this class
+This class represents the parameters used for calling the method ListPublishedSchemaArns on the
+L<Amazon CloudDirectory|Paws::CloudDirectory> service. Use the attributes of this class
 as arguments to method ListPublishedSchemaArns.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ListPublishedSchemaArns.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ListPublishedSchemaArns(Att1 => $value1, Att2 => $value2, ...);
+    my $clouddirectory = Paws->service('CloudDirectory');
+    my $ListPublishedSchemaArnsResponse =
+      $clouddirectory->ListPublishedSchemaArns(
+      MaxResults => 1,                # OPTIONAL
+      NextToken  => 'MyNextToken',    # OPTIONAL
+      SchemaArn  => 'MyArn',          # OPTIONAL
+      );
+
+    # Results:
+    my $SchemaArns = $ListPublishedSchemaArnsResponse->SchemaArns;
+    my $NextToken  = $ListPublishedSchemaArnsResponse->NextToken;
+
+    # Returns a L<Paws::CloudDirectory::ListPublishedSchemaArnsResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/clouddirectory/ListPublishedSchemaArns>
 
 =head1 ATTRIBUTES
 
@@ -48,6 +61,13 @@ The pagination token.
 
 
 
+=head2 SchemaArn => Str
+
+The response for C<ListPublishedSchemaArns> when this parameter is used
+will list all minor version ARNs for a major version.
+
+
+
 
 =head1 SEE ALSO
 
@@ -55,9 +75,9 @@ This class forms part of L<Paws>, documenting arguments for method ListPublished
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

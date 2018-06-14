@@ -1,5 +1,7 @@
+#line 1 "/home/ben/projects/ip-tools/ip-tools.c"
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #include "ip-tools.h"
 
@@ -11,22 +13,23 @@
 #define INVALID_IP 0
 #define NOTFOUND -1
 
-typedef struct {
-    unsigned start;
-    unsigned end;
+typedef struct
+{
+    uint32_t start;
+    uint32_t end;
 }
 ip_block_t;
 
 #endif /* HEADER */
 
-/* Convert the character string in "ip" into an unsigned integer.
+/* Convert the character string in "ip" into a thirty-two bit unsigned
+   integer. */
 
-   This assumes that an unsigned integer contains at least 32 bits. */
-
-unsigned int ip_tools_ip_to_int (const char * ip)
+uint32_t
+ip_tools_ip_to_int (const char * ip)
 {
     /* The return value. */
-    unsigned v = 0;
+    uint32_t v = 0;
     /* The count of the number of bytes processed. */
     int i;
     /* A pointer to the next digit to process. */
@@ -64,10 +67,12 @@ unsigned int ip_tools_ip_to_int (const char * ip)
     return v;
 }
 
-/* Search for "ip" in the structure "ip_blocks". "n_ip_ranges" is the
-   total number of members in "ip_blocks". */
+/* Search for "ip" in a sorted list of IP address blocks "ip_blocks"
+   with a total number of members "n_ip_ranges". If "ip" is not found,
+   the value NOTFOUND is returned. */
 
-int ip_tools_ip_range (ip_block_t * ip_blocks, int n_ip_ranges, unsigned ip)
+int
+ip_tools_ip_range (ip_block_t * ip_blocks, int n_ip_ranges, uint32_t ip)
 {
     int i;
     int division;

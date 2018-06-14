@@ -1,7 +1,7 @@
 package App::DuckPAN::Cmd::Env::Cmd;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Base class for Env commands
-$App::DuckPAN::Cmd::Env::Cmd::VERSION = '1019';
+$App::DuckPAN::Cmd::Env::Cmd::VERSION = '1021';
 use Moo::Role;
 
 requires 'run';
@@ -35,7 +35,7 @@ App::DuckPAN::Cmd::Env::Cmd - Base class for Env commands
 
 =head1 VERSION
 
-version 1019
+version 1021
 
 =head1 AUTHOR
 

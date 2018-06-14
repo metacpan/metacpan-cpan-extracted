@@ -35,6 +35,7 @@
       },
       "runtime" : {
          "requires" : {
+            "IO::Socket::Timeout" : "0.32",
             "Mojolicious" : "7.01",
             "Net::LDAP::SPNEGO" : "v0.1.4",
             "perl" : "5.010001"
@@ -53,5 +54,5 @@
          "url" : "https://github.com/oetiker/mojolicious-plugin-spnego"
       }
    },
-   "version" : "v0.3.2"
+   "version" : "v0.3.7"
 }

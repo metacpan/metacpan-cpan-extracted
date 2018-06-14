@@ -9,28 +9,43 @@ package Paws::IoT::DescribeThing;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/things/{thingName}');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'GET');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::IoT::DescribeThingResponse');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::IoT::DescribeThing - Arguments for method DescribeThing on Paws::IoT
+Paws::IoT::DescribeThing - Arguments for method DescribeThing on L<Paws::IoT>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DescribeThing on the 
-AWS IoT service. Use the attributes of this class
+This class represents the parameters used for calling the method DescribeThing on the
+L<AWS IoT|Paws::IoT> service. Use the attributes of this class
 as arguments to method DescribeThing.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DescribeThing.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DescribeThing(Att1 => $value1, Att2 => $value2, ...);
+    my $iot = Paws->service('IoT');
+    my $DescribeThingResponse = $iot->DescribeThing(
+      ThingName => 'MyThingName',
+
+    );
+
+    # Results:
+    my $Version         = $DescribeThingResponse->Version;
+    my $ThingName       = $DescribeThingResponse->ThingName;
+    my $ThingId         = $DescribeThingResponse->ThingId;
+    my $Attributes      = $DescribeThingResponse->Attributes;
+    my $ThingTypeName   = $DescribeThingResponse->ThingTypeName;
+    my $ThingArn        = $DescribeThingResponse->ThingArn;
+    my $DefaultClientId = $DescribeThingResponse->DefaultClientId;
+
+    # Returns a L<Paws::IoT::DescribeThingResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/iot/DescribeThing>
 
 =head1 ATTRIBUTES
 
@@ -48,9 +63,9 @@ This class forms part of L<Paws>, documenting arguments for method DescribeThing
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

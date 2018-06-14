@@ -8,16 +8,18 @@ use LWP::UserAgent;
 use JSON;
 use Data::Dumper;
 use Log::Any qw($log);
+use URI;
+use URI::QueryParam;
 
 =encoding utf8
 
 =head1 VERSION
 
-Version v0.8.6
+Version v0.8.8
 
 =cut
 
-our $VERSION = 'v0.8.6';
+our $VERSION = 'v0.8.8';
 
 =head1 SYNOPSIS
 
@@ -105,7 +107,7 @@ Get current debug mode
 
 has debug => (
     is      => 'rw',
-    writer => 'set_debug',
+    writer  => 'set_debug',
     default => '0',
 );
 
@@ -207,14 +209,8 @@ sub _validate_params {
 sub _get {
     my ( $self, $uri, $params, %passed_params ) = @_;
 
-    my $url = sprintf 'https://%s/%s/?application_id=%s', $self->api_uri, $uri, $self->application_id;
-    for (@$params) {
-        $url .= sprintf "&%s=%s", $_, $passed_params{$_} if defined $passed_params{$_};
-    }
-
-    $self->log( sprintf "METHOD GET, URL: %s\n", $url );
-
-    my HTTP::Response $response = $self->ua->get($url);
+    #@type HTTP::Response
+    my $response = $self->_raw_get( $self->_build_url($uri) . $self->_build_get_params( $params, %passed_params ) );
 
     return $self->_parse( $response->is_success ? decode_json $response->decoded_content : undef );
 }
@@ -222,19 +218,8 @@ sub _get {
 sub _post {
     my ( $self, $uri, $params, %passed_params ) = @_;
 
-    my $url = sprintf 'https://%s/%s/', $self->api_uri, $uri;
-
-    #remove unused fields
-    my %params;
-    @params{ keys %passed_params } = ();
-    delete @params{@$params};
-    delete $passed_params{$_} for keys %params;
-
-    $passed_params{'application_id'} = $self->application_id;
-
-    $self->log( sprintf "METHOD POST, URL %s, %s\n", $url, Dumper \%passed_params );
-
-    my HTTP::Response $response = $self->ua->post( $url, \%passed_params );
+    #@type HTTP::Response
+    my $response = $self->_raw_post( $self->_build_url($uri), $self->_build_post_params( $params, %passed_params ) );
 
     return $self->_parse( $response->is_success ? decode_json $response->decoded_content : undef );
 }
@@ -283,9 +268,63 @@ sub _parse {
     return;
 }
 
+#@returns URI;
+sub _build_url {
+    my ( $self, $uri ) = @_;
+
+    my $url = URI->new( $self->api_uri );
+    $url->scheme("https");
+    $url->path($uri);
+
+    return $url->as_string;
+}
+
+sub _build_get_params {
+    my ( $self, $params, %passed_params ) = @_;
+
+    my $url = URI->new( "", "https" );
+    $url->query_param( application_id => $self->application_id );
+    foreach my $param (@$params) {
+        $passed_params{$param} = $self->language if $param eq 'language' && !exists $passed_params{$param};
+        $url->query_param( $param => $passed_params{$param} ) if defined $passed_params{$param};
+    }
+
+    return $url->as_string;
+}
+
+sub _build_post_params {
+    my ( $self, $params, %passed_params ) = @_;
+
+    my %params;
+    @params{ keys %passed_params } = ();
+    delete @params{@$params};
+    delete $passed_params{$_} for keys %params;
+
+    $passed_params{'application_id'} = $self->application_id;
+    $passed_params{'language'} = $self->language unless exists $passed_params{'language'};
+
+    return \%passed_params;
+}
+
+sub _raw_get {
+    my ( $self, $url ) = @_;
+
+    $self->log( sprintf "METHOD GET, URL: %s\n", $url );
+
+    return $self->ua->get($url);
+}
+
+sub _raw_post {
+    my ( $self, $url, $params ) = @_;
+
+    $self->log( sprintf "METHOD POST, URL %s, %s\n", $url, Dumper $params );
+
+    return $self->ua->post( $url, $params );
+}
+
 =head1 BUGS
 
-Please report any bugs or feature requests to C<cynovg at cpan.org>, or through the web interface at L<https://github.com/cynovg/WG-API/issues>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to C<cynovg at cpan.org>, or through the web interface at L<https://gitlab.com/cynovg/WG-API/issues>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
@@ -299,7 +338,7 @@ You can also look for information at:
 
 =item * RT: GitHub's request tracker (report bugs here)
 
-L<https://github.com/cynovg/WG-API/issues>
+L<https://gitlab.com/cynovg/WG-API/issues>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
@@ -311,7 +350,7 @@ L<http://cpanratings.perl.org/d/WG-API>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/WG-API/>
+L<https://metacpan.org/pod/WG::API>
 
 =back
 

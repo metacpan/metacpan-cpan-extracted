@@ -132,7 +132,7 @@
     "e.Kr.",
   ],
   first_day_of_week => 1,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
+  glibc_date_1_format => "%a %e %b %H:%M:%S %Z %Y",
   glibc_date_format => "%d-%m-%Y",
   glibc_datetime_format => "%a %d %b %Y %T %Z",
   glibc_time_12_format => "%I:%M:%S %p",

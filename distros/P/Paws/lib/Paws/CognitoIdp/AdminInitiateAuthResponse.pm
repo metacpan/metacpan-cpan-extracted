@@ -35,6 +35,18 @@ need to pass another challenge.
 
 =item *
 
+C<MFA_SETUP>: If MFA is required, users who do not have at least one of
+the MFA methods set up are presented with an C<MFA_SETUP> challenge.
+The user must set up at least one MFA type to continue to authenticate.
+
+=item *
+
+C<SELECT_MFA_TYPE>: Selects the MFA type. Valid MFA options are
+C<SMS_MFA> for text SMS MFA, and C<SOFTWARE_TOKEN_MFA> for TOTP
+software token MFA.
+
+=item *
+
 C<SMS_MFA>: Next challenge is to supply an C<SMS_MFA_CODE>, delivered
 via SMS.
 
@@ -76,7 +88,7 @@ with C<NEW_PASSWORD> and any other required attributes.
 =back
 
 
-Valid values are: C<"SMS_MFA">, C<"PASSWORD_VERIFIER">, C<"CUSTOM_CHALLENGE">, C<"DEVICE_SRP_AUTH">, C<"DEVICE_PASSWORD_VERIFIER">, C<"ADMIN_NO_SRP_AUTH">, C<"NEW_PASSWORD_REQUIRED">
+Valid values are: C<"SMS_MFA">, C<"SOFTWARE_TOKEN_MFA">, C<"SELECT_MFA_TYPE">, C<"MFA_SETUP">, C<"PASSWORD_VERIFIER">, C<"CUSTOM_CHALLENGE">, C<"DEVICE_SRP_AUTH">, C<"DEVICE_PASSWORD_VERIFIER">, C<"ADMIN_NO_SRP_AUTH">, C<"NEW_PASSWORD_REQUIRED">
 =head2 ChallengeParameters => L<Paws::CognitoIdp::ChallengeParametersType>
 
 The challenge parameters. These are returned to you in the
@@ -86,7 +98,7 @@ next call (C<AdminRespondToAuthChallenge>).
 
 All challenges require C<USERNAME> and C<SECRET_HASH> (if applicable).
 
-The value of the C<USER_IF_FOR_SRP> attribute will be the user's actual
+The value of the C<USER_ID_FOR_SRP> attribute will be the user's actual
 username, not an alias (such as email address or phone number), even if
 you specified an alias in your call to C<AdminInitiateAuth>. This is
 because, in the C<AdminRespondToAuthChallenge> API

@@ -81,6 +81,8 @@ Revision history for VSGDR::StaticData
         Created genTestData.pl.  Runs a SQL select to pull out CSV data to populate a test example.  Re-uses code from genStaticData.pl.
 0.38	17/05/2018
         Fixed column typing for new genTestData.pl
+0.39	11/06/2018
+        Fixed regression bug introduced into genStaticData.pl
 
         
 	

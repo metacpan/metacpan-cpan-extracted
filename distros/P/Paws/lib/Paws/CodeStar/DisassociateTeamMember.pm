@@ -15,21 +15,27 @@ package Paws::CodeStar::DisassociateTeamMember;
 
 =head1 NAME
 
-Paws::CodeStar::DisassociateTeamMember - Arguments for method DisassociateTeamMember on Paws::CodeStar
+Paws::CodeStar::DisassociateTeamMember - Arguments for method DisassociateTeamMember on L<Paws::CodeStar>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DisassociateTeamMember on the 
-AWS CodeStar service. Use the attributes of this class
+This class represents the parameters used for calling the method DisassociateTeamMember on the
+L<AWS CodeStar|Paws::CodeStar> service. Use the attributes of this class
 as arguments to method DisassociateTeamMember.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DisassociateTeamMember.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DisassociateTeamMember(Att1 => $value1, Att2 => $value2, ...);
+    my $codestar = Paws->service('CodeStar');
+    my $DisassociateTeamMemberResult = $codestar->DisassociateTeamMember(
+      ProjectId => 'MyProjectId',
+      UserArn   => 'MyUserArn',
+
+    );
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/codestar/DisassociateTeamMember>
 
 =head1 ATTRIBUTES
 
@@ -55,9 +61,9 @@ This class forms part of L<Paws>, documenting arguments for method DisassociateT
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

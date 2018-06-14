@@ -7,5 +7,7 @@ t/00.load.t
 t/array.t
 t/hash.t
 t/scalar.t
+t/no_alias.t
+t/perl_5.20.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

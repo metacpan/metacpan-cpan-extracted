@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-04-06'; # DATE
-our $VERSION = '0.023'; # VERSION
+our $DATE = '2018-06-12'; # DATE
+our $VERSION = '0.024'; # VERSION
 
 use 5.010001;
 use strict;
@@ -60,7 +60,7 @@ indodax - CLI for Indodax.com
 
 =head1 VERSION
 
-This document describes version 0.023 of indodax (from Perl distribution App-indodax), released on 2018-04-06.
+This document describes version 0.024 of indodax (from Perl distribution App-indodax), released on 2018-06-12.
 
 =head1 SYNOPSIS
 
@@ -128,6 +128,13 @@ Cancelling multiple orders in one go:
 For other available commands, see the help message or documentation:
 
  % indodax -h
+
+=head1 DESCRIPTION
+
+B<DEPRECATION WARNING:> This script is being deprecated in favor of
+L<App::cryp::Exchange::indodax> and L<cryp-exchange>, but as the latter does not
+have as many as subcommands as this script, this script is still being
+maintained.
 
 =head1 SUBCOMMANDS
 
@@ -358,7 +365,7 @@ Default value:
 
 Valid values:
 
- ["btc_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","act_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","stq_idr","ten_idr","trx_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","ten_btc","xem_btc","xlm_btc","xrp_btc"]
 
 =item B<--secret>=I<s>*
 
@@ -386,7 +393,7 @@ Filter by currency.
 
 Valid values:
 
- ["ada","bcd","bch","btc","btg","bts","dash","doge","etc","eth","idr","ignis","ltc","nxt","ten","waves","xem","xlm","xrp","xzc"]
+ ["act","ada","bcd","bch","btc","btg","bts","dash","doge","etc","eth","idr","ignis","ltc","nxt","stq","ten","trx","waves","xem","xlm","xrp","xzc"]
 
 =item B<--key>=I<s>*
 
@@ -396,7 +403,7 @@ Filter by pair.
 
 Valid values:
 
- ["btc_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","act_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","stq_idr","ten_idr","trx_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","ten_btc","xem_btc","xlm_btc","xrp_btc"]
 
 =item B<--secret>=I<s>*
 
@@ -436,7 +443,7 @@ Default value:
 
 Valid values:
 
- ["btc_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","act_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","stq_idr","ten_idr","trx_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","ten_btc","xem_btc","xlm_btc","xrp_btc"]
 
 =item B<--price>=I<s>*
 
@@ -470,7 +477,7 @@ Default value:
 
 Valid values:
 
- ["btc_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","act_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","stq_idr","ten_idr","trx_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","ten_btc","xem_btc","xlm_btc","xrp_btc"]
 
 =item B<--type>=I<s>
 
@@ -496,7 +503,7 @@ Default value:
 
 Valid values:
 
- ["ada","bcd","bch","btc","btg","bts","dash","doge","etc","eth","idr","ignis","ltc","nxt","ten","waves","xem","xlm","xrp","xzc"]
+ ["act","ada","bcd","bch","btc","btg","bts","dash","doge","etc","eth","idr","ignis","ltc","nxt","stq","ten","trx","waves","xem","xlm","xrp","xzc"]
 
 =item B<--key>=I<s>*
 
@@ -526,7 +533,7 @@ Filter by pair.
 
 Valid values:
 
- ["btc_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","act_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","stq_idr","ten_idr","trx_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","ten_btc","xem_btc","xlm_btc","xrp_btc"]
 
 =item B<--secret>=I<s>*
 
@@ -586,7 +593,7 @@ Default value:
 
 Valid values:
 
- ["btc_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","act_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","stq_idr","ten_idr","trx_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","ten_btc","xem_btc","xlm_btc","xrp_btc"]
 
 =item B<--secret>=I<s>*
 
@@ -636,7 +643,7 @@ Default value:
 
 Valid values:
 
- ["btc_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","act_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","stq_idr","ten_idr","trx_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","ten_btc","xem_btc","xlm_btc","xrp_btc"]
 
 =back
 
@@ -666,7 +673,7 @@ Default value:
 
 Valid values:
 
- ["btc_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","act_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","stq_idr","ten_idr","trx_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","ten_btc","xem_btc","xlm_btc","xrp_btc"]
 
 =item B<--price>=I<s>*
 
@@ -702,7 +709,7 @@ Default value:
 
 Valid values:
 
- ["btc_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","act_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","stq_idr","ten_idr","trx_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","ten_btc","xem_btc","xlm_btc","xrp_btc"]
 
 =item B<--secret>=I<s>*
 
@@ -768,7 +775,7 @@ Default value:
 
 Valid values:
 
- ["btc_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","act_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","stq_idr","ten_idr","trx_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","ten_btc","xem_btc","xlm_btc","xrp_btc"]
 
 =item B<--type>=I<s>
 
@@ -790,7 +797,7 @@ Filter by currency.
 
 Valid values:
 
- ["ada","bcd","bch","btc","btg","bts","dash","doge","etc","eth","idr","ignis","ltc","nxt","ten","waves","xem","xlm","xrp","xzc"]
+ ["act","ada","bcd","bch","btc","btg","bts","dash","doge","etc","eth","idr","ignis","ltc","nxt","stq","ten","trx","waves","xem","xlm","xrp","xzc"]
 
 =item B<--key>=I<s>*
 

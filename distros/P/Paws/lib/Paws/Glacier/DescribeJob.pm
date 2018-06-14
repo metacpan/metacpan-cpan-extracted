@@ -11,28 +11,51 @@ package Paws::Glacier::DescribeJob;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/{accountId}/vaults/{vaultName}/jobs/{jobId}');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'GET');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::Glacier::GlacierJobDescription');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::Glacier::DescribeJob - Arguments for method DescribeJob on Paws::Glacier
+Paws::Glacier::DescribeJob - Arguments for method DescribeJob on L<Paws::Glacier>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DescribeJob on the 
-Amazon Glacier service. Use the attributes of this class
+This class represents the parameters used for calling the method DescribeJob on the
+L<Amazon Glacier|Paws::Glacier> service. Use the attributes of this class
 as arguments to method DescribeJob.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DescribeJob.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DescribeJob(Att1 => $value1, Att2 => $value2, ...);
+    my $glacier = Paws->service('Glacier');
+    # To get information about a previously initiated job
+    # The example returns information about the previously initiated job
+    # specified by the job ID.
+    my $GlacierJobDescription = $glacier->DescribeJob(
+      {
+        'JobId' =>
+'zbxcm3Z_3z5UkoroF7SuZKrxgGoDc3RloGduS7Eg-RO47Yc6FxsdGBgf_Q2DK5Ejh18CnTS5XW4_XqlNHS61dsO4Cn',
+        'AccountId' => '-',
+        'VaultName' => 'my-vault'
+      }
+    );
+
+    # Results:
+    my $CreationDate = $GlacierJobDescription->CreationDate;
+    my $Action       = $GlacierJobDescription->Action;
+    my $VaultARN     = $GlacierJobDescription->VaultARN;
+    my $StatusCode   = $GlacierJobDescription->StatusCode;
+    my $InventoryRetrievalParameters =
+      $GlacierJobDescription->InventoryRetrievalParameters;
+    my $Completed = $GlacierJobDescription->Completed;
+    my $JobId     = $GlacierJobDescription->JobId;
+
+    # Returns a L<Paws::Glacier::GlacierJobDescription> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/glacier/>
 
 =head1 ATTRIBUTES
 
@@ -66,9 +89,9 @@ This class forms part of L<Paws>, documenting arguments for method DescribeJob i
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

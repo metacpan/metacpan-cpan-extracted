@@ -1,7 +1,7 @@
 package App::DuckPAN::WebPublisher;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Webserver for duckpan publisher
-$App::DuckPAN::WebPublisher::VERSION = '1019';
+$App::DuckPAN::WebPublisher::VERSION = '1021';
 use Moo;
 with qw( App::DuckPAN::HasApp );
 
@@ -110,7 +110,7 @@ App::DuckPAN::WebPublisher - Webserver for duckpan publisher
 
 =head1 VERSION
 
-version 1019
+version 1021
 
 =head1 AUTHOR
 

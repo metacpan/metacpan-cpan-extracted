@@ -1,92 +1,90 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -T 
 
 # csv2tsv 
 #   Toshiyuki Shimono at Uhuru Corporation in Tokyo.
-#   2015-09-28 , 2016-07-06
+#   2015-09-28 , 2016-07-06, 2018-06-08
 
 use 5.014 ; use strict ; use warnings ;  # Confirmed also for 5.010 
-use Getopt::Std ; getopts "f:g:nwWq2", \my %o ;
-use Text::CSV_XS ; 
+use Getopt::Std ; getopts '!~2n:t:', \my %o ;
+use Text::CSV_XS ;  #  Not a core module.
 use FindBin qw [ $Script ] ; 
 use Term::ANSIColor qw[ :constants color ] ; $Term::ANSIColor::AUTORESET = 1 ; 
 
-sub initOpt ( ) ;
-sub main ( ) ; 
-
-my $tTo = defined $o{f} ? eval qq[qq[$o{f}]] : "\t" ; # レコード(セル)に現れたタブ文字を何の文字列に置き換えるか
-my $nTo = defined $o{g} ? eval qq[qq[$o{g}]] : "\n" ; # レコード(セル)に現れた改行文字を何の文字列に置き換えるか
-
-my $replaceFlag = 1 if defined $o{f} || defined $o{g} || ! $o{n} ;
-my ( $cntN , $fldN, $linesN ) = (0,0,0) ; # レコード中の改行文字の数 <-- - "\n" 以外の改行文字の対策はどうする?  perlport をよく読もう
-my ( $cntT , $fldT, $linesT ) = (0,0,0) ; # レコード中のタブ文字の数
-
-#END{ warn YELLOW "wer"} ;
-
-initOpt ; 
-main ; 
+my $tE = ! defined $o{t} ? "\t" : $o{t} ; # eval qq[qq[$o{t}]] # レコード(セル)に現れたタブ文字を何の文字列に置き換えるか
+my $nE = ! defined $o{n} ? "\n" : $o{n} ; # eval qq[qq[$o{n}]]  # レコード(セル)に現れた改行文字を何の文字列に置き換えるか
+my $tnChange = defined $o{t} || defined $o{n} ;
+my ( $tC , $tF, $tL ) = (0,0,0) ; # タブ文字の、個数、フィールド数、行数
+my ( $nC , $nF, $nL ) = (0,0,0) ; # 改行文字の数 <-- - "\n" 以外の改行文字の対策はどうする?  perlport をよく読もう
+& rev if $o{'~'} ;
+& main ; 
 exit 0 ;
 
-# 1. 読取りのハンドラの文字コードを決めたりする。
-sub initOpt ( ) { 
-  if ( @ARGV ) { 
-  	pipe *STDIN , my $WH ; 
-  	print {$WH} $_ while ( <> ) ; # <- やや思い処理になる可能性がある。
-  	close $WH ;
+sub rev ( ) { 
+  while (<>){ 
+    chomp ; 
+    s/\r$// ;
+    my @F = split /\t/, $_ , -1 ; 
+    print join ',' , map {qq["$_"]} @F ;
+    print "\n" ;
   }
-  binmode STDIN, ":encoding(utf8)" if ! $o{w} ; 
-  binmode STDIN, ":encoding(cp932)" if $o{w} ; # <-- - "cp932" 以外が良い可能性は? 絵文字はどうするか?
-  binmode STDOUT,":encoding(utf8)";
-  $/ = "\r\n" if $o{W} ;
+  exit 0; 
 }
 
 sub main ( ) { 
+  binmode *STDOUT , ":utf8" ;
   print STDERR RED "Waiting CSV-formatted input from STDIN.. ($Script)  \n" if -t ; 
   eval { reading ( ) } ; 
-  warn $@ if $@ ; # <-- CSV形式から少し違うと、END{}は実行を続けることはできるが、この行は実行しないようだ。この行は何の役に立つのか?
+  #END { warn $@ if $@ } ; # <-- CSV形式から少し違うと、END{}は実行を続けることはできるが、この行は実行しないようだ。この行は何の役に立つのか?
 }
 
 sub reading ( ) {
-  my $li = 1 ; # CSV で読み込んでいるので、$. は2以上増えることがある。読み取る度に、 $li から $. 行目までと認識するため。
-  my $csv = Text::CSV_XS -> new ( { binary => 1 } );
-  while ( my $x = $csv -> getline( *STDIN ) ) { 
+  my $lines = 1 ; # CSV で読み込んでいるので、$. は2以上増えることがある。読み取る度に、 $lines から $. 行目までと認識するため。
+  our $csv = Text::CSV_XS -> new ( { binary => 1 } );
+
+  while ( my $x = $csv -> getline( *ARGV ) ) {   # *ARGVはOld(er) support と perldoc Text::CSV_XSに記載あり。将来サポートされないかも。
     my @F = @$x ; 
     # 入力レコード中にタブ文字か改行文字が現れた場合に、カウントし、表示する。
-    if ( ! $o{n} ) { 
-      my ( $cn, $ct ) ; 
-      print STDERR BRIGHT_RED qq[Warning: "\\n" detected at input line $li - $.. ($Script)\n] if $cn = grep { m/\n/ } @F and ++ $linesN and $fldN += $cn ; 
-      print STDERR BRIGHT_RED qq[Warning: "\\t" detected at input line $li - $.. ($Script)\n] if $ct = grep { m/\t/ } @F and ++ $linesT and $fldT += $ct ; 
+    if ( ! $o{'!'} ) { 
+      my ( $cn, $ct ) ; # その行での、改行文字の個数とタブ文字の発生したフィールドの個数
+      print STDERR BRIGHT_RED qq[Warning: "\\n" detected at input btw. $lines - $. -th line ($Script)\n] if $cn = grep { m/\n/ } @F and ++ $nL and $nF += $cn ; 
+      print STDERR BRIGHT_RED qq[Warning: "\\t" detected at input btw. $lines - $. -th line ($Script)\n] if $ct = grep { m/\t/ } @F and ++ $tL and $tF += $ct ; 
     }
 
     # タブ文字と改行文字を置換する。(改行文字を任意の指定文字、タブ文字を任意の指定文字に変換するだけだが、ややこしいアルゴリズムを採用せざるを得ず)
-    if ( $replaceFlag ) { 
+    if ( $tnChange ) { 
       for ( @F ) { 
-        my @tmp = split /(\t|\n)/ , $_ , -1 ; 
-        $_ = join '' , map {  $_ eq "\t" ? do{ $cntT++ ; $tTo } : $_ eq "\n" ? do{ $cntN++ ;$nTo }: $_ } @tmp  ;
+        my @tmp = split /([\t\n])/ , $_ , -1 ; #print CYAN join "-", @tmp ;
+        $_ = join '' , map {  $_ eq "\t" ? do{ $tC++ ; $tE } : $_ eq "\n" ? do{ $nC++ ;$nE }: $_ } @tmp  ;
       }
     }
 
-    # 中心的な処理
-    print join "\t", @F ;  
-    print "\n" ;
+    # 出力処理
+    print join ("\t", @F) . "\n" ;  
+    print "\n" if $o{2} ; #     # 出力各行の間に空行を挿入する場合の処理
 
-    # 出力各行の間に空行を挿入する場合の処理
-    if ( $o{2} ) { 
-        print "\n" ; 
-    }
-  }
-  continue { 
-    $li = $. + 1 ;
+    $lines = $. + 1 ; # <- tricky!
   }
   $csv->eof; # <-- - 必要か?
 
-  return if $o{n} ; 
-  print STDERR GREEN qq[Totally "\\n" appeared in $fldN record(s) in $linesN line(s) for output.] if $linesN ; 
-  print STDERR GREEN qq[ $cntN count(s) of "\\n" in input.] if $cntN ; 
-  print STDERR "\n" if $linesN || $cntN ; 
-  print STDERR GREEN qq[Totally "\\t" appeared in $fldT record(s) in $linesT line(s) for output.] if $linesT ; 
-  print STDERR GREEN qq[ $cntT count(s) of "\\t" in input.] if $cntT ; 
-  print STDERR "\n" if $linesT || $cntT ; 
+  return if $o{'!'} ; 
+  print STDERR GREEN qq[Totally "\\n" appeared in $nF record(s) in $nL line(s) for output.] if $nL ; 
+  print STDERR GREEN qq[ $nC count(s) of "\\n" in input.] if $nC ; 
+  print STDERR "\n" if $nL || $nC ; 
+  print STDERR GREEN qq[Totally "\\t" appeared in $tF record(s) in $tL line(s) for output.] if $tL ; 
+  print STDERR GREEN qq[ $tC count(s) of "\\t" in input.] if $tC ; 
+  print STDERR "\n" if $tL || $tC ; 
+
+
+  END{ 
+    exit if $o{'~'} ;
+    my @tmp = $csv -> error_diag () ; # ($cde, $str, $pos, $rec, $fld) = $csv->error_diag ();
+    if ( $tmp[0] != 2012 ) {  # perldoc Text::CSV_XS で 2012 を参照。EOFを意味する。
+      print STDERR BRIGHT_RED join (":",@tmp),"\n" ;
+      exit 1 ; 
+    }
+  }
 }
+
 
 ## ヘルプの扱い
 sub VERSION_MESSAGE {}
@@ -109,30 +107,18 @@ sub HELP_MESSAGE {
   $0 file.csv > file.tsv 
   $0 < file.csv > file.tsv 
 
-  CSV 形式のファイルを TSV形式 に変換する。
+  CSV 形式(RFC 4180)のファイルを TSV形式(タブ文字区切り) に変換する。
   出力については、文字コード UTF-8 で改行コードは "\n" となる。
-
-
- 注意点:
-
-  内部ではText::CSV_XS のライブラリに依存している。
-  "絵文字" に対応していないことに注意。(要改良)
-
 
  オプション:
 
-   -n : 入力のレコード内に、タブ文字または改行文字があっても、警告を出さない(no check)
-   -f str : 入力にタブ文字があれば、それを何に置き換えるかを文字列表現で指定する。
-   -g str : 入力に改行文字があれば、それを何に置き換えるかを文字列表現で指定する。
-
-   -w : 入力の文字コードを cp932  (シフトJIS) と見なす。
-   -W : 入力の改行コードを \r\n と見なす。
+   -t str : 入力にタブ文字があれば、それを何に置き換えるかを文字列表現で指定する。
+   -n str : 入力に改行文字があれば、それを何に置き換えるかを文字列表現で指定する。
+   -! : 入力のレコード内に、タブ文字または改行文字があっても、警告を出さない。付けることで高速化はする。(no check)
    -2 : レコードの区切りを単一の \n ではなくて、2個続けた \n\n にする。CSVのセル内に改行文字がある場合に使うかもしれない。
+
+   -~ : TSV形式からCSV形式に変換。各レコードをダブルクォーテーションで囲み、コンマで区切る。     
 
   --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
   --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
-
- 開発上のメモ: 
-   * (改行文字が、Unix 形式でない場合にも "自動的に" 対処するようにしたい。)
-   * 改行文字やタブ文字を、置換した場合の文字列、さらに、その文字列が他の文字列と一緒になる場合の対策も、実装したい。
 =cut

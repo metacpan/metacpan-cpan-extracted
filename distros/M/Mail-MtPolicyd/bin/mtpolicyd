@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
 # ABSTRACT: the mtpolicyd executable
 # PODNAME: mtpolicyd
 
@@ -23,7 +23,7 @@ mtpolicyd - the mtpolicyd executable
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 DESCRIPTION
 
@@ -32,8 +32,6 @@ mtpolicyd is a policy daemon for postfix access delegation.
 It can be configured to accept connections on several ports from a postfix mta.
 For each port a VirtualHost can be configured and for each VirtualHost several
 Plugins can be configured.
-
-For more info, mailing list, see: L<https://www.mtpolicyd.org>
 
 =head1 NAME
 

@@ -17,21 +17,38 @@ package Paws::RDS::ModifyOptionGroup;
 
 =head1 NAME
 
-Paws::RDS::ModifyOptionGroup - Arguments for method ModifyOptionGroup on Paws::RDS
+Paws::RDS::ModifyOptionGroup - Arguments for method ModifyOptionGroup on L<Paws::RDS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ModifyOptionGroup on the 
-Amazon Relational Database Service service. Use the attributes of this class
+This class represents the parameters used for calling the method ModifyOptionGroup on the
+L<Amazon Relational Database Service|Paws::RDS> service. Use the attributes of this class
 as arguments to method ModifyOptionGroup.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ModifyOptionGroup.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ModifyOptionGroup(Att1 => $value1, Att2 => $value2, ...);
+    my $rds = Paws->service('RDS');
+    # To modify an option group
+    # The following example adds an option to an option group.
+    my $ModifyOptionGroupResult = $rds->ModifyOptionGroup(
+      {
+        'OptionGroupName'  => 'myawsuser-og02',
+        'OptionsToInclude' => [
+
+          {
+            'DBSecurityGroupMemberships' => ['default'],
+            'OptionName'                 => 'MEMCACHED'
+          }
+        ],
+        'ApplyImmediately' => true
+      }
+    );
+
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/rds/ModifyOptionGroup>
 
 =head1 ATTRIBUTES
 
@@ -49,9 +66,8 @@ option group.
 The name of the option group to be modified.
 
 Permanent options, such as the TDE option for Oracle Advanced Security
-TDE, cannot be removed from an option group, and that option group
-cannot be removed from a DB instance once it is associated with a DB
-instance
+TDE, can't be removed from an option group, and that option group can't
+be removed from a DB instance once it is associated with a DB instance
 
 
 
@@ -76,9 +92,9 @@ This class forms part of L<Paws>, documenting arguments for method ModifyOptionG
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

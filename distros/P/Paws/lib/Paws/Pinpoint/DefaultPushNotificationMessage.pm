@@ -3,7 +3,6 @@ package Paws::Pinpoint::DefaultPushNotificationMessage;
   has Action => (is => 'ro', isa => 'Str');
   has Body => (is => 'ro', isa => 'Str');
   has Data => (is => 'ro', isa => 'Paws::Pinpoint::MapOf__string');
-  has JsonData => (is => 'ro', isa => 'Str');
   has SilentPush => (is => 'ro', isa => 'Bool');
   has Substitutions => (is => 'ro', isa => 'Paws::Pinpoint::MapOfListOf__string');
   has Title => (is => 'ro', isa => 'Str');
@@ -67,12 +66,6 @@ message.
 notifications' data.pinpoint.jsonBody' object
 
 
-=head2 JsonData => Str
-
-  The data payload used for a silent push. This payload is added to the
-notifications' data.pinpoint.jsonBody' object
-
-
 =head2 SilentPush => Bool
 
   Indicates if the message should display on the users device. Silent
@@ -103,9 +96,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Pinpoint>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

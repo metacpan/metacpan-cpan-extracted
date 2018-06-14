@@ -20,21 +20,36 @@ package Paws::SSM::PutParameter;
 
 =head1 NAME
 
-Paws::SSM::PutParameter - Arguments for method PutParameter on Paws::SSM
+Paws::SSM::PutParameter - Arguments for method PutParameter on L<Paws::SSM>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method PutParameter on the 
-Amazon Simple Systems Manager (SSM) service. Use the attributes of this class
+This class represents the parameters used for calling the method PutParameter on the
+L<Amazon Simple Systems Manager (SSM)|Paws::SSM> service. Use the attributes of this class
 as arguments to method PutParameter.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to PutParameter.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->PutParameter(Att1 => $value1, Att2 => $value2, ...);
+    my $ssm = Paws->service('SSM');
+    my $PutParameterResult = $ssm->PutParameter(
+      Name           => 'MyPSParameterName',
+      Type           => 'String',
+      Value          => 'MyPSParameterValue',
+      AllowedPattern => 'MyAllowedPattern',          # OPTIONAL
+      Description    => 'MyParameterDescription',    # OPTIONAL
+      KeyId          => 'MyParameterKeyId',          # OPTIONAL
+      Overwrite      => 1,                           # OPTIONAL
+    );
+
+    # Results:
+    my $Version = $PutParameterResult->Version;
+
+    # Returns a L<Paws::SSM::PutParameterResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ssm/PutParameter>
 
 =head1 ATTRIBUTES
 
@@ -49,7 +64,9 @@ following: AllowedPattern=^\d+$
 
 =head2 Description => Str
 
-Information about the parameter that you want to add to the system
+Information about the parameter that you want to add to the system.
+
+Do not enter personally identifiable information in this field.
 
 
 
@@ -63,7 +80,19 @@ system uses the default key associated with your AWS account.
 
 =head2 B<REQUIRED> Name => Str
 
-The name of the parameter that you want to add to the system.
+The fully qualified name of the parameter that you want to add to the
+system. The fully qualified name includes the complete hierarchy of the
+parameter path and name. For example:
+C</Dev/DBServer/MySQL/db-string13>
+
+For information about parameter name requirements and restrictions, see
+About Creating Systems Manager Parameters
+(http://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-paramstore-su-create.html#sysman-paramstore-su-create-about)
+in the I<AWS Systems Manager User Guide>.
+
+The maximum length constraint listed below includes capacity for
+additional system attributes that are not part of the name. The maximum
+length for the fully qualified parameter name is 1011 characters.
 
 
 
@@ -93,9 +122,9 @@ This class forms part of L<Paws>, documenting arguments for method PutParameter 
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

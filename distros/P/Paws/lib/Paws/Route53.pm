@@ -2,6 +2,7 @@ package Paws::Route53;
   warn "Paws::Route53 is not stable / supported / entirely developed";
   use Moose;
   sub service { 'route53' }
+  sub signing_name { 'route53' }
   sub version { '2013-04-01' }
   sub flattened_arrays { 0 }
   has max_attempts => (is => 'ro', isa => 'Int', default => 5);
@@ -13,7 +14,7 @@ package Paws::Route53;
        sub { defined $_[0]->http_status and $_[0]->http_status == 400 and $_[0]->code eq 'PriorRequestNotComplete' },
   ] });
 
-  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::RestXmlCaller', 'Paws::Net::RestXMLResponse';
+  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::RestXmlCaller';
 
   has '+region_rules' => (default => sub {
     my $regioninfo;
@@ -134,6 +135,11 @@ package Paws::Route53;
     my $call_object = $self->new_with_coercions('Paws::Route53::DisassociateVPCFromHostedZone', @_);
     return $self->caller->do_call($self, $call_object);
   }
+  sub GetAccountLimit {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Route53::GetAccountLimit', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
   sub GetChange {
     my $self = shift;
     my $call_object = $self->new_with_coercions('Paws::Route53::GetChange', @_);
@@ -179,6 +185,11 @@ package Paws::Route53;
     my $call_object = $self->new_with_coercions('Paws::Route53::GetHostedZoneCount', @_);
     return $self->caller->do_call($self, $call_object);
   }
+  sub GetHostedZoneLimit {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Route53::GetHostedZoneLimit', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
   sub GetQueryLoggingConfig {
     my $self = shift;
     my $call_object = $self->new_with_coercions('Paws::Route53::GetQueryLoggingConfig', @_);
@@ -187,6 +198,11 @@ package Paws::Route53;
   sub GetReusableDelegationSet {
     my $self = shift;
     my $call_object = $self->new_with_coercions('Paws::Route53::GetReusableDelegationSet', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub GetReusableDelegationSetLimit {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Route53::GetReusableDelegationSetLimit', @_);
     return $self->caller->do_call($self, $call_object);
   }
   sub GetTrafficPolicy {
@@ -376,7 +392,7 @@ package Paws::Route53;
   }
 
 
-  sub operations { qw/AssociateVPCWithHostedZone ChangeResourceRecordSets ChangeTagsForResource CreateHealthCheck CreateHostedZone CreateQueryLoggingConfig CreateReusableDelegationSet CreateTrafficPolicy CreateTrafficPolicyInstance CreateTrafficPolicyVersion CreateVPCAssociationAuthorization DeleteHealthCheck DeleteHostedZone DeleteQueryLoggingConfig DeleteReusableDelegationSet DeleteTrafficPolicy DeleteTrafficPolicyInstance DeleteVPCAssociationAuthorization DisassociateVPCFromHostedZone GetChange GetCheckerIpRanges GetGeoLocation GetHealthCheck GetHealthCheckCount GetHealthCheckLastFailureReason GetHealthCheckStatus GetHostedZone GetHostedZoneCount GetQueryLoggingConfig GetReusableDelegationSet GetTrafficPolicy GetTrafficPolicyInstance GetTrafficPolicyInstanceCount ListGeoLocations ListHealthChecks ListHostedZones ListHostedZonesByName ListQueryLoggingConfigs ListResourceRecordSets ListReusableDelegationSets ListTagsForResource ListTagsForResources ListTrafficPolicies ListTrafficPolicyInstances ListTrafficPolicyInstancesByHostedZone ListTrafficPolicyInstancesByPolicy ListTrafficPolicyVersions ListVPCAssociationAuthorizations TestDNSAnswer UpdateHealthCheck UpdateHostedZoneComment UpdateTrafficPolicyComment UpdateTrafficPolicyInstance / }
+  sub operations { qw/AssociateVPCWithHostedZone ChangeResourceRecordSets ChangeTagsForResource CreateHealthCheck CreateHostedZone CreateQueryLoggingConfig CreateReusableDelegationSet CreateTrafficPolicy CreateTrafficPolicyInstance CreateTrafficPolicyVersion CreateVPCAssociationAuthorization DeleteHealthCheck DeleteHostedZone DeleteQueryLoggingConfig DeleteReusableDelegationSet DeleteTrafficPolicy DeleteTrafficPolicyInstance DeleteVPCAssociationAuthorization DisassociateVPCFromHostedZone GetAccountLimit GetChange GetCheckerIpRanges GetGeoLocation GetHealthCheck GetHealthCheckCount GetHealthCheckLastFailureReason GetHealthCheckStatus GetHostedZone GetHostedZoneCount GetHostedZoneLimit GetQueryLoggingConfig GetReusableDelegationSet GetReusableDelegationSetLimit GetTrafficPolicy GetTrafficPolicyInstance GetTrafficPolicyInstanceCount ListGeoLocations ListHealthChecks ListHostedZones ListHostedZonesByName ListQueryLoggingConfigs ListResourceRecordSets ListReusableDelegationSets ListTagsForResource ListTagsForResources ListTrafficPolicies ListTrafficPolicyInstances ListTrafficPolicyInstancesByHostedZone ListTrafficPolicyInstancesByPolicy ListTrafficPolicyVersions ListVPCAssociationAuthorizations TestDNSAnswer UpdateHealthCheck UpdateHostedZoneComment UpdateTrafficPolicyComment UpdateTrafficPolicyInstance / }
 
 1;
 
@@ -418,17 +434,32 @@ friendly domains names like www.example.com into IP addresses like
 192.0.2.1. Amazon Route 53 responds to DNS queries using a global
 network of authoritative DNS servers, which reduces latency. For a list
 of the locations of Amazon Route 53 DNS servers, see The Amazon Route
-53 Global Network on the Amazon Route 53 detail page.
+53 Global Network (http://aws.amazon.com/route53/#details) on the
+Amazon Route 53 detail page.
+
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/route53-2013-04-01>
+
 
 =head1 METHODS
 
-=head2 AssociateVPCWithHostedZone(HostedZoneId => Str, VPC => L<Paws::Route53::VPC>, [Comment => Str])
+=head2 AssociateVPCWithHostedZone
+
+=over
+
+=item HostedZoneId => Str
+
+=item VPC => L<Paws::Route53::VPC>
+
+=item [Comment => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::AssociateVPCWithHostedZone>
 
 Returns: a L<Paws::Route53::AssociateVPCWithHostedZoneResponse> instance
 
-  Associates an Amazon VPC with a private hosted zone.
+Associates an Amazon VPC with a private hosted zone.
 
 To perform the association, the VPC and the private hosted zone must
 already exist. You can't convert a public hosted zone into a private
@@ -442,13 +473,22 @@ the account that created the VPC must submit an
 C<AssociateVPCWithHostedZone> request.
 
 
-=head2 ChangeResourceRecordSets(ChangeBatch => L<Paws::Route53::ChangeBatch>, HostedZoneId => Str)
+=head2 ChangeResourceRecordSets
+
+=over
+
+=item ChangeBatch => L<Paws::Route53::ChangeBatch>
+
+=item HostedZoneId => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::ChangeResourceRecordSets>
 
 Returns: a L<Paws::Route53::ChangeResourceRecordSetsResponse> instance
 
-  Creates, changes, or deletes a resource record set, which contains
+Creates, changes, or deletes a resource record set, which contains
 authoritative DNS information for a specified domain name or subdomain
 name. For example, you can use C<ChangeResourceRecordSets> to create a
 resource record set that routes traffic for test.example.com to a web
@@ -488,7 +528,9 @@ policy with one or more domain names (such as example.com) or subdomain
 names (such as www.example.com), in the same hosted zone or in multiple
 hosted zones. You can roll back the updates if the new configuration
 isn't performing as expected. For more information, see Using Traffic
-Flow to Route DNS Traffic in the I<Amazon Route 53 Developer Guide>.
+Flow to Route DNS Traffic
+(http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/traffic-flow.html)
+in the I<Amazon Route 53 Developer Guide>.
 
 B<Create, Delete, and Upsert>
 
@@ -540,28 +582,54 @@ see GetChange.
 B<Limits on ChangeResourceRecordSets Requests>
 
 For information about the limits on a C<ChangeResourceRecordSets>
-request, see Limits in the I<Amazon Route 53 Developer Guide>.
+request, see Limits
+(http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/DNSLimitations.html)
+in the I<Amazon Route 53 Developer Guide>.
 
 
-=head2 ChangeTagsForResource(ResourceId => Str, ResourceType => Str, [AddTags => ArrayRef[L<Paws::Route53::Tag>], RemoveTagKeys => ArrayRef[Str|Undef]])
+=head2 ChangeTagsForResource
+
+=over
+
+=item ResourceId => Str
+
+=item ResourceType => Str
+
+=item [AddTags => ArrayRef[L<Paws::Route53::Tag>]]
+
+=item [RemoveTagKeys => ArrayRef[Str|Undef]]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::ChangeTagsForResource>
 
 Returns: a L<Paws::Route53::ChangeTagsForResourceResponse> instance
 
-  Adds, edits, or deletes tags for a health check or a hosted zone.
+Adds, edits, or deletes tags for a health check or a hosted zone.
 
 For information about using tags for cost allocation, see Using Cost
-Allocation Tags in the I<AWS Billing and Cost Management User Guide>.
+Allocation Tags
+(http://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html)
+in the I<AWS Billing and Cost Management User Guide>.
 
 
-=head2 CreateHealthCheck(CallerReference => Str, HealthCheckConfig => L<Paws::Route53::HealthCheckConfig>)
+=head2 CreateHealthCheck
+
+=over
+
+=item CallerReference => Str
+
+=item HealthCheckConfig => L<Paws::Route53::HealthCheckConfig>
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::CreateHealthCheck>
 
 Returns: a L<Paws::Route53::CreateHealthCheckResponse> instance
 
-  Creates a new health check.
+Creates a new health check.
 
 For information about adding health checks to resource record sets, see
 ResourceRecordSet$HealthCheckId in ChangeResourceRecordSets.
@@ -601,19 +669,35 @@ status of the Amazon EC2 C<StatusCheckFailed> metric, add an alarm to
 the metric, and then create a health check that is based on the state
 of the alarm. For information about creating CloudWatch metrics and
 alarms by using the CloudWatch console, see the Amazon CloudWatch User
-Guide.
+Guide
+(http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/WhatIsCloudWatch.html).
 
 =back
 
 
 
-=head2 CreateHostedZone(CallerReference => Str, Name => Str, [DelegationSetId => Str, HostedZoneConfig => L<Paws::Route53::HostedZoneConfig>, VPC => L<Paws::Route53::VPC>])
+=head2 CreateHostedZone
+
+=over
+
+=item CallerReference => Str
+
+=item Name => Str
+
+=item [DelegationSetId => Str]
+
+=item [HostedZoneConfig => L<Paws::Route53::HostedZoneConfig>]
+
+=item [VPC => L<Paws::Route53::VPC>]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::CreateHostedZone>
 
 Returns: a L<Paws::Route53::CreateHostedZoneResponse> instance
 
-  Creates a new public hosted zone, which you use to specify how the
+Creates a new public hosted zone, which you use to specify how the
 Domain Name System (DNS) routes traffic on the Internet for a domain,
 such as example.com, and its subdomains.
 
@@ -622,7 +706,7 @@ vice versa. Instead, you must create a new hosted zone with the same
 name and create new resource record sets.
 
 For more information about charges for hosted zones, see Amazon Route
-53 Pricing.
+53 Pricing (http://aws.amazon.com/route53/pricing/).
 
 Note the following:
 
@@ -637,6 +721,7 @@ You can't create a hosted zone for a top-level domain (TLD).
 Amazon Route 53 automatically creates a default SOA record and four NS
 records for the zone. For more information about SOA and NS records,
 see NS and SOA Records that Amazon Route 53 Creates for a Hosted Zone
+(http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/SOA-NSrecords.html)
 in the I<Amazon Route 53 Developer Guide>.
 
 If you want to use the same name servers for multiple hosted zones, you
@@ -648,7 +733,9 @@ zone. See the C<DelegationSetId> element.
 If your domain is registered with a registrar other than Amazon Route
 53, you must update the name servers with your registrar to make Amazon
 Route 53 your DNS service. For more information, see Configuring Amazon
-Route 53 as your DNS Service in the I<Amazon Route 53 Developer Guide>.
+Route 53 as your DNS Service
+(http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/creating-migrating.html)
+in the I<Amazon Route 53 Developer Guide>.
 
 =back
 
@@ -659,13 +746,22 @@ and SOA records are available, the status of the zone changes to
 C<INSYNC>.
 
 
-=head2 CreateQueryLoggingConfig(CloudWatchLogsLogGroupArn => Str, HostedZoneId => Str)
+=head2 CreateQueryLoggingConfig
+
+=over
+
+=item CloudWatchLogsLogGroupArn => Str
+
+=item HostedZoneId => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::CreateQueryLoggingConfig>
 
 Returns: a L<Paws::Route53::CreateQueryLoggingConfigResponse> instance
 
-  Creates a configuration for DNS query logging. After you create a query
+Creates a configuration for DNS query logging. After you create a query
 logging configuration, Amazon Route 53 begins to publish log data to an
 Amazon CloudWatch Logs log group.
 
@@ -740,9 +836,9 @@ log groups that you create for query logging.
 =item 2.
 
 Create a CloudWatch Logs resource policy, and give it the permissions
-that Amazon Route 53 needs to create log streams and to to send query
-logs to log streams. For the value of C<Resource>, specify the ARN for
-the log group that you created in the previous step. To use the same
+that Amazon Route 53 needs to create log streams and to send query logs
+to log streams. For the value of C<Resource>, specify the ARN for the
+log group that you created in the previous step. To use the same
 resource policy for all the CloudWatch Logs log groups that you created
 for query logging configurations, replace the hosted zone name with
 C<*>, for example:
@@ -784,7 +880,8 @@ assigned number, for example, DFW3. The three-letter code typically
 corresponds with the International Air Transport Association airport
 code for an airport near the edge location. (These abbreviations might
 change in the future.) For a list of edge locations, see "The Amazon
-Route 53 Global Network" on the Amazon Route 53 Product Details page.
+Route 53 Global Network" on the Amazon Route 53 Product Details
+(http://aws.amazon.com/route53/details/) page.
 
 =item Queries That Are Logged
 
@@ -798,19 +895,21 @@ queries are submitted for a resource record set, and depending on the
 TTL for that resource record set, query logs might contain information
 about only one query out of every several thousand queries that are
 submitted to DNS. For more information about how DNS works, see Routing
-Internet Traffic to Your Website or Web Application in the I<Amazon
-Route 53 Developer Guide>.
+Internet Traffic to Your Website or Web Application
+(http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/welcome-dns-service.html)
+in the I<Amazon Route 53 Developer Guide>.
 
 =item Log File Format
 
 For a list of the values in each query log and the format of each
-value, see Logging DNS Queries in the I<Amazon Route 53 Developer
-Guide>.
+value, see Logging DNS Queries
+(http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/query-logs.html)
+in the I<Amazon Route 53 Developer Guide>.
 
 =item Pricing
 
 For information about charges for query logs, see Amazon CloudWatch
-Pricing.
+Pricing (http://aws.amazon.com/cloudwatch/pricing/).
 
 =item How to Stop Logging
 
@@ -822,42 +921,141 @@ DeleteQueryLoggingConfig.
 
 
 
-=head2 CreateReusableDelegationSet(CallerReference => Str, [HostedZoneId => Str])
+=head2 CreateReusableDelegationSet
+
+=over
+
+=item CallerReference => Str
+
+=item [HostedZoneId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::CreateReusableDelegationSet>
 
 Returns: a L<Paws::Route53::CreateReusableDelegationSetResponse> instance
 
-  Creates a delegation set (a group of four name servers) that can be
+Creates a delegation set (a group of four name servers) that can be
 reused by multiple hosted zones. If a hosted zoned ID is specified,
 C<CreateReusableDelegationSet> marks the delegation set associated with
-that zone as reusable
+that zone as reusable.
 
-A reusable delegation set can't be associated with a private hosted
+You can't associate a reusable delegation set with a private hosted
 zone.
 
-For information on how to use a reusable delegation set to configure
-white label name servers, see Configuring White Label Name Servers.
+For information about using a reusable delegation set to configure
+white label name servers, see Configuring White Label Name Servers
+(http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/white-label-name-servers.html).
+
+The process for migrating existing hosted zones to use a reusable
+delegation set is comparable to the process for configuring white label
+name servers. You need to perform the following steps:
+
+=over
+
+=item 1.
+
+Create a reusable delegation set.
+
+=item 2.
+
+Recreate hosted zones, and reduce the TTL to 60 seconds or less.
+
+=item 3.
+
+Recreate resource record sets in the new hosted zones.
+
+=item 4.
+
+Change the registrar's name servers to use the name servers for the new
+hosted zones.
+
+=item 5.
+
+Monitor traffic for the website or application.
+
+=item 6.
+
+Change TTLs back to their original values.
+
+=back
+
+If you want to migrate existing hosted zones to use a reusable
+delegation set, the existing hosted zones can't use any of the name
+servers that are assigned to the reusable delegation set. If one or
+more hosted zones do use one or more name servers that are assigned to
+the reusable delegation set, you can do one of the following:
+
+=over
+
+=item *
+
+For small numbers of hosted zonesE<mdash>up to a few
+hundredE<mdash>it's relatively easy to create reusable delegation sets
+until you get one that has four name servers that don't overlap with
+any of the name servers in your hosted zones.
+
+=item *
+
+For larger numbers of hosted zones, the easiest solution is to use more
+than one reusable delegation set.
+
+=item *
+
+For larger numbers of hosted zones, you can also migrate hosted zones
+that have overlapping name servers to hosted zones that don't have
+overlapping name servers, then migrate the hosted zones again to use
+the reusable delegation set.
+
+=back
 
 
-=head2 CreateTrafficPolicy(Document => Str, Name => Str, [Comment => Str])
+
+=head2 CreateTrafficPolicy
+
+=over
+
+=item Document => Str
+
+=item Name => Str
+
+=item [Comment => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::CreateTrafficPolicy>
 
 Returns: a L<Paws::Route53::CreateTrafficPolicyResponse> instance
 
-  Creates a traffic policy, which you use to create multiple DNS resource
+Creates a traffic policy, which you use to create multiple DNS resource
 record sets for one domain name (such as example.com) or one subdomain
 name (such as www.example.com).
 
 
-=head2 CreateTrafficPolicyInstance(HostedZoneId => Str, Name => Str, TrafficPolicyId => Str, TrafficPolicyVersion => Int, TTL => Int)
+=head2 CreateTrafficPolicyInstance
+
+=over
+
+=item HostedZoneId => Str
+
+=item Name => Str
+
+=item TrafficPolicyId => Str
+
+=item TrafficPolicyVersion => Int
+
+=item TTL => Int
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::CreateTrafficPolicyInstance>
 
 Returns: a L<Paws::Route53::CreateTrafficPolicyInstanceResponse> instance
 
-  Creates resource record sets in a specified hosted zone based on the
+Creates resource record sets in a specified hosted zone based on the
 settings in a specified traffic policy version. In addition,
 C<CreateTrafficPolicyInstance> associates the resource record sets with
 a specified domain name (such as example.com) or subdomain name (such
@@ -866,13 +1064,24 @@ domain or subdomain name by using the resource record sets that
 C<CreateTrafficPolicyInstance> created.
 
 
-=head2 CreateTrafficPolicyVersion(Document => Str, Id => Str, [Comment => Str])
+=head2 CreateTrafficPolicyVersion
+
+=over
+
+=item Document => Str
+
+=item Id => Str
+
+=item [Comment => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::CreateTrafficPolicyVersion>
 
 Returns: a L<Paws::Route53::CreateTrafficPolicyVersionResponse> instance
 
-  Creates a new version of an existing traffic policy. When you create a
+Creates a new version of an existing traffic policy. When you create a
 new version of a traffic policy, you specify the ID of the traffic
 policy that you want to update and a JSON-formatted document that
 describes the new version. You use traffic policies to create multiple
@@ -882,13 +1091,22 @@ of 1000 versions of a traffic policy. If you reach the limit and need
 to create another version, you'll need to start a new traffic policy.
 
 
-=head2 CreateVPCAssociationAuthorization(HostedZoneId => Str, VPC => L<Paws::Route53::VPC>)
+=head2 CreateVPCAssociationAuthorization
+
+=over
+
+=item HostedZoneId => Str
+
+=item VPC => L<Paws::Route53::VPC>
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::CreateVPCAssociationAuthorization>
 
 Returns: a L<Paws::Route53::CreateVPCAssociationAuthorizationResponse> instance
 
-  Authorizes the AWS account that created a specified VPC to submit an
+Authorizes the AWS account that created a specified VPC to submit an
 C<AssociateVPCWithHostedZone> request to associate the VPC with a
 specified hosted zone that was created by a different account. To
 submit a C<CreateVPCAssociationAuthorization> request, you must use the
@@ -901,13 +1119,20 @@ account with a hosted zone that you created by using a different
 account, you must submit one authorization request for each VPC.
 
 
-=head2 DeleteHealthCheck(HealthCheckId => Str)
+=head2 DeleteHealthCheck
+
+=over
+
+=item HealthCheckId => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::DeleteHealthCheck>
 
 Returns: a L<Paws::Route53::DeleteHealthCheckResponse> instance
 
-  Deletes a health check.
+Deletes a health check.
 
 Amazon Route 53 does not prevent you from deleting a health check even
 if the health check is associated with one or more resource record
@@ -915,17 +1140,25 @@ sets. If you delete a health check and you don't update the associated
 resource record sets, the future status of the health check can't be
 predicted and may change. This will affect the routing of DNS queries
 for your DNS failover configuration. For more information, see
-Replacing and Deleting Health Checks in the I<Amazon Route 53 Developer
-Guide>.
+Replacing and Deleting Health Checks
+(http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/health-checks-creating-deleting.html#health-checks-deleting.html)
+in the I<Amazon Route 53 Developer Guide>.
 
 
-=head2 DeleteHostedZone(Id => Str)
+=head2 DeleteHostedZone
+
+=over
+
+=item Id => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::DeleteHostedZone>
 
 Returns: a L<Paws::Route53::DeleteHostedZoneResponse> instance
 
-  Deletes a hosted zone.
+Deletes a hosted zone.
 
 If the name servers for the hosted zone are associated with a domain
 and if you want to make the domain unavailable on the Internet, we
@@ -969,13 +1202,20 @@ associated with the current AWS account.
 
 
 
-=head2 DeleteQueryLoggingConfig(Id => Str)
+=head2 DeleteQueryLoggingConfig
+
+=over
+
+=item Id => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::DeleteQueryLoggingConfig>
 
 Returns: a L<Paws::Route53::DeleteQueryLoggingConfigResponse> instance
 
-  Deletes a configuration for DNS query logging. If you delete a
+Deletes a configuration for DNS query logging. If you delete a
 configuration, Amazon Route 53 stops sending query logs to CloudWatch
 Logs. Amazon Route 53 doesn't delete any logs that are already in
 CloudWatch Logs.
@@ -984,13 +1224,20 @@ For more information about DNS query logs, see
 CreateQueryLoggingConfig.
 
 
-=head2 DeleteReusableDelegationSet(Id => Str)
+=head2 DeleteReusableDelegationSet
+
+=over
+
+=item Id => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::DeleteReusableDelegationSet>
 
 Returns: a L<Paws::Route53::DeleteReusableDelegationSetResponse> instance
 
-  Deletes a reusable delegation set.
+Deletes a reusable delegation set.
 
 You can delete a reusable delegation set only if it isn't associated
 with any hosted zones.
@@ -1000,35 +1247,60 @@ hosted zones, submit a GetReusableDelegationSet request and specify the
 ID of the reusable delegation set that you want to delete.
 
 
-=head2 DeleteTrafficPolicy(Id => Str, Version => Int)
+=head2 DeleteTrafficPolicy
+
+=over
+
+=item Id => Str
+
+=item Version => Int
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::DeleteTrafficPolicy>
 
 Returns: a L<Paws::Route53::DeleteTrafficPolicyResponse> instance
 
-  Deletes a traffic policy.
+Deletes a traffic policy.
 
 
-=head2 DeleteTrafficPolicyInstance(Id => Str)
+=head2 DeleteTrafficPolicyInstance
+
+=over
+
+=item Id => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::DeleteTrafficPolicyInstance>
 
 Returns: a L<Paws::Route53::DeleteTrafficPolicyInstanceResponse> instance
 
-  Deletes a traffic policy instance and all of the resource record sets
+Deletes a traffic policy instance and all of the resource record sets
 that Amazon Route 53 created when you created the instance.
 
 In the Amazon Route 53 console, traffic policy instances are known as
 policy records.
 
 
-=head2 DeleteVPCAssociationAuthorization(HostedZoneId => Str, VPC => L<Paws::Route53::VPC>)
+=head2 DeleteVPCAssociationAuthorization
+
+=over
+
+=item HostedZoneId => Str
+
+=item VPC => L<Paws::Route53::VPC>
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::DeleteVPCAssociationAuthorization>
 
 Returns: a L<Paws::Route53::DeleteVPCAssociationAuthorizationResponse> instance
 
-  Removes authorization to submit an C<AssociateVPCWithHostedZone>
+Removes authorization to submit an C<AssociateVPCWithHostedZone>
 request to associate a specified VPC with a hosted zone that was
 created by a different account. You must use the account that created
 the hosted zone to submit a C<DeleteVPCAssociationAuthorization>
@@ -1042,13 +1314,24 @@ the hosted zone. If you want to delete an existing association, use
 C<DisassociateVPCFromHostedZone>.
 
 
-=head2 DisassociateVPCFromHostedZone(HostedZoneId => Str, VPC => L<Paws::Route53::VPC>, [Comment => Str])
+=head2 DisassociateVPCFromHostedZone
+
+=over
+
+=item HostedZoneId => Str
+
+=item VPC => L<Paws::Route53::VPC>
+
+=item [Comment => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::DisassociateVPCFromHostedZone>
 
 Returns: a L<Paws::Route53::DisassociateVPCFromHostedZoneResponse> instance
 
-  Disassociates a VPC from a Amazon Route 53 private hosted zone.
+Disassociates a VPC from a Amazon Route 53 private hosted zone.
 
 You can't disassociate the last VPC from a private hosted zone.
 
@@ -1057,13 +1340,43 @@ VPC is associated with the hosted zone. You also can't convert a
 private hosted zone into a public hosted zone.
 
 
-=head2 GetChange(Id => Str)
+=head2 GetAccountLimit
+
+=over
+
+=item Type => Str
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Route53::GetAccountLimit>
+
+Returns: a L<Paws::Route53::GetAccountLimitResponse> instance
+
+Gets the specified limit for the current account, for example, the
+maximum number of health checks that you can create using the account.
+
+For the default limit, see Limits
+(http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/DNSLimitations.html)
+in the I<Amazon Route 53 Developer Guide>. To request a higher limit,
+open a case
+(https://console.aws.amazon.com/support/home#/case/create?issueType=service-limit-increase&limitType=service-code-route53).
+
+
+=head2 GetChange
+
+=over
+
+=item Id => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::GetChange>
 
 Returns: a L<Paws::Route53::GetChangeResponse> instance
 
-  Returns the current status of a change batch request. The status is one
+Returns the current status of a change batch request. The status is one
 of the following values:
 
 =over
@@ -1083,25 +1396,42 @@ Route 53 DNS servers.
 
 
 
-=head2 GetCheckerIpRanges()
+=head2 GetCheckerIpRanges
+
+
+
+
+
 
 Each argument is described in detail in: L<Paws::Route53::GetCheckerIpRanges>
 
 Returns: a L<Paws::Route53::GetCheckerIpRangesResponse> instance
 
-  C<GetCheckerIpRanges> still works, but we recommend that you download
+C<GetCheckerIpRanges> still works, but we recommend that you download
 ip-ranges.json, which includes IP address ranges for all AWS services.
 For more information, see IP Address Ranges of Amazon Route 53 Servers
+(http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/route-53-ip-addresses.html)
 in the I<Amazon Route 53 Developer Guide>.
 
 
-=head2 GetGeoLocation([ContinentCode => Str, CountryCode => Str, SubdivisionCode => Str])
+=head2 GetGeoLocation
+
+=over
+
+=item [ContinentCode => Str]
+
+=item [CountryCode => Str]
+
+=item [SubdivisionCode => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::GetGeoLocation>
 
 Returns: a L<Paws::Route53::GetGeoLocationResponse> instance
 
-  Gets information about whether a specified geographic location is
+Gets information about whether a specified geographic location is
 supported for Amazon Route 53 geolocation resource record sets.
 
 Use the following syntax to determine whether a continent is supported
@@ -1123,102 +1453,221 @@ C<GET /2013-04-01/geolocation?CountryCode=I<two-character country
 code>&SubdivisionCode=I<subdivision code>>
 
 
-=head2 GetHealthCheck(HealthCheckId => Str)
+=head2 GetHealthCheck
+
+=over
+
+=item HealthCheckId => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::GetHealthCheck>
 
 Returns: a L<Paws::Route53::GetHealthCheckResponse> instance
 
-  Gets information about a specified health check.
+Gets information about a specified health check.
 
 
-=head2 GetHealthCheckCount()
+=head2 GetHealthCheckCount
+
+
+
+
+
 
 Each argument is described in detail in: L<Paws::Route53::GetHealthCheckCount>
 
 Returns: a L<Paws::Route53::GetHealthCheckCountResponse> instance
 
-  Retrieves the number of health checks that are associated with the
+Retrieves the number of health checks that are associated with the
 current AWS account.
 
 
-=head2 GetHealthCheckLastFailureReason(HealthCheckId => Str)
+=head2 GetHealthCheckLastFailureReason
+
+=over
+
+=item HealthCheckId => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::GetHealthCheckLastFailureReason>
 
 Returns: a L<Paws::Route53::GetHealthCheckLastFailureReasonResponse> instance
 
-  Gets the reason that a specified health check failed most recently.
+Gets the reason that a specified health check failed most recently.
 
 
-=head2 GetHealthCheckStatus(HealthCheckId => Str)
+=head2 GetHealthCheckStatus
+
+=over
+
+=item HealthCheckId => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::GetHealthCheckStatus>
 
 Returns: a L<Paws::Route53::GetHealthCheckStatusResponse> instance
 
-  Gets status of a specified health check.
+Gets status of a specified health check.
 
 
-=head2 GetHostedZone(Id => Str)
+=head2 GetHostedZone
+
+=over
+
+=item Id => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::GetHostedZone>
 
 Returns: a L<Paws::Route53::GetHostedZoneResponse> instance
 
-  Gets information about a specified hosted zone including the four name
+Gets information about a specified hosted zone including the four name
 servers assigned to the hosted zone.
 
 
-=head2 GetHostedZoneCount()
+=head2 GetHostedZoneCount
+
+
+
+
+
 
 Each argument is described in detail in: L<Paws::Route53::GetHostedZoneCount>
 
 Returns: a L<Paws::Route53::GetHostedZoneCountResponse> instance
 
-  Retrieves the number of hosted zones that are associated with the
+Retrieves the number of hosted zones that are associated with the
 current AWS account.
 
 
-=head2 GetQueryLoggingConfig(Id => Str)
+=head2 GetHostedZoneLimit
+
+=over
+
+=item HostedZoneId => Str
+
+=item Type => Str
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Route53::GetHostedZoneLimit>
+
+Returns: a L<Paws::Route53::GetHostedZoneLimitResponse> instance
+
+Gets the specified limit for a specified hosted zone, for example, the
+maximum number of records that you can create in the hosted zone.
+
+For the default limit, see Limits
+(http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/DNSLimitations.html)
+in the I<Amazon Route 53 Developer Guide>. To request a higher limit,
+open a case
+(https://console.aws.amazon.com/support/home#/case/create?issueType=service-limit-increase&limitType=service-code-route53).
+
+
+=head2 GetQueryLoggingConfig
+
+=over
+
+=item Id => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::GetQueryLoggingConfig>
 
 Returns: a L<Paws::Route53::GetQueryLoggingConfigResponse> instance
 
-  Gets information about a specified configuration for DNS query logging.
+Gets information about a specified configuration for DNS query logging.
 
 For more information about DNS query logs, see CreateQueryLoggingConfig
-and Logging DNS Queries.
+and Logging DNS Queries
+(http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/query-logs.html).
 
 
-=head2 GetReusableDelegationSet(Id => Str)
+=head2 GetReusableDelegationSet
+
+=over
+
+=item Id => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::GetReusableDelegationSet>
 
 Returns: a L<Paws::Route53::GetReusableDelegationSetResponse> instance
 
-  Retrieves information about a specified reusable delegation set,
+Retrieves information about a specified reusable delegation set,
 including the four name servers that are assigned to the delegation
 set.
 
 
-=head2 GetTrafficPolicy(Id => Str, Version => Int)
+=head2 GetReusableDelegationSetLimit
+
+=over
+
+=item DelegationSetId => Str
+
+=item Type => Str
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Route53::GetReusableDelegationSetLimit>
+
+Returns: a L<Paws::Route53::GetReusableDelegationSetLimitResponse> instance
+
+Gets the maximum number of hosted zones that you can associate with the
+specified reusable delegation set.
+
+For the default limit, see Limits
+(http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/DNSLimitations.html)
+in the I<Amazon Route 53 Developer Guide>. To request a higher limit,
+open a case
+(https://console.aws.amazon.com/support/home#/case/create?issueType=service-limit-increase&limitType=service-code-route53).
+
+
+=head2 GetTrafficPolicy
+
+=over
+
+=item Id => Str
+
+=item Version => Int
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::GetTrafficPolicy>
 
 Returns: a L<Paws::Route53::GetTrafficPolicyResponse> instance
 
-  Gets information about a specific traffic policy version.
+Gets information about a specific traffic policy version.
 
 
-=head2 GetTrafficPolicyInstance(Id => Str)
+=head2 GetTrafficPolicyInstance
+
+=over
+
+=item Id => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::GetTrafficPolicyInstance>
 
 Returns: a L<Paws::Route53::GetTrafficPolicyInstanceResponse> instance
 
-  Gets information about a specified traffic policy instance.
+Gets information about a specified traffic policy instance.
 
 After you submit a C<CreateTrafficPolicyInstance> or an
 C<UpdateTrafficPolicyInstance> request, there's a brief delay while
@@ -1230,23 +1679,41 @@ In the Amazon Route 53 console, traffic policy instances are known as
 policy records.
 
 
-=head2 GetTrafficPolicyInstanceCount()
+=head2 GetTrafficPolicyInstanceCount
+
+
+
+
+
 
 Each argument is described in detail in: L<Paws::Route53::GetTrafficPolicyInstanceCount>
 
 Returns: a L<Paws::Route53::GetTrafficPolicyInstanceCountResponse> instance
 
-  Gets the number of traffic policy instances that are associated with
+Gets the number of traffic policy instances that are associated with
 the current AWS account.
 
 
-=head2 ListGeoLocations([MaxItems => Str, StartContinentCode => Str, StartCountryCode => Str, StartSubdivisionCode => Str])
+=head2 ListGeoLocations
+
+=over
+
+=item [MaxItems => Str]
+
+=item [StartContinentCode => Str]
+
+=item [StartCountryCode => Str]
+
+=item [StartSubdivisionCode => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::ListGeoLocations>
 
 Returns: a L<Paws::Route53::ListGeoLocationsResponse> instance
 
-  Retrieves a list of supported geo locations.
+Retrieves a list of supported geo locations.
 
 Countries are listed first, and continents are listed last. If Amazon
 Route 53 supports subdivisions for a country (for example, states or
@@ -1254,23 +1721,43 @@ provinces), the subdivisions for that country are listed in
 alphabetical order immediately after the corresponding country.
 
 
-=head2 ListHealthChecks([Marker => Str, MaxItems => Str])
+=head2 ListHealthChecks
+
+=over
+
+=item [Marker => Str]
+
+=item [MaxItems => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::ListHealthChecks>
 
 Returns: a L<Paws::Route53::ListHealthChecksResponse> instance
 
-  Retrieve a list of the health checks that are associated with the
+Retrieve a list of the health checks that are associated with the
 current AWS account.
 
 
-=head2 ListHostedZones([DelegationSetId => Str, Marker => Str, MaxItems => Str])
+=head2 ListHostedZones
+
+=over
+
+=item [DelegationSetId => Str]
+
+=item [Marker => Str]
+
+=item [MaxItems => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::ListHostedZones>
 
 Returns: a L<Paws::Route53::ListHostedZonesResponse> instance
 
-  Retrieves a list of the public and private hosted zones that are
+Retrieves a list of the public and private hosted zones that are
 associated with the current AWS account. The response includes a
 C<HostedZones> child element for each hosted zone.
 
@@ -1279,13 +1766,24 @@ have a lot of hosted zones, you can use the C<maxitems> parameter to
 list them in groups of up to 100.
 
 
-=head2 ListHostedZonesByName([DNSName => Str, HostedZoneId => Str, MaxItems => Str])
+=head2 ListHostedZonesByName
+
+=over
+
+=item [DNSName => Str]
+
+=item [HostedZoneId => Str]
+
+=item [MaxItems => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::ListHostedZonesByName>
 
 Returns: a L<Paws::Route53::ListHostedZonesByNameResponse> instance
 
-  Retrieves a list of your hosted zones in lexicographic order. The
+Retrieves a list of your hosted zones in lexicographic order. The
 response includes a C<HostedZones> child element for each hosted zone
 created by the current AWS account.
 
@@ -1308,8 +1806,9 @@ C<com.ex\344mple.>
 
 The labels are reversed and alphabetized using the escaped value. For
 more information about valid domain name formats, including
-internationalized domain names, see DNS Domain Name Format in the
-I<Amazon Route 53 Developer Guide>.
+internationalized domain names, see DNS Domain Name Format
+(http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/DomainNameFormat.html)
+in the I<Amazon Route 53 Developer Guide>.
 
 Amazon Route 53 returns up to 100 items in each response. If you have a
 lot of hosted zones, use the C<MaxItems> parameter to list them in
@@ -1352,29 +1851,56 @@ C<dnsname> and C<hostedzoneid> parameters, respectively.
 
 
 
-=head2 ListQueryLoggingConfigs([HostedZoneId => Str, MaxResults => Str, NextToken => Str])
+=head2 ListQueryLoggingConfigs
+
+=over
+
+=item [HostedZoneId => Str]
+
+=item [MaxResults => Str]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::ListQueryLoggingConfigs>
 
 Returns: a L<Paws::Route53::ListQueryLoggingConfigsResponse> instance
 
-  Lists the configurations for DNS query logging that are associated with
+Lists the configurations for DNS query logging that are associated with
 the current AWS account or the configuration that is associated with a
 specified hosted zone.
 
 For more information about DNS query logs, see
 CreateQueryLoggingConfig. Additional information, including the format
-of DNS query logs, appears in Logging DNS Queries in the I<Amazon Route
-53 Developer Guide>.
+of DNS query logs, appears in Logging DNS Queries
+(http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/query-logs.html)
+in the I<Amazon Route 53 Developer Guide>.
 
 
-=head2 ListResourceRecordSets(HostedZoneId => Str, [MaxItems => Str, StartRecordIdentifier => Str, StartRecordName => Str, StartRecordType => Str])
+=head2 ListResourceRecordSets
+
+=over
+
+=item HostedZoneId => Str
+
+=item [MaxItems => Str]
+
+=item [StartRecordIdentifier => Str]
+
+=item [StartRecordName => Str]
+
+=item [StartRecordType => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::ListResourceRecordSets>
 
 Returns: a L<Paws::Route53::ListResourceRecordSetsResponse> instance
 
-  Lists the resource record sets in a specified hosted zone.
+Lists the resource record sets in a specified hosted zone.
 
 C<ListResourceRecordSets> returns up to 100 resource record sets at a
 time in ASCII order, beginning at a position specified by the C<name>
@@ -1428,58 +1954,111 @@ may display results without the latest changes while other pages
 display results with the latest changes.
 
 
-=head2 ListReusableDelegationSets([Marker => Str, MaxItems => Str])
+=head2 ListReusableDelegationSets
+
+=over
+
+=item [Marker => Str]
+
+=item [MaxItems => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::ListReusableDelegationSets>
 
 Returns: a L<Paws::Route53::ListReusableDelegationSetsResponse> instance
 
-  Retrieves a list of the reusable delegation sets that are associated
+Retrieves a list of the reusable delegation sets that are associated
 with the current AWS account.
 
 
-=head2 ListTagsForResource(ResourceId => Str, ResourceType => Str)
+=head2 ListTagsForResource
+
+=over
+
+=item ResourceId => Str
+
+=item ResourceType => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::ListTagsForResource>
 
 Returns: a L<Paws::Route53::ListTagsForResourceResponse> instance
 
-  Lists tags for one health check or hosted zone.
+Lists tags for one health check or hosted zone.
 
 For information about using tags for cost allocation, see Using Cost
-Allocation Tags in the I<AWS Billing and Cost Management User Guide>.
+Allocation Tags
+(http://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html)
+in the I<AWS Billing and Cost Management User Guide>.
 
 
-=head2 ListTagsForResources(ResourceIds => ArrayRef[Str|Undef], ResourceType => Str)
+=head2 ListTagsForResources
+
+=over
+
+=item ResourceIds => ArrayRef[Str|Undef]
+
+=item ResourceType => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::ListTagsForResources>
 
 Returns: a L<Paws::Route53::ListTagsForResourcesResponse> instance
 
-  Lists tags for up to 10 health checks or hosted zones.
+Lists tags for up to 10 health checks or hosted zones.
 
 For information about using tags for cost allocation, see Using Cost
-Allocation Tags in the I<AWS Billing and Cost Management User Guide>.
+Allocation Tags
+(http://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html)
+in the I<AWS Billing and Cost Management User Guide>.
 
 
-=head2 ListTrafficPolicies([MaxItems => Str, TrafficPolicyIdMarker => Str])
+=head2 ListTrafficPolicies
+
+=over
+
+=item [MaxItems => Str]
+
+=item [TrafficPolicyIdMarker => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::ListTrafficPolicies>
 
 Returns: a L<Paws::Route53::ListTrafficPoliciesResponse> instance
 
-  Gets information about the latest version for every traffic policy that
+Gets information about the latest version for every traffic policy that
 is associated with the current AWS account. Policies are listed in the
 order in which they were created.
 
 
-=head2 ListTrafficPolicyInstances([HostedZoneIdMarker => Str, MaxItems => Str, TrafficPolicyInstanceNameMarker => Str, TrafficPolicyInstanceTypeMarker => Str])
+=head2 ListTrafficPolicyInstances
+
+=over
+
+=item [HostedZoneIdMarker => Str]
+
+=item [MaxItems => Str]
+
+=item [TrafficPolicyInstanceNameMarker => Str]
+
+=item [TrafficPolicyInstanceTypeMarker => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::ListTrafficPolicyInstances>
 
 Returns: a L<Paws::Route53::ListTrafficPolicyInstancesResponse> instance
 
-  Gets information about the traffic policy instances that you created by
+Gets information about the traffic policy instances that you created by
 using the current AWS account.
 
 After you submit an C<UpdateTrafficPolicyInstance> request, there's a
@@ -1492,13 +2071,26 @@ have a lot of traffic policy instances, you can use the C<MaxItems>
 parameter to list them in groups of up to 100.
 
 
-=head2 ListTrafficPolicyInstancesByHostedZone(HostedZoneId => Str, [MaxItems => Str, TrafficPolicyInstanceNameMarker => Str, TrafficPolicyInstanceTypeMarker => Str])
+=head2 ListTrafficPolicyInstancesByHostedZone
+
+=over
+
+=item HostedZoneId => Str
+
+=item [MaxItems => Str]
+
+=item [TrafficPolicyInstanceNameMarker => Str]
+
+=item [TrafficPolicyInstanceTypeMarker => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::ListTrafficPolicyInstancesByHostedZone>
 
 Returns: a L<Paws::Route53::ListTrafficPolicyInstancesByHostedZoneResponse> instance
 
-  Gets information about the traffic policy instances that you created in
+Gets information about the traffic policy instances that you created in
 a specified hosted zone.
 
 After you submit a C<CreateTrafficPolicyInstance> or an
@@ -1512,13 +2104,30 @@ have a lot of traffic policy instances, you can use the C<MaxItems>
 parameter to list them in groups of up to 100.
 
 
-=head2 ListTrafficPolicyInstancesByPolicy(TrafficPolicyId => Str, TrafficPolicyVersion => Int, [HostedZoneIdMarker => Str, MaxItems => Str, TrafficPolicyInstanceNameMarker => Str, TrafficPolicyInstanceTypeMarker => Str])
+=head2 ListTrafficPolicyInstancesByPolicy
+
+=over
+
+=item TrafficPolicyId => Str
+
+=item TrafficPolicyVersion => Int
+
+=item [HostedZoneIdMarker => Str]
+
+=item [MaxItems => Str]
+
+=item [TrafficPolicyInstanceNameMarker => Str]
+
+=item [TrafficPolicyInstanceTypeMarker => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::ListTrafficPolicyInstancesByPolicy>
 
 Returns: a L<Paws::Route53::ListTrafficPolicyInstancesByPolicyResponse> instance
 
-  Gets information about the traffic policy instances that you created by
+Gets information about the traffic policy instances that you created by
 using a specify traffic policy version.
 
 After you submit a C<CreateTrafficPolicyInstance> or an
@@ -1532,26 +2141,48 @@ have a lot of traffic policy instances, you can use the C<MaxItems>
 parameter to list them in groups of up to 100.
 
 
-=head2 ListTrafficPolicyVersions(Id => Str, [MaxItems => Str, TrafficPolicyVersionMarker => Str])
+=head2 ListTrafficPolicyVersions
+
+=over
+
+=item Id => Str
+
+=item [MaxItems => Str]
+
+=item [TrafficPolicyVersionMarker => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::ListTrafficPolicyVersions>
 
 Returns: a L<Paws::Route53::ListTrafficPolicyVersionsResponse> instance
 
-  Gets information about all of the versions for a specified traffic
+Gets information about all of the versions for a specified traffic
 policy.
 
 Traffic policy versions are listed in numerical order by
 C<VersionNumber>.
 
 
-=head2 ListVPCAssociationAuthorizations(HostedZoneId => Str, [MaxResults => Str, NextToken => Str])
+=head2 ListVPCAssociationAuthorizations
+
+=over
+
+=item HostedZoneId => Str
+
+=item [MaxResults => Str]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::ListVPCAssociationAuthorizations>
 
 Returns: a L<Paws::Route53::ListVPCAssociationAuthorizationsResponse> instance
 
-  Gets a list of the VPCs that were created by other accounts and that
+Gets a list of the VPCs that were created by other accounts and that
 can be associated with a specified hosted zone because you've submitted
 one or more C<CreateVPCAssociationAuthorization> requests.
 
@@ -1559,57 +2190,145 @@ The response includes a C<VPCs> element with a C<VPC> child element for
 each VPC that can be associated with the hosted zone.
 
 
-=head2 TestDNSAnswer(HostedZoneId => Str, RecordName => Str, RecordType => Str, [EDNS0ClientSubnetIP => Str, EDNS0ClientSubnetMask => Str, ResolverIP => Str])
+=head2 TestDNSAnswer
+
+=over
+
+=item HostedZoneId => Str
+
+=item RecordName => Str
+
+=item RecordType => Str
+
+=item [EDNS0ClientSubnetIP => Str]
+
+=item [EDNS0ClientSubnetMask => Str]
+
+=item [ResolverIP => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::TestDNSAnswer>
 
 Returns: a L<Paws::Route53::TestDNSAnswerResponse> instance
 
-  Gets the value that Amazon Route 53 returns in response to a DNS
+Gets the value that Amazon Route 53 returns in response to a DNS
 request for a specified record name and type. You can optionally
 specify the IP address of a DNS resolver, an EDNS0 client subnet IP
 address, and a subnet mask.
 
 
-=head2 UpdateHealthCheck(HealthCheckId => Str, [AlarmIdentifier => L<Paws::Route53::AlarmIdentifier>, ChildHealthChecks => ArrayRef[Str|Undef], EnableSNI => Bool, FailureThreshold => Int, FullyQualifiedDomainName => Str, HealthCheckVersion => Int, HealthThreshold => Int, InsufficientDataHealthStatus => Str, Inverted => Bool, IPAddress => Str, Port => Int, Regions => ArrayRef[Str|Undef], ResetElements => ArrayRef[Str|Undef], ResourcePath => Str, SearchString => Str])
+=head2 UpdateHealthCheck
+
+=over
+
+=item HealthCheckId => Str
+
+=item [AlarmIdentifier => L<Paws::Route53::AlarmIdentifier>]
+
+=item [ChildHealthChecks => ArrayRef[Str|Undef]]
+
+=item [EnableSNI => Bool]
+
+=item [FailureThreshold => Int]
+
+=item [FullyQualifiedDomainName => Str]
+
+=item [HealthCheckVersion => Int]
+
+=item [HealthThreshold => Int]
+
+=item [InsufficientDataHealthStatus => Str]
+
+=item [Inverted => Bool]
+
+=item [IPAddress => Str]
+
+=item [Port => Int]
+
+=item [Regions => ArrayRef[Str|Undef]]
+
+=item [ResetElements => ArrayRef[Str|Undef]]
+
+=item [ResourcePath => Str]
+
+=item [SearchString => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::UpdateHealthCheck>
 
 Returns: a L<Paws::Route53::UpdateHealthCheckResponse> instance
 
-  Updates an existing health check. Note that some values can't be
+Updates an existing health check. Note that some values can't be
 updated.
 
 For more information about updating health checks, see Creating,
-Updating, and Deleting Health Checks in the I<Amazon Route 53 Developer
-Guide>.
+Updating, and Deleting Health Checks
+(http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/health-checks-creating-deleting.html)
+in the I<Amazon Route 53 Developer Guide>.
 
 
-=head2 UpdateHostedZoneComment(Id => Str, [Comment => Str])
+=head2 UpdateHostedZoneComment
+
+=over
+
+=item Id => Str
+
+=item [Comment => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::UpdateHostedZoneComment>
 
 Returns: a L<Paws::Route53::UpdateHostedZoneCommentResponse> instance
 
-  Updates the comment for a specified hosted zone.
+Updates the comment for a specified hosted zone.
 
 
-=head2 UpdateTrafficPolicyComment(Comment => Str, Id => Str, Version => Int)
+=head2 UpdateTrafficPolicyComment
+
+=over
+
+=item Comment => Str
+
+=item Id => Str
+
+=item Version => Int
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::UpdateTrafficPolicyComment>
 
 Returns: a L<Paws::Route53::UpdateTrafficPolicyCommentResponse> instance
 
-  Updates the comment for a specified traffic policy version.
+Updates the comment for a specified traffic policy version.
 
 
-=head2 UpdateTrafficPolicyInstance(Id => Str, TrafficPolicyId => Str, TrafficPolicyVersion => Int, TTL => Int)
+=head2 UpdateTrafficPolicyInstance
+
+=over
+
+=item Id => Str
+
+=item TrafficPolicyId => Str
+
+=item TrafficPolicyVersion => Int
+
+=item TTL => Int
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Route53::UpdateTrafficPolicyInstance>
 
 Returns: a L<Paws::Route53::UpdateTrafficPolicyInstanceResponse> instance
 
-  Updates the resource record sets in a specified hosted zone that were
+Updates the resource record sets in a specified hosted zone that were
 created based on the settings in a specified traffic policy version.
 
 When you update a traffic policy instance, Amazon Route 53 continues to
@@ -1692,9 +2411,9 @@ This service class forms part of L<Paws>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

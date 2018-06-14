@@ -21,21 +21,34 @@ package Paws::RDS::DescribeDBSnapshots;
 
 =head1 NAME
 
-Paws::RDS::DescribeDBSnapshots - Arguments for method DescribeDBSnapshots on Paws::RDS
+Paws::RDS::DescribeDBSnapshots - Arguments for method DescribeDBSnapshots on L<Paws::RDS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DescribeDBSnapshots on the 
-Amazon Relational Database Service service. Use the attributes of this class
+This class represents the parameters used for calling the method DescribeDBSnapshots on the
+L<Amazon Relational Database Service|Paws::RDS> service. Use the attributes of this class
 as arguments to method DescribeDBSnapshots.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DescribeDBSnapshots.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DescribeDBSnapshots(Att1 => $value1, Att2 => $value2, ...);
+    my $rds = Paws->service('RDS');
+   # To list DB snapshot attributes
+   # This example lists all manually-created, shared snapshots for the specified
+   # DB instance.
+    my $DBSnapshotMessage = $rds->DescribeDBSnapshots(
+      {
+        'IncludeShared'        => true,
+        'SnapshotType'         => 'manual',
+        'IncludePublic'        => 0,
+        'DBInstanceIdentifier' => 'mymysqlinstance'
+      }
+    );
+
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/rds/DescribeDBSnapshots>
 
 =head1 ATTRIBUTES
 
@@ -43,7 +56,7 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 =head2 DBInstanceIdentifier => Str
 
 The ID of the DB instance to retrieve the list of DB snapshots for.
-This parameter cannot be used in conjunction with
+This parameter can't be used in conjunction with
 C<DBSnapshotIdentifier>. This parameter is not case-sensitive.
 
 Constraints:
@@ -52,15 +65,7 @@ Constraints:
 
 =item *
 
-Must contain from 1 to 63 alphanumeric characters or hyphens
-
-=item *
-
-First character must be a letter
-
-=item *
-
-Cannot end with a hyphen or contain two consecutive hyphens
+If supplied, must match the identifier of an existing DBInstance.
 
 =back
 
@@ -69,7 +74,7 @@ Cannot end with a hyphen or contain two consecutive hyphens
 
 =head2 DBSnapshotIdentifier => Str
 
-A specific DB snapshot identifier to describe. This parameter cannot be
+A specific DB snapshot identifier to describe. This parameter can't be
 used in conjunction with C<DBInstanceIdentifier>. This value is stored
 as a lowercase string.
 
@@ -79,15 +84,7 @@ Constraints:
 
 =item *
 
-Must be 1 to 255 alphanumeric characters.
-
-=item *
-
-First character must be a letter.
-
-=item *
-
-Cannot end with a hyphen or contain two consecutive hyphens.
+If supplied, must match the identifier of an existing DBSnapshot.
 
 =item *
 
@@ -107,9 +104,9 @@ This parameter is not currently supported.
 
 =head2 IncludePublic => Bool
 
-Set this value to C<true> to include manual DB snapshots that are
-public and can be copied or restored by any AWS account, otherwise set
-this value to C<false>. The default is C<false>.
+True to include manual DB snapshots that are public and can be copied
+or restored by any AWS account, and otherwise false. The default is
+false.
 
 You can share a manual DB snapshot as public by using the
 ModifyDBSnapshotAttribute API.
@@ -118,10 +115,9 @@ ModifyDBSnapshotAttribute API.
 
 =head2 IncludeShared => Bool
 
-Set this value to C<true> to include shared manual DB snapshots from
-other AWS accounts that this AWS account has been given permission to
-copy or restore, otherwise set this value to C<false>. The default is
-C<false>.
+True to include shared manual DB snapshots from other AWS accounts that
+this AWS account has been given permission to copy or restore, and
+otherwise false. The default is C<false>.
 
 You can give an AWS account permission to restore a manual DB snapshot
 from another AWS account by using the ModifyDBSnapshotAttribute API
@@ -201,9 +197,9 @@ This class forms part of L<Paws>, documenting arguments for method DescribeDBSna
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

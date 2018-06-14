@@ -69,7 +69,7 @@ type.
 
 Similarly, AWS Config does not accept C<INSUFFICIENT_DATA> as the value
 for C<ComplianceType> from a C<PutEvaluations> request. For example, an
-AWS Lambda function for a custom Config rule cannot pass an
+AWS Lambda function for a custom AWS Config rule cannot pass an
 C<INSUFFICIENT_DATA> value to AWS Config.
 
 
@@ -90,9 +90,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Config>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

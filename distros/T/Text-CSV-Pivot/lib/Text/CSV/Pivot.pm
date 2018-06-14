@@ -1,6 +1,6 @@
 package Text::CSV::Pivot;
 
-$Text::CSV::Pivot::VERSION   = '0.03';
+$Text::CSV::Pivot::VERSION   = '0.04';
 $Text::CSV::Pivot::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Text::CSV::Pivot - Transform CSV file into Pivot Table format.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -18,20 +18,58 @@ use Data::Dumper;
 use Text::CSV;
 use File::Basename;
 
-use Moo;
-use namespace::autoclean;
+sub new {
+    my ($class, @args) = @_;
 
-has 'output_file'   => (is => 'rw');
-has 'input_file'    => (is => 'ro', required => 1);
-has 'col_key_idx'   => (is => 'ro', required => 1);
-has 'col_name_idx'  => (is => 'ro', required => 1);
-has 'col_value_idx' => (is => 'ro', required => 1);
-has 'col_skip_idx'  => (is => 'ro', default  => sub { [] });
+    die "ERROR: Parameters have to be hashref."
+        if (@args == 1 && ((ref $args[0]) ne 'HASH'));
 
-has '_csv_handler'  => (is => 'rw');
-has '_new_columns'  => (is => 'rw');
-has '_old_columns'  => (is => 'ro');
-has '_raw_data'     => (is => 'rw');
+    my @required_keys = qw(input_file col_key_idx col_name_idx col_value_idx);
+    my @optional_keys = qw(output_file col_skip_idx);
+
+    my $self = {};
+    foreach my $key (@required_keys) {
+        my $val = $args[0]->{$key};
+        die "ERROR: Missing required key '$key'." unless (defined $val);
+        $self->{$key} = delete $args[0]->{$key};
+    }
+    foreach my $key (@optional_keys) {
+        my $val = $args[0]->{$key};
+        if (defined $val) {
+            $self->{$key} = delete $args[0]->{$key};
+        }
+    }
+
+    $self->{col_skip_idx} = [] unless (exists $self->{col_skip_idx});
+    $args[0]->{binary} = 1 unless (exists $args[0]->{binary});
+
+    $self->{'_csv_handler'} = Text::CSV->new($args[0])
+        or die "ERROR: Can't use CSV: ".Text::CSV->error_diag;
+
+    my $input_file = $self->{'input_file'};
+    open(my $in, '<:encoding(utf8)', $input_file)
+        or die "ERROR: Can't open input file $input_file [$!]\n";
+    $self->{'input_file'} = $in;
+
+    my $output_file = $self->{'output_file'};
+    if (!defined $output_file) {
+        $output_file = fileparse($input_file, '\.[^\.]*');
+        $output_file = sprintf("%s.pivot.csv", $output_file);
+    }
+
+    open(my $out, '>:encoding(utf8)', $output_file)
+        or die "ERROR: Can't open output file $output_file [$!]\n";
+    $self->{'output_file'} = $out;
+
+    $self->{'_old_columns'} = $self->{'_csv_handler'}->getline($in);
+
+    bless $self, $class;
+
+    $self->_process_data;
+
+    return $self;
+}
+
 
 =head1 DESCRIPTION
 
@@ -134,53 +172,6 @@ You should get the result as below:
     | Smith, John    |           | 9.0     | 7.0      | 4.0   | 7.0   |
     +----------------+-----------+---------+----------+-------+-------+
 
-=cut
-
-around BUILDARGS => sub {
-    my ($orig, $class, @args) = @_;
-
-    die "ERROR: Parameters have to be hashref."
-        if (@args == 1 && ((ref $args[0]) ne 'HASH'));
-
-    my $params = {};
-    foreach my $key ('output_file',
-                     'input_file',
-                     'col_key_idx',
-                     'col_name_idx',
-                     'col_value_idx',
-                     'col_skip_idx') {
-        my $val = $args[0]->{$key};
-        $params->{$key} = $val if (defined $val);
-        delete $args[0]->{$key};
-    }
-
-    $args[0]->{binary} = 1 unless (exists $args[0]->{binary});
-
-    $params->{'_csv_handler'} = Text::CSV->new($args[0])
-        or die "ERROR: Can't use CSV: ".Text::CSV->error_diag;
-
-    my $input_file = $params->{'input_file'};
-    open(my $in, '<:encoding(utf8)', $input_file)
-        or die "ERROR: Can't open input file $input_file [$!]\n";
-    $params->{'input_file'} = $in;
-
-    my $output_file = $params->{'output_file'};
-    if (!defined $output_file) {
-        $output_file = fileparse($input_file, '\.[^\.]*');
-        $output_file = sprintf("%s.pivot.csv", $output_file);
-    }
-
-    open(my $out, '>:encoding(utf8)', $output_file)
-        or die "ERROR: Can't open output file $output_file [$!]\n";
-    $params->{'output_file'} = $out;
-
-    $params->{'_old_columns'} = $params->{'_csv_handler'}->getline($in);
-
-    _process_data($params);
-
-    return $class->$orig($params);
-};
-
 =head1 CONSTRUCTOR
 
 The following table explains the parameters for the constructor. However you can
@@ -196,6 +187,10 @@ also pass any valid parameters for C<Text::CSV>.
     | col_value_idx | Yes      | Column index that would provide new column value. |
     | col_skip_idx  | No       | Column index to ignore in the output csv.         |
     +---------------+----------+---------------------------------------------------+
+
+Please note C<output_file> is optional. If missing, it would create one for you. For
+example if you provide C<input_file> as  B<"sample.csv"> then it would create output
+file as B<"sample.pivot.csv">.
 
 Column index starts with 0, left to right. So in the example below, the C<col_key_idx>
 would be 0. Similarly C<col_name_idx> and C<col_value_idx> would be 1 and 2 resp. In
@@ -226,6 +221,7 @@ Also C<"Year"> column to be skipped.Then the call would look like something belo
     use Text::CSV::Pivot;
 
     Text::CSV::Pivot->new({ input_file    => 'sample.csv',
+                            output_file   => 'output.csv',
                             col_key_idx   => 0,
                             col_name_idx  => 1,
                             col_value_idx => 2,
@@ -304,14 +300,14 @@ sub transform {
 # PRIVATE METHODS
 
 sub _process_data {
-    my ($params) = @_;
+    my ($self) = @_;
 
-    my $csv           = $params->{'_csv_handler'};
-    my $in            = $params->{'input_file'};
-    my $col_key_idx   = $params->{'col_key_idx'};
-    my $col_name_idx  = $params->{'col_name_idx'};
-    my $col_value_idx = $params->{'col_value_idx'};
-    my $columns       = $params->{'_old_columns'};
+    my $csv           = $self->{'_csv_handler'};
+    my $in            = $self->{'input_file'};
+    my $col_key_idx   = $self->{'col_key_idx'};
+    my $col_name_idx  = $self->{'col_name_idx'};
+    my $col_value_idx = $self->{'col_value_idx'};
+    my $columns       = $self->{'_old_columns'};
 
     my $raw_data    = {};
     my $new_columns = {};
@@ -330,8 +326,8 @@ sub _process_data {
     $csv->eof;
     close($in);
 
-    $params->{'_new_columns'} = [ sort keys %$new_columns ];
-    $params->{'_raw_data'}    = $raw_data;
+    $self->{'_new_columns'} = [ sort keys %$new_columns ];
+    $self->{'_raw_data'}    = $raw_data;
 }
 
 =head1 AUTHOR

@@ -4,6 +4,7 @@ package Paws::Pinpoint::GCMChannelResponse;
   has CreationDate => (is => 'ro', isa => 'Str');
   has Credential => (is => 'ro', isa => 'Str');
   has Enabled => (is => 'ro', isa => 'Bool');
+  has HasCredential => (is => 'ro', isa => 'Bool');
   has Id => (is => 'ro', isa => 'Str');
   has IsArchived => (is => 'ro', isa => 'Bool');
   has LastModifiedBy => (is => 'ro', isa => 'Str');
@@ -65,6 +66,14 @@ Google Cloud Messaging channel definition
   If the channel is enabled for sending messages.
 
 
+=head2 HasCredential => Bool
+
+  Indicates whether the channel is configured with FCM or GCM
+credentials. Amazon Pinpoint uses your credentials to authenticate push
+notifications with FCM or GCM. Provide your credentials by setting the
+ApiKey attribute.
+
+
 =head2 Id => Str
 
   Channel ID. Not used. Present only for backwards compatibility.
@@ -102,9 +111,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Pinpoint>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

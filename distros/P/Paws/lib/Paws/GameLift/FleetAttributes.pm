@@ -5,6 +5,8 @@ package Paws::GameLift::FleetAttributes;
   has Description => (is => 'ro', isa => 'Str');
   has FleetArn => (is => 'ro', isa => 'Str');
   has FleetId => (is => 'ro', isa => 'Str');
+  has FleetType => (is => 'ro', isa => 'Str');
+  has InstanceType => (is => 'ro', isa => 'Str');
   has LogPaths => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
   has MetricGroups => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
   has Name => (is => 'ro', isa => 'Str');
@@ -14,6 +16,7 @@ package Paws::GameLift::FleetAttributes;
   has ServerLaunchParameters => (is => 'ro', isa => 'Str');
   has ServerLaunchPath => (is => 'ro', isa => 'Str');
   has Status => (is => 'ro', isa => 'Str');
+  has StoppedActions => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
   has TerminationTime => (is => 'ro', isa => 'Str');
 1;
 
@@ -61,6 +64,10 @@ ListFleets
 
 =item *
 
+DeleteFleet
+
+=item *
+
 Describe fleets:
 
 =over
@@ -68,6 +75,10 @@ Describe fleets:
 =item *
 
 DescribeFleetAttributes
+
+=item *
+
+DescribeFleetCapacity
 
 =item *
 
@@ -80,6 +91,10 @@ DescribeFleetUtilization
 =item *
 
 DescribeRuntimeConfiguration
+
+=item *
+
+DescribeEC2InstanceLimits
 
 =item *
 
@@ -113,39 +128,19 @@ UpdateRuntimeConfiguration
 
 =item *
 
-Manage fleet capacity:
+Manage fleet actions:
 
 =over
 
 =item *
 
-DescribeFleetCapacity
+StartFleetActions
 
 =item *
 
-UpdateFleetCapacity
-
-=item *
-
-PutScalingPolicy (automatic scaling)
-
-=item *
-
-DescribeScalingPolicies (automatic scaling)
-
-=item *
-
-DeleteScalingPolicy (automatic scaling)
-
-=item *
-
-DescribeEC2InstanceLimits
+StopFleetActions
 
 =back
-
-=item *
-
-DeleteFleet
 
 =back
 
@@ -180,16 +175,31 @@ number expressed in Unix time as milliseconds (for example
   Unique identifier for a fleet.
 
 
+=head2 FleetType => Str
+
+  Indicates whether the fleet uses on-demand or spot instances. A spot
+instance in use may be interrupted with a two-minute notification.
+
+
+=head2 InstanceType => Str
+
+  EC2 instance type indicating the computing resources of each instance
+in the fleet, including CPU, memory, storage, and networking capacity.
+See Amazon EC2 Instance Types
+(http://aws.amazon.com/ec2/instance-types/) for detailed descriptions.
+
+
 =head2 LogPaths => ArrayRef[Str|Undef]
 
   Location of default log files. When a server process is shut down,
 Amazon GameLift captures and stores any log files in this location.
 These logs are in addition to game session logs; see more on game
-session logs in the Amazon GameLift Developer Guide. If no default log
-path for a fleet is specified, Amazon GameLift automatically uploads
-logs that are stored on each instance at C<C:\game\logs> (for Windows)
-or C</local/game/logs> (for Linux). Use the Amazon GameLift console to
-access stored logs.
+session logs in the Amazon GameLift Developer Guide
+(http://docs.aws.amazon.com/gamelift/latest/developerguide/gamelift-sdk-server-api.html#gamelift-sdk-server-api-server-code).
+If no default log path for a fleet is specified, Amazon GameLift
+automatically uploads logs that are stored on each instance at
+C<C:\game\logs> (for Windows) or C</local/game/logs> (for Linux). Use
+the Amazon GameLift console to access stored logs.
 
 
 =head2 MetricGroups => ArrayRef[Str|Undef]
@@ -296,6 +306,12 @@ B<TERMINATED> -- The fleet no longer exists.
 
 
 
+=head2 StoppedActions => ArrayRef[Str|Undef]
+
+  List of fleet actions that have been suspended using StopFleetActions.
+This includes auto-scaling.
+
+
 =head2 TerminationTime => Str
 
   Time stamp indicating when this data object was terminated. Format is a
@@ -310,9 +326,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::GameLift>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

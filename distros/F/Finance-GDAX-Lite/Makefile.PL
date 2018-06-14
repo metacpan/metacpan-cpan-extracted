@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Finance::GDAX::Lite",
   "PREREQ_PM" => {
     "Digest::SHA" => 0,
-    "HTTP::Tiny" => 0,
+    "HTTP::Tiny" => "0.057",
     "JSON::XS" => 0,
     "Log::ger" => "0.023",
     "MIME::Base64" => 0,
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Digest::SHA" => 0,
   "File::Spec" => 0,
-  "HTTP::Tiny" => 0,
+  "HTTP::Tiny" => "0.057",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON::XS" => 0,

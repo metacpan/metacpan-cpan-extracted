@@ -9,6 +9,7 @@ package Paws::RedShift::ReservedNode;
   has RecurringCharges => (is => 'ro', isa => 'ArrayRef[Paws::RedShift::RecurringCharge]', request_name => 'RecurringCharge', traits => ['NameInRequest']);
   has ReservedNodeId => (is => 'ro', isa => 'Str');
   has ReservedNodeOfferingId => (is => 'ro', isa => 'Str');
+  has ReservedNodeOfferingType => (is => 'ro', isa => 'Str');
   has StartTime => (is => 'ro', isa => 'Str');
   has State => (is => 'ro', isa => 'Str');
   has UsagePrice => (is => 'ro', isa => 'Num');
@@ -95,6 +96,11 @@ reserved node offering.
   The identifier for the reserved node offering.
 
 
+=head2 ReservedNodeOfferingType => Str
+
+  
+
+
 =head2 StartTime => Str
 
   The time the reservation started. You purchase a reserved node offering
@@ -139,9 +145,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::RedShift>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

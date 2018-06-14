@@ -1,5 +1,5 @@
 package QBit::Application::Model::DBManager::Filter::subfilter;
-$QBit::Application::Model::DBManager::Filter::subfilter::VERSION = '0.020';
+$QBit::Application::Model::DBManager::Filter::subfilter::VERSION = '0.021';
 use qbit;
 
 use base qw(QBit::Application::Model::DBManager::Filter);

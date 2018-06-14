@@ -22,21 +22,35 @@ package Paws::RDS::DescribeEvents;
 
 =head1 NAME
 
-Paws::RDS::DescribeEvents - Arguments for method DescribeEvents on Paws::RDS
+Paws::RDS::DescribeEvents - Arguments for method DescribeEvents on L<Paws::RDS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DescribeEvents on the 
-Amazon Relational Database Service service. Use the attributes of this class
+This class represents the parameters used for calling the method DescribeEvents on the
+L<Amazon Relational Database Service|Paws::RDS> service. Use the attributes of this class
 as arguments to method DescribeEvents.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DescribeEvents.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DescribeEvents(Att1 => $value1, Att2 => $value2, ...);
+    my $rds = Paws->service('RDS');
+   # To list information about events
+   # This example lists information for all backup-related events for the
+   # specified DB instance for the past 7 days (7 days * 24 hours * 60 minutes =
+   # 10,080 minutes).
+    my $EventsMessage = $rds->DescribeEvents(
+      {
+        'SourceIdentifier' => 'mymysqlinstance',
+        'SourceType'       => 'db-instance',
+        'Duration'         => 10080,
+        'EventCategories'  => ['backup']
+      }
+    );
+
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/rds/DescribeEvents>
 
 =head1 ATTRIBUTES
 
@@ -53,7 +67,7 @@ Default: 60
 
 The end of the time interval for which to retrieve events, specified in
 ISO 8601 format. For more information about ISO 8601, go to the ISO8601
-Wikipedia page.
+Wikipedia page. (http://en.wikipedia.org/wiki/ISO_8601)
 
 Example: 2009-07-08T18:00Z
 
@@ -95,8 +109,8 @@ Constraints: Minimum 20, maximum 100.
 
 =head2 SourceIdentifier => Str
 
-The identifier of the event source for which events will be returned.
-If not specified, then all sources are included in the response.
+The identifier of the event source for which events are returned. If
+not specified, then all sources are included in the response.
 
 Constraints:
 
@@ -146,7 +160,7 @@ Valid values are: C<"db-instance">, C<"db-parameter-group">, C<"db-security-grou
 
 The beginning of the time interval to retrieve events for, specified in
 ISO 8601 format. For more information about ISO 8601, go to the ISO8601
-Wikipedia page.
+Wikipedia page. (http://en.wikipedia.org/wiki/ISO_8601)
 
 Example: 2009-07-08T18:00Z
 
@@ -159,9 +173,9 @@ This class forms part of L<Paws>, documenting arguments for method DescribeEvent
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

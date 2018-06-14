@@ -9,7 +9,7 @@ use CGI::OptimalQuery::SavedSearches();
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION     = '0.26';
+    $VERSION     = '0.30';
     @ISA         = qw(Exporter);
     #Give a hoot don't pollute, do not export more than needed by default
     @EXPORT      = qw();
@@ -37,6 +37,15 @@ our %DEFAULT_MODULES = (
   'InteractiveQuery2Tools' => 'CGI::OptimalQuery::InteractiveQuery2Tools'
 );
 
+sub default_output_handler {
+  print STDOUT @_;
+  return undef;
+}
+sub default_error_handler {
+  print STDERR @_;
+  return undef;
+}
+
 
 # Constructor
 # my $recset = CGI::OptimalQuery->new(\%schema )
@@ -63,8 +72,9 @@ sub new {
   }
 
   # set default handlers
-  $$schema{output_handler} ||= sub { print @_ };
-  $$schema{error_handler}  ||= sub { print STDERR @_; 0; };
+  $$schema{output_handler} ||= \&default_output_handler;
+  $$schema{error_handler}  ||= \&default_error_handler;
+  $$schema{httpHeader} ||= \&CGI::header;
 
   # find module & class
   my $module = $$schema{q}->param('module') || $$schema{module} || $DEFAULT_MODULE;

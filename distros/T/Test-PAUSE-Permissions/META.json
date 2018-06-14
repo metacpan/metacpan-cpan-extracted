@@ -4,13 +4,13 @@
       "Kenichi Ishigaki <ishigaki@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-PAUSE-Permissions",
    "no_index" : {
@@ -22,17 +22,18 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::More" : "0.88",
-            "Test::UseAllModules" : "0.10"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker::CPANfile" : "0.07"
+            "ExtUtils::MakeMaker::CPANfile" : "0.08"
          }
       },
       "runtime" : {
+         "recommends" : {
+            "PAUSE::Permissions::MetaCPAN" : "0"
+         },
          "requires" : {
             "Config::Identity" : "0",
             "Exporter" : "0",
@@ -42,6 +43,12 @@
             "Parse::PMFile" : "0.15",
             "parent" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::UseAllModules" : "0.10"
+         }
       }
    },
    "release_status" : "stable",
@@ -50,5 +57,6 @@
          "url" : "https://github.com/charsbar/Test-PAUSE-Permissions"
       }
    },
-   "version" : "0.06"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,7 +1,7 @@
 package App::DuckPAN::Cmd::Roadrunner;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Install requirements as fast as possible
-$App::DuckPAN::Cmd::Roadrunner::VERSION = '1019';
+$App::DuckPAN::Cmd::Roadrunner::VERSION = '1021';
 use Moo;
 with qw( App::DuckPAN::Cmd );
 
@@ -46,7 +46,7 @@ App::DuckPAN::Cmd::Roadrunner - Install requirements as fast as possible
 
 =head1 VERSION
 
-version 1019
+version 1021
 
 =head1 AUTHOR
 

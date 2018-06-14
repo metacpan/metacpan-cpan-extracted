@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Digest::SHA1 qw( sha1_hex );
 use Encode qw( encode );
@@ -36,9 +36,9 @@ use MooseX::StrictConstructor;
 with 'Markdent::Role::BlockParser';
 
 has __html_blocks => (
-    traits => ['Hash'],
-    is     => 'ro',
-    isa    => t( 'HashRef', of => t('Str') ),
+    traits   => ['Hash'],
+    is       => 'ro',
+    isa      => t( 'HashRef', of => t('Str') ),
     default  => sub { {} },
     init_arg => undef,
     handles  => {
@@ -137,7 +137,6 @@ sub _parse_text {
     my $text = shift;
 
     my $last_pos;
-    my $x = 1;
 PARSE:
     while (1) {
         if ( $self->debug() && pos ${$text} ) {
@@ -809,7 +808,7 @@ Markdent::Parser::BlockParser - Block parser for standard Markdown
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 DESCRIPTION
 
@@ -839,7 +838,7 @@ L<Markdent::Role::AnyParser>, and L<Markdent::Role::DebugPrinter> roles.
 
 See L<Markdent> for bug reporting details.
 
-Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Markdent> or via email to L<bug-markdent@rt.cpan.org|mailto:bug-markdent@rt.cpan.org>.
+Bugs may be submitted at L<https://github.com/houseabsolute/Markdent/issues>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 

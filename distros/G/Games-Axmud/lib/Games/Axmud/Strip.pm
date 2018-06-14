@@ -7677,7 +7677,7 @@
             # For 'main' windows, when GA::Client->autoCompleteMode = 'auto', the first time the
             #   user presses the 'up' or 'down' arrow key, this IV is set to the contents of the
             #   entry box (even if it's an empty string). The IV is set back to 'undef' as soon as
-            #   the user presses the RETURN key
+            #   the user presses the ENTER key
             originalEntryText           => undef,
             # Any code can temporarily desensitise the entry box, when required, by calling
             #   $self->captureEntry, which adds an entry to this hash IV

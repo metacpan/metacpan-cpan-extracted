@@ -1,7 +1,7 @@
 package App::DuckPAN::Fathead;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Searches a given output.txt file for a query match
-$App::DuckPAN::Fathead::VERSION = '1019';
+$App::DuckPAN::Fathead::VERSION = '1021';
 use Moo;
 with 'App::DuckPAN::HasApp';
 
@@ -290,7 +290,7 @@ App::DuckPAN::Fathead - Searches a given output.txt file for a query match
 
 =head1 VERSION
 
-version 1019
+version 1021
 
 =head1 AUTHOR
 

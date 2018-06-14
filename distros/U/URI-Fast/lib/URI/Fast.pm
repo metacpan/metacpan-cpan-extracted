@@ -4,7 +4,7 @@ use strict;
 use warnings;
 no strict 'refs';
 
-our $VERSION = '0.29';
+our $VERSION = '0.32';
 
 use Carp;
 use Exporter;
@@ -13,14 +13,13 @@ require XSLoader;
 XSLoader::load('URI::Fast', $VERSION);
 
 use Exporter 'import';
-our @EXPORT_OK = qw(uri iri uri_split);
+our @EXPORT_OK = qw(uri iri uri_split encode decode);
 
 use overload '""' => sub{ $_[0]->to_string };
 
-sub uri ($) {
-  my $self = URI::Fast->new($_[0]);
-  $self;
-}
+sub uri { URI::Fast->new($_[0]) }
+sub iri { URI::Fast::IRI->new_iri($_[0]) }
+sub as_string { goto \&to_string }
 
 # Build a simple accessor for basic attributes
 foreach my $attr (qw(scheme usr pwd host port frag)) {
@@ -159,6 +158,8 @@ parameter.
 
 =head1 EXPORTED SUBROUTINES
 
+Subroutines are exported on demand.
+
 =head2 uri
 
 Accepts a URI string, minimally parses it, and returns a C<URI::Fast> object.
@@ -173,6 +174,10 @@ be percent-encoded when modified.
 
 Behaves (hopefully) identically to L<URI::Split>, but roughly twice as fast.
 
+=head2 encode/decode
+
+See L</ENCODING>.
+
 =head1 ATTRIBUTES
 
 Unless otherwise specified, all attributes serve as full accessors, allowing
@@ -183,7 +188,7 @@ its value.
 
 =head2 scheme
 
-Defaults to C<file> if not present in the URI string.
+Gets or sets the scheme portion of the URI (e.g. C<http>), excluding C<://>.
 
 =head2 auth
 

@@ -23,21 +23,41 @@ package Paws::EC2::CreateNetworkAclEntry;
 
 =head1 NAME
 
-Paws::EC2::CreateNetworkAclEntry - Arguments for method CreateNetworkAclEntry on Paws::EC2
+Paws::EC2::CreateNetworkAclEntry - Arguments for method CreateNetworkAclEntry on L<Paws::EC2>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateNetworkAclEntry on the 
-Amazon Elastic Compute Cloud service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateNetworkAclEntry on the
+L<Amazon Elastic Compute Cloud|Paws::EC2> service. Use the attributes of this class
 as arguments to method CreateNetworkAclEntry.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateNetworkAclEntry.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateNetworkAclEntry(Att1 => $value1, Att2 => $value2, ...);
+    my $ec2 = Paws->service('EC2');
+    # To create a network ACL entry
+    # This example creates an entry for the specified network ACL. The rule
+    # allows ingress traffic from anywhere (0.0.0.0/0) on UDP port 53 (DNS) into
+    # any associated subnet.
+    $ec2->CreateNetworkAclEntry(
+      {
+        'RuleAction'   => 'allow',
+        'RuleNumber'   => 100,
+        'Protocol'     => 'udp',
+        'NetworkAclId' => 'acl-5fb85d36',
+        'PortRange'    => {
+          'To'   => 53,
+          'From' => 53
+        },
+        'Egress'    => 0,
+        'CidrBlock' => '0.0.0.0/0'
+      }
+    );
+
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ec2/CreateNetworkAclEntry>
 
 =head1 ATTRIBUTES
 
@@ -94,13 +114,13 @@ TCP or UDP protocols: The range of ports the rule applies to.
 =head2 B<REQUIRED> Protocol => Str
 
 The protocol. A value of C<-1> or C<all> means all protocols. If you
-specify C<all>, C<-1>, or a protocol number other than C<tcp>, C<udp>,
-or C<icmp>, traffic on all ports is allowed, regardless of any ports or
-ICMP types or codes you specify. If you specify protocol C<58> (ICMPv6)
-and specify an IPv4 CIDR block, traffic for all ICMP types and codes
-allowed, regardless of any that you specify. If you specify protocol
-C<58> (ICMPv6) and specify an IPv6 CIDR block, you must specify an ICMP
-type and code.
+specify C<all>, C<-1>, or a protocol number other than C<6> (tcp),
+C<17> (udp), or C<1> (icmp), traffic on all ports is allowed,
+regardless of any ports or ICMP types or codes you specify. If you
+specify protocol C<58> (ICMPv6) and specify an IPv4 CIDR block, traffic
+for all ICMP types and codes allowed, regardless of any that you
+specify. If you specify protocol C<58> (ICMPv6) and specify an IPv6
+CIDR block, you must specify an ICMP type and code.
 
 
 
@@ -127,9 +147,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateNetwork
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

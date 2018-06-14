@@ -118,7 +118,6 @@ Specific error classes aren’t yet defined.
 
 use Crypt::Format ();
 use MIME::Base64 ();
-use Types::Serialiser ();
 
 use Net::ACME2::Constants ();
 use Net::ACME2::HTTP ();
@@ -242,7 +241,7 @@ or 0 if the account already existed.
 sub create_new_account {
     my ($self, %opts) = @_;
 
-    $opts{$_} &&= Types::Serialiser::true() for newAccount_booleans();
+    $opts{$_} &&= JSON::true() for newAccount_booleans();
 
     my $resp = $self->_post(
         'newAccount',

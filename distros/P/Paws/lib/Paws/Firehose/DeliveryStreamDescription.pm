@@ -52,7 +52,10 @@ Contains information about a delivery stream.
 
 =head2 B<REQUIRED> DeliveryStreamARN => Str
 
-  The Amazon Resource Name (ARN) of the delivery stream.
+  The Amazon Resource Name (ARN) of the delivery stream. For more
+information, see Amazon Resource Names (ARNs) and AWS Service
+Namespaces
+(https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html).
 
 
 =head2 B<REQUIRED> DeliveryStreamName => Str
@@ -78,8 +81,8 @@ directly.
 
 =item *
 
-C<KinesisStreamAsSource>: The delivery stream uses a Kinesis stream as
-a source.
+C<KinesisStreamAsSource>: The delivery stream uses a Kinesis data
+stream as a source.
 
 =back
 
@@ -103,7 +106,7 @@ a source.
 =head2 Source => L<Paws::Firehose::SourceDescription>
 
   If the C<DeliveryStreamType> parameter is C<KinesisStreamAsSource>, a
-SourceDescription object describing the source Kinesis stream.
+SourceDescription object describing the source Kinesis data stream.
 
 
 =head2 B<REQUIRED> VersionId => Str
@@ -121,9 +124,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Firehose>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -1,7 +1,7 @@
 package App::DuckPAN::Cmd::Env::Cmd::Help;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: List commands and usage
-$App::DuckPAN::Cmd::Env::Cmd::Help::VERSION = '1019';
+$App::DuckPAN::Cmd::Env::Cmd::Help::VERSION = '1021';
 use Moo;
 with qw( App::DuckPAN::Cmd::Env::Cmd );
 
@@ -24,7 +24,7 @@ App::DuckPAN::Cmd::Env::Cmd::Help - List commands and usage
 
 =head1 VERSION
 
-version 1019
+version 1021
 
 =head1 AUTHOR
 

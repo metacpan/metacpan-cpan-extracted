@@ -53,7 +53,8 @@ codes.
 =head2 IpProtocol => Str
 
   The IP protocol name (C<tcp>, C<udp>, C<icmp>) or number (see Protocol
-Numbers).
+Numbers
+(http://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml)).
 
 [EC2-VPC only] Use C<-1> to specify all protocols. When authorizing
 security group rules, specifying C<-1> or a protocol number other than
@@ -76,11 +77,11 @@ and codes is allowed when authorizing rules.
 
 =head2 PrefixListIds => ArrayRef[L<Paws::EC2::PrefixListId>]
 
-  (Valid for AuthorizeSecurityGroupEgress, RevokeSecurityGroupEgress and
-DescribeSecurityGroups only) One or more prefix list IDs for an AWS
-service. In an AuthorizeSecurityGroupEgress request, this is the AWS
-service that you want to access through a VPC endpoint from instances
-associated with the security group.
+  (EC2-VPC only; valid for AuthorizeSecurityGroupEgress,
+RevokeSecurityGroupEgress and DescribeSecurityGroups only) One or more
+prefix list IDs for an AWS service. In an AuthorizeSecurityGroupEgress
+request, this is the AWS service that you want to access through a VPC
+endpoint from instances associated with the security group.
 
 
 =head2 ToPort => Int
@@ -103,8 +104,8 @@ This class forms part of L<Paws>, describing an object used in L<Paws::EC2>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut

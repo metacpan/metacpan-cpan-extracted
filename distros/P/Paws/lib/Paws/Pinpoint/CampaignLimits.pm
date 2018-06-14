@@ -47,15 +47,15 @@ sent to a user.
 
 =head2 MaximumDuration => Int
 
-  The maximum duration of a campaign from the scheduled start. Must be a
-minimum of 60 seconds.
+  The length of time (in seconds) that the campaign can run before it
+ends and message deliveries stop. This duration begins at the scheduled
+start time for the campaign. The minimum value is 60.
 
 
 =head2 MessagesPerSecond => Int
 
-  The maximum number of messages per second that the campaign will send.
-This is a best effort maximum cap and can go as high as 20000 and as
-low as 50
+  The number of messages that the campaign can send per second. The
+minimum value is 50, and the maximum is 20000.
 
 
 =head2 Total => Int
@@ -70,9 +70,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Pinpoint>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

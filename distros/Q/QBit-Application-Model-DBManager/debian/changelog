@@ -1,3 +1,9 @@
+libqbit-application-model-dbmanager-perl (0.021) raring; urgency=low
+
+  * fields
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat,  9 Jun 2018 22:18:48 +0300
+
 libqbit-application-model-dbmanager-perl (0.020) raring; urgency=low
 
   * move exception

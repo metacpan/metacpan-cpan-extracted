@@ -391,10 +391,10 @@ any workflow and will work as expected.
 
     cases check_several_numbers => sub {
         my $number;
-        case one => sub { $number = 2 };
-        case one => sub { $number = 4 };
-        case one => sub { $number = 6 };
-        case one => sub { $number = 8 };
+        case two   => sub { $number = 2 };
+        case four  => sub { $number = 4 };
+        case six   => sub { $number = 6 };
+        case eight => sub { $number = 8 };
 
         tests is_even => sub {
             ok( !$number % 2, "number is even" );

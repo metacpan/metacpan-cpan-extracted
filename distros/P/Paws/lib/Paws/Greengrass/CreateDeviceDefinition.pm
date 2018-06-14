@@ -11,47 +11,74 @@ package Paws::Greengrass::CreateDeviceDefinition;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/greengrass/definition/devices');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'POST');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::Greengrass::CreateDeviceDefinitionResponse');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::Greengrass::CreateDeviceDefinition - Arguments for method CreateDeviceDefinition on Paws::Greengrass
+Paws::Greengrass::CreateDeviceDefinition - Arguments for method CreateDeviceDefinition on L<Paws::Greengrass>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateDeviceDefinition on the 
-AWS Greengrass service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateDeviceDefinition on the
+L<AWS Greengrass|Paws::Greengrass> service. Use the attributes of this class
 as arguments to method CreateDeviceDefinition.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateDeviceDefinition.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateDeviceDefinition(Att1 => $value1, Att2 => $value2, ...);
+    my $greengrass = Paws->service('Greengrass');
+    my $CreateDeviceDefinitionResponse = $greengrass->CreateDeviceDefinition(
+      AmznClientToken => 'My__string',    # OPTIONAL
+      InitialVersion  => {
+        Devices => [
+          {
+            CertificateArn => 'My__string',
+            Id             => 'My__string',
+            ThingArn       => 'My__string',
+            SyncShadow     => 1,              # OPTIONAL
+          },
+          ...
+        ],                                    # OPTIONAL
+      },    # OPTIONAL
+      Name => 'My__string',    # OPTIONAL
+    );
+
+    # Results:
+    my $LatestVersionArn  = $CreateDeviceDefinitionResponse->LatestVersionArn;
+    my $Arn               = $CreateDeviceDefinitionResponse->Arn;
+    my $Name              = $CreateDeviceDefinitionResponse->Name;
+    my $CreationTimestamp = $CreateDeviceDefinitionResponse->CreationTimestamp;
+    my $LatestVersion     = $CreateDeviceDefinitionResponse->LatestVersion;
+    my $LastUpdatedTimestamp =
+      $CreateDeviceDefinitionResponse->LastUpdatedTimestamp;
+    my $Id = $CreateDeviceDefinitionResponse->Id;
+
+    # Returns a L<Paws::Greengrass::CreateDeviceDefinitionResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/greengrass/>
 
 =head1 ATTRIBUTES
 
 
 =head2 AmznClientToken => Str
 
-The client token used to request idempotent operations.
+A client token used to correlate requests and responses.
 
 
 
 =head2 InitialVersion => L<Paws::Greengrass::DeviceDefinitionVersion>
 
-Information on the initial version
+Information about the initial version of the device definition.
 
 
 
 =head2 Name => Str
 
-name of the device definition
+The name of the device definition.
 
 
 
@@ -62,9 +89,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateDeviceD
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

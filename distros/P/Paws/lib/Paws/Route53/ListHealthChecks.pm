@@ -18,21 +18,35 @@ package Paws::Route53::ListHealthChecks;
 
 =head1 NAME
 
-Paws::Route53::ListHealthChecks - Arguments for method ListHealthChecks on Paws::Route53
+Paws::Route53::ListHealthChecks - Arguments for method ListHealthChecks on L<Paws::Route53>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ListHealthChecks on the 
-Amazon Route 53 service. Use the attributes of this class
+This class represents the parameters used for calling the method ListHealthChecks on the
+L<Amazon Route 53|Paws::Route53> service. Use the attributes of this class
 as arguments to method ListHealthChecks.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ListHealthChecks.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ListHealthChecks(Att1 => $value1, Att2 => $value2, ...);
+    my $route53 = Paws->service('Route53');
+    my $ListHealthChecksResponse = $route53->ListHealthChecks(
+      Marker   => 'MyPageMarker',      # OPTIONAL
+      MaxItems => 'MyPageMaxItems',    # OPTIONAL
+    );
+
+    # Results:
+    my $MaxItems     = $ListHealthChecksResponse->MaxItems;
+    my $Marker       = $ListHealthChecksResponse->Marker;
+    my $NextMarker   = $ListHealthChecksResponse->NextMarker;
+    my $HealthChecks = $ListHealthChecksResponse->HealthChecks;
+    my $IsTruncated  = $ListHealthChecksResponse->IsTruncated;
+
+    # Returns a L<Paws::Route53::ListHealthChecksResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/route53/ListHealthChecks>
 
 =head1 ATTRIBUTES
 
@@ -68,9 +82,9 @@ This class forms part of L<Paws>, documenting arguments for method ListHealthChe
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

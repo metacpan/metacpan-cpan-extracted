@@ -1,0 +1,39 @@
+---
+abstract: 'Validate DNS SSH Fingerprint (SSHFP) Record Values'
+author:
+  - 'Michael Schout <mschout@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Scalar::Util: '0'
+  Test::More: '0'
+  Test::Warnings: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Validate-DNS-SSHFP
+provides:
+  Data::Validate::DNS::SSHFP:
+    file: lib/Data/Validate/DNS/SSHFP.pm
+    version: '0.01'
+requires:
+  Exporter: '0'
+  Taint::Util: '0'
+  parent: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/mschout/perl-data-validate-dns-sshfp/issues
+  homepage: https://github.com/mschout/perl-data-validate-dns-sshfp
+  repository: https://github.com/mschout/perl-data-validate-dns-sshfp.git
+version: '0.01'
+x_serialization_backend: 'YAML::Tiny version 1.70'

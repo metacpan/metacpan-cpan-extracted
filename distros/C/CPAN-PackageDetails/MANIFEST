@@ -8,6 +8,7 @@ corpus/cpan/L/LO/LOCAL/Local-Bar-4.56.tar.gz
 corpus/cpan/L/LO/LOCAL/Local-Foo-1.23.tar.gz
 corpus/good/no_tricks.txt.gz
 examples/make_02packages.pl
+INSTALL.SKIP
 lib/CPAN/PackageDetails.pm
 lib/CPAN/PackageDetails/Entries.pm
 lib/CPAN/PackageDetails/Entry.pm
@@ -16,9 +17,9 @@ lib/CPAN/PackageDetails/PerlHash.pm
 lib/CPAN/PackageDetails/Redis.pm
 LICENSE
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST
 MANIFEST.SKIP
-README
+README.pod
 t/_filter_older_dists.t
 t/allow_packages_only_once.t
 t/alpha_versions.t
@@ -40,11 +41,10 @@ t/regression_output/three_entries.gz
 t/suspicious_package_name.t
 t/test_files/02packages.details.txt.gz
 t/test_manifest
-t/test_output/no_entries.gz
-t/test_output/three_entries.gz
 t/test_regression/no_entries.gz
 t/test_regression/three_entries.gz
 t/unique_sorted.t
 t/write_file.t
+xt/changes.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

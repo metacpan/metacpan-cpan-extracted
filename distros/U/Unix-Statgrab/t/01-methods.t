@@ -38,12 +38,12 @@ my @constants_names = (
 
 foreach my $constname (@constants_names)
 {
-    ok( eval "my \$a = $constname; 1", "Unix::Statgrab::$constname" );
+    ok(eval "my \$a = $constname; 1", "Unix::Statgrab::$constname");
 
     my $c = Unix::Statgrab->can($constname);
-    ok( $c, "Unix::Statgrab->can('$constname')" ) or skip("Can't get constant value of $constname");
+    ok($c, "Unix::Statgrab->can('$constname')") or skip("Can't get constant value of $constname");
     my $v = &{$c}();
-    ok( defined($v), "value of $constname" );
+    ok(defined($v), "value of $constname");
 }
 
 my %funcs = (
@@ -105,44 +105,44 @@ my %methods = (
 sub check_methods
 {
     my ($o) = @_;
-    ( my $func = ref($o) ) =~ s/Unix::Statgrab::sg_(\w+).*$/$1/g;
+    (my $func = ref($o)) =~ s/Unix::Statgrab::sg_(\w+).*$/$1/g;
     my $entries = $o->entries();
-    ok( defined $entries, "Unix::Statgrab::sg_${func}->entries" );
-    my @cols = @{ $o->colnames };
-    ok( @cols, "Unix::Statgrab::sg_${func}->colnames" );
+    ok(defined $entries, "Unix::Statgrab::sg_${func}->entries");
+    my @cols = @{$o->colnames};
+    ok(@cols, "Unix::Statgrab::sg_${func}->colnames");
     $entries or return;    # diskless system, no logins, ...
     foreach my $method (@cols)
     {
-        ok( defined( $o->$method() ), "Unix::Statgrab::sg_$func->$method" );
+        ok(defined($o->$method()), "Unix::Statgrab::sg_$func->$method");
     }
 }
 
 # we only check that nothing segfaults
 SKIP:
-foreach my $func ( sort @{ $Unix::Statgrab::EXPORT_TAGS{stats} } )
+foreach my $func (sort @{$Unix::Statgrab::EXPORT_TAGS{stats}})
 {
     my $sub = Unix::Statgrab->can($func);
-    ok( $sub, "Unix::Statgrab->can('$func')" ) or skip("Can't invoke unknow stats-call $func");
+    ok($sub, "Unix::Statgrab->can('$func')") or skip("Can't invoke unknow stats-call $func");
     my $o = eval { $sub->(); };
     $@ and skip "$func: " . $@, 1;
     $o or do { my $e = get_error(); skip "$func: " . $e->strperror(), 1 } while (0);
-    ok( $o, "Unix::Statgrab::$func" ) or skip("Can't invoke methods on non-object");
+    ok($o, "Unix::Statgrab::$func") or skip("Can't invoke methods on non-object");
     check_methods($o);
-    if ( defined( $methods{$func} ) )
+    if (defined($methods{$func}))
     {
       SKIP:
-        foreach my $inh_func ( sort keys %{ $methods{$func} } )
+        foreach my $inh_func (sort keys %{$methods{$func}})
         {
             my $inh_sub = $o->can($inh_func);
-            ok( $inh_sub, "Unix::Statgrab->can('$inh_func')" ) or next;
+            ok($inh_sub, "Unix::Statgrab->can('$inh_func')") or next;
             my $inh_s =
               $methods{$func}{$inh_func} == $funcs{$func}
-              ? sub { my $n = $sub->(); $inh_sub->( $n, $o ); }
+              ? sub { my $n = $sub->(); $inh_sub->($n, $o); }
               : sub { $inh_sub->($o); };
             my $inh_o = eval { $inh_s->(); };
             $@ or skip "$inh_func: $@", 1;
-            ok( $inh_o, "Unix::Statgrab::$func" ) or next;
-            check_methods( $inh_o, $methods{$func}{$inh_func} );
+            ok($inh_o, "Unix::Statgrab::$func") or next;
+            check_methods($inh_o, $methods{$func}{$inh_func});
         }
     }
 }

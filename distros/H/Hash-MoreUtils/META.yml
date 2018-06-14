@@ -4,21 +4,26 @@ author:
   - 'Hans Dieter Pearcey <hdp@cpan.org>'
   - 'Jens Rehsack <rehsack@cpan.org>'
 build_requires:
-  Test::More: 0.90
+  Test::More: '0.9'
 configure_requires:
-  Module::Build: 0.42
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4203, CPAN::Meta::Converter version 2.132830'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Hash-MoreUtils
-provides:
-  Hash::MoreUtils:
-    file: lib/Hash/MoreUtils.pm
-    version: 0.05
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: v5.8.1
 resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Hash-MoreUtils
+  homepage: https://metacpan.org/release/Hash-MoreUtils
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/perl5-utils/Hash-MoreUtils
-version: 0.05
+  repository: https://github.com/perl5-utils/Hash-MoreUtils.git
+version: '0.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

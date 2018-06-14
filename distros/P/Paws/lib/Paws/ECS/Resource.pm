@@ -61,8 +61,8 @@ extended precision floating-point type.
 
 =head2 Name => Str
 
-  The name of the resource, such as C<cpu>, C<memory>, C<ports>, or a
-user-defined resource.
+  The name of the resource, such as C<CPU>, C<MEMORY>, C<PORTS>,
+C<PORTS_UDP>, or a user-defined resource.
 
 
 =head2 StringSetValue => ArrayRef[Str|Undef]
@@ -84,9 +84,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::ECS>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

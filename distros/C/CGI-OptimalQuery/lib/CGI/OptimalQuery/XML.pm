@@ -14,25 +14,21 @@ sub output {
   my @t = localtime;
   $title .= '_'.($t[5] + 1900).($t[4] + 1).$t[3].$t[2].$t[1];
 
-  $$o{output_handler}->(CGI::header(-type => 'text/xml', -attachment => "$title.xml").
+  $$o{output_handler}->($$o{httpHeader}->(-type => 'text/xml', -attachment => "$title.xml").
 "<?xml version=\"1.0\"?>\n<OptimalQuery>\n");
 
   my @userselcols = @{ $o->get_usersel_cols };
 
-  my $buf;
-
   # print data
   while (my $rec = $o->fetch()) {
-    $buf .= "<rec id=\"$$rec{U_ID}\">\n";
+    my $buf = "<rec id=\"$$rec{U_ID}\">\n";
     foreach my $col (@userselcols) {
       $buf .= "  <$col>".$o->escape_html($o->get_val($col))."</$col>\n";
     }
     $buf .= "</rec>\n";
+    $$o{output_handler}->($buf);
   }
-  $buf .= "</OptimalQuery>";
-
-  $$o{output_handler}->($buf);
-
+  $$o{output_handler}->("</OptimalQuery>");
   $o->finish();
   return undef;
 }

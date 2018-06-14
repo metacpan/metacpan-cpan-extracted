@@ -18,21 +18,57 @@ package Paws::MachineLearning::CreateDataSourceFromRDS;
 
 =head1 NAME
 
-Paws::MachineLearning::CreateDataSourceFromRDS - Arguments for method CreateDataSourceFromRDS on Paws::MachineLearning
+Paws::MachineLearning::CreateDataSourceFromRDS - Arguments for method CreateDataSourceFromRDS on L<Paws::MachineLearning>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateDataSourceFromRDS on the 
-Amazon Machine Learning service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateDataSourceFromRDS on the
+L<Amazon Machine Learning|Paws::MachineLearning> service. Use the attributes of this class
 as arguments to method CreateDataSourceFromRDS.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateDataSourceFromRDS.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateDataSourceFromRDS(Att1 => $value1, Att2 => $value2, ...);
+    my $machinelearning = Paws->service('MachineLearning');
+    my $CreateDataSourceFromRDSOutput =
+      $machinelearning->CreateDataSourceFromRDS(
+      DataSourceId => 'MyEntityId',
+      RDSData      => {
+        ResourceRole        => 'MyEDPResourceRole',      # min: 1, max: 64
+        ServiceRole         => 'MyEDPServiceRole',       # min: 1, max: 64
+        SelectSqlQuery      => 'MyRDSSelectSqlQuery',    # min: 1, max: 16777216
+        S3StagingLocation   => 'MyS3Url',                # max: 2048
+        DatabaseCredentials => {
+          Username => 'MyRDSDatabaseUsername',           # min: 1, max: 128
+          Password => 'MyRDSDatabasePassword',           # min: 8, max: 128
+
+        },
+        SecurityGroupIds => [
+          'MyEDPSecurityGroupId', ...                    # min: 1, max: 255
+        ],
+        DatabaseInformation => {
+          InstanceIdentifier => 'MyRDSInstanceIdentifier',    # min: 1, max: 63
+          DatabaseName       => 'MyRDSDatabaseName',          # min: 1, max: 64
+
+        },
+        SubnetId          => 'MyEDPSubnetId',          # min: 1, max: 255
+        DataRearrangement => 'MyDataRearrangement',    # OPTIONAL
+        DataSchema        => 'MyDataSchema',           # max: 131071; OPTIONAL
+        DataSchemaUri     => 'MyS3Url',                # max: 2048
+      },
+      RoleARN           => 'MyRoleARN',
+      ComputeStatistics => 1,                          # OPTIONAL
+      DataSourceName    => 'MyEntityName',             # OPTIONAL
+      );
+
+    # Results:
+    my $DataSourceId = $CreateDataSourceFromRDSOutput->DataSourceId;
+
+    # Returns a L<Paws::MachineLearning::CreateDataSourceFromRDSOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/machinelearning/CreateDataSourceFromRDS>
 
 =head1 ATTRIBUTES
 
@@ -90,14 +126,17 @@ credentials that are used to connect to the Amazon RDS database.
 ResourceRole - A role (DataPipelineDefaultResourceRole) assumed by an
 EC2 instance to carry out the copy task from Amazon RDS to Amazon
 Simple Storage Service (Amazon S3). For more information, see Role
-templates for data pipelines.
+templates
+(http://docs.aws.amazon.com/datapipeline/latest/DeveloperGuide/dp-iam-roles.html)
+for data pipelines.
 
 =item *
 
 ServiceRole - A role (DataPipelineDefaultRole) assumed by the AWS Data
 Pipeline service to monitor the progress of the copy task from Amazon
-RDS to Amazon S3. For more information, see Role templates for data
-pipelines.
+RDS to Amazon S3. For more information, see Role templates
+(http://docs.aws.amazon.com/datapipeline/latest/DeveloperGuide/dp-iam-roles.html)
+for data pipelines.
 
 =item *
 
@@ -154,9 +193,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateDataSou
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

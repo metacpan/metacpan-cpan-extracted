@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Role::NodeLoader;
-$Config::Model::Role::NodeLoader::VERSION = '2.123';
+$Config::Model::Role::NodeLoader::VERSION = '2.124';
 # ABSTRACT: Load Node element in configuration tree
 
 use Mouse::Role;
@@ -28,7 +28,7 @@ sub load_node {
     my $config_class_name = $params{config_class_name};
     my $config_class =  $self->config_model->get_model($config_class_name) ;
     my $node_class = $config_class->{class} || 'Config::Model::Node';
-    $load_logger->info("Loading $config_class_name ". $self->location . " with $node_class");
+    $load_logger->debug("Loading $config_class_name ". $self->location . " with $node_class");
     Mouse::Util::load_class($node_class);
 
     if (delete $params{check}) {
@@ -52,7 +52,7 @@ Config::Model::Role::NodeLoader - Load Node element in configuration tree
 
 =head1 VERSION
 
-version 2.123
+version 2.124
 
 =head1 SYNOPSIS
 

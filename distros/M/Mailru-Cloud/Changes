@@ -6,5 +6,12 @@ Revision history for Perl extension Mailru::Cloud.
 0.02  Sun Mar  11 10:55:00 2018
     - Version 0.02
         - Added info() method
-        - Changes __isLogin method. This method autologin if login is expired
-	
+0.03  Sun Mar  11 23:55:00 2018
+    - Version 0.03
+        - Fix 'Unescaped left brace in regex is deprecated'
+0.04  Wed Jun  06 12:12:00 2018
+    - Version 0.04
+        - Added skip test if test script can't login to mailcloud account 
+0.05  Sun Jun  09 16:09:00 2018
+    - Version 0.05
+        - Fix authentication error

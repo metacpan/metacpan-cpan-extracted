@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Class::Load::PP;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Module::Runtime ();
 use Package::Stash 0.14;

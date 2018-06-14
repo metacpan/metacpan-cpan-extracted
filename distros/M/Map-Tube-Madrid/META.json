@@ -44,15 +44,15 @@
    "provides" : {
       "Map::Tube::Madrid" : {
          "file" : "lib/Map/Tube/Madrid.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Map::Tube::Madrid::Line::L3" : {
          "file" : "lib/Map/Tube/Madrid/Line/L3.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Map::Tube::Madrid::Line::L5" : {
          "file" : "lib/Map/Tube/Madrid/Line/L5.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -63,6 +63,6 @@
          "web" : "https://github.com/manwar/Map-Tube-Madrid"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

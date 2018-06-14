@@ -40,7 +40,10 @@ should be applied to schematize the records on the stream.
 
 =head2 MappingParameters => L<Paws::KinesisAnalytics::MappingParameters>
 
-  
+  When configuring application input at the time of creating or updating
+an application, provides additional mapping information specific to the
+record format (such as JSON, CSV, or record fields delimited by some
+delimiter) on the streaming source.
 
 
 =head2 B<REQUIRED> RecordFormatType => Str
@@ -55,9 +58,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::KinesisAn
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

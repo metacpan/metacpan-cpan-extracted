@@ -17,21 +17,52 @@ package Paws::WAF::UpdateWebACL;
 
 =head1 NAME
 
-Paws::WAF::UpdateWebACL - Arguments for method UpdateWebACL on Paws::WAF
+Paws::WAF::UpdateWebACL - Arguments for method UpdateWebACL on L<Paws::WAF>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateWebACL on the 
-AWS WAF service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateWebACL on the
+L<AWS WAF|Paws::WAF> service. Use the attributes of this class
 as arguments to method UpdateWebACL.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateWebACL.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateWebACL(Att1 => $value1, Att2 => $value2, ...);
+    my $waf = Paws->service('WAF');
+    # To update a Web ACL
+    # The following example deletes an ActivatedRule object in a WebACL with the
+    # ID webacl-1472061481310.
+    my $UpdateWebACLResponse = $waf->UpdateWebACL(
+      {
+        'ChangeToken' => 'abcd12f2-46da-4fdb-b8d5-fbd4c466928f',
+        'Updates'     => [
+
+          {
+            'ActivatedRule' => {
+              'RuleId' => 'WAFRule-1-Example',
+              'Action' => {
+                'Type' => 'ALLOW'
+              },
+              'Priority' => 1
+            },
+            'Action' => 'DELETE'
+          }
+        ],
+        'WebACLId'      => 'webacl-1472061481310',
+        'DefaultAction' => {
+          'Type' => 'ALLOW'
+        }
+      }
+    );
+
+    # Results:
+    my $ChangeToken = $UpdateWebACLResponse->ChangeToken;
+
+    # Returns a L<Paws::WAF::UpdateWebACLResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/waf/UpdateWebACL>
 
 =head1 ATTRIBUTES
 
@@ -66,7 +97,12 @@ WebACLUpdate: Contains C<Action> and C<ActivatedRule>
 
 =item *
 
-ActivatedRule: Contains C<Action>, C<Priority>, C<RuleId>, and C<Type>
+ActivatedRule: Contains C<Action>, C<OverrideAction>, C<Priority>,
+C<RuleId>, and C<Type>. C<ActivatedRule|OverrideAction> applies only
+when updating or adding a C<RuleGroup> to a C<WebACL>. In this case you
+do not use C<ActivatedRule|Action>. For all other update requests,
+C<ActivatedRule|Action> is used instead of
+C<ActivatedRule|OverrideAction>.
 
 =item *
 
@@ -91,9 +127,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateWebACL 
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

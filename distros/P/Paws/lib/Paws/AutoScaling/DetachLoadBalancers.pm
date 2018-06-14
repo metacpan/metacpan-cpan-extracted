@@ -15,21 +15,32 @@ package Paws::AutoScaling::DetachLoadBalancers;
 
 =head1 NAME
 
-Paws::AutoScaling::DetachLoadBalancers - Arguments for method DetachLoadBalancers on Paws::AutoScaling
+Paws::AutoScaling::DetachLoadBalancers - Arguments for method DetachLoadBalancers on L<Paws::AutoScaling>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DetachLoadBalancers on the 
-Auto Scaling service. Use the attributes of this class
+This class represents the parameters used for calling the method DetachLoadBalancers on the
+L<Auto Scaling|Paws::AutoScaling> service. Use the attributes of this class
 as arguments to method DetachLoadBalancers.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DetachLoadBalancers.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DetachLoadBalancers(Att1 => $value1, Att2 => $value2, ...);
+    my $autoscaling = Paws->service('AutoScaling');
+    # To detach a load balancer from an Auto Scaling group
+    # This example detaches the specified load balancer from the specified Auto
+    # Scaling group.
+    my $DetachLoadBalancersResultType = $autoscaling->DetachLoadBalancers(
+      {
+        'LoadBalancerNames'    => ['my-load-balancer'],
+        'AutoScalingGroupName' => 'my-auto-scaling-group'
+      }
+    );
+
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/autoscaling/DetachLoadBalancers>
 
 =head1 ATTRIBUTES
 
@@ -42,7 +53,8 @@ The name of the Auto Scaling group.
 
 =head2 B<REQUIRED> LoadBalancerNames => ArrayRef[Str|Undef]
 
-One or more load balancer names.
+The names of the load balancers. You can specify up to 10 load
+balancers.
 
 
 
@@ -53,9 +65,9 @@ This class forms part of L<Paws>, documenting arguments for method DetachLoadBal
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -3,7 +3,7 @@ package Paws::EC2::ImportInstanceTaskDetails;
   has Description => (is => 'ro', isa => 'Str', request_name => 'description', traits => ['NameInRequest']);
   has InstanceId => (is => 'ro', isa => 'Str', request_name => 'instanceId', traits => ['NameInRequest']);
   has Platform => (is => 'ro', isa => 'Str', request_name => 'platform', traits => ['NameInRequest']);
-  has Volumes => (is => 'ro', isa => 'ArrayRef[Paws::EC2::ImportInstanceVolumeDetailItem]', request_name => 'volumes', traits => ['NameInRequest'], required => 1);
+  has Volumes => (is => 'ro', isa => 'ArrayRef[Paws::EC2::ImportInstanceVolumeDetailItem]', request_name => 'volumes', traits => ['NameInRequest']);
 1;
 
 ### main pod documentation begin ###
@@ -54,7 +54,7 @@ This class has no description
   The instance operating system.
 
 
-=head2 B<REQUIRED> Volumes => ArrayRef[L<Paws::EC2::ImportInstanceVolumeDetailItem>]
+=head2 Volumes => ArrayRef[L<Paws::EC2::ImportInstanceVolumeDetailItem>]
 
   One or more volumes.
 
@@ -66,8 +66,8 @@ This class forms part of L<Paws>, describing an object used in L<Paws::EC2>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut

@@ -1,3 +1,17 @@
+0.3.6 2018-06-11
+  - log who is trying to authenticate
+
+0.3.5 2018-06-11
+  - actually load IO::Socket::Timout 
+
+0.3.4 2018-06-11
+  - timeout for reading and writing added
+
+0.3.3 2018-06-11
+  - SPNEGO_LDAP_DEBUG environemnt to override debug value
+  - timeout reduced to 5s
+  - die on error
+  
 0.3.2 2018-05-17
   - return 0 if all fails
 

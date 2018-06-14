@@ -1,7 +1,7 @@
 
 package Paws::ApiGateway::GetApiKey;
   use Moose;
-  has ApiKey => (is => 'ro', isa => 'Str', traits => ['ParamInURI'], uri_name => 'apiKey', required => 1);
+  has ApiKey => (is => 'ro', isa => 'Str', traits => ['ParamInURI'], uri_name => 'api_Key', required => 1);
   has IncludeValue => (is => 'ro', isa => 'Bool', traits => ['ParamInQuery'], query_name => 'includeValue');
 
   use MooseX::ClassAttribute;
@@ -10,35 +10,52 @@ package Paws::ApiGateway::GetApiKey;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/apikeys/{api_Key}');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'GET');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::ApiGateway::ApiKey');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::ApiGateway::GetApiKey - Arguments for method GetApiKey on Paws::ApiGateway
+Paws::ApiGateway::GetApiKey - Arguments for method GetApiKey on L<Paws::ApiGateway>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method GetApiKey on the 
-Amazon API Gateway service. Use the attributes of this class
+This class represents the parameters used for calling the method GetApiKey on the
+L<Amazon API Gateway|Paws::ApiGateway> service. Use the attributes of this class
 as arguments to method GetApiKey.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to GetApiKey.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->GetApiKey(Att1 => $value1, Att2 => $value2, ...);
+    my $apigateway = Paws->service('ApiGateway');
+    my $ApiKey = $apigateway->GetApiKey(
+      ApiKey       => 'MyString',
+      IncludeValue => 1,            # OPTIONAL
+    );
+
+    # Results:
+    my $CreatedDate     = $ApiKey->CreatedDate;
+    my $Description     = $ApiKey->Description;
+    my $LastUpdatedDate = $ApiKey->LastUpdatedDate;
+    my $Value           = $ApiKey->Value;
+    my $Name            = $ApiKey->Name;
+    my $Enabled         = $ApiKey->Enabled;
+    my $StageKeys       = $ApiKey->StageKeys;
+    my $Id              = $ApiKey->Id;
+    my $CustomerId      = $ApiKey->CustomerId;
+
+    # Returns a L<Paws::ApiGateway::ApiKey> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/apigateway/>
 
 =head1 ATTRIBUTES
 
 
 =head2 B<REQUIRED> ApiKey => Str
 
-The identifier of the ApiKey resource.
+[Required] The identifier of the ApiKey resource.
 
 
 
@@ -56,9 +73,9 @@ This class forms part of L<Paws>, documenting arguments for method GetApiKey in 
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

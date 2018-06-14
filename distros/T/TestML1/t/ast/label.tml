@@ -1,0 +1,58 @@
+--- !!perl/hash:TestML1::Function
+namespace:
+  TestML: !!perl/hash:TestML1::Str
+    value: '0.1.0'
+
+statements:
+- !!perl/hash:TestML1::Assignment
+  name: Plan
+  expr: !!perl/hash:TestML1::Num
+    value: 4
+- !!perl/hash:TestML1::Assignment
+  name: Label
+  expr: !!perl/hash:TestML1::Str
+    value: My label
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Call
+    name: Get
+    args:
+    - !!perl/hash:TestML1::Str
+      value: Label
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Str
+      value: My label
+- !!perl/hash:TestML1::Assignment
+  name: Label
+  expr: !!perl/hash:TestML1::Str
+    value: '$BlockLabel: $num) The $fruit'
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Call
+    name: GetLabel
+    args: []
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Point
+      name: text
+  points:
+  - text
+
+data:
+- !!perl/hash:TestML1::Block
+  label: A Fruity Test
+  points:
+    num: '14'
+    fruit: apple
+    text: 'A Fruity Test: 14) The apple'
+- !!perl/hash:TestML1::Block
+  label: X
+  points:
+    num: '21'
+    fruit: pear
+    text: 'X: 21) The pear'
+- !!perl/hash:TestML1::Block
+  label: Last Test
+  points:
+    num: '99'
+    fruit: tomato
+    text: 'Last Test: 99) The tomato'

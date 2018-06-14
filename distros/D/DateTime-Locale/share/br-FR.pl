@@ -137,7 +137,7 @@
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
   glibc_date_format => "%d.%m.%Y",
-  glibc_datetime_format => "D'ar %A %d a viz %B %Y",
+  glibc_datetime_format => "D\N{U+02bc}ar %A %d a viz %B %Y",
   glibc_time_12_format => "%Ie%M:%S %p",
   glibc_time_format => "%T",
   language => "Breton",

@@ -7,8 +7,6 @@ use base 'SPVM::Build::Base';
 use Carp 'croak', 'confess';
 use File::Spec;
 
-use SPVM::Build::Util;
-
 use ExtUtils::CBuilder;
 use Config;
 use File::Copy 'move';
@@ -16,8 +14,9 @@ use File::Path 'mkpath', 'rmtree';
 
 use File::Basename 'dirname', 'basename';
 
-use SPVM::Build::SPVMInfo;
+use SPVM::Build;
 use SPVM::Build::Util;
+use SPVM::Build::SPVMInfo;
 
 sub new {
   my $self = shift->SUPER::new(@_);
@@ -27,56 +26,39 @@ sub new {
   return $self;
 }
 
-sub get_sub_names_from_module_file {
-  my ($self, $module_file) = @_;
-  
-  return SPVM::Build::Util::get_precompile_sub_names_from_module_file($module_file);
-}
-
 sub get_subs_from_package_name {
   my ($self, $package_name) = @_;
   
-  return SPVM::Build::SPVMInfo::get_precompile_subs_from_package_name($package_name);
+  my $compiler = $self->{compiler};
+  
+  my $subs = SPVM::Build::SPVMInfo::get_subs_from_package_name($compiler, $package_name);
+  $subs = [grep { $_->{have_compile_desc} } @$subs];
+  
+  return $subs;
 }
 
-sub create_cfunc_name {
-  my ($self, $sub_name) = @_;
-
-  # Precompile Subroutine names
-  my $cfunc_name = $sub_name;
-  $cfunc_name =~ s/:/_/g;
-  $cfunc_name = "SPVM_BUILD_PRECOMPILE_$cfunc_name";
+sub create_csource {
+  my ($self, %opt) = @_;
   
-  return $cfunc_name;
-}
-
-sub build_shared_lib_runtime {
-  my ($self, $package_name) = @_;
-
-  # Output directory
-  my $build_dir = $SPVM::BUILD_DIR;
-  unless (defined $build_dir && -d $build_dir) {
-    confess "SPVM build directory must be specified for runtime " . $self->category . " build";
-  }
+  my $package_name = $opt{package_name};
   
-  my $work_dir = "$build_dir/work";
+  my $input_dir = $opt{input_dir};
+
+  my $work_dir = $opt{work_dir};
   mkpath $work_dir;
   
-  my $input_dir = "$build_dir/src";
+  my $output_dir = $opt{output_dir};
+  
+  my $is_cached_ref = $opt{is_cached};
+  
   my $package_path = SPVM::Build::Util::convert_package_name_to_path($package_name, $self->category);
-  my $input_src_dir = "$input_dir/$package_path";
-  mkpath $input_src_dir;
+  my $work_src_dir = "$work_dir/$package_path";
+  mkpath $work_src_dir;
   
-  my $output_dir = "$build_dir/lib";
-  mkpath $output_dir;
-  
-  my $subs = $self->get_subs_from_package_name($package_name);
-  my $sub_names = [map { $_->{name} } @$subs];
-
   my $module_base_name = $package_name;
   $module_base_name =~ s/^.+:://;
   
-  my $source_file = "$input_src_dir/$module_base_name.c";
+  my $source_file = "$work_src_dir/$module_base_name.c";
 
   # Get old csource source
   my $old_package_csource;
@@ -97,20 +79,89 @@ sub build_shared_lib_runtime {
   close $fh;
   
   if ($package_csource ne $old_package_csource) {
-    $self->build_shared_lib(
+    $$is_cached_ref = 0;
+  }
+  else {
+    $$is_cached_ref = 1;
+  }
+}
+
+sub create_shared_lib_dist {
+  my ($self, $package_name) = @_;
+  
+  my $input_dir = 'lib';
+  my $output_dir = 'blib/lib';
+  
+  my $category = $self->category;
+  my $subs = $self->get_subs_from_package_name($package_name);
+  my $sub_names = [map { $_->{name} } @$subs];
+  
+  my $work_dir = "spvm_build/work";
+  mkpath $work_dir;
+
+  my $module_base_name = $package_name;
+  $module_base_name =~ s/^.+:://;
+  my $config_file = "$input_dir/$module_base_name.config";
+
+  my $is_cached;
+  $self->create_csource(
+    package_name => $package_name,
+    input_dir => $input_dir,
+    work_dir => $work_dir,
+    output_dir => $work_dir,
+    is_cached => \$is_cached,
+  );
+  
+  unless ($is_cached) {
+    $self->create_shared_lib(
       package_name => $package_name,
-      input_dir => $input_dir,
+      input_dir => $work_dir,
       work_dir => $work_dir,
       output_dir => $output_dir,
       quiet => 1,
       sub_names => $sub_names,
     );
   }
+}
+
+sub create_shared_lib_runtime {
+  my ($self, $package_name) = @_;
+
+  # Output directory
+  my $build_dir = $self->{build_dir};
+  unless (defined $build_dir && -d $build_dir) {
+    confess "SPVM build directory must be specified for runtime " . $self->category . " build";
+  }
   
-  my $shared_lib_rel_file = SPVM::Build::Util::convert_package_name_to_shared_lib_rel_file($package_name, $self->category);
-  my $shared_lib_file = "$output_dir/$shared_lib_rel_file";
+  my $work_dir = "$build_dir/work";
+  mkpath $work_dir;
+  my $input_dir = "$build_dir/src";
+  mkpath $input_dir;
+  my $output_dir = "$build_dir/lib";
+  mkpath $output_dir;
   
-  return $shared_lib_file;
+  my $subs = $self->get_subs_from_package_name($package_name);
+  my $sub_names = [map { $_->{name} } @$subs];
+  
+  my $is_cached;
+  $self->create_csource(
+    package_name => $package_name,
+    input_dir => $input_dir,
+    work_dir => $work_dir,
+    output_dir => $work_dir,
+    is_cached => \$is_cached,
+  );
+  
+  unless ($is_cached) {
+    $self->create_shared_lib(
+      package_name => $package_name,
+      input_dir => $work_dir,
+      work_dir => $work_dir,
+      output_dir => $output_dir,
+      quiet => 1,
+      sub_names => $sub_names,
+    );
+  }
 }
 
 1;

@@ -1,3 +1,8 @@
+0.002   2018-06-11 (PERLANCAR)
+
+	- Add list: PERLANCAR::Task::AliasingModuleName.
+
+
 0.001   2017-01-09 (PERLANCAR)
 
         - First release. Converted from Acme::CPANLists::PERLANCAR.

@@ -61,7 +61,8 @@ the load balancer and removed from the deployment group.
 =head2 TerminationWaitTimeInMinutes => Int
 
   The number of minutes to wait after a successful blue/green deployment
-before terminating instances from the original environment.
+before terminating instances from the original environment. The maximum
+setting is 2880 minutes (2 days).
 
 
 
@@ -71,9 +72,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::CodeDeplo
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -1,4 +1,31 @@
+v1.1.012 (8 Jun 2018)
+---------------------
+
+Major new features
+- Text-to-speech (TTS) is now enabled on MS Windows. The Windows installer
+    includes the eSpeak engine, so TTS will work out-of-the-box (no screenreader
+    required)
+- Added support for the 'espeak-ng' engine (on both Linux and MS Windows)
+
+Major fixes
+- Fixed issues with ';connect', ';reconnect' and ';xconnect' that especially
+    affected visually-impaired users
+- Fixed several issues on MS Windows. The GUI window will now open, the quick
+    help file can be opened for viewing, and ';searchhelp' works again
+- Autosave is now turned on by default. If you've installed a previous version
+    of Axmud, your previous preferences are retained, so use ';autosave on' to
+    turn on autosaves
+- Fixed problems with clickable links, which caused Axmud to crash instantly
+    when they occur at the end of a line
+- Fixed incorrect handling of UTF-8 which made Russian-language MUDs unplayable
+- Fixed packaging of Perl modules that caused CPAN archive to complain
+- The .deb installer on Linux now adds two items to the Start menu, just like
+    the corresponding MS Windows installer
+
+Minor fixes
+- Numerous minor fixes
+
 v1.1.0 (31 May 2018)
 --------------------
 
-This is the first public release of Axmud
+- This is the first public release of Axmud

@@ -71,7 +71,7 @@
      DEFAULT = 287,
      EVAL = 288,
      WEAKEN = 289,
-     COMPILE = 290,
+     PRECOMPILE = 290,
      UNDEF = 291,
      VOID = 292,
      BYTE = 293,
@@ -95,7 +95,7 @@
      DIVIDE = 311,
      MULTIPLY = 312,
      UMINUS = 313,
-     ARRAY_LENGTH = 314,
+     SCALAR = 314,
      NOT = 315,
      DEC = 316,
      INC = 317,
@@ -135,7 +135,7 @@
 #define DEFAULT 287
 #define EVAL 288
 #define WEAKEN 289
-#define COMPILE 290
+#define PRECOMPILE 290
 #define UNDEF 291
 #define VOID 292
 #define BYTE 293
@@ -159,7 +159,7 @@
 #define DIVIDE 311
 #define MULTIPLY 312
 #define UMINUS 313
-#define ARRAY_LENGTH 314
+#define SCALAR 314
 #define NOT 315
 #define DEC 316
 #define INC 317

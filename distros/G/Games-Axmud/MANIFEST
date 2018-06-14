@@ -10,6 +10,7 @@ lib/Games/Axmud/Cmd.pm
 lib/Games/Axmud/EditWin.pm
 lib/Games/Axmud/FixedWin.pm
 lib/Games/Axmud/Generic.pm
+lib/Games/Axmud/Gtk.pm
 lib/Games/Axmud/Interface.pm
 lib/Games/Axmud/InterfaceModel.pm
 lib/Games/Axmud/ModelObj.pm
@@ -19,6 +20,7 @@ lib/Games/Axmud/Node.pm
 lib/Games/Axmud/Obj/Area.pm
 lib/Games/Axmud/Obj/Atcp.pm
 lib/Games/Axmud/Obj/BasicWorld.pm
+lib/Games/Axmud/Obj/BinomialHeap.pm
 lib/Games/Axmud/Obj/Blinker.pm
 lib/Games/Axmud/Obj/ChatContact.pm
 lib/Games/Axmud/Obj/ColourScheme.pm
@@ -74,19 +76,6 @@ lib/Games/Axmud/Task.pm
 lib/Games/Axmud/Widget.pm
 lib/Games/Axmud/Win.pm
 lib/Games/Axmud/WizWin.pm
-lib/Gtk2/Ex/Simple/List.pm
-lib/Gtk2/Ex/Simple/TiedCommon.pm
-lib/Gtk2/Ex/Simple/TiedList.pm
-lib/Heap/Binary.pm
-lib/Heap/Binomial.pm
-lib/Heap/Elem.pm
-lib/Heap/Elem/Num.pm
-lib/Heap/Elem/NumRev.pm
-lib/Heap/Elem/Ref.pm
-lib/Heap/Elem/RefRev.pm
-lib/Heap/Elem/Str.pm
-lib/Heap/Elem/StrRev.pm
-lib/Heap/Fibonacci.pm
 lib/Language/Axbasic.pm
 lib/Language/Axbasic/Expression.pm
 lib/Language/Axbasic/Function.pm
@@ -97,7 +86,7 @@ MANIFEST			This list of files
 pack/axmud.desktop
 pack/axmud.png
 pack/axmud.xpm
-pack/copyright
+pack/baxmud.desktop
 pack/install
 pack/README
 README
@@ -962,6 +951,7 @@ share/help/cmd/worldcommand
 share/help/cmd/xconnect
 share/help/cmd/xxit
 share/help/COPYING
+share/help/quick/quickhelp
 share/help/task/advance
 share/help/task/attack
 share/help/task/chat

@@ -1,0 +1,64 @@
+#!/usr/bin/perl
+
+use 5.001 ; use strict ; use warnings  ; 
+use Getopt::Std ; 
+getopts "b:e=" , \my%o ; 
+
+# Reads the Inputs 
+
+my $tmp = <>  if $o{'='} ; 
+my %strcnt ; 
+my $allcnt = 0 ;
+while ( <> ) { 
+    chomp ; 
+    $strcnt { $_ } ++ ;  
+    $allcnt ++ ; 
+}
+
+# Calculates the entropy 
+my $entropy = 0 ; 
+for ( values %strcnt ) { 
+    my $p = $_ / $allcnt ; 
+    $entropy -= $p * log $p ; 
+}
+
+# Outputs the result. 
+my @out ;
+unshift @out , exp $entropy if $o{e} ; 
+$o{b} //= 2 ; 
+unshift @out , $entropy / log $o{b} ; 
+
+print join "\t" , @out ; 
+print "\n" ; 
+
+
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+ $0 
+
+  Calculates entropy. Input data values are assumed to be separated by "\n".
+
+ Options: 
+  
+    -b num : change the base number to num. 
+    -e     : show the exp ( entropy ) 
+
+
+=cut

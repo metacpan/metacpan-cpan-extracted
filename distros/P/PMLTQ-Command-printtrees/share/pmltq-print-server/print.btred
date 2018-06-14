@@ -47,7 +47,6 @@ my $output_dirname = delete $opts{'-out-dir'};
   if (ref($grp) eq 'HASH') {
     bless $grp, 'BTrEd::Print::Window';
   }
-
   package main;
   import TrEd::Utils ':all';
 
@@ -190,6 +189,7 @@ sub print_trees {
     -colors => 1,
     -extraOptions => {
       use_svg_desc_and_title => (($opts->{-sentenceInfo} || $opts->{-fileInfo}) ? 1 : 0),
+      $opts->{-extraOptions}->{compress} ? (compress => 1) : ()
     },
     ($opts->{-psMedia} eq 'BBox') ?
       (-hMargin => 0, -vMargin => 0) : (),

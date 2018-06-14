@@ -23,28 +23,65 @@ package Paws::Lambda::CreateFunction;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/2015-03-31/functions');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'POST');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::Lambda::FunctionConfiguration');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::Lambda::CreateFunction - Arguments for method CreateFunction on Paws::Lambda
+Paws::Lambda::CreateFunction - Arguments for method CreateFunction on L<Paws::Lambda>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateFunction on the 
-AWS Lambda service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateFunction on the
+L<AWS Lambda|Paws::Lambda> service. Use the attributes of this class
 as arguments to method CreateFunction.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateFunction.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateFunction(Att1 => $value1, Att2 => $value2, ...);
+    my $lambda = Paws->service('Lambda');
+    # create-function
+    # This example creates a Lambda function.
+    my $FunctionConfiguration = $lambda->CreateFunction(
+      {
+        'Handler' => 'souce_file.handler_name',
+        'Runtime' => 'nodejs4.3',
+        'Code'    => {
+
+        },
+        'Publish'    => true,
+        'MemorySize' => 128,
+        'Role'       => 'arn:aws:iam::123456789012:role/service-role/role-name',
+        'Timeout'    => 15,
+        'Description'  => '',
+        'FunctionName' => 'MyFunction',
+        'VpcConfig'    => {
+
+        }
+      }
+    );
+
+    # Results:
+    my $Handler      = $FunctionConfiguration->Handler;
+    my $FunctionArn  = $FunctionConfiguration->FunctionArn;
+    my $Runtime      = $FunctionConfiguration->Runtime;
+    my $MemorySize   = $FunctionConfiguration->MemorySize;
+    my $Role         = $FunctionConfiguration->Role;
+    my $Timeout      = $FunctionConfiguration->Timeout;
+    my $LastModified = $FunctionConfiguration->LastModified;
+    my $Version      = $FunctionConfiguration->Version;
+    my $FunctionName = $FunctionConfiguration->FunctionName;
+    my $Description  = $FunctionConfiguration->Description;
+    my $CodeSha256   = $FunctionConfiguration->CodeSha256;
+    my $VpcConfig    = $FunctionConfiguration->VpcConfig;
+    my $CodeSize     = $FunctionConfiguration->CodeSize;
+
+    # Returns a L<Paws::Lambda::FunctionConfiguration> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/lambda/CreateFunction>
 
 =head1 ATTRIBUTES
 
@@ -58,7 +95,8 @@ The code for the Lambda function.
 =head2 DeadLetterConfig => L<Paws::Lambda::DeadLetterConfig>
 
 The parent object that contains the target ARN (Amazon Resource Name)
-of an Amazon SQS queue or Amazon SNS topic.
+of an Amazon SQS queue or Amazon SNS topic. For more information, see
+dlq.
 
 
 
@@ -92,7 +130,8 @@ The function within your code that Lambda calls to begin execution. For
 Node.js, it is the I<module-name>.I<export> value in your function. For
 Java, it can be C<package.class-name::handler> or
 C<package.class-name>. For more information, see Lambda Function
-Handler (Java).
+Handler (Java)
+(http://docs.aws.amazon.com/lambda/latest/dg/java-programming-model-handler-types.html).
 
 
 
@@ -126,7 +165,8 @@ Lambda function and publish a version as an atomic operation.
 
 The Amazon Resource Name (ARN) of the IAM role that Lambda assumes when
 it executes your function to access any other Amazon Web Services (AWS)
-resources. For more information, see AWS Lambda: How it Works.
+resources. For more information, see AWS Lambda: How it Works
+(http://docs.aws.amazon.com/lambda/latest/dg/lambda-introduction.html).
 
 
 
@@ -137,22 +177,25 @@ The runtime environment for the Lambda function you are uploading.
 To use the Python runtime v3.6, set the value to "python3.6". To use
 the Python runtime v2.7, set the value to "python2.7". To use the
 Node.js runtime v6.10, set the value to "nodejs6.10". To use the
-Node.js runtime v4.3, set the value to "nodejs4.3".
+Node.js runtime v4.3, set the value to "nodejs4.3". To use the .NET
+Core runtime v1.0, set the value to "dotnetcore1.0". To use the .NET
+Core runtime v2.0, set the value to "dotnetcore2.0".
 
 Node v0.10.42 is currently marked as deprecated. You must migrate
 existing functions to the newer Node.js runtime versions available on
-AWS Lambda (nodejs4.3 or nodejs6.10) as soon as possible. You can
-request a one-time extension until June 30, 2017 by going to the Lambda
-console and following the instructions provided. Failure to do so will
-result in an invalid parmaeter error being returned. Note that you will
-have to follow this procedure for each region that contains functions
-written in the Node v0.10.42 runtime.
+AWS Lambda (nodejs4.3 or nodejs6.10) as soon as possible. Failure to do
+so will result in an invalid parameter error being returned. Note that
+you will have to follow this procedure for each region that contains
+functions written in the Node v0.10.42 runtime.
 
-Valid values are: C<"nodejs">, C<"nodejs4.3">, C<"nodejs6.10">, C<"java8">, C<"python2.7">, C<"python3.6">, C<"dotnetcore1.0">, C<"nodejs4.3-edge">
+Valid values are: C<"nodejs">, C<"nodejs4.3">, C<"nodejs6.10">, C<"nodejs8.10">, C<"java8">, C<"python2.7">, C<"python3.6">, C<"dotnetcore1.0">, C<"dotnetcore2.0">, C<"nodejs4.3-edge">, C<"go1.x">
 
 =head2 Tags => L<Paws::Lambda::Tags>
 
-The list of tags (key-value pairs) assigned to the new function.
+The list of tags (key-value pairs) assigned to the new function. For
+more information, see Tagging Lambda Functions
+(http://docs.aws.amazon.com/lambda/latest/dg/tagging.html) in the B<AWS
+Lambda Developer Guide>.
 
 
 
@@ -187,9 +230,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateFunctio
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

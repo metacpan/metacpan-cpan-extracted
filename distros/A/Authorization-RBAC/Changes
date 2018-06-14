@@ -1,5 +1,8 @@
 Revision history for Authorization-RBAC
 
+0.11 2018-06-09
+  - add cache
+
 0.10 2015-12-08
   - removing unnecessary dependencies
   - takes the schema from outside

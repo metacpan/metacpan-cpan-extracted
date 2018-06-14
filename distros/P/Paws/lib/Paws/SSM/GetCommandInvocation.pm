@@ -16,21 +16,52 @@ package Paws::SSM::GetCommandInvocation;
 
 =head1 NAME
 
-Paws::SSM::GetCommandInvocation - Arguments for method GetCommandInvocation on Paws::SSM
+Paws::SSM::GetCommandInvocation - Arguments for method GetCommandInvocation on L<Paws::SSM>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method GetCommandInvocation on the 
-Amazon Simple Systems Manager (SSM) service. Use the attributes of this class
+This class represents the parameters used for calling the method GetCommandInvocation on the
+L<Amazon Simple Systems Manager (SSM)|Paws::SSM> service. Use the attributes of this class
 as arguments to method GetCommandInvocation.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to GetCommandInvocation.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->GetCommandInvocation(Att1 => $value1, Att2 => $value2, ...);
+    my $ssm = Paws->service('SSM');
+    my $GetCommandInvocationResult = $ssm->GetCommandInvocation(
+      CommandId  => 'MyCommandId',
+      InstanceId => 'MyInstanceId',
+      PluginName => 'MyCommandPluginName',    # OPTIONAL
+    );
+
+    # Results:
+    my $StandardErrorUrl = $GetCommandInvocationResult->StandardErrorUrl;
+    my $ExecutionElapsedTime =
+      $GetCommandInvocationResult->ExecutionElapsedTime;
+    my $ExecutionStartDateTime =
+      $GetCommandInvocationResult->ExecutionStartDateTime;
+    my $DocumentVersion = $GetCommandInvocationResult->DocumentVersion;
+    my $ExecutionEndDateTime =
+      $GetCommandInvocationResult->ExecutionEndDateTime;
+    my $ResponseCode = $GetCommandInvocationResult->ResponseCode;
+    my $StandardErrorContent =
+      $GetCommandInvocationResult->StandardErrorContent;
+    my $CommandId         = $GetCommandInvocationResult->CommandId;
+    my $StatusDetails     = $GetCommandInvocationResult->StatusDetails;
+    my $Status            = $GetCommandInvocationResult->Status;
+    my $DocumentName      = $GetCommandInvocationResult->DocumentName;
+    my $PluginName        = $GetCommandInvocationResult->PluginName;
+    my $StandardOutputUrl = $GetCommandInvocationResult->StandardOutputUrl;
+    my $InstanceId        = $GetCommandInvocationResult->InstanceId;
+    my $StandardOutputContent =
+      $GetCommandInvocationResult->StandardOutputContent;
+    my $Comment = $GetCommandInvocationResult->Comment;
+
+    # Returns a L<Paws::SSM::GetCommandInvocationResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ssm/GetCommandInvocation>
 
 =head1 ATTRIBUTES
 
@@ -64,9 +95,9 @@ This class forms part of L<Paws>, documenting arguments for method GetCommandInv
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

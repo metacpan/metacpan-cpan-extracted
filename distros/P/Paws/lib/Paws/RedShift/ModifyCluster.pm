@@ -31,21 +31,47 @@ package Paws::RedShift::ModifyCluster;
 
 =head1 NAME
 
-Paws::RedShift::ModifyCluster - Arguments for method ModifyCluster on Paws::RedShift
+Paws::RedShift::ModifyCluster - Arguments for method ModifyCluster on L<Paws::RedShift>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ModifyCluster on the 
-Amazon Redshift service. Use the attributes of this class
+This class represents the parameters used for calling the method ModifyCluster on the
+L<Amazon Redshift|Paws::RedShift> service. Use the attributes of this class
 as arguments to method ModifyCluster.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ModifyCluster.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ModifyCluster(Att1 => $value1, Att2 => $value2, ...);
+    my $redshift = Paws->service('RedShift');
+    my $ModifyClusterResult = $redshift->ModifyCluster(
+      ClusterIdentifier                => 'MyString',
+      AllowVersionUpgrade              => 1,                      # OPTIONAL
+      AutomatedSnapshotRetentionPeriod => 1,                      # OPTIONAL
+      ClusterParameterGroupName        => 'MyString',             # OPTIONAL
+      ClusterSecurityGroups            => [ 'MyString', ... ],    # OPTIONAL
+      ClusterType                      => 'MyString',             # OPTIONAL
+      ClusterVersion                   => 'MyString',             # OPTIONAL
+      ElasticIp                        => 'MyString',             # OPTIONAL
+      EnhancedVpcRouting               => 1,                      # OPTIONAL
+      HsmClientCertificateIdentifier   => 'MyString',             # OPTIONAL
+      HsmConfigurationIdentifier       => 'MyString',             # OPTIONAL
+      MasterUserPassword               => 'MyString',             # OPTIONAL
+      NewClusterIdentifier             => 'MyString',             # OPTIONAL
+      NodeType                         => 'MyString',             # OPTIONAL
+      NumberOfNodes                    => 1,                      # OPTIONAL
+      PreferredMaintenanceWindow       => 'MyString',             # OPTIONAL
+      PubliclyAccessible               => 1,                      # OPTIONAL
+      VpcSecurityGroupIds              => [ 'MyString', ... ],    # OPTIONAL
+    );
+
+    # Results:
+    my $Cluster = $ModifyClusterResult->Cluster;
+
+    # Returns a L<Paws::RedShift::ModifyClusterResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/redshift/ModifyCluster>
 
 =head1 ATTRIBUTES
 
@@ -150,8 +176,9 @@ currently in use, a new cluster parameter group in the cluster
 parameter group family for the new version must be specified. The new
 cluster parameter group can be the default for that cluster parameter
 group family. For more information about parameters and parameter
-groups, go to Amazon Redshift Parameter Groups in the I<Amazon Redshift
-Cluster Management Guide>.
+groups, go to Amazon Redshift Parameter Groups
+(http://docs.aws.amazon.com/redshift/latest/mgmt/working-with-parameter-groups.html)
+in the I<Amazon Redshift Cluster Management Guide>.
 
 Example: C<1.0>
 
@@ -164,7 +191,9 @@ The Elastic IP (EIP) address for the cluster.
 Constraints: The cluster must be provisioned in EC2-VPC and
 publicly-accessible through an Internet gateway. For more information
 about provisioning clusters in EC2-VPC, go to Supported Platforms to
-Launch Your Cluster in the Amazon Redshift Cluster Management Guide.
+Launch Your Cluster
+(http://docs.aws.amazon.com/redshift/latest/mgmt/working-with-clusters.html#cluster-platforms)
+in the Amazon Redshift Cluster Management Guide.
 
 
 
@@ -173,7 +202,9 @@ Launch Your Cluster in the Amazon Redshift Cluster Management Guide.
 An option that specifies whether to create the cluster with enhanced
 VPC routing enabled. To create a cluster that uses enhanced VPC
 routing, the cluster must be in a VPC. For more information, see
-Enhanced VPC Routing in the Amazon Redshift Cluster Management Guide.
+Enhanced VPC Routing
+(http://docs.aws.amazon.com/redshift/latest/mgmt/enhanced-vpc-routing.html)
+in the Amazon Redshift Cluster Management Guide.
 
 If this option is C<true>, enhanced VPC routing is enabled.
 
@@ -287,8 +318,8 @@ connection is switched to the new cluster. When the new connection is
 complete, the original access permissions for the cluster are restored.
 You can use DescribeResize to track the progress of the resize request.
 
-Valid Values: C< ds1.xlarge> | C<ds1.8xlarge> | C< ds2.xlarge> |
-C<ds2.8xlarge> | C<dc1.large> | C<dc1.8xlarge>.
+Valid Values: C<ds2.xlarge> | C<ds2.8xlarge> | C<dc1.large> |
+C<dc1.8xlarge> | C<dc2.large> | C<dc2.8xlarge>
 
 
 
@@ -340,7 +371,8 @@ clusters in VPCs can be set to be publicly available.
 =head2 VpcSecurityGroupIds => ArrayRef[Str|Undef]
 
 A list of virtual private cloud (VPC) security groups to be associated
-with the cluster.
+with the cluster. This change is asynchronously applied as soon as
+possible.
 
 
 
@@ -351,9 +383,9 @@ This class forms part of L<Paws>, documenting arguments for method ModifyCluster
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

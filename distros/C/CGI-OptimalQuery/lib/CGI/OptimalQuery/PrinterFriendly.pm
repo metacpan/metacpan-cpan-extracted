@@ -29,7 +29,7 @@ sub output {
     $title .= ' results: '.$o->commify($o->get_lo_rec)." - ".$o->commify($o->get_hi_rec);
   }
 
-  $buf .= $$o{q}->header(-type => 'text/html', -attachment => $fn);
+  $buf .= $$o{httpHeader}->(-type => 'text/html', -attachment => $fn);
   $buf .= '<!DOCTYPE HTML>
 <html>
 <head>

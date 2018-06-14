@@ -51,6 +51,7 @@ Bhms
 Blin
 Bodo
 Bokmål
+Breiddal
 Burkina
 Bïkua
 CLDR
@@ -361,6 +362,7 @@ Rolsky's
 Rombo
 Rundi
 Rwa
+Ryley
 Réunion
 SAR
 SX
@@ -1150,6 +1152,7 @@ qu
 qu_BO
 qu_EC
 qu_PE
+rbreiddal
 rm
 rm_CH
 rn

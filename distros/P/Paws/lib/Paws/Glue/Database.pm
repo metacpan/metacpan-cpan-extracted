@@ -58,7 +58,8 @@ reside in a Hive metastore or an RDBMS.
 
 =head2 B<REQUIRED> Name => Str
 
-  Name of the database.
+  Name of the database. For Hive compatibility, this is folded to
+lowercase when it is stored.
 
 
 =head2 Parameters => L<Paws::Glue::ParametersMap>
@@ -74,9 +75,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Glue>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

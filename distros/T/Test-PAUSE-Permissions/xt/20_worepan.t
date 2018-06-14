@@ -11,7 +11,7 @@ BEGIN {
 }
 
 my $worepan = WorePAN->new(
-  files => ['ISHIGAKI/WorePAN-0.09.tar.gz'],
+  files => ['ISHIGAKI/WorePAN-0.17.tar.gz'],
   no_network => 0,
   cleanup => 1,
   no_indices => 1,
@@ -30,7 +30,7 @@ all_permissions_ok('ISHIGAKI');
 TEST
 
   my $dir = pushd($basedir);
-  my $output = `prove -l xt/perms.t`;
+  my $output = `prove -l xt/perms.t 2>&1`;
   like $output => qr/Result: PASS/;
   # note $output;
 
@@ -42,7 +42,7 @@ local $ENV{RELEASE_TESTING} = 1;
 all_permissions_ok('LOCAL');
 TEST
 
-  $output = `prove -l xt/perms.t`;
+  $output = `prove -l xt/perms.t 2>&1`;
   like $output => qr/Result: FAIL/;
   # note $output;
 });
@@ -68,7 +68,7 @@ all_permissions_ok('ISHIGAKI', {strict => 1});
 TEST
 
   my $dir = pushd($basedir);
-  my $output = `prove -l xt/perms.t`;
+  my $output = `prove -l xt/perms.t 2>&1`;
   like $output => qr/Result: PASS/;
   # note $output;
 
@@ -84,7 +84,7 @@ TEST
   my $manifest = $basedir->file("MANIFEST");
   $manifest->save($manifest->slurp."\nlib/DBD/SQLite/NOSUCHMODULE.pm\n");
 
-  $output = `prove -l xt/perms.t`;
+  $output = `prove -l xt/perms.t 2>&1`;
   like $output => qr/Result: FAIL/;
   note $output;
 });

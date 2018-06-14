@@ -37,6 +37,11 @@ END{
 	\s+ (\w+\:\:)+Rename 
 	\s+ version 
 	\s+ \d+(\.\d+)+[a-z]*
+	(	, \s+ 
+		(\w+\:\:)+Rename\:\:\w+ 
+		\s+ version 
+		\s+ \d+(\.\d+)+ 
+	)*
 	$
     }msx, "-V");
 }

@@ -1,6 +1,7 @@
 package Paws::Glue;
   use Moose;
   sub service { 'glue' }
+  sub signing_name { 'glue' }
   sub version { '2017-03-31' }
   sub target_prefix { 'AWSGlue' }
   sub json_version { "1.1" }
@@ -11,7 +12,7 @@ package Paws::Glue;
   has retriables => (is => 'ro', isa => 'ArrayRef', default => sub { [
   ] });
 
-  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller', 'Paws::Net::JsonResponse';
+  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller';
 
   
   sub BatchCreatePartition {
@@ -34,9 +35,19 @@ package Paws::Glue;
     my $call_object = $self->new_with_coercions('Paws::Glue::BatchDeleteTable', @_);
     return $self->caller->do_call($self, $call_object);
   }
+  sub BatchDeleteTableVersion {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Glue::BatchDeleteTableVersion', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
   sub BatchGetPartition {
     my $self = shift;
     my $call_object = $self->new_with_coercions('Paws::Glue::BatchGetPartition', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub BatchStopJobRun {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Glue::BatchStopJobRun', @_);
     return $self->caller->do_call($self, $call_object);
   }
   sub CreateClassifier {
@@ -132,6 +143,11 @@ package Paws::Glue;
   sub DeleteTable {
     my $self = shift;
     my $call_object = $self->new_with_coercions('Paws::Glue::DeleteTable', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub DeleteTableVersion {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Glue::DeleteTableVersion', @_);
     return $self->caller->do_call($self, $call_object);
   }
   sub DeleteTrigger {
@@ -257,6 +273,11 @@ package Paws::Glue;
   sub GetTables {
     my $self = shift;
     my $call_object = $self->new_with_coercions('Paws::Glue::GetTables', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub GetTableVersion {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::Glue::GetTableVersion', @_);
     return $self->caller->do_call($self, $call_object);
   }
   sub GetTableVersions {
@@ -385,9 +406,308 @@ package Paws::Glue;
     return $self->caller->do_call($self, $call_object);
   }
   
+  sub GetAllClassifiers {
+    my $self = shift;
+
+    my $callback = shift @_ if (ref($_[0]) eq 'CODE');
+    my $result = $self->GetClassifiers(@_);
+    my $next_result = $result;
+
+    if (not defined $callback) {
+      while ($next_result->NextToken) {
+        $next_result = $self->GetClassifiers(@_, NextToken => $next_result->NextToken);
+        push @{ $result->Classifiers }, @{ $next_result->Classifiers };
+      }
+      return $result;
+    } else {
+      while ($result->NextToken) {
+        $callback->($_ => 'Classifiers') foreach (@{ $result->Classifiers });
+        $result = $self->GetClassifiers(@_, NextToken => $result->NextToken);
+      }
+      $callback->($_ => 'Classifiers') foreach (@{ $result->Classifiers });
+    }
+
+    return undef
+  }
+  sub GetAllConnections {
+    my $self = shift;
+
+    my $callback = shift @_ if (ref($_[0]) eq 'CODE');
+    my $result = $self->GetConnections(@_);
+    my $next_result = $result;
+
+    if (not defined $callback) {
+      while ($next_result->NextToken) {
+        $next_result = $self->GetConnections(@_, NextToken => $next_result->NextToken);
+        push @{ $result->ConnectionList }, @{ $next_result->ConnectionList };
+      }
+      return $result;
+    } else {
+      while ($result->NextToken) {
+        $callback->($_ => 'ConnectionList') foreach (@{ $result->ConnectionList });
+        $result = $self->GetConnections(@_, NextToken => $result->NextToken);
+      }
+      $callback->($_ => 'ConnectionList') foreach (@{ $result->ConnectionList });
+    }
+
+    return undef
+  }
+  sub GetAllCrawlerMetrics {
+    my $self = shift;
+
+    my $callback = shift @_ if (ref($_[0]) eq 'CODE');
+    my $result = $self->GetCrawlerMetrics(@_);
+    my $next_result = $result;
+
+    if (not defined $callback) {
+      while ($next_result->NextToken) {
+        $next_result = $self->GetCrawlerMetrics(@_, NextToken => $next_result->NextToken);
+        push @{ $result->CrawlerMetricsList }, @{ $next_result->CrawlerMetricsList };
+      }
+      return $result;
+    } else {
+      while ($result->NextToken) {
+        $callback->($_ => 'CrawlerMetricsList') foreach (@{ $result->CrawlerMetricsList });
+        $result = $self->GetCrawlerMetrics(@_, NextToken => $result->NextToken);
+      }
+      $callback->($_ => 'CrawlerMetricsList') foreach (@{ $result->CrawlerMetricsList });
+    }
+
+    return undef
+  }
+  sub GetAllCrawlers {
+    my $self = shift;
+
+    my $callback = shift @_ if (ref($_[0]) eq 'CODE');
+    my $result = $self->GetCrawlers(@_);
+    my $next_result = $result;
+
+    if (not defined $callback) {
+      while ($next_result->NextToken) {
+        $next_result = $self->GetCrawlers(@_, NextToken => $next_result->NextToken);
+        push @{ $result->Crawlers }, @{ $next_result->Crawlers };
+      }
+      return $result;
+    } else {
+      while ($result->NextToken) {
+        $callback->($_ => 'Crawlers') foreach (@{ $result->Crawlers });
+        $result = $self->GetCrawlers(@_, NextToken => $result->NextToken);
+      }
+      $callback->($_ => 'Crawlers') foreach (@{ $result->Crawlers });
+    }
+
+    return undef
+  }
+  sub GetAllDatabases {
+    my $self = shift;
+
+    my $callback = shift @_ if (ref($_[0]) eq 'CODE');
+    my $result = $self->GetDatabases(@_);
+    my $next_result = $result;
+
+    if (not defined $callback) {
+      while ($next_result->NextToken) {
+        $next_result = $self->GetDatabases(@_, NextToken => $next_result->NextToken);
+        push @{ $result->DatabaseList }, @{ $next_result->DatabaseList };
+      }
+      return $result;
+    } else {
+      while ($result->NextToken) {
+        $callback->($_ => 'DatabaseList') foreach (@{ $result->DatabaseList });
+        $result = $self->GetDatabases(@_, NextToken => $result->NextToken);
+      }
+      $callback->($_ => 'DatabaseList') foreach (@{ $result->DatabaseList });
+    }
+
+    return undef
+  }
+  sub GetAllDevEndpoints {
+    my $self = shift;
+
+    my $callback = shift @_ if (ref($_[0]) eq 'CODE');
+    my $result = $self->GetDevEndpoints(@_);
+    my $next_result = $result;
+
+    if (not defined $callback) {
+      while ($next_result->NextToken) {
+        $next_result = $self->GetDevEndpoints(@_, NextToken => $next_result->NextToken);
+        push @{ $result->DevEndpoints }, @{ $next_result->DevEndpoints };
+      }
+      return $result;
+    } else {
+      while ($result->NextToken) {
+        $callback->($_ => 'DevEndpoints') foreach (@{ $result->DevEndpoints });
+        $result = $self->GetDevEndpoints(@_, NextToken => $result->NextToken);
+      }
+      $callback->($_ => 'DevEndpoints') foreach (@{ $result->DevEndpoints });
+    }
+
+    return undef
+  }
+  sub GetAllJobRuns {
+    my $self = shift;
+
+    my $callback = shift @_ if (ref($_[0]) eq 'CODE');
+    my $result = $self->GetJobRuns(@_);
+    my $next_result = $result;
+
+    if (not defined $callback) {
+      while ($next_result->NextToken) {
+        $next_result = $self->GetJobRuns(@_, NextToken => $next_result->NextToken);
+        push @{ $result->JobRuns }, @{ $next_result->JobRuns };
+      }
+      return $result;
+    } else {
+      while ($result->NextToken) {
+        $callback->($_ => 'JobRuns') foreach (@{ $result->JobRuns });
+        $result = $self->GetJobRuns(@_, NextToken => $result->NextToken);
+      }
+      $callback->($_ => 'JobRuns') foreach (@{ $result->JobRuns });
+    }
+
+    return undef
+  }
+  sub GetAllJobs {
+    my $self = shift;
+
+    my $callback = shift @_ if (ref($_[0]) eq 'CODE');
+    my $result = $self->GetJobs(@_);
+    my $next_result = $result;
+
+    if (not defined $callback) {
+      while ($next_result->NextToken) {
+        $next_result = $self->GetJobs(@_, NextToken => $next_result->NextToken);
+        push @{ $result->Jobs }, @{ $next_result->Jobs };
+      }
+      return $result;
+    } else {
+      while ($result->NextToken) {
+        $callback->($_ => 'Jobs') foreach (@{ $result->Jobs });
+        $result = $self->GetJobs(@_, NextToken => $result->NextToken);
+      }
+      $callback->($_ => 'Jobs') foreach (@{ $result->Jobs });
+    }
+
+    return undef
+  }
+  sub GetAllPartitions {
+    my $self = shift;
+
+    my $callback = shift @_ if (ref($_[0]) eq 'CODE');
+    my $result = $self->GetPartitions(@_);
+    my $next_result = $result;
+
+    if (not defined $callback) {
+      while ($next_result->NextToken) {
+        $next_result = $self->GetPartitions(@_, NextToken => $next_result->NextToken);
+        push @{ $result->Partitions }, @{ $next_result->Partitions };
+      }
+      return $result;
+    } else {
+      while ($result->NextToken) {
+        $callback->($_ => 'Partitions') foreach (@{ $result->Partitions });
+        $result = $self->GetPartitions(@_, NextToken => $result->NextToken);
+      }
+      $callback->($_ => 'Partitions') foreach (@{ $result->Partitions });
+    }
+
+    return undef
+  }
+  sub GetAllTables {
+    my $self = shift;
+
+    my $callback = shift @_ if (ref($_[0]) eq 'CODE');
+    my $result = $self->GetTables(@_);
+    my $next_result = $result;
+
+    if (not defined $callback) {
+      while ($next_result->NextToken) {
+        $next_result = $self->GetTables(@_, NextToken => $next_result->NextToken);
+        push @{ $result->TableList }, @{ $next_result->TableList };
+      }
+      return $result;
+    } else {
+      while ($result->NextToken) {
+        $callback->($_ => 'TableList') foreach (@{ $result->TableList });
+        $result = $self->GetTables(@_, NextToken => $result->NextToken);
+      }
+      $callback->($_ => 'TableList') foreach (@{ $result->TableList });
+    }
+
+    return undef
+  }
+  sub GetAllTableVersions {
+    my $self = shift;
+
+    my $callback = shift @_ if (ref($_[0]) eq 'CODE');
+    my $result = $self->GetTableVersions(@_);
+    my $next_result = $result;
+
+    if (not defined $callback) {
+      while ($next_result->NextToken) {
+        $next_result = $self->GetTableVersions(@_, NextToken => $next_result->NextToken);
+        push @{ $result->TableVersions }, @{ $next_result->TableVersions };
+      }
+      return $result;
+    } else {
+      while ($result->NextToken) {
+        $callback->($_ => 'TableVersions') foreach (@{ $result->TableVersions });
+        $result = $self->GetTableVersions(@_, NextToken => $result->NextToken);
+      }
+      $callback->($_ => 'TableVersions') foreach (@{ $result->TableVersions });
+    }
+
+    return undef
+  }
+  sub GetAllTriggers {
+    my $self = shift;
+
+    my $callback = shift @_ if (ref($_[0]) eq 'CODE');
+    my $result = $self->GetTriggers(@_);
+    my $next_result = $result;
+
+    if (not defined $callback) {
+      while ($next_result->NextToken) {
+        $next_result = $self->GetTriggers(@_, NextToken => $next_result->NextToken);
+        push @{ $result->Triggers }, @{ $next_result->Triggers };
+      }
+      return $result;
+    } else {
+      while ($result->NextToken) {
+        $callback->($_ => 'Triggers') foreach (@{ $result->Triggers });
+        $result = $self->GetTriggers(@_, NextToken => $result->NextToken);
+      }
+      $callback->($_ => 'Triggers') foreach (@{ $result->Triggers });
+    }
+
+    return undef
+  }
+  sub GetAllUserDefinedFunctions {
+    my $self = shift;
+
+    my $callback = shift @_ if (ref($_[0]) eq 'CODE');
+    my $result = $self->GetUserDefinedFunctions(@_);
+    my $next_result = $result;
+
+    if (not defined $callback) {
+      while ($next_result->NextToken) {
+        $next_result = $self->GetUserDefinedFunctions(@_, NextToken => $next_result->NextToken);
+        push @{ $result->UserDefinedFunctions }, @{ $next_result->UserDefinedFunctions };
+      }
+      return $result;
+    } else {
+      while ($result->NextToken) {
+        $callback->($_ => 'UserDefinedFunctions') foreach (@{ $result->UserDefinedFunctions });
+        $result = $self->GetUserDefinedFunctions(@_, NextToken => $result->NextToken);
+      }
+      $callback->($_ => 'UserDefinedFunctions') foreach (@{ $result->UserDefinedFunctions });
+    }
+
+    return undef
+  }
 
 
-  sub operations { qw/BatchCreatePartition BatchDeleteConnection BatchDeletePartition BatchDeleteTable BatchGetPartition CreateClassifier CreateConnection CreateCrawler CreateDatabase CreateDevEndpoint CreateJob CreatePartition CreateScript CreateTable CreateTrigger CreateUserDefinedFunction DeleteClassifier DeleteConnection DeleteCrawler DeleteDatabase DeleteDevEndpoint DeleteJob DeletePartition DeleteTable DeleteTrigger DeleteUserDefinedFunction GetCatalogImportStatus GetClassifier GetClassifiers GetConnection GetConnections GetCrawler GetCrawlerMetrics GetCrawlers GetDatabase GetDatabases GetDataflowGraph GetDevEndpoint GetDevEndpoints GetJob GetJobRun GetJobRuns GetJobs GetMapping GetPartition GetPartitions GetPlan GetTable GetTables GetTableVersions GetTrigger GetTriggers GetUserDefinedFunction GetUserDefinedFunctions ImportCatalogToGlue ResetJobBookmark StartCrawler StartCrawlerSchedule StartJobRun StartTrigger StopCrawler StopCrawlerSchedule StopTrigger UpdateClassifier UpdateConnection UpdateCrawler UpdateCrawlerSchedule UpdateDatabase UpdateDevEndpoint UpdateJob UpdatePartition UpdateTable UpdateTrigger UpdateUserDefinedFunction / }
+  sub operations { qw/BatchCreatePartition BatchDeleteConnection BatchDeletePartition BatchDeleteTable BatchDeleteTableVersion BatchGetPartition BatchStopJobRun CreateClassifier CreateConnection CreateCrawler CreateDatabase CreateDevEndpoint CreateJob CreatePartition CreateScript CreateTable CreateTrigger CreateUserDefinedFunction DeleteClassifier DeleteConnection DeleteCrawler DeleteDatabase DeleteDevEndpoint DeleteJob DeletePartition DeleteTable DeleteTableVersion DeleteTrigger DeleteUserDefinedFunction GetCatalogImportStatus GetClassifier GetClassifiers GetConnection GetConnections GetCrawler GetCrawlerMetrics GetCrawlers GetDatabase GetDatabases GetDataflowGraph GetDevEndpoint GetDevEndpoints GetJob GetJobRun GetJobRuns GetJobs GetMapping GetPartition GetPartitions GetPlan GetTable GetTables GetTableVersion GetTableVersions GetTrigger GetTriggers GetUserDefinedFunction GetUserDefinedFunctions ImportCatalogToGlue ResetJobBookmark StartCrawler StartCrawlerSchedule StartJobRun StartTrigger StopCrawler StopCrawlerSchedule StopTrigger UpdateClassifier UpdateConnection UpdateCrawler UpdateCrawlerSchedule UpdateDatabase UpdateDevEndpoint UpdateJob UpdatePartition UpdateTable UpdateTrigger UpdateUserDefinedFunction / }
 
 1;
 
@@ -415,685 +735,1605 @@ Paws::Glue - Perl Interface to AWS AWS Glue
 
 =head1 DESCRIPTION
 
-Defines service operations used by the GlueFrontendService
+AWS Glue
+
+Defines the public endpoint for the AWS Glue service.
+
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31>
+
 
 =head1 METHODS
 
-=head2 BatchCreatePartition(DatabaseName => Str, PartitionInputList => ArrayRef[L<Paws::Glue::PartitionInput>], TableName => Str, [CatalogId => Str])
+=head2 BatchCreatePartition
+
+=over
+
+=item DatabaseName => Str
+
+=item PartitionInputList => ArrayRef[L<Paws::Glue::PartitionInput>]
+
+=item TableName => Str
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::BatchCreatePartition>
 
 Returns: a L<Paws::Glue::BatchCreatePartitionResponse> instance
 
-  Creates one or more partitions in a batch operation.
+Creates one or more partitions in a batch operation.
 
 
-=head2 BatchDeleteConnection(ConnectionNameList => ArrayRef[Str|Undef], [CatalogId => Str])
+=head2 BatchDeleteConnection
+
+=over
+
+=item ConnectionNameList => ArrayRef[Str|Undef]
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::BatchDeleteConnection>
 
 Returns: a L<Paws::Glue::BatchDeleteConnectionResponse> instance
 
-  Deletes a list of connection definitions from the Data Catalog.
+Deletes a list of connection definitions from the Data Catalog.
 
 
-=head2 BatchDeletePartition(DatabaseName => Str, PartitionsToDelete => ArrayRef[L<Paws::Glue::PartitionValueList>], TableName => Str, [CatalogId => Str])
+=head2 BatchDeletePartition
+
+=over
+
+=item DatabaseName => Str
+
+=item PartitionsToDelete => ArrayRef[L<Paws::Glue::PartitionValueList>]
+
+=item TableName => Str
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::BatchDeletePartition>
 
 Returns: a L<Paws::Glue::BatchDeletePartitionResponse> instance
 
-  Deletes one or more partitions in a batch operation.
+Deletes one or more partitions in a batch operation.
 
 
-=head2 BatchDeleteTable(DatabaseName => Str, TablesToDelete => ArrayRef[Str|Undef], [CatalogId => Str])
+=head2 BatchDeleteTable
+
+=over
+
+=item DatabaseName => Str
+
+=item TablesToDelete => ArrayRef[Str|Undef]
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::BatchDeleteTable>
 
 Returns: a L<Paws::Glue::BatchDeleteTableResponse> instance
 
-  Deletes multiple tables at once.
+Deletes multiple tables at once.
 
 
-=head2 BatchGetPartition(DatabaseName => Str, PartitionsToGet => ArrayRef[L<Paws::Glue::PartitionValueList>], TableName => Str, [CatalogId => Str])
+=head2 BatchDeleteTableVersion
+
+=over
+
+=item DatabaseName => Str
+
+=item TableName => Str
+
+=item VersionIds => ArrayRef[Str|Undef]
+
+=item [CatalogId => Str]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Glue::BatchDeleteTableVersion>
+
+Returns: a L<Paws::Glue::BatchDeleteTableVersionResponse> instance
+
+Deletes a specified batch of versions of a table.
+
+
+=head2 BatchGetPartition
+
+=over
+
+=item DatabaseName => Str
+
+=item PartitionsToGet => ArrayRef[L<Paws::Glue::PartitionValueList>]
+
+=item TableName => Str
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::BatchGetPartition>
 
 Returns: a L<Paws::Glue::BatchGetPartitionResponse> instance
 
-  Retrieves partitions in a batch request.
+Retrieves partitions in a batch request.
 
 
-=head2 CreateClassifier([GrokClassifier => L<Paws::Glue::CreateGrokClassifierRequest>])
+=head2 BatchStopJobRun
+
+=over
+
+=item JobName => Str
+
+=item JobRunIds => ArrayRef[Str|Undef]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Glue::BatchStopJobRun>
+
+Returns: a L<Paws::Glue::BatchStopJobRunResponse> instance
+
+Stops one or more job runs for a specified job definition.
+
+
+=head2 CreateClassifier
+
+=over
+
+=item [GrokClassifier => L<Paws::Glue::CreateGrokClassifierRequest>]
+
+=item [JsonClassifier => L<Paws::Glue::CreateJsonClassifierRequest>]
+
+=item [XMLClassifier => L<Paws::Glue::CreateXMLClassifierRequest>]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::CreateClassifier>
 
 Returns: a L<Paws::Glue::CreateClassifierResponse> instance
 
-  Creates a C<Classifier> in the user's account.
+Creates a classifier in the user's account. This may be a
+C<GrokClassifier>, an C<XMLClassifier>, or abbrev C<JsonClassifier>,
+depending on which field of the request is present.
 
 
-=head2 CreateConnection(ConnectionInput => L<Paws::Glue::ConnectionInput>, [CatalogId => Str])
+=head2 CreateConnection
+
+=over
+
+=item ConnectionInput => L<Paws::Glue::ConnectionInput>
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::CreateConnection>
 
 Returns: a L<Paws::Glue::CreateConnectionResponse> instance
 
-  Creates a connection definition in the Data Catalog.
+Creates a connection definition in the Data Catalog.
 
 
-=head2 CreateCrawler(DatabaseName => Str, Name => Str, Role => Str, Targets => L<Paws::Glue::CrawlerTargets>, [Classifiers => ArrayRef[Str|Undef], Description => Str, Schedule => Str, SchemaChangePolicy => L<Paws::Glue::SchemaChangePolicy>, TablePrefix => Str])
+=head2 CreateCrawler
+
+=over
+
+=item DatabaseName => Str
+
+=item Name => Str
+
+=item Role => Str
+
+=item Targets => L<Paws::Glue::CrawlerTargets>
+
+=item [Classifiers => ArrayRef[Str|Undef]]
+
+=item [Configuration => Str]
+
+=item [Description => Str]
+
+=item [Schedule => Str]
+
+=item [SchemaChangePolicy => L<Paws::Glue::SchemaChangePolicy>]
+
+=item [TablePrefix => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::CreateCrawler>
 
 Returns: a L<Paws::Glue::CreateCrawlerResponse> instance
 
-  Creates a new C<Crawler> with specified targets, role, configuration,
-and optional schedule. At least one crawl target must be specified, in
+Creates a new crawler with specified targets, role, configuration, and
+optional schedule. At least one crawl target must be specified, in
 either the I<s3Targets> or the I<jdbcTargets> field.
 
 
-=head2 CreateDatabase(DatabaseInput => L<Paws::Glue::DatabaseInput>, [CatalogId => Str])
+=head2 CreateDatabase
+
+=over
+
+=item DatabaseInput => L<Paws::Glue::DatabaseInput>
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::CreateDatabase>
 
 Returns: a L<Paws::Glue::CreateDatabaseResponse> instance
 
-  Creates a new database in a Data Catalog.
+Creates a new database in a Data Catalog.
 
 
-=head2 CreateDevEndpoint(EndpointName => Str, RoleArn => Str, SecurityGroupIds => ArrayRef[Str|Undef], SubnetId => Str, [ExtraJarsS3Path => Str, ExtraPythonLibsS3Path => Str, NumberOfNodes => Int, PublicKey => Str])
+=head2 CreateDevEndpoint
+
+=over
+
+=item EndpointName => Str
+
+=item RoleArn => Str
+
+=item [ExtraJarsS3Path => Str]
+
+=item [ExtraPythonLibsS3Path => Str]
+
+=item [NumberOfNodes => Int]
+
+=item [PublicKey => Str]
+
+=item [SecurityGroupIds => ArrayRef[Str|Undef]]
+
+=item [SubnetId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::CreateDevEndpoint>
 
 Returns: a L<Paws::Glue::CreateDevEndpointResponse> instance
 
-  Creates a new DevEndpoint.
+Creates a new DevEndpoint.
 
 
-=head2 CreateJob(Command => L<Paws::Glue::JobCommand>, Name => Str, Role => Str, [AllocatedCapacity => Int, Connections => L<Paws::Glue::ConnectionsList>, DefaultArguments => L<Paws::Glue::GenericMap>, Description => Str, ExecutionProperty => L<Paws::Glue::ExecutionProperty>, LogUri => Str, MaxRetries => Int])
+=head2 CreateJob
+
+=over
+
+=item Command => L<Paws::Glue::JobCommand>
+
+=item Name => Str
+
+=item Role => Str
+
+=item [AllocatedCapacity => Int]
+
+=item [Connections => L<Paws::Glue::ConnectionsList>]
+
+=item [DefaultArguments => L<Paws::Glue::GenericMap>]
+
+=item [Description => Str]
+
+=item [ExecutionProperty => L<Paws::Glue::ExecutionProperty>]
+
+=item [LogUri => Str]
+
+=item [MaxRetries => Int]
+
+=item [NotificationProperty => L<Paws::Glue::NotificationProperty>]
+
+=item [Timeout => Int]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::CreateJob>
 
 Returns: a L<Paws::Glue::CreateJobResponse> instance
 
-  Creates a new job.
+Creates a new job definition.
 
 
-=head2 CreatePartition(DatabaseName => Str, PartitionInput => L<Paws::Glue::PartitionInput>, TableName => Str, [CatalogId => Str])
+=head2 CreatePartition
+
+=over
+
+=item DatabaseName => Str
+
+=item PartitionInput => L<Paws::Glue::PartitionInput>
+
+=item TableName => Str
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::CreatePartition>
 
 Returns: a L<Paws::Glue::CreatePartitionResponse> instance
 
-  Creates a new partition.
+Creates a new partition.
 
 
-=head2 CreateScript([DagEdges => ArrayRef[L<Paws::Glue::CodeGenEdge>], DagNodes => ArrayRef[L<Paws::Glue::CodeGenNode>]])
+=head2 CreateScript
+
+=over
+
+=item [DagEdges => ArrayRef[L<Paws::Glue::CodeGenEdge>]]
+
+=item [DagNodes => ArrayRef[L<Paws::Glue::CodeGenNode>]]
+
+=item [Language => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::CreateScript>
 
 Returns: a L<Paws::Glue::CreateScriptResponse> instance
 
-  Transforms a directed acyclic graph (DAG) into a Python script.
+Transforms a directed acyclic graph (DAG) into code.
 
 
-=head2 CreateTable(DatabaseName => Str, TableInput => L<Paws::Glue::TableInput>, [CatalogId => Str])
+=head2 CreateTable
+
+=over
+
+=item DatabaseName => Str
+
+=item TableInput => L<Paws::Glue::TableInput>
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::CreateTable>
 
 Returns: a L<Paws::Glue::CreateTableResponse> instance
 
-  Creates a new table definition in the Data Catalog.
+Creates a new table definition in the Data Catalog.
 
 
-=head2 CreateTrigger(Actions => ArrayRef[L<Paws::Glue::Action>], Name => Str, Type => Str, [Description => Str, Predicate => L<Paws::Glue::Predicate>, Schedule => Str])
+=head2 CreateTrigger
+
+=over
+
+=item Actions => ArrayRef[L<Paws::Glue::Action>]
+
+=item Name => Str
+
+=item Type => Str
+
+=item [Description => Str]
+
+=item [Predicate => L<Paws::Glue::Predicate>]
+
+=item [Schedule => Str]
+
+=item [StartOnCreation => Bool]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::CreateTrigger>
 
 Returns: a L<Paws::Glue::CreateTriggerResponse> instance
 
-  Creates a new trigger.
+Creates a new trigger.
 
 
-=head2 CreateUserDefinedFunction(DatabaseName => Str, FunctionInput => L<Paws::Glue::UserDefinedFunctionInput>, [CatalogId => Str])
+=head2 CreateUserDefinedFunction
+
+=over
+
+=item DatabaseName => Str
+
+=item FunctionInput => L<Paws::Glue::UserDefinedFunctionInput>
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::CreateUserDefinedFunction>
 
 Returns: a L<Paws::Glue::CreateUserDefinedFunctionResponse> instance
 
-  Creates a new function definition in the Data Catalog.
+Creates a new function definition in the Data Catalog.
 
 
-=head2 DeleteClassifier(Name => Str)
+=head2 DeleteClassifier
+
+=over
+
+=item Name => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::DeleteClassifier>
 
 Returns: a L<Paws::Glue::DeleteClassifierResponse> instance
 
-  Removes a C<Classifier> from the metadata store.
+Removes a classifier from the Data Catalog.
 
 
-=head2 DeleteConnection(ConnectionName => Str, [CatalogId => Str])
+=head2 DeleteConnection
+
+=over
+
+=item ConnectionName => Str
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::DeleteConnection>
 
 Returns: a L<Paws::Glue::DeleteConnectionResponse> instance
 
-  Deletes a connection from the Data Catalog.
+Deletes a connection from the Data Catalog.
 
 
-=head2 DeleteCrawler(Name => Str)
+=head2 DeleteCrawler
+
+=over
+
+=item Name => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::DeleteCrawler>
 
 Returns: a L<Paws::Glue::DeleteCrawlerResponse> instance
 
-  Removes a specified C<Crawler> from the metadata store, unless the
-C<Crawler> state is C<RUNNING>.
+Removes a specified crawler from the Data Catalog, unless the crawler
+state is C<RUNNING>.
 
 
-=head2 DeleteDatabase(Name => Str, [CatalogId => Str])
+=head2 DeleteDatabase
+
+=over
+
+=item Name => Str
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::DeleteDatabase>
 
 Returns: a L<Paws::Glue::DeleteDatabaseResponse> instance
 
-  Removes a specified Database from a Data Catalog.
+Removes a specified Database from a Data Catalog.
 
 
-=head2 DeleteDevEndpoint(EndpointName => Str)
+=head2 DeleteDevEndpoint
+
+=over
+
+=item EndpointName => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::DeleteDevEndpoint>
 
 Returns: a L<Paws::Glue::DeleteDevEndpointResponse> instance
 
-  Deletes a specified DevEndpoint.
+Deletes a specified DevEndpoint.
 
 
-=head2 DeleteJob(JobName => Str)
+=head2 DeleteJob
+
+=over
+
+=item JobName => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::DeleteJob>
 
 Returns: a L<Paws::Glue::DeleteJobResponse> instance
 
-  Deletes a specified job.
+Deletes a specified job definition. If the job definition is not found,
+no exception is thrown.
 
 
-=head2 DeletePartition(DatabaseName => Str, PartitionValues => ArrayRef[Str|Undef], TableName => Str, [CatalogId => Str])
+=head2 DeletePartition
+
+=over
+
+=item DatabaseName => Str
+
+=item PartitionValues => ArrayRef[Str|Undef]
+
+=item TableName => Str
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::DeletePartition>
 
 Returns: a L<Paws::Glue::DeletePartitionResponse> instance
 
-  Deletes a specified partition.
+Deletes a specified partition.
 
 
-=head2 DeleteTable(DatabaseName => Str, Name => Str, [CatalogId => Str])
+=head2 DeleteTable
+
+=over
+
+=item DatabaseName => Str
+
+=item Name => Str
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::DeleteTable>
 
 Returns: a L<Paws::Glue::DeleteTableResponse> instance
 
-  Removes a table definition from the Data Catalog.
+Removes a table definition from the Data Catalog.
 
 
-=head2 DeleteTrigger(Name => Str)
+=head2 DeleteTableVersion
+
+=over
+
+=item DatabaseName => Str
+
+=item TableName => Str
+
+=item VersionId => Str
+
+=item [CatalogId => Str]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Glue::DeleteTableVersion>
+
+Returns: a L<Paws::Glue::DeleteTableVersionResponse> instance
+
+Deletes a specified version of a table.
+
+
+=head2 DeleteTrigger
+
+=over
+
+=item Name => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::DeleteTrigger>
 
 Returns: a L<Paws::Glue::DeleteTriggerResponse> instance
 
-  Deletes a specified trigger.
+Deletes a specified trigger. If the trigger is not found, no exception
+is thrown.
 
 
-=head2 DeleteUserDefinedFunction(DatabaseName => Str, FunctionName => Str, [CatalogId => Str])
+=head2 DeleteUserDefinedFunction
+
+=over
+
+=item DatabaseName => Str
+
+=item FunctionName => Str
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::DeleteUserDefinedFunction>
 
 Returns: a L<Paws::Glue::DeleteUserDefinedFunctionResponse> instance
 
-  Deletes an existing function definition from the Data Catalog.
+Deletes an existing function definition from the Data Catalog.
 
 
-=head2 GetCatalogImportStatus([CatalogId => Str])
+=head2 GetCatalogImportStatus
+
+=over
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetCatalogImportStatus>
 
 Returns: a L<Paws::Glue::GetCatalogImportStatusResponse> instance
 
-  Retrieves the status of a migration operation.
+Retrieves the status of a migration operation.
 
 
-=head2 GetClassifier(Name => Str)
+=head2 GetClassifier
+
+=over
+
+=item Name => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetClassifier>
 
 Returns: a L<Paws::Glue::GetClassifierResponse> instance
 
-  Retrieve a C<Classifier> by name.
+Retrieve a classifier by name.
 
 
-=head2 GetClassifiers([MaxResults => Int, NextToken => Str])
+=head2 GetClassifiers
+
+=over
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetClassifiers>
 
 Returns: a L<Paws::Glue::GetClassifiersResponse> instance
 
-  Lists all Classifier objects in the metadata store.
+Lists all classifier objects in the Data Catalog.
 
 
-=head2 GetConnection(Name => Str, [CatalogId => Str])
+=head2 GetConnection
+
+=over
+
+=item Name => Str
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetConnection>
 
 Returns: a L<Paws::Glue::GetConnectionResponse> instance
 
-  Retrieves a connection definition from the Data Catalog.
+Retrieves a connection definition from the Data Catalog.
 
 
-=head2 GetConnections([CatalogId => Str, Filter => L<Paws::Glue::GetConnectionsFilter>, MaxResults => Int, NextToken => Str])
+=head2 GetConnections
+
+=over
+
+=item [CatalogId => Str]
+
+=item [Filter => L<Paws::Glue::GetConnectionsFilter>]
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetConnections>
 
 Returns: a L<Paws::Glue::GetConnectionsResponse> instance
 
-  Retrieves a list of connection definitions from the Data Catalog.
+Retrieves a list of connection definitions from the Data Catalog.
 
 
-=head2 GetCrawler(Name => Str)
+=head2 GetCrawler
+
+=over
+
+=item Name => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetCrawler>
 
 Returns: a L<Paws::Glue::GetCrawlerResponse> instance
 
-  Retrieves metadata for a specified C<Crawler>.
+Retrieves metadata for a specified crawler.
 
 
-=head2 GetCrawlerMetrics([CrawlerNameList => ArrayRef[Str|Undef], MaxResults => Int, NextToken => Str])
+=head2 GetCrawlerMetrics
+
+=over
+
+=item [CrawlerNameList => ArrayRef[Str|Undef]]
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetCrawlerMetrics>
 
 Returns: a L<Paws::Glue::GetCrawlerMetricsResponse> instance
 
-  Retrieves metrics about specified crawlers.
+Retrieves metrics about specified crawlers.
 
 
-=head2 GetCrawlers([MaxResults => Int, NextToken => Str])
+=head2 GetCrawlers
+
+=over
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetCrawlers>
 
 Returns: a L<Paws::Glue::GetCrawlersResponse> instance
 
-  Retrieves metadata for all C<Crawlers> defined in the customer account.
+Retrieves metadata for all crawlers defined in the customer account.
 
 
-=head2 GetDatabase(Name => Str, [CatalogId => Str])
+=head2 GetDatabase
+
+=over
+
+=item Name => Str
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetDatabase>
 
 Returns: a L<Paws::Glue::GetDatabaseResponse> instance
 
-  Retrieves the definition of a specified database.
+Retrieves the definition of a specified database.
 
 
-=head2 GetDatabases([CatalogId => Str, MaxResults => Int, NextToken => Str])
+=head2 GetDatabases
+
+=over
+
+=item [CatalogId => Str]
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetDatabases>
 
 Returns: a L<Paws::Glue::GetDatabasesResponse> instance
 
-  Retrieves all Databases defined in a given Data Catalog.
+Retrieves all Databases defined in a given Data Catalog.
 
 
-=head2 GetDataflowGraph([PythonScript => Str])
+=head2 GetDataflowGraph
+
+=over
+
+=item [PythonScript => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetDataflowGraph>
 
 Returns: a L<Paws::Glue::GetDataflowGraphResponse> instance
 
-  Transforms a Python script into a directed acyclic graph (DAG).
+Transforms a Python script into a directed acyclic graph (DAG).
 
 
-=head2 GetDevEndpoint(EndpointName => Str)
+=head2 GetDevEndpoint
+
+=over
+
+=item EndpointName => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetDevEndpoint>
 
 Returns: a L<Paws::Glue::GetDevEndpointResponse> instance
 
-  Retrieves information about a specified DevEndpoint.
+Retrieves information about a specified DevEndpoint.
 
 
-=head2 GetDevEndpoints([MaxResults => Int, NextToken => Str])
+=head2 GetDevEndpoints
+
+=over
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetDevEndpoints>
 
 Returns: a L<Paws::Glue::GetDevEndpointsResponse> instance
 
-  Retrieves all the DevEndpoints in this AWS account.
+Retrieves all the DevEndpoints in this AWS account.
 
 
-=head2 GetJob(JobName => Str)
+=head2 GetJob
+
+=over
+
+=item JobName => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetJob>
 
 Returns: a L<Paws::Glue::GetJobResponse> instance
 
-  Retrieves an existing job definition.
+Retrieves an existing job definition.
 
 
-=head2 GetJobRun(JobName => Str, RunId => Str, [PredecessorsIncluded => Bool])
+=head2 GetJobRun
+
+=over
+
+=item JobName => Str
+
+=item RunId => Str
+
+=item [PredecessorsIncluded => Bool]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetJobRun>
 
 Returns: a L<Paws::Glue::GetJobRunResponse> instance
 
-  Retrieves the metadata for a given job run.
+Retrieves the metadata for a given job run.
 
 
-=head2 GetJobRuns(JobName => Str, [MaxResults => Int, NextToken => Str])
+=head2 GetJobRuns
+
+=over
+
+=item JobName => Str
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetJobRuns>
 
 Returns: a L<Paws::Glue::GetJobRunsResponse> instance
 
-  Retrieves metadata for all runs of a given job.
+Retrieves metadata for all runs of a given job definition.
 
 
-=head2 GetJobs([MaxResults => Int, NextToken => Str])
+=head2 GetJobs
+
+=over
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetJobs>
 
 Returns: a L<Paws::Glue::GetJobsResponse> instance
 
-  Retrieves all current jobs.
+Retrieves all current job definitions.
 
 
-=head2 GetMapping(Source => L<Paws::Glue::CatalogEntry>, [Location => L<Paws::Glue::Location>, Sinks => ArrayRef[L<Paws::Glue::CatalogEntry>]])
+=head2 GetMapping
+
+=over
+
+=item Source => L<Paws::Glue::CatalogEntry>
+
+=item [Location => L<Paws::Glue::Location>]
+
+=item [Sinks => ArrayRef[L<Paws::Glue::CatalogEntry>]]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetMapping>
 
 Returns: a L<Paws::Glue::GetMappingResponse> instance
 
-  Creates mappings.
+Creates mappings.
 
 
-=head2 GetPartition(DatabaseName => Str, PartitionValues => ArrayRef[Str|Undef], TableName => Str, [CatalogId => Str])
+=head2 GetPartition
+
+=over
+
+=item DatabaseName => Str
+
+=item PartitionValues => ArrayRef[Str|Undef]
+
+=item TableName => Str
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetPartition>
 
 Returns: a L<Paws::Glue::GetPartitionResponse> instance
 
-  Retrieves information about a specified partition.
+Retrieves information about a specified partition.
 
 
-=head2 GetPartitions(DatabaseName => Str, TableName => Str, [CatalogId => Str, Expression => Str, MaxResults => Int, NextToken => Str, Segment => L<Paws::Glue::Segment>])
+=head2 GetPartitions
+
+=over
+
+=item DatabaseName => Str
+
+=item TableName => Str
+
+=item [CatalogId => Str]
+
+=item [Expression => Str]
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+=item [Segment => L<Paws::Glue::Segment>]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetPartitions>
 
 Returns: a L<Paws::Glue::GetPartitionsResponse> instance
 
-  Retrieves information about the partitions in a table.
+Retrieves information about the partitions in a table.
 
 
-=head2 GetPlan(Mapping => ArrayRef[L<Paws::Glue::MappingEntry>], Source => L<Paws::Glue::CatalogEntry>, [Location => L<Paws::Glue::Location>, Sinks => ArrayRef[L<Paws::Glue::CatalogEntry>]])
+=head2 GetPlan
+
+=over
+
+=item Mapping => ArrayRef[L<Paws::Glue::MappingEntry>]
+
+=item Source => L<Paws::Glue::CatalogEntry>
+
+=item [Language => Str]
+
+=item [Location => L<Paws::Glue::Location>]
+
+=item [Sinks => ArrayRef[L<Paws::Glue::CatalogEntry>]]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetPlan>
 
 Returns: a L<Paws::Glue::GetPlanResponse> instance
 
-  Gets a Python script to perform a specified mapping.
+Gets code to perform a specified mapping.
 
 
-=head2 GetTable(DatabaseName => Str, Name => Str, [CatalogId => Str])
+=head2 GetTable
+
+=over
+
+=item DatabaseName => Str
+
+=item Name => Str
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetTable>
 
 Returns: a L<Paws::Glue::GetTableResponse> instance
 
-  Retrieves the C<Table> definition in a Data Catalog for a specified
+Retrieves the C<Table> definition in a Data Catalog for a specified
 table.
 
 
-=head2 GetTables(DatabaseName => Str, [CatalogId => Str, Expression => Str, MaxResults => Int, NextToken => Str])
+=head2 GetTables
+
+=over
+
+=item DatabaseName => Str
+
+=item [CatalogId => Str]
+
+=item [Expression => Str]
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetTables>
 
 Returns: a L<Paws::Glue::GetTablesResponse> instance
 
-  Retrieves the definitions of some or all of the tables in a given
+Retrieves the definitions of some or all of the tables in a given
 C<Database>.
 
 
-=head2 GetTableVersions(DatabaseName => Str, TableName => Str, [CatalogId => Str, MaxResults => Int, NextToken => Str])
+=head2 GetTableVersion
+
+=over
+
+=item DatabaseName => Str
+
+=item TableName => Str
+
+=item [CatalogId => Str]
+
+=item [VersionId => Str]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::Glue::GetTableVersion>
+
+Returns: a L<Paws::Glue::GetTableVersionResponse> instance
+
+Retrieves a specified version of a table.
+
+
+=head2 GetTableVersions
+
+=over
+
+=item DatabaseName => Str
+
+=item TableName => Str
+
+=item [CatalogId => Str]
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetTableVersions>
 
 Returns: a L<Paws::Glue::GetTableVersionsResponse> instance
 
-  Retrieves a list of strings that identify available versions of a
+Retrieves a list of strings that identify available versions of a
 specified table.
 
 
-=head2 GetTrigger(Name => Str)
+=head2 GetTrigger
+
+=over
+
+=item Name => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetTrigger>
 
 Returns: a L<Paws::Glue::GetTriggerResponse> instance
 
-  Retrieves the definition of a trigger.
+Retrieves the definition of a trigger.
 
 
-=head2 GetTriggers([DependentJobName => Str, MaxResults => Int, NextToken => Str])
+=head2 GetTriggers
+
+=over
+
+=item [DependentJobName => Str]
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetTriggers>
 
 Returns: a L<Paws::Glue::GetTriggersResponse> instance
 
-  Gets all the triggers associated with a job.
+Gets all the triggers associated with a job.
 
 
-=head2 GetUserDefinedFunction(DatabaseName => Str, FunctionName => Str, [CatalogId => Str])
+=head2 GetUserDefinedFunction
+
+=over
+
+=item DatabaseName => Str
+
+=item FunctionName => Str
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetUserDefinedFunction>
 
 Returns: a L<Paws::Glue::GetUserDefinedFunctionResponse> instance
 
-  Retrieves a specified function definition from the Data Catalog.
+Retrieves a specified function definition from the Data Catalog.
 
 
-=head2 GetUserDefinedFunctions(DatabaseName => Str, Pattern => Str, [CatalogId => Str, MaxResults => Int, NextToken => Str])
+=head2 GetUserDefinedFunctions
+
+=over
+
+=item DatabaseName => Str
+
+=item Pattern => Str
+
+=item [CatalogId => Str]
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::GetUserDefinedFunctions>
 
 Returns: a L<Paws::Glue::GetUserDefinedFunctionsResponse> instance
 
-  Retrieves a multiple function definitions from the Data Catalog.
+Retrieves a multiple function definitions from the Data Catalog.
 
 
-=head2 ImportCatalogToGlue([CatalogId => Str])
+=head2 ImportCatalogToGlue
+
+=over
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::ImportCatalogToGlue>
 
 Returns: a L<Paws::Glue::ImportCatalogToGlueResponse> instance
 
-  Imports an existing Athena Data Catalog to AWS Glue
+Imports an existing Athena Data Catalog to AWS Glue
 
 
-=head2 ResetJobBookmark(JobName => Str)
+=head2 ResetJobBookmark
+
+=over
+
+=item JobName => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::ResetJobBookmark>
 
 Returns: a L<Paws::Glue::ResetJobBookmarkResponse> instance
 
-  Resets a bookmark entry.
+Resets a bookmark entry.
 
 
-=head2 StartCrawler(Name => Str)
+=head2 StartCrawler
+
+=over
+
+=item Name => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::StartCrawler>
 
 Returns: a L<Paws::Glue::StartCrawlerResponse> instance
 
-  Starts a crawl using the specified C<Crawler>, regardless of what is
-scheduled. If the C<Crawler> is already running, does nothing.
+Starts a crawl using the specified crawler, regardless of what is
+scheduled. If the crawler is already running, does nothing.
 
 
-=head2 StartCrawlerSchedule(CrawlerName => Str)
+=head2 StartCrawlerSchedule
+
+=over
+
+=item CrawlerName => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::StartCrawlerSchedule>
 
 Returns: a L<Paws::Glue::StartCrawlerScheduleResponse> instance
 
-  Changes the schedule state of the specified crawler to C<SCHEDULED>,
+Changes the schedule state of the specified crawler to C<SCHEDULED>,
 unless the crawler is already running or the schedule state is already
 C<SCHEDULED>.
 
 
-=head2 StartJobRun(JobName => Str, [AllocatedCapacity => Int, Arguments => L<Paws::Glue::GenericMap>, JobRunId => Str])
+=head2 StartJobRun
+
+=over
+
+=item JobName => Str
+
+=item [AllocatedCapacity => Int]
+
+=item [Arguments => L<Paws::Glue::GenericMap>]
+
+=item [JobRunId => Str]
+
+=item [NotificationProperty => L<Paws::Glue::NotificationProperty>]
+
+=item [Timeout => Int]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::StartJobRun>
 
 Returns: a L<Paws::Glue::StartJobRunResponse> instance
 
-  Runs a job.
+Starts a job run using a job definition.
 
 
-=head2 StartTrigger(Name => Str)
+=head2 StartTrigger
+
+=over
+
+=item Name => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::StartTrigger>
 
 Returns: a L<Paws::Glue::StartTriggerResponse> instance
 
-  Starts an existing trigger.
+Starts an existing trigger. See Triggering Jobs
+(http://docs.aws.amazon.com/glue/latest/dg/trigger-job.html) for
+information about how different types of trigger are started.
 
 
-=head2 StopCrawler(Name => Str)
+=head2 StopCrawler
+
+=over
+
+=item Name => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::StopCrawler>
 
 Returns: a L<Paws::Glue::StopCrawlerResponse> instance
 
-  If the specified C<Crawler> is running, stops the crawl.
+If the specified crawler is running, stops the crawl.
 
 
-=head2 StopCrawlerSchedule(CrawlerName => Str)
+=head2 StopCrawlerSchedule
+
+=over
+
+=item CrawlerName => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::StopCrawlerSchedule>
 
 Returns: a L<Paws::Glue::StopCrawlerScheduleResponse> instance
 
-  Sets the schedule state of the specified crawler to C<NOT_SCHEDULED>,
+Sets the schedule state of the specified crawler to C<NOT_SCHEDULED>,
 but does not stop the crawler if it is already running.
 
 
-=head2 StopTrigger(Name => Str)
+=head2 StopTrigger
+
+=over
+
+=item Name => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::StopTrigger>
 
 Returns: a L<Paws::Glue::StopTriggerResponse> instance
 
-  Stops a specified trigger.
+Stops a specified trigger.
 
 
-=head2 UpdateClassifier([GrokClassifier => L<Paws::Glue::UpdateGrokClassifierRequest>])
+=head2 UpdateClassifier
+
+=over
+
+=item [GrokClassifier => L<Paws::Glue::UpdateGrokClassifierRequest>]
+
+=item [JsonClassifier => L<Paws::Glue::UpdateJsonClassifierRequest>]
+
+=item [XMLClassifier => L<Paws::Glue::UpdateXMLClassifierRequest>]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::UpdateClassifier>
 
 Returns: a L<Paws::Glue::UpdateClassifierResponse> instance
 
-  Modifies an existing C<Classifier>.
+Modifies an existing classifier (a C<GrokClassifier>, C<XMLClassifier>,
+or C<JsonClassifier>, depending on which field is present).
 
 
-=head2 UpdateConnection(ConnectionInput => L<Paws::Glue::ConnectionInput>, Name => Str, [CatalogId => Str])
+=head2 UpdateConnection
+
+=over
+
+=item ConnectionInput => L<Paws::Glue::ConnectionInput>
+
+=item Name => Str
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::UpdateConnection>
 
 Returns: a L<Paws::Glue::UpdateConnectionResponse> instance
 
-  Updates a connection definition in the Data Catalog.
+Updates a connection definition in the Data Catalog.
 
 
-=head2 UpdateCrawler(Name => Str, [Classifiers => ArrayRef[Str|Undef], DatabaseName => Str, Description => Str, Role => Str, Schedule => Str, SchemaChangePolicy => L<Paws::Glue::SchemaChangePolicy>, TablePrefix => Str, Targets => L<Paws::Glue::CrawlerTargets>])
+=head2 UpdateCrawler
+
+=over
+
+=item Name => Str
+
+=item [Classifiers => ArrayRef[Str|Undef]]
+
+=item [Configuration => Str]
+
+=item [DatabaseName => Str]
+
+=item [Description => Str]
+
+=item [Role => Str]
+
+=item [Schedule => Str]
+
+=item [SchemaChangePolicy => L<Paws::Glue::SchemaChangePolicy>]
+
+=item [TablePrefix => Str]
+
+=item [Targets => L<Paws::Glue::CrawlerTargets>]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::UpdateCrawler>
 
 Returns: a L<Paws::Glue::UpdateCrawlerResponse> instance
 
-  Updates a C<Crawler>. If a C<Crawler> is running, you must stop it
-using C<StopCrawler> before updating it.
+Updates a crawler. If a crawler is running, you must stop it using
+C<StopCrawler> before updating it.
 
 
-=head2 UpdateCrawlerSchedule(CrawlerName => Str, [Schedule => Str])
+=head2 UpdateCrawlerSchedule
+
+=over
+
+=item CrawlerName => Str
+
+=item [Schedule => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::UpdateCrawlerSchedule>
 
 Returns: a L<Paws::Glue::UpdateCrawlerScheduleResponse> instance
 
-  Updates the schedule of a crawler using a Cron expression.
+Updates the schedule of a crawler using a C<cron> expression.
 
 
-=head2 UpdateDatabase(DatabaseInput => L<Paws::Glue::DatabaseInput>, Name => Str, [CatalogId => Str])
+=head2 UpdateDatabase
+
+=over
+
+=item DatabaseInput => L<Paws::Glue::DatabaseInput>
+
+=item Name => Str
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::UpdateDatabase>
 
 Returns: a L<Paws::Glue::UpdateDatabaseResponse> instance
 
-  Updates an existing database definition in a Data Catalog.
+Updates an existing database definition in a Data Catalog.
 
 
-=head2 UpdateDevEndpoint(EndpointName => Str, [CustomLibraries => L<Paws::Glue::DevEndpointCustomLibraries>, PublicKey => Str])
+=head2 UpdateDevEndpoint
+
+=over
+
+=item EndpointName => Str
+
+=item [CustomLibraries => L<Paws::Glue::DevEndpointCustomLibraries>]
+
+=item [PublicKey => Str]
+
+=item [UpdateEtlLibraries => Bool]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::UpdateDevEndpoint>
 
 Returns: a L<Paws::Glue::UpdateDevEndpointResponse> instance
 
-  Updates a specified DevEndpoint.
+Updates a specified DevEndpoint.
 
 
-=head2 UpdateJob(JobName => Str, JobUpdate => L<Paws::Glue::JobUpdate>)
+=head2 UpdateJob
+
+=over
+
+=item JobName => Str
+
+=item JobUpdate => L<Paws::Glue::JobUpdate>
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::UpdateJob>
 
 Returns: a L<Paws::Glue::UpdateJobResponse> instance
 
-  Updates an existing job definition.
+Updates an existing job definition.
 
 
-=head2 UpdatePartition(DatabaseName => Str, PartitionInput => L<Paws::Glue::PartitionInput>, PartitionValueList => ArrayRef[Str|Undef], TableName => Str, [CatalogId => Str])
+=head2 UpdatePartition
+
+=over
+
+=item DatabaseName => Str
+
+=item PartitionInput => L<Paws::Glue::PartitionInput>
+
+=item PartitionValueList => ArrayRef[Str|Undef]
+
+=item TableName => Str
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::UpdatePartition>
 
 Returns: a L<Paws::Glue::UpdatePartitionResponse> instance
 
-  Updates a partition.
+Updates a partition.
 
 
-=head2 UpdateTable(DatabaseName => Str, TableInput => L<Paws::Glue::TableInput>, [CatalogId => Str])
+=head2 UpdateTable
+
+=over
+
+=item DatabaseName => Str
+
+=item TableInput => L<Paws::Glue::TableInput>
+
+=item [CatalogId => Str]
+
+=item [SkipArchive => Bool]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::UpdateTable>
 
 Returns: a L<Paws::Glue::UpdateTableResponse> instance
 
-  Updates a metadata table in the Data Catalog.
+Updates a metadata table in the Data Catalog.
 
 
-=head2 UpdateTrigger(Name => Str, TriggerUpdate => L<Paws::Glue::TriggerUpdate>)
+=head2 UpdateTrigger
+
+=over
+
+=item Name => Str
+
+=item TriggerUpdate => L<Paws::Glue::TriggerUpdate>
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::UpdateTrigger>
 
 Returns: a L<Paws::Glue::UpdateTriggerResponse> instance
 
-  Updates a trigger definition.
+Updates a trigger definition.
 
 
-=head2 UpdateUserDefinedFunction(DatabaseName => Str, FunctionInput => L<Paws::Glue::UserDefinedFunctionInput>, FunctionName => Str, [CatalogId => Str])
+=head2 UpdateUserDefinedFunction
+
+=over
+
+=item DatabaseName => Str
+
+=item FunctionInput => L<Paws::Glue::UserDefinedFunctionInput>
+
+=item FunctionName => Str
+
+=item [CatalogId => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Glue::UpdateUserDefinedFunction>
 
 Returns: a L<Paws::Glue::UpdateUserDefinedFunctionResponse> instance
 
-  Updates an existing function definition in the Data Catalog.
+Updates an existing function definition in the Data Catalog.
 
 
 
@@ -1101,6 +2341,162 @@ Returns: a L<Paws::Glue::UpdateUserDefinedFunctionResponse> instance
 =head1 PAGINATORS
 
 Paginator methods are helpers that repetively call methods that return partial results
+
+=head2 GetAllClassifiers(sub { },[MaxResults => Int, NextToken => Str])
+
+=head2 GetAllClassifiers([MaxResults => Int, NextToken => Str])
+
+
+If passed a sub as first parameter, it will call the sub for each element found in :
+
+ - Classifiers, passing the object as the first parameter, and the string 'Classifiers' as the second parameter 
+
+If not, it will return a a L<Paws::Glue::GetClassifiersResponse> instance with all the C<param>s;  from all the responses. Please take into account that this mode can potentially consume vasts ammounts of memory.
+
+
+=head2 GetAllConnections(sub { },[CatalogId => Str, Filter => L<Paws::Glue::GetConnectionsFilter>, MaxResults => Int, NextToken => Str])
+
+=head2 GetAllConnections([CatalogId => Str, Filter => L<Paws::Glue::GetConnectionsFilter>, MaxResults => Int, NextToken => Str])
+
+
+If passed a sub as first parameter, it will call the sub for each element found in :
+
+ - ConnectionList, passing the object as the first parameter, and the string 'ConnectionList' as the second parameter 
+
+If not, it will return a a L<Paws::Glue::GetConnectionsResponse> instance with all the C<param>s;  from all the responses. Please take into account that this mode can potentially consume vasts ammounts of memory.
+
+
+=head2 GetAllCrawlerMetrics(sub { },[CrawlerNameList => ArrayRef[Str|Undef], MaxResults => Int, NextToken => Str])
+
+=head2 GetAllCrawlerMetrics([CrawlerNameList => ArrayRef[Str|Undef], MaxResults => Int, NextToken => Str])
+
+
+If passed a sub as first parameter, it will call the sub for each element found in :
+
+ - CrawlerMetricsList, passing the object as the first parameter, and the string 'CrawlerMetricsList' as the second parameter 
+
+If not, it will return a a L<Paws::Glue::GetCrawlerMetricsResponse> instance with all the C<param>s;  from all the responses. Please take into account that this mode can potentially consume vasts ammounts of memory.
+
+
+=head2 GetAllCrawlers(sub { },[MaxResults => Int, NextToken => Str])
+
+=head2 GetAllCrawlers([MaxResults => Int, NextToken => Str])
+
+
+If passed a sub as first parameter, it will call the sub for each element found in :
+
+ - Crawlers, passing the object as the first parameter, and the string 'Crawlers' as the second parameter 
+
+If not, it will return a a L<Paws::Glue::GetCrawlersResponse> instance with all the C<param>s;  from all the responses. Please take into account that this mode can potentially consume vasts ammounts of memory.
+
+
+=head2 GetAllDatabases(sub { },[CatalogId => Str, MaxResults => Int, NextToken => Str])
+
+=head2 GetAllDatabases([CatalogId => Str, MaxResults => Int, NextToken => Str])
+
+
+If passed a sub as first parameter, it will call the sub for each element found in :
+
+ - DatabaseList, passing the object as the first parameter, and the string 'DatabaseList' as the second parameter 
+
+If not, it will return a a L<Paws::Glue::GetDatabasesResponse> instance with all the C<param>s;  from all the responses. Please take into account that this mode can potentially consume vasts ammounts of memory.
+
+
+=head2 GetAllDevEndpoints(sub { },[MaxResults => Int, NextToken => Str])
+
+=head2 GetAllDevEndpoints([MaxResults => Int, NextToken => Str])
+
+
+If passed a sub as first parameter, it will call the sub for each element found in :
+
+ - DevEndpoints, passing the object as the first parameter, and the string 'DevEndpoints' as the second parameter 
+
+If not, it will return a a L<Paws::Glue::GetDevEndpointsResponse> instance with all the C<param>s;  from all the responses. Please take into account that this mode can potentially consume vasts ammounts of memory.
+
+
+=head2 GetAllJobRuns(sub { },JobName => Str, [MaxResults => Int, NextToken => Str])
+
+=head2 GetAllJobRuns(JobName => Str, [MaxResults => Int, NextToken => Str])
+
+
+If passed a sub as first parameter, it will call the sub for each element found in :
+
+ - JobRuns, passing the object as the first parameter, and the string 'JobRuns' as the second parameter 
+
+If not, it will return a a L<Paws::Glue::GetJobRunsResponse> instance with all the C<param>s;  from all the responses. Please take into account that this mode can potentially consume vasts ammounts of memory.
+
+
+=head2 GetAllJobs(sub { },[MaxResults => Int, NextToken => Str])
+
+=head2 GetAllJobs([MaxResults => Int, NextToken => Str])
+
+
+If passed a sub as first parameter, it will call the sub for each element found in :
+
+ - Jobs, passing the object as the first parameter, and the string 'Jobs' as the second parameter 
+
+If not, it will return a a L<Paws::Glue::GetJobsResponse> instance with all the C<param>s;  from all the responses. Please take into account that this mode can potentially consume vasts ammounts of memory.
+
+
+=head2 GetAllPartitions(sub { },DatabaseName => Str, TableName => Str, [CatalogId => Str, Expression => Str, MaxResults => Int, NextToken => Str, Segment => L<Paws::Glue::Segment>])
+
+=head2 GetAllPartitions(DatabaseName => Str, TableName => Str, [CatalogId => Str, Expression => Str, MaxResults => Int, NextToken => Str, Segment => L<Paws::Glue::Segment>])
+
+
+If passed a sub as first parameter, it will call the sub for each element found in :
+
+ - Partitions, passing the object as the first parameter, and the string 'Partitions' as the second parameter 
+
+If not, it will return a a L<Paws::Glue::GetPartitionsResponse> instance with all the C<param>s;  from all the responses. Please take into account that this mode can potentially consume vasts ammounts of memory.
+
+
+=head2 GetAllTables(sub { },DatabaseName => Str, [CatalogId => Str, Expression => Str, MaxResults => Int, NextToken => Str])
+
+=head2 GetAllTables(DatabaseName => Str, [CatalogId => Str, Expression => Str, MaxResults => Int, NextToken => Str])
+
+
+If passed a sub as first parameter, it will call the sub for each element found in :
+
+ - TableList, passing the object as the first parameter, and the string 'TableList' as the second parameter 
+
+If not, it will return a a L<Paws::Glue::GetTablesResponse> instance with all the C<param>s;  from all the responses. Please take into account that this mode can potentially consume vasts ammounts of memory.
+
+
+=head2 GetAllTableVersions(sub { },DatabaseName => Str, TableName => Str, [CatalogId => Str, MaxResults => Int, NextToken => Str])
+
+=head2 GetAllTableVersions(DatabaseName => Str, TableName => Str, [CatalogId => Str, MaxResults => Int, NextToken => Str])
+
+
+If passed a sub as first parameter, it will call the sub for each element found in :
+
+ - TableVersions, passing the object as the first parameter, and the string 'TableVersions' as the second parameter 
+
+If not, it will return a a L<Paws::Glue::GetTableVersionsResponse> instance with all the C<param>s;  from all the responses. Please take into account that this mode can potentially consume vasts ammounts of memory.
+
+
+=head2 GetAllTriggers(sub { },[DependentJobName => Str, MaxResults => Int, NextToken => Str])
+
+=head2 GetAllTriggers([DependentJobName => Str, MaxResults => Int, NextToken => Str])
+
+
+If passed a sub as first parameter, it will call the sub for each element found in :
+
+ - Triggers, passing the object as the first parameter, and the string 'Triggers' as the second parameter 
+
+If not, it will return a a L<Paws::Glue::GetTriggersResponse> instance with all the C<param>s;  from all the responses. Please take into account that this mode can potentially consume vasts ammounts of memory.
+
+
+=head2 GetAllUserDefinedFunctions(sub { },DatabaseName => Str, Pattern => Str, [CatalogId => Str, MaxResults => Int, NextToken => Str])
+
+=head2 GetAllUserDefinedFunctions(DatabaseName => Str, Pattern => Str, [CatalogId => Str, MaxResults => Int, NextToken => Str])
+
+
+If passed a sub as first parameter, it will call the sub for each element found in :
+
+ - UserDefinedFunctions, passing the object as the first parameter, and the string 'UserDefinedFunctions' as the second parameter 
+
+If not, it will return a a L<Paws::Glue::GetUserDefinedFunctionsResponse> instance with all the C<param>s;  from all the responses. Please take into account that this mode can potentially consume vasts ammounts of memory.
+
 
 
 
@@ -1111,9 +2507,9 @@ This service class forms part of L<Paws>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

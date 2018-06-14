@@ -13,6 +13,11 @@ has 'amount' => (
     isa=>'Int',
 );
 
+has 'weight' => (
+    is=>'ro',
+    isa=>'Num',
+);
+
 has 'more' => (
     is=>'ro',
     isa=>'HashRef',

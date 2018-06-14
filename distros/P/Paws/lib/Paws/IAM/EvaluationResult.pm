@@ -48,7 +48,7 @@ SimulateCustomPolicy > and C< SimulatePrincipalPolicy >.
 
 =head2 B<REQUIRED> EvalActionName => Str
 
-  The name of the API action tested on the indicated resource.
+  The name of the API operation tested on the indicated resource.
 
 
 =head2 B<REQUIRED> EvalDecision => Str
@@ -64,19 +64,20 @@ explains how each set of policies contributes to the final evaluation
 decision. When simulating cross-account access to a resource, both the
 resource-based policy and the caller's IAM policy must grant access.
 See How IAM Roles Differ from Resource-based Policies
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_compare-resource-policies.html)
 
 
 =head2 EvalResourceName => Str
 
-  The ARN of the resource that the indicated API action was tested on.
+  The ARN of the resource that the indicated API operation was tested on.
 
 
 =head2 MatchedStatements => ArrayRef[L<Paws::IAM::Statement>]
 
   A list of the statements in the input policies that determine the
 result for this scenario. Remember that even if multiple statements
-allow the action on the resource, if only one statement denies that
-action, then the explicit deny overrides any allow, and the deny
+allow the operation on the resource, if only one statement denies that
+operation, then the explicit deny overrides any allow, and the deny
 statement is the only entry included in the result.
 
 
@@ -101,8 +102,8 @@ simulated user's account is part of an organization.
 
 =head2 ResourceSpecificResults => ArrayRef[L<Paws::IAM::ResourceSpecificResult>]
 
-  The individual results of the simulation of the API action specified in
-EvalActionName on each resource.
+  The individual results of the simulation of the API operation specified
+in EvalActionName on each resource.
 
 
 
@@ -112,9 +113,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::IAM>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

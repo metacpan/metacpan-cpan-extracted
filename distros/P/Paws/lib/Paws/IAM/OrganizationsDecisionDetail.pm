@@ -31,7 +31,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::IAM::Organi
 
 =head1 DESCRIPTION
 
-Contains information about AWS Organizations's affect on a policy
+Contains information about AWS Organizations's effect on a policy
 simulation.
 
 =head1 ATTRIBUTES
@@ -39,7 +39,7 @@ simulation.
 
 =head2 AllowedByOrganizations => Bool
 
-  Specifies whether the simulated action is allowed by the AWS
+  Specifies whether the simulated operation is allowed by the AWS
 Organizations service control policies that impact the simulated user's
 account.
 
@@ -51,9 +51,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::IAM>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

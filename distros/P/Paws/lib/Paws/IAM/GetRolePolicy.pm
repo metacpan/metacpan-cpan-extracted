@@ -15,21 +15,34 @@ package Paws::IAM::GetRolePolicy;
 
 =head1 NAME
 
-Paws::IAM::GetRolePolicy - Arguments for method GetRolePolicy on Paws::IAM
+Paws::IAM::GetRolePolicy - Arguments for method GetRolePolicy on L<Paws::IAM>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method GetRolePolicy on the 
-AWS Identity and Access Management service. Use the attributes of this class
+This class represents the parameters used for calling the method GetRolePolicy on the
+L<AWS Identity and Access Management|Paws::IAM> service. Use the attributes of this class
 as arguments to method GetRolePolicy.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to GetRolePolicy.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->GetRolePolicy(Att1 => $value1, Att2 => $value2, ...);
+    my $iam = Paws->service('IAM');
+    my $GetRolePolicyResponse = $iam->GetRolePolicy(
+      PolicyName => 'MypolicyNameType',
+      RoleName   => 'MyroleNameType',
+
+    );
+
+    # Results:
+    my $RoleName       = $GetRolePolicyResponse->RoleName;
+    my $PolicyName     = $GetRolePolicyResponse->PolicyName;
+    my $PolicyDocument = $GetRolePolicyResponse->PolicyDocument;
+
+    # Returns a L<Paws::IAM::GetRolePolicyResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/iam/GetRolePolicy>
 
 =head1 ATTRIBUTES
 
@@ -38,9 +51,10 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 
 The name of the policy document to get.
 
-This parameter allows (per its regex pattern) a string of characters
-consisting of upper and lowercase alphanumeric characters with no
-spaces. You can also include any of the following characters: =,.@-+
+This parameter allows (per its regex pattern
+(http://wikipedia.org/wiki/regex)) a string of characters consisting of
+upper and lowercase alphanumeric characters with no spaces. You can
+also include any of the following characters: _+=,.@-
 
 
 
@@ -48,9 +62,10 @@ spaces. You can also include any of the following characters: =,.@-+
 
 The name of the role associated with the policy.
 
-This parameter allows (per its regex pattern) a string of characters
-consisting of upper and lowercase alphanumeric characters with no
-spaces. You can also include any of the following characters: _+=,.@-
+This parameter allows (per its regex pattern
+(http://wikipedia.org/wiki/regex)) a string of characters consisting of
+upper and lowercase alphanumeric characters with no spaces. You can
+also include any of the following characters: _+=,.@-
 
 
 
@@ -61,9 +76,9 @@ This class forms part of L<Paws>, documenting arguments for method GetRolePolicy
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

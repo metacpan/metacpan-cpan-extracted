@@ -19,21 +19,116 @@ package Paws::KinesisAnalytics::CreateApplication;
 
 =head1 NAME
 
-Paws::KinesisAnalytics::CreateApplication - Arguments for method CreateApplication on Paws::KinesisAnalytics
+Paws::KinesisAnalytics::CreateApplication - Arguments for method CreateApplication on L<Paws::KinesisAnalytics>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateApplication on the 
-Amazon Kinesis Analytics service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateApplication on the
+L<Amazon Kinesis Analytics|Paws::KinesisAnalytics> service. Use the attributes of this class
 as arguments to method CreateApplication.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateApplication.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateApplication(Att1 => $value1, Att2 => $value2, ...);
+    my $kinesisanalytics = Paws->service('KinesisAnalytics');
+    my $CreateApplicationResponse = $kinesisanalytics->CreateApplication(
+      ApplicationName          => 'MyApplicationName',
+      ApplicationCode          => 'MyApplicationCode',           # OPTIONAL
+      ApplicationDescription   => 'MyApplicationDescription',    # OPTIONAL
+      CloudWatchLoggingOptions => [
+        {
+          RoleARN      => 'MyRoleARN',         # min: 1, max: 2048
+          LogStreamARN => 'MyLogStreamARN',    # min: 1, max: 2048
+
+        },
+        ...
+      ],                                       # OPTIONAL
+      Inputs => [
+        {
+          NamePrefix  => 'MyInAppStreamName',    # min: 1, max: 32
+          InputSchema => {
+            RecordFormat => {
+              RecordFormatType  => 'JSON',       # values: JSON, CSV
+              MappingParameters => {
+                CSVMappingParameters => {
+                  RecordColumnDelimiter => 'MyRecordColumnDelimiter',  # min: 1,
+                  RecordRowDelimiter    => 'MyRecordRowDelimiter',     # min: 1,
+
+                },    # OPTIONAL
+                JSONMappingParameters => {
+                  RecordRowPath => 'MyRecordRowPath',    # min: 1,
+
+                },    # OPTIONAL
+              },    # OPTIONAL
+            },
+            RecordColumns => [
+              {
+                SqlType => 'MyRecordColumnSqlType',    # min: 1,
+                Name    => 'MyRecordColumnName',
+                Mapping => 'MyRecordColumnMapping',    # OPTIONAL
+              },
+              ...
+            ],                                         # min: 1, max: 1000
+            RecordEncoding => 'MyRecordEncoding',      # OPTIONAL
+          },
+          InputProcessingConfiguration => {
+            InputLambdaProcessor => {
+              ResourceARN => 'MyResourceARN',          # min: 1, max: 2048
+              RoleARN     => 'MyRoleARN',              # min: 1, max: 2048
+
+            },
+
+          },    # OPTIONAL
+          InputParallelism => {
+            Count => 1,    # min: 1, max: 64; OPTIONAL
+          },    # OPTIONAL
+          KinesisStreamsInput => {
+            RoleARN     => 'MyRoleARN',        # min: 1, max: 2048
+            ResourceARN => 'MyResourceARN',    # min: 1, max: 2048
+
+          },    # OPTIONAL
+          KinesisFirehoseInput => {
+            RoleARN     => 'MyRoleARN',        # min: 1, max: 2048
+            ResourceARN => 'MyResourceARN',    # min: 1, max: 2048
+
+          },    # OPTIONAL
+        },
+        ...
+      ],        # OPTIONAL
+      Outputs => [
+        {
+          Name              => 'MyInAppStreamName',    # min: 1, max: 32
+          DestinationSchema => {
+            RecordFormatType => 'JSON',                # values: JSON, CSV
+          },
+          KinesisStreamsOutput => {
+            ResourceARN => 'MyResourceARN',            # min: 1, max: 2048
+            RoleARN     => 'MyRoleARN',                # min: 1, max: 2048
+
+          },    # OPTIONAL
+          KinesisFirehoseOutput => {
+            RoleARN     => 'MyRoleARN',        # min: 1, max: 2048
+            ResourceARN => 'MyResourceARN',    # min: 1, max: 2048
+
+          },    # OPTIONAL
+          LambdaOutput => {
+            ResourceARN => 'MyResourceARN',    # min: 1, max: 2048
+            RoleARN     => 'MyRoleARN',        # min: 1, max: 2048
+
+          },    # OPTIONAL
+        },
+        ...
+      ],        # OPTIONAL
+    );
+
+    # Results:
+    my $ApplicationSummary = $CreateApplicationResponse->ApplicationSummary;
+
+    # Returns a L<Paws::KinesisAnalytics::CreateApplicationResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/kinesisanalytics/CreateApplication>
 
 =head1 ATTRIBUTES
 
@@ -44,8 +139,9 @@ One or more SQL statements that read input data, transform it, and
 generate output. For example, you can write a SQL statement that reads
 data from one in-application stream, generates a running average of the
 number of advertisement clicks by vendor, and insert resulting rows in
-another in-application stream using pumps. For more inforamtion about
-the typical pattern, see Application Code.
+another in-application stream using pumps. For more information about
+the typical pattern, see Application Code
+(http://docs.aws.amazon.com/kinesisanalytics/latest/dev/how-it-works-app-code.html).
 
 You can provide such series of SQL statements, where output of one
 statement can be used as the input for the next statement. You store
@@ -76,7 +172,8 @@ C<sample-app>).
 
 Use this parameter to configure a CloudWatch log stream to monitor
 application configuration errors. For more information, see Working
-with Amazon CloudWatch Logs.
+with Amazon CloudWatch Logs
+(http://docs.aws.amazon.com/kinesisanalytics/latest/dev/cloudwatch-logs.html).
 
 
 
@@ -91,7 +188,7 @@ then query the in-application stream like a table (you can think of it
 as a constantly updating table).
 
 For the streaming source, you provide its Amazon Resource Name (ARN)
-and format of data on the stream (for example, JSON, CSV, etc). You
+and format of data on the stream (for example, JSON, CSV, etc.). You
 also must provide an IAM role that Amazon Kinesis Analytics can assume
 to read this stream on your behalf.
 
@@ -105,21 +202,23 @@ streaming source to record columns in the in-app stream.
 =head2 Outputs => ArrayRef[L<Paws::KinesisAnalytics::Output>]
 
 You can configure application output to write data from any of the
-in-application streams to up to five destinations.
+in-application streams to up to three destinations.
 
 These destinations can be Amazon Kinesis streams, Amazon Kinesis
-Firehose delivery streams, or both.
+Firehose delivery streams, Amazon Lambda destinations, or any
+combination of the three.
 
 In the configuration, you specify the in-application stream name, the
-destination stream Amazon Resource Name (ARN), and the format to use
-when writing data. You must also provide an IAM role that Amazon
-Kinesis Analytics can assume to write to the destination stream on your
-behalf.
+destination stream or Lambda function Amazon Resource Name (ARN), and
+the format to use when writing data. You must also provide an IAM role
+that Amazon Kinesis Analytics can assume to write to the destination
+stream or Lambda function on your behalf.
 
-In the output configuration, you also provide the output stream Amazon
-Resource Name (ARN) and the format of data in the stream (for example,
-JSON, CSV). You also must provide an IAM role that Amazon Kinesis
-Analytics can assume to write to this stream on your behalf.
+In the output configuration, you also provide the output stream or
+Lambda function ARN. For stream destinations, you provide the format of
+data in the stream (for example, JSON, CSV). You also must provide an
+IAM role that Amazon Kinesis Analytics can assume to write to the
+stream or Lambda function on your behalf.
 
 
 
@@ -130,9 +229,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateApplica
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

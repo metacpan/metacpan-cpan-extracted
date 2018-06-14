@@ -17,21 +17,35 @@ package Paws::RDS::CopyDBClusterParameterGroup;
 
 =head1 NAME
 
-Paws::RDS::CopyDBClusterParameterGroup - Arguments for method CopyDBClusterParameterGroup on Paws::RDS
+Paws::RDS::CopyDBClusterParameterGroup - Arguments for method CopyDBClusterParameterGroup on L<Paws::RDS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CopyDBClusterParameterGroup on the 
-Amazon Relational Database Service service. Use the attributes of this class
+This class represents the parameters used for calling the method CopyDBClusterParameterGroup on the
+L<Amazon Relational Database Service|Paws::RDS> service. Use the attributes of this class
 as arguments to method CopyDBClusterParameterGroup.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CopyDBClusterParameterGroup.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CopyDBClusterParameterGroup(Att1 => $value1, Att2 => $value2, ...);
+    my $rds = Paws->service('RDS');
+    # To copy a DB cluster parameter group
+    # This example copies a DB cluster parameter group.
+    my $CopyDBClusterParameterGroupResult = $rds->CopyDBClusterParameterGroup(
+      {
+        'SourceDBClusterParameterGroupIdentifier' =>
+          'mydbclusterparametergroup',
+        'TargetDBClusterParameterGroupDescription' =>
+          'My DB cluster parameter group copy',
+        'TargetDBClusterParameterGroupIdentifier' =>
+          'mydbclusterparametergroup-copy'
+      }
+    );
+
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/rds/CopyDBClusterParameterGroup>
 
 =head1 ATTRIBUTES
 
@@ -40,7 +54,8 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 
 The identifier or Amazon Resource Name (ARN) for the source DB cluster
 parameter group. For information about creating an ARN, see
-Constructing an RDS Amazon Resource Name (ARN).
+Constructing an RDS Amazon Resource Name (ARN)
+(http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_Tagging.ARN.html#USER_Tagging.ARN.Constructing).
 
 Constraints:
 
@@ -93,7 +108,7 @@ Cannot be null, empty, or blank
 
 =item *
 
-Must contain from 1 to 255 alphanumeric characters or hyphens
+Must contain from 1 to 255 letters, numbers, or hyphens
 
 =item *
 
@@ -116,9 +131,9 @@ This class forms part of L<Paws>, documenting arguments for method CopyDBCluster
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

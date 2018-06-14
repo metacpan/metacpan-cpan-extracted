@@ -19,7 +19,7 @@ BEGIN {
 }
 use Pod::Coverage::TrustPod;
 
-my %skip = map { $_ => 1 } qw(  );
+my %skip = map { $_ => 1 } qw( WebService::Pokemon::APIResourceList WebService::Pokemon::NamedAPIResource WebService::Pokemon::Role::APIResource );
 
 my @modules;
 for my $module ( all_modules() ) {
@@ -35,7 +35,7 @@ plan tests => scalar @modules;
 
 my %trustme = (
              'WebService::Pokemon' => [
-                                        qr/^(?:BUILD|commands|has_decoder|has_encoder|mapping|wrapper)$/
+                                        qr/^(?:BUILD)$/
                                       ]
            );
 

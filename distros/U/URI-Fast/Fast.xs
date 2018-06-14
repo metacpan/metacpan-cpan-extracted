@@ -751,8 +751,11 @@ SV* to_string(pTHX_ SV* uri_obj) {
   uri_t* uri = URI(uri_obj);
   SV*    out = newSVpv("", 0);
 
-  sv_catpv(out, uri->scheme);
-  sv_catpv(out, "://");
+  if (uri->scheme[0] != '\0') {
+    sv_catpv(out, uri->scheme);
+    sv_catpv(out, "://");
+  }
+
   sv_catsv(out, sv_2mortal(get_auth(aTHX_ uri_obj)));
   sv_catpv(out, uri->path);
 
@@ -808,17 +811,13 @@ SV* new(pTHX_ const char* class, SV* uri_str) {
     src = SvPV_nomg_const(uri_str, len);
   }
 
-  // set default scheme
-  const char* default_scheme = "file";
-  strncpy(uri->scheme, default_scheme, 4);
-
   uri_scan(uri, src, len);
 
   return obj_ref;
 }
 
 static
-SV* iri(pTHX_ SV* uri_str) {
+SV* new_iri(pTHX_ const char* class, SV* uri_str) {
   SV* obj = new(aTHX_ "URI::Fast::IRI", uri_str);
   URI_MEMBER(obj, is_iri) = 1;
   return obj;
@@ -949,10 +948,11 @@ SV* new(class, uri_str)
   OUTPUT:
     RETVAL
 
-SV* iri(uri_str)
+SV* new_iri(class, uri_str)
+  const char* class;
   SV* uri_str
   CODE:
-    RETVAL = iri(aTHX_ uri_str);
+    RETVAL = new_iri(aTHX_ class, uri_str);
   OUTPUT:
     RETVAL
 

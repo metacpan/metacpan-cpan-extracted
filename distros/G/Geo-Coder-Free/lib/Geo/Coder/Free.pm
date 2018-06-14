@@ -7,44 +7,49 @@ use lib '.';
 
 use Geo::Coder::Free::MaxMind;
 use Geo::Coder::Free::OpenAddresses;
+use List::MoreUtils;
 
 =head1 NAME
 
-Geo::Coder::Free - Provides a geocoding functionality using free databases
+Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 
     use Geo::Coder::Free;
 
-    my $geocoder = Geo::Coder::Free->new();
-    my $location = $geocoder->geocode(location => 'Ramsgate, Kent, UK');
+    my $geo_coder = Geo::Coder::Free->new();
+    my $location = $geo_coder->geocode(location => 'Ramsgate, Kent, UK');
 
     # Use a local download of http://results.openaddresses.io/
-    my $openaddr_geocoder = Geo::Coder::Free->new(openaddr => $ENV{'OPENADDR_HOME'});
-    $location = $openaddr_geocoder->geocode(location => '1600 Pennsylvania Avenue NW, Washington DC, USA');
+    my $openaddr_geo_coder = Geo::Coder::Free->new(openaddr => $ENV{'OPENADDR_HOME'});
+    $location = $openaddr_geo_coder->geocode(location => '1600 Pennsylvania Avenue NW, Washington DC, USA');
 
 =head1 DESCRIPTION
 
 Geo::Coder::Free provides an interface to free databases by acting as a front-end to
 Geo::Coder::Free::MaxMind and Geo::Coder::Free::OpenAddresses.
 
-The cgi-bin directory contains a simple DIY geocoding website:
+The cgi-bin directory contains a simple DIY Geo-Coding website.
 
-    curl 'http://localhost/~user/cgi-bin/page.fcgi?page=query&q=1600+Pennsylvania+Avenue+NW+Washington+DC+USA'
+    cgi-bin/page.fcgi page=query q=1600+Pennsylvania+Avenue+NW+Washington+DC+USA
+
+You can see a sample website at L<https://geocode.nigelhorne.com/>.
+
+    curl 'https://geocode.nigelhorne.com/cgi-bin/page.fcgi?page=query&q=1600+Pennsylvania+Avenue+NW+Washington+DC+USA'
 
 =head1 METHODS
 
 =head2 new
 
-    $geocoder = Geo::Coder::Free->new();
+    $geo_coder = Geo::Coder::Free->new();
 
 Takes one optional parameter, openaddr, which is the base directory of
 the OpenAddresses data downloaded from L<http://results.openaddresses.io>.
@@ -80,27 +85,74 @@ sub new {
 
 =head2 geocode
 
-    $location = $geocoder->geocode(location => $location);
+    $location = $geo_coder->geocode(location => $location);
 
     print 'Latitude: ', $location->{'latitude'}, "\n";
     print 'Longitude: ', $location->{'longitude'}, "\n";
 
     # TODO:
-    # @locations = $geocoder->geocode('Portland, USA');
+    # @locations = $geo_coder->geocode('Portland, USA');
     # diag 'There are Portlands in ', join (', ', map { $_->{'state'} } @locations);
+
+    my @matches = $geo_coder->geocode(scantext => 'arbitrary text', region => 'US');
 
 =cut
 
+my %common_words = (
+	'the' => 1,
+	'and' => 1,
+	'at' => 1,
+	'she' => 1,
+	'of' => 1,
+	'for' => 1,
+	'on' => 1,
+	'in' => 1,
+	'an' => 1,
+	'to' => 1,
+	'road' => 1,
+	'is' => 1
+);
+
 sub geocode {
 	my $self = shift;
+	my %param;
+	if(ref($_[0]) eq 'HASH') {
+		%param = %{$_[0]};
+	} elsif(ref($_[0])) {
+		Carp::croak('Usage: geocode(location => $location|scantext => $text)');
+	} elsif(@_ % 2 == 0) {
+		%param = @_;
+	} else {
+		$param{location} = shift;
+	}
 
 	if($self->{'openaddr'}) {
-		if(my $rc = $self->{'openaddr'}->geocode(@_)) {
+		if(wantarray) {
+			my @rc = $self->{'openaddr'}->geocode(\%param);
+			if((my $scantext = $param{'scantext'}) && (my $region = $param{'region'})) {
+				$scantext =~ s/\W+/ /g;
+				foreach my $word(List::MoreUtils::uniq(split(/\s/, $scantext))) {
+					# FIXME:  There are a *lot* of false positives
+					next if(exists($common_words{lc$word}));
+					if($word =~ /^[a-z]{2,}$/i) {
+						@rc = (@rc, $self->{'maxmind'}->geocode({ location => $word, region => $region }));
+					}
+
+				}
+			}
+			return @rc;
+		} elsif(my $rc = $self->{'openaddr'}->geocode(\%param)) {
 			return $rc;
 		}
 	}
 
-	return $self->{'maxmind'}->geocode(@_);
+	# FIXME:  scantext only works if OPENADDR_HOME is set
+	if($param{'location'}) {
+		return $self->{'maxmind'}->geocode(\%param);
+	}
+	if(!$param{'scantext'}) {
+		Carp::croak('Usage: geocode(location => $location|scantext => $text)');
+	}
 }
 
 =head2 reverse_geocode
@@ -117,7 +169,7 @@ sub reverse_geocode {
 
 =head2	ua
 
-Does nothing, here for compatibility with other geocoders
+Does nothing, here for compatibility with other Geo-Coders
 
 =cut
 
@@ -159,6 +211,27 @@ Nigel Horne <njh@bandsman.co.uk>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=head1 MORE INFORMATION
+
+I've written a few Perl related Genealogy programs including gedcom (L<https://github.com/nigelhorne/gedcom>)
+and ged2site (L<https://github.com/nigelhorne/ged2site>).
+One of the things that these do is to check the validity of your family tree, and one of those tasks is to verify place-names.
+Of course places do change names and spelling becomes more consistent over the years, but the vast majority remain the same.
+Enough of a majority to computerise the verification.
+Unfortunately all of the on-line services have one problem or another - most either charge for large number of access, or throttle the number of look-ups.
+Even my modest tree, just over 2000 people, reaches those limits.
+
+There are, however, a number of free databases that can be used, including MaxMind, GeoNames, OpenAddresses and WhosOnFirst.
+The objective of Geo::Coder::Free (L<https://github.com/nigelhorne/Geo-Coder-Free>)
+is to create a database of those databases and to create a search engine either through a local copy of the database or through an on-line website.
+Both are in their early days, but I have examples which do surprisingly well.
+
+The local copy of the database is built using the createdatabase.PL script which is bundled with G:C:F.
+That script creates a single SQLite file from downloaded copies of the databases listed above.
+Running 'make' will download GeoNames and Maxmind, but OpenAddresses and WhosOnFirst need to be downloaded manually if you decide to use them - they are treated as optional by G:C:.F.
+
+There is a sample website at L<https://geocode.nigelhorne.com/>.  The source code for that site is included in the G:C:F distribution.
 
 =head1 BUGS
 

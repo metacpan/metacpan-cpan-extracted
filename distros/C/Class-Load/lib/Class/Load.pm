@@ -1,13 +1,13 @@
 use strict;
 use warnings;
-package Class::Load; # git description: v0.23-8-ge399b9c
+package Class::Load; # git description: v0.24-5-g22a44fd
 # ABSTRACT: A working (require "Class::Name") and more
 # KEYWORDS: class module load require use runtime
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use base 'Exporter';
-use Data::OptList ();
+use Data::OptList 0.110 ();
 use Module::Implementation 0.04;
 use Module::Runtime 0.012 ();
 use Try::Tiny;
@@ -211,7 +211,7 @@ Class::Load - A working (require "Class::Name") and more
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 SYNOPSIS
 

@@ -24,7 +24,7 @@ sub output {
   }
   $o->finish();
 
-  my $buf = $$o{q}->header(-type=>'text/html',-expires=>'now')."<html><body>";
+  my $buf = $$o{httpHeader}->(-type=>'text/html',-expires=>'now')."<!DOCTYPE html>\n<html>\n<body>";
 
   if ($tbody) {
     $buf .= "<table class=grid><thead><tr>\n";

@@ -86,7 +86,7 @@ Jens Rehsack, E<lt>rehsack AT cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2015 by Jens Rehsack
+Copyright (C) 2012-2018 by Jens Rehsack
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Lesser General Public License as published by the Free

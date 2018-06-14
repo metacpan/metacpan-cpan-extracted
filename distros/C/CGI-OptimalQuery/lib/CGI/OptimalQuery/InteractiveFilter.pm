@@ -100,7 +100,7 @@ sub new {
 # ------------------------- print -------------------------
 sub output {
   my $o = shift;
-  $$o{output_handler}->(CGI::header());
+  $$o{output_handler}->($$o{httpHeader}->());
   my $view = $$o{view};
   $$o{output_handler}->($o->$view()) if $o->can($view);
   return undef;
@@ -482,7 +482,7 @@ sub html_parent_update( $ ) {
 
     my $doc = $q->start_html( -title=>'OQFilter', -script=> $js )
 	  . '<H3>Unable to contact this filters parent.</H3>'
-	  . $q->start_form( -name=>'failedFilterForm', -class=>'filterForm', -action => $$o{schema}{URI_standalone});
+	  . $q->start_form( -name=>'failedFilterForm', -class=>'filterForm', -action => $$o{schema}{URI_standalone}, -enctype=>'application/x-www-form-urlencoded');
 
 
     if (ref($$o{schema}{state_params}) eq 'ARRAY') {
@@ -664,8 +664,8 @@ sub html_filter_form( $ ) {
           $$o{schema}{options}{'CGI::OptimalQuery::InteractiveFilter'}{css} ).
           "<center>".
         (($$o{error}) ? "<strong>".$q->escapeHTML($$o{error})."</strong>" : "").
-	  $q->start_form ( -action=> $$o{schema}{URI_standalone}, -name=>'filterForm',
-			   -class=>'filterForm');
+	  $q->start_form( -action=> $$o{schema}{URI_standalone}, -name=>'filterForm',
+			   -class=>'filterForm', -enctype=>'application/x-www-form-urlencoded');
 
 
     if (ref($$o{schema}{state_params}) eq 'ARRAY') {

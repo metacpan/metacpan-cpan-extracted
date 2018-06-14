@@ -40,7 +40,7 @@ for my $pair ( sort { $a->[0] cmp $b->[0] } @files ) {
     my $desc = basename($md_file);
     $desc =~ s/\.text$//;
 
-    html_fragment_ok( $markdown, $expect_html, $desc, 'skip validation' );
+    html_fragment_ok( $markdown, $expect_html, $desc );
 }
 
 done_testing();

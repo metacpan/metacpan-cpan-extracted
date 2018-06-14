@@ -1,5 +1,11 @@
 Revision history for BSON
 
+v1.6.4    2018-06-13 10:01:32-04:00 America/New_York
+
+    [Documentation]
+
+    - Clarified BSON type mapping table and BSON::Time SYNOPSIS
+
 v1.6.3    2018-05-25 13:53:32-04:00 America/New_York
 
     [Bugs]
@@ -35,8 +41,7 @@ v1.6.0    2018-05-15 09:41:21-04:00 America/New_York
 
     [New Feature]
 
-    - [PERL-593] Add comparison overloading to BSON::OID  (HEAD -> master,
-      sandbox/master, origin/master)
+    - [PERL-593] Add comparison overloading to BSON::OID
 
     - [PERL-688] Add create_oid class method 
 

@@ -14,21 +14,37 @@ package Paws::SES::GetIdentityVerificationAttributes;
 
 =head1 NAME
 
-Paws::SES::GetIdentityVerificationAttributes - Arguments for method GetIdentityVerificationAttributes on Paws::SES
+Paws::SES::GetIdentityVerificationAttributes - Arguments for method GetIdentityVerificationAttributes on L<Paws::SES>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method GetIdentityVerificationAttributes on the 
-Amazon Simple Email Service service. Use the attributes of this class
+This class represents the parameters used for calling the method GetIdentityVerificationAttributes on the
+L<Amazon Simple Email Service|Paws::SES> service. Use the attributes of this class
 as arguments to method GetIdentityVerificationAttributes.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to GetIdentityVerificationAttributes.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->GetIdentityVerificationAttributes(Att1 => $value1, Att2 => $value2, ...);
+    my $email = Paws->service('SES');
+    # GetIdentityVerificationAttributes
+    # The following example returns the verification status and the verification
+    # token for a domain identity:
+    my $GetIdentityVerificationAttributesResponse =
+      $email->GetIdentityVerificationAttributes(
+      {
+        'Identities' => ['example.com']
+      }
+      );
+
+    # Results:
+    my $VerificationAttributes =
+      $GetIdentityVerificationAttributesResponse->VerificationAttributes;
+
+    # Returns a L<Paws::SES::GetIdentityVerificationAttributesResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/email/GetIdentityVerificationAttributes>
 
 =head1 ATTRIBUTES
 
@@ -46,9 +62,9 @@ This class forms part of L<Paws>, documenting arguments for method GetIdentityVe
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

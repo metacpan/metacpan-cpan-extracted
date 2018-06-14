@@ -32,7 +32,7 @@ my %errs = (
 
 sub check_accessors
 {
-    my ( $func, $stat ) = @_;
+    my ($func, $stat) = @_;
     Test::LeakTrace::no_leaks_ok(
         sub {
             eval { my $colnames = $stat->colnames(); };
@@ -40,7 +40,7 @@ sub check_accessors
         },
         "Unix::Statgrab::${func} doesn't leak"
     );
-    my @colnames = @{ $stat->colnames };
+    my @colnames = @{$stat->colnames};
     foreach my $cn (@colnames)
     {
         Test::LeakTrace::no_leaks_ok(
@@ -54,7 +54,7 @@ sub check_accessors
 
 sub check_cumulative
 {
-    my ( $func, $stat ) = @_;
+    my ($func, $stat) = @_;
     foreach my $cum (qw(fetchrow_arrayref fetchall_arrayref fetchrow_hashref fetchall_hashref))
     {
         Test::LeakTrace::no_leaks_ok(
@@ -81,12 +81,12 @@ sub check_func
   SKIP:
     {
         my $sub = Unix::Statgrab->can($func);
-        $sub or skip( "Unix::Statgrab cannot $func", 2 );
+        $sub or skip("Unix::Statgrab cannot $func", 2);
         Test::LeakTrace::no_leaks_ok(
             sub {
                 eval {
                     my $current = $sub->();
-                    $current or do { my $e = get_error(); diag( $e->strperror() ); croak( $e->strperror() ); } while (0);
+                    $current or do { my $e = get_error(); diag($e->strperror()); croak($e->strperror()); } while (0);
                 };
                 $@ and warn "$func: " . $@;
             },
@@ -95,24 +95,24 @@ sub check_func
         my $stat = eval { $sub->(); };
         $@ and skip "$func: " . $@, 1;
         $stat or do { my $e = get_error(); skip "$func: " . $e->strperror(), 1 } while (0);
-        check_accessors( $func, $stat );
-        check_cumulative( $func, $stat );
+        check_accessors($func, $stat);
+        check_cumulative($func, $stat);
       SKIP:
-        foreach my $below ( @{ $funcs{$func} } )
+        foreach my $below (@{$funcs{$func}})
         {
             my @args;
             $below =~ m/_diff$/ and push @args, $sub->();
             my $bs = eval { $stat->$below(@args); };
             $@ and skip "$below: $@", 1;
             $bs or do { my $e = get_error(); skip "$func: " . $e->strperror(), 1 } while (0);
-            ok( $bs, "Unix::Statgrab::${func}::${bs}" );
-            check_accessors( $below, $bs );
-            check_cumulative( $below, $bs );
+            ok($bs, "Unix::Statgrab::${func}::${bs}");
+            check_accessors($below, $bs);
+            check_cumulative($below, $bs);
         }
     }
 }
 
-foreach my $func ( sort keys %funcs )
+foreach my $func (sort keys %funcs)
 {
     check_func($func);
 }

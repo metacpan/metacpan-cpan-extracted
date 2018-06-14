@@ -2,9 +2,11 @@ package Paws::CognitoIdp::UserPoolType;
   use Moose;
   has AdminCreateUserConfig => (is => 'ro', isa => 'Paws::CognitoIdp::AdminCreateUserConfigType');
   has AliasAttributes => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
+  has Arn => (is => 'ro', isa => 'Str');
   has AutoVerifiedAttributes => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
   has CreationDate => (is => 'ro', isa => 'Str');
   has DeviceConfiguration => (is => 'ro', isa => 'Paws::CognitoIdp::DeviceConfigurationType');
+  has Domain => (is => 'ro', isa => 'Str');
   has EmailConfiguration => (is => 'ro', isa => 'Paws::CognitoIdp::EmailConfigurationType');
   has EmailConfigurationFailure => (is => 'ro', isa => 'Str');
   has EmailVerificationMessage => (is => 'ro', isa => 'Str');
@@ -23,6 +25,7 @@ package Paws::CognitoIdp::UserPoolType;
   has SmsVerificationMessage => (is => 'ro', isa => 'Str');
   has Status => (is => 'ro', isa => 'Str');
   has UsernameAttributes => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
+  has UserPoolAddOns => (is => 'ro', isa => 'Paws::CognitoIdp::UserPoolAddOnsType');
   has UserPoolTags => (is => 'ro', isa => 'Paws::CognitoIdp::UserPoolTagsType');
   has VerificationMessageTemplate => (is => 'ro', isa => 'Paws::CognitoIdp::VerificationMessageTemplateType');
 1;
@@ -55,7 +58,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::CognitoIdp:
 
 =head1 DESCRIPTION
 
-A container for information about the user pool type.
+A container for information about the user pool.
 
 =head1 ATTRIBUTES
 
@@ -68,6 +71,11 @@ A container for information about the user pool type.
 =head2 AliasAttributes => ArrayRef[Str|Undef]
 
   Specifies the attributes that are aliased in a user pool.
+
+
+=head2 Arn => Str
+
+  The Amazon Resource Name (ARN) for the user pool.
 
 
 =head2 AutoVerifiedAttributes => ArrayRef[Str|Undef]
@@ -83,6 +91,12 @@ A container for information about the user pool type.
 =head2 DeviceConfiguration => L<Paws::CognitoIdp::DeviceConfigurationType>
 
   The device configuration.
+
+
+=head2 Domain => Str
+
+  Holds the domain prefix if the user pool has a domain associated with
+it.
 
 
 =head2 EmailConfiguration => L<Paws::CognitoIdp::EmailConfigurationType>
@@ -118,7 +132,7 @@ users.
 
 =head2 LambdaConfig => L<Paws::CognitoIdp::LambdaConfigType>
 
-  A container for the AWS Lambda triggers associated with a user pool.
+  The AWS Lambda triggers associated with the user pool.
 
 
 =head2 LastModifiedDate => Str
@@ -158,7 +172,7 @@ token.
 
 =head2 Policies => L<Paws::CognitoIdp::UserPoolPolicyType>
 
-  A container for the policies associated with a user pool.
+  The policies associated with the user pool.
 
 
 =head2 SchemaAttributes => ArrayRef[L<Paws::CognitoIdp::SchemaAttributeType>]
@@ -198,10 +212,16 @@ users.
 usernames when a user signs up.
 
 
+=head2 UserPoolAddOns => L<Paws::CognitoIdp::UserPoolAddOnsType>
+
+  The user pool add-ons.
+
+
 =head2 UserPoolTags => L<Paws::CognitoIdp::UserPoolTagsType>
 
   The cost allocation tags for the user pool. For more information, see
 Adding Cost Allocation Tags to Your User Pool
+(http://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-cost-allocation-tagging.html)
 
 
 =head2 VerificationMessageTemplate => L<Paws::CognitoIdp::VerificationMessageTemplateType>
@@ -216,9 +236,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::CognitoId
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

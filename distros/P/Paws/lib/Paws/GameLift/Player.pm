@@ -57,9 +57,9 @@ player and the ticket is not matchable.
 
 =head2 PlayerAttributes => L<Paws::GameLift::PlayerAttributeMap>
 
-  Collection of name:value pairs containing player information for use in
-matchmaking. Player attribute names need to match I<playerAttributes>
-names in the rule set being used. Example: C<"PlayerAttributes":
+  Collection of key:value pairs containing player information for use in
+matchmaking. Player attribute keys must match the I<playerAttributes>
+used in a matchmaking rule set. Example: C<"PlayerAttributes":
 {"skill": {"N": "23"}, "gameMode": {"S": "deathmatch"}}>.
 
 
@@ -81,9 +81,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::GameLift>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

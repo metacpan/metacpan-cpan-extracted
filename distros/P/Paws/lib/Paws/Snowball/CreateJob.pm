@@ -25,21 +25,63 @@ package Paws::Snowball::CreateJob;
 
 =head1 NAME
 
-Paws::Snowball::CreateJob - Arguments for method CreateJob on Paws::Snowball
+Paws::Snowball::CreateJob - Arguments for method CreateJob on L<Paws::Snowball>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateJob on the 
-Amazon Import/Export Snowball service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateJob on the
+L<Amazon ImportE<sol>Export Snowball|Paws::Snowball> service. Use the attributes of this class
 as arguments to method CreateJob.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateJob.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateJob(Att1 => $value1, Att2 => $value2, ...);
+    my $snowball = Paws->service('Snowball');
+    # To create a job
+    # Creates a job to import or export data between Amazon S3 and your
+    # on-premises data center. Your AWS account must have the right trust
+    # policies and permissions in place to create a job for Snowball. If you're
+    # creating a job for a node in a cluster, you only need to provide the
+    # clusterId value; the other job attributes are inherited from the cluster.
+    my $CreateJobResult = $snowball->CreateJob(
+      {
+        'Resources' => {
+          'S3Resources' => [
+
+            {
+              'BucketArn' => 'arn:aws:s3:::MyBucket',
+              'KeyRange'  => {
+
+              }
+            }
+          ]
+        },
+        'Description'                => 'My Job',
+        'SnowballCapacityPreference' => 'T80',
+        'KmsKeyARN' =>
+'arn:aws:kms:us-east-1:123456789012:key/abcd1234-12ab-34cd-56ef-123456123456',
+        'JobType'        => 'IMPORT',
+        'ShippingOption' => 'SECOND_DAY',
+        'AddressId'      => 'ADID1234ab12-3eec-4eb3-9be6-9374c10eb51b',
+        'Notification'   => {
+          'JobStatesToNotify' => [
+
+          ],
+          'NotifyAll' => 0
+        },
+        'SnowballType' => 'STANDARD',
+        'RoleARN' => 'arn:aws:iam::123456789012:role/snowball-import-S3-role'
+      }
+    );
+
+    # Results:
+    my $JobId = $CreateJobResult->JobId;
+
+    # Returns a L<Paws::Snowball::CreateJobResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/snowball/CreateJob>
 
 =head1 ATTRIBUTES
 
@@ -81,8 +123,9 @@ Valid values are: C<"IMPORT">, C<"EXPORT">, C<"LOCAL_USE">
 =head2 KmsKeyARN => Str
 
 The C<KmsKeyARN> that you want to associate with this job.
-C<KmsKeyARN>s are created using the CreateKey AWS Key Management
-Service (KMS) API action.
+C<KmsKeyARN>s are created using the CreateKey
+(http://docs.aws.amazon.com/kms/latest/APIReference/API_CreateKey.html)
+AWS Key Management Service (KMS) API action.
 
 
 
@@ -112,8 +155,9 @@ are UTF-8 binary sorted.
 =head2 RoleARN => Str
 
 The C<RoleARN> that you want to associate with this job. C<RoleArn>s
-are created using the CreateRole AWS Identity and Access Management
-(IAM) API action.
+are created using the CreateRole
+(http://docs.aws.amazon.com/IAM/latest/APIReference/API_CreateRole.html)
+AWS Identity and Access Management (IAM) API action.
 
 
 
@@ -173,9 +217,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateJob in 
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

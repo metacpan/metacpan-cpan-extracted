@@ -1,5 +1,14 @@
 Changes file for Date-Holidays
 
+1.13 2018-06-12 Feature release, update recommended
+
+- This release integrates Date::Holidays::CA_ES is does so 
+  by supporting the region parameter with the value 'ca' via
+  Date::Holidays::ES
+
+  Ref: https://github.com/jonasbn/Date-Holidays/issues/28
+
+
 1.12 2018-06-05 Feature release, update recommended
 
 - Added adapter for US, an implementation adapting Date::Holidays::USFederal 

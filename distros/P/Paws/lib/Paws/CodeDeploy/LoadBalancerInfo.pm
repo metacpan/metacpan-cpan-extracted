@@ -44,12 +44,16 @@ group used in a deployment.
 balancing in a deployment. In Elastic Load Balancing, load balancers
 are used with Classic Load Balancers.
 
+Adding more than one load balancer to the array is not supported.
+
 
 =head2 TargetGroupInfoList => ArrayRef[L<Paws::CodeDeploy::TargetGroupInfo>]
 
   An array containing information about the target group to use for load
 balancing in a deployment. In Elastic Load Balancing, target groups are
 used with Application Load Balancers.
+
+Adding more than one target group to the array is not supported.
 
 
 
@@ -59,9 +63,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::CodeDeplo
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

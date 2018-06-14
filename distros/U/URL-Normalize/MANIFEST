@@ -23,4 +23,3 @@ t/70-remove-query-parameter.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-test.pl

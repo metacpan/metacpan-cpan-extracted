@@ -1,8 +1,10 @@
 
 package Paws::CodeDeploy::CreateDeploymentConfig;
   use Moose;
+  has ComputePlatform => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'computePlatform' );
   has DeploymentConfigName => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'deploymentConfigName' , required => 1);
-  has MinimumHealthyHosts => (is => 'ro', isa => 'Paws::CodeDeploy::MinimumHealthyHosts', traits => ['NameInRequest'], request_name => 'minimumHealthyHosts' , required => 1);
+  has MinimumHealthyHosts => (is => 'ro', isa => 'Paws::CodeDeploy::MinimumHealthyHosts', traits => ['NameInRequest'], request_name => 'minimumHealthyHosts' );
+  has TrafficRoutingConfig => (is => 'ro', isa => 'Paws::CodeDeploy::TrafficRoutingConfig', traits => ['NameInRequest'], request_name => 'trafficRoutingConfig' );
 
   use MooseX::ClassAttribute;
 
@@ -15,24 +17,57 @@ package Paws::CodeDeploy::CreateDeploymentConfig;
 
 =head1 NAME
 
-Paws::CodeDeploy::CreateDeploymentConfig - Arguments for method CreateDeploymentConfig on Paws::CodeDeploy
+Paws::CodeDeploy::CreateDeploymentConfig - Arguments for method CreateDeploymentConfig on L<Paws::CodeDeploy>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateDeploymentConfig on the 
-AWS CodeDeploy service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateDeploymentConfig on the
+L<AWS CodeDeploy|Paws::CodeDeploy> service. Use the attributes of this class
 as arguments to method CreateDeploymentConfig.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateDeploymentConfig.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateDeploymentConfig(Att1 => $value1, Att2 => $value2, ...);
+    my $codedeploy = Paws->service('CodeDeploy');
+    my $CreateDeploymentConfigOutput = $codedeploy->CreateDeploymentConfig(
+      DeploymentConfigName => 'MyDeploymentConfigName',
+      ComputePlatform      => 'Server',                   # OPTIONAL
+      MinimumHealthyHosts  => {
+        value => 1,               # OPTIONAL
+        type  => 'HOST_COUNT',    # values: HOST_COUNT, FLEET_PERCENT; OPTIONAL
+      },    # OPTIONAL
+      TrafficRoutingConfig => {
+        timeBasedLinear => {
+          linearInterval   => 1,    # OPTIONAL
+          linearPercentage => 1,    # OPTIONAL
+        },    # OPTIONAL
+        type => 'TimeBasedCanary'
+        ,     # values: TimeBasedCanary, TimeBasedLinear, AllAtOnce; OPTIONAL
+        timeBasedCanary => {
+          canaryPercentage => 1,    # OPTIONAL
+          canaryInterval   => 1,    # OPTIONAL
+        },    # OPTIONAL
+      },    # OPTIONAL
+    );
+
+    # Results:
+    my $DeploymentConfigId = $CreateDeploymentConfigOutput->DeploymentConfigId;
+
+    # Returns a L<Paws::CodeDeploy::CreateDeploymentConfigOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/codedeploy/CreateDeploymentConfig>
 
 =head1 ATTRIBUTES
 
+
+=head2 ComputePlatform => Str
+
+The destination platform type for the deployment (C<Lambda> or
+C<Server>E<gt>).
+
+Valid values are: C<"Server">, C<"Lambda">
 
 =head2 B<REQUIRED> DeploymentConfigName => Str
 
@@ -40,7 +75,7 @@ The name of the deployment configuration to create.
 
 
 
-=head2 B<REQUIRED> MinimumHealthyHosts => L<Paws::CodeDeploy::MinimumHealthyHosts>
+=head2 MinimumHealthyHosts => L<Paws::CodeDeploy::MinimumHealthyHosts>
 
 The minimum number of healthy instances that should be available at any
 time during the deployment. There are two parameters expected in the
@@ -72,6 +107,13 @@ of FLEET_PERCENT and a value of 95.
 
 
 
+=head2 TrafficRoutingConfig => L<Paws::CodeDeploy::TrafficRoutingConfig>
+
+The configuration that specifies how the deployment traffic will be
+routed.
+
+
+
 
 =head1 SEE ALSO
 
@@ -79,9 +121,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateDeploym
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

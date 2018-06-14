@@ -7,6 +7,7 @@ package Paws::WorkSpaces::WorkspaceDirectory;
   has DirectoryType => (is => 'ro', isa => 'Str');
   has DnsIpAddresses => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
   has IamRoleId => (is => 'ro', isa => 'Str');
+  has IpGroupIds => (is => 'ro', isa => 'ArrayRef[Str|Undef]', request_name => 'ipGroupIds', traits => ['NameInRequest']);
   has RegistrationCode => (is => 'ro', isa => 'Str');
   has State => (is => 'ro', isa => 'Str');
   has SubnetIds => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
@@ -42,8 +43,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::WorkSpaces:
 
 =head1 DESCRIPTION
 
-Contains information about an AWS Directory Service directory for use
-with Amazon WorkSpaces.
+Information about an AWS Directory Service directory for use with
+Amazon WorkSpaces.
 
 =head1 ATTRIBUTES
 
@@ -75,8 +76,7 @@ with Amazon WorkSpaces.
 
 =head2 DnsIpAddresses => ArrayRef[Str|Undef]
 
-  An array of strings that contains the IP addresses of the DNS servers
-for the directory.
+  The IP addresses of the DNS servers for the directory.
 
 
 =head2 IamRoleId => Str
@@ -84,6 +84,12 @@ for the directory.
   The identifier of the IAM role. This is the role that allows Amazon
 WorkSpaces to make calls to other services, such as Amazon EC2, on your
 behalf.
+
+
+=head2 IpGroupIds => ArrayRef[Str|Undef]
+
+  The identifiers of the IP access control groups associated with the
+directory.
 
 
 =head2 RegistrationCode => Str
@@ -100,14 +106,12 @@ directory.
 
 =head2 SubnetIds => ArrayRef[Str|Undef]
 
-  An array of strings that contains the identifiers of the subnets used
-with the directory.
+  The identifiers of the subnets used with the directory.
 
 
 =head2 WorkspaceCreationProperties => L<Paws::WorkSpaces::DefaultWorkspaceCreationProperties>
 
-  A structure that specifies the default creation properties for all
-WorkSpaces in the directory.
+  The default creation properties for all WorkSpaces in the directory.
 
 
 =head2 WorkspaceSecurityGroupId => Str
@@ -123,9 +127,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::WorkSpace
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

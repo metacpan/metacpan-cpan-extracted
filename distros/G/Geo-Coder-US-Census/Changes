@@ -1,5 +1,11 @@
 Revision history for Geo-Coder-US-Census
 
+0.03	Sun Jun 10 20:26:36 EDT 2018
+	Added the run() method
+	Allow counties in the location. Caveat: they will be ignored
+	Use AUTHOR_TESTING instead of RELEASE_TESTING
+	Allow parameters to geocode() to be passed in a hash reference
+
 0.02	Tue Oct 24 17:57:14 EDT 2017
 	Bump the minimum version of Net::SSLeay
 	Fix http://www.cpantesters.org/cpan/report/c5317632-b8fa-11e7-9be1-bbe64cf6c7cd

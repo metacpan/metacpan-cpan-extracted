@@ -1,0 +1,15 @@
+Build.PL
+lib/Format.pm
+lib/Format/Error.pm
+lib/Format/Error/ValueNumericException.pm
+lib/Format/Error/ValueProvideException.pm
+lib/Format/Sanitize.pm
+lib/Format/Sanitize/Number.pm
+lib/Format/Validate.pm
+lib/Format/Validate/Number.pm
+lib/Format/Validate/String.pm
+LICENSE
+MANIFEST			This list of files
+README.md
+t/ip.t
+t/money.t

@@ -38,8 +38,11 @@ Describes an encryption key for a destination in Amazon S3.
 
 =head2 B<REQUIRED> AWSKMSKeyARN => Str
 
-  The ARN of the encryption key. Must belong to the same region as the
-destination Amazon S3 bucket.
+  The Amazon Resource Name (ARN) of the encryption key. Must belong to
+the same AWS Region as the destination Amazon S3 bucket. For more
+information, see Amazon Resource Names (ARNs) and AWS Service
+Namespaces
+(https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html).
 
 
 
@@ -49,9 +52,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Firehose>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

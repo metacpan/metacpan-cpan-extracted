@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::BackendMgr;
-$Config::Model::BackendMgr::VERSION = '2.123';
+$Config::Model::BackendMgr::VERSION = '2.124';
 use Mouse;
 use strict;
 use warnings;
@@ -528,7 +528,7 @@ sub is_auto_write_for_type {
 __PACKAGE__->meta->make_immutable;
 
 package Config::Model::DeprecatedHandle;
-$Config::Model::DeprecatedHandle::VERSION = '2.123';
+$Config::Model::DeprecatedHandle::VERSION = '2.124';
 our $AUTOLOAD;
 
 sub new {
@@ -545,7 +545,11 @@ sub AUTOLOAD {
     my ($package, $filename, $line) = caller;
     $logger->warn("io_handle backend parameter is deprecated, please use file_path parameter. ",
               "($filename:$line)") unless $package eq "Config::Model::BackendMgr";
-    $$self->$f(@_) if $$self; # may not be defined during destruction
+
+    # $$self may not be defined during destruction
+    if ($$self and $self->can($f)) {
+        $$self->$f(@_);
+    }
 }
 1;
 
@@ -563,7 +567,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.123
+version 2.124
 
 =head1 SYNOPSIS
 
@@ -586,14 +590,12 @@ version 2.123
     name => "MyClass",
 
     # rw_config spec is used by Config::Model::BackendMgr
-    rw_config => [
-        {
-            backend     => 'yaml',
-            config_dir  => '/tmp/',
-            file        => 'my_class.yml',
-            auto_create => 1,
-        },
-    ],
+    rw_config => {
+        backend     => 'yaml',
+        config_dir  => '/tmp/',
+        file        => 'my_class.yml',
+        auto_create => 1,
+    },
 
     element => [
         [qw/foo bar/] => {
@@ -748,11 +750,11 @@ specifies default values. For instance, this is used by OpenSSH to
 specify a global configuration file (C</etc/ssh/ssh_config>) that is
 overridden by user's file:
 
-	'default_layer' => {
-            os_config_dir => { 'darwin' => '/etc' },
-            config_dir    => '/etc/ssh',
-            file          => 'ssh_config'
-        }
+ default_layer => {
+    os_config_dir => { 'darwin' => '/etc' },
+    config_dir    => '/etc/ssh',
+    file          => 'ssh_config'
+ }
 
 Only the 3 above parameters can be specified in C<default_layer>.
 
@@ -762,12 +764,12 @@ By default, an exception is thrown if no read was
 successful. This behavior can be overridden by specifying
 C<< auto_create => 1 >> in one of the backend specification. For instance:
 
-    rw_config  => {
-        backend => 'IniFile',
-        config_dir => '/tmp',
-        file  => 'foo.conf',
-        auto_create => 1
-    },
+ rw_config  => {
+     backend => 'IniFile',
+     config_dir => '/tmp',
+     file  => 'foo.conf',
+     auto_create => 1
+ },
 
 Setting C<auto_create> to 1 is necessary to create a configuration
 from scratch
@@ -785,11 +787,11 @@ in their documentation.
 
 For instance:
 
-   rw_config => {
-       backend     => 'yaml',
-       config_dir  => '/tmp/',
-       file        => 'my_class.yml',
-   },
+ rw_config => {
+     backend     => 'yaml',
+     config_dir  => '/tmp/',
+     file        => 'my_class.yml',
+ },
 
 See L<Config::Model::Backend::Yaml> for more details for this backend.
 
@@ -804,18 +806,6 @@ for details.
 By default, configurations files are read from the directory specified
 by C<config_dir> parameter specified in the model. You may override the
 C<root> directory for test.
-
-=head1 CAVEATS
-
-When both C<config_dir> and C<file> are specified, this class
-write-opens the configuration file (and thus clobber it) before calling
-the C<write> call-back and pass the file handle with C<io_handle>
-parameter. C<write> should use this handle to write data in the target
-configuration file.
-
-If this behavior causes problem (e.g. with augeas backend), the
-solution is either to set C<file> to undef or an empty string in the
-C<rw_config> specification.
 
 =head1 Methods
 

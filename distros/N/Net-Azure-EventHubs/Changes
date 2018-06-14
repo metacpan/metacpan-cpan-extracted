@@ -1,5 +1,8 @@
 Revision history for Perl extension Net-Azure-EventHubs
 
+0.05 2018-06-11T01:12:57Z
+    - Fix for supporting to Net-Azure-Authorization-SAS-0.03
+
 0.04 2017-06-06T08:29:26Z
     - use fastapi.metacpan.org/v1 in t/31_response_as_hashref.t because api.metacpan.org/v0 is shutdown
 

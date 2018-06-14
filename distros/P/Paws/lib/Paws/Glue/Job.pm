@@ -11,7 +11,9 @@ package Paws::Glue::Job;
   has LogUri => (is => 'ro', isa => 'Str');
   has MaxRetries => (is => 'ro', isa => 'Int');
   has Name => (is => 'ro', isa => 'Str');
+  has NotificationProperty => (is => 'ro', isa => 'Paws::Glue::NotificationProperty');
   has Role => (is => 'ro', isa => 'Str');
+  has Timeout => (is => 'ro', isa => 'Int');
 1;
 
 ### main pod documentation begin ###
@@ -31,7 +33,7 @@ Each attribute should be used as a named argument in the calls that expect this 
 
 As an example, if Att1 is expected to be a Paws::Glue::Job object:
 
-  $service_obj->Method(Att1 => { AllocatedCapacity => $value, ..., Role => $value  });
+  $service_obj->Method(Att1 => { AllocatedCapacity => $value, ..., Timeout => $value  });
 
 =head3 Results returned from an API call
 
@@ -42,14 +44,18 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Glue::Job o
 
 =head1 DESCRIPTION
 
-Specifies a job in the Data Catalog.
+Specifies a job definition.
 
 =head1 ATTRIBUTES
 
 
 =head2 AllocatedCapacity => Int
 
-  The number of capacity units allocated to this job.
+  The number of AWS Glue data processing units (DPUs) allocated to runs
+of this job. From 2 to 100 DPUs can be allocated; the default is 10. A
+DPU is a relative measure of processing power that consists of 4 vCPUs
+of compute capacity and 16 GB of memory. For more information, see the
+AWS Glue pricing page (https://aws.amazon.com/glue/pricing/).
 
 
 =head2 Command => L<Paws::Glue::JobCommand>
@@ -64,17 +70,30 @@ Specifies a job in the Data Catalog.
 
 =head2 CreatedOn => Str
 
-  The time and date that this job specification was created.
+  The time and date that this job definition was created.
 
 
 =head2 DefaultArguments => L<Paws::Glue::GenericMap>
 
-  The default parameters for this job.
+  The default arguments for this job, specified as name-value pairs.
+
+You can specify arguments here that your own job-execution script
+consumes, as well as arguments that AWS Glue itself consumes.
+
+For information about how to specify and consume your own Job
+arguments, see the Calling AWS Glue APIs in Python
+(http://docs.aws.amazon.com/glue/latest/dg/aws-glue-programming-python-calling.html)
+topic in the developer guide.
+
+For information about the key-value pairs that AWS Glue consumes to set
+up your job, see the Special Parameters Used by AWS Glue
+(http://docs.aws.amazon.com/glue/latest/dg/aws-glue-programming-etl-glue-arguments.html)
+topic in the developer guide.
 
 
 =head2 Description => Str
 
-  Description of this job.
+  Description of the job being defined.
 
 
 =head2 ExecutionProperty => L<Paws::Glue::ExecutionProperty>
@@ -85,27 +104,37 @@ allowed for this job.
 
 =head2 LastModifiedOn => Str
 
-  The last point in time when this job specification was modified.
+  The last point in time when this job definition was modified.
 
 
 =head2 LogUri => Str
 
-  Location of the logs for this job.
+  This field is reserved for future use.
 
 
 =head2 MaxRetries => Int
 
-  The maximum number of times to retry this job if it fails.
+  The maximum number of times to retry this job after a JobRun fails.
 
 
 =head2 Name => Str
 
-  The name you assign to this job.
+  The name you assign to this job definition.
+
+
+=head2 NotificationProperty => L<Paws::Glue::NotificationProperty>
+
+  Specifies configuration properties of a job notification.
 
 
 =head2 Role => Str
 
-  The role associated with this job.
+  The name or ARN of the IAM role associated with this job.
+
+
+=head2 Timeout => Int
+
+  The job timeout in minutes.
 
 
 
@@ -115,9 +144,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Glue>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

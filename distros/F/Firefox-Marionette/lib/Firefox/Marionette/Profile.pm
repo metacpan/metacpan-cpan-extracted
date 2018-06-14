@@ -13,7 +13,7 @@ BEGIN {
         require Win32;
     }
 }
-our $VERSION = '0.53';
+our $VERSION = '0.54';
 
 sub _ANY_PORT           { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -238,6 +238,7 @@ sub parse {
             && (   ( $line !~ /\S/smx )
                 || ( $line =~ /^[#]/smx )
                 || ( $line =~ /^\/[*]/smx )
+                || ( $line =~ /^\/\//smx )
                 || ( $line =~ /^\s+[*]/smx ) )
           )
         {
@@ -270,7 +271,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 0.53
+Version 0.54
 
 =head1 SYNOPSIS
 

@@ -2,6 +2,8 @@ package Paws::CodeBuild::Project;
   use Moose;
   has Arn => (is => 'ro', isa => 'Str', request_name => 'arn', traits => ['NameInRequest']);
   has Artifacts => (is => 'ro', isa => 'Paws::CodeBuild::ProjectArtifacts', request_name => 'artifacts', traits => ['NameInRequest']);
+  has Badge => (is => 'ro', isa => 'Paws::CodeBuild::ProjectBadge', request_name => 'badge', traits => ['NameInRequest']);
+  has Cache => (is => 'ro', isa => 'Paws::CodeBuild::ProjectCache', request_name => 'cache', traits => ['NameInRequest']);
   has Created => (is => 'ro', isa => 'Str', request_name => 'created', traits => ['NameInRequest']);
   has Description => (is => 'ro', isa => 'Str', request_name => 'description', traits => ['NameInRequest']);
   has EncryptionKey => (is => 'ro', isa => 'Str', request_name => 'encryptionKey', traits => ['NameInRequest']);
@@ -12,6 +14,7 @@ package Paws::CodeBuild::Project;
   has Source => (is => 'ro', isa => 'Paws::CodeBuild::ProjectSource', request_name => 'source', traits => ['NameInRequest']);
   has Tags => (is => 'ro', isa => 'ArrayRef[Paws::CodeBuild::Tag]', request_name => 'tags', traits => ['NameInRequest']);
   has TimeoutInMinutes => (is => 'ro', isa => 'Int', request_name => 'timeoutInMinutes', traits => ['NameInRequest']);
+  has VpcConfig => (is => 'ro', isa => 'Paws::CodeBuild::VpcConfig', request_name => 'vpcConfig', traits => ['NameInRequest']);
   has Webhook => (is => 'ro', isa => 'Paws::CodeBuild::Webhook', request_name => 'webhook', traits => ['NameInRequest']);
 1;
 
@@ -56,6 +59,16 @@ Information about a build project.
 =head2 Artifacts => L<Paws::CodeBuild::ProjectArtifacts>
 
   Information about the build output artifacts for the build project.
+
+
+=head2 Badge => L<Paws::CodeBuild::ProjectBadge>
+
+  Information about the build badge for the build project.
+
+
+=head2 Cache => L<Paws::CodeBuild::ProjectCache>
+
+  Information about the cache for the build project.
 
 
 =head2 Created => Str
@@ -120,6 +133,11 @@ wait before timing out any related build that did not get marked as
 completed. The default is 60 minutes.
 
 
+=head2 VpcConfig => L<Paws::CodeBuild::VpcConfig>
+
+  Information about the VPC configuration that AWS CodeBuild will access.
+
+
 =head2 Webhook => L<Paws::CodeBuild::Webhook>
 
   Information about a webhook in GitHub that connects repository events
@@ -133,9 +151,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::CodeBuild
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

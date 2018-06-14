@@ -1,3 +1,9 @@
+0.002   2018-06-11 (PERLANCAR)
+
+	- [ux] Include message in response reason, so it's immediately seen
+	  in CLI error message.
+
+
 0.001   2018-02-14 (PERLANCAR)
 
         - First, early release.

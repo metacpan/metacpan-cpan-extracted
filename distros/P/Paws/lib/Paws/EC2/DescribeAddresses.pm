@@ -17,21 +17,68 @@ package Paws::EC2::DescribeAddresses;
 
 =head1 NAME
 
-Paws::EC2::DescribeAddresses - Arguments for method DescribeAddresses on Paws::EC2
+Paws::EC2::DescribeAddresses - Arguments for method DescribeAddresses on L<Paws::EC2>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DescribeAddresses on the 
-Amazon Elastic Compute Cloud service. Use the attributes of this class
+This class represents the parameters used for calling the method DescribeAddresses on the
+L<Amazon Elastic Compute Cloud|Paws::EC2> service. Use the attributes of this class
 as arguments to method DescribeAddresses.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DescribeAddresses.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DescribeAddresses(Att1 => $value1, Att2 => $value2, ...);
+    my $ec2 = Paws->service('EC2');
+    # To describe your Elastic IP addresses
+    # This example describes your Elastic IP addresses.
+    my $DescribeAddressesResult = $ec2->DescribeAddresses();
+
+    # Results:
+    my $Addresses = $DescribeAddressesResult->Addresses;
+
+    # Returns a L<Paws::EC2::DescribeAddressesResult> object.
+    # To describe your Elastic IP addresses for EC2-VPC
+    # This example describes your Elastic IP addresses for use with instances in
+    # a VPC.
+    my $DescribeAddressesResult = $ec2->DescribeAddresses(
+      {
+        'Filters' => [
+
+          {
+            'Name'   => 'domain',
+            'Values' => ['vpc']
+          }
+        ]
+      }
+    );
+
+    # Results:
+    my $Addresses = $DescribeAddressesResult->Addresses;
+
+    # Returns a L<Paws::EC2::DescribeAddressesResult> object.
+    # To describe your Elastic IP addresses for EC2-Classic
+    # This example describes your Elastic IP addresses for use with instances in
+    # EC2-Classic.
+    my $DescribeAddressesResult = $ec2->DescribeAddresses(
+      {
+        'Filters' => [
+
+          {
+            'Values' => ['standard'],
+            'Name'   => 'domain'
+          }
+        ]
+      }
+    );
+
+    # Results:
+    my $Addresses = $DescribeAddressesResult->Addresses;
+
+    # Returns a L<Paws::EC2::DescribeAddressesResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ec2/DescribeAddresses>
 
 =head1 ATTRIBUTES
 
@@ -95,6 +142,24 @@ with the Elastic IP address.
 
 C<public-ip> - The Elastic IP address.
 
+=item *
+
+C<tag>:I<key>=I<value> - The key/value combination of a tag assigned to
+the resource. Specify the key of the tag in the filter name and the
+value of the tag in the filter value. For example, for the tag
+Purpose=X, specify C<tag:Purpose> for the filter name and C<X> for the
+filter value.
+
+=item *
+
+C<tag-key> - The key of a tag assigned to the resource. This filter is
+independent of the C<tag-value> filter. For example, if you use both
+the filter "tag-key=Purpose" and the filter "tag-value=X", you get any
+resources assigned both the tag key Purpose (regardless of what the
+tag's value is), and the tag value X (regardless of the tag's key). If
+you want to list only resources where Purpose is X, see the
+C<tag>:I<key>=I<value> filter.
+
 =back
 
 
@@ -115,9 +180,9 @@ This class forms part of L<Paws>, documenting arguments for method DescribeAddre
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

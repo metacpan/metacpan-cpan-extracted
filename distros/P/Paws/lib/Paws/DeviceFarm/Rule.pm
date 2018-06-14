@@ -71,6 +71,14 @@ REMOTE_ACCESS_ENABLED: Whether the device is enabled for remote access.
 
 APPIUM_VERSION: The Appium version for the test.
 
+=item *
+
+INSTANCE_ARN: The Amazon Resource Name (ARN) of the device instance.
+
+=item *
+
+INSTANCE_LABELS: The label of the device instance.
+
 =back
 
 
@@ -121,9 +129,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::DeviceFar
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -1,7 +1,12 @@
 
 package Paws::ECS::SubmitTaskStateChange;
   use Moose;
+  has Attachments => (is => 'ro', isa => 'ArrayRef[Paws::ECS::AttachmentStateChange]', traits => ['NameInRequest'], request_name => 'attachments' );
   has Cluster => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'cluster' );
+  has Containers => (is => 'ro', isa => 'ArrayRef[Paws::ECS::ContainerStateChange]', traits => ['NameInRequest'], request_name => 'containers' );
+  has ExecutionStoppedAt => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'executionStoppedAt' );
+  has PullStartedAt => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'pullStartedAt' );
+  has PullStoppedAt => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'pullStoppedAt' );
   has Reason => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'reason' );
   has Status => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'status' );
   has Task => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'task' );
@@ -17,29 +22,100 @@ package Paws::ECS::SubmitTaskStateChange;
 
 =head1 NAME
 
-Paws::ECS::SubmitTaskStateChange - Arguments for method SubmitTaskStateChange on Paws::ECS
+Paws::ECS::SubmitTaskStateChange - Arguments for method SubmitTaskStateChange on L<Paws::ECS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method SubmitTaskStateChange on the 
-Amazon EC2 Container Service service. Use the attributes of this class
+This class represents the parameters used for calling the method SubmitTaskStateChange on the
+L<Amazon EC2 Container Service|Paws::ECS> service. Use the attributes of this class
 as arguments to method SubmitTaskStateChange.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to SubmitTaskStateChange.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->SubmitTaskStateChange(Att1 => $value1, Att2 => $value2, ...);
+    my $ecs = Paws->service('ECS');
+    my $SubmitTaskStateChangeResponse = $ecs->SubmitTaskStateChange(
+      Attachments => [
+        {
+          attachmentArn => 'MyString',
+          status        => 'MyString',
+
+        },
+        ...
+      ],    # OPTIONAL
+      Cluster    => 'MyString',    # OPTIONAL
+      Containers => [
+        {
+          networkBindings => [
+            {
+              bindIP        => 'MyString',
+              protocol      => 'tcp',        # values: tcp, udp; OPTIONAL
+              hostPort      => 1,            # OPTIONAL
+              containerPort => 1,            # OPTIONAL
+            },
+            ...
+          ],                                 # OPTIONAL
+          reason        => 'MyString',
+          exitCode      => 1,                # OPTIONAL
+          status        => 'MyString',
+          containerName => 'MyString',
+        },
+        ...
+      ],                                     # OPTIONAL
+      ExecutionStoppedAt => '1970-01-01T01:00:00',    # OPTIONAL
+      PullStartedAt      => '1970-01-01T01:00:00',    # OPTIONAL
+      PullStoppedAt      => '1970-01-01T01:00:00',    # OPTIONAL
+      Reason             => 'MyString',               # OPTIONAL
+      Status             => 'MyString',               # OPTIONAL
+      Task               => 'MyString',               # OPTIONAL
+    );
+
+    # Results:
+    my $Acknowledgment = $SubmitTaskStateChangeResponse->Acknowledgment;
+
+    # Returns a L<Paws::ECS::SubmitTaskStateChangeResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ecs/SubmitTaskStateChange>
 
 =head1 ATTRIBUTES
+
+
+=head2 Attachments => ArrayRef[L<Paws::ECS::AttachmentStateChange>]
+
+Any attachments associated with the state change request.
+
 
 
 =head2 Cluster => Str
 
 The short name or full Amazon Resource Name (ARN) of the cluster that
 hosts the task.
+
+
+
+=head2 Containers => ArrayRef[L<Paws::ECS::ContainerStateChange>]
+
+Any containers associated with the state change request.
+
+
+
+=head2 ExecutionStoppedAt => Str
+
+The Unix time stamp for when the task execution stopped.
+
+
+
+=head2 PullStartedAt => Str
+
+The Unix time stamp for when the container image pull began.
+
+
+
+=head2 PullStoppedAt => Str
+
+The Unix time stamp for when the container image pull completed.
 
 
 
@@ -57,8 +133,7 @@ The status of the state change request.
 
 =head2 Task => Str
 
-The task ID or full Amazon Resource Name (ARN) of the task in the state
-change request.
+The task ID or full ARN of the task in the state change request.
 
 
 
@@ -69,9 +144,9 @@ This class forms part of L<Paws>, documenting arguments for method SubmitTaskSta
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

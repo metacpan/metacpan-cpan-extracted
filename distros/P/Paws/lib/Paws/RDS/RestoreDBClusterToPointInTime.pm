@@ -1,8 +1,10 @@
 
 package Paws::RDS::RestoreDBClusterToPointInTime;
   use Moose;
+  has BacktrackWindow => (is => 'ro', isa => 'Int');
   has DBClusterIdentifier => (is => 'ro', isa => 'Str', required => 1);
   has DBSubnetGroupName => (is => 'ro', isa => 'Str');
+  has EnableCloudwatchLogsExports => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
   has EnableIAMDatabaseAuthentication => (is => 'ro', isa => 'Bool');
   has KmsKeyId => (is => 'ro', isa => 'Str');
   has OptionGroupName => (is => 'ro', isa => 'Str');
@@ -25,23 +27,57 @@ package Paws::RDS::RestoreDBClusterToPointInTime;
 
 =head1 NAME
 
-Paws::RDS::RestoreDBClusterToPointInTime - Arguments for method RestoreDBClusterToPointInTime on Paws::RDS
+Paws::RDS::RestoreDBClusterToPointInTime - Arguments for method RestoreDBClusterToPointInTime on L<Paws::RDS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method RestoreDBClusterToPointInTime on the 
-Amazon Relational Database Service service. Use the attributes of this class
+This class represents the parameters used for calling the method RestoreDBClusterToPointInTime on the
+L<Amazon Relational Database Service|Paws::RDS> service. Use the attributes of this class
 as arguments to method RestoreDBClusterToPointInTime.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to RestoreDBClusterToPointInTime.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->RestoreDBClusterToPointInTime(Att1 => $value1, Att2 => $value2, ...);
+    my $rds = Paws->service('RDS');
+    # To restore a DB cluster to a point in time.
+    # The following example restores a DB cluster to a new DB cluster at a point
+    # in time from the source DB cluster.
+    my $RestoreDBClusterToPointInTimeResult =
+      $rds->RestoreDBClusterToPointInTime(
+      {
+        'SourceDBClusterIdentifier' => 'sample-cluster1',
+        'DBClusterIdentifier'       => 'sample-restored-cluster1',
+        'RestoreToTime'             => '2016-09-13T18:45:00Z'
+      }
+      );
+
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/rds/RestoreDBClusterToPointInTime>
 
 =head1 ATTRIBUTES
+
+
+=head2 BacktrackWindow => Int
+
+The target backtrack window, in seconds. To disable backtracking, set
+this value to 0.
+
+Default: 0
+
+Constraints:
+
+=over
+
+=item *
+
+If specified, this value must be set to a number from 0 to 259,200 (72
+hours).
+
+=back
+
+
 
 
 =head2 B<REQUIRED> DBClusterIdentifier => Str
@@ -54,7 +90,7 @@ Constraints:
 
 =item *
 
-Must contain from 1 to 63 alphanumeric characters or hyphens
+Must contain from 1 to 63 letters, numbers, or hyphens
 
 =item *
 
@@ -73,18 +109,24 @@ Cannot end with a hyphen or contain two consecutive hyphens
 
 The DB subnet group name to use for the new DB cluster.
 
-Constraints: Must contain no more than 255 alphanumeric characters,
-periods, underscores, spaces, or hyphens. Must not be default.
+Constraints: If supplied, must match the name of an existing
+DBSubnetGroup.
 
 Example: C<mySubnetgroup>
 
 
 
+=head2 EnableCloudwatchLogsExports => ArrayRef[Str|Undef]
+
+The list of logs that the restored DB cluster is to export to
+CloudWatch Logs.
+
+
+
 =head2 EnableIAMDatabaseAuthentication => Bool
 
-A Boolean value that is true to enable mapping of AWS Identity and
-Access Management (IAM) accounts to database accounts, and otherwise
-false.
+True to enable mapping of AWS Identity and Access Management (IAM)
+accounts to database accounts, and otherwise false.
 
 Default: C<false>
 
@@ -92,8 +134,8 @@ Default: C<false>
 
 =head2 KmsKeyId => Str
 
-The KMS key identifier to use when restoring an encrypted DB cluster
-from an encrypted DB cluster.
+The AWS KMS key identifier to use when restoring an encrypted DB
+cluster from an encrypted DB cluster.
 
 The KMS key identifier is the Amazon Resource Name (ARN) for the KMS
 encryption key. If you are restoring a DB cluster with the same AWS
@@ -103,8 +145,8 @@ KMS encryption key.
 
 You can restore to a new DB cluster and encrypt the new DB cluster with
 a KMS key that is different than the KMS key used to encrypt the source
-DB cluster. The new DB cluster will be encrypted with the KMS key
-identified by the C<KmsKeyId> parameter.
+DB cluster. The new DB cluster is encrypted with the KMS key identified
+by the C<KmsKeyId> parameter.
 
 If you do not specify a value for the C<KmsKeyId> parameter, then the
 following will occur:
@@ -139,9 +181,9 @@ The name of the option group for the new DB cluster.
 
 The port number on which the new DB cluster accepts connections.
 
-Constraints: Value must be C<1150-65535>
+Constraints: A value from C<1150-65535>.
 
-Default: The same port as the original DB cluster.
+Default: The default port for the engine.
 
 
 
@@ -198,7 +240,7 @@ source DB cluster.
 
 =back
 
-Constraints: You cannot specify C<copy-on-write> if the engine version
+Constraints: You can't specify C<copy-on-write> if the engine version
 of the source DB cluster is earlier than 1.11.
 
 If you don't specify a C<RestoreType> value, then the new DB cluster is
@@ -216,19 +258,7 @@ Constraints:
 
 =item *
 
-Must be the identifier of an existing database instance
-
-=item *
-
-Must contain from 1 to 63 alphanumeric characters or hyphens
-
-=item *
-
-First character must be a letter
-
-=item *
-
-Cannot end with a hyphen or contain two consecutive hyphens
+Must match the identifier of an existing DBCluster.
 
 =back
 
@@ -266,9 +296,9 @@ This class forms part of L<Paws>, documenting arguments for method RestoreDBClus
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

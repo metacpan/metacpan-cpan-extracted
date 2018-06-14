@@ -41,14 +41,15 @@ source.
 
 =head2 ResourceARNUpdate => Str
 
-  ARN of the input Amazon Kinesis Firehose delivery stream to read.
+  Amazon Resource Name (ARN) of the input Amazon Kinesis Firehose
+delivery stream to read.
 
 
 =head2 RoleARNUpdate => Str
 
-  Amazon Resource Name (ARN) of the IAM role that Amazon Kinesis
-Analytics can assume to access the stream on your behalf. You need to
-grant necessary permissions to this role.
+  ARN of the IAM role that Amazon Kinesis Analytics can assume to access
+the stream on your behalf. You need to grant necessary permissions to
+this role.
 
 
 
@@ -58,9 +59,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::KinesisAn
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

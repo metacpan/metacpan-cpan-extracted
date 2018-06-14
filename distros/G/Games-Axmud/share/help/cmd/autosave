@@ -7,6 +7,7 @@ ats / autosave                Turns auto-saves on/off
       ;ats <minutes>          Sets the time between auto-saves
  
    Notes:
+      Autosaving is turned on by default.
       ';autosave on' turns on auto-saves for every session, but each session 
          performs its own auto-save operation.
       <minutes> must be an integer number. The default time between autosaves

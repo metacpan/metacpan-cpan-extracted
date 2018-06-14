@@ -50,6 +50,8 @@ sub cflags {
     my @warning_flags_always = qw/
         all
         extra
+        declaration-after-statement
+        comment
     /;
     $self->{CCFLAGS} .= " -W$_" for @warning_flags_always;
 

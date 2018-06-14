@@ -1,0 +1,163 @@
+--- !!perl/hash:TestML1::Function
+namespace:
+  TestML: !!perl/hash:TestML1::Str
+    value: '0.1.0'
+
+statements:
+- !!perl/hash:TestML1::Assignment
+  name: Plan
+  expr: !!perl/hash:TestML1::Num
+    value: 11
+- !!perl/hash:TestML1::Assignment
+  name: Label
+  expr: !!perl/hash:TestML1::Str
+    value: Test $TestNumber
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Expression
+    calls:
+    - !!perl/hash:TestML1::Str
+      value: Foo
+    - !!perl/hash:TestML1::Call
+      name: Type
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Str
+      value: Str
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Expression
+    calls:
+    - !!perl/hash:TestML1::Num
+      value: 42
+    - !!perl/hash:TestML1::Call
+      name: Type
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Str
+      value: Num
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Expression
+    calls:
+    - !!perl/hash:TestML1::Call
+      name: 'True'
+    - !!perl/hash:TestML1::Call
+      name: Type
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Str
+      value: Bool
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Expression
+    calls:
+    - !!perl/hash:TestML1::Call
+      args:
+      - !!perl/hash:TestML1::Num
+        value: 1
+      - !!perl/hash:TestML1::Num
+        value: 2
+      - !!perl/hash:TestML1::Num
+        value: 3
+      name: List
+    - !!perl/hash:TestML1::Call
+      name: Type
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Str
+      value: List
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Expression
+    calls:
+    - !!perl/hash:TestML1::Function
+      statements: []
+    - !!perl/hash:TestML1::Call
+      name: Type
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Str
+      value: Func
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Expression
+    calls:
+    - !!perl/hash:TestML1::Function
+      statements: []
+    - !!perl/hash:TestML1::Call
+      name: Type
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Str
+      value: Func
+- !!perl/hash:TestML1::Assignment
+  name: s
+  expr: !!perl/hash:TestML1::Str
+    value: Foo
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Expression
+    calls:
+    - !!perl/hash:TestML1::Call
+      name: s
+    - !!perl/hash:TestML1::Call
+      name: Type
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Str
+      value: Str
+- !!perl/hash:TestML1::Assignment
+  name: n
+  expr: !!perl/hash:TestML1::Num
+    value: 42
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Expression
+    calls:
+    - !!perl/hash:TestML1::Call
+      name: n
+    - !!perl/hash:TestML1::Call
+      name: Type
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Str
+      value: Num
+- !!perl/hash:TestML1::Assignment
+  name: b
+  expr: !!perl/hash:TestML1::Call
+    name: 'False'
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Expression
+    calls:
+    - !!perl/hash:TestML1::Call
+      name: b
+    - !!perl/hash:TestML1::Call
+      name: Type
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Str
+      value: Bool
+- !!perl/hash:TestML1::Assignment
+  name: l
+  expr: !!perl/hash:TestML1::Call
+    name: List
+    args: []
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Expression
+    calls:
+    - !!perl/hash:TestML1::Call
+      name: l
+    - !!perl/hash:TestML1::Call
+      name: Type
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Str
+      value: List
+- !!perl/hash:TestML1::Assignment
+  name: f
+  expr: !!perl/hash:TestML1::Function
+    statements: []
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Expression
+    calls:
+    - !!perl/hash:TestML1::Call
+      name: f
+    - !!perl/hash:TestML1::Call
+      name: Type
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Str
+      value: Func

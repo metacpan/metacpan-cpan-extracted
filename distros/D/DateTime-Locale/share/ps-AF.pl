@@ -130,9 +130,9 @@
   ],
   first_day_of_week => 6,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
-  glibc_date_format => "%m/%d/%y",
-  glibc_datetime_format => "%a %b %e %H:%M:%S %Y",
-  glibc_time_12_format => "%I:%M:%S %p",
+  glibc_date_format => "\N{U+062f} %Y \N{U+062f} %B %e",
+  glibc_datetime_format => "%A \N{U+062f} %Y \N{U+062f} %B %e\N{U+060c} %Z %H:%M:%S",
+  glibc_time_12_format => "\N{U+202b}%I:%M:%S %p\N{U+202c}",
   glibc_time_format => "%H:%M:%S",
   language => "Pashto",
   month_format_abbreviated => [

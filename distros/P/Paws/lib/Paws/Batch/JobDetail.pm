@@ -1,5 +1,6 @@
 package Paws::Batch::JobDetail;
   use Moose;
+  has ArrayProperties => (is => 'ro', isa => 'Paws::Batch::ArrayPropertiesDetail', request_name => 'arrayProperties', traits => ['NameInRequest']);
   has Attempts => (is => 'ro', isa => 'ArrayRef[Paws::Batch::AttemptDetail]', request_name => 'attempts', traits => ['NameInRequest']);
   has Container => (is => 'ro', isa => 'Paws::Batch::ContainerDetail', request_name => 'container', traits => ['NameInRequest']);
   has CreatedAt => (is => 'ro', isa => 'Int', request_name => 'createdAt', traits => ['NameInRequest']);
@@ -14,6 +15,7 @@ package Paws::Batch::JobDetail;
   has Status => (is => 'ro', isa => 'Str', request_name => 'status', traits => ['NameInRequest'], required => 1);
   has StatusReason => (is => 'ro', isa => 'Str', request_name => 'statusReason', traits => ['NameInRequest']);
   has StoppedAt => (is => 'ro', isa => 'Int', request_name => 'stoppedAt', traits => ['NameInRequest']);
+  has Timeout => (is => 'ro', isa => 'Paws::Batch::JobTimeout', request_name => 'timeout', traits => ['NameInRequest']);
 1;
 
 ### main pod documentation begin ###
@@ -33,20 +35,25 @@ Each attribute should be used as a named argument in the calls that expect this 
 
 As an example, if Att1 is expected to be a Paws::Batch::JobDetail object:
 
-  $service_obj->Method(Att1 => { Attempts => $value, ..., StoppedAt => $value  });
+  $service_obj->Method(Att1 => { ArrayProperties => $value, ..., Timeout => $value  });
 
 =head3 Results returned from an API call
 
 Use accessors for each attribute. If Att1 is expected to be an Paws::Batch::JobDetail object:
 
   $result = $service_obj->Method(...);
-  $result->Att1->Attempts
+  $result->Att1->ArrayProperties
 
 =head1 DESCRIPTION
 
 An object representing an AWS Batch job.
 
 =head1 ATTRIBUTES
+
+
+=head2 ArrayProperties => L<Paws::Batch::ArrayPropertiesDetail>
+
+  The array properties of the job, if it is an array job.
 
 
 =head2 Attempts => ArrayRef[L<Paws::Batch::AttemptDetail>]
@@ -62,8 +69,11 @@ with the job.
 
 =head2 CreatedAt => Int
 
-  The Unix timestamp for when the job was created (when the task entered
-the C<PENDING> state).
+  The Unix time stamp (in seconds and milliseconds) for when the job was
+created. For non-array jobs and parent array jobs, this is when the job
+entered the C<SUBMITTED> state (at the time SubmitJob was called). For
+array child jobs, this is when the child job was spawned by its parent
+and entered the C<PENDING> state.
 
 
 =head2 DependsOn => ArrayRef[L<Paws::Batch::JobDependency>]
@@ -106,8 +116,9 @@ defaults from the job definition.
 
 =head2 B<REQUIRED> StartedAt => Int
 
-  The Unix timestamp for when the job was started (when the task
-transitioned from the C<PENDING> state to the C<RUNNING> state).
+  The Unix time stamp (in seconds and milliseconds) for when the job was
+started (when the job transitioned from the C<STARTING> state to the
+C<RUNNING> state).
 
 
 =head2 B<REQUIRED> Status => Str
@@ -123,8 +134,14 @@ current status of the job.
 
 =head2 StoppedAt => Int
 
-  The Unix timestamp for when the job was stopped (when the task
-transitioned from the C<RUNNING> state to the C<STOPPED> state).
+  The Unix time stamp (in seconds and milliseconds) for when the job was
+stopped (when the job transitioned from the C<RUNNING> state to a
+terminal state, such as C<SUCCEEDED> or C<FAILED>).
+
+
+=head2 Timeout => L<Paws::Batch::JobTimeout>
+
+  The timeout configuration for the job.
 
 
 
@@ -134,9 +151,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Batch>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

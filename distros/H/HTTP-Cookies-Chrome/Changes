@@ -1,31 +1,35 @@
-0.99_01 - Tue Dec 29 15:47:09 2009
-	* A first implementation.
+Revision history for Perl module HTTP::Cookies::Chrome
 
-1.001 - Sat Dec 27 14:58:47 2014
+1.002 2018-06-11T13:11:26Z
+	* Change to Artistic License 2.0
+
+1.001 - 2014-12-27
 	* Make a release version (Issue #2: https://github.com/briandfoy/HTTP-Cookies-Chrome/issues/2)
 	* This still doesn't handle encrypted values
 
-0.99_09 - Thu Jul  5 03:22:27 2012
+0.99_09 - 2012-07-05
 	* Take care of uninitialized value in _get_utc_microseconds
 
-0.99_06 - Wed Jan  6 00:30:33 2010
+0.99_06 - 2010-01-06
 	* Hey, SQLite support DROP TABLE IF EXISTS. I don't have to
 	catch any errors. :)
 
-0.99_05 - Tue Jan  5 17:19:19 2010
+0.99_05 - 2010-01-05
 	* More testing to see what is going to satisfy these testers
 	who don't like the warning about dropping a table that isn't
 	there.
 
-0.99_04 - Mon Jan  4 17:00:16 2010
+0.99_04 - 2010-01-04
 	* Capture a possible query failure when I try to drop a
-	table from a new file. 
+	table from a new file.
 
-0.99_03 - Sun Jan  3 10:58:23 2010
+0.99_03 - 2010-01-03
 	* How did I forget HTTP::Cookies as a prereq? Oh yeah,
 	I've broken my local copy of Test::Prereq.
 
-0.99_02 - Fri Jan  1 13:23:45 2010
+0.99_02 - 2010-01-01
 	* Fix the pod coverage test. The interface comes from
 	HTTP::Cookies.
 
+0.99_01 - 2009-12-29
+	* A first implementation.

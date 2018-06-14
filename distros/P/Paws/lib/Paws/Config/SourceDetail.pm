@@ -50,14 +50,19 @@ Config to evaluate your AWS resources.
 
 =head2 MaximumExecutionFrequency => Str
 
-  The frequency that you want AWS Config to run evaluations for a custom
-rule with a periodic trigger. If you specify a value for
+  The frequency at which you want AWS Config to run evaluations for a
+custom rule with a periodic trigger. If you specify a value for
 C<MaximumExecutionFrequency>, then C<MessageType> must use the
 C<ScheduledNotification> value.
 
 By default, rules with a periodic trigger are evaluated every 24 hours.
 To change the frequency, specify a valid value for the
 C<MaximumExecutionFrequency> parameter.
+
+Based on the valid value you choose, AWS Config runs evaluations once
+for each valid value. For example, if you choose C<Three_Hours>, AWS
+Config runs evaluations once every three hours. In this case,
+C<Three_Hours> is the frequency of this rule.
 
 
 =head2 MessageType => Str
@@ -93,7 +98,8 @@ evaluation when AWS Config delivers a configuration snapshot.
 =back
 
 If you want your custom rule to be triggered by configuration changes,
-specify both C<ConfigurationItemChangeNotification> and
+specify two SourceDetail objects, one for
+C<ConfigurationItemChangeNotification> and one for
 C<OversizedConfigurationItemChangeNotification>.
 
 
@@ -104,9 +110,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Config>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

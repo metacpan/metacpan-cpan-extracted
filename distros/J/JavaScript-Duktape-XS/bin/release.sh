@@ -43,18 +43,29 @@ echo "== Checking git status ==" >>$errors
 git status >>$errors
 
 echo "== Checking current version ==" >>$errors
-git grep -i version | egrep -v '^(duktape.[hc]|duk_.*.[hc]|ppport.h|Makefile.PL|bin/release.sh)' | egrep -v 'XSLoader|head' >>$errors
+git grep -i -E 'version.*[0-9]' | egrep -v '^(duktape.[hc]|duk_.*.[hc]|ppport.h|Makefile.PL|bin/release.sh)' | egrep -v 'XSLoader|head' >>$errors
 
 echo "== Checking last documented version ==" >>$errors
 cat Changes | head -n 1 | awk '{print $1}' >>$errors
 
+echo "== Checking missing modules required by library ==" >>$errors
+mkfifo /tmp/release_$$_a
+git grep -E '^[ \t]*use' | egrep '\.(pm|pl):' | egrep -v '^(bin)/' | sed 's/::/@@/g' | awk -F: '{print $2}' | sed 's/qw.*//g' | sed 's/#.*//g' | tr -d ';' | sed 's/ *$//g' | sed 's/@@/::/g' | egrep -v 'use (strict|warnings|utf8|parent|JavaScript::Duktape::XS)' | sed 's/^use //g' | sort -u >/tmp/release_$$_a &
+mkfifo /tmp/release_$$_b
+cat Makefile.PL | awk '{if ($0 ~ /},/) {p=0; next;} if (p) { print; } if ($0 ~ /PREREQ_PM/) {p=1; next;}}' | awk -F\' '{print $2}' | sort -u >/tmp/release_$$_b &
+diff /tmp/release_$$_a /tmp/release_$$_b >>$errors
+rm -f /tmp/release_$$_a /tmp/release_$$_b
+
 echo "== Checking missing modules required by tests ==" >>$errors
 mkfifo /tmp/release_$$_a
-git grep use t | sed 's/::/@@/g' | awk -F: '{print $2}' | sed 's/qw.*//g' | sed 's/#.*//g' | tr -d ';' | sed 's/ *$//g' | sed 's/@@/::/g' | egrep -v 'use (strict|warnings|utf8|JavaScript::Duktape::XS)' | sed 's/^use //g' | sort -u >/tmp/release_$$_a &
+git grep use t | sed 's/::/@@/g' | awk -F: '{print $2}' | sed 's/qw.*//g' | sed 's/#.*//g' | tr -d ';' | sed 's/ *$//g' | sed 's/@@/::/g' | egrep -v 'use (strict|warnings|utf8|parent|JavaScript::Duktape::XS)' | sed 's/^use //g' | sort -u >/tmp/release_$$_a &
 mkfifo /tmp/release_$$_b
 cat Makefile.PL | awk '{if ($0 ~ /},/) {p=0; next;} if (p) { print; } if ($0 ~ /TEST_REQUIRES/) {p=1; next;}}' | awk -F\' '{print $2}' | sort -u >/tmp/release_$$_b &
 diff /tmp/release_$$_a /tmp/release_$$_b >>$errors
 rm -f /tmp/release_$$_a /tmp/release_$$_b
+
+echo "== Checking suspicious declarations ==" >>$errors
+git grep -E '(for|while|if|do)[ \t]*\((int|char|long|unsigned|float|double|size_t) ' >>$errors
 
 echo
 echo "== Ready to upload $name.tar.gz to CPAN =="

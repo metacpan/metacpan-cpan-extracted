@@ -10,28 +10,41 @@ package Paws::Pinpoint::UpdateGcmChannel;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/v1/apps/{application-id}/channels/gcm');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'PUT');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::Pinpoint::UpdateGcmChannelResponse');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::Pinpoint::UpdateGcmChannel - Arguments for method UpdateGcmChannel on Paws::Pinpoint
+Paws::Pinpoint::UpdateGcmChannel - Arguments for method UpdateGcmChannel on L<Paws::Pinpoint>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateGcmChannel on the 
-Amazon Pinpoint service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateGcmChannel on the
+L<Amazon Pinpoint|Paws::Pinpoint> service. Use the attributes of this class
 as arguments to method UpdateGcmChannel.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateGcmChannel.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateGcmChannel(Att1 => $value1, Att2 => $value2, ...);
+    my $pinpoint = Paws->service('Pinpoint');
+    my $UpdateGcmChannelResponse = $pinpoint->UpdateGcmChannel(
+      ApplicationId     => 'My__string',
+      GCMChannelRequest => {
+        ApiKey  => 'My__string',
+        Enabled => 1,              # OPTIONAL
+      },
+
+    );
+
+    # Results:
+    my $GCMChannelResponse = $UpdateGcmChannelResponse->GCMChannelResponse;
+
+    # Returns a L<Paws::Pinpoint::UpdateGcmChannelResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/>
 
 =head1 ATTRIBUTES
 
@@ -55,9 +68,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateGcmChan
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -1,5 +1,8 @@
 Revision history for WebService-Pokemon
 
+0.09  2018-06-10 00:45:49 +08
+    - Abstract the web service responses in different data classes
+
 0.08  2018-06-06 01:57:13 +08
     - Cache HTTP decoded content using CHI
     - Speed testing using local cached results

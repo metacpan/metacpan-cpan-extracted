@@ -1,5 +1,8 @@
 Revision history for Text::CSV::Pivot
 
+0.04  2018-06-13
+      - Removed dependency on Moo as suggested by Steven Bray.
+
 0.03  2018-03-06
       - Resolved issue RT #124606, thanks @james2vegas.
 

@@ -202,8 +202,9 @@ static struct {
 
 void pl_register_inlined_functions(Duk* duk)
 {
+    size_t j = 0;
     dTHX;
-    for (size_t j = 0; j < sizeof(js_inlined) / sizeof(js_inlined[0]); ++j) {
+    for (j = 0; j < sizeof(js_inlined) / sizeof(js_inlined[0]); ++j) {
         pl_eval(aTHX_ duk, js_inlined[j].source, js_inlined[j].file_name);
     }
 }

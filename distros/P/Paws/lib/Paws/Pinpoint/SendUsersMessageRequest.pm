@@ -2,7 +2,6 @@ package Paws::Pinpoint::SendUsersMessageRequest;
   use Moose;
   has Context => (is => 'ro', isa => 'Paws::Pinpoint::MapOf__string');
   has MessageConfiguration => (is => 'ro', isa => 'Paws::Pinpoint::DirectMessageConfiguration');
-  has RequestId => (is => 'ro', isa => 'Str');
   has Users => (is => 'ro', isa => 'Paws::Pinpoint::MapOfEndpointSendConfiguration');
 1;
 
@@ -51,11 +50,6 @@ or added to the email/sms delivery receipt event attributes.
   Message configuration.
 
 
-=head2 RequestId => Str
-
-  Original request Id for which this message is delivered.
-
-
 =head2 Users => L<Paws::Pinpoint::MapOfEndpointSendConfiguration>
 
   A map of destination endpoints, with the EndpointId as the key Endpoint
@@ -69,9 +63,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Pinpoint>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

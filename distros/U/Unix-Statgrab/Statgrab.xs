@@ -1,3 +1,14 @@
+/*
+ * This is the XS glue between libstatgrab and a Perl-API
+ * named Unix::Statgrab.
+ *
+ * This file and the compiled artifacts from it can be distributed
+ * under the same license as Perl 5 or the same license as
+ * libstatgrab based on your choice.
+ *
+ *  Copyright (C) 2004-2005 by Tassilo von Parseval
+ *  Copyright (C) 2012-2018 by Jens Rehsack
+ */
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"

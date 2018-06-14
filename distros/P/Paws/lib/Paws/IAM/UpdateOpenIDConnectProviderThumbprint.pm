@@ -15,21 +15,29 @@ package Paws::IAM::UpdateOpenIDConnectProviderThumbprint;
 
 =head1 NAME
 
-Paws::IAM::UpdateOpenIDConnectProviderThumbprint - Arguments for method UpdateOpenIDConnectProviderThumbprint on Paws::IAM
+Paws::IAM::UpdateOpenIDConnectProviderThumbprint - Arguments for method UpdateOpenIDConnectProviderThumbprint on L<Paws::IAM>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateOpenIDConnectProviderThumbprint on the 
-AWS Identity and Access Management service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateOpenIDConnectProviderThumbprint on the
+L<AWS Identity and Access Management|Paws::IAM> service. Use the attributes of this class
 as arguments to method UpdateOpenIDConnectProviderThumbprint.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateOpenIDConnectProviderThumbprint.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateOpenIDConnectProviderThumbprint(Att1 => $value1, Att2 => $value2, ...);
+    my $iam = Paws->service('IAM');
+    $iam->UpdateOpenIDConnectProviderThumbprint(
+      OpenIDConnectProviderArn => 'MyarnType',
+      ThumbprintList           => [
+        'MythumbprintType', ...    # min: 40, max: 40
+      ],
+
+    );
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/iam/UpdateOpenIDConnectProviderThumbprint>
 
 =head1 ATTRIBUTES
 
@@ -38,10 +46,12 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 
 The Amazon Resource Name (ARN) of the IAM OIDC provider resource object
 for which you want to update the thumbprint. You can get a list of OIDC
-provider ARNs by using the ListOpenIDConnectProviders action.
+provider ARNs by using the ListOpenIDConnectProviders operation.
 
 For more information about ARNs, see Amazon Resource Names (ARNs) and
-AWS Service Namespaces in the I<AWS General Reference>.
+AWS Service Namespaces
+(http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+in the I<AWS General Reference>.
 
 
 
@@ -60,9 +70,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateOpenIDC
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

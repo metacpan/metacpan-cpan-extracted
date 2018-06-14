@@ -21,3 +21,26 @@ Revision history for Alias-Any
 
     * Corrected version selection for refaliasing
       (Thanks, Father C...for both the report and for refaliasing! :-)
+
+
+0.000005  Mon Jun 11 21:53:59 2018
+
+    * Added unimport to support: no Alias::Any
+      which removes the 'alias' keyword
+
+
+0.000006  Tue Jun 12 10:54:54 2018
+
+    * Updated documentation to reflect improvements in Data::Alias
+      which now works again under recent Perls.
+      (Thanks for the info, Toby)
+
+    * Now supports all versions of Perl >= 5.12
+
+    * Adjusted Makefile.PL to ensure metadata is generated correctly
+
+
+0.000007  Tue Jun 12 11:33:39 2018
+
+    * Adjusted Makefile.PL to reflect correct version of Keyword::Declare
+      required (0.001009, not 0.001008)

@@ -20,11 +20,9 @@ no_index:
     - inc
 requires:
   File::Basename: '2.6'
-  Moo: '2.000000'
   Text::CSV: '1.33'
-  namespace::autoclean: '0.28'
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Text-CSV-Pivot.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,6 +1,6 @@
 name = "Net-Azure-NotificationHubs"
 badges = ["travis"]
 authority="cpan:YTURTLE"
-
+license = "perl_5"
 module_maker="ModuleBuildTiny"
 

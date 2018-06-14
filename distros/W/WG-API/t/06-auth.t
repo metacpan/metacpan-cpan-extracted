@@ -1,17 +1,12 @@
 #!/usr/bin/env perl
 
 use Modern::Perl '2015';
-use lib('lib');
 
 use WG::API;
 
 use Test::More;
 
-BEGIN {
-    use_ok('WG::API::Auth') || say "WG::API::Auth loaded";
-}
-
-my WG::API::Auth $auth = WG::API->new( application_id => $ENV{'WG_KEY'} || 'demo' )->auth();
+my $auth = WG::API->new( application_id => $ENV{'WG_KEY'} || 'demo' )->auth();
 isa_ok( $auth, "WG::API::Auth" );
 
 ok( $auth->login( nofollow => 1, redirect_uri => 'http://localhost/response' )

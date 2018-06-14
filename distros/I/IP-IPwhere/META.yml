@@ -26,4 +26,4 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/bollwarm/IP-IPwhere
-version: '0.05'
+version: '0.06'

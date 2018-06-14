@@ -1,4 +1,3 @@
-#!/usr/bin/env perl
 package Class::Load::VersionCheck2;
 use strict;
 use warnings;

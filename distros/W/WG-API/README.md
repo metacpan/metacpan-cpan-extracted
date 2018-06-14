@@ -5,7 +5,7 @@ WG::API - Module for work with Wargaming.net Public API
 
 # VERSION
 
-Version v0.8.6
+Version v0.8.8
 
 # SYNOPSIS
 
@@ -49,7 +49,7 @@ This module provide access to WG Public API
 
 # BUGS
 
-Please report any bugs or feature requests to `cynovg at cpan.org`, or through the web interface at [https://github.com/cynovg/WG-API/issues](https://github.com/cynovg/WG-API/issues).  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to `cynovg at cpan.org`, or through the web interface at [https://gitlab.com/cynovg/WG-API/issues](https://gitlab.com/cynovg/WG-API/issues).  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 # SUPPORT
 
@@ -61,7 +61,7 @@ You can also look for information at:
 
 - RT: GitHub's request tracker (report bugs here)
 
-    [https://github.com/cynovg/WG-API/issues](https://github.com/cynovg/WG-API/issues)
+    [https://gitlab.com/cynovg/WG-API/issues](https://gitlab.com/cynovg/WG-API/issues)
 
 - AnnoCPAN: Annotated CPAN documentation
 
@@ -73,7 +73,7 @@ You can also look for information at:
 
 - Search CPAN
 
-    [http://search.cpan.org/dist/WG-API/](http://search.cpan.org/dist/WG-API/)
+    [https://metacpan.org/pod/WG::API](https://metacpan.org/pod/WG::API)
 
 # ACKNOWLEDGEMENTS
 

@@ -15,21 +15,49 @@ package Paws::RedShift::ModifyClusterParameterGroup;
 
 =head1 NAME
 
-Paws::RedShift::ModifyClusterParameterGroup - Arguments for method ModifyClusterParameterGroup on Paws::RedShift
+Paws::RedShift::ModifyClusterParameterGroup - Arguments for method ModifyClusterParameterGroup on L<Paws::RedShift>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ModifyClusterParameterGroup on the 
-Amazon Redshift service. Use the attributes of this class
+This class represents the parameters used for calling the method ModifyClusterParameterGroup on the
+L<Amazon Redshift|Paws::RedShift> service. Use the attributes of this class
 as arguments to method ModifyClusterParameterGroup.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ModifyClusterParameterGroup.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ModifyClusterParameterGroup(Att1 => $value1, Att2 => $value2, ...);
+    my $redshift = Paws->service('RedShift');
+    my $ClusterParameterGroupNameMessage =
+      $redshift->ModifyClusterParameterGroup(
+      ParameterGroupName => 'MyString',
+      Parameters         => [
+        {
+          Source               => 'MyString',
+          ParameterName        => 'MyString',
+          Description          => 'MyString',
+          ParameterValue       => 'MyString',
+          AllowedValues        => 'MyString',
+          DataType             => 'MyString',
+          MinimumEngineVersion => 'MyString',
+          IsModifiable         => 1,         # OPTIONAL
+          ApplyType            => 'static',  # values: static, dynamic; OPTIONAL
+        },
+        ...
+      ],
+
+      );
+
+    # Results:
+    my $ParameterGroupName =
+      $ClusterParameterGroupNameMessage->ParameterGroupName;
+    my $ParameterGroupStatus =
+      $ClusterParameterGroupNameMessage->ParameterGroupStatus;
+
+    # Returns a L<Paws::RedShift::ClusterParameterGroupNameMessage> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/redshift/ModifyClusterParameterGroup>
 
 =head1 ATTRIBUTES
 
@@ -61,9 +89,9 @@ This class forms part of L<Paws>, documenting arguments for method ModifyCluster
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

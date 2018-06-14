@@ -15,36 +15,48 @@ package Paws::StepFunctions::GetActivityTask;
 
 =head1 NAME
 
-Paws::StepFunctions::GetActivityTask - Arguments for method GetActivityTask on Paws::StepFunctions
+Paws::StepFunctions::GetActivityTask - Arguments for method GetActivityTask on L<Paws::StepFunctions>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method GetActivityTask on the 
-AWS Step Functions service. Use the attributes of this class
+This class represents the parameters used for calling the method GetActivityTask on the
+L<AWS Step Functions|Paws::StepFunctions> service. Use the attributes of this class
 as arguments to method GetActivityTask.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to GetActivityTask.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->GetActivityTask(Att1 => $value1, Att2 => $value2, ...);
+    my $states = Paws->service('StepFunctions');
+    my $GetActivityTaskOutput = $states->GetActivityTask(
+      ActivityArn => 'MyArn',
+      WorkerName  => 'MyName',    # OPTIONAL
+    );
+
+    # Results:
+    my $Input     = $GetActivityTaskOutput->Input;
+    my $TaskToken = $GetActivityTaskOutput->TaskToken;
+
+    # Returns a L<Paws::StepFunctions::GetActivityTaskOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/states/GetActivityTask>
 
 =head1 ATTRIBUTES
 
 
 =head2 B<REQUIRED> ActivityArn => Str
 
-The Amazon Resource Name (ARN) of the activity to retrieve tasks from.
+The Amazon Resource Name (ARN) of the activity to retrieve tasks from
+(assigned when you create the task using CreateActivity.)
 
 
 
 =head2 WorkerName => Str
 
-An arbitrary name may be provided in order to identify the worker that
-the task is assigned to. This name will be used when it is logged in
-the execution history.
+You can provide an arbitrary name in order to identify the worker that
+the task is assigned to. This name is used when it is logged in the
+execution history.
 
 
 
@@ -55,9 +67,9 @@ This class forms part of L<Paws>, documenting arguments for method GetActivityTa
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

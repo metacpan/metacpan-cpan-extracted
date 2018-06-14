@@ -2,7 +2,7 @@ package Mail::MtPolicyd::Connection::Memcached;
 
 use Moose;
 
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
 # ABSTRACT: a memcached connection plugin for mtpolicyd
 
 extends 'Mail::MtPolicyd::Connection';
@@ -65,7 +65,7 @@ Mail::MtPolicyd::Connection::Memcached - a memcached connection plugin for mtpol
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 SYNOPSIS
 
@@ -81,7 +81,7 @@ version 2.02
 
 =item servers (default: 127.0.0.1:11211)
 
-Comma seperated list for memcached servers to connect.
+Comma separated list for memcached servers to connect.
 
 =item debug (default: 0)
 

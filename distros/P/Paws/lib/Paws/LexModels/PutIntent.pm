@@ -4,6 +4,7 @@ package Paws::LexModels::PutIntent;
   has Checksum => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'checksum');
   has ConclusionStatement => (is => 'ro', isa => 'Paws::LexModels::Statement', traits => ['NameInRequest'], request_name => 'conclusionStatement');
   has ConfirmationPrompt => (is => 'ro', isa => 'Paws::LexModels::Prompt', traits => ['NameInRequest'], request_name => 'confirmationPrompt');
+  has CreateVersion => (is => 'ro', isa => 'Bool', traits => ['NameInRequest'], request_name => 'createVersion');
   has Description => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'description');
   has DialogCodeHook => (is => 'ro', isa => 'Paws::LexModels::CodeHook', traits => ['NameInRequest'], request_name => 'dialogCodeHook');
   has FollowUpPrompt => (is => 'ro', isa => 'Paws::LexModels::FollowUpPrompt', traits => ['NameInRequest'], request_name => 'followUpPrompt');
@@ -20,28 +21,162 @@ package Paws::LexModels::PutIntent;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/intents/{name}/versions/$LATEST');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'PUT');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::LexModels::PutIntentResponse');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::LexModels::PutIntent - Arguments for method PutIntent on Paws::LexModels
+Paws::LexModels::PutIntent - Arguments for method PutIntent on L<Paws::LexModels>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method PutIntent on the 
-Amazon Lex Model Building Service service. Use the attributes of this class
+This class represents the parameters used for calling the method PutIntent on the
+L<Amazon Lex Model Building Service|Paws::LexModels> service. Use the attributes of this class
 as arguments to method PutIntent.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to PutIntent.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->PutIntent(Att1 => $value1, Att2 => $value2, ...);
+    my $models.lex = Paws->service('LexModels');
+    my $PutIntentResponse = $models . lex->PutIntent(
+      Name                => 'MyIntentName',
+      Checksum            => 'MyString',       # OPTIONAL
+      ConclusionStatement => {
+        messages => [
+          {
+            content => 'MyContentString',      # min: 1, max: 1000
+            contentType => 'PlainText', # values: PlainText, SSML, CustomPayload
+            groupNumber => 1,           # min: 1, max: 5; OPTIONAL
+          },
+          ...
+        ],                              # min: 1, max: 15
+        responseCard => 'MyResponseCard',    # min: 1, max: 50000; OPTIONAL
+      },    # OPTIONAL
+      ConfirmationPrompt => {
+        messages => [
+          {
+            content => 'MyContentString',    # min: 1, max: 1000
+            contentType => 'PlainText', # values: PlainText, SSML, CustomPayload
+            groupNumber => 1,           # min: 1, max: 5; OPTIONAL
+          },
+          ...
+        ],                              # min: 1, max: 15
+        maxAttempts  => 1,                   # min: 1, max: 5
+        responseCard => 'MyResponseCard',    # min: 1, max: 50000; OPTIONAL
+      },    # OPTIONAL
+      CreateVersion  => 1,                  # OPTIONAL
+      Description    => 'MyDescription',    # OPTIONAL
+      DialogCodeHook => {
+        uri            => 'MyLambdaARN',         # min: 20, max: 2048
+        messageVersion => 'MyMessageVersion',    # min: 1, max: 5
+
+      },    # OPTIONAL
+      FollowUpPrompt => {
+        prompt => {
+          messages => [
+            {
+              content => 'MyContentString',    # min: 1, max: 1000
+              contentType =>
+                'PlainText',    # values: PlainText, SSML, CustomPayload
+              groupNumber => 1, # min: 1, max: 5; OPTIONAL
+            },
+            ...
+          ],                    # min: 1, max: 15
+          maxAttempts  => 1,                   # min: 1, max: 5
+          responseCard => 'MyResponseCard',    # min: 1, max: 50000; OPTIONAL
+        },
+        rejectionStatement => {
+          messages => [
+            {
+              content => 'MyContentString',    # min: 1, max: 1000
+              contentType =>
+                'PlainText',    # values: PlainText, SSML, CustomPayload
+              groupNumber => 1, # min: 1, max: 5; OPTIONAL
+            },
+            ...
+          ],                    # min: 1, max: 15
+          responseCard => 'MyResponseCard',    # min: 1, max: 50000; OPTIONAL
+        },
+
+      },    # OPTIONAL
+      FulfillmentActivity => {
+        type     => 'ReturnIntent',    # values: ReturnIntent, CodeHook
+        codeHook => {
+          uri            => 'MyLambdaARN',         # min: 20, max: 2048
+          messageVersion => 'MyMessageVersion',    # min: 1, max: 5
+
+        },
+      },    # OPTIONAL
+      ParentIntentSignature => 'MyBuiltinIntentSignature',    # OPTIONAL
+      RejectionStatement    => {
+        messages => [
+          {
+            content => 'MyContentString',    # min: 1, max: 1000
+            contentType => 'PlainText', # values: PlainText, SSML, CustomPayload
+            groupNumber => 1,           # min: 1, max: 5; OPTIONAL
+          },
+          ...
+        ],                              # min: 1, max: 15
+        responseCard => 'MyResponseCard',    # min: 1, max: 50000; OPTIONAL
+      },    # OPTIONAL
+      SampleUtterances => [
+        'MyUtterance', ...    # min: 1, max: 200
+      ],                      # OPTIONAL
+      Slots => [
+        {
+          slotConstraint   => 'Required',      # values: Required, Optional
+          name             => 'MySlotName',    # min: 1, max: 100
+          sampleUtterances => [
+            'MyUtterance', ...                 # min: 1, max: 200
+          ],                                   # max: 10; OPTIONAL
+          priority => 1,                       # max: 100; OPTIONAL
+          slotType =>
+            'MyCustomOrBuiltinSlotTypeName',    # min: 1, max: 100; OPTIONAL
+          valueElicitationPrompt => {
+            messages => [
+              {
+                content => 'MyContentString',    # min: 1, max: 1000
+                contentType =>
+                  'PlainText',    # values: PlainText, SSML, CustomPayload
+                groupNumber => 1, # min: 1, max: 5; OPTIONAL
+              },
+              ...
+            ],                    # min: 1, max: 15
+            maxAttempts  => 1,                   # min: 1, max: 5
+            responseCard => 'MyResponseCard',    # min: 1, max: 50000; OPTIONAL
+          },
+          responseCard    => 'MyResponseCard',    # min: 1, max: 50000; OPTIONAL
+          slotTypeVersion => 'MyVersion',         # min: 1, max: 64; OPTIONAL
+          description     => 'MyDescription',     # max: 200
+        },
+        ...
+      ],                                          # OPTIONAL
+    );
+
+    # Results:
+    my $LastUpdatedDate       = $PutIntentResponse->LastUpdatedDate;
+    my $Description           = $PutIntentResponse->Description;
+    my $FollowUpPrompt        = $PutIntentResponse->FollowUpPrompt;
+    my $SampleUtterances      = $PutIntentResponse->SampleUtterances;
+    my $ConfirmationPrompt    = $PutIntentResponse->ConfirmationPrompt;
+    my $CreateVersion         = $PutIntentResponse->CreateVersion;
+    my $DialogCodeHook        = $PutIntentResponse->DialogCodeHook;
+    my $Checksum              = $PutIntentResponse->Checksum;
+    my $ConclusionStatement   = $PutIntentResponse->ConclusionStatement;
+    my $Version               = $PutIntentResponse->Version;
+    my $RejectionStatement    = $PutIntentResponse->RejectionStatement;
+    my $CreatedDate           = $PutIntentResponse->CreatedDate;
+    my $Slots                 = $PutIntentResponse->Slots;
+    my $Name                  = $PutIntentResponse->Name;
+    my $FulfillmentActivity   = $PutIntentResponse->FulfillmentActivity;
+    my $ParentIntentSignature = $PutIntentResponse->ParentIntentSignature;
+
+    # Returns a L<Paws::LexModels::PutIntentResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/lex/>
 
 =head1 ATTRIBUTES
 
@@ -89,6 +224,12 @@ for confirmation before providing the information.
 
 You you must provide both the C<rejectionStatement> and the
 C<confirmationPrompt>, or neither.
+
+
+
+=head2 CreateVersion => Bool
+
+
 
 
 
@@ -173,16 +314,18 @@ with "AMAZON." removed. For example, because there is a built-in intent
 called C<AMAZON.HelpIntent>, you can't create a custom intent called
 C<HelpIntent>.
 
-For a list of built-in intents, see Standard Built-in Intents in the
-I<Alexa Skills Kit>.
+For a list of built-in intents, see Standard Built-in Intents
+(https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/built-in-intent-ref/standard-intents)
+in the I<Alexa Skills Kit>.
 
 
 
 =head2 ParentIntentSignature => Str
 
 A unique identifier for the built-in intent to base this intent on. To
-find the signature for an intent, see Standard Built-in Intents in the
-I<Alexa Skills Kit>.
+find the signature for an intent, see Standard Built-in Intents
+(https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/built-in-intent-ref/standard-intents)
+in the I<Alexa Skills Kit>.
 
 
 
@@ -222,9 +365,9 @@ This class forms part of L<Paws>, documenting arguments for method PutIntent in 
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

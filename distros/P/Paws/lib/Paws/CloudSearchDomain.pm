@@ -1,6 +1,7 @@
 package Paws::CloudSearchDomain;
   use Moose;
   sub service { 'cloudsearchdomain' }
+  sub signing_name { 'cloudsearch' }
   sub version { '2013-01-01' }
   sub flattened_arrays { 0 }
   has max_attempts => (is => 'ro', isa => 'Int', default => 5);
@@ -10,7 +11,7 @@ package Paws::CloudSearchDomain;
   has retriables => (is => 'ro', isa => 'ArrayRef', default => sub { [
   ] });
 
-  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::RestJsonCaller', 'Paws::Net::RestJsonResponse';
+  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::RestJsonCaller';
 
   
   sub Search {
@@ -69,17 +70,54 @@ C<DescribeDomains> action. The domain endpoints are also displayed on
 the domain dashboard in the Amazon CloudSearch console. You submit
 suggest requests to the search endpoint.
 
-For more information, see the Amazon CloudSearch Developer Guide.
+For more information, see the Amazon CloudSearch Developer Guide
+(http://docs.aws.amazon.com/cloudsearch/latest/developerguide).
+
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/cloudsearch/>
+
 
 =head1 METHODS
 
-=head2 Search(Query => Str, [Cursor => Str, Expr => Str, Facet => Str, FilterQuery => Str, Highlight => Str, Partial => Bool, QueryOptions => Str, QueryParser => Str, Return => Str, Size => Int, Sort => Str, Start => Int, Stats => Str])
+=head2 Search
+
+=over
+
+=item Query => Str
+
+=item [Cursor => Str]
+
+=item [Expr => Str]
+
+=item [Facet => Str]
+
+=item [FilterQuery => Str]
+
+=item [Highlight => Str]
+
+=item [Partial => Bool]
+
+=item [QueryOptions => Str]
+
+=item [QueryParser => Str]
+
+=item [Return => Str]
+
+=item [Size => Int]
+
+=item [Sort => Str]
+
+=item [Start => Int]
+
+=item [Stats => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CloudSearchDomain::Search>
 
 Returns: a L<Paws::CloudSearchDomain::SearchResponse> instance
 
-  Retrieves a list of documents that match the specified search criteria.
+Retrieves a list of documents that match the specified search criteria.
 How you specify the search criteria depends on which query parser you
 use. Amazon CloudSearch supports four query parsers:
 
@@ -101,8 +139,9 @@ parser.
 
 =back
 
-For more information, see Searching Your Data in the I<Amazon
-CloudSearch Developer Guide>.
+For more information, see Searching Your Data
+(http://docs.aws.amazon.com/cloudsearch/latest/developerguide/searching.html)
+in the I<Amazon CloudSearch Developer Guide>.
 
 The endpoint for submitting C<Search> requests is domain-specific. You
 submit search requests to a domain's search endpoint. To get the search
@@ -111,13 +150,24 @@ service C<DescribeDomains> action. A domain's endpoints are also
 displayed on the domain dashboard in the Amazon CloudSearch console.
 
 
-=head2 Suggest(Query => Str, Suggester => Str, [Size => Int])
+=head2 Suggest
+
+=over
+
+=item Query => Str
+
+=item Suggester => Str
+
+=item [Size => Int]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CloudSearchDomain::Suggest>
 
 Returns: a L<Paws::CloudSearchDomain::SuggestResponse> instance
 
-  Retrieves autocomplete suggestions for a partial query string. You can
+Retrieves autocomplete suggestions for a partial query string. You can
 use suggestions enable you to display likely matches before users
 finish typing. In Amazon CloudSearch, suggestions are based on the
 contents of a particular text field. When you request suggestions,
@@ -126,8 +176,9 @@ suggester field start with the specified query string. The beginning of
 the field must match the query string to be considered a match.
 
 For more information about configuring suggesters and retrieving
-suggestions, see Getting Suggestions in the I<Amazon CloudSearch
-Developer Guide>.
+suggestions, see Getting Suggestions
+(http://docs.aws.amazon.com/cloudsearch/latest/developerguide/getting-suggestions.html)
+in the I<Amazon CloudSearch Developer Guide>.
 
 The endpoint for submitting C<Suggest> requests is domain-specific. You
 submit suggest requests to a domain's search endpoint. To get the
@@ -137,13 +188,22 @@ are also displayed on the domain dashboard in the Amazon CloudSearch
 console.
 
 
-=head2 UploadDocuments(ContentType => Str, Documents => Str)
+=head2 UploadDocuments
+
+=over
+
+=item ContentType => Str
+
+=item Documents => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CloudSearchDomain::UploadDocuments>
 
 Returns: a L<Paws::CloudSearchDomain::UploadDocumentsResponse> instance
 
-  Posts a batch of documents to a search domain for indexing. A document
+Posts a batch of documents to a search domain for indexing. A document
 batch is a collection of add and delete operations that represent the
 documents you want to add, update, or delete from your domain. Batches
 can be described in either JSON or XML. Each item that you want Amazon
@@ -163,9 +223,12 @@ domain's endpoints are also displayed on the domain dashboard in the
 Amazon CloudSearch console.
 
 For more information about formatting your data for Amazon CloudSearch,
-see Preparing Your Data in the I<Amazon CloudSearch Developer Guide>.
-For more information about uploading data for indexing, see Uploading
-Data in the I<Amazon CloudSearch Developer Guide>.
+see Preparing Your Data
+(http://docs.aws.amazon.com/cloudsearch/latest/developerguide/preparing-data.html)
+in the I<Amazon CloudSearch Developer Guide>. For more information
+about uploading data for indexing, see Uploading Data
+(http://docs.aws.amazon.com/cloudsearch/latest/developerguide/uploading-data.html)
+in the I<Amazon CloudSearch Developer Guide>.
 
 
 
@@ -183,9 +246,9 @@ This service class forms part of L<Paws>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -1,8 +1,11 @@
 ######################################################################
 Revision history for Perl extension Archive::Tar::Wrapper
 
+0.26 (2018/06/09)
+    Implemented refactoring due warnings from Perl::Critic.
+
 0.25 (2018/06/04)
-    Implemented refactoring due warnings from Perlcritic.
+    Implemented refactoring due warnings from Perl::Critic.
     Merge pull request #3 from manwar/suggest-code-tidy
 
 0.24 (2018/06/02)

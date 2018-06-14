@@ -39,12 +39,12 @@ Crawler policy for update and deletion behavior.
 
 =head2 DeleteBehavior => Str
 
-  The deletion behavior.
+  The deletion behavior when the crawler finds a deleted object.
 
 
 =head2 UpdateBehavior => Str
 
-  The update behavior.
+  The update behavior when the crawler finds a changed schema.
 
 
 
@@ -54,9 +54,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Glue>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

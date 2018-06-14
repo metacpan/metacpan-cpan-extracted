@@ -3,6 +3,7 @@ package Paws::KinesisAnalytics::OutputDescription;
   has DestinationSchema => (is => 'ro', isa => 'Paws::KinesisAnalytics::DestinationSchema');
   has KinesisFirehoseOutputDescription => (is => 'ro', isa => 'Paws::KinesisAnalytics::KinesisFirehoseOutputDescription');
   has KinesisStreamsOutputDescription => (is => 'ro', isa => 'Paws::KinesisAnalytics::KinesisStreamsOutputDescription');
+  has LambdaOutputDescription => (is => 'ro', isa => 'Paws::KinesisAnalytics::LambdaOutputDescription');
   has Name => (is => 'ro', isa => 'Str');
   has OutputId => (is => 'ro', isa => 'Str');
 1;
@@ -60,6 +61,12 @@ destination where output is written.
 output is written.
 
 
+=head2 LambdaOutputDescription => L<Paws::KinesisAnalytics::LambdaOutputDescription>
+
+  Describes the AWS Lambda function configured as the destination where
+output is written.
+
+
 =head2 Name => Str
 
   Name of the in-application stream configured as output.
@@ -77,9 +84,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::KinesisAn
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

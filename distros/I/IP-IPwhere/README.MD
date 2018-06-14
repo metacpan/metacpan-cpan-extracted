@@ -5,11 +5,8 @@
 查询，没有整合到本模块中。
 
 试用方法： ./ipwhere.pl 8.8.8.8 8.8.8.6
-
 需要安装perl及扩展LWP::Simple；use JSON;
-
 建议通过cpanm LWP::Simple JSON 一键安装。
-
 
 ## useage：
     
@@ -35,7 +32,9 @@
     pconline 203.123.123.123:,,, 澳大利亚
 
 ### Mojo::webqq插件，我们也提供一个Mojo::webqq插件，见example
-目录。通过本插件可以通过qq，QQ群，以及微信，交互式查询ip归属地。
+目录。
+
+通过本插件可以通过qq，QQ群，以及微信，交互式查询ip归属地。
 [Mojo-Webqq-IPwhere插件](https://git.oschina.net/ijz/Mojo-Webqq-IPwhere)
 
 ![qqipwhere](example/qqip.png)

@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::Quota;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
 # ABSTRACT: mtpolicyd plugin for accounting in sql tables
 
 extends 'Mail::MtPolicyd::Plugin';
@@ -120,7 +120,7 @@ Mail::MtPolicyd::Plugin::Quota - mtpolicyd plugin for accounting in sql tables
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 DESCRIPTION
 

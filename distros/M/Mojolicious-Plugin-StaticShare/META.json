@@ -47,6 +47,6 @@
          "web" : "https://github.com/mche/Mojolicious-Plugin-StaticShare"
       }
    },
-   "version" : "0.062",
+   "version" : "0.063",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

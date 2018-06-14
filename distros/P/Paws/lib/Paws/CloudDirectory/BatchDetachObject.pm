@@ -1,6 +1,6 @@
 package Paws::CloudDirectory::BatchDetachObject;
   use Moose;
-  has BatchReferenceName => (is => 'ro', isa => 'Str', required => 1);
+  has BatchReferenceName => (is => 'ro', isa => 'Str');
   has LinkName => (is => 'ro', isa => 'Str', required => 1);
   has ParentReference => (is => 'ro', isa => 'Paws::CloudDirectory::ObjectReference', required => 1);
 1;
@@ -38,9 +38,11 @@ Represents the output of a DetachObject operation.
 =head1 ATTRIBUTES
 
 
-=head2 B<REQUIRED> BatchReferenceName => Str
+=head2 BatchReferenceName => Str
 
-  The batch reference name. See Batches for more information.
+  The batch reference name. See Batches
+(http://docs.aws.amazon.com/directoryservice/latest/admin-guide/cd_advanced.html#batches)
+for more information.
 
 
 =head2 B<REQUIRED> LinkName => Str
@@ -61,9 +63,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::CloudDire
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

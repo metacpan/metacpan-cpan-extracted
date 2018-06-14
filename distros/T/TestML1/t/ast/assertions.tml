@@ -1,0 +1,60 @@
+--- !!perl/hash:TestML1::Function
+namespace:
+  TestML: !!perl/hash:TestML1::Str
+    value: '0.1.0'
+
+statements:
+- !!perl/hash:TestML1::Assignment
+  name: Plan
+  expr: !!perl/hash:TestML1::Num
+    value: 6
+- !!perl/hash:TestML1::Assignment
+  name: Label
+  expr: !!perl/hash:TestML1::Str
+    value: EQ tests
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Str
+    value: The cat in the hat
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Str
+      value: The cat in the hat
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Str
+    value: The cat in the hat
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Str
+      value: The cat in the hat
+- !!perl/hash:TestML1::Assignment
+  name: Label
+  expr: !!perl/hash:TestML1::Str
+    value: HAS tests
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Str
+    value: The cat in the hat
+  assert: !!perl/hash:TestML1::Assertion
+    name: HAS
+    expr: !!perl/hash:TestML1::Str
+      value: cat
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Str
+    value: The cat in the hat
+  assert: !!perl/hash:TestML1::Assertion
+    name: HAS
+    expr: !!perl/hash:TestML1::Str
+      value: hat
+- !!perl/hash:TestML1::Assignment
+  name: Label
+  expr: !!perl/hash:TestML1::Str
+    value: OK tests
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Str
+    value: The cat in the hat
+  assert: !!perl/hash:TestML1::Assertion
+    name: OK
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Str
+    value: The cat in the hat
+  assert: !!perl/hash:TestML1::Assertion
+    name: OK

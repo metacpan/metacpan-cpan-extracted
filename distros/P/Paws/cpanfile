@@ -8,7 +8,7 @@ requires 'URI';
 requires 'Net::Amazon::Signature::V3';
 requires 'Net::Amazon::Signature::V4';
 requires 'JSON::MaybeXS';
-requires 'XML::Simple';
+requires 'XML::Simple' => '2.21';
 requires 'IO::Socket::SSL';
 requires 'DateTime';
 requires 'DateTime::Format::ISO8601';
@@ -32,6 +32,7 @@ suggests "Future::Mojo";
 on 'develop' => sub {
   requires 'Template';
   requires 'Pod::HTML2Pod';
+  requires 'Perl::Tidy';
   requires 'Dist::Zilla';
   requires 'Dist::Zilla::Plugin::Prereqs::FromCPANfile';
   requires 'Dist::Zilla::Plugin::VersionFromMainModule';
@@ -52,16 +53,22 @@ on 'develop' => sub {
   # For developing / testing the pluggable callers
   requires 'Mojolicious';
   requires 'Future::Mojo', '>= 0.003';
+  requires 'Mojo::Promise::Role::Futurify';
   requires 'EV';
   requires 'LWP::UserAgent';
   requires 'Furl';
+  requires 'Pod::Checker';
+  requires 'Pod::Escapes';
+  requires 'Data::Munge';
 };
+
 on 'test' => sub {
-  requires 'File::Slurper';
+  requires 'Path::Class';
   requires 'YAML';
   requires 'Test::More';
   requires 'Test::Timer';
   requires 'Test::Exception';
   requires 'Test::Warnings';
   requires 'Class::Unload';
+  requires 'File::Slurper';
 };

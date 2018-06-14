@@ -16,21 +16,51 @@ package Paws::WAFRegional::UpdateByteMatchSet;
 
 =head1 NAME
 
-Paws::WAFRegional::UpdateByteMatchSet - Arguments for method UpdateByteMatchSet on Paws::WAFRegional
+Paws::WAFRegional::UpdateByteMatchSet - Arguments for method UpdateByteMatchSet on L<Paws::WAFRegional>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateByteMatchSet on the 
-AWS WAF Regional service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateByteMatchSet on the
+L<AWS WAF Regional|Paws::WAFRegional> service. Use the attributes of this class
 as arguments to method UpdateByteMatchSet.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateByteMatchSet.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateByteMatchSet(Att1 => $value1, Att2 => $value2, ...);
+    my $waf-regional = Paws->service('WAFRegional');
+    # To update a byte match set
+    # The following example deletes a ByteMatchTuple object (filters) in an byte
+    # match set with the ID exampleIDs3t-46da-4fdb-b8d5-abc321j569j5.
+    my $UpdateByteMatchSetResponse = $waf -regional->UpdateByteMatchSet(
+      {
+        'Updates' => [
+
+          {
+            'ByteMatchTuple' => {
+              'TargetString' => 'badrefer1',
+              'FieldToMatch' => {
+                'Type' => 'HEADER',
+                'Data' => 'referer'
+              },
+              'PositionalConstraint' => 'CONTAINS',
+              'TextTransformation'   => 'NONE'
+            },
+            'Action' => 'DELETE'
+          }
+        ],
+        'ChangeToken'    => 'abcd12f2-46da-4fdb-b8d5-fbd4c466928f',
+        'ByteMatchSetId' => 'exampleIDs3t-46da-4fdb-b8d5-abc321j569j5'
+      }
+    );
+
+    # Results:
+    my $ChangeToken = $UpdateByteMatchSetResponse->ChangeToken;
+
+    # Returns a L<Paws::WAFRegional::UpdateByteMatchSetResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/waf-regional/UpdateByteMatchSet>
 
 =head1 ATTRIBUTES
 
@@ -82,9 +112,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateByteMat
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

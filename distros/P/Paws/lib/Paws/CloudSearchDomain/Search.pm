@@ -4,12 +4,12 @@ package Paws::CloudSearchDomain::Search;
   has Cursor => (is => 'ro', isa => 'Str', traits => ['ParamInQuery'], query_name => 'cursor');
   has Expr => (is => 'ro', isa => 'Str', traits => ['ParamInQuery'], query_name => 'expr');
   has Facet => (is => 'ro', isa => 'Str', traits => ['ParamInQuery'], query_name => 'facet');
-  has FilterQuery => (is => 'ro', isa => 'Str', traits => ['ParamInQuery'], query_name => 'filterQuery');
+  has FilterQuery => (is => 'ro', isa => 'Str', traits => ['ParamInQuery'], query_name => 'fq');
   has Highlight => (is => 'ro', isa => 'Str', traits => ['ParamInQuery'], query_name => 'highlight');
   has Partial => (is => 'ro', isa => 'Bool', traits => ['ParamInQuery'], query_name => 'partial');
-  has Query => (is => 'ro', isa => 'Str', traits => ['ParamInQuery'], query_name => 'query', required => 1);
-  has QueryOptions => (is => 'ro', isa => 'Str', traits => ['ParamInQuery'], query_name => 'queryOptions');
-  has QueryParser => (is => 'ro', isa => 'Str', traits => ['ParamInQuery'], query_name => 'queryParser');
+  has Query => (is => 'ro', isa => 'Str', traits => ['ParamInQuery'], query_name => 'q', required => 1);
+  has QueryOptions => (is => 'ro', isa => 'Str', traits => ['ParamInQuery'], query_name => 'q.options');
+  has QueryParser => (is => 'ro', isa => 'Str', traits => ['ParamInQuery'], query_name => 'q.parser');
   has Return => (is => 'ro', isa => 'Str', traits => ['ParamInQuery'], query_name => 'return');
   has Size => (is => 'ro', isa => 'Int', traits => ['ParamInQuery'], query_name => 'size');
   has Sort => (is => 'ro', isa => 'Str', traits => ['ParamInQuery'], query_name => 'sort');
@@ -22,28 +22,52 @@ package Paws::CloudSearchDomain::Search;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/2013-01-01/search?format=sdk&pretty=true');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'GET');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::CloudSearchDomain::SearchResponse');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::CloudSearchDomain::Search - Arguments for method Search on Paws::CloudSearchDomain
+Paws::CloudSearchDomain::Search - Arguments for method Search on L<Paws::CloudSearchDomain>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method Search on the 
-Amazon CloudSearch Domain service. Use the attributes of this class
+This class represents the parameters used for calling the method Search on the
+L<Amazon CloudSearch Domain|Paws::CloudSearchDomain> service. Use the attributes of this class
 as arguments to method Search.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to Search.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->Search(Att1 => $value1, Att2 => $value2, ...);
+    my $cloudsearchdomain = Paws->service('CloudSearchDomain');
+    my $SearchResponse = $cloudsearchdomain->Search(
+      Query        => 'MyQuery',
+      Cursor       => 'MyCursor',          # OPTIONAL
+      Expr         => 'MyExpr',            # OPTIONAL
+      Facet        => 'MyFacet',           # OPTIONAL
+      FilterQuery  => 'MyFilterQuery',     # OPTIONAL
+      Highlight    => 'MyHighlight',       # OPTIONAL
+      Partial      => 1,                   # OPTIONAL
+      QueryOptions => 'MyQueryOptions',    # OPTIONAL
+      QueryParser  => 'simple',            # OPTIONAL
+      Return       => 'MyReturn',          # OPTIONAL
+      Size         => 1,                   # OPTIONAL
+      Sort         => 'MySort',            # OPTIONAL
+      Start        => 1,                   # OPTIONAL
+      Stats        => 'MyStat',            # OPTIONAL
+    );
+
+    # Results:
+    my $hits   = $SearchResponse->hits;
+    my $facets = $SearchResponse->facets;
+    my $stats  = $SearchResponse->stats;
+    my $status = $SearchResponse->status;
+
+    # Returns a L<Paws::CloudSearchDomain::SearchResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/cloudsearch/>
 
 =head1 ATTRIBUTES
 
@@ -57,8 +81,9 @@ parameter in a request; they are mutually exclusive. To get the first
 cursor, set the cursor value to C<initial>. In subsequent requests,
 specify the cursor value returned in the hits section of the response.
 
-For more information, see Paginating Results in the I<Amazon
-CloudSearch Developer Guide>.
+For more information, see Paginating Results
+(http://docs.aws.amazon.com/cloudsearch/latest/developerguide/paginating-results.html)
+in the I<Amazon CloudSearch Developer Guide>.
 
 
 
@@ -75,8 +100,9 @@ expressions in a search request. For example:
 C<{"expression1":"_score*rating", "expression2":"(1/rank)*year"}>
 
 For information about the variables, operators, and functions you can
-use in expressions, see Writing Expressions in the I<Amazon CloudSearch
-Developer Guide>.
+use in expressions, see Writing Expressions
+(http://docs.aws.amazon.com/cloudsearch/latest/developerguide/configuring-expressions.html#writing-expressions)
+in the I<Amazon CloudSearch Developer Guide>.
 
 
 
@@ -97,9 +123,11 @@ You can specify the following faceting options:
 C<buckets> specifies an array of the facet values or ranges to count.
 Ranges are specified using the same syntax that you use to search for a
 range of values. For more information, see Searching for a Range of
-Values in the I<Amazon CloudSearch Developer Guide>. Buckets are
-returned in the order they are specified in the request. The C<sort>
-and C<size> options are not valid if you specify C<buckets>.
+Values
+(http://docs.aws.amazon.com/cloudsearch/latest/developerguide/searching-ranges.html)
+in the I<Amazon CloudSearch Developer Guide>. Buckets are returned in
+the order they are specified in the request. The C<sort> and C<size>
+options are not valid if you specify C<buckets>.
 
 =item *
 
@@ -143,8 +171,9 @@ facet values numerically by year, with earliest year listed first.
 
 C<{"year":{"sort":"bucket"}}>
 
-For more information, see Getting and Using Facet Information in the
-I<Amazon CloudSearch Developer Guide>.
+For more information, see Getting and Using Facet Information
+(http://docs.aws.amazon.com/cloudsearch/latest/developerguide/faceting.html)
+in the I<Amazon CloudSearch Developer Guide>.
 
 
 
@@ -160,7 +189,9 @@ and sorted. The C<filterQuery> parameter supports the full structured
 query syntax.
 
 For more information about using filters, see Filtering Matching
-Documents in the I<Amazon CloudSearch Developer Guide>.
+Documents
+(http://docs.aws.amazon.com/cloudsearch/latest/developerguide/filtering-results.html)
+in the I<Amazon CloudSearch Developer Guide>.
 
 
 
@@ -233,7 +264,9 @@ the C<structured>, C<lucene>, or C<dismax> query parser, you must also
 specify the C<queryParser> parameter.
 
 For more information about specifying search criteria, see Searching
-Your Data in the I<Amazon CloudSearch Developer Guide>.
+Your Data
+(http://docs.aws.amazon.com/cloudsearch/latest/developerguide/searching.html)
+in the I<Amazon CloudSearch Developer Guide>.
 
 
 
@@ -365,22 +398,26 @@ the C<queryOptions> parameter.) You can use the C<-> (NOT), C<|> (OR),
 and C<*> (wildcard) operators to exclude particular terms, find results
 that match any of the specified terms, or search for a prefix. To
 search for a phrase rather than individual terms, enclose the phrase in
-double quotes. For more information, see Searching for Text in the
-I<Amazon CloudSearch Developer Guide>.
+double quotes. For more information, see Searching for Text
+(http://docs.aws.amazon.com/cloudsearch/latest/developerguide/searching-text.html)
+in the I<Amazon CloudSearch Developer Guide>.
 
 =item * C<structured>: perform advanced searches by combining multiple
 expressions to define the search criteria. You can also search within
 particular fields, search for values and ranges of values, and use
 advanced options such as term boosting, C<matchall>, and C<near>. For
-more information, see Constructing Compound Queries in the I<Amazon
-CloudSearch Developer Guide>.
+more information, see Constructing Compound Queries
+(http://docs.aws.amazon.com/cloudsearch/latest/developerguide/searching-compound-queries.html)
+in the I<Amazon CloudSearch Developer Guide>.
 
 =item * C<lucene>: search using the Apache Lucene query parser syntax.
-For more information, see Apache Lucene Query Parser Syntax.
+For more information, see Apache Lucene Query Parser Syntax
+(http://lucene.apache.org/core/4_6_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#package_description).
 
 =item * C<dismax>: search using the simplified subset of the Apache
 Lucene query parser syntax defined by the DisMax query parser. For more
-information, see DisMax Query Parser Syntax.
+information, see DisMax Query Parser Syntax
+(http://wiki.apache.org/solr/DisMaxQParserPlugin#Query_Syntax).
 
 =back
 
@@ -416,8 +453,9 @@ C<sort> parameter is specified, results are sorted by their default
 relevance scores in descending order: C<_score desc>. You can also sort
 by document ID (C<_id asc>) and version (C<_version desc>).
 
-For more information, see Sorting Results in the I<Amazon CloudSearch
-Developer Guide>.
+For more information, see Sorting Results
+(http://docs.aws.amazon.com/cloudsearch/latest/developerguide/sorting-results.html)
+in the I<Amazon CloudSearch Developer Guide>.
 
 
 
@@ -428,8 +466,9 @@ that the result set is zero-based; the first result is at index 0. You
 can specify either the C<start> or C<cursor> parameter in a request,
 they are mutually exclusive.
 
-For more information, see Paginating Results in the I<Amazon
-CloudSearch Developer Guide>.
+For more information, see Paginating Results
+(http://docs.aws.amazon.com/cloudsearch/latest/developerguide/paginating-results.html)
+in the I<Amazon CloudSearch Developer Guide>.
 
 
 
@@ -452,9 +491,9 @@ This class forms part of L<Paws>, documenting arguments for method Search in L<P
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

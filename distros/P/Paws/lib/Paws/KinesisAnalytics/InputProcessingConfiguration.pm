@@ -32,8 +32,9 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::KinesisAnal
 =head1 DESCRIPTION
 
 Provides a description of a processor that is used to preprocess the
-records in the stream prior to being processed by your application
-code. Currently, the only input processor available is AWS Lambda.
+records in the stream before being processed by your application code.
+Currently, the only input processor available is AWS Lambda
+(https://aws.amazon.com/documentation/lambda/).
 
 =head1 ATTRIBUTES
 
@@ -41,7 +42,7 @@ code. Currently, the only input processor available is AWS Lambda.
 =head2 B<REQUIRED> InputLambdaProcessor => L<Paws::KinesisAnalytics::InputLambdaProcessor>
 
   The InputLambdaProcessor that is used to preprocess the records in the
-stream prior to being processed by your application code.
+stream before being processed by your application code.
 
 
 
@@ -51,9 +52,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::KinesisAn
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

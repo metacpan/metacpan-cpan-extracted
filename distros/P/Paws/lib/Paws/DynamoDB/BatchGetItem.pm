@@ -15,21 +15,68 @@ package Paws::DynamoDB::BatchGetItem;
 
 =head1 NAME
 
-Paws::DynamoDB::BatchGetItem - Arguments for method BatchGetItem on Paws::DynamoDB
+Paws::DynamoDB::BatchGetItem - Arguments for method BatchGetItem on L<Paws::DynamoDB>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method BatchGetItem on the 
-Amazon DynamoDB service. Use the attributes of this class
+This class represents the parameters used for calling the method BatchGetItem on the
+L<Amazon DynamoDB|Paws::DynamoDB> service. Use the attributes of this class
 as arguments to method BatchGetItem.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to BatchGetItem.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->BatchGetItem(Att1 => $value1, Att2 => $value2, ...);
+    my $dynamodb = Paws->service('DynamoDB');
+    # To retrieve multiple items from a table
+    # This example reads multiple items from the Music table using a batch of
+    # three GetItem requests.  Only the AlbumTitle attribute is returned.
+    my $BatchGetItemOutput = $dynamodb->BatchGetItem(
+      {
+        'RequestItems' => {
+          'Music' => {
+            'Keys' => [
+
+              {
+                'SongTitle' => {
+                  'S' => 'Call Me Today'
+                },
+                'Artist' => {
+                  'S' => 'No One You Know'
+                }
+              },
+
+              {
+                'Artist' => {
+                  'S' => 'Acme Band'
+                },
+                'SongTitle' => {
+                  'S' => 'Happy Day'
+                }
+              },
+
+              {
+                'Artist' => {
+                  'S' => 'No One You Know'
+                },
+                'SongTitle' => {
+                  'S' => 'Scared of My Shadow'
+                }
+              }
+            ],
+            'ProjectionExpression' => 'AlbumTitle'
+          }
+        }
+      }
+    );
+
+    # Results:
+    my $Responses = $BatchGetItemOutput->Responses;
+
+    # Returns a L<Paws::DynamoDB::BatchGetItemOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/dynamodb/BatchGetItem>
 
 =head1 ATTRIBUTES
 
@@ -87,9 +134,10 @@ C<Percentile>
 
 The name of this attribute conflicts with a reserved word, so it cannot
 be used directly in an expression. (For the complete list of reserved
-words, see Reserved Words in the I<Amazon DynamoDB Developer Guide>).
-To work around this, you could specify the following for
-C<ExpressionAttributeNames>:
+words, see Reserved Words
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ReservedWords.html)
+in the I<Amazon DynamoDB Developer Guide>). To work around this, you
+could specify the following for C<ExpressionAttributeNames>:
 
 =over
 
@@ -114,7 +162,9 @@ Tokens that begin with the B<:> character are I<expression attribute
 values>, which are placeholders for the actual value at runtime.
 
 For more information on expression attribute names, see Accessing Item
-Attributes in the I<Amazon DynamoDB Developer Guide>.
+Attributes
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.AccessingItemAttributes.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 =item *
 
@@ -135,14 +185,17 @@ If no attribute names are specified, then all attributes will be
 returned. If any of the requested attributes are not found, they will
 not appear in the result.
 
-For more information, see Accessing Item Attributes in the I<Amazon
-DynamoDB Developer Guide>.
+For more information, see Accessing Item Attributes
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.AccessingItemAttributes.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 =item *
 
 C<AttributesToGet> - This is a legacy parameter. Use
 C<ProjectionExpression> instead. For more information, see
-AttributesToGet in the I<Amazon DynamoDB Developer Guide>.
+AttributesToGet
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LegacyConditionalParameters.AttributesToGet.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 =back
 
@@ -162,9 +215,9 @@ This class forms part of L<Paws>, documenting arguments for method BatchGetItem 
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

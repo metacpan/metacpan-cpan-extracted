@@ -33,12 +33,10 @@ if (WriteMakefile(
         'Test::More' => 0.44,
     },
     PREREQ_PM      => {
-        'Log::Fast'       => 1.00,
         'Time::HiRes'     => 1.9715,
         'Term::ANSIColor' => 4.00,
         'DateTime'        => 1.18,
         'File::Basename'  => 0,
-#        'Best'            => 0,
         'Data::Dumper'    => 0,
     },
     dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},

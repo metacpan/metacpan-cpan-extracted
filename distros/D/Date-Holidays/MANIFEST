@@ -18,6 +18,7 @@ lib/Date/Holidays/Adapter.pm
 lib/Date/Holidays/Adapter/AU.pm
 lib/Date/Holidays/Adapter/BR.pm
 lib/Date/Holidays/Adapter/BY.pm
+lib/Date/Holidays/Adapter/CA_ES.pm
 lib/Date/Holidays/Adapter/CN.pm
 lib/Date/Holidays/Adapter/DE.pm
 lib/Date/Holidays/Adapter/DK.pm
@@ -36,6 +37,7 @@ lib/Date/Holidays/Adapter/RU.pm
 lib/Date/Holidays/Adapter/SK.pm
 lib/Date/Holidays/Adapter/US.pm
 lib/Date/Holidays/Adapter/USFederal.pm
+perl-date-holidays.code-workspace
 scripts/report_date-holidays_modules.t
 scripts/test_countries.t
 scripts/test_date-holidays_modules.pl

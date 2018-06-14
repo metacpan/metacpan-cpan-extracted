@@ -39,7 +39,8 @@ The user-specified preferences for how AWS CloudFormation performs a
 stack set operation.
 
 For more information on maximum concurrent accounts and failure
-tolerance, see Stack set operation options.
+tolerance, see Stack set operation options
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacksets-concepts.html#stackset-ops-options).
 
 =head1 ATTRIBUTES
 
@@ -117,9 +118,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::CloudForm
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -15,21 +15,27 @@ package Paws::Organizations::DetachPolicy;
 
 =head1 NAME
 
-Paws::Organizations::DetachPolicy - Arguments for method DetachPolicy on Paws::Organizations
+Paws::Organizations::DetachPolicy - Arguments for method DetachPolicy on L<Paws::Organizations>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DetachPolicy on the 
-AWS Organizations service. Use the attributes of this class
+This class represents the parameters used for calling the method DetachPolicy on the
+L<AWS Organizations|Paws::Organizations> service. Use the attributes of this class
 as arguments to method DetachPolicy.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DetachPolicy.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DetachPolicy(Att1 => $value1, Att2 => $value2, ...);
+    my $organizations = Paws->service('Organizations');
+    $organizations->DetachPolicy(
+      PolicyId => 'MyPolicyId',
+      TargetId => 'MyPolicyTargetId',
+
+    );
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/organizations/DetachPolicy>
 
 =head1 ATTRIBUTES
 
@@ -39,8 +45,9 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 The unique identifier (ID) of the policy you want to detach. You can
 get the ID from the ListPolicies or ListPoliciesForTarget operations.
 
-The regex pattern for a policy ID string requires "p-" followed by from
-8 to 128 lower-case letters or digits.
+The regex pattern (http://wikipedia.org/wiki/regex) for a policy ID
+string requires "p-" followed by from 8 to 128 lower-case letters or
+digits.
 
 
 
@@ -50,7 +57,8 @@ The unique identifier (ID) of the root, OU, or account from which you
 want to detach the policy. You can get the ID from the ListRoots,
 ListOrganizationalUnitsForParent, or ListAccounts operations.
 
-The regex pattern for a target ID string requires one of the following:
+The regex pattern (http://wikipedia.org/wiki/regex) for a target ID
+string requires one of the following:
 
 =over
 
@@ -82,9 +90,9 @@ This class forms part of L<Paws>, documenting arguments for method DetachPolicy 
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -4,28 +4,25 @@ use Test::More;
 use Test::Exception;
 use Net::Azure::NotificationHubs::Request;
 use URI;
-use LWP::UserAgent;
+use HTTP::Tiny;
 
 subtest 'do' => sub {
     my $uri = URI->new('http://search.cpan.org/search');
     $uri->query_form(query => 'Azure', mode => 'all'); 
     my $req = Net::Azure::NotificationHubs::Request->new(GET => $uri);
-    $req->agent(LWP::UserAgent->new);
+    $req->agent(HTTP::Tiny->new);
     isa_ok $req, 'Net::Azure::NotificationHubs::Request';
-    isa_ok $req, 'HTTP::Request';
     can_ok $req, qw/do/;
     my $res = $req->do;
     isa_ok $res, 'Net::Azure::NotificationHubs::Response';
-    isa_ok $res, 'HTTP::Response';
     like $res->content, qr/Net::Azure/, 'response body contains "Net::Azure"'; 
 };
 
 subtest 'do - 404' => sub {
     my $uri = URI->new('http://search.cpan.org/search');
     my $req = Net::Azure::NotificationHubs::Request->new(GET => $uri);
-    $req->agent(LWP::UserAgent->new);
+    $req->agent(HTTP::Tiny->new);
     isa_ok $req, 'Net::Azure::NotificationHubs::Request';
-    isa_ok $req, 'HTTP::Request';
     can_ok $req, qw/do/;
     my $res;
     dies_ok {$res = $req->do} qr/not found/;

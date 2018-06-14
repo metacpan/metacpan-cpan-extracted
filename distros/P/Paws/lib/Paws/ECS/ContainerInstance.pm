@@ -2,6 +2,7 @@ package Paws::ECS::ContainerInstance;
   use Moose;
   has AgentConnected => (is => 'ro', isa => 'Bool', request_name => 'agentConnected', traits => ['NameInRequest']);
   has AgentUpdateStatus => (is => 'ro', isa => 'Str', request_name => 'agentUpdateStatus', traits => ['NameInRequest']);
+  has Attachments => (is => 'ro', isa => 'ArrayRef[Paws::ECS::Attachment]', request_name => 'attachments', traits => ['NameInRequest']);
   has Attributes => (is => 'ro', isa => 'ArrayRef[Paws::ECS::Attribute]', request_name => 'attributes', traits => ['NameInRequest']);
   has ContainerInstanceArn => (is => 'ro', isa => 'Str', request_name => 'containerInstanceArn', traits => ['NameInRequest']);
   has Ec2InstanceId => (is => 'ro', isa => 'Str', request_name => 'ec2InstanceId', traits => ['NameInRequest']);
@@ -51,16 +52,21 @@ registered with a cluster.
 
 =head2 AgentConnected => Bool
 
-  This parameter returns C<true> if the agent is actually connected to
-Amazon ECS. Registered instances with an agent that may be unhealthy or
-stopped return C<false>, and instances without a connected agent cannot
-accept placement requests.
+  This parameter returns C<true> if the agent is connected to Amazon ECS.
+Registered instances with an agent that may be unhealthy or stopped
+return C<false>. Instances without a connected agent can't accept
+placement requests.
 
 
 =head2 AgentUpdateStatus => Str
 
   The status of the most recent agent update. If an update has never been
 requested, this value is C<NULL>.
+
+
+=head2 Attachments => ArrayRef[L<Paws::ECS::Attachment>]
+
+  The Elastic Network Interfaces associated with the container instance.
 
 
 =head2 Attributes => ArrayRef[L<Paws::ECS::Attribute>]
@@ -94,25 +100,29 @@ C<PENDING> status.
 
 =head2 RegisteredAt => Str
 
-  The Unix timestamp for when the container instance was registered.
+  The Unix time stamp for when the container instance was registered.
 
 
 =head2 RegisteredResources => ArrayRef[L<Paws::ECS::Resource>]
 
-  For most resource types, this parameter describes the registered
-resources on the container instance that are in use by current tasks.
-For port resource types, this parameter describes the ports that were
-reserved by the Amazon ECS container agent when it registered the
-container instance with Amazon ECS.
+  For CPU and memory resource types, this parameter describes the amount
+of each resource that was available on the container instance when the
+container agent registered it with Amazon ECS; this value represents
+the total amount of CPU and memory that can be allocated on this
+container instance to tasks. For port resource types, this parameter
+describes the ports that were reserved by the Amazon ECS container
+agent when it registered the container instance with Amazon ECS.
 
 
 =head2 RemainingResources => ArrayRef[L<Paws::ECS::Resource>]
 
-  For most resource types, this parameter describes the remaining
-resources of the container instance that are available for new tasks.
-For port resource types, this parameter describes the ports that are
-reserved by the Amazon ECS container agent and any containers that have
-reserved port mappings; any port that is not specified here is
+  For CPU and memory resource types, this parameter describes the
+remaining CPU and memory that has not already been allocated to tasks
+and is therefore available for new tasks. For port resource types, this
+parameter describes the ports that were reserved by the Amazon ECS
+container agent (at instance registration time) and any task containers
+that have reserved port mappings on the host (with the C<host> or
+C<bridge> network mode). Any port that is not specified here is
 available for new tasks.
 
 
@@ -129,8 +139,9 @@ C<INACTIVE>, or C<DRAINING>. C<ACTIVE> indicates that the container
 instance can accept tasks. C<DRAINING> indicates that new tasks are not
 placed on the container instance and any service tasks running on the
 container instance are removed if possible. For more information, see
-Container Instance Draining in the I<Amazon EC2 Container Service
-Developer Guide>.
+Container Instance Draining
+(http://docs.aws.amazon.com/AmazonECS/latest/developerguide/container-instance-draining.html)
+in the I<Amazon Elastic Container Service Developer Guide>.
 
 
 =head2 Version => Int
@@ -138,9 +149,9 @@ Developer Guide>.
   The version counter for the container instance. Every time a container
 instance experiences a change that triggers a CloudWatch event, the
 version counter is incremented. If you are replicating your Amazon ECS
-container instance state with CloudWatch events, you can compare the
+container instance state with CloudWatch Events, you can compare the
 version of a container instance reported by the Amazon ECS APIs with
-the version reported in CloudWatch events for the container instance
+the version reported in CloudWatch Events for the container instance
 (inside the C<detail> object) to verify that the version in your event
 stream is current.
 
@@ -158,9 +169,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::ECS>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

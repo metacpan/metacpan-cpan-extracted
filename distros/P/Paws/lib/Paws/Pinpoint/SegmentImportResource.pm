@@ -48,8 +48,10 @@ Segment import definition.
 
 =head2 ExternalId => Str
 
-  A unique, custom ID assigned to the IAM role that restricts who can
-assume the role.
+  DEPRECATED. Your AWS account ID, which you assigned to the ExternalID
+key in an IAM trust policy. Used by Amazon Pinpoint to assume an IAM
+role. This requirement is removed, and external IDs are not recommended
+for IAM roles assumed by Amazon Pinpoint.
 
 
 =head2 Format => Str
@@ -83,9 +85,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Pinpoint>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

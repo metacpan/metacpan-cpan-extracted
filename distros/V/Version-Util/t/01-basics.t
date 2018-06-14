@@ -12,6 +12,7 @@ use Version::Util qw(
                         version_lt version_le version_gt version_ge
                         version_between
                         version_in
+                        min_version max_version
                         add_version subtract_version
                 );
 
@@ -69,6 +70,14 @@ subtest version_in => sub {
     ok( version_in("1.1.0" , "1.1.0", "1.1.1"));
     ok( version_in("1.1.1" , "1.1.0", "1.1.1"));
     ok(!version_in("1.2.0" , "1.1.0", "1.1.1"));
+};
+
+subtest min_version => sub {
+    is(min_version("0.1", "0.1.0", "0.2"), "0.1.0");
+};
+
+subtest max_version => sub {
+    is(max_version("0.1", "0.1.0", "0.2.0"), "0.1");
 };
 
 subtest add_version => sub {

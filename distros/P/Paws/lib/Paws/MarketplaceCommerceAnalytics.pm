@@ -1,6 +1,7 @@
 package Paws::MarketplaceCommerceAnalytics;
   use Moose;
   sub service { 'marketplacecommerceanalytics' }
+  sub signing_name { 'marketplacecommerceanalytics' }
   sub version { '2015-07-01' }
   sub target_prefix { 'MarketplaceCommerceAnalytics20150701' }
   sub json_version { "1.1" }
@@ -11,7 +12,7 @@ package Paws::MarketplaceCommerceAnalytics;
   has retriables => (is => 'ro', isa => 'ArrayRef', default => sub { [
   ] });
 
-  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller', 'Paws::Net::JsonResponse';
+  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller';
 
   
   sub GenerateDataSet {
@@ -57,15 +58,37 @@ Paws::MarketplaceCommerceAnalytics - Perl Interface to AWS AWS Marketplace Comme
 
 Provides AWS Marketplace business intelligence data on-demand.
 
+For the AWS API documentation, see L<https://docs.aws.amazon.com/marketplace/latest/userguide/commerce-analytics-service.html>
+
+
 =head1 METHODS
 
-=head2 GenerateDataSet(DataSetPublicationDate => Str, DataSetType => Str, DestinationS3BucketName => Str, RoleNameArn => Str, SnsTopicArn => Str, [CustomerDefinedValues => L<Paws::MarketplaceCommerceAnalytics::CustomerDefinedValues>, DestinationS3Prefix => Str])
+=head2 GenerateDataSet
+
+=over
+
+=item DataSetPublicationDate => Str
+
+=item DataSetType => Str
+
+=item DestinationS3BucketName => Str
+
+=item RoleNameArn => Str
+
+=item SnsTopicArn => Str
+
+=item [CustomerDefinedValues => L<Paws::MarketplaceCommerceAnalytics::CustomerDefinedValues>]
+
+=item [DestinationS3Prefix => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::MarketplaceCommerceAnalytics::GenerateDataSet>
 
 Returns: a L<Paws::MarketplaceCommerceAnalytics::GenerateDataSetResult> instance
 
-  Given a data set type and data set publication date, asynchronously
+Given a data set type and data set publication date, asynchronously
 publishes the requested data set to the specified S3 bucket and
 notifies the specified SNS topic once the data is available. Returns a
 unique request identifier that can be used to correlate requests with
@@ -79,13 +102,32 @@ following actions: s3:PutObject, s3:GetBucketLocation,
 sns:GetTopicAttributes, sns:Publish, iam:GetRolePolicy.
 
 
-=head2 StartSupportDataExport(DataSetType => Str, DestinationS3BucketName => Str, FromDate => Str, RoleNameArn => Str, SnsTopicArn => Str, [CustomerDefinedValues => L<Paws::MarketplaceCommerceAnalytics::CustomerDefinedValues>, DestinationS3Prefix => Str])
+=head2 StartSupportDataExport
+
+=over
+
+=item DataSetType => Str
+
+=item DestinationS3BucketName => Str
+
+=item FromDate => Str
+
+=item RoleNameArn => Str
+
+=item SnsTopicArn => Str
+
+=item [CustomerDefinedValues => L<Paws::MarketplaceCommerceAnalytics::CustomerDefinedValues>]
+
+=item [DestinationS3Prefix => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::MarketplaceCommerceAnalytics::StartSupportDataExport>
 
 Returns: a L<Paws::MarketplaceCommerceAnalytics::StartSupportDataExportResult> instance
 
-  Given a data set type and a from date, asynchronously publishes the
+Given a data set type and a from date, asynchronously publishes the
 requested customer support data to the specified S3 bucket and notifies
 the specified SNS topic once the data is available. Returns a unique
 request identifier that can be used to correlate requests with
@@ -114,9 +156,9 @@ This service class forms part of L<Paws>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

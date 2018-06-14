@@ -14,21 +14,31 @@ package Paws::ElastiCache::ListTagsForResource;
 
 =head1 NAME
 
-Paws::ElastiCache::ListTagsForResource - Arguments for method ListTagsForResource on Paws::ElastiCache
+Paws::ElastiCache::ListTagsForResource - Arguments for method ListTagsForResource on L<Paws::ElastiCache>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ListTagsForResource on the 
-Amazon ElastiCache service. Use the attributes of this class
+This class represents the parameters used for calling the method ListTagsForResource on the
+L<Amazon ElastiCache|Paws::ElastiCache> service. Use the attributes of this class
 as arguments to method ListTagsForResource.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ListTagsForResource.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ListTagsForResource(Att1 => $value1, Att2 => $value2, ...);
+    my $elasticache = Paws->service('ElastiCache');
+    my $TagListMessage = $elasticache->ListTagsForResource(
+      ResourceName => 'MyString',
+
+    );
+
+    # Results:
+    my $TagList = $TagListMessage->TagList;
+
+    # Returns a L<Paws::ElastiCache::TagListMessage> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/elasticache/ListTagsForResource>
 
 =head1 ATTRIBUTES
 
@@ -41,7 +51,8 @@ C<arn:aws:elasticache:us-west-2:0123456789:cluster:myCluster> or
 C<arn:aws:elasticache:us-west-2:0123456789:snapshot:mySnapshot>.
 
 For more information about ARNs, see Amazon Resource Names (ARNs) and
-AWS Service Namespaces.
+AWS Service Namespaces
+(http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html).
 
 
 
@@ -52,9 +63,9 @@ This class forms part of L<Paws>, documenting arguments for method ListTagsForRe
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

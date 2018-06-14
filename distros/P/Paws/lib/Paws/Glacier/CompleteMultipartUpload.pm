@@ -2,8 +2,8 @@
 package Paws::Glacier::CompleteMultipartUpload;
   use Moose;
   has AccountId => (is => 'ro', isa => 'Str', traits => ['ParamInURI'], uri_name => 'accountId', required => 1);
-  has ArchiveSize => (is => 'ro', isa => 'Str', traits => ['ParamInHeader'], header_name => 'archiveSize');
-  has Checksum => (is => 'ro', isa => 'Str', traits => ['ParamInHeader'], header_name => 'checksum');
+  has ArchiveSize => (is => 'ro', isa => 'Str', traits => ['ParamInHeader'], header_name => 'x-amz-archive-size');
+  has Checksum => (is => 'ro', isa => 'Str', traits => ['ParamInHeader'], header_name => 'x-amz-sha256-tree-hash');
   has UploadId => (is => 'ro', isa => 'Str', traits => ['ParamInURI'], uri_name => 'uploadId', required => 1);
   has VaultName => (is => 'ro', isa => 'Str', traits => ['ParamInURI'], uri_name => 'vaultName', required => 1);
 
@@ -13,28 +13,48 @@ package Paws::Glacier::CompleteMultipartUpload;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/{accountId}/vaults/{vaultName}/multipart-uploads/{uploadId}');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'POST');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::Glacier::ArchiveCreationOutput');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::Glacier::CompleteMultipartUpload - Arguments for method CompleteMultipartUpload on Paws::Glacier
+Paws::Glacier::CompleteMultipartUpload - Arguments for method CompleteMultipartUpload on L<Paws::Glacier>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CompleteMultipartUpload on the 
-Amazon Glacier service. Use the attributes of this class
+This class represents the parameters used for calling the method CompleteMultipartUpload on the
+L<Amazon Glacier|Paws::Glacier> service. Use the attributes of this class
 as arguments to method CompleteMultipartUpload.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CompleteMultipartUpload.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CompleteMultipartUpload(Att1 => $value1, Att2 => $value2, ...);
+    my $glacier = Paws->service('Glacier');
+    # To complete a multipart upload
+    # The example completes a multipart upload for a 3 MiB archive.
+    my $ArchiveCreationOutput = $glacier->CompleteMultipartUpload(
+      {
+        'AccountId' => '-',
+        'UploadId' =>
+'19gaRezEXAMPLES6Ry5YYdqthHOC_kGRCT03L9yetr220UmPtBYKk-OssZtLqyFu7sY1_lR7vgFuJV6NtcV5zpsJ',
+        'ArchiveSize' => 3145728,
+        'Checksum' =>
+          '9628195fcdbcbbe76cdde456d4646fa7de5f219fb39823836d81f0cc0e18aa67',
+        'VaultName' => 'my-vault'
+      }
+    );
+
+    # Results:
+    my $location  = $ArchiveCreationOutput->location;
+    my $checksum  = $ArchiveCreationOutput->checksum;
+    my $archiveId = $ArchiveCreationOutput->archiveId;
+
+    # Returns a L<Paws::Glacier::ArchiveCreationOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/glacier/>
 
 =head1 ATTRIBUTES
 
@@ -85,9 +105,9 @@ This class forms part of L<Paws>, documenting arguments for method CompleteMulti
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

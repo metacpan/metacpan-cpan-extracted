@@ -1,7 +1,7 @@
 package App::DuckPAN::Cmd::Help;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Launch help page
-$App::DuckPAN::Cmd::Help::VERSION = '1019';
+$App::DuckPAN::Cmd::Help::VERSION = '1021';
 use Moo;
 with qw( App::DuckPAN::Option::Global );
 
@@ -28,7 +28,7 @@ App::DuckPAN::Cmd::Help - Launch help page
 
 =head1 VERSION
 
-version 1019
+version 1021
 
 =head1 AUTHOR
 

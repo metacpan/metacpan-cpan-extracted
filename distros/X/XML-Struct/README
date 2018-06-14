@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
 
-        use XML::Struct qw(readXML writeXML simpleXML removeXMLAttr);
+        use XML::Struct qw(readXML writeXML simpleXML);
     
         my $xml = readXML( "input.xml" );
         # [ root => { xmlns => 'http://example.org/' }, [ '!', [ x => {}, [42] ] ] ]
@@ -15,9 +15,6 @@ SYNOPSIS
     
         my $simple = simpleXML( $xml, root => 'record' );
         # { record => { xmlns => 'http://example.org/', x => 42 } }
-    
-        my $xml2 = removeXMLAttr($xml);
-        # [ root => [ '!', [ x => [42] ] ] ]
 
 DESCRIPTION
 
@@ -34,7 +31,8 @@ DESCRIPTION
     If your XML documents don't contain relevant attributes, you can also
     choose to map to this format:
 
-       [ $name => \@children ]
+       [ $name => \@children ]   # element without attributes
+       [ $name ]                 # empty tag without attributes
 
     Both parsing (with XML::Struct::Reader or function readXML) and
     serializing (with XML::Struct::Writer or function writeXML) are fully
@@ -67,24 +65,27 @@ FUNCTIONS
  readXML( $source [, %options ] )
 
     Read an XML document with XML::Struct::Reader. The type of source
-    (string, filename, URL, IO Handle...) is detected automatically.
-    Options not known to XML::Struct::Reader are passed to
-    XML::LibXML::Reader.
+    (string, filename, URL, IO Handle...) is detected automatically. See
+    XML::Struct::Reader for options. Options not known to
+    XML::Struct::Reader are passed to XML::LibXML::Reader.
 
  writeXML( $xml [, %options ] )
 
-    Write an XML document/element with XML::Struct::Writer.
+    Write an XML document/element with XML::Struct::Writer. See
+    XML::Struct::Writer for options.
 
  simpleXML( $element [, %options ] )
 
     Transform an XML document/element into simple key-value format as known
-    from XML::Simple. See XML::Struct::Simple for configuration options.
+    from XML::Simple. See XML::Struct::Simple for options.
 
  removeXMLAttr( $element )
 
     Transform XML structure with attributes to XML structure without
     attributes. The function does not modify the passed element but creates
     a modified copy.
+
+    this function is deprecated and will be removed in a future release!
 
 EXAMPLE
 

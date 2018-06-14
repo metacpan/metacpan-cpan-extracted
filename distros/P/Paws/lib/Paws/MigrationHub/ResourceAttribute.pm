@@ -34,6 +34,33 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::MigrationHu
 
 Attribute associated with a resource.
 
+Note the corresponding format required per type listed below:
+
+=over
+
+=item IPV4
+
+C<x.x.x.x>
+
+I<where x is an integer in the range [0,255]>
+
+=item IPV6
+
+C<y : y : y : y : y : y : y : y>
+
+I<where y is a hexadecimal between 0 and FFFF. [0, FFFF]>
+
+=item MAC_ADDRESS
+
+C<^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$>
+
+=item FQDN
+
+C<^[^E<lt>E<gt>{}\\\\/?,=\\p{Cntrl}]{1,256}$>
+
+=back
+
+
 =head1 ATTRIBUTES
 
 
@@ -54,9 +81,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Migration
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

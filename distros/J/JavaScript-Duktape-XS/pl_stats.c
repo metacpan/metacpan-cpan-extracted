@@ -6,6 +6,7 @@ static void save_stat(pTHX_ Duk* duk, const char* category, const char* name, do
     STRLEN clen = strlen(category);
     STRLEN nlen = strlen(name);
     HV* data = 0;
+    SV* pvalue = 0;
     SV** found = hv_fetch(duk->stats, category, clen, 0);
     if (found) {
         SV* ref = SvRV(*found);
@@ -16,8 +17,9 @@ static void save_stat(pTHX_ Duk* duk, const char* category, const char* name, do
         }
         data = (HV*) ref;
     } else {
+        SV* ref = 0;
         data = newHV();
-        SV* ref = newRV_noinc((SV*) data);
+        ref = newRV_noinc((SV*) data);
         if (hv_store(duk->stats, category, clen, ref, 0)) {
             SvREFCNT_inc(ref);
         }
@@ -26,7 +28,7 @@ static void save_stat(pTHX_ Duk* duk, const char* category, const char* name, do
         }
     }
 
-    SV* pvalue = sv_2mortal(newSVnv(value));
+    pvalue = sv_2mortal(newSVnv(value));
     if (hv_store(data, name, nlen, pvalue, 0)) {
         SvREFCNT_inc(pvalue);
     }

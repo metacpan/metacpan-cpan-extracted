@@ -69,7 +69,6 @@ add_packages = Carp Test::Builder
 # Sometimes I want to write "return unless $x > 4"
 [-ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions]
 
-
 # For legacy crufty Time::Local code
 [-Modules::ProhibitAutomaticExportation]
 [-ValuesAndExpressions::ProhibitConstantPragma]
@@ -77,6 +76,3 @@ add_packages = Carp Test::Builder
 [-Subroutines::ProhibitManyArgs]
 [-TestingAndDebugging::RequireUseWarnings]
 [-ErrorHandling::RequireCheckingReturnValueOfEval]
-
-
-

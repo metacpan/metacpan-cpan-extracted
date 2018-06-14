@@ -3,7 +3,7 @@ package Paws::AutoScaling::LifecycleHookSpecification;
   has DefaultResult => (is => 'ro', isa => 'Str');
   has HeartbeatTimeout => (is => 'ro', isa => 'Int');
   has LifecycleHookName => (is => 'ro', isa => 'Str', required => 1);
-  has LifecycleTransition => (is => 'ro', isa => 'Str');
+  has LifecycleTransition => (is => 'ro', isa => 'Str', required => 1);
   has NotificationMetadata => (is => 'ro', isa => 'Str');
   has NotificationTargetARN => (is => 'ro', isa => 'Str');
   has RoleARN => (is => 'ro', isa => 'Str');
@@ -41,8 +41,9 @@ Describes a lifecycle hook, which tells Auto Scaling that you want to
 perform an action whenever it launches instances or whenever it
 terminates instances.
 
-For more information, see Auto Scaling Lifecycle Hooks in the I<Auto
-Scaling User Guide>.
+For more information, see Auto Scaling Lifecycle Hooks
+(http://docs.aws.amazon.com/autoscaling/latest/userguide/lifecycle-hooks.html)
+in the I<Auto Scaling User Guide>.
 
 =head1 ATTRIBUTES
 
@@ -51,8 +52,7 @@ Scaling User Guide>.
 
   Defines the action the Auto Scaling group should take when the
 lifecycle hook timeout elapses or if an unexpected failure occurs. The
-valid values are C<CONTINUE> and C<ABANDON>. The default value is
-C<CONTINUE>.
+valid values are C<CONTINUE> and C<ABANDON>.
 
 
 =head2 HeartbeatTimeout => Int
@@ -68,7 +68,7 @@ calling RecordLifecycleActionHeartbeat.
   The name of the lifecycle hook.
 
 
-=head2 LifecycleTransition => Str
+=head2 B<REQUIRED> LifecycleTransition => Str
 
   The state of the EC2 instance to which you want to attach the lifecycle
 hook. For a list of lifecycle hook types, see
@@ -101,9 +101,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::AutoScali
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -38,7 +38,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::IAM::Instan
 
 Contains information about an instance profile.
 
-This data type is used as a response element in the following actions:
+This data type is used as a response element in the following
+operations:
 
 =over
 
@@ -68,7 +69,9 @@ ListInstanceProfilesForRole
 
   The Amazon Resource Name (ARN) specifying the instance profile. For
 more information about ARNs and how to use them in policies, see IAM
-Identifiers in the I<Using IAM> guide.
+Identifiers
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/Using_Identifiers.html)
+in the I<Using IAM> guide.
 
 
 =head2 B<REQUIRED> CreateDate => Str
@@ -79,7 +82,9 @@ Identifiers in the I<Using IAM> guide.
 =head2 B<REQUIRED> InstanceProfileId => Str
 
   The stable and unique string identifying the instance profile. For more
-information about IDs, see IAM Identifiers in the I<Using IAM> guide.
+information about IDs, see IAM Identifiers
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/Using_Identifiers.html)
+in the I<Using IAM> guide.
 
 
 =head2 B<REQUIRED> InstanceProfileName => Str
@@ -90,7 +95,9 @@ information about IDs, see IAM Identifiers in the I<Using IAM> guide.
 =head2 B<REQUIRED> Path => Str
 
   The path to the instance profile. For more information about paths, see
-IAM Identifiers in the I<Using IAM> guide.
+IAM Identifiers
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/Using_Identifiers.html)
+in the I<Using IAM> guide.
 
 
 =head2 B<REQUIRED> Roles => ArrayRef[L<Paws::IAM::Role>]
@@ -105,9 +112,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::IAM>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -1,5 +1,21 @@
 Revision history for Perl extension Net-Azure-NotificationHubs
 
+0.07 2018-06-12T00:57:10Z
+    - Fixed POD formatting. [manwar]
+    - Added missing license meta name. [manwar]
+
+0.06 2018-06-11T06:22:24Z
+    - Version increment for resolving misdirected release. 
+
+0.05 2018-06-11T06:19:02Z
+    - Remove HTTP::Request from NotificationHubs.pm
+
+0.04 2018-06-11T03:24:43Z
+    - Change agent from LWP::UserAgent to HTTP::Tiny
+
+0.03 2018-06-11T01:20:04Z
+    - Fix for supporting to Net-Azure-Authorization-SAS-0.03
+
 0.02 2017-06-06T08:41:16Z
     - use fastapi.metacpan.org/v1 in t/31_response_as_hashref.t because v0 is shutdown
 

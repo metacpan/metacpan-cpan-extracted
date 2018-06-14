@@ -36,7 +36,9 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::OpsWorks::E
 =head1 DESCRIPTION
 
 Describes an Amazon EBS volume. This data type maps directly to the
-Amazon EC2 EbsBlockDevice data type.
+Amazon EC2 EbsBlockDevice
+(http://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_EbsBlockDevice.html)
+data type.
 
 =head1 ATTRIBUTES
 
@@ -49,7 +51,8 @@ Amazon EC2 EbsBlockDevice data type.
 =head2 Iops => Int
 
   The number of I/O operations per second (IOPS) that the volume
-supports. For more information, see EbsBlockDevice.
+supports. For more information, see EbsBlockDevice
+(http://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_EbsBlockDevice.html).
 
 
 =head2 SnapshotId => Str
@@ -59,13 +62,22 @@ supports. For more information, see EbsBlockDevice.
 
 =head2 VolumeSize => Int
 
-  The volume size, in GiB. For more information, see EbsBlockDevice.
+  The volume size, in GiB. For more information, see EbsBlockDevice
+(http://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_EbsBlockDevice.html).
 
 
 =head2 VolumeType => Str
 
   The volume type. C<gp2> for General Purpose (SSD) volumes, C<io1> for
-Provisioned IOPS (SSD) volumes, and C<standard> for Magnetic volumes.
+Provisioned IOPS (SSD) volumes, C<st1> for Throughput Optimized hard
+disk drives (HDD), C<sc1> for Cold HDD,and C<standard> for Magnetic
+volumes.
+
+If you specify the C<io1> volume type, you must also specify a value
+for the C<Iops> attribute. The maximum ratio of provisioned IOPS to
+requested volume size (in GiB) is 50:1. AWS uses the default volume
+size (in GiB) specified in the AMI attributes to set IOPS to 50 x
+(volume size).
 
 
 
@@ -75,9 +87,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::OpsWorks>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

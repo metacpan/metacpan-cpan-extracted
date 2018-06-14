@@ -1,24 +1,36 @@
+#
+# This file is part of CHI-Driver-BerkeleyDB
+#
+# This software is copyright (c) 2009 by Jonathan Swartz.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+
 package CHI::Driver::BerkeleyDB;
-use 5.006;
-use BerkeleyDB;
-use CHI::Util qw(read_dir);
-use File::Path qw(mkpath);
-use Moose;
+$CHI::Driver::BerkeleyDB::VERSION = '0.04';
+# ABSTRACT: BerkeleyDB Cache Driver for CHI
+
 use strict;
 use warnings;
+use BerkeleyDB 0.30;
+use CHI::Util 0.25 qw(read_dir);
+use File::Path qw(mkpath);
+use Moose;
 
 extends 'CHI::Driver';
 
-our $VERSION = '0.03';
+has db => (is => 'ro', lazy_build => 1);
 
-has 'db'       => ( is => 'ro', lazy_build => 1 );
-has 'db_class' => ( is => 'ro', default    => 'BerkeleyDB::Hash' );
-has 'dir_create_mode' => ( is => 'ro', isa => 'Int', default => oct(775) );
-has 'env' => ( is => 'ro', lazy_build => 1 );
-has 'filename' => ( is => 'ro', init_arg => undef, lazy_build => 1 );
-has 'root_dir' => ( is => 'ro' );
+has db_class => (is => 'ro', default => 'BerkeleyDB::Hash');
 
-__PACKAGE__->meta->make_immutable();
+has dir_create_mode => (is => 'ro', isa => 'Int', default => oct(775));
+
+has env => (is => 'ro', lazy_build => 1);
+
+has filename => (is => 'ro', init_arg => undef, lazy_build => 1);
+
+has root_dir => (is => 'ro');
 
 sub _build_filename {
     my $self = shift;
@@ -29,16 +41,22 @@ sub _build_env {
     my $self = shift;
 
     my $root_dir = $self->root_dir;
-    die "must specify one of env or root_dir" if !defined($root_dir);
-    mkpath( $root_dir, 0, $self->dir_create_mode )
-      if !-d $root_dir;
+
+    unless (defined $root_dir) {
+        die "must specify one of env or root_dir";
+    }
+
+    unless (-d $root_dir) {
+        mkpath( $root_dir, 0, $self->dir_create_mode );
+    }
+
     my $env = BerkeleyDB::Env->new(
         '-Home'   => $self->root_dir,
         '-Config' => {},
-        '-Flags'  => DB_CREATE | DB_INIT_CDB | DB_INIT_MPOOL
-      )
+        '-Flags'  => DB_CREATE | DB_INIT_CDB | DB_INIT_MPOOL)
       or die sprintf( "cannot open Berkeley DB environment in '%s': %s",
         $root_dir, $BerkeleyDB::Error );
+
     return $env;
 }
 
@@ -49,37 +67,38 @@ sub _build_db {
     my $db       = $self->db_class->new(
         '-Filename' => $filename,
         '-Flags'    => DB_CREATE,
-        '-Env'      => $self->env
-      )
+        '-Env'      => $self->env)
       or die
       sprintf( "cannot open Berkeley DB file '%s' in environment '%s': %s",
         $filename, $self->root_dir, $BerkeleyDB::Error );
+
     return $db;
 }
 
 sub fetch {
-    my ( $self, $key ) = @_;
+    my ($self, $key) = @_;
 
     my $data;
+
     return ( $self->db->db_get( $key, $data ) == 0 ) ? $data : undef;
 }
 
 sub store {
-    my ( $self, $key, $data ) = @_;
+    my ($self, $key, $data) = @_;
 
     $self->db->db_put( $key, $data ) == 0
       or die $BerkeleyDB::Error;
 }
 
 sub remove {
-    my ( $self, $key ) = @_;
+    my ($self, $key) = @_;
 
     $self->db->db_del($key) == 0
       or die $BerkeleyDB::Error;
 }
 
 sub clear {
-    my ($self) = @_;
+    my $self = shift;
 
     my $count = 0;
     $self->db->truncate($count) == 0
@@ -87,45 +106,55 @@ sub clear {
 }
 
 sub get_keys {
-    my ($self) = @_;
+    my $self = shift;
 
     my @keys;
     my $cursor = $self->db->db_cursor();
-    my ( $key, $value ) = ( "", "" );
+    my ($key, $value) = ('', '');
+
     while ( $cursor->c_get( $key, $value, BerkeleyDB::DB_NEXT() ) == 0 ) {
         push( @keys, $key );
     }
+
     return @keys;
 }
 
 sub get_namespaces {
-    my ($self) = @_;
+    my $self = shift;
 
     my @contents = read_dir( $self->root_dir );
+
     my @namespaces =
       map { $self->unescape_for_filename( substr( $_, 0, -3 ) ) }
       grep { /\.db$/ } @contents;
+
     return @namespaces;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-CHI::Driver::BerkeleyDB -- Using BerkeleyDB for cache
+CHI::Driver::BerkeleyDB - BerkeleyDB Cache Driver for CHI
+
+=head1 VERSION
+
+version 0.04
 
 =head1 SYNOPSIS
 
-    use CHI;
+ use CHI;
 
-    my $cache = CHI->new(
-        driver     => 'BerkeleyDB',
-        root_dir   => '/path/to/cache/root'
-    );
+ my $cache = CHI->new(
+     driver     => 'BerkeleyDB',
+     root_dir   => '/path/to/cache/root'
+ );
 
 =head1 DESCRIPTION
 
@@ -136,62 +165,80 @@ By default, the driver configures the Berkeley DB environment to use the
 Concurrent Data Store (CDS), making it safe for multiple processes to read and
 write the cache without explicit locking.
 
+=for Pod::Coverage clear fetch get_keys get_namespaces remove store
+
 =head1 CONSTRUCTOR OPTIONS
 
-=over
+=over 4
 
-=item root_dir
+=item *
 
-Path to the directory that will contain the Berkeley DB environment, also known
-as the "Home".
+root_dir
 
-=item db_class
+Path to the directory that will contain the Berkeley DB environment, also known as the "Home".
+
+=item *
+
+db_class
 
 BerkeleyDB class, defaults to BerkeleyDB::Hash.
 
-=item env
+=item *
+
+env
 
 Use this Berkeley DB environment instead of creating one.
 
-=item db
+=item *
+
+db
 
 Use this Berkeley DB object instead of creating one.
 
 =back
 
-=head1 SUPPORT AND DOCUMENTATION
+=head1 HISTORY
 
-Questions and feedback are welcome, and should be directed to the perl-cache
-mailing list:
-
-    http://groups.google.com/group/perl-cache-discuss
-
-Bugs and feature requests will be tracked at RT:
-
-    http://rt.cpan.org/NoAuth/Bugs.html?Dist=CHI-Driver-BerkeleyDB
-
-The latest source code can be browsed and fetched at:
-
-    http://github.com/jonswar/perl-chi-driver-bdb/tree/master
-    git clone git://github.com/jonswar/perl-chi-driver-bdb.git
-
-=head1 AUTHOR
-
-Jonathan Swartz
+Originally created by Jonathan Swartz.  Version 0.04 and later maintained by
+Michael Schout.
 
 =head1 SEE ALSO
 
-L<CHI>, L<BerkeleyDB>
+=over 4
 
-=head1 COPYRIGHT & LICENSE
+=item *
 
-Copyright (C) 2007 Jonathan Swartz.
+L<CHI>
 
-CHI::Driver::BerkeleyDB is provided "as is" and without any express or implied
-warranties, including, without limitation, the implied warranties of
-merchantibility and fitness for a particular purpose.
+=item *
 
-This program is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
+L<BerkeleyDB>
+
+=back
+
+=head1 SOURCE
+
+The development version is on github at L<http://https://github.com/mschout/perl-chi-driver-bdb>
+and may be cloned from L<git://https://github.com/mschout/perl-chi-driver-bdb.git>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/mschout/perl-chi-driver-bdb/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+Michael Schout <mschout@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2009 by Jonathan Swartz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -40,5 +40,5 @@ requires:
   perl: '5.006001'
 resources:
   repository: http://github.com/jettero/stockmonkey
-version: '2.9408'
+version: '2.9409'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

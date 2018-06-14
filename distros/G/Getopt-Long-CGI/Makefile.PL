@@ -7,6 +7,6 @@ WriteMakefile(
     VERSION_FROM      => 'lib/Getopt/Long/CGI.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
     PREREQ_PM         => {CGI => 0}, # e.g., Module::Name => 1.1
     ABSTRACT_FROM     => 'lib/Getopt/Long/CGI.pm', # retrieve abstract from module
-    AUTHOR            => 'Luke Ross <lross@>',
+    AUTHOR            => 'Luke Ross <luke@lukeross.name>',
     LICENSE           => 'perl',
 );

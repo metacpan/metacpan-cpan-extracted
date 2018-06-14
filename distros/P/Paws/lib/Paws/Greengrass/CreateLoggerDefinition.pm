@@ -11,47 +11,77 @@ package Paws::Greengrass::CreateLoggerDefinition;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/greengrass/definition/loggers');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'POST');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::Greengrass::CreateLoggerDefinitionResponse');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::Greengrass::CreateLoggerDefinition - Arguments for method CreateLoggerDefinition on Paws::Greengrass
+Paws::Greengrass::CreateLoggerDefinition - Arguments for method CreateLoggerDefinition on L<Paws::Greengrass>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateLoggerDefinition on the 
-AWS Greengrass service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateLoggerDefinition on the
+L<AWS Greengrass|Paws::Greengrass> service. Use the attributes of this class
 as arguments to method CreateLoggerDefinition.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateLoggerDefinition.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateLoggerDefinition(Att1 => $value1, Att2 => $value2, ...);
+    my $greengrass = Paws->service('Greengrass');
+    my $CreateLoggerDefinitionResponse = $greengrass->CreateLoggerDefinition(
+      AmznClientToken => 'My__string',    # OPTIONAL
+      InitialVersion  => {
+        Loggers => [
+          {
+            Component =>
+              'GreengrassSystem',   # values: GreengrassSystem, Lambda; OPTIONAL
+            Id    => 'My__string',
+            Space => 1,            # OPTIONAL
+            Type  => 'FileSystem', # values: FileSystem, AWSCloudWatch; OPTIONAL
+            Level =>
+              'DEBUG',    # values: DEBUG, INFO, WARN, ERROR, FATAL; OPTIONAL
+          },
+          ...
+        ],                # OPTIONAL
+      },    # OPTIONAL
+      Name => 'My__string',    # OPTIONAL
+    );
+
+    # Results:
+    my $Name              = $CreateLoggerDefinitionResponse->Name;
+    my $CreationTimestamp = $CreateLoggerDefinitionResponse->CreationTimestamp;
+    my $LatestVersion     = $CreateLoggerDefinitionResponse->LatestVersion;
+    my $LatestVersionArn  = $CreateLoggerDefinitionResponse->LatestVersionArn;
+    my $Arn               = $CreateLoggerDefinitionResponse->Arn;
+    my $Id                = $CreateLoggerDefinitionResponse->Id;
+    my $LastUpdatedTimestamp =
+      $CreateLoggerDefinitionResponse->LastUpdatedTimestamp;
+
+    # Returns a L<Paws::Greengrass::CreateLoggerDefinitionResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/greengrass/>
 
 =head1 ATTRIBUTES
 
 
 =head2 AmznClientToken => Str
 
-The client token used to request idempotent operations.
+A client token used to correlate requests and responses.
 
 
 
 =head2 InitialVersion => L<Paws::Greengrass::LoggerDefinitionVersion>
 
-Information on the initial version
+Information about the initial version of the logger definition.
 
 
 
 =head2 Name => Str
 
-name of the logger definition
+The name of the logger definition.
 
 
 
@@ -62,9 +92,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateLoggerD
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -34,7 +34,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::GameLift::A
 
 =head1 DESCRIPTION
 
-Values for use in Player attribute type:value pairs. This object lets
+Values for use in Player attribute key:value pairs. This object lets
 you specify an attribute value using any of the valid data types:
 string, number, string array or data map. Each C<AttributeValue> object
 can use only one of the available properties.
@@ -54,8 +54,8 @@ can use only one of the available properties.
 
 =head2 SDM => L<Paws::GameLift::StringDoubleMap>
 
-  For a map of up to 10 type:value pairs. Maximum length for each string
-value is 100 characters.
+  For a map of up to 10 data type:value pairs. Maximum length for each
+string value is 100 characters.
 
 
 =head2 SL => ArrayRef[Str|Undef]
@@ -72,9 +72,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::GameLift>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

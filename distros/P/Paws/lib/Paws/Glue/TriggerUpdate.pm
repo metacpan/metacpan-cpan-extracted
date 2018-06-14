@@ -35,7 +35,9 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Glue::Trigg
 
 =head1 DESCRIPTION
 
-A structure used to provide information used to updata a trigger.
+A structure used to provide information used to update a trigger. This
+object will update the the previous trigger definition by overwriting
+it completely.
 
 =head1 ATTRIBUTES
 
@@ -52,7 +54,7 @@ A structure used to provide information used to updata a trigger.
 
 =head2 Name => Str
 
-  The name of the trigger.
+  Reserved for future use.
 
 
 =head2 Predicate => L<Paws::Glue::Predicate>
@@ -62,7 +64,11 @@ A structure used to provide information used to updata a trigger.
 
 =head2 Schedule => Str
 
-  A cron expression specifying the schedule.
+  A C<cron> expression used to specify the schedule (see Time-Based
+Schedules for Jobs and Crawlers
+(http://docs.aws.amazon.com/glue/latest/dg/monitor-data-warehouse-schedule.html).
+For example, to run something every day at 12:15 UTC, you would
+specify: C<cron(15 12 * * ? *)>.
 
 
 
@@ -72,9 +78,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Glue>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

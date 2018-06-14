@@ -65,7 +65,7 @@ const char* pl_typeof(pTHX_ duk_context* ctx, int pos);
  */
 int pl_call_perl_sv(duk_context* ctx, SV* func);
 
-// Get / set the value for a global object or a slot in an object
+/* Get / set the value for a global object or a slot in an object */
 SV* pl_exists_global_or_property(pTHX_ duk_context* ctx, const char* name);
 SV* pl_typeof_global_or_property(pTHX_ duk_context* ctx, const char* name);
 SV* pl_instanceof_global_or_property(pTHX_ duk_context* ctx, const char* object, const char* class);
@@ -73,7 +73,7 @@ SV* pl_get_global_or_property(pTHX_ duk_context* ctx, const char* name);
 int pl_set_global_or_property(pTHX_ duk_context* ctx, const char* name, SV* value);
 SV* pl_eval(pTHX_ Duk* duk, const char* js, const char* file);
 
-// Run the Duktape GC
+/* Run the Duktape GC */
 int pl_run_gc(Duk* duk);
 
 #endif

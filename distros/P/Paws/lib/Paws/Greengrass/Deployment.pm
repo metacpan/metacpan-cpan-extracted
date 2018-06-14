@@ -35,34 +35,35 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Greengrass:
 
 =head1 DESCRIPTION
 
-Information on the deployment
+Information about a deployment.
 
 =head1 ATTRIBUTES
 
 
 =head2 CreatedAt => Str
 
-  Timestamp when the deployment was created.
+  The time, in milliseconds since the epoch, when the deployment was
+created.
 
 
 =head2 DeploymentArn => Str
 
-  Arn of the deployment.
+  The ARN of the deployment.
 
 
 =head2 DeploymentId => Str
 
-  Id of the deployment.
+  The ID of the deployment.
 
 
 =head2 DeploymentType => Str
 
-  The type of deployment.
+  The type of the deployment.
 
 
 =head2 GroupArn => Str
 
-  Arn of the group for this deployment.
+  The ARN of the group for this deployment.
 
 
 
@@ -72,9 +73,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Greengras
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

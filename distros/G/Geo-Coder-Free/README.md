@@ -10,33 +10,37 @@ Provides a geocoding functionality using free databases
 
 # VERSION
 
-Version 0.10
+Version 0.11
 
 # SYNOPSIS
 
     use Geo::Coder::Free;
 
-    my $geocoder = Geo::Coder::Free->new();
-    my $location = $geocoder->geocode(location => 'Ramsgate, Kent, UK');
+    my $geo_coder = Geo::Coder::Free->new();
+    my $location = $geo_coder->geocode(location => 'Ramsgate, Kent, UK');
 
     # Use a local download of http://results.openaddresses.io/
-    my $openaddr_geocoder = Geo::Coder::Free->new(openaddr => $ENV{'OPENADDR_HOME'});
-    $location = $openaddr_geocoder->geocode(location => '1600 Pennsylvania Avenue NW, Washington DC, USA');
+    my $openaddr_geo_coder = Geo::Coder::Free->new(openaddr => $ENV{'OPENADDR_HOME'});
+    $location = $openaddr_geo_coder->geocode(location => '1600 Pennsylvania Avenue NW, Washington DC, USA');
 
 # DESCRIPTION
 
 Geo::Coder::Free provides an interface to free databases by acting as a front-end to
 Geo::Coder::Free::MaxMind and Geo::Coder::Free::OpenAddresses.
 
-The cgi-bin directory contains a simple DIY geocoding website:
+The cgi-bin directory contains a simple DIY Geo-Coding website.
 
-    curl 'http://localhost/~user/cgi-bin/page.fcgi?page=query&q=1600+Pennsylvania+Avenue+NW+Washington+DC+USA'
+    cgi-bin/page.fcgi page=query q=1600+Pennsylvania+Avenue+NW+Washington+DC+USA
+
+You can see a sample website at [https://geocode.nigelhorne.com/](https://geocode.nigelhorne.com/).
+
+    curl 'https://geocode.nigelhorne.com/cgi-bin/page.fcgi?page=query&q=1600+Pennsylvania+Avenue+NW+Washington+DC+USA'
 
 # METHODS
 
 ## new
 
-    $geocoder = Geo::Coder::Free->new();
+    $geo_coder = Geo::Coder::Free->new();
 
 Takes one optional parameter, openaddr, which is the base directory of
 the OpenAddresses data downloaded from [http://results.openaddresses.io](http://results.openaddresses.io).
@@ -49,14 +53,16 @@ If that parameter isn't given, the module will attempt to find the databases, bu
 
 ## geocode
 
-    $location = $geocoder->geocode(location => $location);
+    $location = $geo_coder->geocode(location => $location);
 
     print 'Latitude: ', $location->{'latitude'}, "\n";
     print 'Longitude: ', $location->{'longitude'}, "\n";
 
     # TODO:
-    # @locations = $geocoder->geocode('Portland, USA');
+    # @locations = $geo_coder->geocode('Portland, USA');
     # diag 'There are Portlands in ', join (', ', map { $_->{'state'} } @locations);
+
+    my @matches = $geo_coder->geocode(scantext => 'arbitrary text', region => 'US');
 
 ## reverse\_geocode
 
@@ -66,7 +72,7 @@ To be done.
 
 ## ua
 
-Does nothing, here for compatibility with other geocoders
+Does nothing, here for compatibility with other Geo-Coders
 
 ## run
 
@@ -80,6 +86,27 @@ Nigel Horne <njh@bandsman.co.uk>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+# MORE INFORMATION
+
+I've written a few Perl related Genealogy programs including gedcom ([https://github.com/nigelhorne/gedcom](https://github.com/nigelhorne/gedcom))
+and ged2site ([https://github.com/nigelhorne/ged2site](https://github.com/nigelhorne/ged2site)).
+One of the things that these do is to check the validity of your family tree, and one of those tasks is to verify place-names.
+Of course places do change names and spelling becomes more consistent over the years, but the vast majority remain the same.
+Enough of a majority to computerise the verification.
+Unfortunately all of the on-line services have one problem or another - most either charge for large number of access, or throttle the number of look-ups.
+Even my modest tree, just over 2000 people, reaches those limits.
+
+There are, however, a number of free databases that can be used, including MaxMind, GeoNames, OpenAddresses and WhosOnFirst.
+The objective of Geo::Coder::Free ([https://github.com/nigelhorne/Geo-Coder-Free](https://github.com/nigelhorne/Geo-Coder-Free))
+is to create a database of those databases and to create a search engine either through a local copy of the database or through an on-line website.
+Both are in their early days, but I have examples which do surprisingly well.
+
+The local copy of the database is built using the createdatabase.PL script which is bundled with G:C:F.
+That script creates a single SQLite file from downloaded copies of the databases listed above.
+Running 'make' will download GeoNames and Maxmind, but OpenAddresses and WhosOnFirst need to be downloaded manually if you decide to use them - they are treated as optional by G:C:.F.
+
+There is a sample website at [https://geocode.nigelhorne.com/](https://geocode.nigelhorne.com/).  The source code for that site is included in the G:C:F distribution.
 
 # BUGS
 

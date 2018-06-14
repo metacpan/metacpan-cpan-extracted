@@ -7,19 +7,20 @@ cfunctions ip-tools.c
 #ifndef CFH_IP_TOOLS_H
 #define CFH_IP_TOOLS_H
 
-#line 5 "ip-tools.c"
+#line 7 "/home/ben/projects/ip-tools/ip-tools.c"
 #define INVALID_IP 0
 #define NOTFOUND -1
-typedef struct {
-    unsigned start;
-    unsigned end;
+typedef struct
+{
+    uint32_t start;
+    uint32_t end;
 }
 ip_block_t;
 
-#line 19 "ip-tools.c"
-unsigned int ip_tools_ip_to_int (const char* ip);
+#line 22 "/home/ben/projects/ip-tools/ip-tools.c"
+uint32_t ip_tools_ip_to_int (const char* ip);
 
-#line 60 "ip-tools.c"
-int ip_tools_ip_range (ip_block_t* ip_blocks, int n_ip_ranges, unsigned ip);
+#line 64 "/home/ben/projects/ip-tools/ip-tools.c"
+int ip_tools_ip_range (ip_block_t* ip_blocks, int n_ip_ranges, uint32_t ip);
 
 #endif /* CFH_IP_TOOLS_H */

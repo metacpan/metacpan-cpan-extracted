@@ -1,5 +1,18 @@
 Revision history for Hash-MoreUtils
 
+0.06	2018-06-08
+    - update toolchain for modern perl environments including
+      * automated regression test
+      * test coverage analyzation
+      * pod coverage
+    - introducing common code style
+    - introduce a bunch of missing functions:
+      * slice_without (Thanks to Theo van Hoesel <Th.J.v.Hoesel@THEMA-MEDIA.nl>)
+      * slice_missing / slice_missing_map (Thanks to Christoph Zimmermann <christophemzim@web.de>)
+      * slice_notdef / slice_notdef_map (Thanks to Christoph Zimmermann <christophemzim@web.de>)
+      * slice_true / slice_true_map
+      * slice_false / slice_false_map
+
 0.05	2013-12-09
     - Fix hashsort with sort block (Koichi Nakashima - http://nksm.name)
 

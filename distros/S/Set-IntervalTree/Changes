@@ -1,16 +1,20 @@
 Revision history for Perl extension Set::IntervalTree.
 
-0.11  Thu Jul 20 22:27:59 2017
+0.12    Sat Jun  9 21:33:52 2018
+    - RT#123410 fix fetch_window()
+    - RT#123098 try to support systems with clang++, like freebsd.
+
+0.11    Thu Jul 20 22:27:59 2017
     - SLOYD becomes co-maintainer.
     - Use dzil as distribution builder.
     - Use ExtUtils::CppGuess to detect C++ compiler on multi-platform.
     - Fix building on older versions of gcc and MSVC.
 
-0.02  Mon Apr 29 11:03:00 2011
-	- change to half-closed intervals
-	- add remove, remove_window, fetch_window methods
+0.02    Mon Apr 29 11:03:00 2011
+    - change to half-closed intervals
+    - add remove, remove_window, fetch_window methods
 	
-0.01  Mon Jul 12 15:58:33 2010
-	- original version; created by h2xs 1.23 with options
-		-n Set::IntervalTree -F -I. interval_tree.h
+0.01    Mon Jul 12 15:58:33 2010
+    - original version; created by h2xs 1.23 with options
+    -n Set::IntervalTree -F -I. interval_tree.h
 

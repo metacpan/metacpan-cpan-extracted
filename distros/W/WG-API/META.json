@@ -4,7 +4,7 @@
       "Cyrill Novgorodcev , C<< <cynovg at cpan.org> >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.17",
+   "generated_by" : "Minilla/v3.1.1",
    "license" : [
       "artistic_2"
    ],
@@ -28,8 +28,16 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "CPAN::Uploader" : "0",
             "Log::Any::Test" : "1.049",
-            "Test::More" : "0"
+            "Test::CPAN::Meta" : "0",
+            "Test::Exception" : "0",
+            "Test::MinimumVersion::Fast" : "0",
+            "Test::More" : "0",
+            "Test::PAUSE::Permissions" : "0",
+            "Test::Pod" : "0",
+            "Test::Spellunker" : "0",
+            "Version::Next" : "0"
          }
       },
       "configure" : {
@@ -54,55 +62,62 @@
             "Log::Any" : "1.049",
             "Modern::Perl" : "1.20170117",
             "Moo" : "2.00",
+            "URI" : "0",
             "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Software::License::Artistic_2_0" : "0"
          }
       }
    },
    "provides" : {
       "WG::API" : {
          "file" : "lib/WG/API.pm",
-         "version" : "v0.8.6"
+         "version" : "v0.8.8"
       },
       "WG::API::Auth" : {
          "file" : "lib/WG/API/Auth.pm",
-         "version" : "v0.8.6"
+         "version" : "v0.8.8"
       },
       "WG::API::Base" : {
          "file" : "lib/WG/API/Base.pm",
-         "version" : "v0.8.6"
+         "version" : "v0.8.8"
       },
       "WG::API::Error" : {
          "file" : "lib/WG/API/Error.pm",
-         "version" : "v0.8.6"
+         "version" : "v0.8.8"
       },
       "WG::API::NET" : {
          "file" : "lib/WG/API/NET.pm",
-         "version" : "v0.8.6"
+         "version" : "v0.8.8"
       },
       "WG::API::WoT" : {
          "file" : "lib/WG/API/WoT.pm",
-         "version" : "v0.8.6"
+         "version" : "v0.8.8"
       },
       "WG::API::WoWp" : {
          "file" : "lib/WG/API/WoWp.pm",
-         "version" : "v0.8.6"
+         "version" : "v0.8.8"
       },
       "WG::API::WoWs" : {
          "file" : "lib/WG/API/WoWs.pm",
-         "version" : "v0.8.6"
+         "version" : "v0.8.8"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "url" : "git://gitlab.com/cynovg/WG-API.git"
+         "url" : "https://gitlab-ci-token:tCfC_pncY8dgc_jsjfzz@gitlab.com/cynovg/WG-API.git"
       }
    },
-   "version" : "v0.8.6",
+   "version" : "v0.8.8",
    "x_contributors" : [
       "Novgorodcev Cyrill <cynovg@gmail.com>",
       "Novgorodcev Cyrill <novgorodtsev.kirill@220-volt.ru>",
       "root <root@cynovg-debian.local>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
 }

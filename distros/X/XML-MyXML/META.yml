@@ -17,10 +17,10 @@ name: XML-MyXML
 provides:
   XML::MyXML:
     file: lib/XML/MyXML.pm
-    version: '1.000'
+    version: '1.02'
   XML::MyXML::Object:
     file: lib/XML/MyXML.pm
-    version: '1.000'
+    version: '1.02'
 requires:
   Carp: '0'
   Encode: '0'
@@ -34,5 +34,5 @@ resources:
   bugtracker: https://github.com/akarelas/xml-myxml/issues
   homepage: https://github.com/akarelas/xml-myxml
   repository: https://github.com/akarelas/xml-myxml.git
-version: '1.000'
+version: '1.02'
 x_serialization_backend: 'YAML::Tiny version 1.69'

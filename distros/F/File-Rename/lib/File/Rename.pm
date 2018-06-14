@@ -59,12 +59,14 @@ use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 
 @EXPORT_OK = qw( rename );
-$VERSION = '0.32';
+$VERSION = '0.33';
 
 sub rename_files {
     my $code = shift;
     my $options = shift;
     _default(\$options); 
+
+    my $errors;
     for (@_) {
         my $was = $_;
 	$code->();
@@ -76,6 +78,7 @@ sub rename_files {
 	    else {
 		warn  "$was not renamed: $_ already exists\n"; 
 	    }
+	    $errors ++;
 	}
     	elsif( $options->{no_action} ) { 
 		print "rename($was, $_)\n";
@@ -83,8 +86,9 @@ sub rename_files {
     	elsif( CORE::rename($was,$_)) { 
 		print "$was renamed as $_\n" if $options->{verbose}; 
 	}
-    	else { 	warn  "Can't rename $was $_: $!\n"; }
+    	else { 	warn  "Can't rename $was $_: $!\n"; $errors ++; }
     }
+    return !$errors;
 }
 
 sub rename_list { 
@@ -166,10 +170,10 @@ File::Rename - Perl extension for renaming multiple files
 =head1 SYNOPSIS
 
   use File::Rename qw(rename);		# hide CORE::rename
-  rename @ARGV, sub { s/\.pl\z/.pm/ }, 1;
+  rename \@ARGV, sub { s/\.pl\z/.pm/ }, 1;
 
   use File::Rename;
-  File::Rename::rename @ARGV, '$_ = lc';
+  File::Rename::rename \@ARGV, '$_ = lc';
 
 =head1 DESCRIPTION
 
@@ -197,7 +201,7 @@ rename a list of file read from HANDLE, using CODE
 =item FILES
 
 List of files to be renamed,
-for C<rename> must be an array
+for C<rename> must be an ARRAY reference
 
 =item CODE
 

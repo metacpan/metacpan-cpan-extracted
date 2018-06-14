@@ -14,28 +14,50 @@ package Paws::Lambda::CreateEventSourceMapping;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/2015-03-31/event-source-mappings/');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'POST');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::Lambda::EventSourceMappingConfiguration');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::Lambda::CreateEventSourceMapping - Arguments for method CreateEventSourceMapping on Paws::Lambda
+Paws::Lambda::CreateEventSourceMapping - Arguments for method CreateEventSourceMapping on L<Paws::Lambda>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateEventSourceMapping on the 
-AWS Lambda service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateEventSourceMapping on the
+L<AWS Lambda|Paws::Lambda> service. Use the attributes of this class
 as arguments to method CreateEventSourceMapping.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateEventSourceMapping.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateEventSourceMapping(Att1 => $value1, Att2 => $value2, ...);
+    my $lambda = Paws->service('Lambda');
+    my $EventSourceMappingConfiguration = $lambda->CreateEventSourceMapping(
+      EventSourceArn            => 'MyArn',
+      FunctionName              => 'MyFunctionName',
+      StartingPosition          => 'TRIM_HORIZON',
+      BatchSize                 => 1,                        # OPTIONAL
+      Enabled                   => 1,                        # OPTIONAL
+      StartingPositionTimestamp => '1970-01-01T01:00:00',    # OPTIONAL
+    );
+
+    # Results:
+    my $BatchSize    = $EventSourceMappingConfiguration->BatchSize;
+    my $LastModified = $EventSourceMappingConfiguration->LastModified;
+    my $State        = $EventSourceMappingConfiguration->State;
+    my $StateTransitionReason =
+      $EventSourceMappingConfiguration->StateTransitionReason;
+    my $EventSourceArn = $EventSourceMappingConfiguration->EventSourceArn;
+    my $UUID           = $EventSourceMappingConfiguration->UUID;
+    my $FunctionArn    = $EventSourceMappingConfiguration->FunctionArn;
+    my $LastProcessingResult =
+      $EventSourceMappingConfiguration->LastProcessingResult;
+
+    # Returns a L<Paws::Lambda::EventSourceMappingConfiguration> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/lambda/CreateEventSourceMapping>
 
 =head1 ATTRIBUTES
 
@@ -79,6 +101,7 @@ If you are using versioning, you can also provide a qualified function
 ARN (ARN that is qualified with function version or alias name as
 suffix). For more information about versioning, see AWS Lambda Function
 Versioning and Aliases
+(http://docs.aws.amazon.com/lambda/latest/dg/versioning-aliases.html)
 
 AWS Lambda also allows you to specify only the function name with the
 account ID qualifier (for example, C<account-id:Thumbnail>).
@@ -90,20 +113,28 @@ only the function name, it is limited to 64 characters in length.
 
 =head2 B<REQUIRED> StartingPosition => Str
 
-The position in the stream where AWS Lambda should start reading. Valid
-only for Kinesis streams. For more information, see ShardIteratorType
-in the I<Amazon Kinesis API Reference>.
+The position in the DynamoDB or Kinesis stream where AWS Lambda should
+start reading. For more information, see GetShardIterator
+(http://docs.aws.amazon.com/kinesis/latest/APIReference/API_GetShardIterator.html#Kinesis-GetShardIterator-request-ShardIteratorType)
+in the I<Amazon Kinesis API Reference Guide> or GetShardIterator
+(http://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_streams_GetShardIterator.html)
+in the I<Amazon DynamoDB API Reference Guide>. The C<AT_TIMESTAMP>
+value is supported only for Kinesis streams
+(http://docs.aws.amazon.com/streams/latest/dev/amazon-kinesis-streams.html).
 
 Valid values are: C<"TRIM_HORIZON">, C<"LATEST">, C<"AT_TIMESTAMP">
 
 =head2 StartingPositionTimestamp => Str
 
 The timestamp of the data record from which to start reading. Used with
-shard iterator type AT_TIMESTAMP. If a record with this exact timestamp
-does not exist, the iterator returned is for the next (later) record.
-If the timestamp is older than the current trim horizon, the iterator
-returned is for the oldest untrimmed data record (TRIM_HORIZON). Valid
-only for Kinesis streams.
+shard iterator type
+(http://docs.aws.amazon.com/kinesis/latest/APIReference/API_GetShardIterator.html#Kinesis-GetShardIterator-request-ShardIteratorType)
+AT_TIMESTAMP. If a record with this exact timestamp does not exist, the
+iterator returned is for the next (later) record. If the timestamp is
+older than the current trim horizon, the iterator returned is for the
+oldest untrimmed data record (TRIM_HORIZON). Valid only for Kinesis
+streams
+(http://docs.aws.amazon.com/streams/latest/dev/amazon-kinesis-streams.html).
 
 
 
@@ -114,9 +145,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateEventSo
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

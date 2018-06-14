@@ -50,7 +50,7 @@ See L<HTTP::Cookies>.
 
 This module is in Github:
 
-	http://github.com/briandfoy/HTTP-Cookies-Chrome
+	https://github.com/briandfoy/http-cookies-chrome
 
 =head1 AUTHOR
 
@@ -62,10 +62,10 @@ Jon Orwant pointed out the problem with dates too far in the future
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2009-2014 brian d foy. All rights reserved.
+Copyright © 2009-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the terms of the Artistic License 2.0.
 
 =cut
 
@@ -76,7 +76,7 @@ use vars qw( $VERSION );
 use constant TRUE  => 1;
 use constant FALSE => 0;
 
-$VERSION = '1.001';
+$VERSION = '1.002';
 
 use DBI;
 
@@ -90,35 +90,35 @@ sub _connect {
 		} );
 	$_[0]->{dbh} = $dbh;
 	}
-	
+
 sub _get_rows {
 	my( $self, $file ) = @_;
-	
+
 	my $dbh = $self->_connect( $file );
-	
+
 	my $sth = $dbh->prepare( 'SELECT * FROM cookies' );
-		
+
 	$sth->execute;
-	
+
 	my @rows = map { bless $_, 'HTTP::Cookies::Chrome::Record' }
 		@{ $sth->fetchall_arrayref };
-	
+
 	$dbh->disconnect;
-	
+
 	\ @rows;
 	}
-	
+
 sub load {
     my( $self, $file ) = @_;
 
     $file ||= $self->{'file'} || return;
 
-# $cookie_jar->set_cookie( $version, $key, $val, $path, 
+# $cookie_jar->set_cookie( $version, $key, $val, $path,
 # $domain, $port, $path_spec, $secure, $maxage, $discard, \%rest )
 
  	foreach my $row ( @{ $self->_get_rows( $file ) } ) {
 		$self->set_cookie(
-			undef, 
+			undef,
 			$row->name,
 			$row->value,
 			$row->path,
@@ -126,7 +126,7 @@ sub load {
 			undef,
 			undef,
 			$row->secure,
-			($row->expires_utc / 1_000_000) - gmtime, 
+			($row->expires_utc / 1_000_000) - gmtime,
 			0,
 			{}
 			);
@@ -139,9 +139,9 @@ sub save {
     my( $self, $new_file ) = @_;
 
     $new_file ||= $self->{'file'} || return;
-	
-	my $dbh = $self->_connect( $new_file );	
-	
+
+	my $dbh = $self->_connect( $new_file );
+
 	$self->_create_table;
 	$self->_prepare_insert;
 	$self->_filter_cookies;
@@ -157,22 +157,22 @@ sub _filter_cookies {
 		sub {
 			my( $version, $key, $val, $path, $domain, $port,
 				$path_spec, $secure, $expires, $discard, $rest ) = @_;
-	
+
 				return if $discard && not $self->{ignore_discard};
-	
+
 				return if defined $expires && time > $expires;
-	
+
 				$expires = do {
 					unless( $expires ) { 0 }
 					else {
 						$expires * 1_000_000
 						}
 					};
-	
+
 				$secure = $secure ? TRUE : FALSE;
-	
+
 				my $bool = $domain =~ /^\./ ? TRUE : FALSE;
-	
+
 				$self->_insert(
 					$domain,
 					$key,
@@ -205,18 +205,18 @@ CREATE TABLE cookies (
 )
 SQL
 	}
-	
+
 sub _prepare_insert {
 	my( $self ) = @_;
-	
+
 	my $sth = $self->{insert_sth} = $self->_dbh->prepare_cached( <<'SQL' );
 INSERT INTO cookies VALUES
-	( 
-	?, 
-	?, ?, ?, ?, 
-	?, 
-	?, 
-	?, 
+	(
+	?,
+	?, ?, ?, ?,
+	?,
+	?,
+	?,
 	?
 	)
 SQL
@@ -227,11 +227,11 @@ SQL
 my $creation_offset = 0;
 
 sub _insert {
-	my( $self, 					
+	my( $self,
 		$domain, $key, $value, $path, $expires, $secure, ) = @_;
-		
+
 	my $sth = $self->{insert_sth};
-	
+
 	my $creation    = $self->_get_utc_microseconds( $creation_offset++ );
 
 	my $last_access = $self->_get_utc_microseconds;
@@ -252,7 +252,7 @@ sub _insert {
 	}
 }
 
-sub _get_utc_microseconds {	
+sub _get_utc_microseconds {
 	no warnings 'uninitialized';
 	use bignum;
 	POSIX::strftime( '%s', gmtime() ) * 1_000_000 + ($_[1]//0);
@@ -263,24 +263,24 @@ package HTTP::Cookies::Chrome::Record;
 use vars qw($AUTOLOAD);
 
 my %columns = map { state $n = 0; $_, $n++ } qw(
-	creation_utc    
-	host_key        
-	name            
-	value           
-	path            
-	expires_utc     
-	secure          
-	httponly        
-	last_access_utc 
+	creation_utc
+	host_key
+	name
+	value
+	path
+	expires_utc
+	secure
+	httponly
+	last_access_utc
 	);
-	
+
 sub AUTOLOAD {
 	my( $self ) = @_;
 	my $method = $AUTOLOAD;
 	$method =~ s/.*:://;
-	
+
 	die "" unless exists $columns{$method};
-	
+
 	$self->[ $columns{$method} ];
 	}
 

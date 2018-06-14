@@ -1,3 +1,8 @@
+0.31   2018-06-09
+
+- Moved from rt.cpan.org to GitHub issues.
+
+
 0.30   2018-02-18
 
 - Require Perl 5.10. Perl 5.8.x has very weird parsing failures on valid Perl

@@ -48,7 +48,7 @@ change the assigned name.
 
 =head2 RecordingGroup => L<Paws::Config::RecordingGroup>
 
-  Specifies the types of AWS resource for which AWS Config records
+  Specifies the types of AWS resources for which AWS Config records
 configuration changes.
 
 
@@ -65,9 +65,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Config>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

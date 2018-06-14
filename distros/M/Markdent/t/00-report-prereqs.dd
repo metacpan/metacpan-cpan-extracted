@@ -29,8 +29,7 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.04',
                                       'Test::Spelling' => '0.12',
                                       'Test::Vars' => '0.009',
-                                      'Test::Version' => '2.05',
-                                      'WebService::Validator::HTML::W3C' => '0'
+                                      'Test::Version' => '2.05'
                                     }
                     },
        'runtime' => {

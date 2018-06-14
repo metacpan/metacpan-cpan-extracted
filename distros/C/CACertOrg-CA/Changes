@@ -1,8 +1,16 @@
-20110724.01 - Sun Jul 24 22:40:29 2011
-	* First release of a module to distribute the CACert.org
-	root certificate. This is handy to connect to 
-	https://pause.perl.org, for example.
+Revision history for Perl module CACertOrg::CA
 
-20110724.02 - Wed Jul 10 13:43:20 2013
+20110724.005 2018-06-10T11:49:11Z
+	* Freshen dist. The cert is still the same one on the website.
+
+20110724.04 - 2014-01-03
+	* Get rid of MYMETA
+
+20110724.02 - 2013-07-10
 	* Small fix to synopsis (RT# 86662)
+
+20110724.01 - 2011-07-24
+	* First release of a module to distribute the CACert.org
+	root certificate. This is handy to connect to
+	https://pause.perl.org, for example.
 

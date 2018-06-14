@@ -17,21 +17,45 @@ package Paws::WAF::GetSampledRequests;
 
 =head1 NAME
 
-Paws::WAF::GetSampledRequests - Arguments for method GetSampledRequests on Paws::WAF
+Paws::WAF::GetSampledRequests - Arguments for method GetSampledRequests on L<Paws::WAF>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method GetSampledRequests on the 
-AWS WAF service. Use the attributes of this class
+This class represents the parameters used for calling the method GetSampledRequests on the
+L<AWS WAF|Paws::WAF> service. Use the attributes of this class
 as arguments to method GetSampledRequests.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to GetSampledRequests.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->GetSampledRequests(Att1 => $value1, Att2 => $value2, ...);
+    my $waf = Paws->service('WAF');
+    # To get a sampled requests
+    # The following example returns detailed information about 100 requests --a
+    # sample-- that AWS WAF randomly selects from among the first 5,000 requests
+    # that your AWS resource received between the time period 2016-09-27T15:50Z
+    # to 2016-09-27T15:50Z.
+    my $GetSampledRequestsResponse = $waf->GetSampledRequests(
+      {
+        'RuleId'     => 'WAFRule-1-Example',
+        'WebAclId'   => 'createwebacl-1472061481310',
+        'MaxItems'   => 100,
+        'TimeWindow' => {
+          'StartTime' => '2016-09-27T15:50Z',
+          'EndTime'   => '2016-09-27T15:50Z'
+        }
+      }
+    );
+
+    # Results:
+    my $SampledRequests = $GetSampledRequestsResponse->SampledRequests;
+    my $TimeWindow      = $GetSampledRequestsResponse->TimeWindow;
+    my $PopulationSize  = $GetSampledRequestsResponse->PopulationSize;
+
+    # Returns a L<Paws::WAF::GetSampledRequestsResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/waf/GetSampledRequests>
 
 =head1 ATTRIBUTES
 
@@ -48,14 +72,15 @@ them.
 
 =head2 B<REQUIRED> RuleId => Str
 
-C<RuleId> is one of two values:
+C<RuleId> is one of three values:
 
 =over
 
 =item *
 
-The C<RuleId> of the C<Rule> for which you want C<GetSampledRequests>
-to return a sample of requests.
+The C<RuleId> of the C<Rule> or the C<RuleGroupId> of the C<RuleGroup>
+for which you want C<GetSampledRequests> to return a sample of
+requests.
 
 =item *
 
@@ -92,9 +117,9 @@ This class forms part of L<Paws>, documenting arguments for method GetSampledReq
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

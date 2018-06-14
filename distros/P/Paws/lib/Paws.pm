@@ -57,7 +57,7 @@ __PACKAGE__->meta->make_immutable;
 
 package Paws;
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 use Moose;
 use MooseX::ClassAttribute;
@@ -236,19 +236,29 @@ kept stable, and changes to it should be notified via ChangeLog
 
 L<Paws::ACM>
 
+L<Paws::ACMPCA>
+
+L<Paws::AlexaForBusiness>
+
 L<Paws::ApiGateway>
 
 L<Paws::ApplicationAutoScaling>
 
 L<Paws::AppStream>
 
+L<Paws::AppSync>
+
 L<Paws::Athena>
 
 L<Paws::AutoScaling>
 
+L<Paws::AutoScalingPlans>
+
 L<Paws::Batch>
 
 L<Paws::Budgets>
+
+L<Paws::Cloud9>
 
 L<Paws::CloudDirectory>
 
@@ -290,7 +300,13 @@ L<Paws::CognitoIdp>
 
 L<Paws::CognitoSync>
 
+L<Paws::Comprehend>
+
 L<Paws::Config>
+
+L<Paws::Connect>
+
+L<Paws::CostExplorer>
 
 L<Paws::CUR>
 
@@ -320,6 +336,10 @@ L<Paws::ECS>
 
 L<Paws::EFS>
 
+L<Paws::EFS>
+
+L<Paws::EKS>
+
 L<Paws::ElastiCache>
 
 L<Paws::ElasticBeanstalk>
@@ -340,6 +360,8 @@ L<Paws::ES>
 
 L<Paws::Firehose>
 
+L<Paws::FMS>
+
 L<Paws::GameLift>
 
 L<Paws::Glacier>
@@ -347,6 +369,8 @@ L<Paws::Glacier>
 L<Paws::Glue>
 
 L<Paws::Greengrass>
+
+L<Paws::GuardDuty>
 
 L<Paws::Health>
 
@@ -358,11 +382,25 @@ L<Paws::Inspector>
 
 L<Paws::IoT>
 
+L<Paws::IoT1ClickDevices>
+
+L<Paws::IoT1ClickProjects>
+
+L<Paws::IoTAnalytics>
+
 L<Paws::IoTData>
+
+L<Paws::IoTJobsData>
 
 L<Paws::Kinesis>
 
 L<Paws::KinesisAnalytics>
+
+L<Paws::KinesisVideo>
+
+L<Paws::KinesisVideoArchivedMedia>
+
+L<Paws::KinesisVideoMedia>
 
 L<Paws::KMS>
 
@@ -382,11 +420,27 @@ L<Paws::MarketplaceEntitlement>
 
 L<Paws::MarketplaceMetering>
 
+L<Paws::MediaConvert>
+
+L<Paws::MediaLive>
+
+L<Paws::MediaPackage>
+
+L<Paws::MediaStore>
+
+L<Paws::MediaStoreData>
+
+L<Paws::MediaTailor>
+
 L<Paws::MigrationHub>
 
 L<Paws::MobileHub>
 
+L<Paws::MQ>
+
 L<Paws::MTurk>
+
+L<Paws::Neptune>
 
 L<Paws::OpsWorks>
 
@@ -394,15 +448,21 @@ L<Paws::OpsWorksCM>
 
 L<Paws::Organizations>
 
+L<Paws::PerformanceInsights>
+
 L<Paws::Pinpoint>
 
 L<Paws::Polly>
+
+L<Paws::Pricing>
 
 L<Paws::RDS>
 
 L<Paws::RedShift>
 
 L<Paws::Rekognition>
+
+L<Paws::ResourceGroups>
 
 L<Paws::ResourceTagging>
 
@@ -412,9 +472,19 @@ L<Paws::Route53Domains>
 
 L<Paws::S3>
 
+L<Paws::SageMaker>
+
+L<Paws::SageMakerRuntime>
+
 L<Paws::SDB>
 
+L<Paws::SecretsManager>
+
+L<Paws::ServerlessRepo>
+
 L<Paws::ServiceCatalog>
+
+L<Paws::ServiceDiscovery>
 
 L<Paws::SES>
 
@@ -446,11 +516,17 @@ L<Paws::STS>
 
 L<Paws::Support>
 
+L<Paws::Transcribe>
+
+L<Paws::Translate>
+
 L<Paws::WAF>
 
 L<Paws::WAFRegional>
 
 L<Paws::WorkDocs>
+
+L<Paws::WorkMail>
 
 L<Paws::WorkSpaces>
 
@@ -680,9 +756,9 @@ L<https://github.com/pplu/aws-sdk-perl>
 
 =head1 BUGS and SOURCE
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =head1 COPYRIGHT and LICENSE
 
@@ -693,10 +769,10 @@ This code is distributed under the Apache 2 License. The full text of the licens
 =head1 CONTRIBUITIONS
 
 
-CAPSiDE (http://www.capside.com) for letting Paws be contributed in an open source model 
+CAPSiDE (http://www.capside.com) for letting Paws be contributed in an open source model
 and giving me time to build and maintain it regularly
 
-Luis Alberto Gimenez (@agimenez) for 
+Luis Alberto Gimenez (@agimenez) for
  - The git-fu cleaning up the "pull other sdks" code
  - Credential Providers code
  - Fixes for users that have no HOME env variable
@@ -727,7 +803,7 @@ karenetheridge for bug reporting, pull requests and help
 ioanrogers for fixing unicode issues in tests
 
 ilmari for fixing issues with timestamps in Date and X-Amz-Date headers,
-test fixes and 5.10 support fixes, documentation issue fixes for S3, 
+test fixes and 5.10 support fixes, documentation issue fixes for S3,
 CloudFront and Route53, help with number stringification
 
 stevecaldwell77 for contributing support for temporary credentials in S3
@@ -738,7 +814,8 @@ Roger Pettett for testing and contributing fixes for tests on MacOSX
 
 Henri Yandell for help with licensing issues
 
-Oriol Soriano (@ureesoriano) for contribution to API builders
+Oriol Soriano (@ureesoriano) for contributions to API builders and better
+documentation generation
 
 H. Daniel Cesario (@maneta) for devel setup instructions on RH and MacOSX
 
@@ -769,11 +846,22 @@ PopeFelix for solving issues around S3 and MojoAsyncCaller
 meis for contributing Paws::Credential::Explicit
 
 sven-schubert for contributing fixes to RestXML services,
-working on fixing S3 to work correctly. 
+working on fixing S3 to work correctly.
 
 SeptamusNonovant for fixing paginators in non-callback mode
 
 gadgetjunkie for contributing the ECS credential provider
+
+mla for contributing a fix to correct dependencies
+
+castaway for contributing to fixing documentation problems
+ - properly providing backlinks between related pages
+ - making TOCs render correctly on search.cpan.org
+ - generating helpful copy-paste ready scenarios in the synopsis of each method call
+
+autarch for correcting signature generation for a bunch of services
+
+piratefinn for linking calls to documentation AWS URLs
 
 
 =cut

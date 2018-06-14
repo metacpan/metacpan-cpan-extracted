@@ -93,19 +93,19 @@ loader_error_msg(perl_yaml_loader_t *loader, char *problem)
         loader->parser.problem_mark.line ||
         loader->parser.problem_mark.column
     )
-        msg = form("%s, line: %d, column: %d\n",
+        msg = form("%s, line: %lu, column: %lu\n",
             msg,
-            loader->parser.problem_mark.line + 1,
-            loader->parser.problem_mark.column + 1
+            (unsigned long)loader->parser.problem_mark.line + 1,
+            (unsigned long)loader->parser.problem_mark.column + 1
         );
     else
         msg = form("%s\n", msg);
     if (loader->parser.context)
-        msg = form("%s%s at line: %d, column: %d\n",
+        msg = form("%s%s at line: %lu, column: %lu\n",
             msg,
             loader->parser.context,
-            loader->parser.context_mark.line + 1,
-            loader->parser.context_mark.column + 1
+            (unsigned long)loader->parser.context_mark.line + 1,
+            (unsigned long)loader->parser.context_mark.column + 1
         );
 
     return msg;
@@ -596,6 +596,7 @@ void
 set_dumper_options(perl_yaml_dumper_t *dumper)
 {
     GV *gv;
+    char* boolean = "";
     dumper->dump_code = (
         ((gv = gv_fetchpv("YAML::XS::UseCode", TRUE, SVt_PV)) &&
         SvTRUE(GvSV(gv)))
@@ -610,7 +611,6 @@ set_dumper_options(perl_yaml_dumper_t *dumper)
     );
 
     gv = gv_fetchpv("YAML::XS::Boolean", FALSE, SVt_PV);
-    char* boolean = "";
     dumper->dump_bool_jsonpp = 0;
     dumper->dump_bool_boolean = 0;
     if (SvTRUE(GvSV(gv))) {

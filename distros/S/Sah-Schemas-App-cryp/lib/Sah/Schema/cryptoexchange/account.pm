@@ -1,7 +1,7 @@
 package Sah::Schema::cryptoexchange::account;
 
-our $DATE = '2018-06-07'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-06-09'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our $schema = [str => {
     summary => 'Account at a cryptocurrency exchange',
@@ -33,7 +33,7 @@ Sah::Schema::cryptoexchange::account - Account at a cryptocurrency exchange
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::cryptoexchange::account (from Perl distribution Sah-Schemas-App-cryp), released on 2018-06-07.
+This document describes version 0.003 of Sah::Schema::cryptoexchange::account (from Perl distribution Sah-Schemas-App-cryp), released on 2018-06-09.
 
 =head1 DESCRIPTION
 

@@ -16,49 +16,72 @@ package Paws::Kinesis::StopStreamEncryption;
 
 =head1 NAME
 
-Paws::Kinesis::StopStreamEncryption - Arguments for method StopStreamEncryption on Paws::Kinesis
+Paws::Kinesis::StopStreamEncryption - Arguments for method StopStreamEncryption on L<Paws::Kinesis>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method StopStreamEncryption on the 
-Amazon Kinesis service. Use the attributes of this class
+This class represents the parameters used for calling the method StopStreamEncryption on the
+L<Amazon Kinesis|Paws::Kinesis> service. Use the attributes of this class
 as arguments to method StopStreamEncryption.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to StopStreamEncryption.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->StopStreamEncryption(Att1 => $value1, Att2 => $value2, ...);
+    my $kinesis = Paws->service('Kinesis');
+    $kinesis->StopStreamEncryption(
+      EncryptionType => 'NONE',
+      KeyId          => 'MyKeyId',
+      StreamName     => 'MyStreamName',
+
+    );
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/kinesis/StopStreamEncryption>
 
 =head1 ATTRIBUTES
 
 
 =head2 B<REQUIRED> EncryptionType => Str
 
-The encryption type. This parameter can be one of the following values:
-
-=over
-
-=item *
-
-C<NONE>: Not valid for this operation. An C<InvalidOperationException>
-will be thrown.
-
-=item *
-
-C<KMS>: Use server-side encryption on the records in the stream using a
-customer-managed KMS key.
-
-=back
-
+The encryption type. The only valid value is C<KMS>.
 
 Valid values are: C<"NONE">, C<"KMS">
 
 =head2 B<REQUIRED> KeyId => Str
 
-The GUID for the customer-managed key that was used for encryption.
+The GUID for the customer-managed AWS KMS key to use for encryption.
+This value can be a globally unique identifier, a fully specified
+Amazon Resource Name (ARN) to either an alias or a key, or an alias
+name prefixed by "alias/".You can also use a master key owned by
+Kinesis Data Streams by specifying the alias C<aws/kinesis>.
+
+=over
+
+=item *
+
+Key ARN example:
+C<arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012>
+
+=item *
+
+Alias ARN example:
+C<arn:aws:kms:us-east-1:123456789012:alias/MyAliasName>
+
+=item *
+
+Globally unique key ID example: C<12345678-1234-1234-1234-123456789012>
+
+=item *
+
+Alias name example: C<alias/MyAliasName>
+
+=item *
+
+Master key owned by Kinesis Data Streams: C<alias/aws/kinesis>
+
+=back
+
 
 
 
@@ -75,9 +98,9 @@ This class forms part of L<Paws>, documenting arguments for method StopStreamEnc
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

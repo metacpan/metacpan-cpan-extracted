@@ -33,7 +33,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::CloudFormat
 =head1 DESCRIPTION
 
 A rollback trigger AWS CloudFormation monitors during creation and
-updating of stacks. If any of the alarms you specify goes to ALERT
+updating of stacks. If any of the alarms you specify goes to ALARM
 state during the stack operation or within the specified monitoring
 period afterwards, CloudFormation rolls back the entire stack
 operation.
@@ -45,11 +45,16 @@ operation.
 
   The Amazon Resource Name (ARN) of the rollback trigger.
 
+If a specified trigger is missing, the entire stack operation fails and
+is rolled back.
+
 
 =head2 B<REQUIRED> Type => Str
 
   The resource type of the rollback trigger. Currently,
-AWS::CloudWatch::Alarm is the only supported resource type.
+AWS::CloudWatch::Alarm
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cw-alarm.html)
+is the only supported resource type.
 
 
 
@@ -59,9 +64,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::CloudForm
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

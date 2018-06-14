@@ -6,6 +6,7 @@ package Paws::DynamoDB::CreateTable;
   has KeySchema => (is => 'ro', isa => 'ArrayRef[Paws::DynamoDB::KeySchemaElement]', required => 1);
   has LocalSecondaryIndexes => (is => 'ro', isa => 'ArrayRef[Paws::DynamoDB::LocalSecondaryIndex]');
   has ProvisionedThroughput => (is => 'ro', isa => 'Paws::DynamoDB::ProvisionedThroughput', required => 1);
+  has SSESpecification => (is => 'ro', isa => 'Paws::DynamoDB::SSESpecification');
   has StreamSpecification => (is => 'ro', isa => 'Paws::DynamoDB::StreamSpecification');
   has TableName => (is => 'ro', isa => 'Str', required => 1);
 
@@ -20,21 +21,62 @@ package Paws::DynamoDB::CreateTable;
 
 =head1 NAME
 
-Paws::DynamoDB::CreateTable - Arguments for method CreateTable on Paws::DynamoDB
+Paws::DynamoDB::CreateTable - Arguments for method CreateTable on L<Paws::DynamoDB>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateTable on the 
-Amazon DynamoDB service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateTable on the
+L<Amazon DynamoDB|Paws::DynamoDB> service. Use the attributes of this class
 as arguments to method CreateTable.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateTable.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateTable(Att1 => $value1, Att2 => $value2, ...);
+    my $dynamodb = Paws->service('DynamoDB');
+    # To create a table
+    # This example creates a table named Music.
+    my $CreateTableOutput = $dynamodb->CreateTable(
+      {
+        'TableName'             => 'Music',
+        'ProvisionedThroughput' => {
+          'WriteCapacityUnits' => 5,
+          'ReadCapacityUnits'  => 5
+        },
+        'KeySchema' => [
+
+          {
+            'AttributeName' => 'Artist',
+            'KeyType'       => 'HASH'
+          },
+
+          {
+            'KeyType'       => 'RANGE',
+            'AttributeName' => 'SongTitle'
+          }
+        ],
+        'AttributeDefinitions' => [
+
+          {
+            'AttributeName' => 'Artist',
+            'AttributeType' => 'S'
+          },
+
+          {
+            'AttributeType' => 'S',
+            'AttributeName' => 'SongTitle'
+          }
+        ]
+      }
+    );
+
+    # Results:
+    my $TableDescription = $CreateTableOutput->TableDescription;
+
+    # Returns a L<Paws::DynamoDB::CreateTableOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/dynamodb/CreateTable>
 
 =head1 ATTRIBUTES
 
@@ -119,8 +161,9 @@ global secondary index, consisting of read and write capacity units.
 
 Specifies the attributes that make up the primary key for a table or an
 index. The attributes in C<KeySchema> must also be defined in the
-C<AttributeDefinitions> array. For more information, see Data Model in
-the I<Amazon DynamoDB Developer Guide>.
+C<AttributeDefinitions> array. For more information, see Data Model
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DataModel.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 Each C<KeySchemaElement> in the array is composed of:
 
@@ -166,8 +209,9 @@ provide exactly two elements, in this order: The first element must
 have a C<KeyType> of C<HASH>, and the second element must have a
 C<KeyType> of C<RANGE>.
 
-For more information, see Specifying the Primary Key in the I<Amazon
-DynamoDB Developer Guide>.
+For more information, see Specifying the Primary Key
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithTables.html#WorkingWithTables.primary.key)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
@@ -245,7 +289,15 @@ Represents the provisioned throughput settings for a specified table or
 index. The settings can be modified using the C<UpdateTable> operation.
 
 For current minimum and maximum provisioned throughput values, see
-Limits in the I<Amazon DynamoDB Developer Guide>.
+Limits
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Limits.html)
+in the I<Amazon DynamoDB Developer Guide>.
+
+
+
+=head2 SSESpecification => L<Paws::DynamoDB::SSESpecification>
+
+Represents the settings used to enable server-side encryption.
 
 
 
@@ -309,9 +361,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateTable i
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

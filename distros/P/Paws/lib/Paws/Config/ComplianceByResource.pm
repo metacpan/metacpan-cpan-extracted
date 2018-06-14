@@ -35,8 +35,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Config::Com
 
 Indicates whether an AWS resource that is evaluated according to one or
 more AWS Config rules is compliant. A resource is compliant if it
-complies with all of the rules that evaluate it, and it is noncompliant
-if it does not comply with one or more of these rules.
+complies with all of the rules that evaluate it. A resource is
+noncompliant if it does not comply with one or more of these rules.
 
 =head1 ATTRIBUTES
 
@@ -64,9 +64,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Config>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

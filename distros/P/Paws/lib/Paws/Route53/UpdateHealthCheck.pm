@@ -32,21 +32,58 @@ package Paws::Route53::UpdateHealthCheck;
 
 =head1 NAME
 
-Paws::Route53::UpdateHealthCheck - Arguments for method UpdateHealthCheck on Paws::Route53
+Paws::Route53::UpdateHealthCheck - Arguments for method UpdateHealthCheck on L<Paws::Route53>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateHealthCheck on the 
-Amazon Route 53 service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateHealthCheck on the
+L<Amazon Route 53|Paws::Route53> service. Use the attributes of this class
 as arguments to method UpdateHealthCheck.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateHealthCheck.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateHealthCheck(Att1 => $value1, Att2 => $value2, ...);
+    my $route53 = Paws->service('Route53');
+    my $UpdateHealthCheckResponse = $route53->UpdateHealthCheck(
+      HealthCheckId   => 'MyHealthCheckId',
+      AlarmIdentifier => {
+        Name   => 'MyAlarmName',    # min: 1, max: 256
+        Region => 'us-east-1'
+        , # values: us-east-1, us-east-2, us-west-1, us-west-2, ca-central-1, eu-central-1, eu-west-1, eu-west-2, eu-west-3, ap-south-1, ap-southeast-1, ap-southeast-2, ap-northeast-1, ap-northeast-2, ap-northeast-3, sa-east-1min: 1, max: 64
+
+      },    # OPTIONAL
+      ChildHealthChecks => [
+        'MyHealthCheckId', ...    # max: 64
+      ],                          # OPTIONAL
+      EnableSNI                    => 1,                              # OPTIONAL
+      FailureThreshold             => 1,                              # OPTIONAL
+      FullyQualifiedDomainName     => 'MyFullyQualifiedDomainName',   # OPTIONAL
+      HealthCheckVersion           => 1,                              # OPTIONAL
+      HealthThreshold              => 1,                              # OPTIONAL
+      IPAddress                    => 'MyIPAddress',                  # OPTIONAL
+      InsufficientDataHealthStatus => 'Healthy',                      # OPTIONAL
+      Inverted                     => 1,                              # OPTIONAL
+      Port                         => 1,                              # OPTIONAL
+      Regions                      => [
+        'us-east-1',
+        ... # values: us-east-1, us-west-1, us-west-2, eu-west-1, ap-southeast-1, ap-southeast-2, ap-northeast-1, sa-east-1min: 1, max: 64
+      ],    # OPTIONAL
+      ResetElements => [
+        'FullyQualifiedDomainName',
+        ... # values: FullyQualifiedDomainName, Regions, ResourcePath, ChildHealthChecksmin: 1, max: 64
+      ],    # OPTIONAL
+      ResourcePath => 'MyResourcePath',    # OPTIONAL
+      SearchString => 'MySearchString',    # OPTIONAL
+    );
+
+    # Results:
+    my $HealthCheck = $UpdateHealthCheckResponse->HealthCheck;
+
+    # Returns a L<Paws::Route53::UpdateHealthCheckResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/route53/UpdateHealthCheck>
 
 =head1 ATTRIBUTES
 
@@ -98,8 +135,9 @@ message.
 The number of consecutive health checks that an endpoint must pass or
 fail for Amazon Route 53 to change the current status of the endpoint
 from unhealthy to healthy or vice versa. For more information, see How
-Amazon Route 53 Determines Whether an Endpoint Is Healthy in the
-I<Amazon Route 53 Developer Guide>.
+Amazon Route 53 Determines Whether an Endpoint Is Healthy
+(http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-failover-determining-health-of-endpoints.html)
+in the I<Amazon Route 53 Developer Guide>.
 
 If you don't specify a value for C<FailureThreshold>, the default value
 is three health checks.
@@ -332,13 +370,15 @@ applicable documentation:
 
 =item *
 
-Linux: Elastic IP Addresses (EIP) in the I<Amazon EC2 User Guide for
-Linux Instances>
+Linux: Elastic IP Addresses (EIP)
+(http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html)
+in the I<Amazon EC2 User Guide for Linux Instances>
 
 =item *
 
-Windows: Elastic IP Addresses (EIP) in the I<Amazon EC2 User Guide for
-Windows Instances>
+Windows: Elastic IP Addresses (EIP)
+(http://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/elastic-ip-addresses-eip.html)
+in the I<Amazon EC2 User Guide for Windows Instances>
 
 =back
 
@@ -359,14 +399,17 @@ create health checks, see the following documents:
 =item *
 
 RFC 5735, Special Use IPv4 Addresses
+(https://tools.ietf.org/html/rfc5735)
 
 =item *
 
 RFC 6598, IANA-Reserved IPv4 Prefix for Shared Address Space
+(https://tools.ietf.org/html/rfc6598)
 
 =item *
 
 RFC 5156, Special-Use IPv6 Addresses
+(https://tools.ietf.org/html/rfc5156)
 
 =back
 
@@ -390,9 +433,9 @@ endpoint from.
 
 =head2 ResetElements => ArrayRef[Str|Undef]
 
-A complex type that contains one C<ResetElement> element for each
-element that you want to reset to the default value. Valid values for
-C<ResetElement> include the following:
+A complex type that contains one C<ResettableElementName> element for
+each element that you want to reset to the default value. Valid values
+for C<ResettableElementName> include the following:
 
 =over
 
@@ -449,9 +492,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateHealthC
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

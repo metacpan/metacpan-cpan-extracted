@@ -1,13 +1,13 @@
 ---
 abstract: 'Perl extension for command-line and CGI argument parsing.'
 author:
-  - 'Luke Ross <lross@>'
+  - 'Luke Ross <luke@lukeross.name>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,5 +19,5 @@ no_index:
     - inc
 requires:
   CGI: '0'
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

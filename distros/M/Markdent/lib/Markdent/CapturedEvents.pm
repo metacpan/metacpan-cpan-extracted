@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Markdent::Types;
 use Params::ValidationCompiler qw( validation_for );
@@ -17,7 +17,7 @@ has _events => (
     is       => 'ro',
     isa      => t( 'ArrayRef', of => t('EventObject') ),
     init_arg => 'events',
-    default => sub { [] },
+    default  => sub { [] },
 );
 
 sub events {
@@ -34,7 +34,7 @@ sub events {
         my $self   = shift;
         my @events = $validator->(@_);
 
-        push @{ $self->_events() }, @_;
+        push @{ $self->_events() }, @events;
     }
 }
 
@@ -69,7 +69,7 @@ Markdent::CapturedEvents - Represents a series of captured events
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 DESCRIPTION
 
@@ -101,7 +101,7 @@ will replay all the captured events to that handler.
 
 See L<Markdent> for bug reporting details.
 
-Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Markdent> or via email to L<bug-markdent@rt.cpan.org|mailto:bug-markdent@rt.cpan.org>.
+Bugs may be submitted at L<https://github.com/houseabsolute/Markdent/issues>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 

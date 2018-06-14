@@ -1,7 +1,7 @@
 package Finance::GDAX::Lite;
 
-our $DATE = '2018-02-14'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-06-11'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -122,7 +122,12 @@ sub _request {
 
     log_trace("API response [%s]: %s", $time, $res->{content});
 
-    [$res->{status}, $res->{reason}, $res->{content}];
+    my $reason = $res->{reason};
+    if ($res->{status} != 200 &&
+            ref($res->{content}) eq 'HASH' && $res->{content}{message}) {
+        $reason .= ": $res->{content}{message}";
+    }
+    [$res->{status}, $reason, $res->{content}];
 }
 
 sub public_request {
@@ -150,7 +155,7 @@ Finance::GDAX::Lite - Client API library for GDAX (lite edition)
 
 =head1 VERSION
 
-This document describes version 0.001 of Finance::GDAX::Lite (from Perl distribution Finance-GDAX-Lite), released on 2018-02-14.
+This document describes version 0.002 of Finance::GDAX::Lite (from Perl distribution Finance-GDAX-Lite), released on 2018-06-11.
 
 =head1 SYNOPSIS
 
@@ -201,9 +206,9 @@ This document describes version 0.001 of Finance::GDAX::Lite (from Perl distribu
 =head1 DESCRIPTION
 
 L<https://gdax.com> is a US cryptocurrency exchange. This module provides a Perl
-wrapper for its API. This module is an alternative to L<Finance::GDAX::API> and
-is more lightweight/barebones (no objects, Moose, etc). Please peruse the GDAX
-API reference to see which API endpoints are available.
+wrapper for GDAX's API. This module is an alternative to L<Finance::GDAX::API>
+and is more lightweight/barebones (no entity objects, Moose, etc). Please peruse
+the GDAX API reference to see which API endpoints are available.
 
 =head1 METHODS
 

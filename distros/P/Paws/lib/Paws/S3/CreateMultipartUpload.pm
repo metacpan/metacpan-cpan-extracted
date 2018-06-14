@@ -39,21 +39,63 @@ package Paws::S3::CreateMultipartUpload;
 
 =head1 NAME
 
-Paws::S3::CreateMultipartUpload - Arguments for method CreateMultipartUpload on Paws::S3
+Paws::S3::CreateMultipartUpload - Arguments for method CreateMultipartUpload on L<Paws::S3>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateMultipartUpload on the 
-Amazon Simple Storage Service service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateMultipartUpload on the
+L<Amazon Simple Storage Service|Paws::S3> service. Use the attributes of this class
 as arguments to method CreateMultipartUpload.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateMultipartUpload.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateMultipartUpload(Att1 => $value1, Att2 => $value2, ...);
+    my $s3 = Paws->service('S3');
+    my $CreateMultipartUploadOutput = $s3->CreateMultipartUpload(
+      Bucket             => 'MyBucketName',
+      Key                => 'MyObjectKey',
+      ACL                => 'private',                 # OPTIONAL
+      CacheControl       => 'MyCacheControl',          # OPTIONAL
+      ContentDisposition => 'MyContentDisposition',    # OPTIONAL
+      ContentEncoding    => 'MyContentEncoding',       # OPTIONAL
+      ContentLanguage    => 'MyContentLanguage',       # OPTIONAL
+      ContentType        => 'MyContentType',           # OPTIONAL
+      Expires            => '1970-01-01T01:00:00',     # OPTIONAL
+      GrantFullControl   => 'MyGrantFullControl',      # OPTIONAL
+      GrantRead          => 'MyGrantRead',             # OPTIONAL
+      GrantReadACP       => 'MyGrantReadACP',          # OPTIONAL
+      GrantWriteACP      => 'MyGrantWriteACP',         # OPTIONAL
+      Metadata     => { 'MyMetadataKey' => 'MyMetadataValue', },    # OPTIONAL
+      RequestPayer => 'requester',                                  # OPTIONAL
+      SSECustomerAlgorithm    => 'MySSECustomerAlgorithm',          # OPTIONAL
+      SSECustomerKey          => 'MySSECustomerKey',                # OPTIONAL
+      SSECustomerKeyMD5       => 'MySSECustomerKeyMD5',             # OPTIONAL
+      SSEKMSKeyId             => 'MySSEKMSKeyId',                   # OPTIONAL
+      ServerSideEncryption    => 'AES256',                          # OPTIONAL
+      StorageClass            => 'STANDARD',                        # OPTIONAL
+      Tagging                 => 'MyTaggingHeader',                 # OPTIONAL
+      WebsiteRedirectLocation => 'MyWebsiteRedirectLocation',       # OPTIONAL
+    );
+
+    # Results:
+    my $AbortRuleId = $CreateMultipartUploadOutput->AbortRuleId;
+    my $Bucket      = $CreateMultipartUploadOutput->Bucket;
+    my $Key         = $CreateMultipartUploadOutput->Key;
+    my $SSEKMSKeyId = $CreateMultipartUploadOutput->SSEKMSKeyId;
+    my $SSECustomerAlgorithm =
+      $CreateMultipartUploadOutput->SSECustomerAlgorithm;
+    my $SSECustomerKeyMD5 = $CreateMultipartUploadOutput->SSECustomerKeyMD5;
+    my $AbortDate         = $CreateMultipartUploadOutput->AbortDate;
+    my $RequestCharged    = $CreateMultipartUploadOutput->RequestCharged;
+    my $ServerSideEncryption =
+      $CreateMultipartUploadOutput->ServerSideEncryption;
+    my $UploadId = $CreateMultipartUploadOutput->UploadId;
+
+    # Returns a L<Paws::S3::CreateMultipartUploadOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/s3/CreateMultipartUpload>
 
 =head1 ATTRIBUTES
 
@@ -197,7 +239,7 @@ http://docs.aws.amazon.com/AmazonS3/latest/dev/UsingAWSSDK.html#specify-signatur
 
 The type of storage to use for the object. Defaults to 'STANDARD'.
 
-Valid values are: C<"STANDARD">, C<"REDUCED_REDUNDANCY">, C<"STANDARD_IA">
+Valid values are: C<"STANDARD">, C<"REDUCED_REDUNDANCY">, C<"STANDARD_IA">, C<"ONEZONE_IA">
 
 =head2 Tagging => Str
 
@@ -221,9 +263,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateMultipa
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

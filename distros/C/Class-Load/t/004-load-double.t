@@ -8,7 +8,7 @@ use Test::Fatal;
 
 # This test does 2 things.
 # Firstly, confirm that on 5.8, load_class will
-# still throw an exception , even if its been loaded before:
+# still throw an exception, even if it's been loaded before:
 #
 #    eval { require Foo; }; require Foo; # doesn't error on 5.8
 #

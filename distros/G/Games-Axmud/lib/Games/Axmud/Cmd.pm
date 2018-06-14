@@ -611,7 +611,7 @@
         $session->writeText('Testing ' . $axmud::SCRIPT . ' quick help...');
 
         # Load the quick help file
-        $file = $axmud::SHARE_DIR . '/../README';
+        $file = $axmud::SHARE_DIR . '/help/quick/quickhelp';
         if (! (-e $file)) {
 
             $session->writeText('   Missing quick help file');
@@ -4412,7 +4412,7 @@
         }
 
         # Load the quick help file
-        $file = $axmud::SHARE_DIR . '/../README';
+        $file = $axmud::SHARE_DIR . '/help/quick/quickhelp';
         if (! (-e $file)) {
 
             return $self->error(
@@ -6153,9 +6153,13 @@
             return $self->improper($session, $inputString);
         }
 
-        # Check that we don't already have too many sessions open
-        if ($axmud::BLIND_MODE_FLAG) {
-
+        # Check that we don't already have too many sessions open. If the current session is not
+        #   connected to a world, then the call to GA::Client->startSession will terminate that
+        #   session before creating a new one, so that's ok
+        if (
+            $axmud::BLIND_MODE_FLAG
+            && ($session->status eq 'connecting' || $session->status eq 'connected')
+        ) {
             return $self->error(
                 $session, $inputString,
                 'Can\'t open multiple sessions when ' . $axmud::SCRIPT . ' is running in \'blind\''
@@ -6174,7 +6178,13 @@
         # ;cn
         if (! $world) {
 
-            # Check that the Connections window isn't already open
+            # In blind mode, use the usual dialogue windows
+            if ($axmud::BLIND_MODE_FLAG) {
+
+                return $axmud::CLIENT->connectBlind();
+            }
+
+            # Otherwise, check that the Connections window isn't already open
             if ($axmud::CLIENT->connectWin) {
 
                 # Window already open; draw attention to the fact by presenting it
@@ -6230,7 +6240,7 @@
             # Get the world's connection details
             ($host, $port, $char, $pass, $account) = $worldObj->getConnectDetails($char);
 
-            # Start a new GA::Session in a new window tab
+            # Start a new GA::Session in a new 'main' window tab
             if (
                 ! $axmud::CLIENT->startSession(
                     $world,
@@ -6340,7 +6350,7 @@
         # If the user is currently connected to a world, prompt before reconnecting (this only
         #   happens with ';reconnect' and ';xconnect'; with commands like ';quit', the disconnection
         #   happens right away)
-        if ($session->status eq 'connected') {
+        if ($session->status eq 'connecting' || $session->status eq 'connected') {
 
             if (! $offlineFlag) {
                 $msg = 'Are you sure you want to reconnect?',
@@ -6358,10 +6368,14 @@
 
             if ($choice ne 'yes') {
 
-                return $self->complete(
-                    $session, $standardCmd,
-                    'Reconnection abandoned',
-                );
+                return $self->complete($session, $standardCmd, 'Reconnection abandoned');
+
+            } else {
+
+                # Terminate the connection
+                $session->doDisconnect(TRUE);
+                # React to the disconnection, as if it had been initiated by the host
+                $session->reactDisconnect(TRUE);
             }
         }
 
@@ -6374,7 +6388,7 @@
         # Get the current world's connection details
         ($host, $port, $char, $pass, $account) = $session->currentWorld->getConnectDetails($char);
 
-        # Start a new GA::Session, using the existing $session's 'main' window tab
+        # Start a new GA::Session in a new 'main' window tab
         if (
             ! $axmud::CLIENT->startSession(
                 $session->currentWorld->name,
@@ -6480,7 +6494,7 @@
         # If the user is currently connected to a world, prompt before reconnecting (this only
         #   happens with ';reconnect' and ';xconnect'; with commands like ';quit', the disconnection
         #   happens right away)
-        if ($session->status eq 'connected') {
+        if ($session->status eq 'connecting' || $session->status eq 'connected') {
 
             if (! $offlineFlag) {
                 $msg = 'Are you sure you want to reconnect?',
@@ -6502,6 +6516,15 @@
                     $session, $standardCmd,
                     'Reconnection abandoned',
                 );
+
+            } else {
+
+                # Prevent files for this session from being saved
+                $session->set_disconnectNoSaveFlag(TRUE);
+                # Terminate the connection
+                $session->doDisconnect(TRUE);
+                # React to the disconnection, as if it had been initiated by the host
+                $session->reactDisconnect(TRUE);
             }
         }
 
@@ -6514,10 +6537,7 @@
         # Get the current world's connection details
         ($host, $port, $char, $pass, $account) = $session->currentWorld->getConnectDetails($char);
 
-        # Prevent files for this session from being saved
-        $session->set_disconnectNoSaveFlag(TRUE);
-
-        # Start a new GA::Session, using the existing $session's 'main' window tab
+        # Start a new GA::Session in a new 'main' window tab
         if (
             ! $axmud::CLIENT->startSession(
                 $session->currentWorld->name,
@@ -6603,9 +6623,13 @@
             return $self->improper($session, $inputString);
         }
 
-        # Check that we don't already have too many sessions open
-        if ($axmud::BLIND_MODE_FLAG) {
-
+        # Check that we don't already have too many sessions open. If the current session is not
+        #   connected to a world, then the call to GA::Client->startSession will terminate that
+        #   session before creating a new one, so that's ok
+        if (
+            $axmud::BLIND_MODE_FLAG
+            && ($session->status eq 'connecting' || $session->status eq 'connected')
+        ) {
             return $self->error(
                 $session, $inputString,
                 'Can\'t open multiple sessions when ' . $axmud::SCRIPT . ' is running in \'blind\''
@@ -6638,7 +6662,7 @@
             $port = undef;
         }
 
-        # Start a new GA::Session in a new window tab
+        # Start a new GA::Session in a new 'main' window tab
         if (
             ! $axmud::CLIENT->startSession(
                 $world,
@@ -6728,9 +6752,13 @@
             return $self->improper($session, $inputString);
         }
 
-        # Check that we don't already have too many sessions open
-        if ($axmud::BLIND_MODE_FLAG) {
-
+        # Check that we don't already have too many sessions open. If the current session is not
+        #   connected to a world, then the call to GA::Client->startSession will terminate that
+        #   session before creating a new one, so that's ok
+        if (
+            $axmud::BLIND_MODE_FLAG
+            && ($session->status eq 'connecting' || $session->status eq 'connected')
+        ) {
             return $self->error(
                 $session, $inputString,
                 'Can\'t open multiple sessions when ' . $axmud::SCRIPT . ' is running in \'blind\''
@@ -6763,7 +6791,7 @@
             $port = undef;
         }
 
-        # Start a new GA::Session in a new window tab
+        # Start a new GA::Session in a new 'main' window tab
         if (
             ! $axmud::CLIENT->startSession(
                 $world,
@@ -6853,9 +6881,13 @@
             return $self->improper($session, $inputString);
         }
 
-        # Check that we don't already have too many sessions open
-        if ($axmud::BLIND_MODE_FLAG) {
-
+        # Check that we don't already have too many sessions open. If the current session is not
+        #   connected to a world, then the call to GA::Client->startSession will terminate that
+        #   session before creating a new one, so that's ok
+        if (
+            $axmud::BLIND_MODE_FLAG
+            && ($session->status eq 'connecting' || $session->status eq 'connected')
+        ) {
             return $self->error(
                 $session, $inputString,
                 'Can\'t open multiple sessions when ' . $axmud::SCRIPT . ' is running in \'blind\''
@@ -6888,7 +6920,7 @@
             $port = undef;
         }
 
-        # Start a new GA::Session in a new window tab
+        # Start a new GA::Session in a new 'main' window tab
         if (
             ! $axmud::CLIENT->startSession(
                 $world,
@@ -15005,7 +15037,7 @@
             $switch, $forceFlag, $allSessionFlag, $configFlag, $allProfFlag, $tasksFlag,
             $scriptsFlag, $contactsFlag, $keycodesFlag, $dictsFlag, $toolbarFlag, $userCmdFlag,
             $zonemapsFlag, $winmapsFlag, $ttsFlag, $currentWorldFlag, $otherWorldFlag,
-            $worldNoModelFlag, $modelFlag, $count, $errorCount,
+            $worldNoModelFlag, $modelFlag, $count, $errorCount, $saveMsg,
             @otherWorldList,
             %fileObjHash, %profHash, %worldHash, %otherHash,
         );
@@ -15418,7 +15450,14 @@
         $errorCount = 0;
         # For large files (e.g. world models containing tens of thousands of rooms), we need to
         #   display an initial message to explain the pause
-        $session->writeText('Saving file(s)...');
+        # However, in blind mode don't display a message at all; speech engine struggle to read
+        #   'file(s)' correctly, and those users are probably not using the automapper anyway, so
+        #   file saves will be more or less instantaneous
+        if (! $axmud::BLIND_MODE_FLAG) {
+
+            $session->writeText('Saving file(s)...');
+        }
+
         $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->do');
 
         # (1) 'config'
@@ -15514,30 +15553,33 @@
                     # Save modified files in all sessions, except this one
                     $axmud::CLIENT->broadcastInstruct(';save', $session);
 
-                    return $self->complete(
-                        $session, $standardCmd,
-                        'Files saved: ' . $count . ', errors: ' . $errorCount . ' (also saved files'
-                        . ' in other sessions)',
-                    );
+                    $saveMsg = 'Files saved: ' . $count . ', errors: ' . $errorCount
+                                    . ' (also saved files in other sessions)';
 
                 } else {
 
                     # Force-save files in all sessions, except this one
                     $axmud::CLIENT->broadcastInstruct(';save -f', $session);
 
-                    return $self->complete(
-                        $session, $standardCmd,
-                        'Files saved: ' . $count . ', errors: ' . $errorCount . ' (also force-saved'
-                        . ' files in other sessions)',
-                    );
+                    $saveMsg = 'Files saved: ' . $count . ', errors: ' . $errorCount
+                                . ' (also force-saved files in other sessions)';
                 }
 
             } else {
 
-                return $self->complete(
-                    $session, $standardCmd,
-                    'Files saved: ' . $count . ', errors: ' . $errorCount,
-                );
+                $saveMsg = 'Files saved: ' . $count . ', errors: ' . $errorCount;
+            }
+
+            if (! $axmud::BLIND_MODE_FLAG) {
+
+                return $self->complete($session, $standardCmd, $saveMsg);
+
+            } else {
+
+                # The success message appears whenever a blind user stops a session, and they
+                #   probably don't care how many files have been saved, so just confirm that they
+                #   have been saved
+                return $self->complete($session, $standardCmd, 'Files saved');
             }
         }
     }
@@ -22313,17 +22355,6 @@
         # (For the benefit of visually-impaired users, don't check for improper arguments; ignore
         #   everything after the expected arguments)
 
-        # TTS not implemented on MSWin yet
-        if ($^O eq 'MSWin32') {
-
-            return $self->complete(
-                $session, $standardCmd,
-                'Built-in text-to-speech capabilities haven\'t been implemented on Microsoft'
-                . ' Windows systems yet (but you can still use your screenreader with its'
-                . ' default settings)',
-            );
-        }
-
         # ;tts
         if (! @args) {
 
@@ -22337,7 +22368,7 @@
                 $string = 'no';
             }
 
-            $session->writeText('   TTS enabled for all users: ' . $string);
+            $session->writeText('   TTS enabled for all users:  ' . $string);
 
             if ($axmud::CLIENT->systemAllowTTSFlag) {
                 $string = 'yes';
@@ -22345,14 +22376,19 @@
                 $string = 'no';
             }
 
-            $session->writeText('   TTS enabled at the moment: ' . $string);
+            $session->writeText('   TTS enabled at the moment:  ' . $string);
 
             $session->writeText(
                 '   Supported TTS engines:      ' . join(', ', $axmud::CLIENT->constTTSList),
             );
 
             $session->writeText(
-                '   Available TTS configurations:     '
+                '   OS-compatible TTS engines:  ' . join(', ', $axmud::CLIENT->constTTSCompatList),
+            );
+
+            $session->writeText('   Available TTS configurations:');
+            $session->writeText(
+                '      '
                 . join(', ', sort {lc($a) cmp lc($b)} ($axmud::CLIENT->ivKeys('ttsObjHash'))),
             );
 
@@ -22372,7 +22408,7 @@
             );
 
             $session->writeText(
-                '   Convert system errors:     '
+                '   Convert system errors:      '
                 . $self->convertFlag($axmud::CLIENT->ttsSystemErrorFlag),
             );
 
@@ -22397,27 +22433,52 @@
         # ;tts -o
         } elsif ($args[0] eq 'on' || $args[0] eq '-o') {
 
-            if ($axmud::CLIENT->customAllowTTSFlag) {
+            if (! $axmud::BLIND_MODE_FLAG) {
 
-                return $self->complete(
-                    $session, $standardCmd,
-                    'Text-to-speech is already turned on',
-                );
+                if ($axmud::CLIENT->customAllowTTSFlag) {
+
+                    return $self->complete(
+                        $session, $standardCmd,
+                        'Text-to-speech is already turned on',
+                    );
+
+                } else {
+
+                    $axmud::CLIENT->set_customAllowTTSFlag(TRUE);
+
+                    return $self->complete(
+                        $session, $standardCmd,
+                        'Text-to-speech has been turned on',
+                    );
+                }
 
             } else {
 
-                $axmud::CLIENT->set_customAllowTTSFlag(TRUE);
+                if ($axmud::CLIENT->customAllowTTSFlag) {
 
-                return $self->complete($session, $standardCmd, 'Text-to-speech has been turned on');
+                    return $self->complete(
+                        $session, $standardCmd,
+                        'Text-to-speech is already turned on for all users',
+                    );
+
+                } else {
+
+                    $axmud::CLIENT->set_customAllowTTSFlag(TRUE);
+
+                    return $self->complete(
+                        $session, $standardCmd,
+                        'Text-to-speech has been turned on for all users',
+                    );
+                }
             }
 
         # ;tts off
         # ;tts -f
         } elsif ($args[0] eq 'off' || $args[0] eq '-f') {
 
-            if (! $axmud::CLIENT->customAllowTTSFlag) {
+            if (! $axmud::BLIND_MODE_FLAG) {
 
-                if (! $axmud::CLIENT->systemAllowTTSFlag) {
+                if (! $axmud::CLIENT->customAllowTTSFlag) {
 
                     return $self->complete(
                         $session, $standardCmd,
@@ -22426,29 +22487,28 @@
 
                 } else {
 
+                    $axmud::CLIENT->set_customAllowTTSFlag(FALSE);
+
+                    return $self->complete(
+                        $session, $standardCmd,
+                        'Text-to-speech has been turned off',
+                    );
+                }
+
+            } else {
+
+                if (! $axmud::CLIENT->customAllowTTSFlag) {
+
                     return $self->complete(
                         $session, $standardCmd,
                         'Text-to-speech for all users is already turned off, but text-to-speech'
                         . ' is still available because ' . $axmud::SCRIPT . ' is running in'
                         . ' \'blind\' mode',
                     );
-                }
-
-            } else {
-
-                # Unusual step: display the confirmation before setting the IV, so the user hears it
-                if (! $axmud::CLIENT->systemAllowTTSFlag) {
-
-                    $self->complete(
-                        $session, $standardCmd,
-                        'Text-to-speech has been turned off',
-                    );
-
-                    $axmud::CLIENT->set_customAllowTTSFlag(FALSE);
-
-                    return 1;
 
                 } else {
+
+                    $axmud::CLIENT->set_customAllowTTSFlag(FALSE);
 
                     return $self->complete(
                         $session, $standardCmd,
@@ -22464,27 +22524,42 @@
         } elsif ($args[0] eq 'toggle' || $args[0] eq '-g') {
 
             # (Used by the 'main' window's toolbar icon)
-            if (! $axmud::CLIENT->customAllowTTSFlag) {
 
-                $axmud::CLIENT->set_customAllowTTSFlag(TRUE);
+            if (! $axmud::BLIND_MODE_FLAG) {
 
-                return $self->complete($session, $standardCmd, 'Text-to-speech has been turned on');
+                if (! $axmud::CLIENT->customAllowTTSFlag) {
 
-            } else {
+                    $axmud::CLIENT->set_customAllowTTSFlag(TRUE);
 
-                # Unusual step: display the confirmation before setting the IV, so the user hears it
-                if (! $axmud::BLIND_MODE_FLAG) {
-
-                    $self->complete(
+                    return $self->complete(
                         $session, $standardCmd,
-                        'Text-to-speech has been turned off',
+                        'Text-to-speech has been turned on',
                     );
+
+                } else {
 
                     $axmud::CLIENT->set_customAllowTTSFlag(FALSE);
 
-                    return 1;
+                    return $self->complete(
+                        $session, $standardCmd,
+                        'Text-to-speech has been turned off',
+                    );
+                }
+
+            } else {
+
+                if (! $axmud::CLIENT->customAllowTTSFlag) {
+
+                    $axmud::CLIENT->set_customAllowTTSFlag(TRUE);
+
+                    return $self->complete(
+                        $session, $standardCmd,
+                        'Text-to-speech has been turned on for all users',
+                    );
 
                 } else {
+
+                    $axmud::CLIENT->set_customAllowTTSFlag(FALSE);
 
                     return $self->complete(
                         $session, $standardCmd,
@@ -24399,7 +24474,7 @@
         my $self = Games::Axmud::Generic::Cmd->new('modifyconfig', TRUE, FALSE);
         if (! $self) {return undef}
 
-        $self->{defaultUserCmdList} = ['mcf', 'modconfig', 'modifyconfig'];
+        $self->{defaultUserCmdList} = ['mcf', 'config', 'modconfig', 'modifyconfig'];
         $self->{userCmdList} = $self->{defaultUserCmdList};
         $self->{descrip} = 'Modifies text-to-speech configurations';
 
@@ -72667,7 +72742,7 @@
 
         # ;cmp <key> <command>
         # ;cmp <key>
-        } elsif ($args[0]) {
+        } else {
 
             # Get the Axmud standard keycode
             $key = shift @args;

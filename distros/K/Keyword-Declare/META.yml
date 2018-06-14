@@ -3,12 +3,12 @@ abstract: 'Declare new Perl keywords...via a keyword...named C<keyword>'
 author:
   - 'Damian Conway <DCONWAY@CPAN.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '7'
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '7'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,8 +21,8 @@ no_index:
     - demo
     - dlib
 requires:
-  Keyword::Simple: '0'
+  Keyword::Simple: '>= 0.03, != 0.04'
   List::Util: '1.45'
-  PPR: '0.000005'
+  PPR: '0.000015'
   perl: '5.012'
-version: '0.001006'
+version: '0.001009'

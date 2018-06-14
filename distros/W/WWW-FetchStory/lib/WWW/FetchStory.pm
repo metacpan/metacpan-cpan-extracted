@@ -2,14 +2,14 @@ use strict;
 use warnings;
 
 package WWW::FetchStory;
-$WWW::FetchStory::VERSION = '0.1902';
+$WWW::FetchStory::VERSION = '0.2002';
 =head1 NAME
 
 WWW::FetchStory - Fetch a story from a fiction website
 
 =head1 VERSION
 
-version 0.1902
+version 0.2002
 
 =head1 SYNOPSIS
 

@@ -60,22 +60,23 @@ Metrics for a specified crawler.
 
 =head2 StillEstimating => Bool
 
-  True if the crawler is estimating its
+  True if the crawler is still estimating how long it will take to
+complete this run.
 
 
 =head2 TablesCreated => Int
 
-  A list of the tables created by this crawler.
+  The number of tables created by this crawler.
 
 
 =head2 TablesDeleted => Int
 
-  A list of the tables deleted by this crawler.
+  The number of tables deleted by this crawler.
 
 
 =head2 TablesUpdated => Int
 
-  A list of the tables created by this crawler.
+  The number of tables updated by this crawler.
 
 
 =head2 TimeLeftSeconds => Num
@@ -90,9 +91,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Glue>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

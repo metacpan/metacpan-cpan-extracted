@@ -1,5 +1,10 @@
 Revision history for Config-AutoConf
 
+0.317	2018-06-08
+	- fix pkg_config_package_flags a bit more
+	- improve documentation of pkg_config_package_flags (fix
+	  RT#125274 - thanks to Petr Písař <ppisar@redhat.com>)
+
 0.316	2018-04-12
 	- deal with pkg-config errors
 	- allow more search_lib others

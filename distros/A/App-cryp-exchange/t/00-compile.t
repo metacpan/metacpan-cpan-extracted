@@ -6,9 +6,19 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 15 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'App/cryp/Cmd/Exchange/accounts.pm',
+    'App/cryp/Cmd/Exchange/balance.pm',
+    'App/cryp/Cmd/Exchange/cancel_order.pm',
+    'App/cryp/Cmd/Exchange/create_limit_order.pm',
+    'App/cryp/Cmd/Exchange/exchanges.pm',
+    'App/cryp/Cmd/Exchange/get_order.pm',
+    'App/cryp/Cmd/Exchange/open_orders.pm',
+    'App/cryp/Cmd/Exchange/orderbook.pm',
+    'App/cryp/Cmd/Exchange/pairs.pm',
+    'App/cryp/Cmd/Exchange/ticker.pm',
     'App/cryp/Exchange/gdax.pm',
     'App/cryp/Exchange/indodax.pm',
     'App/cryp/Role/Exchange.pm',

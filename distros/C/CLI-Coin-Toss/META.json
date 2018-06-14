@@ -1,0 +1,42 @@
+{
+   "abstract" : "Several random number generators by CLI (Command Line Interface) are provided.",
+   "author" : [
+      "\"Toshiyuki Shimono\" <bin4tsv@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CLI-Coin-Toss",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "CLI::Coin::Toss" : {
+         "file" : "lib/CLI/Coin/Toss.pm",
+         "version" : "0.33"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ]
+   },
+   "version" : "0.33",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

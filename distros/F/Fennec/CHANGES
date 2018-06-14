@@ -1,3 +1,9 @@
+v2.018 - Jun 08 2018
+    * Doc fixes, deprecate in favor of Test2::Suite
+
+v2.017 - ?
+    ?
+
 v2.016 - Mar 18 2014
     * Bugfix for 2.015 issue
 

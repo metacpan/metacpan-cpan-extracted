@@ -1,5 +1,5 @@
 ---
-abstract: 'Interact with cryptoexchanges'
+abstract: 'Interact with cryptoexchanges using a common interface'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
@@ -17,19 +17,23 @@ meta-spec:
   version: '1.4'
 name: App-cryp-exchange
 requires:
-  App::indodax: '0'
-  Complete::Util: '0.57'
+  Data::Sah::Coerce::perl::float::str_num_en: '0'
+  Data::Sah::Coerce::perl::str::str_normalize_cryptoexchange_account: '0.005'
   Data::Sah::Compiler::perl::TH::bool: '0'
+  Data::Sah::Compiler::perl::TH::float: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
+  DateTime::Format::ISO8601: '0'
   Finance::GDAX::Lite: '0'
-  Finance::Indodax: '0'
+  Finance::Indodax: '0.011'
   Log::Log4perl::Appender::LogGer: '0'
   Log::Log4perl::Layout::SimpleLayout: '0'
   Log::ger: '0.023'
   PERLANCAR::Module::List: '0'
-  Perinci::CmdLine::cryp: '0.004'
+  POSIX: '0'
+  Perinci::CmdLine::cryp: '0.006'
   Role::Tiny: '0'
   Role::Tiny::With: '0'
+  Sah::Schema::cryptoexchange::account: '0'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -37,7 +41,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-cryp-exchange
   homepage: https://metacpan.org/release/App-cryp-exchange
   repository: git://github.com/perlancar/perl-App-cryp-exchange.git
-version: '0.005'
+version: '0.009'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -295,7 +299,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.13'
+      version: '0.142'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'

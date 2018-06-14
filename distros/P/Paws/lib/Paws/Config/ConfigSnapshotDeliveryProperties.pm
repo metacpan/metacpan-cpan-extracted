@@ -49,7 +49,7 @@ two values, depending on which is less frequent:
 The value for the C<deliveryFrequency> parameter within the delivery
 channel configuration, which sets how often AWS Config delivers
 configuration snapshots. This value also sets how often AWS Config
-invokes evaluations for Config rules.
+invokes evaluations for AWS Config rules.
 
 =item *
 
@@ -110,9 +110,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Config>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

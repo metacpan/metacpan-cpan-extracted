@@ -23,21 +23,53 @@ package Paws::CloudTrail::CreateTrail;
 
 =head1 NAME
 
-Paws::CloudTrail::CreateTrail - Arguments for method CreateTrail on Paws::CloudTrail
+Paws::CloudTrail::CreateTrail - Arguments for method CreateTrail on L<Paws::CloudTrail>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateTrail on the 
-AWS CloudTrail service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateTrail on the
+L<AWS CloudTrail|Paws::CloudTrail> service. Use the attributes of this class
 as arguments to method CreateTrail.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateTrail.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateTrail(Att1 => $value1, Att2 => $value2, ...);
+    my $cloudtrail = Paws->service('CloudTrail');
+    my $CreateTrailResponse = $cloudtrail->CreateTrail(
+      Name                       => 'MyString',
+      S3BucketName               => 'MyString',
+      CloudWatchLogsLogGroupArn  => 'MyString',    # OPTIONAL
+      CloudWatchLogsRoleArn      => 'MyString',    # OPTIONAL
+      EnableLogFileValidation    => 1,             # OPTIONAL
+      IncludeGlobalServiceEvents => 1,             # OPTIONAL
+      IsMultiRegionTrail         => 1,             # OPTIONAL
+      KmsKeyId                   => 'MyString',    # OPTIONAL
+      S3KeyPrefix                => 'MyString',    # OPTIONAL
+      SnsTopicName               => 'MyString',    # OPTIONAL
+    );
+
+    # Results:
+    my $IncludeGlobalServiceEvents =
+      $CreateTrailResponse->IncludeGlobalServiceEvents;
+    my $CloudWatchLogsLogGroupArn =
+      $CreateTrailResponse->CloudWatchLogsLogGroupArn;
+    my $CloudWatchLogsRoleArn = $CreateTrailResponse->CloudWatchLogsRoleArn;
+    my $S3KeyPrefix           = $CreateTrailResponse->S3KeyPrefix;
+    my $Name                  = $CreateTrailResponse->Name;
+    my $SnsTopicName          = $CreateTrailResponse->SnsTopicName;
+    my $SnsTopicARN           = $CreateTrailResponse->SnsTopicARN;
+    my $TrailARN              = $CreateTrailResponse->TrailARN;
+    my $S3BucketName          = $CreateTrailResponse->S3BucketName;
+    my $LogFileValidationEnabled =
+      $CreateTrailResponse->LogFileValidationEnabled;
+    my $KmsKeyId           = $CreateTrailResponse->KmsKeyId;
+    my $IsMultiRegionTrail = $CreateTrailResponse->IsMultiRegionTrail;
+
+    # Returns a L<Paws::CloudTrail::CreateTrailResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/cloudtrail/CreateTrail>
 
 =head1 ATTRIBUTES
 
@@ -158,7 +190,8 @@ Not be in IP address format (for example, 192.168.5.4)
 =head2 B<REQUIRED> S3BucketName => Str
 
 Specifies the name of the Amazon S3 bucket designated for publishing
-log files. See Amazon S3 Bucket Naming Requirements.
+log files. See Amazon S3 Bucket Naming Requirements
+(http://docs.aws.amazon.com/awscloudtrail/latest/userguide/create_trail_naming_policy.html).
 
 
 
@@ -166,8 +199,9 @@ log files. See Amazon S3 Bucket Naming Requirements.
 
 Specifies the Amazon S3 key prefix that comes after the name of the
 bucket you have designated for log file delivery. For more information,
-see Finding Your CloudTrail Log Files. The maximum length is 200
-characters.
+see Finding Your CloudTrail Log Files
+(http://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-find-log-files.html).
+The maximum length is 200 characters.
 
 
 
@@ -185,9 +219,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateTrail i
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

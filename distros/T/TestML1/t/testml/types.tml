@@ -1,0 +1,24 @@
+%TestML 0.1.0
+
+Plan = 11
+
+Label = 'Test $TestNumber'
+
+'Foo'.Type == 'Str'
+42.Type == 'Num'
+True.Type == 'Bool'
+List(1,2,3).Type == 'List'
+# [].Type == 'List'
+{}.Type == 'Func'
+(){}.Type == 'Func'
+
+s = 'Foo'
+s.Type == 'Str'
+n = 42
+n.Type == 'Num'
+b = False
+b.Type == 'Bool'
+l = List()
+l.Type == 'List'
+f = {}
+f.Type == 'Func'

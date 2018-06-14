@@ -37,15 +37,15 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Glue::GrokC
 
 =head1 DESCRIPTION
 
-A classifier that uses C<grok>.
+A classifier that uses C<grok> patterns.
 
 =head1 ATTRIBUTES
 
 
 =head2 B<REQUIRED> Classification => Str
 
-  The data form that the classifier matches, such as Twitter, JSON,
-Omniture Logs, and so forth.
+  An identifier of the data format that the classifier matches, such as
+Twitter, JSON, Omniture logs, and so on.
 
 
 =head2 CreationTime => Str
@@ -55,12 +55,16 @@ Omniture Logs, and so forth.
 
 =head2 CustomPatterns => Str
 
-  Custom grok patterns used by this classifier.
+  Optional custom grok patterns defined by this classifier. For more
+information, see custom patterns in Writing Custom Classifers
+(http://docs.aws.amazon.com/glue/latest/dg/custom-classifier.html).
 
 
 =head2 B<REQUIRED> GrokPattern => Str
 
-  The grok pattern used by this classifier.
+  The grok pattern applied to a data store by this classifier. For more
+information, see built-in patterns in Writing Custom Classifers
+(http://docs.aws.amazon.com/glue/latest/dg/custom-classifier.html).
 
 
 =head2 LastUpdated => Str
@@ -85,9 +89,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Glue>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

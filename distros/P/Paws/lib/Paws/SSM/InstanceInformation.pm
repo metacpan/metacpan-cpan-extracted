@@ -99,7 +99,10 @@ instances or managed instances.
 =head2 IsLatestVersion => Bool
 
   Indicates whether latest version of the SSM Agent is running on your
-instance.
+instance. Some older versions of Windows Server use the EC2Config
+service to process SSM requests. For this reason, this field does not
+indicate whether or not the latest version is installed on Windows
+managed instances.
 
 
 =head2 LastAssociationExecutionDate => Str
@@ -161,9 +164,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::SSM>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -1,46 +1,19 @@
 NAME
-    App::cryp::exchange - Interact with cryptoexchanges
+    App::cryp::exchange - Interact with cryptoexchanges using a common
+    interface
 
 VERSION
-    This document describes version 0.005 of App::cryp::exchange (from Perl
-    distribution App-cryp-exchange), released on 2018-06-08.
+    This document describes version 0.009 of App::cryp::exchange (from Perl
+    distribution App-cryp-exchange), released on 2018-06-13.
 
 SYNOPSIS
     Please see included script cryp-exchange.
 
 FUNCTIONS
-  get_order_book
+  accounts
     Usage:
 
-     get_order_book(%args) -> [status, msg, result, meta]
-
-    Get order book on an exchange.
-
-    This function is not exported.
-
-    Arguments ('*' denotes required arguments):
-
-    *   exchange* => *str*
-
-    *   pair* => *str*
-
-    *   type => *str*
-
-    Returns an enveloped result (an array).
-
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
-
-    Return value: (any)
-
-  list_accounts
-    Usage:
-
-     list_accounts(%args) -> [status, msg, result, meta]
+     accounts(%args) -> [status, msg, result, meta]
 
     List exchange accounts.
 
@@ -61,18 +34,18 @@ FUNCTIONS
 
     Return value: (any)
 
-  list_balances
+  balance
     Usage:
 
-     list_balances(%args) -> [status, msg, result, meta]
+     balance(%args) -> [status, msg, result, meta]
 
-    List account balances.
+    List account balance.
 
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
 
-    *   exchange* => *str*
+    *   account* => *cryptoexchange::account*
 
     Returns an enveloped result (an array).
 
@@ -85,10 +58,80 @@ FUNCTIONS
 
     Return value: (any)
 
-  list_exchanges
+  cancel_order
     Usage:
 
-     list_exchanges(%args) -> [status, msg, result, meta]
+     cancel_order(%args) -> [status, msg, result, meta]
+
+    Cancel an order.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   account* => *cryptoexchange::account*
+
+    *   order_id* => *str*
+
+    *   pair* => *str*
+
+    *   type* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  create_limit_order
+    Usage:
+
+     create_limit_order(%args) -> [status, msg, result, meta]
+
+    Create a limit order.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   account* => *cryptoexchange::account*
+
+    *   base_size => *float*
+
+        Order amount, denominated in base currency (first currency of the
+        pair).
+
+    *   pair* => *str*
+
+    *   price* => *float*
+
+    *   quote_size => *float*
+
+        Order amount, denominated in quote currency (second currency of the
+        pair).
+
+    *   type* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  exchanges
+    Usage:
+
+     exchanges(%args) -> [status, msg, result, meta]
 
     List supported exchanges.
 
@@ -109,10 +152,94 @@ FUNCTIONS
 
     Return value: (any)
 
-  list_pairs
+  get_order
     Usage:
 
-     list_pairs(%args) -> [status, msg, result, meta]
+     get_order(%args) -> [status, msg, result, meta]
+
+    Get information about an order.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   account* => *cryptoexchange::account*
+
+    *   order_id* => *str*
+
+    *   pair* => *str*
+
+    *   type* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  open_orders
+    Usage:
+
+     open_orders(%args) -> [status, msg, result, meta]
+
+    List open orders.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   account* => *cryptoexchange::account*
+
+    *   pair => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  orderbook
+    Usage:
+
+     orderbook(%args) -> [status, msg, result, meta]
+
+    Get order book on an exchange.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   account* => *cryptoexchange::account*
+
+    *   pair* => *str*
+
+    *   type => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  pairs
+    Usage:
+
+     pairs(%args) -> [status, msg, result, meta]
 
     List pairs supported by exchange.
 
@@ -120,11 +247,37 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   account* => *cryptoexchange::account*
+
     *   detail => *bool*
 
-    *   exchange* => *str*
-
     *   native => *bool*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  ticker
+    Usage:
+
+     ticker(%args) -> [status, msg, result, meta]
+
+    Get a pair's ticker (last 24h price & volume information).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   account* => *cryptoexchange::account*
+
+    *   pair* => *str*
 
     Returns an enveloped result (an array).
 

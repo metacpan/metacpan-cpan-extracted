@@ -18,29 +18,47 @@ package Paws::ApplicationAutoScaling::DescribeScalingActivities;
 
 =head1 NAME
 
-Paws::ApplicationAutoScaling::DescribeScalingActivities - Arguments for method DescribeScalingActivities on Paws::ApplicationAutoScaling
+Paws::ApplicationAutoScaling::DescribeScalingActivities - Arguments for method DescribeScalingActivities on L<Paws::ApplicationAutoScaling>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DescribeScalingActivities on the 
-Application Auto Scaling service. Use the attributes of this class
+This class represents the parameters used for calling the method DescribeScalingActivities on the
+L<Application Auto Scaling|Paws::ApplicationAutoScaling> service. Use the attributes of this class
 as arguments to method DescribeScalingActivities.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DescribeScalingActivities.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DescribeScalingActivities(Att1 => $value1, Att2 => $value2, ...);
+    my $autoscaling = Paws->service('ApplicationAutoScaling');
+    # To describe scaling activities for a scalable target
+    # This example describes the scaling activities for an Amazon ECS service
+    # called web-app that is running in the default cluster.
+    my $DescribeScalingActivitiesResponse =
+      $autoscaling->DescribeScalingActivities(
+      {
+        'ResourceId'        => 'service/default/web-app',
+        'ScalableDimension' => 'ecs:service:DesiredCount',
+        'ServiceNamespace'  => 'ecs'
+      }
+      );
+
+    # Results:
+    my $ScalingActivities =
+      $DescribeScalingActivitiesResponse->ScalingActivities;
+
+# Returns a L<Paws::ApplicationAutoScaling::DescribeScalingActivitiesResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/autoscaling/DescribeScalingActivities>
 
 =head1 ATTRIBUTES
 
 
 =head2 MaxResults => Int
 
-The maximum number of scalable target results. This value can be
-between 1 and 50. The default value is 50.
+The maximum number of scalable targets. This value can be between 1 and
+50. The default value is 50.
 
 If this parameter is used, the operation returns up to C<MaxResults>
 results at a time, along with a C<NextToken> value. To get the next set
@@ -98,6 +116,17 @@ DynamoDB global secondary index - The resource type is C<index> and the
 unique identifier is the resource ID. Example:
 C<table/my-table/index/my-table-index>.
 
+=item *
+
+Aurora DB cluster - The resource type is C<cluster> and the unique
+identifier is the cluster name. Example: C<cluster:my-db-cluster>.
+
+=item *
+
+Amazon SageMaker endpoint variants - The resource type is C<variant>
+and the unique identifier is the resource ID. Example:
+C<endpoint/my-end-point/variant/KMeansClustering>.
+
 =back
 
 
@@ -150,17 +179,29 @@ a DynamoDB global secondary index.
 C<dynamodb:index:WriteCapacityUnits> - The provisioned write capacity
 for a DynamoDB global secondary index.
 
+=item *
+
+C<rds:cluster:ReadReplicaCount> - The count of Aurora Replicas in an
+Aurora DB cluster. Available for Aurora MySQL-compatible edition.
+
+=item *
+
+C<sagemaker:variant:DesiredInstanceCount> - The number of EC2 instances
+for an Amazon SageMaker model endpoint variant.
+
 =back
 
 
-Valid values are: C<"ecs:service:DesiredCount">, C<"ec2:spot-fleet-request:TargetCapacity">, C<"elasticmapreduce:instancegroup:InstanceCount">, C<"appstream:fleet:DesiredCapacity">, C<"dynamodb:table:ReadCapacityUnits">, C<"dynamodb:table:WriteCapacityUnits">, C<"dynamodb:index:ReadCapacityUnits">, C<"dynamodb:index:WriteCapacityUnits">
+Valid values are: C<"ecs:service:DesiredCount">, C<"ec2:spot-fleet-request:TargetCapacity">, C<"elasticmapreduce:instancegroup:InstanceCount">, C<"appstream:fleet:DesiredCapacity">, C<"dynamodb:table:ReadCapacityUnits">, C<"dynamodb:table:WriteCapacityUnits">, C<"dynamodb:index:ReadCapacityUnits">, C<"dynamodb:index:WriteCapacityUnits">, C<"rds:cluster:ReadReplicaCount">, C<"sagemaker:variant:DesiredInstanceCount">
 
 =head2 B<REQUIRED> ServiceNamespace => Str
 
 The namespace of the AWS service. For more information, see AWS Service
-Namespaces in the I<Amazon Web Services General Reference>.
+Namespaces
+(http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#genref-aws-service-namespaces)
+in the I<Amazon Web Services General Reference>.
 
-Valid values are: C<"ecs">, C<"elasticmapreduce">, C<"ec2">, C<"appstream">, C<"dynamodb">
+Valid values are: C<"ecs">, C<"elasticmapreduce">, C<"ec2">, C<"appstream">, C<"dynamodb">, C<"rds">, C<"sagemaker">
 
 
 =head1 SEE ALSO
@@ -169,9 +210,9 @@ This class forms part of L<Paws>, documenting arguments for method DescribeScali
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

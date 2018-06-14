@@ -21,21 +21,44 @@ package Paws::SES::SendRawEmail;
 
 =head1 NAME
 
-Paws::SES::SendRawEmail - Arguments for method SendRawEmail on Paws::SES
+Paws::SES::SendRawEmail - Arguments for method SendRawEmail on L<Paws::SES>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method SendRawEmail on the 
-Amazon Simple Email Service service. Use the attributes of this class
+This class represents the parameters used for calling the method SendRawEmail on the
+L<Amazon Simple Email Service|Paws::SES> service. Use the attributes of this class
 as arguments to method SendRawEmail.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to SendRawEmail.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->SendRawEmail(Att1 => $value1, Att2 => $value2, ...);
+    my $email = Paws->service('SES');
+    # SendRawEmail
+    # The following example sends an email with an attachment:
+    my $SendRawEmailResponse = $email->SendRawEmail(
+      {
+        'Source'       => '',
+        'Destinations' => [
+
+        ],
+        'SourceArn'  => '',
+        'RawMessage' => {
+          'Data' =>
+'From: sender@example.com\nTo: recipient@example.com\nSubject: Test email (contains an attachment)\nMIME-Version: 1.0\nContent-type: Multipart/Mixed; boundary="NextPart"\n\n--NextPart\nContent-Type: text/plain\n\nThis is the message body.\n\n--NextPart\nContent-Type: text/plain;\nContent-Disposition: attachment; filename="attachment.txt"\n\nThis is the text in the attachment.\n\n--NextPart--'
+        },
+        'ReturnPathArn' => '',
+        'FromArn'       => ''
+      }
+    );
+
+    # Results:
+    my $MessageId = $SendRawEmailResponse->MessageId;
+
+    # Returns a L<Paws::SES::SendRawEmailResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/email/SendRawEmail>
 
 =head1 ATTRIBUTES
 
@@ -67,8 +90,8 @@ C<FromArn> parameter and the corresponding X-header, Amazon SES uses
 the value of the C<FromArn> parameter.
 
 For information about when to use this parameter, see the description
-of C<SendRawEmail> in this guide, or see the Amazon SES Developer
-Guide.
+of C<SendRawEmail> in this guide, or see the Amazon SES Developer Guide
+(http://docs.aws.amazon.com/ses/latest/DeveloperGuide/sending-authorization-delegate-sender-tasks-email.html).
 
 
 
@@ -94,7 +117,8 @@ Each part of a multipart MIME message must be formatted properly.
 =item *
 
 MIME content types must be among those supported by Amazon SES. For
-more information, go to the Amazon SES Developer Guide.
+more information, go to the Amazon SES Developer Guide
+(http://docs.aws.amazon.com/ses/latest/DeveloperGuide/mime-types.html).
 
 =item *
 
@@ -102,8 +126,9 @@ Must be base64-encoded.
 
 =item *
 
-Per RFC 5321, the maximum length of each line of text, including the
-E<lt>CRLFE<gt>, must not exceed 1,000 characters.
+Per RFC 5321 (https://tools.ietf.org/html/rfc5321#section-4.5.3.1.6),
+the maximum length of each line of text, including the E<lt>CRLFE<gt>,
+must not exceed 1,000 characters.
 
 =back
 
@@ -130,8 +155,8 @@ both the C<ReturnPathArn> parameter and the corresponding X-header,
 Amazon SES uses the value of the C<ReturnPathArn> parameter.
 
 For information about when to use this parameter, see the description
-of C<SendRawEmail> in this guide, or see the Amazon SES Developer
-Guide.
+of C<SendRawEmail> in this guide, or see the Amazon SES Developer Guide
+(http://docs.aws.amazon.com/ses/latest/DeveloperGuide/sending-authorization-delegate-sender-tasks-email.html).
 
 
 
@@ -141,11 +166,19 @@ The identity's email address. If you do not provide a value for this
 parameter, you must specify a "From" address in the raw text of the
 message. (You can also specify both.)
 
-By default, the string must be 7-bit ASCII. If the text must contain
-any other characters, then you must use MIME encoded-word syntax (RFC
-2047) instead of a literal string. MIME encoded-word syntax uses the
-following form: C<=?charset?encoding?encoded-text?=>. For more
-information, see RFC 2047.
+Amazon SES does not support the SMTPUTF8 extension, as described
+inRFC6531 (https://tools.ietf.org/html/rfc6531). For this reason, the
+I<local part> of a source email address (the part of the email address
+that precedes the @ sign) may only contain 7-bit ASCII characters
+(https://en.wikipedia.org/wiki/Email_address#Local-part). If the
+I<domain part> of an address (the part after the @ sign) contains
+non-ASCII characters, they must be encoded using Punycode, as described
+in RFC3492 (https://tools.ietf.org/html/rfc3492.html). The sender name
+(also known as the I<friendly name>) may contain non-ASCII characters.
+These characters must be encoded using MIME encoded-word syntax, as
+described in RFC 2047 (https://tools.ietf.org/html/rfc2047). MIME
+encoded-word syntax uses the following form:
+C<=?charset?encoding?encoded-text?=>.
 
 If you specify the C<Source> parameter and have feedback forwarding
 enabled, then bounces and complaints will be sent to this email
@@ -174,8 +207,8 @@ the C<SourceArn> parameter and the corresponding X-header, Amazon SES
 uses the value of the C<SourceArn> parameter.
 
 For information about when to use this parameter, see the description
-of C<SendRawEmail> in this guide, or see the Amazon SES Developer
-Guide.
+of C<SendRawEmail> in this guide, or see the Amazon SES Developer Guide
+(http://docs.aws.amazon.com/ses/latest/DeveloperGuide/sending-authorization-delegate-sender-tasks-email.html).
 
 
 
@@ -195,9 +228,9 @@ This class forms part of L<Paws>, documenting arguments for method SendRawEmail 
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

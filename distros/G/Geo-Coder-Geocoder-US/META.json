@@ -1,5 +1,5 @@
 {
-   "abstract" : "Geocode addresses using geocoder.us",
+   "abstract" : "RETRACTED. Geocode addresses using geocoder.us, which is defunct",
    "author" : [
       "Tom Wyant (wyant at cpan dot org)"
    ],
@@ -9,7 +9,7 @@
       "perl_5"
    ],
    "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
       "version" : 2
    },
    "name" : "Geo-Coder-Geocoder-US",
@@ -41,7 +41,7 @@
    "provides" : {
       "Geo::Coder::Geocoder::US" : {
          "file" : "lib/Geo/Coder/Geocoder/US.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -58,7 +58,7 @@
          "web" : "https://github.com/trwyant/perl-Geo-Coder-Geocoder-US"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_deprecated" : 1,
-   "x_serialization_backend" : "JSON::PP version 2.97000"
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

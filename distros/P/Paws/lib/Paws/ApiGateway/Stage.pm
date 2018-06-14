@@ -1,9 +1,11 @@
 
 package Paws::ApiGateway::Stage;
   use Moose;
+  has AccessLogSettings => (is => 'ro', isa => 'Paws::ApiGateway::AccessLogSettings', traits => ['NameInRequest'], request_name => 'accessLogSettings');
   has CacheClusterEnabled => (is => 'ro', isa => 'Bool', traits => ['NameInRequest'], request_name => 'cacheClusterEnabled');
   has CacheClusterSize => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'cacheClusterSize');
   has CacheClusterStatus => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'cacheClusterStatus');
+  has CanarySettings => (is => 'ro', isa => 'Paws::ApiGateway::CanarySettings', traits => ['NameInRequest'], request_name => 'canarySettings');
   has ClientCertificateId => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'clientCertificateId');
   has CreatedDate => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'createdDate');
   has DeploymentId => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'deploymentId');
@@ -12,6 +14,7 @@ package Paws::ApiGateway::Stage;
   has LastUpdatedDate => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'lastUpdatedDate');
   has MethodSettings => (is => 'ro', isa => 'Paws::ApiGateway::MapOfMethodSettings', traits => ['NameInRequest'], request_name => 'methodSettings');
   has StageName => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'stageName');
+  has Tags => (is => 'ro', isa => 'Paws::ApiGateway::MapOfStringToString', traits => ['NameInRequest'], request_name => 'tags');
   has Variables => (is => 'ro', isa => 'Paws::ApiGateway::MapOfStringToString', traits => ['NameInRequest'], request_name => 'variables');
 
   has _request_id => (is => 'ro', isa => 'Str');
@@ -24,6 +27,11 @@ package Paws::ApiGateway::Stage;
 Paws::ApiGateway::Stage
 
 =head1 ATTRIBUTES
+
+
+=head2 AccessLogSettings => L<Paws::ApiGateway::AccessLogSettings>
+
+Settings for logging access in this stage.
 
 
 =head2 CacheClusterEnabled => Bool
@@ -41,6 +49,11 @@ Valid values are: C<"0.5">, C<"1.6">, C<"6.1">, C<"13.5">, C<"28.4">, C<"58.2">,
 The status of the cache cluster for the stage, if enabled.
 
 Valid values are: C<"CREATE_IN_PROGRESS">, C<"AVAILABLE">, C<"DELETE_IN_PROGRESS">, C<"NOT_AVAILABLE">, C<"FLUSH_IN_PROGRESS">
+=head2 CanarySettings => L<Paws::ApiGateway::CanarySettings>
+
+Settings for the canary deployment in this stage.
+
+
 =head2 ClientCertificateId => Str
 
 The identifier of a client certificate for an API stage.
@@ -82,7 +95,13 @@ or C</\*/\*> for overriding all methods in the stage.
 =head2 StageName => Str
 
 The name of the stage is the first path segment in the Uniform Resource
-Identifier (URI) of a call to Amazon API Gateway.
+Identifier (URI) of a call to API Gateway.
+
+
+=head2 Tags => L<Paws::ApiGateway::MapOfStringToString>
+
+The collection of tags. Each tag element is associated with a given
+resource.
 
 
 =head2 Variables => L<Paws::ApiGateway::MapOfStringToString>

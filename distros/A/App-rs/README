@@ -1,2 +1,3 @@
-This is the package manager of RSLinux, please see the pod document by
-running `perldoc bin/rs' for more information.
+This is the package manager of RSLinux and the first reference counting
+CPAN client, please see the pod document by running `perldoc bin/rs'
+for more information.

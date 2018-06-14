@@ -282,16 +282,22 @@ sub test_dk : Test(2) {
     }
 }
 
-sub test_es : Test(5) {
+sub test_es : Test(11) {
     SKIP: {
-        eval { require Date::Holidays::ES };
-        skip "Date::Holidays::ES not installed", 5 if $@;
+        eval { require Date::Holidays::ES; require Date::Holidays::CA_ES; };
+        skip "Date::Holidays::ES not installed", 11 if $@;
 
         ok( my $dh = Date::Holidays->new( countrycode => 'es' ),
             'Testing Date::Holidays::ES' );
 
         ok( $dh->holidays( year => 2006 ),
             'Testing holidays with argument for Date::Holidays::ES' );
+
+        ok($dh->is_holiday(
+            year   => 2017,
+            month  => 1,
+            day    => 1,
+        ), 'Testing spanish national hoiday');
 
         my $holidays_hashref = Date::Holidays->is_holiday(
             year  => 2017,
@@ -300,9 +306,37 @@ sub test_es : Test(5) {
             countries => [ 'es' ],
         );
 
-        ok( $holidays_hashref->{'es'}, 'Checking for Spanish christmas' );
+        ok( $holidays_hashref->{'es'}, 'Checking for Spanish holidays' );
 
         can_ok('Date::Holidays::ES', qw(holidays is_holiday));
+        can_ok('Date::Holidays::CA_ES', qw(holidays is_holiday));
+
+        # Catalan region
+        ok( my $holidays = $dh->holidays( year => 2006, region => 'ca' ),
+            'Testing holidays with argument for Date::Holidays::ES Catalan region' );
+
+        ok($dh->is_holiday(
+            year   => 2017,
+            month  => 1,
+            day    => 1,
+            region => 'ca'
+        ), 'Testing spanish national holiday');
+
+        ok($dh->is_holiday(
+            year   => 2017,
+            month  => 6,
+            day    => 24,
+            region => 'ca'
+        ), 'Testing local Catalan holiday');
+
+        ok( $dh = Date::Holidays->new( countrycode => 'es' ),
+            'Testing Date::Holidays::ES' );
+
+        is($dh->is_holiday(
+            year   => 2017,
+            month  => 6,
+            day    => 24,
+        ), undef, 'Testing local Catalan holiday is not a holiday in Spain');
     }
 }
 

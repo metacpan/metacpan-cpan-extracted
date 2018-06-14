@@ -2,12 +2,14 @@
 package Paws::RDS::RestoreDBClusterFromS3;
   use Moose;
   has AvailabilityZones => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
+  has BacktrackWindow => (is => 'ro', isa => 'Int');
   has BackupRetentionPeriod => (is => 'ro', isa => 'Int');
   has CharacterSetName => (is => 'ro', isa => 'Str');
   has DatabaseName => (is => 'ro', isa => 'Str');
   has DBClusterIdentifier => (is => 'ro', isa => 'Str', required => 1);
   has DBClusterParameterGroupName => (is => 'ro', isa => 'Str');
   has DBSubnetGroupName => (is => 'ro', isa => 'Str');
+  has EnableCloudwatchLogsExports => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
   has EnableIAMDatabaseAuthentication => (is => 'ro', isa => 'Bool');
   has Engine => (is => 'ro', isa => 'Str', required => 1);
   has EngineVersion => (is => 'ro', isa => 'Str');
@@ -38,21 +40,62 @@ package Paws::RDS::RestoreDBClusterFromS3;
 
 =head1 NAME
 
-Paws::RDS::RestoreDBClusterFromS3 - Arguments for method RestoreDBClusterFromS3 on Paws::RDS
+Paws::RDS::RestoreDBClusterFromS3 - Arguments for method RestoreDBClusterFromS3 on L<Paws::RDS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method RestoreDBClusterFromS3 on the 
-Amazon Relational Database Service service. Use the attributes of this class
+This class represents the parameters used for calling the method RestoreDBClusterFromS3 on the
+L<Amazon Relational Database Service|Paws::RDS> service. Use the attributes of this class
 as arguments to method RestoreDBClusterFromS3.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to RestoreDBClusterFromS3.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->RestoreDBClusterFromS3(Att1 => $value1, Att2 => $value2, ...);
+    my $rds = Paws->service('RDS');
+    my $RestoreDBClusterFromS3Result = $rds->RestoreDBClusterFromS3(
+      DBClusterIdentifier             => 'MyString',
+      Engine                          => 'MyString',
+      MasterUserPassword              => 'MyString',
+      MasterUsername                  => 'MyString',
+      S3BucketName                    => 'MyString',
+      S3IngestionRoleArn              => 'MyString',
+      SourceEngine                    => 'MyString',
+      SourceEngineVersion             => 'MyString',
+      AvailabilityZones               => [ 'MyString', ... ],    # OPTIONAL
+      BacktrackWindow                 => 1,                      # OPTIONAL
+      BackupRetentionPeriod           => 1,                      # OPTIONAL
+      CharacterSetName                => 'MyString',             # OPTIONAL
+      DBClusterParameterGroupName     => 'MyString',             # OPTIONAL
+      DBSubnetGroupName               => 'MyString',             # OPTIONAL
+      DatabaseName                    => 'MyString',             # OPTIONAL
+      EnableCloudwatchLogsExports     => [ 'MyString', ... ],    # OPTIONAL
+      EnableIAMDatabaseAuthentication => 1,                      # OPTIONAL
+      EngineVersion                   => 'MyString',             # OPTIONAL
+      KmsKeyId                        => 'MyString',             # OPTIONAL
+      OptionGroupName                 => 'MyString',             # OPTIONAL
+      Port                            => 1,                      # OPTIONAL
+      PreferredBackupWindow           => 'MyString',             # OPTIONAL
+      PreferredMaintenanceWindow      => 'MyString',             # OPTIONAL
+      S3Prefix                        => 'MyString',             # OPTIONAL
+      StorageEncrypted                => 1,                      # OPTIONAL
+      Tags                            => [
+        {
+          Value => 'MyString',
+          Key   => 'MyString',
+        },
+        ...
+      ],                                                         # OPTIONAL
+      VpcSecurityGroupIds => [ 'MyString', ... ],                # OPTIONAL
+    );
+
+    # Results:
+    my $DBCluster = $RestoreDBClusterFromS3Result->DBCluster;
+
+    # Returns a L<Paws::RDS::RestoreDBClusterFromS3Result> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/rds/RestoreDBClusterFromS3>
 
 =head1 ATTRIBUTES
 
@@ -61,6 +104,27 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 
 A list of EC2 Availability Zones that instances in the restored DB
 cluster can be created in.
+
+
+
+=head2 BacktrackWindow => Int
+
+The target backtrack window, in seconds. To disable backtracking, set
+this value to 0.
+
+Default: 0
+
+Constraints:
+
+=over
+
+=item *
+
+If specified, this value must be set to a number from 0 to 259,200 (72
+hours).
+
+=back
+
 
 
 
@@ -99,8 +163,8 @@ The database name for the restored DB cluster.
 
 =head2 B<REQUIRED> DBClusterIdentifier => Str
 
-The name of the DB cluster to create from the source data in the S3
-bucket. This parameter is isn't case-sensitive.
+The name of the DB cluster to create from the source data in the Amazon
+S3 bucket. This parameter is isn't case-sensitive.
 
 Constraints:
 
@@ -108,7 +172,7 @@ Constraints:
 
 =item *
 
-Must contain from 1 to 63 alphanumeric characters or hyphens.
+Must contain from 1 to 63 letters, numbers, or hyphens.
 
 =item *
 
@@ -128,7 +192,7 @@ Example: C<my-cluster1>
 
 The name of the DB cluster parameter group to associate with the
 restored DB cluster. If this argument is omitted, C<default.aurora5.6>
-will be used.
+is used.
 
 Constraints:
 
@@ -136,15 +200,8 @@ Constraints:
 
 =item *
 
-Must be 1 to 255 alphanumeric characters
-
-=item *
-
-First character must be a letter
-
-=item *
-
-Cannot end with a hyphen or contain two consecutive hyphens
+If supplied, must match the name of an existing
+DBClusterParameterGroup.
 
 =back
 
@@ -155,18 +212,24 @@ Cannot end with a hyphen or contain two consecutive hyphens
 
 A DB subnet group to associate with the restored DB cluster.
 
-Constraints: Must contain no more than 255 alphanumeric characters,
-periods, underscores, spaces, or hyphens. Must not be default.
+Constraints: If supplied, must match the name of an existing
+DBSubnetGroup.
 
 Example: C<mySubnetgroup>
 
 
 
+=head2 EnableCloudwatchLogsExports => ArrayRef[Str|Undef]
+
+The list of logs that the restored DB cluster is to export to
+CloudWatch Logs.
+
+
+
 =head2 EnableIAMDatabaseAuthentication => Bool
 
-A Boolean value that is true to enable mapping of AWS Identity and
-Access Management (IAM) accounts to database accounts, and otherwise
-false.
+True to enable mapping of AWS Identity and Access Management (IAM)
+accounts to database accounts, and otherwise false.
 
 Default: C<false>
 
@@ -176,7 +239,7 @@ Default: C<false>
 
 The name of the database engine to be used for the restored DB cluster.
 
-Valid Values: C<aurora>
+Valid Values: C<aurora>, C<aurora-postgresql>
 
 
 
@@ -184,15 +247,19 @@ Valid Values: C<aurora>
 
 The version number of the database engine to use.
 
-B<Aurora>
+B<Aurora MySQL>
 
 Example: C<5.6.10a>
+
+B<Aurora PostgreSQL>
+
+Example: C<9.6.3>
 
 
 
 =head2 KmsKeyId => Str
 
-The KMS key identifier for an encrypted DB cluster.
+The AWS KMS key identifier for an encrypted DB cluster.
 
 The KMS key identifier is the Amazon Resource Name (ARN) for the KMS
 encryption key. If you are creating a DB cluster with the same AWS
@@ -218,7 +285,7 @@ Constraints:
 
 =item *
 
-Must be 1 to 16 alphanumeric characters.
+Must be 1 to 16 letters or numbers.
 
 =item *
 
@@ -247,8 +314,8 @@ Constraints: Must contain from 8 to 41 characters.
 A value that indicates that the restored DB cluster should be
 associated with the specified option group.
 
-Permanent options cannot be removed from an option group. An option
-group cannot be removed from a DB cluster once it is associated with a
+Permanent options can't be removed from an option group. An option
+group can't be removed from a DB cluster once it is associated with a
 DB cluster.
 
 
@@ -268,9 +335,11 @@ The daily time range during which automated backups are created if
 automated backups are enabled using the C<BackupRetentionPeriod>
 parameter.
 
-Default: A 30-minute window selected at random from an 8-hour block of
-time per AWS Region. To see the time blocks available, see Adjusting
-the Preferred Maintenance Window in the I<Amazon RDS User Guide.>
+The default is a 30-minute window selected at random from an 8-hour
+block of time for each AWS Region. To see the time blocks available,
+see Adjusting the Preferred Maintenance Window
+(http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/AdjustingTheMaintenanceWindow.html)
+in the I<Amazon RDS User Guide.>
 
 Constraints:
 
@@ -282,7 +351,7 @@ Must be in the format C<hh24:mi-hh24:mi>.
 
 =item *
 
-Times should be in Universal Coordinated Time (UTC).
+Must be in Universal Coordinated Time (UTC).
 
 =item *
 
@@ -304,12 +373,14 @@ Universal Coordinated Time (UTC).
 
 Format: C<ddd:hh24:mi-ddd:hh24:mi>
 
-Default: A 30-minute window selected at random from an 8-hour block of
-time per AWS Region, occurring on a random day of the week. To see the
-time blocks available, see Adjusting the Preferred Maintenance Window
+The default is a 30-minute window selected at random from an 8-hour
+block of time for each AWS Region, occurring on a random day of the
+week. To see the time blocks available, see Adjusting the Preferred
+Maintenance Window
+(http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/AdjustingTheMaintenanceWindow.html)
 in the I<Amazon RDS User Guide.>
 
-Valid Days: Mon, Tue, Wed, Thu, Fri, Sat, Sun
+Valid Days: Mon, Tue, Wed, Thu, Fri, Sat, Sun.
 
 Constraints: Minimum 30-minute window.
 
@@ -384,9 +455,9 @@ This class forms part of L<Paws>, documenting arguments for method RestoreDBClus
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

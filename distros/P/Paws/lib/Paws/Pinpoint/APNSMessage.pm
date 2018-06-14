@@ -4,15 +4,17 @@ package Paws::Pinpoint::APNSMessage;
   has Badge => (is => 'ro', isa => 'Int');
   has Body => (is => 'ro', isa => 'Str');
   has Category => (is => 'ro', isa => 'Str');
+  has CollapseId => (is => 'ro', isa => 'Str');
   has Data => (is => 'ro', isa => 'Paws::Pinpoint::MapOf__string');
-  has JsonData => (is => 'ro', isa => 'Str');
   has MediaUrl => (is => 'ro', isa => 'Str');
   has PreferredAuthenticationMethod => (is => 'ro', isa => 'Str');
+  has Priority => (is => 'ro', isa => 'Str');
   has RawContent => (is => 'ro', isa => 'Str');
   has SilentPush => (is => 'ro', isa => 'Bool');
   has Sound => (is => 'ro', isa => 'Str');
   has Substitutions => (is => 'ro', isa => 'Paws::Pinpoint::MapOfListOf__string');
   has ThreadId => (is => 'ro', isa => 'Str');
+  has TimeToLive => (is => 'ro', isa => 'Int');
   has Title => (is => 'ro', isa => 'Str');
   has Url => (is => 'ro', isa => 'Str');
 1;
@@ -82,13 +84,16 @@ type. This value corresponds to the value in the identifier property of
 one of your app's registered categories.
 
 
+=head2 CollapseId => Str
+
+  An ID that, if assigned to multiple messages, causes APNs to coalesce
+the messages into a single push notification instead of delivering each
+message individually. The value must not exceed 64 bytes. Amazon
+Pinpoint uses this value to set the apns-collapse-id request header
+when it sends the message to APNs.
+
+
 =head2 Data => L<Paws::Pinpoint::MapOf__string>
-
-  The data payload used for a silent push. This payload is added to the
-notifications' data.pinpoint.jsonBody' object
-
-
-=head2 JsonData => Str
 
   The data payload used for a silent push. This payload is added to the
 notifications' data.pinpoint.jsonBody' object
@@ -102,6 +107,21 @@ notifications' data.pinpoint.jsonBody' object
 =head2 PreferredAuthenticationMethod => Str
 
   The preferred authentication method, either "CERTIFICATE" or "TOKEN"
+
+
+=head2 Priority => Str
+
+  The message priority. Amazon Pinpoint uses this value to set the
+apns-priority request header when it sends the message to APNs. Accepts
+the following values: "5" - Low priority. Messages might be delayed,
+delivered in groups, and throttled. "10" - High priority. Messages are
+sent immediately. High priority messages must cause an alert, sound, or
+badge on the receiving device. The default value is "10". The
+equivalent values for FCM or GCM messages are "normal" and "high".
+Amazon Pinpoint accepts these values for APNs messages and converts
+them. For more information about the apns-priority parameter, see
+Communicating with APNs in the APNs Local and Remote Notification
+Programming Guide.
 
 
 =head2 RawContent => Str
@@ -139,6 +159,15 @@ Content app extension, you can use this value to group your
 notifications together.
 
 
+=head2 TimeToLive => Int
+
+  The length of time (in seconds) that APNs stores and attempts to
+deliver the message. If the value is 0, APNs does not store the message
+or attempt to deliver it more than once. Amazon Pinpoint uses this
+value to set the apns-expiration request header when it sends the
+message to APNs.
+
+
 =head2 Title => Str
 
   The message title that displays above the message on the user's device.
@@ -157,9 +186,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Pinpoint>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

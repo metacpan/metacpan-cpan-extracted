@@ -1473,6 +1473,9 @@
 
         my ($self, $session, $standardCmd, $msg, $check) = @_;
 
+        # Local variables
+        my $string;
+
         # Check for improper arguments
         if (! defined $session || ! defined $standardCmd || ! defined $msg || defined $check) {
 
@@ -1481,8 +1484,16 @@
 
         if ($session->cmdMode eq 'show_all' || $session->cmdMode eq 'win_error') {
 
+            # In blind mode, say 'client command', otherwise, save space on the line by displaying
+            #   just 'client'
+            if ($axmud::BLIND_MODE_FLAG) {
+                $string = 'Client command \'';
+            } else {
+                $string = 'Client \'';
+            }
+
             return $session->writeText(
-                'Client \'' . $axmud::CLIENT->constClientSigil . $standardCmd . '\' : ' . $msg,
+                $string . $axmud::CLIENT->constClientSigil . $standardCmd . '\' : ' . $msg,
             );
 
         } else {
@@ -8660,7 +8671,7 @@
 
     sub addSimpleList {
 
-        # Adds a Gtk2::Ex::Simple::List at the specified position in the window's Gtk2::Table
+        # Adds a GA::Gtk::Simple::List at the specified position in the window's Gtk2::Table
         #
         # Example calls:
         #   my $slWidget = $self->addSimpleList($table, 'some_IV', \@columnList,
@@ -8674,7 +8685,7 @@
         #   $columnListRef  - Reference to a list of column headings and types, in the form
         #                       ('heading', 'column_type', 'heading', 'column_type'...)
         #                   - 'column_type' is one of the column types specified by
-        #                       Gtk2::Ex::Simple::List, e.g. 'scalar', 'int'
+        #                       GA::Gtk::Simple::List, e.g. 'scalar', 'int'
         #   $leftAttach, $rightAttach, $topAttach, $bottomAttach
         #                   - The position of the simple list in the table
         #
@@ -8685,7 +8696,7 @@
         #
         # Return values
         #   'undef' on improper arguments
-        #   Otherwise the Gtk2::Ex::Simple::List created
+        #   Otherwise the GA::Gtk::Simple::List created
 
         my (
             $self, $table, $iv, $columnListRef, $leftAttach, $rightAttach, $topAttach,
@@ -8738,7 +8749,7 @@
         $scroller->set_border_width(0);
         $scroller->set_size_request($width, $height);
 
-        my $slWidget = Gtk2::Ex::Simple::List->new(@columnList);
+        my $slWidget = Games::Axmud::Gtk::Simple::List->new(@columnList);
         $scroller->add($slWidget);
 
         # Make the simple list scrollable
@@ -10183,7 +10194,7 @@
 
     sub addSimpleListButtons_listIV {
 
-        # Adds four standard buttons used with Gtk2::Ex::Simple::List widgets, when they're
+        # Adds four standard buttons used with GA::Gtk::Simple::List widgets, when they're
         #   displaying a list IV. The buttons are 'Add', 'Delete', 'Reset' and 'Clear'
         # NB The ->signal_connect method for the 'Add' button must be specified by the calling
         #   function
@@ -10193,7 +10204,7 @@
         #
         # Expected arguments
         #   $table      - The tab's Gtk2::Table object
-        #   $slWidget   - The Gtk2::Ex::Simple::List object on which the buttons will act
+        #   $slWidget   - The GA::Gtk::Simple::List object on which the buttons will act
         #   $iv         - The list IV in $self->editObj storing the data being edited
         #   $rowNumber  - On the current tab's table, the row on which the buttons are put
         #   $columns    - The number of columns. For a straightforward list, 1, but many IVs
@@ -10309,7 +10320,7 @@
 
     sub addSimpleListButtons_hashIV {
 
-        # Adds four standard buttons used with Gtk2::Ex::Simple::List widgets, when they're
+        # Adds four standard buttons used with GA::Gtk::Simple::List widgets, when they're
         #   displaying a hash IV. The buttons are 'Add', 'Delete', 'Reset' and 'Clear'
         # NB The ->signal_connect method for the 'Add' button must be specified by the calling
         #   function
@@ -10319,7 +10330,7 @@
         #
         # Expected arguments
         #   $table      - The tab's Gtk2::Table object
-        #   $slWidget   - The Gtk2::Ex::Simple::List object on which the buttons will act
+        #   $slWidget   - The GA::Gtk::Simple::List object on which the buttons will act
         #   $iv         - The hash IV in $self->editObj storing the data being edited
         #   $rowNumber  - On the current tab's table, the row on which the buttons are put
         #
@@ -10420,11 +10431,11 @@
 
     sub refreshList_listIV {
 
-        # Standard function for refreshing (or initialising) Gtk::Ex::Simple::List widgets when they
+        # Standard function for refreshing (or initialising) GA::Gtk::Simple::List widgets when they
         #   are displaying a list in two columns
         #
         # Expected arguments
-        #   $slWidget   - The Gtk2::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns. Should be 2; this argument is retained for
         #                   consistency with other functions
         #   $iv         - The IV being displayed in the simple list
@@ -10507,11 +10518,11 @@
 
     sub refreshList_hashIV {
 
-        # Standard function for refreshing (or initialising) Gtk::Ex::Simple::List widgets, when
+        # Standard function for refreshing (or initialising) GA::Gtk::Simple::List widgets, when
         #   they're displaying a hash in two columns
         #
         # Expected arguments
-        #   $slWidget   - The Gtk2::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns. Should be 2; this argument is retained for
         #                   consistency with other functions
         #   $iv         - The IV being displayed in the simple list
@@ -10653,11 +10664,11 @@
 
     sub resetListData {
 
-        # Replaces the data stored in a Gtk2::Ex::Simple::List with the data stored in the
-        #   specified list
+        # Replaces the data stored in a GA::Gtk::Simple::List with the data stored in the specified
+        #   list
         #
         # Expected arguments
-        #   $slWidget   - Reference to a Gtk2::Ex::Simple::List
+        #   $slWidget   - Reference to a GA::Gtk::Simple::List
         #   $listRef    - Reference to a list which contains the replacement data
         #   $number     - The list is split into groups (e.g. the elements of
         #                   GA::Profile::World->barPatternList are split into groups of 6); $number
@@ -10707,11 +10718,11 @@
 
     sub resetSortListData {
 
-        # Replaces the data stored in a Gtk2::Ex::Simple::List with the data stored in the
-        #   specified list which we assume represents a hash in the form (key, value, key, value...)
+        # Replaces the data stored in a GA::Gtk::Simple::List with the data stored in the specified
+        #   list which we assume represents a hash in the form (key, value, key, value...)
         #
         # Expected arguments
-        #   $slWidget   - Reference to a Gtk2::Ex::Simple::List
+        #   $slWidget   - Reference to a GA::Gtk::Simple::List
         #   $listRef    - Reference to a list which contains the replacement data
         #
         # Return values
@@ -10760,7 +10771,7 @@
         # Get items of data from specified cells in the currently selected row of a simple list
         #
         # Expected arguments
-        #   $slWidget   - The Gtk2::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   @columnList - A list of column numbers on the simple list, e.g. the list (0, 2, 3)
         #                   represents the first, third and fourth columns.
         #
@@ -11104,15 +11115,15 @@
 
     sub updateListDataWithKey {
 
-        # Can be called by any tab function to update the data in a Gtk2::Ex::Simple::List when it
-        #   is storing data in two columns representing the contents of a hash
+        # Can be called by any tab function to update the data in a GA::Gtk::Simple::List when it is
+        #   storing data in two columns representing the contents of a hash
         # The first column is the key, the second column its corresponding value
         # If the key already exists in the list, it is replaced; otherwise a new key-value pair is
         #   added to the simple list
         # If the key is not defined or an empty string, it isn't added to the simple list
         #
         # Expected arguments
-        #   $slWidget   - The Gtk2::Ex::Simple::List to modify
+        #   $slWidget   - The GA::Gtk::Simple::List to modify
         #   $key        - The key to add to the list, which will eventually be stored as a hash
         #   $value      - Its corresponding value
         #
@@ -11140,7 +11151,7 @@
             return undef;
         }
 
-        # Convert the data stored in the Gtk2::Ex::Simple::List into a hash
+        # Convert the data stored in the GA::Gtk::Simple::List into a hash
         %hash = $self->convertListDataToHash($slWidget);
 
         # Add the key-value pair
@@ -11149,7 +11160,7 @@
         # Get a list of keys in the hash, so we can sort it alphabetically
         @list = sort {lc($a) cmp lc($b)} (keys %hash);
 
-        # Reset the Gtk2::Ex::Simple::List
+        # Reset the GA::Gtk::Simple::List
         @{$slWidget->{data}} = ();
 
         foreach my $sortedKey (@list) {
@@ -11162,13 +11173,13 @@
 
     sub findKeyInListData {
 
-        # Can be called by any tab function to check the data in a Gtk2::Ex::Simple::List when it is
+        # Can be called by any tab function to check the data in a GA::Gtk::Simple::List when it is
         #   storing data in two columns representing the contents of a hash
         # The first column is the key, the second column its corresponding value
         # Checks whether the specified key exists in list's data
         #
         # Expected arguments
-        #   $slWidget   - The Gtk2::Ex::Simple::List to modify
+        #   $slWidget   - The GA::Gtk::Simple::List to modify
         #   $key        - The key to add to the list's data
         #
         # Return values
@@ -11197,7 +11208,7 @@
             return undef;
         }
 
-        # Convert the data stored in the Gtk2::Ex::Simple::List into a hash
+        # Convert the data stored in the GA::Gtk::Simple::List into a hash
         %hash = $self->convertListDataToHash($slWidget);
 
         # See whether the key exists
@@ -11210,11 +11221,11 @@
 
     sub convertListDataToHash {
 
-        # Can be called by any tab function to convert the data in a Gtk2::Ex::Simple::List (in
-        #   which data is stored in two columns) into a hash
+        # Can be called by any tab function to convert the data in a GA::Gtk::Simple::List (in which
+        #   data is stored in two columns) into a hash
         #
         # Expected arguments
-        #   $slWidget   - The Gtk2::Ex::Simple::List to use
+        #   $slWidget   - The GA::Gtk::Simple::List to use
         #
         # Return values
         #   An empty hash on improper arguments
@@ -11246,11 +11257,11 @@
 
     sub storeListData {
 
-        # Can be called by any tab function to store the data in a Gtk2::Ex::Simple::List in
+        # Can be called by any tab function to store the data in a GA::Gtk::Simple::List in
         #   $self->editHash
         #
         # Expected arguments
-        #   $slWidget   - The Gtk2::Ex::Simple::List to use
+        #   $slWidget   - The GA::Gtk::Simple::List to use
         #   $iv         - The name of the instance variable in $self->editHash where the list is
         #                   stored
         #
@@ -11283,10 +11294,10 @@
     sub storeListColumnInList {
 
         # Can be called by any tab function to store the data from a single column in a
-        #   Gtk2::Ex::Simple::List as a list in $self->editHash
+        #   GA::Gtk::Simple::List as a list in $self->editHash
         #
         # Expected arguments
-        #   $slWidget   - The Gtk2::Ex::Simple::List to use
+        #   $slWidget   - The GA::Gtk::Simple::List to use
         #   $iv         - The name of the instance variable in $self->editHash in which the column's
         #                   data is stored
         #   $column     - The number of the chosen column
@@ -11323,13 +11334,13 @@
 
     sub storeListDataInHash {
 
-        # Can be called by any tab function to store the data in a Gtk2::Ex::Simple::List in
+        # Can be called by any tab function to store the data in a GA::Gtk::Simple::List in
         #   $self->editHash
         # This is a companion function to $self->storeListData (which stores the data as a list);
         #   this function stores the data as a hash
         #
         # Expected arguments
-        #   $slWidget   - Reference to a Gtk2::Ex::Simple::List
+        #   $slWidget   - Reference to a GA::Gtk::Simple::List
         #   $iv         - The name of the instance variable in $self->editHash where the hash is
         #                   stored
         #
@@ -11642,7 +11653,7 @@
         # Called by $self->privateDataTab to refresh the simple list
         #
         # Expected arguments
-        #   $slWidget       - The Gtk::Ex::Simple::list
+        #   $slWidget       - The GA::Gtk::Simple::List
         #   $columns        - The number of columns
         #   $hashIV         - The hash IV being edited
         #
@@ -12008,10 +12019,10 @@
 
     sub objects1Tab_refreshList {
 
-        # Called by $self->objects1Tab to reset the Gtk::Ex::Simple::List
+        # Called by $self->objects1Tab to reset the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget       - The Gtk::Ex::Simple::List
+        #   $slWidget       - The GA::Gtk::Simple::List
         #   $columns        - The number of columns in the list
         #
         # Optional arguments
@@ -12351,10 +12362,10 @@
 
     sub objects2Tab_refreshList {
 
-        # Called by $self->objects2Tab to reset the Gtk::Ex::Simple::List
+        # Called by $self->objects2Tab to reset the GA::Gtk::Simple::List
         #
         # Expected arguments
-        #   $slWidget   - The Gtk::Ex::Simple::List
+        #   $slWidget   - The GA::Gtk::Simple::List
         #   $columns    - The number of columns in the list
         #
         # Optional arguments
@@ -13906,7 +13917,7 @@
 
         # Create a simple list with two columns representing a hash, for which the user
         #   supplies key-value pairs
-        my $slWidget2 = Gtk2::Ex::Simple::List->new(
+        my $slWidget2 = Games::Axmud::Gtk::Simple::List->new(
             # Give the first column a minimum width; don't want the columns moving around too
             #   much when the user enter new key-value pairs
             'Key           ' => 'text',
@@ -14143,11 +14154,11 @@
 
         # Called by $self->promptHash when we want to edit a hash IV in $self->editObj or
         #   $self->editHash
-        # The calling function had created a Gtk2::Ex::Simple::List; this function's job is to fill
+        # The calling function had created a GA::Gtk::Simple::List; this function's job is to fill
         #   it with data
         #
         # Expected arguments
-        #   $slWidget   - The Gtk2::Ex::Simple::List where the IV's data is displayed
+        #   $slWidget   - The GA::Gtk::Simple::List where the IV's data is displayed
         #   $iv         - The IV being edited
         #
         # Return values
@@ -14186,7 +14197,7 @@
             %dataHash = %$hashRef;
         }
 
-        # Update the Gtk2::Ex::Simple::List (which currently stores no data)
+        # Update the GA::Gtk::Simple::List (which currently stores no data)
         foreach my $key (sort {lc($a) cmp lc($b)} (keys %dataHash)) {
 
             push (
@@ -14209,11 +14220,11 @@
         #               iv3     => hash_reference_to_edit,
         #       }
         #
-        # The calling function had created a Gtk2::Ex::Simple::List to display
+        # The calling function had created a GA::Gtk::Simple::List to display
         #   hash_reference_to_edit; this function's job is to fill it with data
         #
         # Expected arguments
-        #   $slWidget   - The Gtk2::Ex::Simple::List where the IV's data is displayed
+        #   $slWidget   - The GA::Gtk::Simple::List where the IV's data is displayed
         #   $iv         - The IV being edited ('myHash' in the example above)
         #   $key        - The IV is a hash. $key is a key in that hash; $key's corresponding value
         #                   is the reference to the hash which we display in the simple list ('iv3'
@@ -14255,7 +14266,7 @@
             %hash = %$hashRef;
         }
 
-        # Update the Gtk2::Ex::Simple::List (which currently stores no data)
+        # Update the GA::Gtk::Simple::List (which currently stores no data)
         if (exists $hash{$key} && defined $hash{$key}) {
 
             $dataHashRef = $hash{$key};
@@ -21944,6 +21955,12 @@
             $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->showMsgDialogue');
         });
 
+        # Display the 'dialogue' window. Without this combination of Gtk calls, the window is not
+        #   consistently active (don't know why this works; it just does)
+        $dialogueWin->show_all();
+        $dialogueWin->present();
+        $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->showComboDialogue');
+
         # Prepare text-to-speech (TTS) code. Get a hash of possible response buttons, in the form
         #   $buttonHash{'response'} = Gtk2::Button (if the button is used), or 'undef' (if not)
         %buttonHash = (
@@ -22596,8 +22613,8 @@
         $response = $dialogueWin->run();
         if ($response eq 'accept' || $response eq 'none') {
 
-            # If the user pressed the RETURN key, the entry's ->signal_connect for 'activate'
-            #   stored the entry's text in $responseText, before destroying the window
+            # If the user pressed the ENTER key, the entry's ->signal_connect for 'activate' stored
+            #   the entry's text in $responseText, before destroying the window
             if (! $responseText) {
 
                 $responseText = $entry->get_text();

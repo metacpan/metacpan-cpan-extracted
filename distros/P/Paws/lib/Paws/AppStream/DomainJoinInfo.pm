@@ -32,7 +32,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::AppStream::
 
 =head1 DESCRIPTION
 
-Contains the information needed for streaming instances to join a
+Contains the information needed to join a Microsoft Active Directory
 domain.
 
 =head1 ATTRIBUTES
@@ -57,9 +57,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::AppStream
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

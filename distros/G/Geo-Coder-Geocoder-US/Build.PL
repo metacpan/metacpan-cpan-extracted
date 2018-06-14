@@ -17,7 +17,7 @@ $meta->notice();
 
 my %args = (
     dist_author => 'Tom Wyant (wyant at cpan dot org)',
-    dist_abstract => 'Geocode addresses using geocoder.us',
+    dist_abstract => 'RETRACTED. Geocode addresses using geocoder.us, which is defunct',
     module_name => 'Geo::Coder::Geocoder::US',
     build_requires => $meta->build_requires(),
     requires => $meta->requires(

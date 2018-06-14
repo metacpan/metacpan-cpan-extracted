@@ -1,5 +1,23 @@
 Revision history for Perl extension Test::Warn.
 
+0.35  2018-06-13
+        Merged several Pull Requests:
+        - README clean-up: Assign Copyright to current author
+          https://github.com/hanfried/test-warn/pull/6
+          thx to Andrew Grangaard (spazm)
+        - Pod cleanup
+          https://github.com/hanfried/test-warn/pull/5
+          thx to Andrew Grangaar (spazm) and Gabor Szabo (szabgab)
+        - add missing comma
+          https://github.com/hanfried/test-warn/pull/4
+          thx to Desmond Daignault (nawglan)
+        - Nawglan/update meta yml
+          https://github.com/hanfried/test-warn/pull/3
+          thx to Desmond Daignault (nawglan) and Karen Etheridge (karenetheridge)
+        - create META.json so that perl Makefile.PL stops complaining
+          https://github.com/hanfried/test-warn/pull/2
+          thx to Desmond Daignault (nawglan) and Karen Etheridge (karenetheridge)
+
 0.34  2018-05-31
         - Added a note that XS warnings might not be caught
           https://rt.cpan.org/Ticket/Display.html?id=42070&results=3c71d1b101a730e185691657f3b02f21

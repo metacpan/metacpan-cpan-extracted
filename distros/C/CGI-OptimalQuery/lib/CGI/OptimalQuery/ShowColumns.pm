@@ -9,7 +9,7 @@ sub escapeHTML { CGI::OptimalQuery::Base::escapeHTML(@_) }
 
 sub output {
   my $o = shift;
-  my $buf = CGI::header('text/html').
+  my $buf = $$o{httpHeader}->('text/html').
 "<!DOCTYPE html>
 <html>
 <body>

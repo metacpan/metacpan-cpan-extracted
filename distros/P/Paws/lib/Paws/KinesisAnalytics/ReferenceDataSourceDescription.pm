@@ -48,7 +48,9 @@ application using the AddApplicationReferenceDataSource operation.
 
 =head2 ReferenceSchema => L<Paws::KinesisAnalytics::SourceSchema>
 
-  
+  Describes the format of the data in the streaming source, and how each
+data element maps to corresponding columns created in the
+in-application stream.
 
 
 =head2 B<REQUIRED> S3ReferenceDataSourceDescription => L<Paws::KinesisAnalytics::S3ReferenceDataSourceDescription>
@@ -72,9 +74,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::KinesisAn
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

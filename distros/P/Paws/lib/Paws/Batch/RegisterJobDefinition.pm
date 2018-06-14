@@ -5,6 +5,7 @@ package Paws::Batch::RegisterJobDefinition;
   has JobDefinitionName => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'jobDefinitionName', required => 1);
   has Parameters => (is => 'ro', isa => 'Paws::Batch::ParametersMap', traits => ['NameInRequest'], request_name => 'parameters');
   has RetryStrategy => (is => 'ro', isa => 'Paws::Batch::RetryStrategy', traits => ['NameInRequest'], request_name => 'retryStrategy');
+  has Timeout => (is => 'ro', isa => 'Paws::Batch::JobTimeout', traits => ['NameInRequest'], request_name => 'timeout');
   has Type => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'type', required => 1);
 
   use MooseX::ClassAttribute;
@@ -13,28 +14,49 @@ package Paws::Batch::RegisterJobDefinition;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/v1/registerjobdefinition');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'POST');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::Batch::RegisterJobDefinitionResponse');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::Batch::RegisterJobDefinition - Arguments for method RegisterJobDefinition on Paws::Batch
+Paws::Batch::RegisterJobDefinition - Arguments for method RegisterJobDefinition on L<Paws::Batch>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method RegisterJobDefinition on the 
-AWS Batch service. Use the attributes of this class
+This class represents the parameters used for calling the method RegisterJobDefinition on the
+L<AWS Batch|Paws::Batch> service. Use the attributes of this class
 as arguments to method RegisterJobDefinition.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to RegisterJobDefinition.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->RegisterJobDefinition(Att1 => $value1, Att2 => $value2, ...);
+    my $batch = Paws->service('Batch');
+    # To register a job definition
+    # This example registers a job definition for a simple container job.
+    my $RegisterJobDefinitionResponse = $batch->RegisterJobDefinition(
+      {
+        'Type'                => 'container',
+        'JobDefinitionName'   => 'sleep10',
+        'ContainerProperties' => {
+          'Memory'  => 128,
+          'Command' => [ 'sleep', 10 ],
+          'Image'   => 'busybox',
+          'Vcpus'   => 1
+        }
+      }
+    );
+
+    # Results:
+    my $revision          = $RegisterJobDefinitionResponse->revision;
+    my $jobDefinitionName = $RegisterJobDefinitionResponse->jobDefinitionName;
+    my $jobDefinitionArn  = $RegisterJobDefinitionResponse->jobDefinitionArn;
+
+    # Returns a L<Paws::Batch::RegisterJobDefinitionResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/batch/RegisterJobDefinition>
 
 =head1 ATTRIBUTES
 
@@ -67,7 +89,22 @@ parameter defaults from the job definition.
 
 The retry strategy to use for failed jobs that are submitted with this
 job definition. Any retry strategy that is specified during a SubmitJob
-operation overrides the retry strategy defined here.
+operation overrides the retry strategy defined here. If a job is
+terminated due to a timeout, it is not retried.
+
+
+
+=head2 Timeout => L<Paws::Batch::JobTimeout>
+
+The timeout configuration for jobs that are submitted with this job
+definition, after which AWS Batch terminates your jobs if they have not
+finished. If a job is terminated due to a timeout, it is not retried.
+The minimum value for the timeout is 60 seconds. Any timeout
+configuration that is specified during a SubmitJob operation overrides
+the timeout configuration defined here. For more information, see Job
+Timeouts
+(http://docs.aws.amazon.com/AmazonECS/latest/developerguide/job_timeouts.html)
+in the I<Amazon Elastic Container Service Developer Guide>.
 
 
 
@@ -84,9 +121,9 @@ This class forms part of L<Paws>, documenting arguments for method RegisterJobDe
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

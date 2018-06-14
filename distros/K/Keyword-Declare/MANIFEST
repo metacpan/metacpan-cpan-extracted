@@ -34,5 +34,7 @@ dlib/Test/Expr.pm
 dlib/Var/Javan.pm
 dlib/Var/Your.pm
 t/recursive.t
+t/postfix_deref.t
+t/unkeyword.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

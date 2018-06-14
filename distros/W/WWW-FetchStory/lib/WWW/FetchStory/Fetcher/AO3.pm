@@ -1,5 +1,5 @@
 package WWW::FetchStory::Fetcher::AO3;
-$WWW::FetchStory::Fetcher::AO3::VERSION = '0.1902';
+$WWW::FetchStory::Fetcher::AO3::VERSION = '0.2002';
 use strict;
 use warnings;
 =head1 NAME
@@ -8,7 +8,7 @@ WWW::FetchStory::Fetcher::AO3 - fetching module for WWW::FetchStory
 
 =head1 VERSION
 
-version 0.1902
+version 0.2002
 
 =head1 DESCRIPTION
 
@@ -213,7 +213,12 @@ sub parse_title {
     my $content = $args{content};
 
     my $title = '';
-    if ($content =~ m!&lt;a href=&quot;http://archiveofourown.org/works/\d+&quot;&gt;&lt;strong&gt;(.*?)&lt;/strong&gt;&lt;/a&gt;!)
+    if ($content =~ m!<h2 class="title heading">\s*([^<]*)</h2>!s)
+    {
+	$title = $1;
+        $title =~ s/\s*$//s; # remove any trailing whitespace
+    }
+    elsif ($content =~ m!<h1>([^<]*)</h1>!)
     {
 	$title = $1;
     }
@@ -235,12 +240,9 @@ sub parse_author {
 
     my $content = $args{content};
 
+    say STDERR "start of parse_author";
     my $author = '';
-    if ($content =~ m!<a href="/users/\w+/pseuds/\w+" class="login author">([^<]+)</a>!)
-    {
-	$author = $1;
-    }
-    elsif ($content =~ m!&lt;a href=&quot;http://archiveofourown.org/users/\w+&quot;&gt;&lt;strong&gt;([-\w\s]+)&lt;/strong&gt;&lt;/a&gt;!)
+    if ($content =~ m! href="/users/\w+/pseuds/\w+">([^<]+)</a>!)
     {
 	$author = $1;
     }
@@ -278,6 +280,7 @@ sub parse_summary {
     $summary =~ s!<\w+>!!g;
     $summary =~ s!</\w+>!!g;
     $summary =~ s!&#x27;!'!g;
+    $summary =~ s!&#39;!'!g;
     return $summary;
 } # parse_summary
 
@@ -346,25 +349,25 @@ sub parse_universe {
     my $content = $args{content};
 
     my $universe = '';
-    if ($content =~ m!Fandom: &lt;a href=&quot;http://archiveofourown\.org/tags/.*?&quot;&gt;(.*?)&lt;/a&gt!)
+    if ($content =~ m!Fandom: &lt;a href=&quot;https?://archiveofourown\.org/tags/.*?&quot;&gt;(.*?)&lt;/a&gt!)
     {
         $universe = $1;
     }
-    elsif ($content =~ m!^Fandom: (&lt;a href=&quot;http://archiveofourown.org/tags/.*?,.*?)$!m)
+    elsif ($content =~ m!^Fandom: (&lt;a href=&quot;https?://archiveofourown.org/tags/.*?,.*?)$!m)
     {
 	my $fandoms = $1;
 	my @fds = split(/,/, $fandoms);
 	my @universes = ();
 	foreach my $fd (@fds)
 	{
-	    if ($fd =~ m!&lt;a href=&quot;http://archiveofourown.org/tags/.*?&quot;&gt;(.*?)&lt;/a&gt;!m)
+	    if ($fd =~ m!&lt;a href=&quot;https?://archiveofourown.org/tags/.*?&quot;&gt;(.*?)&lt;/a&gt;!m)
 	    {
 		push @universes, $1;
 	    }
 	}
 	$universe = join(', ', @universes);
     }
-    elsif ($content =~ m!^Fandom: &lt;a href=&quot;http://archiveofourown.org/tags/.*?&quot;&gt;(.*?)&lt;/a&gt;$!m)
+    elsif ($content =~ m!^Fandom: &lt;a href=&quot;https?://archiveofourown.org/tags/.*?&quot;&gt;(.*?)&lt;/a&gt;$!m)
     {
 	$universe = $1;
     }
@@ -372,9 +375,14 @@ sub parse_universe {
     {
 	$universe = $self->SUPER::parse_universe(%args);
     }
+    # Minor adjustments to AO3 tags
     if ($universe =~ m!Harry Potter - J\. K\. Rowling!)
     {
         $universe =~ s/\s*-\s*J\. K\. Rowling//;
+    }
+    elsif ($universe =~ m!(Doctor Who)!)
+    {
+        $universe = $1;
     }
     return $universe;
 } # parse_universe
@@ -391,7 +399,18 @@ sub parse_category {
     my $content = $args{content};
 
     my $category = '';
-    if ($content =~ m!Additional Tags:\s*</dt>\s*<dd class="freeform tags">\s*<ul[^>]*>\s*(.*?)\s*</ul>!s)
+    if ($content =~ m!<dd class="freeform tags">(.*?)</dd>!s)
+    {
+        # multiple categories inside links
+        my $str = $1;
+        my @cats = ();
+        while ($str =~ m!([^><]+)</a>!g)
+        {
+            push @cats, $1;
+        }
+        $category = join(', ', @cats);
+    }
+    elsif ($content =~ m!Additional Tags:\s*</dt>\s*<dd class="freeform tags">\s*<ul[^>]*>\s*(.*?)\s*</ul>!s)
     {
 	my $categories = $1;
 	my @cats = split(/<li>/, $categories);

@@ -1,6 +1,7 @@
 package Paws::ElasticBeanstalk::ApplicationVersionDescription;
   use Moose;
   has ApplicationName => (is => 'ro', isa => 'Str');
+  has ApplicationVersionArn => (is => 'ro', isa => 'Str');
   has BuildArn => (is => 'ro', isa => 'Str');
   has DateCreated => (is => 'ro', isa => 'Str');
   has DateUpdated => (is => 'ro', isa => 'Str');
@@ -47,6 +48,11 @@ Describes the properties of an application version.
 =head2 ApplicationName => Str
 
   The name of the application to which the application version belongs.
+
+
+=head2 ApplicationVersionArn => Str
+
+  The Amazon Resource Name (ARN) of the application version.
 
 
 =head2 BuildArn => Str
@@ -98,9 +104,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::ElasticBe
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -68,6 +68,10 @@ container is running.
 
   The environment variables to pass to a container.
 
+Environment variables must not start with C<AWS_BATCH>; this naming
+convention is reserved for variables that are set by the AWS Batch
+service.
+
 
 =head2 ExitCode => Int
 
@@ -123,7 +127,8 @@ additional details about a running or stopped container.
 =head2 TaskArn => Str
 
   The Amazon Resource Name (ARN) of the Amazon ECS task that is
-associated with the container job.
+associated with the container job. Each container attempt receives a
+task ARN when they reach the C<STARTING> status.
 
 
 =head2 Ulimits => ArrayRef[L<Paws::Batch::Ulimit>]
@@ -153,9 +158,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Batch>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

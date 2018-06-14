@@ -10,13 +10,13 @@ WG::API::WoT - Modules to work with Wargaming.net Public API for World of Tanks
 
 =head1 VERSION
 
-Version v0.8.6
+Version v0.8.8
 
 =cut
 
-our $VERSION = 'v0.8.6';
+our $VERSION = 'v0.8.8';
 
-use constant api_uri => 'api.worldoftanks.ru/wot';
+use constant api_uri => '//api.worldoftanks.ru/';
 
 =head1 SYNOPSIS
 
@@ -48,46 +48,72 @@ Params:
 
 =head2 Account
 
-=head3 B<account_list( [ %params ] )>
+=over 1
+
+=item B<account_list( [ %params ] )>
 
 Method returns partial list of players. The list is filtered by initial characters of user name and sorted alphabetically
+
+=over 2
+
+=item I<required fields:>
+
+    search - Player name search string. Parameter "type" defines minimum length and type of search. Using the exact search type, you can enter several names, separated with commas. Maximum length: 24.
+
+=back
 
 =cut
 
 sub account_list {
     my $self = shift;
 
-    return $self->_request( 'get', 'account/list', [ 'language', 'fields', 'type', 'search', 'limit' ], ['search'],
+    return $self->_request( 'get', 'wot/account/list/', [ 'language', 'fields', 'type', 'search', 'limit' ], ['search'],
         @_ );
 }
 
-=head3 B<account_info( [ %params ] )>
+=item B<account_info( [ %params ] )>
 
 Method returns player details.
+
+=over 2
+
+=item I<required fields:>
+
+    account_id - Account ID. Max limit is 100. Min value is 1.
+
+=back
 
 =cut
 
 sub account_info {
     my $self = shift;
 
-    return $self->_request( 'get', 'account/info', [ 'language', 'fields', 'access_token', 'extra', 'account_id' ],
+    return $self->_request( 'get', 'wot/account/info/', [ 'language', 'fields', 'access_token', 'extra', 'account_id' ],
         ['account_id'], @_ );
 }
 
-=head3 B<account_tanks( [ %params ] )>
+=item B<account_tanks( [ %params ] )>
 
 Method returns details on player's vehicles.
+
+=over 2
+
+=item I<required fields:>
+
+    account_id - Account ID. Max limit is 100. Min value is 1.
+
+=back
 
 =cut
 
 sub account_tanks {
     my $self = shift;
 
-    return $self->_request( 'get', 'account/tanks', [ 'language', 'fields', 'access_token', 'account_id', 'tank_id' ],
+    return $self->_request( 'get', 'wot/account/tanks/', [ 'language', 'fields', 'access_token', 'account_id', 'tank_id' ],
         ['account_id'], @_ );
 }
 
-=head3 B<account_achievements( [ %params ] )>
+=item B<account_achievements( [ %params ] )>
 
 Method returns players' achievement details.
 
@@ -97,31 +123,51 @@ Achievement properties define the achievements field values:
     maximum value of Achievement series (type: "series");
     number of achievements earned from sections: Battle Hero, Epic Achievements, Group Achievements, Special Achievements, etc. (type: "repeatable, single, custom").
 
+=over 2
+
+=item I<required fields:>
+
+    account_id - Account ID. Max limit is 100. Min value is 1.
+
+=back
+
+=back
+
 =cut
 
 sub account_achievements {
     my $self = shift;
 
-    return $self->_request( 'get', 'account/achievements', [ 'language', 'fields', 'account_id' ], ['account_id'], @_ );
+    return $self->_request( 'get', 'wot/account/achievements/', [ 'language', 'fields', 'account_id' ], ['account_id'], @_ );
 }
 
 =head2 Player's vehicles
 
-=head3 B<tanks_stats( [ %params ] )>
+=over 1
+
+=item B<tanks_stats( [ %params ] )>
 
 Method returns overall statistics, Tank Company statistics, and clan statistics per each vehicle for each user.
+
+=over 2
+
+=item I<required fields:>
+
+    account_id - Account ID. Max limit is 100. Min value is 1.
+
+=back
 
 =cut
 
 sub tanks_stats {
     my $self = shift;
 
-    return $self->_request( 'get', 'tanks/stats',
-        [ 'language', 'fields', 'access_token', 'account_id', 'tank_id', 'in_garage' ],
+    return $self->_request( 'get', 'wot/tanks/stats/',
+        [ 'language', 'fields', 'access_token', 'account_id', 'tank_id', 'in_garage', 'extra' ],
         ['account_id'], @_ );
 }
 
-=head3 B<tanks_achievements( [ %params ] )>
+=item B<tanks_achievements( [ %params ] )>
 
 Method returns list of achievements on all vehicles.
 
@@ -131,19 +177,29 @@ Achievement properties define the achievements field values:
     maximum value of Achievement series (type: "series");
     number of achievements earned from sections: Battle Hero, Epic Achievements, Group Achievements, Special Achievements, etc. (type: "repeatable, single, custom").
 
+=over 2
+
+=item I<required fields:>
+
+    account_id - Account ID. Max limit is 100. Min value is 1.
+
+=back
+
+=back
+
 =cut
 
 sub tanks_achievements {
     my $self = shift;
 
-    return $self->_request( 'get', 'tanks/achievements',
+    return $self->_request( 'get', 'wot/tanks/achievements/',
         [ 'language', 'fields', 'access_token', 'account_id', 'tank_id', 'in_garage' ],
         ['account_id'], @_ );
 }
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<cynovg at cpan.org>, or through the web interface at L<https://github.com/cynovg/WG-API/issues>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to C<cynovg at cpan.org>, or through the web interface at L<https://gitlab.com/cynovg/WG-API/issues>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
@@ -157,7 +213,7 @@ You can also look for information at:
 
 =item * RT: GitHub's request tracker (report bugs here)
 
-L<https://github.com/cynovg/WG-API/issues>
+L<https://gitlab.com/cynovg/WG-API/issues>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
@@ -169,7 +225,7 @@ L<http://cpanratings.perl.org/d/WG-API>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/WG-API/>
+L<https://metacpan.org/pod/WG::API>
 
 =back
 

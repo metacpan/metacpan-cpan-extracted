@@ -1,3 +1,10 @@
+0.011   2018-06-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fix terminology in currency_pair.
+
+
 0.010   2018-06-07 (PERLANCAR)
 
         - [build] Rebuild to set minimum version of coerce module dependencies

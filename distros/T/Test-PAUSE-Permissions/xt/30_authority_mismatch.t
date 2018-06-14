@@ -14,7 +14,7 @@ BEGIN {
 }
 
 my $worepan = WorePAN->new(
-  files => ['ISHIGAKI/WorePAN-0.09.tar.gz'],
+  files => ['ISHIGAKI/WorePAN-0.17.tar.gz'],
   no_network => 0,
   cleanup => 1,
   no_indices => 1,

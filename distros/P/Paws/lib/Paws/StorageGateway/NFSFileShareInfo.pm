@@ -6,12 +6,15 @@ package Paws::StorageGateway::NFSFileShareInfo;
   has FileShareId => (is => 'ro', isa => 'Str');
   has FileShareStatus => (is => 'ro', isa => 'Str');
   has GatewayARN => (is => 'ro', isa => 'Str');
+  has GuessMIMETypeEnabled => (is => 'ro', isa => 'Bool');
   has KMSEncrypted => (is => 'ro', isa => 'Bool');
   has KMSKey => (is => 'ro', isa => 'Str');
   has LocationARN => (is => 'ro', isa => 'Str');
   has NFSFileShareDefaults => (is => 'ro', isa => 'Paws::StorageGateway::NFSFileShareDefaults');
+  has ObjectACL => (is => 'ro', isa => 'Str');
   has Path => (is => 'ro', isa => 'Str');
   has ReadOnly => (is => 'ro', isa => 'Bool');
+  has RequesterPays => (is => 'ro', isa => 'Bool');
   has Role => (is => 'ro', isa => 'Str');
   has Squash => (is => 'ro', isa => 'Str');
 1;
@@ -59,9 +62,9 @@ buckets. This operation is only supported in file gateways.
 =head2 DefaultStorageClass => Str
 
   The default storage class for objects put into an Amazon S3 bucket by
-file gateway. Possible values are S3_STANDARD or S3_STANDARD_IA. If
-this field is not populated, the default value S3_STANDARD is used.
-Optional.
+file gateway. Possible values are S3_STANDARD, S3_STANDARD_IA or
+S3_ONEZONE_IA. If this field is not populated, the default value
+S3_STANDARD is used. Optional.
 
 
 =head2 FileShareARN => Str
@@ -82,6 +85,13 @@ Optional.
 =head2 GatewayARN => Str
 
   
+
+
+=head2 GuessMIMETypeEnabled => Bool
+
+  Enables guessing of the MIME type for uploaded objects based on file
+extensions. Set this value to true to enable MIME type guessing, and
+otherwise to false. The default value is true.
 
 
 =head2 KMSEncrypted => Bool
@@ -105,6 +115,11 @@ false to use a key managed by Amazon S3. Optional.
   
 
 
+=head2 ObjectACL => Str
+
+  
+
+
 =head2 Path => Str
 
   
@@ -112,7 +127,15 @@ false to use a key managed by Amazon S3. Optional.
 
 =head2 ReadOnly => Bool
 
-  
+  Sets the write status of a file share. This value is true if the write
+status is read-only, and otherwise false.
+
+
+=head2 RequesterPays => Bool
+
+  Sets who pays the cost of the request and the data download from the
+Amazon S3 bucket. Set this value to true if you want the requester to
+pay instead of the bucket owner, and otherwise to false.
 
 
 =head2 Role => Str
@@ -132,9 +155,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::StorageGa
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

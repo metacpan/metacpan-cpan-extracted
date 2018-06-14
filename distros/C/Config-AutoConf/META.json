@@ -5,13 +5,13 @@
       "Jens Rehsack <rehsack@cpan.org"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Config-AutoConf",
    "no_index" : {
@@ -88,6 +88,6 @@
       "x_IRC" : "irc://irc.perl.org/#toolchain",
       "x_MailingList" : "mailto:cpan-workers@perl.org'"
    },
-   "version" : "0.316",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.317",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

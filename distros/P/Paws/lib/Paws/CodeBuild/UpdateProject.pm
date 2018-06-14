@@ -2,6 +2,8 @@
 package Paws::CodeBuild::UpdateProject;
   use Moose;
   has Artifacts => (is => 'ro', isa => 'Paws::CodeBuild::ProjectArtifacts', traits => ['NameInRequest'], request_name => 'artifacts' );
+  has BadgeEnabled => (is => 'ro', isa => 'Bool', traits => ['NameInRequest'], request_name => 'badgeEnabled' );
+  has Cache => (is => 'ro', isa => 'Paws::CodeBuild::ProjectCache', traits => ['NameInRequest'], request_name => 'cache' );
   has Description => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'description' );
   has EncryptionKey => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'encryptionKey' );
   has Environment => (is => 'ro', isa => 'Paws::CodeBuild::ProjectEnvironment', traits => ['NameInRequest'], request_name => 'environment' );
@@ -10,6 +12,7 @@ package Paws::CodeBuild::UpdateProject;
   has Source => (is => 'ro', isa => 'Paws::CodeBuild::ProjectSource', traits => ['NameInRequest'], request_name => 'source' );
   has Tags => (is => 'ro', isa => 'ArrayRef[Paws::CodeBuild::Tag]', traits => ['NameInRequest'], request_name => 'tags' );
   has TimeoutInMinutes => (is => 'ro', isa => 'Int', traits => ['NameInRequest'], request_name => 'timeoutInMinutes' );
+  has VpcConfig => (is => 'ro', isa => 'Paws::CodeBuild::VpcConfig', traits => ['NameInRequest'], request_name => 'vpcConfig' );
 
   use MooseX::ClassAttribute;
 
@@ -22,21 +25,92 @@ package Paws::CodeBuild::UpdateProject;
 
 =head1 NAME
 
-Paws::CodeBuild::UpdateProject - Arguments for method UpdateProject on Paws::CodeBuild
+Paws::CodeBuild::UpdateProject - Arguments for method UpdateProject on L<Paws::CodeBuild>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateProject on the 
-AWS CodeBuild service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateProject on the
+L<AWS CodeBuild|Paws::CodeBuild> service. Use the attributes of this class
 as arguments to method UpdateProject.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateProject.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateProject(Att1 => $value1, Att2 => $value2, ...);
+    my $codebuild = Paws->service('CodeBuild');
+    my $UpdateProjectOutput = $codebuild->UpdateProject(
+      Name      => 'MyNonEmptyString',
+      Artifacts => {
+        type => 'CODEPIPELINE',    # values: CODEPIPELINE, S3, NO_ARTIFACTS
+        name => 'MyString',        # OPTIONAL
+        namespaceType => 'NONE',        # values: NONE, BUILD_ID; OPTIONAL
+        packaging     => 'NONE',        # values: NONE, ZIP; OPTIONAL
+        location      => 'MyString',    # OPTIONAL
+        path          => 'MyString',    # OPTIONAL
+      },    # OPTIONAL
+      BadgeEnabled => 1,    # OPTIONAL
+      Cache        => {
+        type     => 'NO_CACHE',    # values: NO_CACHE, S3
+        location => 'MyString',    # OPTIONAL
+      },    # OPTIONAL
+      Description   => 'MyProjectDescription',    # OPTIONAL
+      EncryptionKey => 'MyNonEmptyString',        # OPTIONAL
+      Environment   => {
+        type =>
+          'WINDOWS_CONTAINER',    # values: WINDOWS_CONTAINER, LINUX_CONTAINER
+        computeType => 'BUILD_GENERAL1_SMALL'
+        , # values: BUILD_GENERAL1_SMALL, BUILD_GENERAL1_MEDIUM, BUILD_GENERAL1_LARGE
+        image                => 'MyNonEmptyString',    # min: 1,
+        privilegedMode       => 1,
+        environmentVariables => [
+          {
+            name  => 'MyNonEmptyString',               # min: 1,
+            value => 'MyString',                       # OPTIONAL
+            type => 'PLAINTEXT',  # values: PLAINTEXT, PARAMETER_STORE; OPTIONAL
+          },
+          ...
+        ],                        # OPTIONAL
+        certificate => 'MyString',    # OPTIONAL
+      },    # OPTIONAL
+      ServiceRole => 'MyNonEmptyString',    # OPTIONAL
+      Source      => {
+        type => 'CODECOMMIT'
+        , # values: CODECOMMIT, CODEPIPELINE, GITHUB, S3, BITBUCKET, GITHUB_ENTERPRISE
+        gitCloneDepth => 1,             # OPTIONAL
+        location      => 'MyString',    # OPTIONAL
+        insecureSsl   => 1,
+        auth          => {
+          type     => 'OAUTH',          # values: OAUTH
+          resource => 'MyString',       # OPTIONAL
+        },    # OPTIONAL
+        buildspec => 'MyString',    # OPTIONAL
+      },    # OPTIONAL
+      Tags => [
+        {
+          key   => 'MyKeyInput',      # min: 1, max: 127; OPTIONAL
+          value => 'MyValueInput',    # min: 1, max: 255; OPTIONAL
+        },
+        ...
+      ],                              # OPTIONAL
+      TimeoutInMinutes => 1,          # OPTIONAL
+      VpcConfig        => {
+        vpcId   => 'MyNonEmptyString',    # min: 1,
+        subnets => [
+          'MyNonEmptyString', ...         # min: 1,
+        ],                                # max: 16; OPTIONAL
+        securityGroupIds => [
+          'MyNonEmptyString', ...         # min: 1,
+        ],                                # max: 5; OPTIONAL
+      },    # OPTIONAL
+    );
+
+    # Results:
+    my $Project = $UpdateProjectOutput->Project;
+
+    # Returns a L<Paws::CodeBuild::UpdateProjectOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/codebuild/UpdateProject>
 
 =head1 ATTRIBUTES
 
@@ -45,6 +119,20 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 
 Information to be changed about the build output artifacts for the
 build project.
+
+
+
+=head2 BadgeEnabled => Bool
+
+Set this to true to generate a publicly-accessible URL for your
+project's build badge.
+
+
+
+=head2 Cache => L<Paws::CodeBuild::ProjectCache>
+
+Stores recently used information so that it can be quickly accessed at
+a later time.
 
 
 
@@ -111,6 +199,12 @@ marked as completed.
 
 
 
+=head2 VpcConfig => L<Paws::CodeBuild::VpcConfig>
+
+VpcConfig enables AWS CodeBuild to access resources in an Amazon VPC.
+
+
+
 
 =head1 SEE ALSO
 
@@ -118,9 +212,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateProject
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -1,0 +1,80 @@
+#!perl
+
+# ABSTRACT: Generate BSN numbers from the command line
+# PODNAME: generate_bsn
+
+use warnings;
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Random::NL qw(generate_bsn);
+
+my %opts = (help => 0, n => 10);
+
+{
+    local $SIG{__WARN__};
+    my $ok = eval {
+        GetOptions(
+            \%opts, qw(help n=i start=i)
+        );
+    };
+    if (!$ok) {
+        die($@);
+    }
+}
+
+pod2usage(0) if ($opts{help});
+
+for (1...$opts{n}) {
+    print generate_bsn($opts{start}), $/;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+generate_bsn - Generate BSN numbers from the command line
+
+=head1 VERSION
+
+version 1.4
+
+=head1 SYNOPSIS
+
+    generate_bsn OPTIONS
+
+=head1 DESCRIPTION
+
+Generate BSN numbers from the command line
+
+=head1 OPTIONS
+
+=head2 help
+
+This help
+
+=head2 n
+
+The number of generated numbers, defaults to 10
+
+=head2 start
+
+The first number of your BSN number(s).
+
+=head1 AUTHOR
+
+Wesley Schwengle <waterkip@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Wesley Schwengle.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+=cut

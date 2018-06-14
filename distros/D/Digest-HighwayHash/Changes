@@ -1,0 +1,8 @@
+Revision history for Perl extension Digest::HighwayHash.
+
+0.001 2018-06-09T18:55+01:00
+ - Fix test failures
+ - Write some documentation
+
+0.000_001 2018-05-31T20:58+01:00
+ - First release, very experimental code

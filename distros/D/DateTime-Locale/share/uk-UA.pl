@@ -134,7 +134,7 @@
     "\N{U+043d}\N{U+0430}\N{U+0448}\N{U+043e}\N{U+0457} \N{U+0435}\N{U+0440}\N{U+0438}",
   ],
   first_day_of_week => 1,
-  glibc_date_1_format => "%A, %-d %Om %Y %X %z",
+  glibc_date_1_format => "%A, %-d %B %Y %X %z",
   glibc_date_format => "%d.%m.%y",
   glibc_datetime_format => "%a, %d-%b-%Y %X %z",
   glibc_time_12_format => "%I:%M:%S %p",

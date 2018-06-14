@@ -11,47 +11,70 @@ package Paws::Greengrass::CreateGroup;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/greengrass/groups');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'POST');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::Greengrass::CreateGroupResponse');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::Greengrass::CreateGroup - Arguments for method CreateGroup on Paws::Greengrass
+Paws::Greengrass::CreateGroup - Arguments for method CreateGroup on L<Paws::Greengrass>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateGroup on the 
-AWS Greengrass service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateGroup on the
+L<AWS Greengrass|Paws::Greengrass> service. Use the attributes of this class
 as arguments to method CreateGroup.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateGroup.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateGroup(Att1 => $value1, Att2 => $value2, ...);
+    my $greengrass = Paws->service('Greengrass');
+    my $CreateGroupResponse = $greengrass->CreateGroup(
+      AmznClientToken => 'My__string',    # OPTIONAL
+      InitialVersion  => {
+        DeviceDefinitionVersionArn       => 'My__string',
+        CoreDefinitionVersionArn         => 'My__string',
+        ResourceDefinitionVersionArn     => 'My__string',
+        LoggerDefinitionVersionArn       => 'My__string',
+        SubscriptionDefinitionVersionArn => 'My__string',
+        FunctionDefinitionVersionArn     => 'My__string',
+      },                                  # OPTIONAL
+      Name => 'My__string',               # OPTIONAL
+    );
+
+    # Results:
+    my $LastUpdatedTimestamp = $CreateGroupResponse->LastUpdatedTimestamp;
+    my $Id                   = $CreateGroupResponse->Id;
+    my $LatestVersionArn     = $CreateGroupResponse->LatestVersionArn;
+    my $Arn                  = $CreateGroupResponse->Arn;
+    my $CreationTimestamp    = $CreateGroupResponse->CreationTimestamp;
+    my $Name                 = $CreateGroupResponse->Name;
+    my $LatestVersion        = $CreateGroupResponse->LatestVersion;
+
+    # Returns a L<Paws::Greengrass::CreateGroupResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/greengrass/>
 
 =head1 ATTRIBUTES
 
 
 =head2 AmznClientToken => Str
 
-The client token used to request idempotent operations.
+A client token used to correlate requests and responses.
 
 
 
 =head2 InitialVersion => L<Paws::Greengrass::GroupVersion>
 
-Information on the initial version
+Information about the initial version of the group.
 
 
 
 =head2 Name => Str
 
-name of the group
+The name of the group.
 
 
 
@@ -62,9 +85,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateGroup i
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -4,9 +4,12 @@ package Paws::ECS::RunTask;
   has Cluster => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'cluster' );
   has Count => (is => 'ro', isa => 'Int', traits => ['NameInRequest'], request_name => 'count' );
   has Group => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'group' );
+  has LaunchType => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'launchType' );
+  has NetworkConfiguration => (is => 'ro', isa => 'Paws::ECS::NetworkConfiguration', traits => ['NameInRequest'], request_name => 'networkConfiguration' );
   has Overrides => (is => 'ro', isa => 'Paws::ECS::TaskOverride', traits => ['NameInRequest'], request_name => 'overrides' );
   has PlacementConstraints => (is => 'ro', isa => 'ArrayRef[Paws::ECS::PlacementConstraint]', traits => ['NameInRequest'], request_name => 'placementConstraints' );
   has PlacementStrategy => (is => 'ro', isa => 'ArrayRef[Paws::ECS::PlacementStrategy]', traits => ['NameInRequest'], request_name => 'placementStrategy' );
+  has PlatformVersion => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'platformVersion' );
   has StartedBy => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'startedBy' );
   has TaskDefinition => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'taskDefinition' , required => 1);
 
@@ -21,21 +24,35 @@ package Paws::ECS::RunTask;
 
 =head1 NAME
 
-Paws::ECS::RunTask - Arguments for method RunTask on Paws::ECS
+Paws::ECS::RunTask - Arguments for method RunTask on L<Paws::ECS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method RunTask on the 
-Amazon EC2 Container Service service. Use the attributes of this class
+This class represents the parameters used for calling the method RunTask on the
+L<Amazon EC2 Container Service|Paws::ECS> service. Use the attributes of this class
 as arguments to method RunTask.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to RunTask.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->RunTask(Att1 => $value1, Att2 => $value2, ...);
+    my $ecs = Paws->service('ECS');
+    # To run a task on your default cluster
+    # This example runs the specified task definition on your default cluster.
+    my $RunTaskResponse = $ecs->RunTask(
+      {
+        'Cluster'        => 'default',
+        'TaskDefinition' => 'sleep360:1'
+      }
+    );
+
+    # Results:
+    my $tasks = $RunTaskResponse->tasks;
+
+    # Returns a L<Paws::ECS::RunTaskResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ecs/RunTask>
 
 =head1 ATTRIBUTES
 
@@ -60,6 +77,23 @@ cluster. You can specify up to 10 tasks per call.
 The name of the task group to associate with the task. The default
 value is the family name of the task definition (for example,
 family:my-family-name).
+
+
+
+=head2 LaunchType => Str
+
+The launch type on which to run your task.
+
+Valid values are: C<"EC2">, C<"FARGATE">
+
+=head2 NetworkConfiguration => L<Paws::ECS::NetworkConfiguration>
+
+The network configuration for the task. This parameter is required for
+task definitions that use the C<awsvpc> network mode to receive their
+own Elastic Network Interface, and it is not supported for other
+network modes. For more information, see Task Networking
+(http://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html)
+in the I<Amazon Elastic Container Service Developer Guide>.
 
 
 
@@ -89,7 +123,14 @@ task definition and those specified at run time).
 =head2 PlacementStrategy => ArrayRef[L<Paws::ECS::PlacementStrategy>]
 
 The placement strategy objects to use for the task. You can specify a
-maximum of 5 strategy rules per task.
+maximum of five strategy rules per task.
+
+
+
+=head2 PlatformVersion => Str
+
+The platform version on which to run your task. If one is not
+specified, the latest version is used by default.
 
 
 
@@ -110,9 +151,9 @@ parameter contains the deployment ID of the service that starts it.
 
 =head2 B<REQUIRED> TaskDefinition => Str
 
-The C<family> and C<revision> (C<family:revision>) or full Amazon
-Resource Name (ARN) of the task definition to run. If a C<revision> is
-not specified, the latest C<ACTIVE> revision is used.
+The C<family> and C<revision> (C<family:revision>) or full ARN of the
+task definition to run. If a C<revision> is not specified, the latest
+C<ACTIVE> revision is used.
 
 
 
@@ -123,9 +164,9 @@ This class forms part of L<Paws>, documenting arguments for method RunTask in L<
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

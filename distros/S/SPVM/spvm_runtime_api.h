@@ -18,7 +18,7 @@ int32_t SPVM_RUNTIME_API_create_long_type_id(SPVM_ENV* env);
 int32_t SPVM_RUNTIME_API_create_float_type_id(SPVM_ENV* env);
 int32_t SPVM_RUNTIME_API_create_double_type_id(SPVM_ENV* env);
 
-SPVM_RUNTIME* SPVM_RUNTIME_API_new_runtime();
+SPVM_ENV* SPVM_RUNTIME_API_get_env_runtime();
 void SPVM_RUNTIME_API_dec_ref_count_only(SPVM_ENV* env, SPVM_OBJECT* object);
 int32_t SPVM_RUNTIME_API_get_object_header_length_offset(SPVM_ENV* env);
 
@@ -81,9 +81,6 @@ int32_t SPVM_RUNTIME_API_get_class_method_sub_id(SPVM_ENV* env, const char* pack
 int32_t SPVM_RUNTIME_API_get_basic_type_id(SPVM_ENV* env, const char* name);
 
 SPVM_OBJECT* SPVM_RUNTIME_API_new_object(SPVM_ENV* env, int32_t package_id);
-
-SPVM_OBJECT* SPVM_RUNTIME_API_new_address_array(SPVM_ENV* env, int32_t length);
-
 SPVM_OBJECT* SPVM_RUNTIME_API_new_byte_array(SPVM_ENV* env, int32_t length);
 SPVM_OBJECT* SPVM_RUNTIME_API_new_short_array(SPVM_ENV* env, int32_t length);
 SPVM_OBJECT* SPVM_RUNTIME_API_new_int_array(SPVM_ENV* env, int32_t length);
@@ -92,8 +89,6 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_float_array(SPVM_ENV* env, int32_t length);
 SPVM_OBJECT* SPVM_RUNTIME_API_new_double_array(SPVM_ENV* env, int32_t length);
 SPVM_OBJECT* SPVM_RUNTIME_API_new_object_array(SPVM_ENV* env, int32_t basic_type_id, int32_t length);
 SPVM_OBJECT* SPVM_RUNTIME_API_new_multi_array(SPVM_ENV* env, int32_t basic_type_id, int32_t dimension, int32_t length);
-
-SPVM_OBJECT* SPVM_RUNTIME_API_new_call_stack_object(SPVM_ENV* env, int32_t length);
 
 // Exception
 void SPVM_RUNTIME_API_set_exception(SPVM_ENV* env, SPVM_OBJECT* exception);

@@ -67,7 +67,7 @@ ID, the execution type (for example, command), and the execution time.
 =head2 Id => Str
 
   An ID for the compliance item. For example, if the compliance item is a
-Windows patch, the ID could be the number of the KB article. Here's an
+Windows patch, the ID could be the number of the KB article; for
 example: KB4010320.
 
 
@@ -99,8 +99,8 @@ NON_COMPLIANT.
 
   A title for the compliance item. For example, if the compliance item is
 a Windows patch, the title could be the title of the KB article for the
-patch. Here's an example: Security Update for Active Directory
-Federation Services.
+patch; for example: Security Update for Active Directory Federation
+Services.
 
 
 
@@ -110,9 +110,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::SSM>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

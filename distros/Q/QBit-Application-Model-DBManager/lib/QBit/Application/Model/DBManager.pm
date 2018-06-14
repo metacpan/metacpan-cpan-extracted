@@ -30,7 +30,7 @@ For more information. please, see code.
 =cut
 
 package QBit::Application::Model::DBManager;
-$QBit::Application::Model::DBManager::VERSION = '0.020';
+$QBit::Application::Model::DBManager::VERSION = '0.021';
 use qbit;
 
 use base qw(QBit::Application::Model);
@@ -44,48 +44,38 @@ use Exception::DBManager::Grammar;
 
 __PACKAGE__->abstract_methods(qw(query add));
 
-=head2 init
+=head2 remove_model_fields
 
-Initialization model.
+Removes the model fields. Use this method if you want to set an entirely different set of fields for the model.
 
-B<It is done:>
+B<No arguments>
 
-=over
-
-=item
-
-Init fields
-
-=back
-
-B<No arguments.>
+B<Return value:> $model_fields (type: ref of a hash)
 
 B<Example:>
 
-  my $model = Application::Model->new(); # Application::Model based on QBit::Application::Model
-
-  # but usually this is used so
-
-  package Application;
-
-  use base qw(QBit::Application);
-
-  __Package__->set_accessors(model => {package => 'Application::Model'});
-
-  ...
-
-  # after
-
-  my $model = $app->model;
+  my $model_fields = $app->users->remove_model_fields();
+  
+  # set new fields.
+  $app->users->model_fields(...);
 
 =cut
 
-sub init {
+sub remove_model_fields {
     my ($self) = @_;
 
-    $self->SUPER::init();
+    my $stash = package_stash(ref($self) || $self);
 
-    $self->init_fields();
+    delete(
+        @$stash{
+            qw(
+              __MODEL_FIELDS_INITIALIZED__
+              __MODEL_FIELDS_SORT_ORDERS__
+              )
+        }
+    );
+
+    return delete($stash->{'__MODEL_FIELDS__'});
 }
 
 =head2 model_fields
@@ -238,33 +228,13 @@ B<Example:>
 sub model_fields {
     my ($class, %fields) = @_;
 
-    package_stash($class)->{'__MODEL_FIELDS__'} = \%fields;
-}
-
-=head2 init_fields
-
-Initialization fields. Used after calling B<model_fields> in run time a code
-
-B<No arguments.>
-
-B<Example:>
-
-  $model->model_fields(...);
-  $model->init_fields();
-
-=cut
-
-sub init_fields {
-    my ($self) = @_;
-
-    my $class = ref($self) || $self;
-
-    my $fields = package_stash($class)->{'__MODEL_FIELDS__'};
+    my $stash_fields = package_stash($class)->{'__MODEL_FIELDS__'} // {};
+    package_stash($class)->{'__MODEL_FIELDS__'} = $stash_fields = {%$stash_fields, %fields};
 
     my $inited_fields;
 
     package_stash($class)->{'__MODEL_FIELDS_INITIALIZED__'} = $inited_fields =
-      QBit::Application::Model::DBManager::_Utils::Fields->init_fields($fields);
+      QBit::Application::Model::DBManager::_Utils::Fields->init_fields($stash_fields);
 
     package_stash($class)->{'__MODEL_FIELDS_SORT_ORDERS__'} =
       QBit::Application::Model::DBManager::_Utils::Fields->init_field_sort($inited_fields);
@@ -376,13 +346,14 @@ sub model_filter {
     my ($class, %opts) = @_;
 
     my $pkg_stash = package_stash($class);
-    $pkg_stash->{'__DB_FILTER__'} = $opts{'fields'} || return;
 
-    $pkg_stash->{'__DB_FILTER_DBACCESSOR__'} = $opts{'db_accessor'} || 'db';
+    $pkg_stash->{'__DB_FILTER__'} //= {};
+    $pkg_stash->{'__DB_FILTER__'} = {%{$pkg_stash->{'__DB_FILTER__'}}, %{$opts{'fields'}}};
+
+    $pkg_stash->{'__DB_FILTER_DBACCESSOR__'} = $opts{'db_accessor'} || $pkg_stash->{'__DB_FILTER_DBACCESSOR__'} || 'db';
     throw Exception::BadArguments gettext("Cannot find DB accessor %s, package %s",
         $pkg_stash->{'__DB_FILTER_DBACCESSOR__'}, $class)
       unless $class->can($pkg_stash->{'__DB_FILTER_DBACCESSOR__'});
-
 }
 
 =head2 get_model_fields

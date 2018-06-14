@@ -54,8 +54,7 @@ Contains information about the schema attribute.
 
 =head2 Mutable => Bool
 
-  Specifies whether the attribute can be changed once it has been
-created.
+  Specifies whether the value of the attribute can be changed.
 
 
 =head2 Name => Str
@@ -87,9 +86,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::CognitoId
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -16,21 +16,32 @@ package Paws::RDS::ResetDBParameterGroup;
 
 =head1 NAME
 
-Paws::RDS::ResetDBParameterGroup - Arguments for method ResetDBParameterGroup on Paws::RDS
+Paws::RDS::ResetDBParameterGroup - Arguments for method ResetDBParameterGroup on L<Paws::RDS>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ResetDBParameterGroup on the 
-Amazon Relational Database Service service. Use the attributes of this class
+This class represents the parameters used for calling the method ResetDBParameterGroup on the
+L<Amazon Relational Database Service|Paws::RDS> service. Use the attributes of this class
 as arguments to method ResetDBParameterGroup.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ResetDBParameterGroup.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ResetDBParameterGroup(Att1 => $value1, Att2 => $value2, ...);
+    my $rds = Paws->service('RDS');
+    # To reset the values of a DB parameter group
+    # This example resets all parameters for the specified DB parameter group to
+    # their default values.
+    my $DBParameterGroupNameMessage = $rds->ResetDBParameterGroup(
+      {
+        'ResetAllParameters'   => true,
+        'DBParameterGroupName' => 'mydbparametergroup'
+      }
+    );
+
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/rds/ResetDBParameterGroup>
 
 =head1 ATTRIBUTES
 
@@ -45,15 +56,7 @@ Constraints:
 
 =item *
 
-Must be 1 to 255 alphanumeric characters
-
-=item *
-
-First character must be a letter
-
-=item *
-
-Cannot end with a hyphen or contain two consecutive hyphens
+Must match the name of an existing DBParameterGroup.
 
 =back
 
@@ -106,9 +109,9 @@ This class forms part of L<Paws>, documenting arguments for method ResetDBParame
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

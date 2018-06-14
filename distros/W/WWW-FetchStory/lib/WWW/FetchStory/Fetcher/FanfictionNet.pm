@@ -1,5 +1,5 @@
 package WWW::FetchStory::Fetcher::FanfictionNet;
-$WWW::FetchStory::Fetcher::FanfictionNet::VERSION = '0.1902';
+$WWW::FetchStory::Fetcher::FanfictionNet::VERSION = '0.2002';
 use strict;
 use warnings;
 =head1 NAME
@@ -8,7 +8,7 @@ WWW::FetchStory::Fetcher::FanfictionNet - fetching module for WWW::FetchStory
 
 =head1 VERSION
 
-version 0.1902
+version 0.2002
 
 =head1 DESCRIPTION
 
@@ -446,6 +446,14 @@ sub parse_characters {
     $characters =~ s/Ginny W/Ginny Weasley/;
     $characters =~ s/Fred W/Fred Weasley/;
     $characters =~ s/George W/George Weasley/;
+    $characters =~ s/8th Doctor/Eighth Doctor/;
+    $characters =~ s/9th Doctor/Ninth Doctor/;
+    $characters =~ s/10th Doctor/Tenth Doctor/;
+    $characters =~ s/11th Doctor/Eleventh Doctor/;
+    $characters =~ s/Rose T/Rose Tyler/;
+    $characters =~ s/Donna N/Donna Noble/;
+    $characters =~ s/Jenny - Doctor's Daughter/Jenny/;
+    $characters =~ s#River Song/Melody P III#River Song#;
 
     return $characters;
 } # parse_characters
@@ -514,6 +522,10 @@ sub parse_title {
 	$title = $1;
     }
     elsif ($content =~ m#<title>([^<]+)\s*Chapter[^<]+</title>#is)
+    {
+	$title = $1;
+    }
+    elsif ($content =~ m#<title>([^<]+), a [^<]+ fanfic [|] FanFiction</title>#is)
     {
 	$title = $1;
     }

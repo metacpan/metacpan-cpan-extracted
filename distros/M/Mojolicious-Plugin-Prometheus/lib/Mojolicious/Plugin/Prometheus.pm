@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Time::HiRes qw/gettimeofday tv_interval/;
 use Net::Prometheus;
 
-our $VERSION = '1.1.0';
+our $VERSION = '1.1.1';
 
 has prometheus => sub { state $prom = _init_prometheus() };
 has route => sub {undef};
@@ -122,6 +122,8 @@ sub register {
 1;
 __END__
 
+=for stopwords prometheus
+
 =encoding utf8
 
 =head1 NAME
@@ -210,11 +212,11 @@ this plugin will also expose
 
 =item * C<http_requests_total>, request counter partitioned over HTTP method and HTTP response code
 
-=item * C<http_request_duration_seconds>, request duration histogram partitoned over HTTP method
+=item * C<http_request_duration_seconds>, request duration histogram partitioned over HTTP method
 
-=item * C<http_request_size_bytes>, request size histogram partitoned over HTTP method
+=item * C<http_request_size_bytes>, request size histogram partitioned over HTTP method
 
-=item * C<http_response_size_bytes>, response size histogram partitoned over HTTP method
+=item * C<http_response_size_bytes>, response size histogram partitioned over HTTP method
 
 =back
 
@@ -223,6 +225,8 @@ this plugin will also expose
 When running under a preforking daemon like L<Hypnotoad|Mojo::Server::Hypnotoad>, you will not get global metrics but only the metrics of each worker, randomly.
 
 The C<worker> label will include the pid of the current worker so metrics can be aggregated per worker in Prometheus.
+
+If you prefer to get the global metrics from any worker, then see L<Mojolicious::Plugin::Prometheus::Shared::FastMmap> for a possible solution.
 
 =head1 AUTHOR
 
@@ -238,6 +242,8 @@ the terms of the Artistic License version 2.0.
 =head1 SEE ALSO
 
 =over 2
+
+=item L<Mojolicious::Plugin::Prometheus::Shared::FastMmap>
 
 =item L<Net::Prometheus>
 

@@ -1,5 +1,11 @@
 Revision history for XML-MyXML
 
+1.02    2018-06-12
+        - Add mention of perlmodules.net
+
+1.01    2018-06-12
+        - Added mini-tutorial on how to use the simple_to_xml function
+
 1.000   2018-06-08
         - simple_to_xml allows setting attributes, with refs or strings
         - default indentstring changed from tab character to 4 spaces

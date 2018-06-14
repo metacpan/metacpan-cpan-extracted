@@ -1,6 +1,7 @@
 package Paws::CloudWatch;
   use Moose;
   sub service { 'monitoring' }
+  sub signing_name { 'monitoring' }
   sub version { '2010-08-01' }
   sub flattened_arrays { 0 }
   has max_attempts => (is => 'ro', isa => 'Int', default => 5);
@@ -10,7 +11,7 @@ package Paws::CloudWatch;
   has retriables => (is => 'ro', isa => 'ArrayRef', default => sub { [
   ] });
 
-  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::QueryCaller', 'Paws::Net::XMLResponse';
+  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::QueryCaller';
 
   
   sub DeleteAlarms {
@@ -51,6 +52,11 @@ package Paws::CloudWatch;
   sub GetDashboard {
     my $self = shift;
     my $call_object = $self->new_with_coercions('Paws::CloudWatch::GetDashboard', @_);
+    return $self->caller->do_call($self, $call_object);
+  }
+  sub GetMetricData {
+    my $self = shift;
+    my $call_object = $self->new_with_coercions('Paws::CloudWatch::GetMetricData', @_);
     return $self->caller->do_call($self, $call_object);
   }
   sub GetMetricStatistics {
@@ -135,6 +141,29 @@ package Paws::CloudWatch;
 
     return undef
   }
+  sub ListAllDashboards {
+    my $self = shift;
+
+    my $callback = shift @_ if (ref($_[0]) eq 'CODE');
+    my $result = $self->ListDashboards(@_);
+    my $next_result = $result;
+
+    if (not defined $callback) {
+      while ($next_result->NextToken) {
+        $next_result = $self->ListDashboards(@_, NextToken => $next_result->NextToken);
+        push @{ $result->DashboardEntries }, @{ $next_result->DashboardEntries };
+      }
+      return $result;
+    } else {
+      while ($result->NextToken) {
+        $callback->($_ => 'DashboardEntries') foreach (@{ $result->DashboardEntries });
+        $result = $self->ListDashboards(@_, NextToken => $result->NextToken);
+      }
+      $callback->($_ => 'DashboardEntries') foreach (@{ $result->DashboardEntries });
+    }
+
+    return undef
+  }
   sub ListAllMetrics {
     my $self = shift;
 
@@ -160,7 +189,7 @@ package Paws::CloudWatch;
   }
 
 
-  sub operations { qw/DeleteAlarms DeleteDashboards DescribeAlarmHistory DescribeAlarms DescribeAlarmsForMetric DisableAlarmActions EnableAlarmActions GetDashboard GetMetricStatistics ListDashboards ListMetrics PutDashboard PutMetricAlarm PutMetricData SetAlarmState / }
+  sub operations { qw/DeleteAlarms DeleteDashboards DescribeAlarmHistory DescribeAlarms DescribeAlarmsForMetric DisableAlarmActions EnableAlarmActions GetDashboard GetMetricData GetMetricStatistics ListDashboards ListMetrics PutDashboard PutMetricAlarm PutMetricData SetAlarmState / }
 
 1;
 
@@ -205,36 +234,70 @@ can monitor your own custom metrics. With CloudWatch, you gain
 system-wide visibility into resource utilization, application
 performance, and operational health.
 
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/cloudwatch/>
+
+
 =head1 METHODS
 
-=head2 DeleteAlarms(AlarmNames => ArrayRef[Str|Undef])
+=head2 DeleteAlarms
+
+=over
+
+=item AlarmNames => ArrayRef[Str|Undef]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CloudWatch::DeleteAlarms>
 
 Returns: nothing
 
-  Deletes the specified alarms. In the event of an error, no alarms are
+Deletes the specified alarms. In the event of an error, no alarms are
 deleted.
 
 
-=head2 DeleteDashboards([DashboardNames => ArrayRef[Str|Undef]])
+=head2 DeleteDashboards
+
+=over
+
+=item DashboardNames => ArrayRef[Str|Undef]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CloudWatch::DeleteDashboards>
 
 Returns: a L<Paws::CloudWatch::DeleteDashboardsOutput> instance
 
-  Deletes all dashboards that you specify. You may specify up to 100
+Deletes all dashboards that you specify. You may specify up to 100
 dashboards to delete. If there is an error during this call, no
 dashboards are deleted.
 
 
-=head2 DescribeAlarmHistory([AlarmName => Str, EndDate => Str, HistoryItemType => Str, MaxRecords => Int, NextToken => Str, StartDate => Str])
+=head2 DescribeAlarmHistory
+
+=over
+
+=item [AlarmName => Str]
+
+=item [EndDate => Str]
+
+=item [HistoryItemType => Str]
+
+=item [MaxRecords => Int]
+
+=item [NextToken => Str]
+
+=item [StartDate => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CloudWatch::DescribeAlarmHistory>
 
 Returns: a L<Paws::CloudWatch::DescribeAlarmHistoryOutput> instance
 
-  Retrieves the history for the specified alarm. You can filter the
+Retrieves the history for the specified alarm. You can filter the
 results by date range or item type. If an alarm name is not specified,
 the histories for all alarms are returned.
 
@@ -242,67 +305,187 @@ CloudWatch retains the history of an alarm even if you delete the
 alarm.
 
 
-=head2 DescribeAlarms([ActionPrefix => Str, AlarmNamePrefix => Str, AlarmNames => ArrayRef[Str|Undef], MaxRecords => Int, NextToken => Str, StateValue => Str])
+=head2 DescribeAlarms
+
+=over
+
+=item [ActionPrefix => Str]
+
+=item [AlarmNamePrefix => Str]
+
+=item [AlarmNames => ArrayRef[Str|Undef]]
+
+=item [MaxRecords => Int]
+
+=item [NextToken => Str]
+
+=item [StateValue => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CloudWatch::DescribeAlarms>
 
 Returns: a L<Paws::CloudWatch::DescribeAlarmsOutput> instance
 
-  Retrieves the specified alarms. If no alarms are specified, all alarms
+Retrieves the specified alarms. If no alarms are specified, all alarms
 are returned. Alarms can be retrieved by using only a prefix for the
 alarm name, the alarm state, or a prefix for any action.
 
 
-=head2 DescribeAlarmsForMetric(MetricName => Str, Namespace => Str, [Dimensions => ArrayRef[L<Paws::CloudWatch::Dimension>], ExtendedStatistic => Str, Period => Int, Statistic => Str, Unit => Str])
+=head2 DescribeAlarmsForMetric
+
+=over
+
+=item MetricName => Str
+
+=item Namespace => Str
+
+=item [Dimensions => ArrayRef[L<Paws::CloudWatch::Dimension>]]
+
+=item [ExtendedStatistic => Str]
+
+=item [Period => Int]
+
+=item [Statistic => Str]
+
+=item [Unit => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CloudWatch::DescribeAlarmsForMetric>
 
 Returns: a L<Paws::CloudWatch::DescribeAlarmsForMetricOutput> instance
 
-  Retrieves the alarms for the specified metric. To filter the results,
+Retrieves the alarms for the specified metric. To filter the results,
 specify a statistic, period, or unit.
 
 
-=head2 DisableAlarmActions(AlarmNames => ArrayRef[Str|Undef])
+=head2 DisableAlarmActions
+
+=over
+
+=item AlarmNames => ArrayRef[Str|Undef]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CloudWatch::DisableAlarmActions>
 
 Returns: nothing
 
-  Disables the actions for the specified alarms. When an alarm's actions
+Disables the actions for the specified alarms. When an alarm's actions
 are disabled, the alarm actions do not execute when the alarm state
 changes.
 
 
-=head2 EnableAlarmActions(AlarmNames => ArrayRef[Str|Undef])
+=head2 EnableAlarmActions
+
+=over
+
+=item AlarmNames => ArrayRef[Str|Undef]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CloudWatch::EnableAlarmActions>
 
 Returns: nothing
 
-  Enables the actions for the specified alarms.
+Enables the actions for the specified alarms.
 
 
-=head2 GetDashboard([DashboardName => Str])
+=head2 GetDashboard
+
+=over
+
+=item DashboardName => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CloudWatch::GetDashboard>
 
 Returns: a L<Paws::CloudWatch::GetDashboardOutput> instance
 
-  Displays the details of the dashboard that you specify.
+Displays the details of the dashboard that you specify.
 
 To copy an existing dashboard, use C<GetDashboard>, and then use the
 data returned within C<DashboardBody> as the template for the new
 dashboard when you call C<PutDashboard> to create the copy.
 
 
-=head2 GetMetricStatistics(EndTime => Str, MetricName => Str, Namespace => Str, Period => Int, StartTime => Str, [Dimensions => ArrayRef[L<Paws::CloudWatch::Dimension>], ExtendedStatistics => ArrayRef[Str|Undef], Statistics => ArrayRef[Str|Undef], Unit => Str])
+=head2 GetMetricData
+
+=over
+
+=item EndTime => Str
+
+=item MetricDataQueries => ArrayRef[L<Paws::CloudWatch::MetricDataQuery>]
+
+=item StartTime => Str
+
+=item [MaxDatapoints => Int]
+
+=item [NextToken => Str]
+
+=item [ScanBy => Str]
+
+
+=back
+
+Each argument is described in detail in: L<Paws::CloudWatch::GetMetricData>
+
+Returns: a L<Paws::CloudWatch::GetMetricDataOutput> instance
+
+You can use the C<GetMetricData> API to retrieve as many as 100
+different metrics in a single request, with a total of as many as
+100,800 datapoints. You can also optionally perform math expressions on
+the values of the returned statistics, to create new time series that
+represent new insights into your data. For example, using Lambda
+metrics, you could divide the Errors metric by the Invocations metric
+to get an error rate time series. For more information about metric
+math expressions, see Metric Math Syntax and Functions
+(http://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/using-metric-math.html#metric-math-syntax)
+in the I<Amazon CloudWatch User Guide>.
+
+Calls to the C<GetMetricData> API have a different pricing structure
+than calls to C<GetMetricStatistics>. For more information about
+pricing, see Amazon CloudWatch Pricing
+(https://aws.amazon.com/cloudwatch/pricing/).
+
+
+=head2 GetMetricStatistics
+
+=over
+
+=item EndTime => Str
+
+=item MetricName => Str
+
+=item Namespace => Str
+
+=item Period => Int
+
+=item StartTime => Str
+
+=item [Dimensions => ArrayRef[L<Paws::CloudWatch::Dimension>]]
+
+=item [ExtendedStatistics => ArrayRef[Str|Undef]]
+
+=item [Statistics => ArrayRef[Str|Undef]]
+
+=item [Unit => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CloudWatch::GetMetricStatistics>
 
 Returns: a L<Paws::CloudWatch::GetMetricStatisticsOutput> instance
 
-  Gets statistics for the specified metric.
+Gets statistics for the specified metric.
 
 The maximum number of data points returned from a single call is 1,440.
 If you request more than 1,440 data points, CloudWatch returns an
@@ -375,29 +558,52 @@ CloudWatch started retaining 5-minute and 1-hour metric data as of July
 9, 2016.
 
 For information about metrics and dimensions supported by AWS services,
-see the Amazon CloudWatch Metrics and Dimensions Reference in the
-I<Amazon CloudWatch User Guide>.
+see the Amazon CloudWatch Metrics and Dimensions Reference
+(http://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CW_Support_For_AWS.html)
+in the I<Amazon CloudWatch User Guide>.
 
 
-=head2 ListDashboards([DashboardNamePrefix => Str, NextToken => Str])
+=head2 ListDashboards
+
+=over
+
+=item [DashboardNamePrefix => Str]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CloudWatch::ListDashboards>
 
 Returns: a L<Paws::CloudWatch::ListDashboardsOutput> instance
 
-  Returns a list of the dashboards for your account. If you include
+Returns a list of the dashboards for your account. If you include
 C<DashboardNamePrefix>, only those dashboards with names starting with
 the prefix are listed. Otherwise, all dashboards in your account are
 listed.
 
 
-=head2 ListMetrics([Dimensions => ArrayRef[L<Paws::CloudWatch::DimensionFilter>], MetricName => Str, Namespace => Str, NextToken => Str])
+=head2 ListMetrics
+
+=over
+
+=item [Dimensions => ArrayRef[L<Paws::CloudWatch::DimensionFilter>]]
+
+=item [MetricName => Str]
+
+=item [Namespace => Str]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CloudWatch::ListMetrics>
 
 Returns: a L<Paws::CloudWatch::ListMetricsOutput> instance
 
-  List the specified metrics. You can use the returned metrics with
+List the specified metrics. You can use the returned metrics with
 GetMetricStatistics to obtain statistical data.
 
 Up to 500 results are returned for any one call. To retrieve additional
@@ -408,13 +614,22 @@ metric appears. Statistics about the metric, however, are available
 sooner using GetMetricStatistics.
 
 
-=head2 PutDashboard([DashboardBody => Str, DashboardName => Str])
+=head2 PutDashboard
+
+=over
+
+=item DashboardBody => Str
+
+=item DashboardName => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CloudWatch::PutDashboard>
 
 Returns: a L<Paws::CloudWatch::PutDashboardOutput> instance
 
-  Creates a dashboard if it does not already exist, or updates an
+Creates a dashboard if it does not already exist, or updates an
 existing dashboard. If you update a dashboard, the entire contents are
 replaced with what you specify here.
 
@@ -437,13 +652,56 @@ the C<DashboardBody> script or the CloudFormation template used to
 create the dashboard.
 
 
-=head2 PutMetricAlarm(AlarmName => Str, ComparisonOperator => Str, EvaluationPeriods => Int, MetricName => Str, Namespace => Str, Period => Int, Threshold => Num, [ActionsEnabled => Bool, AlarmActions => ArrayRef[Str|Undef], AlarmDescription => Str, Dimensions => ArrayRef[L<Paws::CloudWatch::Dimension>], EvaluateLowSampleCountPercentile => Str, ExtendedStatistic => Str, InsufficientDataActions => ArrayRef[Str|Undef], OKActions => ArrayRef[Str|Undef], Statistic => Str, TreatMissingData => Str, Unit => Str])
+=head2 PutMetricAlarm
+
+=over
+
+=item AlarmName => Str
+
+=item ComparisonOperator => Str
+
+=item EvaluationPeriods => Int
+
+=item MetricName => Str
+
+=item Namespace => Str
+
+=item Period => Int
+
+=item Threshold => Num
+
+=item [ActionsEnabled => Bool]
+
+=item [AlarmActions => ArrayRef[Str|Undef]]
+
+=item [AlarmDescription => Str]
+
+=item [DatapointsToAlarm => Int]
+
+=item [Dimensions => ArrayRef[L<Paws::CloudWatch::Dimension>]]
+
+=item [EvaluateLowSampleCountPercentile => Str]
+
+=item [ExtendedStatistic => Str]
+
+=item [InsufficientDataActions => ArrayRef[Str|Undef]]
+
+=item [OKActions => ArrayRef[Str|Undef]]
+
+=item [Statistic => Str]
+
+=item [TreatMissingData => Str]
+
+=item [Unit => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CloudWatch::PutMetricAlarm>
 
 Returns: nothing
 
-  Creates or updates an alarm and associates it with the specified
+Creates or updates an alarm and associates it with the specified
 metric. Optionally, this operation can associate one or more Amazon SNS
 resources with the alarm.
 
@@ -459,6 +717,10 @@ If you are an IAM user, you must have Amazon EC2 permissions for some
 operations:
 
 =over
+
+=item *
+
+C<iam:CreateServiceLinkedRole> for all alarms with EC2 actions
 
 =item *
 
@@ -501,13 +763,22 @@ create stop, terminate, or reboot alarms using a command-line interface
 or API.
 
 
-=head2 PutMetricData(MetricData => ArrayRef[L<Paws::CloudWatch::MetricDatum>], Namespace => Str)
+=head2 PutMetricData
+
+=over
+
+=item MetricData => ArrayRef[L<Paws::CloudWatch::MetricDatum>]
+
+=item Namespace => Str
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CloudWatch::PutMetricData>
 
 Returns: nothing
 
-  Publishes metric data points to Amazon CloudWatch. CloudWatch
+Publishes metric data points to Amazon CloudWatch. CloudWatch
 associates the data points with the specified metric. If the specified
 metric does not exist, CloudWatch creates the metric. When CloudWatch
 creates a metric, it can take up to fifteen minutes for the metric to
@@ -524,7 +795,9 @@ NaN, +Infinity, -Infinity) are not supported.
 
 You can use up to 10 dimensions per metric to further clarify what data
 the metric collects. For more information about specifying dimensions,
-see Publishing Metrics in the I<Amazon CloudWatch User Guide>.
+see Publishing Metrics
+(http://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html)
+in the I<Amazon CloudWatch User Guide>.
 
 Data points with time stamps from 24 hours ago or longer can take at
 least 48 hours to become available for GetMetricStatistics from the
@@ -549,13 +822,26 @@ The Min and the Max values of the statistic set are equal
 
 
 
-=head2 SetAlarmState(AlarmName => Str, StateReason => Str, StateValue => Str, [StateReasonData => Str])
+=head2 SetAlarmState
+
+=over
+
+=item AlarmName => Str
+
+=item StateReason => Str
+
+=item StateValue => Str
+
+=item [StateReasonData => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::CloudWatch::SetAlarmState>
 
 Returns: nothing
 
-  Temporarily sets the state of an alarm for testing purposes. When the
+Temporarily sets the state of an alarm for testing purposes. When the
 updated state differs from the previous value, the action configured
 for the appropriate state is invoked. For example, if your alarm is
 configured to send an Amazon SNS message when an alarm is triggered,
@@ -596,6 +882,18 @@ If passed a sub as first parameter, it will call the sub for each element found 
 If not, it will return a a L<Paws::CloudWatch::DescribeAlarmsOutput> instance with all the C<param>s;  from all the responses. Please take into account that this mode can potentially consume vasts ammounts of memory.
 
 
+=head2 ListAllDashboards(sub { },[DashboardNamePrefix => Str, NextToken => Str])
+
+=head2 ListAllDashboards([DashboardNamePrefix => Str, NextToken => Str])
+
+
+If passed a sub as first parameter, it will call the sub for each element found in :
+
+ - DashboardEntries, passing the object as the first parameter, and the string 'DashboardEntries' as the second parameter 
+
+If not, it will return a a L<Paws::CloudWatch::ListDashboardsOutput> instance with all the C<param>s;  from all the responses. Please take into account that this mode can potentially consume vasts ammounts of memory.
+
+
 =head2 ListAllMetrics(sub { },[Dimensions => ArrayRef[L<Paws::CloudWatch::DimensionFilter>], MetricName => Str, Namespace => Str, NextToken => Str])
 
 =head2 ListAllMetrics([Dimensions => ArrayRef[L<Paws::CloudWatch::DimensionFilter>], MetricName => Str, Namespace => Str, NextToken => Str])
@@ -617,9 +915,9 @@ This service class forms part of L<Paws>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -1,4 +1,4 @@
-#!/usr/bin/perl;
+#!/usr/bin/perl
 package TEST::Fennec::TODO;
 use strict;
 use warnings;

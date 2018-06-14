@@ -17,46 +17,69 @@ package Paws::Budgets::UpdateNotification;
 
 =head1 NAME
 
-Paws::Budgets::UpdateNotification - Arguments for method UpdateNotification on Paws::Budgets
+Paws::Budgets::UpdateNotification - Arguments for method UpdateNotification on L<Paws::Budgets>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateNotification on the 
-AWS Budgets service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateNotification on the
+L<AWS Budgets|Paws::Budgets> service. Use the attributes of this class
 as arguments to method UpdateNotification.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateNotification.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateNotification(Att1 => $value1, Att2 => $value2, ...);
+    my $budgets = Paws->service('Budgets');
+    my $UpdateNotificationResponse = $budgets->UpdateNotification(
+      AccountId       => 'MyAccountId',
+      BudgetName      => 'MyBudgetName',
+      NewNotification => {
+        NotificationType => 'ACTUAL',    # values: ACTUAL, FORECASTED
+        ComparisonOperator =>
+          'GREATER_THAN',    # values: GREATER_THAN, LESS_THAN, EQUAL_TO
+        Threshold => 1,      # min: 0.1, max: 1000000000
+        ThresholdType =>
+          'PERCENTAGE',      # values: PERCENTAGE, ABSOLUTE_VALUE; OPTIONAL
+      },
+      OldNotification => {
+        NotificationType => 'ACTUAL',    # values: ACTUAL, FORECASTED
+        ComparisonOperator =>
+          'GREATER_THAN',    # values: GREATER_THAN, LESS_THAN, EQUAL_TO
+        Threshold => 1,      # min: 0.1, max: 1000000000
+        ThresholdType =>
+          'PERCENTAGE',      # values: PERCENTAGE, ABSOLUTE_VALUE; OPTIONAL
+      },
+
+    );
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/budgets/UpdateNotification>
 
 =head1 ATTRIBUTES
 
 
 =head2 B<REQUIRED> AccountId => Str
 
-
+The C<accountId> that is associated with the budget whose notification
+you want to update.
 
 
 
 =head2 B<REQUIRED> BudgetName => Str
 
-
+The name of the budget whose notification you want to update.
 
 
 
 =head2 B<REQUIRED> NewNotification => L<Paws::Budgets::Notification>
 
-
+The updated notification to be associated with a budget.
 
 
 
 =head2 B<REQUIRED> OldNotification => L<Paws::Budgets::Notification>
 
-
+The previous notification associated with a budget.
 
 
 
@@ -67,9 +90,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateNotific
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

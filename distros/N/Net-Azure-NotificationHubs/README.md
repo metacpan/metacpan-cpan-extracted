@@ -78,7 +78,7 @@ $payload is a hashref.
 
     Set specified value to 'ServiceBusNotification-Format' header.
 
-head1 LICENSE
+# LICENSE
 
 Copyright (C) ytnobody.
 

@@ -1,7 +1,7 @@
 package App::DuckPAN::Cmd::Server;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Starting up the web server to test instant answers
-$App::DuckPAN::Cmd::Server::VERSION = '1019';
+$App::DuckPAN::Cmd::Server::VERSION = '1021';
 use Moo;
 with qw( App::DuckPAN::Cmd App::DuckPAN::Restart );
 
@@ -458,7 +458,7 @@ App::DuckPAN::Cmd::Server - Starting up the web server to test instant answers
 
 =head1 VERSION
 
-version 1019
+version 1021
 
 =head1 AUTHOR
 

@@ -2,7 +2,7 @@
 
 package Math::Business::StockMonkey;
 
-our $VERSION = "2.9408";
+our $VERSION = "2.9409";
 
 1;
 

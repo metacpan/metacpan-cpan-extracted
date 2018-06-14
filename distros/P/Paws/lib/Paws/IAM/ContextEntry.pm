@@ -59,8 +59,8 @@ C<ContextKeyValues> parameter.
 =head2 ContextKeyValues => ArrayRef[Str|Undef]
 
   The value (or values, if the condition context key supports multiple
-values) to provide to the simulation for use when the key is referenced
-by a C<Condition> element in an input policy.
+values) to provide to the simulation when the key is referenced by a
+C<Condition> element in an input policy.
 
 
 
@@ -70,9 +70,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::IAM>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

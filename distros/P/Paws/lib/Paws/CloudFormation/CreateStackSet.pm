@@ -1,9 +1,11 @@
 
 package Paws::CloudFormation::CreateStackSet;
   use Moose;
+  has AdministrationRoleARN => (is => 'ro', isa => 'Str');
   has Capabilities => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
   has ClientRequestToken => (is => 'ro', isa => 'Str');
   has Description => (is => 'ro', isa => 'Str');
+  has ExecutionRoleName => (is => 'ro', isa => 'Str');
   has Parameters => (is => 'ro', isa => 'ArrayRef[Paws::CloudFormation::Parameter]');
   has StackSetName => (is => 'ro', isa => 'Str', required => 1);
   has Tags => (is => 'ro', isa => 'ArrayRef[Paws::CloudFormation::Tag]');
@@ -21,23 +23,72 @@ package Paws::CloudFormation::CreateStackSet;
 
 =head1 NAME
 
-Paws::CloudFormation::CreateStackSet - Arguments for method CreateStackSet on Paws::CloudFormation
+Paws::CloudFormation::CreateStackSet - Arguments for method CreateStackSet on L<Paws::CloudFormation>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateStackSet on the 
-AWS CloudFormation service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateStackSet on the
+L<AWS CloudFormation|Paws::CloudFormation> service. Use the attributes of this class
 as arguments to method CreateStackSet.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateStackSet.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateStackSet(Att1 => $value1, Att2 => $value2, ...);
+    my $cloudformation = Paws->service('CloudFormation');
+    my $CreateStackSetOutput = $cloudformation->CreateStackSet(
+      StackSetName          => 'MyStackSetName',
+      AdministrationRoleARN => 'MyRoleARN',        # OPTIONAL
+      Capabilities          => [
+        'CAPABILITY_IAM', ...    # values: CAPABILITY_IAM, CAPABILITY_NAMED_IAM
+      ],                         # OPTIONAL
+      ClientRequestToken => 'MyClientRequestToken',    # OPTIONAL
+      Description        => 'MyDescription',           # OPTIONAL
+      ExecutionRoleName  => 'MyExecutionRoleName',     # OPTIONAL
+      Parameters         => [
+        {
+          ParameterKey     => 'MyParameterKey',        # OPTIONAL
+          ResolvedValue    => 'MyParameterValue',      # OPTIONAL
+          UsePreviousValue => 1,                       # OPTIONAL
+          ParameterValue   => 'MyParameterValue',      # OPTIONAL
+        },
+        ...
+      ],                                               # OPTIONAL
+      Tags => [
+        {
+          Value => 'MyTagValue',                       # min: 1, max: 256
+          Key   => 'MyTagKey',                         # min: 1, max: 128
+
+        },
+        ...
+      ],                                               # OPTIONAL
+      TemplateBody => 'MyTemplateBody',                # OPTIONAL
+      TemplateURL  => 'MyTemplateURL',                 # OPTIONAL
+    );
+
+    # Results:
+    my $StackSetId = $CreateStackSetOutput->StackSetId;
+
+    # Returns a L<Paws::CloudFormation::CreateStackSetOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/cloudformation/CreateStackSet>
 
 =head1 ATTRIBUTES
+
+
+=head2 AdministrationRoleARN => Str
+
+The Amazon Resource Number (ARN) of the IAM role to use to create this
+stack set.
+
+Specify an IAM role only if you are using customized administrator
+roles to control which users or groups can manage specific stack sets
+within the same administrator account. For more information, see
+Prerequisites: Granting Permissions for Stack Set Operations
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacksets-prereqs.html)
+in the I<AWS CloudFormation User Guide>.
+
 
 
 =head2 Capabilities => ArrayRef[Str|Undef]
@@ -95,6 +146,7 @@ returns an C<InsufficientCapabilities> error.
 
 For more information, see Acknowledging IAM Resources in AWS
 CloudFormation Templates.
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-template.html#capabilities)
 
 
 
@@ -115,6 +167,19 @@ automatically.
 
 A description of the stack set. You can use the description to identify
 the stack set's purpose or other important information.
+
+
+
+=head2 ExecutionRoleName => Str
+
+The name of the IAM execution role to use to create the stack set. If
+you do not specify an execution role, AWS CloudFormation uses the
+C<AWSCloudFormationStackSetExecutionRole> role for the stack set
+operation.
+
+Specify an IAM role only if you are using customized execution roles to
+control which stack resources users and groups can include in their
+stack sets.
 
 
 
@@ -153,7 +218,9 @@ with an C<access denied> error, and the stack set is not created.
 
 The structure that contains the template body, with a minimum length of
 1 byte and a maximum length of 51,200 bytes. For more information, see
-Template Anatomy in the AWS CloudFormation User Guide.
+Template Anatomy
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-anatomy.html)
+in the AWS CloudFormation User Guide.
 
 Conditional: You must specify either the TemplateBody or the
 TemplateURL parameter, but not both.
@@ -164,8 +231,9 @@ TemplateURL parameter, but not both.
 
 The location of the file that contains the template body. The URL must
 point to a template (maximum size: 460,800 bytes) that's located in an
-Amazon S3 bucket. For more information, see Template Anatomy in the AWS
-CloudFormation User Guide.
+Amazon S3 bucket. For more information, see Template Anatomy
+(http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-anatomy.html)
+in the AWS CloudFormation User Guide.
 
 Conditional: You must specify either the TemplateBody or the
 TemplateURL parameter, but not both.
@@ -179,9 +247,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateStackSe
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

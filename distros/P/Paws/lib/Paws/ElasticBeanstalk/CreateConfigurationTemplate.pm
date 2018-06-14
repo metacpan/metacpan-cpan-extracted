@@ -21,21 +21,43 @@ package Paws::ElasticBeanstalk::CreateConfigurationTemplate;
 
 =head1 NAME
 
-Paws::ElasticBeanstalk::CreateConfigurationTemplate - Arguments for method CreateConfigurationTemplate on Paws::ElasticBeanstalk
+Paws::ElasticBeanstalk::CreateConfigurationTemplate - Arguments for method CreateConfigurationTemplate on L<Paws::ElasticBeanstalk>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateConfigurationTemplate on the 
-AWS Elastic Beanstalk service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateConfigurationTemplate on the
+L<AWS Elastic Beanstalk|Paws::ElasticBeanstalk> service. Use the attributes of this class
 as arguments to method CreateConfigurationTemplate.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateConfigurationTemplate.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateConfigurationTemplate(Att1 => $value1, Att2 => $value2, ...);
+    my $elasticbeanstalk = Paws->service('ElasticBeanstalk');
+    # To create a configuration template
+    # The following operation creates a configuration template named my-app-v1
+    # from the settings applied to an environment with the id e-rpqsewtp2j:
+    my $ConfigurationSettingsDescription =
+      $elasticbeanstalk->CreateConfigurationTemplate(
+      {
+        'EnvironmentId'   => 'e-rpqsewtp2j',
+        'TemplateName'    => 'my-app-v1',
+        'ApplicationName' => 'my-app'
+      }
+      );
+
+    # Results:
+    my $ApplicationName = $ConfigurationSettingsDescription->ApplicationName;
+    my $TemplateName    = $ConfigurationSettingsDescription->TemplateName;
+    my $DateCreated     = $ConfigurationSettingsDescription->DateCreated;
+    my $DateUpdated     = $ConfigurationSettingsDescription->DateUpdated;
+    my $SolutionStackName =
+      $ConfigurationSettingsDescription->SolutionStackName;
+
+ # Returns a L<Paws::ElasticBeanstalk::ConfigurationSettingsDescription> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/elasticbeanstalk/CreateConfigurationTemplate>
 
 =head1 ATTRIBUTES
 
@@ -70,7 +92,7 @@ obtained from the solution stack or the source configuration template.
 
 =head2 PlatformArn => Str
 
-The ARN of the custome platform.
+The ARN of the custom platform.
 
 
 
@@ -131,9 +153,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateConfigu
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

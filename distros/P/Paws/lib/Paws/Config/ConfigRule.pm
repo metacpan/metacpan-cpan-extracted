@@ -53,8 +53,9 @@ configuration snapshot. For more information, see
 ConfigSnapshotDeliveryProperties.
 
 For more information about developing and using AWS Config rules, see
-Evaluating AWS Resource Configurations with AWS Config in the I<AWS
-Config Developer Guide>.
+Evaluating AWS Resource Configurations with AWS Config
+(http://docs.aws.amazon.com/config/latest/developerguide/evaluate-config.html)
+in the I<AWS Config Developer Guide>.
 
 =head1 ATTRIBUTES
 
@@ -79,17 +80,17 @@ if you are adding a new rule.
 
   Indicates whether the AWS Config rule is active or is currently being
 deleted by AWS Config. It can also indicate the evaluation status for
-the Config rule.
+the AWS Config rule.
 
 AWS Config sets the state of the rule to C<EVALUATING> temporarily
 after you use the C<StartConfigRulesEvaluation> request to evaluate
-your resources against the Config rule.
+your resources against the AWS Config rule.
 
 AWS Config sets the state of the rule to C<DELETING_RESULTS>
 temporarily after you use the C<DeleteEvaluationResults> request to
-delete the current evaluation results for the Config rule.
+delete the current evaluation results for the AWS Config rule.
 
-AWS Config sets the state of a rule to C<DELETING> temporarily after
+AWS Config temporarily sets the state of a rule to C<DELETING> after
 you use the C<DeleteConfigRule> request to delete the rule. After AWS
 Config deletes the rule, the rule and all of its evaluations are erased
 and are no longer available.
@@ -102,7 +103,7 @@ and are no longer available.
 
 =head2 InputParameters => Str
 
-  A string in JSON format that is passed to the AWS Config rule Lambda
+  A string, in JSON format, that is passed to the AWS Config rule Lambda
 function.
 
 
@@ -154,9 +155,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Config>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

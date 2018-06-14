@@ -1,18 +1,33 @@
 package Net::Azure::NotificationHubs::Response;
 use strict;
 use warnings;
- 
-use parent 'HTTP::Response';
+
 use JSON;
 use Carp;
- 
+use Class::Accessor::Lite (
+    ro => [qw[status reason headers content success]],
+    new => 0
+);
+
+sub new {
+    my ($class, $status, $reason, $headers, $content, $success) = @_;
+    bless {
+        status => $status,
+        reason => $reason,
+        headers => $headers || {},
+        content => $content,
+        success => $success,
+    }, $class;
+}
+
 sub as_hashref {
     my $self = shift;
-    return if !$self->is_success;
+    return if !$self->success;
  
-    my $type = $self->header('Content-Type'); 
+    my $type = $self->headers->{'content-type'};
+
     if ($type && $type =~ /\Aapplication\/json/) {
-        return JSON->new->utf8(1)->decode($self->content);
+        return JSON->new->utf8(1)->decode($self->{content});
     }
     return;
 }
@@ -28,9 +43,9 @@ Net::Azure::NotificationHubs::Response - A Response Class for Net::Azure::Notifi
 =head1 SYNOPSIS
 
     use Net::Azure::NotificationHubs::Request;
-    use LWP::UserAgent;
+    use HTTP::Tiny;
     my $req = Net::Azure::NotificationHubs::Request->new(GET => 'http://...');
-    $req->agent(LWP::UserAgent->new);
+    $req->agent(HTTP::Tiny->new);
     my $res = $req->do;
     my $json_data = $res->as_hashref;
 

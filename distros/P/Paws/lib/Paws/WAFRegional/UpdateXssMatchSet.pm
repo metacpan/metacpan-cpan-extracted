@@ -16,21 +16,48 @@ package Paws::WAFRegional::UpdateXssMatchSet;
 
 =head1 NAME
 
-Paws::WAFRegional::UpdateXssMatchSet - Arguments for method UpdateXssMatchSet on Paws::WAFRegional
+Paws::WAFRegional::UpdateXssMatchSet - Arguments for method UpdateXssMatchSet on L<Paws::WAFRegional>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateXssMatchSet on the 
-AWS WAF Regional service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateXssMatchSet on the
+L<AWS WAF Regional|Paws::WAFRegional> service. Use the attributes of this class
 as arguments to method UpdateXssMatchSet.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateXssMatchSet.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateXssMatchSet(Att1 => $value1, Att2 => $value2, ...);
+    my $waf-regional = Paws->service('WAFRegional');
+    # To update an XSS match set
+    # The following example deletes an XssMatchTuple object (filters) in an
+    # XssMatchSet with the ID example1ds3t-46da-4fdb-b8d5-abc321j569j5.
+    my $UpdateXssMatchSetResponse = $waf -regional->UpdateXssMatchSet(
+      {
+        'Updates' => [
+
+          {
+            'XssMatchTuple' => {
+              'TextTransformation' => 'URL_DECODE',
+              'FieldToMatch'       => {
+                'Type' => 'QUERY_STRING'
+              }
+            },
+            'Action' => 'DELETE'
+          }
+        ],
+        'ChangeToken'   => 'abcd12f2-46da-4fdb-b8d5-fbd4c466928f',
+        'XssMatchSetId' => 'example1ds3t-46da-4fdb-b8d5-abc321j569j5'
+      }
+    );
+
+    # Results:
+    my $ChangeToken = $UpdateXssMatchSetResponse->ChangeToken;
+
+    # Returns a L<Paws::WAFRegional::UpdateXssMatchSetResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/waf-regional/UpdateXssMatchSet>
 
 =head1 ATTRIBUTES
 
@@ -81,9 +108,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateXssMatc
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

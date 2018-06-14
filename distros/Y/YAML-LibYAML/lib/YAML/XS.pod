@@ -91,11 +91,11 @@ With that it's possible to add new "real" booleans to a data structure:
       # boolfalse: false
       # booltrue: true
 
-It also allows to let booleans survive when loading YAML via YAML::XS and
-encode it in JSON via one of the various JSON encoders, which mostly support
+It also lets booleans survive when loading YAML via YAML::XS and encode it
+in JSON via one of the various JSON encoders, which mostly support
 JSON::PP booleans.
 
-Please note that JSON::PP::Booolean and boolean.pm behave a bit differently.
+Please note that JSON::PP::Boolean and boolean.pm behave a bit differently.
 Ideally you should only use them in boolean context.
 
 If not set, booleans are loaded as special perl variables C<PL_sv_yes> and
@@ -136,7 +136,7 @@ Ingy döt Net <ingy@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2007-2017. Ingy döt Net.
+Copyright 2007-2018. Ingy döt Net.
 
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

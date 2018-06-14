@@ -33,24 +33,26 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Greengrass:
 
 =head1 DESCRIPTION
 
-Information on the group certificate configuration
+Information about a group certificate configuration.
 
 =head1 ATTRIBUTES
 
 
 =head2 CertificateAuthorityExpiryInMilliseconds => Str
 
-  Amount of time when the certificate authority expires in milliseconds.
+  The amount of time remaining before the certificate authority expires,
+in milliseconds.
 
 
 =head2 CertificateExpiryInMilliseconds => Str
 
-  Amount of time when the certificate expires in milliseconds.
+  The amount of time remaining before the certificate expires, in
+milliseconds.
 
 
 =head2 GroupId => Str
 
-  Id of the group the certificate configuration belongs to.
+  The ID of the group certificate configuration.
 
 
 
@@ -60,9 +62,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Greengras
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

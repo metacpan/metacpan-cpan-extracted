@@ -8,7 +8,7 @@ static duk_ret_t perl_caller(duk_context* ctx);
 
 static SV* pl_duk_to_perl_impl(pTHX_ duk_context* ctx, int pos, HV* seen)
 {
-    SV* ret = &PL_sv_undef; // return undef by default
+    SV* ret = &PL_sv_undef; /* return undef by default */
     switch (duk_get_type(ctx, pos)) {
         case DUK_TYPE_NONE:
         case DUK_TYPE_UNDEFINED:
@@ -22,80 +22,88 @@ static SV* pl_duk_to_perl_impl(pTHX_ duk_context* ctx, int pos, HV* seen)
         }
         case DUK_TYPE_NUMBER: {
             duk_double_t val = duk_get_number(ctx, pos);
-            ret = newSVnv(val);  // JS numbers are always doubles
+            ret = newSVnv(val);  /* JS numbers are always doubles */
             break;
         }
         case DUK_TYPE_STRING: {
             duk_size_t clen = 0;
             const char* cstr = duk_get_lstring(ctx, pos, &clen);
             ret = newSVpvn(cstr, clen);
-            SvUTF8_on(ret); // yes, always
+            SvUTF8_on(ret); /* yes, always */
             break;
         }
         case DUK_TYPE_OBJECT: {
             if (duk_is_c_function(ctx, pos)) {
-                // if the JS function has a slot with the Perl callback,
-                // then we know we created it, so we return that
+                /* if the JS function has a slot with the Perl callback, */
+                /* then we know we created it, so we return that */
                 if (duk_get_prop_lstring(ctx, pos, PL_SLOT_GENERIC_CALLBACK, sizeof(PL_SLOT_GENERIC_CALLBACK) - 1)) {
                     ret = (SV*) duk_get_pointer(ctx, pos);
                 }
-                duk_pop(ctx); // pop function / null pointer
+                duk_pop(ctx); /* pop function / null pointer */
             } else if (duk_is_array(ctx, pos)) {
                 void* ptr = duk_get_heapptr(ctx, pos);
                 char kstr[100];
                 int klen = sprintf(kstr, "%p", ptr);
                 SV** answer = hv_fetch(seen, kstr, klen, 0);
                 if (answer) {
-                    // TODO: weaken reference?
+                    /* TODO: weaken reference? */
                     ret = newRV(*answer);
                 } else {
-                    AV* values = newAV();
-                    hv_store(seen, kstr, klen, (SV*) values, 0);
-                    ret = newRV((SV*) values);
-
-                    int array_top = duk_get_length(ctx, pos);
+                    int array_top = 0;
                     int j = 0;
+                    AV* values_array = newAV();
+                    SV* values = sv_2mortal((SV*) values_array);
+                    if (hv_store(seen, kstr, klen, values, 0)) {
+                        SvREFCNT_inc(values);
+                    }
+                    ret = newRV(values);
+
+                    array_top = duk_get_length(ctx, pos);
                     for (j = 0; j < array_top; ++j) {
+                        SV* nested = 0;
                         if (!duk_get_prop_index(ctx, pos, j)) {
-                            continue; // index doesn't exist => end of array
+                            continue; /* index doesn't exist => end of array */
                         }
-                        SV* nested = sv_2mortal(pl_duk_to_perl_impl(aTHX_ ctx, -1, seen));
-                        duk_pop(ctx); // value in current pos
+                        nested = sv_2mortal(pl_duk_to_perl_impl(aTHX_ ctx, -1, seen));
+                        duk_pop(ctx); /* value in current pos */
                         if (!nested) {
                             croak("Could not create Perl SV for array\n");
                         }
-                        if (av_store(values, j, nested)) {
+                        if (av_store(values_array, j, nested)) {
                             SvREFCNT_inc(nested);
                         }
                     }
                 }
-            } else { // if (duk_is_object(ctx, pos)) {
+            } else { /* if (duk_is_object(ctx, pos)) { */
                 void* ptr = duk_get_heapptr(ctx, pos);
                 char kstr[100];
                 int klen = sprintf(kstr, "%p", ptr);
                 SV** answer = hv_fetch(seen, kstr, klen, 0);
                 if (answer) {
-                    // TODO: weaken reference?
+                    /* TODO: weaken reference? */
                     ret = newRV(*answer);
                 } else {
-                    HV* values = newHV();
-                    hv_store(seen, kstr, klen, (SV*) values, 0);
-                    ret = newRV((SV*) values);
+                    HV* values_hash = newHV();
+                    SV* values = sv_2mortal((SV*) values_hash);
+                    if (hv_store(seen, kstr, klen, values, 0)) {
+                        SvREFCNT_inc(values);
+                    }
+                    ret = newRV(values);
 
                     duk_enum(ctx, pos, 0);
-                    while (duk_next(ctx, -1, 1)) { // get key and value
+                    while (duk_next(ctx, -1, 1)) { /* get key and value */
                         duk_size_t klen = 0;
                         const char* kstr = duk_get_lstring(ctx, -2, &klen);
                         SV* nested = sv_2mortal(pl_duk_to_perl_impl(aTHX_ ctx, -1, seen));
-                        duk_pop_2(ctx); // key and value
+                        duk_pop_2(ctx); /* key and value */
                         if (!nested) {
                             croak("Could not create Perl SV for hash\n");
                         }
-                        if (hv_store(values, kstr, -klen, nested, 0)) {
+                        if (hv_store(values_hash, kstr, -klen, nested, 0)) {
                             SvREFCNT_inc(nested);
                         }
                     }
-                    duk_pop(ctx);  // iterator
+                    duk_pop(ctx);  /* iterator */
                 }
             }
             break;
@@ -145,18 +153,21 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen)
                 void* ptr = (void*) SvUV(*answer);
                 duk_push_heapptr(ctx, ptr);
             } else {
-                duk_idx_t array_pos = duk_push_array(ctx);
-                void* ptr = duk_get_heapptr(ctx, array_pos);
-                SV* uptr = newSVuv(PTR2UV(ptr));
-                hv_store(seen, kstr, klen, uptr, 0);
-
-                int array_top = av_top_index(values);
+                int array_top = 0;
                 int count = 0;
                 int j = 0;
-                for (j = 0; j <= array_top; ++j) { // yes, [0, array_top]
+                duk_idx_t array_pos = duk_push_array(ctx);
+                void* ptr = duk_get_heapptr(ctx, array_pos);
+                SV* uptr = sv_2mortal(newSVuv(PTR2UV(ptr)));
+                if (hv_store(seen, kstr, klen, uptr, 0)) {
+                    SvREFCNT_inc(uptr);
+                }
+
+                array_top = av_top_index(values);
+                for (j = 0; j <= array_top; ++j) { /* yes, [0, array_top] */
                     SV** elem = av_fetch(values, j, 0);
                     if (!elem || !*elem) {
-                        break; // could not get element
+                        break; /* could not get element */
                     }
                     if (!pl_perl_to_duk_impl(aTHX_ *elem, ctx, seen)) {
                         croak("Could not create JS element for array\n");
@@ -178,8 +189,10 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen)
             } else {
                 duk_idx_t hash_pos = duk_push_object(ctx);
                 void* ptr = duk_get_heapptr(ctx, hash_pos);
-                SV* uptr = newSVuv(PTR2UV(ptr));
-                hv_store(seen, kstr, klen, uptr, 0);
+                SV* uptr = sv_2mortal(newSVuv(PTR2UV(ptr)));
+                if (hv_store(seen, kstr, klen, uptr, 0)) {
+                    SvREFCNT_inc(uptr);
+                }
 
                 hv_iterinit(values);
                 while (1) {
@@ -189,23 +202,23 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen)
                     STRLEN klen = 0;
                     HE* entry = hv_iternext(values);
                     if (!entry) {
-                        break; // no more hash keys
+                        break; /* no more hash keys */
                     }
                     key = hv_iterkeysv(entry);
                     if (!key) {
-                        continue; // invalid key
+                        continue; /* invalid key */
                     }
-                    SvUTF8_on(key); // yes, always
+                    SvUTF8_on(key); /* yes, always */
                     kstr = SvPV(key, klen);
                     if (!kstr) {
-                        continue; // invalid key
+                        continue; /* invalid key */
                     }
 
                     value = hv_iterval(values, entry);
                     if (!value) {
-                        continue; // invalid value
+                        continue; /* invalid value */
                     }
-                    SvUTF8_on(value); // yes, always
+                    SvUTF8_on(value); /* yes, always */
 
                     if (!pl_perl_to_duk_impl(aTHX_ value, ctx, seen)) {
                         croak("Could not create JS element for hash\n");
@@ -216,10 +229,10 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen)
                 }
             }
         } else if (SvTYPE(ref) == SVt_PVCV) {
-            // use perl_caller as generic handler, but store the real callback
-            // in a slot, from where we can later retrieve it
-            duk_push_c_function(ctx, perl_caller, DUK_VARARGS);
+            /* use perl_caller as generic handler, but store the real callback */
+            /* in a slot, from where we can later retrieve it */
             SV* func = newSVsv(value);
+            duk_push_c_function(ctx, perl_caller, DUK_VARARGS);
             if (!func) {
                 croak("Could not create copy of Perl callback\n");
             }
@@ -315,32 +328,34 @@ static const char* get_typeof(duk_context* ctx, int pos)
 int pl_call_perl_sv(duk_context* ctx, SV* func)
 {
     duk_idx_t j = 0;
+    duk_idx_t nargs = 0;
+    SV* ret = 0;
 
-    // prepare Perl environment for calling the CV
+    /* prepare Perl environment for calling the CV */
     dTHX;
     dSP;
     ENTER;
     SAVETMPS;
     PUSHMARK(SP);
 
-    // pass in the stack each of the params we received
-    duk_idx_t nargs = duk_get_top(ctx);
+    /* pass in the stack each of the params we received */
+    nargs = duk_get_top(ctx);
     for (j = 0; j < nargs; j++) {
         SV* val = pl_duk_to_perl(aTHX_ ctx, j);
         mXPUSHs(val);
     }
 
-    // call actual Perl CV, passing all params
+    /* call actual Perl CV, passing all params */
     PUTBACK;
     call_sv(func, G_SCALAR | G_EVAL);
     SPAGAIN;
 
-    // get returned value from Perl and push its JS equivalent back in
-    // duktape's stack
-    SV* ret = POPs;
+    /* get returned value from Perl and push its JS equivalent back in */
+    /* duktape's stack */
+    ret = POPs;
     pl_perl_to_duk(aTHX_ ret, ctx);
 
-    // cleanup and return 1, indicating we are returning a value
+    /* cleanup and return 1, indicating we are returning a value */
     PUTBACK;
     FREETMPS;
     LEAVE;
@@ -373,9 +388,9 @@ static int find_global_or_property(duk_context* ctx, const char* name)
             if (duk_get_prop_lstring(ctx, -1, name + last_dot + 1, len - last_dot - 1)) {
                 ret = 1;
                 duk_swap(ctx, -2, -1);
-                duk_pop(ctx); // pop object, leave value
+                duk_pop(ctx); /* pop object, leave value */
             } else {
-                duk_pop_2(ctx); // pop object and value (which was undef)
+                duk_pop_2(ctx); /* pop object and value (which was undef) */
             }
         } else {
         }
@@ -385,10 +400,10 @@ static int find_global_or_property(duk_context* ctx, const char* name)
 
 SV* pl_exists_global_or_property(pTHX_ duk_context* ctx, const char* name)
 {
-    SV* ret = &PL_sv_no; // return false by default
+    SV* ret = &PL_sv_no; /* return false by default */
     if (find_global_or_property(ctx, name)) {
         ret = &PL_sv_yes;
-        duk_pop(ctx); // pop value
+        duk_pop(ctx); /* pop value */
     }
     return ret;
 }
@@ -400,7 +415,7 @@ SV* pl_typeof_global_or_property(pTHX_ duk_context* ctx, const char* name)
     SV* ret = 0;
     if (find_global_or_property(ctx, name)) {
         cstr = get_typeof(ctx, -1);
-        duk_pop(ctx); // pop value
+        duk_pop(ctx); /* pop value */
     }
     ret = newSVpv(cstr, clen);
     return ret;
@@ -408,7 +423,7 @@ SV* pl_typeof_global_or_property(pTHX_ duk_context* ctx, const char* name)
 
 SV* pl_instanceof_global_or_property(pTHX_ duk_context* ctx, const char* object, const char* class)
 {
-    SV* ret = &PL_sv_no; // return false by default
+    SV* ret = &PL_sv_no; /* return false by default */
     if (find_global_or_property(ctx, object)) {
         if (find_global_or_property(ctx, class)) {
             if (duk_instanceof(ctx, -2, -1)) {
@@ -423,7 +438,7 @@ SV* pl_instanceof_global_or_property(pTHX_ duk_context* ctx, const char* object,
 
 SV* pl_get_global_or_property(pTHX_ duk_context* ctx, const char* name)
 {
-    SV* ret = &PL_sv_undef; // return undef by default
+    SV* ret = &PL_sv_undef; /* return undef by default */
     if (find_global_or_property(ctx, name)) {
         ret = pl_duk_to_perl(aTHX_ ctx, -1);
     }
@@ -432,14 +447,15 @@ SV* pl_get_global_or_property(pTHX_ duk_context* ctx, const char* name)
 
 int pl_set_global_or_property(pTHX_ duk_context* ctx, const char* name, SV* value)
 {
+    int len = 0;
+    int last_dot = 0;
     if (sv_isobject(value)) {
         SV* obj = newSVsv(value);
         duk_push_pointer(ctx, obj);
     } else if (!pl_perl_to_duk(aTHX_ value, ctx)) {
         return 0;
     }
-    int len = 0;
-    int last_dot = find_last_dot(name, &len);
+    last_dot = find_last_dot(name, &len);
     if (last_dot < 0) {
         if (!duk_put_global_lstring(ctx, name, len)) {
             croak("Could not save duk value for %s\n", name);
@@ -450,17 +466,17 @@ int pl_set_global_or_property(pTHX_ duk_context* ctx, const char* name, SV* valu
             croak("Could not eval JS object %*.*s: %s\n",
                   last_dot, last_dot, name, duk_safe_to_string(ctx, -1));
         }
-        // Have [value, key, object], need [object, key, value], hence swap
+        /* Have [value, key, object], need [object, key, value], hence swap */
         duk_swap(ctx, -3, -1);
         duk_put_prop(ctx, -3);
-        duk_pop(ctx); // pop object
+        duk_pop(ctx); /* pop object */
     }
     return 1;
 }
 
 SV* pl_eval(pTHX_ Duk* duk, const char* js, const char* file)
 {
-    SV* ret = &PL_sv_undef; // return undef by default
+    SV* ret = &PL_sv_undef; /* return undef by default */
     duk_context* ctx = duk->ctx;
     Stats stats;
     duk_uint_t flags = 0;
@@ -507,7 +523,7 @@ int pl_run_gc(Duk* duk)
      */
     duk_context* ctx = duk->ctx;
     for (j = 0; j < PL_GC_RUNS; ++j) {
-        // DUK_GC_COMPACT: Force object property table compaction
+        /* DUK_GC_COMPACT: Force object property table compaction */
         duk_gc(ctx, DUK_GC_COMPACT);
     }
     return PL_GC_RUNS;
@@ -515,13 +531,15 @@ int pl_run_gc(Duk* duk)
 
 static duk_ret_t perl_caller(duk_context* ctx)
 {
-    // get actual Perl CV stored as a function property
+    SV* func = 0;
+
+    /* get actual Perl CV stored as a function property */
     duk_push_current_function(ctx);
     if (!duk_get_prop_lstring(ctx, -1, PL_SLOT_GENERIC_CALLBACK, sizeof(PL_SLOT_GENERIC_CALLBACK) - 1)) {
         croak("Calling Perl handler for a non-Perl function\n");
     }
 
-    SV* func = (SV*) duk_get_pointer(ctx, -1);
+    func = (SV*) duk_get_pointer(ctx, -1);
     duk_pop_2(ctx);  /* pop pointer and function */
     if (func == 0) {
         croak("Could not get value for property %s\n", PL_SLOT_GENERIC_CALLBACK);

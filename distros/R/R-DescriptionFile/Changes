@@ -1,5 +1,8 @@
 Revision history
 
+0.003   2018-06-09
+    - RT#124376 remove Test::More from build dependencies.
+
 0.002   2018-01-20
     - Typo fixes
 

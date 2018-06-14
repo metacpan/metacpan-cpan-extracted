@@ -17,29 +17,69 @@ package Paws::ELBv2::CreateRule;
 
 =head1 NAME
 
-Paws::ELBv2::CreateRule - Arguments for method CreateRule on Paws::ELBv2
+Paws::ELBv2::CreateRule - Arguments for method CreateRule on L<Paws::ELBv2>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateRule on the 
-Elastic Load Balancing service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateRule on the
+L<Elastic Load Balancing|Paws::ELBv2> service. Use the attributes of this class
 as arguments to method CreateRule.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateRule.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateRule(Att1 => $value1, Att2 => $value2, ...);
+    my $elasticloadbalancing = Paws->service('ELBv2');
+    # To create a rule
+    # This example creates a rule that forwards requests to the specified target
+    # group if the URL contains the specified pattern (for example, /img/*).
+    my $CreateRuleOutput = $elasticloadbalancing->CreateRule(
+      {
+        'Priority' => 10,
+        'Actions'  => [
+
+          {
+            'TargetGroupArn' =>
+'arn:aws:elasticloadbalancing:us-west-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067',
+            'Type' => 'forward'
+          }
+        ],
+        'ListenerArn' =>
+'arn:aws:elasticloadbalancing:us-west-2:123456789012:listener/app/my-load-balancer/50dc6c495c0c9188/f2f7dc8efc522ab2',
+        'Conditions' => [
+
+          {
+            'Field'  => 'path-pattern',
+            'Values' => ['/img/*']
+          }
+        ]
+      }
+    );
+
+    # Results:
+    my $Rules = $CreateRuleOutput->Rules;
+
+    # Returns a L<Paws::ELBv2::CreateRuleOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancing/CreateRule>
 
 =head1 ATTRIBUTES
 
 
 =head2 B<REQUIRED> Actions => ArrayRef[L<Paws::ELBv2::Action>]
 
-An action. Each action has the type C<forward> and specifies a target
+The actions. Each rule must include one forward action.
+
+If the action type is C<forward>, you can specify a single target
 group.
+
+If the action type is C<authenticate-oidc>, you can use an identity
+provider that is OpenID Connect (OIDC) compliant to authenticate users
+as they access your application.
+
+If the action type is C<authenticate-cognito>, you can use Amazon
+Cognito to authenticate users as they access your application.
 
 
 
@@ -113,8 +153,8 @@ The Amazon Resource Name (ARN) of the listener.
 
 =head2 B<REQUIRED> Priority => Int
 
-The priority for the rule. A listener can't have multiple rules with
-the same priority.
+The rule priority. A listener can't have multiple rules with the same
+priority.
 
 
 
@@ -125,9 +165,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateRule in
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

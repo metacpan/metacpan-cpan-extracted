@@ -1,5 +1,5 @@
 requires 'perl', '5.008001';
-requires 'Net::Azure::Authorization::SAS';
+requires 'Net::Azure::Authorization::SAS' => '0.03';
 requires 'Class::Accessor::Lite';
 requires 'HTTP::Request';
 requires 'LWP::UserAgent';

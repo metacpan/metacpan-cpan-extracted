@@ -14,21 +14,30 @@ package Paws::AutoScaling::DeleteLaunchConfiguration;
 
 =head1 NAME
 
-Paws::AutoScaling::DeleteLaunchConfiguration - Arguments for method DeleteLaunchConfiguration on Paws::AutoScaling
+Paws::AutoScaling::DeleteLaunchConfiguration - Arguments for method DeleteLaunchConfiguration on L<Paws::AutoScaling>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DeleteLaunchConfiguration on the 
-Auto Scaling service. Use the attributes of this class
+This class represents the parameters used for calling the method DeleteLaunchConfiguration on the
+L<Auto Scaling|Paws::AutoScaling> service. Use the attributes of this class
 as arguments to method DeleteLaunchConfiguration.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DeleteLaunchConfiguration.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DeleteLaunchConfiguration(Att1 => $value1, Att2 => $value2, ...);
+    my $autoscaling = Paws->service('AutoScaling');
+    # To delete a launch configuration
+    # This example deletes the specified launch configuration.
+    $autoscaling->DeleteLaunchConfiguration(
+      {
+        'LaunchConfigurationName' => 'my-launch-config'
+      }
+    );
+
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/autoscaling/DeleteLaunchConfiguration>
 
 =head1 ATTRIBUTES
 
@@ -46,9 +55,9 @@ This class forms part of L<Paws>, documenting arguments for method DeleteLaunchC
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -4,9 +4,12 @@ package Paws::AppStream::Stack;
   has CreatedTime => (is => 'ro', isa => 'Str');
   has Description => (is => 'ro', isa => 'Str');
   has DisplayName => (is => 'ro', isa => 'Str');
+  has FeedbackURL => (is => 'ro', isa => 'Str');
   has Name => (is => 'ro', isa => 'Str', required => 1);
+  has RedirectURL => (is => 'ro', isa => 'Str');
   has StackErrors => (is => 'ro', isa => 'ArrayRef[Paws::AppStream::StackError]');
   has StorageConnectors => (is => 'ro', isa => 'ArrayRef[Paws::AppStream::StorageConnector]');
+  has UserSettings => (is => 'ro', isa => 'ArrayRef[Paws::AppStream::UserSetting]');
 1;
 
 ### main pod documentation begin ###
@@ -26,7 +29,7 @@ Each attribute should be used as a named argument in the calls that expect this 
 
 As an example, if Att1 is expected to be a Paws::AppStream::Stack object:
 
-  $service_obj->Method(Att1 => { Arn => $value, ..., StorageConnectors => $value  });
+  $service_obj->Method(Att1 => { Arn => $value, ..., UserSettings => $value  });
 
 =head3 Results returned from an API call
 
@@ -54,17 +57,29 @@ Describes a stack.
 
 =head2 Description => Str
 
-  The description displayed to end users.
+  The description for display.
 
 
 =head2 DisplayName => Str
 
-  The stack name displayed to end users.
+  The stack name for display.
+
+
+=head2 FeedbackURL => Str
+
+  The URL that users are redirected to after they click the Send Feedback
+link. If no URL is specified, no Send Feedback link is displayed.
 
 
 =head2 B<REQUIRED> Name => Str
 
   The name of the stack.
+
+
+=head2 RedirectURL => Str
+
+  The URL that users are redirected to after their streaming session
+ends.
 
 
 =head2 StackErrors => ArrayRef[L<Paws::AppStream::StackError>]
@@ -77,6 +92,12 @@ Describes a stack.
   The storage connectors to enable.
 
 
+=head2 UserSettings => ArrayRef[L<Paws::AppStream::UserSetting>]
+
+  The actions that are enabled or disabled for users during their
+streaming sessions. By default these actions are enabled.
+
+
 
 =head1 SEE ALSO
 
@@ -84,9 +105,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::AppStream
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

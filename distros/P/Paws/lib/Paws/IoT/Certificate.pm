@@ -46,7 +46,8 @@ Information about a certificate.
 
 =head2 CertificateId => Str
 
-  The ID of the certificate.
+  The ID of the certificate. (The last part of the certificate ARN
+contains the certificate ID.)
 
 
 =head2 CreationDate => Str
@@ -69,9 +70,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::IoT>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -129,7 +129,7 @@
     "na Christus",
   ],
   first_day_of_week => 1,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
+  glibc_date_1_format => "%a %e %b %Y %k:%M:%S %Z",
   glibc_date_format => "%d-%m-%y",
   glibc_datetime_format => "%a %d %b %Y %T %Z",
   glibc_time_12_format => "%I:%M:%S %p",

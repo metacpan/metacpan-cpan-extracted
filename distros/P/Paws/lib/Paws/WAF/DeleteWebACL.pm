@@ -15,21 +15,36 @@ package Paws::WAF::DeleteWebACL;
 
 =head1 NAME
 
-Paws::WAF::DeleteWebACL - Arguments for method DeleteWebACL on Paws::WAF
+Paws::WAF::DeleteWebACL - Arguments for method DeleteWebACL on L<Paws::WAF>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DeleteWebACL on the 
-AWS WAF service. Use the attributes of this class
+This class represents the parameters used for calling the method DeleteWebACL on the
+L<AWS WAF|Paws::WAF> service. Use the attributes of this class
 as arguments to method DeleteWebACL.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DeleteWebACL.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DeleteWebACL(Att1 => $value1, Att2 => $value2, ...);
+    my $waf = Paws->service('WAF');
+    # To delete a web ACL
+    # The following example deletes a web ACL with the ID
+    # example-46da-4444-5555-example.
+    my $DeleteWebACLResponse = $waf->DeleteWebACL(
+      {
+        'ChangeToken' => 'abcd12f2-46da-4fdb-b8d5-fbd4c466928f',
+        'WebACLId'    => 'example-46da-4444-5555-example'
+      }
+    );
+
+    # Results:
+    my $ChangeToken = $DeleteWebACLResponse->ChangeToken;
+
+    # Returns a L<Paws::WAF::DeleteWebACLResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/waf/DeleteWebACL>
 
 =head1 ATTRIBUTES
 
@@ -54,9 +69,9 @@ This class forms part of L<Paws>, documenting arguments for method DeleteWebACL 
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

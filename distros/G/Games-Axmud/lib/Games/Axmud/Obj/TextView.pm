@@ -5482,7 +5482,7 @@
         my ($self, $linkObj, $check) = @_;
 
         # Local variables
-        my ($listRef, $startIter, $length, $endPosn, $stopIter);
+        my ($listRef, $startIter, $length, $stopPosn, $stopIter, $endIter);
 
         # Check for improper arguments
         if (! defined $linkObj || defined $check) {
@@ -5518,15 +5518,20 @@
             # Need to check that the 'link_off' is going at the right place; if the line is too
             #   short, Axmud will crash
             $length = $startIter->get_chars_in_line();
-            $endPosn = $linkObj->posn + length ($linkObj->text);
-            if ($endPosn > $length) {
+            $stopPosn = $linkObj->posn + length ($linkObj->text);
+            if ($stopPosn > $length) {
 
-                $endPosn = $length;
+                $endIter = $self->buffer->get_end_iter();
+                if ($endIter->get_line() == $startIter->get_line()) {
+                    $stopPosn = $length;
+                } else {
+                    $stopPosn = $length - 1;
+                }
             }
 
             $stopIter = $self->buffer->get_iter_at_line_offset(
                 $linkObj->lineNum,
-                $endPosn,
+                $stopPosn,
             );
 
             if ($startIter && $stopIter) {

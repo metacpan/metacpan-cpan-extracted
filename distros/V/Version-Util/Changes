@@ -1,3 +1,8 @@
+0.731   2018-06-10 (PERLANCAR)
+
+	- Add functions: min_version, max_version.
+
+
 0.730   2018-01-09 (PERLANCAR)
 
 	- Relax version regex pattern.

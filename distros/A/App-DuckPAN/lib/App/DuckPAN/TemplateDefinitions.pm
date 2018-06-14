@@ -1,7 +1,7 @@
 package App::DuckPAN::TemplateDefinitions;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Parse the template definitions file to create templates and template sets
-$App::DuckPAN::TemplateDefinitions::VERSION = '1019';
+$App::DuckPAN::TemplateDefinitions::VERSION = '1021';
 use Moo;
 
 use Try::Tiny;
@@ -139,7 +139,7 @@ App::DuckPAN::TemplateDefinitions - Parse the template definitions file to creat
 
 =head1 VERSION
 
-version 1019
+version 1021
 
 =head1 AUTHOR
 

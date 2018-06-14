@@ -145,7 +145,7 @@ sub on_init {
         $rec{id} ||= $$o{dbh}->last_insert_id("","","","");
       }
       
-      $$o{output_handler}->(CGI::header('application/json').encode_json({ status => "ok", msg => "search saved successfully", id => $rec{id} }));
+      $$o{output_handler}->($$o{httpHeader}->('application/json').encode_json({ status => "ok", msg => "search saved successfully", id => $rec{id} }));
     }; if ($@) {
       my $err = $@;
       $err =~ s/\ at\ .*//;
@@ -163,7 +163,7 @@ sub on_init {
         $$o{error_handler}->("err", $err);
       }
 
-      $$o{output_handler}->(CGI::header('application/json').encode_json({ status => "error", msg => $err }));
+      $$o{output_handler}->($$o{httpHeader}->('application/json').encode_json({ status => "error", msg => $err }));
     }
     return undef;
   }

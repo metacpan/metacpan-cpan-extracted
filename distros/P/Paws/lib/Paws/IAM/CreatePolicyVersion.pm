@@ -16,21 +16,32 @@ package Paws::IAM::CreatePolicyVersion;
 
 =head1 NAME
 
-Paws::IAM::CreatePolicyVersion - Arguments for method CreatePolicyVersion on Paws::IAM
+Paws::IAM::CreatePolicyVersion - Arguments for method CreatePolicyVersion on L<Paws::IAM>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreatePolicyVersion on the 
-AWS Identity and Access Management service. Use the attributes of this class
+This class represents the parameters used for calling the method CreatePolicyVersion on the
+L<AWS Identity and Access Management|Paws::IAM> service. Use the attributes of this class
 as arguments to method CreatePolicyVersion.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreatePolicyVersion.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreatePolicyVersion(Att1 => $value1, Att2 => $value2, ...);
+    my $iam = Paws->service('IAM');
+    my $CreatePolicyVersionResponse = $iam->CreatePolicyVersion(
+      PolicyArn      => 'MyarnType',
+      PolicyDocument => 'MypolicyDocumentType',
+      SetAsDefault   => 1,                        # OPTIONAL
+    );
+
+    # Results:
+    my $PolicyVersion = $CreatePolicyVersionResponse->PolicyVersion;
+
+    # Returns a L<Paws::IAM::CreatePolicyVersionResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/iam/CreatePolicyVersion>
 
 =head1 ATTRIBUTES
 
@@ -41,7 +52,9 @@ The Amazon Resource Name (ARN) of the IAM policy to which you want to
 add a new version.
 
 For more information about ARNs, see Amazon Resource Names (ARNs) and
-AWS Service Namespaces in the I<AWS General Reference>.
+AWS Service Namespaces
+(http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+in the I<AWS General Reference>.
 
 
 
@@ -50,13 +63,28 @@ AWS Service Namespaces in the I<AWS General Reference>.
 The JSON policy document that you want to use as the content for this
 new version of the policy.
 
-The regex pattern used to validate this parameter is a string of
-characters consisting of any printable ASCII character ranging from the
-space character (\u0020) through end of the ASCII character range as
-well as the printable characters in the Basic Latin and Latin-1
-Supplement character set (through \u00FF). It also includes the special
-characters tab (\u0009), line feed (\u000A), and carriage return
-(\u000D).
+The regex pattern (http://wikipedia.org/wiki/regex) used to validate
+this parameter is a string of characters consisting of the following:
+
+=over
+
+=item *
+
+Any printable ASCII character ranging from the space character (\u0020)
+through the end of the ASCII character range
+
+=item *
+
+The printable characters in the Basic Latin and Latin-1 Supplement
+character set (through \u00FF)
+
+=item *
+
+The special characters tab (\u0009), line feed (\u000A), and carriage
+return (\u000D)
+
+=back
+
 
 
 
@@ -65,11 +93,13 @@ characters tab (\u0009), line feed (\u000A), and carriage return
 Specifies whether to set this version as the policy's default version.
 
 When this parameter is C<true>, the new policy version becomes the
-operative version; that is, the version that is in effect for the IAM
-users, groups, and roles that the policy is attached to.
+operative version. That is, it becomes the version that is in effect
+for the IAM users, groups, and roles that the policy is attached to.
 
 For more information about managed policy versions, see Versioning for
-Managed Policies in the I<IAM User Guide>.
+Managed Policies
+(http://docs.aws.amazon.com/IAM/latest/UserGuide/policies-managed-versions.html)
+in the I<IAM User Guide>.
 
 
 
@@ -80,9 +110,9 @@ This class forms part of L<Paws>, documenting arguments for method CreatePolicyV
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

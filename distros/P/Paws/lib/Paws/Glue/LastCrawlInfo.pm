@@ -43,7 +43,7 @@ Status and error information about the most recent crawl.
 
 =head2 ErrorMessage => Str
 
-  Error information about the last crawl, if an error occurred.
+  If an error occurred, the error information about the last crawl.
 
 
 =head2 LogGroup => Str
@@ -78,9 +78,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Glue>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

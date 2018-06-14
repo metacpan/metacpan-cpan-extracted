@@ -13,7 +13,6 @@ isa_ok $hub, 'Net::Azure::NotificationHubs';
 
 subtest 'Test a request for send - apple' => sub {
     my $req = $hub->send({aps => {alert => "Hello World!"}}, format => 'apple', tags => 'mytag');
-    isa_ok $req, 'HTTP::Request';
     isa_ok $req, 'Net::Azure::NotificationHubs::Request';
     can_ok $req, qw/do/;
     is $req->header('Content-Type'), 'application/atom+xml;charset=utf-8', 'Content-Type header is "application/atom+xml;charset=utf-8"';
@@ -29,7 +28,6 @@ subtest 'Test a request for send - apple' => sub {
 
 subtest 'Test a request for send - gcm' => sub {
     my $req = $hub->send({data => {message => "Hello World!"}}, format => 'gcm');
-    isa_ok $req, 'HTTP::Request';
     isa_ok $req, 'Net::Azure::NotificationHubs::Request';
     can_ok $req, qw/do/;
     is $req->header('Content-Type'), 'application/atom+xml;charset=utf-8', 'Content-Type header is "application/atom+xml;charset=utf-8"';

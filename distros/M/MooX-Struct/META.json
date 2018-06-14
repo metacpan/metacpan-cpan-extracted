@@ -4,7 +4,7 @@
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [],
    "license" : [
       "perl_5"
@@ -50,15 +50,15 @@
    "provides" : {
       "MooX::Struct" : {
          "file" : "lib/MooX/Struct.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "MooX::Struct::Processor" : {
          "file" : "lib/MooX/Struct.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "MooX::Struct::Util" : {
          "file" : "lib/MooX/Struct/Util.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       }
    },
    "release_status" : "stable",
@@ -77,10 +77,10 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/MooX-Struct/project"
    },
-   "version" : "0.016",
+   "version" : "0.017",
    "x_contributors" : [
       "NOBODY"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
    "x_static_install" : 1
 }

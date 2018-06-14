@@ -32,20 +32,25 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Firehose::K
 
 =head1 DESCRIPTION
 
-The stream and role ARNs for a Kinesis stream used as the source for a
-delivery stream.
+The stream and role Amazon Resource Names (ARNs) for a Kinesis data
+stream used as the source for a delivery stream.
 
 =head1 ATTRIBUTES
 
 
 =head2 B<REQUIRED> KinesisStreamARN => Str
 
-  The ARN of the source Kinesis stream.
+  The ARN of the source Kinesis data stream. For more information, see
+Amazon Kinesis Data Streams ARN Format
+(https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-kinesis-streams).
 
 
 =head2 B<REQUIRED> RoleARN => Str
 
-  The ARN of the role that provides access to the source Kinesis stream.
+  The ARN of the role that provides access to the source Kinesis data
+stream. For more information, see AWS Identity and Access Management
+(IAM) ARN Format
+(https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-iam).
 
 
 
@@ -55,9 +60,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Firehose>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

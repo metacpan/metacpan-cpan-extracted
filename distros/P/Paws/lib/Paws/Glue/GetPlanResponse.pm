@@ -2,6 +2,7 @@
 package Paws::Glue::GetPlanResponse;
   use Moose;
   has PythonScript => (is => 'ro', isa => 'Str');
+  has ScalaCode => (is => 'ro', isa => 'Str');
 
   has _request_id => (is => 'ro', isa => 'Str');
 
@@ -16,7 +17,12 @@ Paws::Glue::GetPlanResponse
 
 =head2 PythonScript => Str
 
-A python script to perform the mapping.
+A Python script to perform the mapping.
+
+
+=head2 ScalaCode => Str
+
+Scala code to perform the mapping.
 
 
 =head2 _request_id => Str

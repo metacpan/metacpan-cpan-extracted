@@ -34,8 +34,9 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::GameLift::V
 
 Represents status information for a VPC peering connection. Status is
 associated with a VpcPeeringConnection object. Status codes and
-messages are provided from EC2 (). Connection status information is
-also communicated as a fleet Event.
+messages are provided from EC2 (see VpcPeeringConnectionStateReason
+(http://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_VpcPeeringConnectionStateReason.html)).
+Connection status information is also communicated as a fleet Event.
 
 =head1 ATTRIBUTES
 
@@ -57,9 +58,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::GameLift>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

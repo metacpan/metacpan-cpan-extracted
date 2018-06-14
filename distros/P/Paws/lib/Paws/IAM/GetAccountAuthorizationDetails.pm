@@ -16,21 +16,44 @@ package Paws::IAM::GetAccountAuthorizationDetails;
 
 =head1 NAME
 
-Paws::IAM::GetAccountAuthorizationDetails - Arguments for method GetAccountAuthorizationDetails on Paws::IAM
+Paws::IAM::GetAccountAuthorizationDetails - Arguments for method GetAccountAuthorizationDetails on L<Paws::IAM>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method GetAccountAuthorizationDetails on the 
-AWS Identity and Access Management service. Use the attributes of this class
+This class represents the parameters used for calling the method GetAccountAuthorizationDetails on the
+L<AWS Identity and Access Management|Paws::IAM> service. Use the attributes of this class
 as arguments to method GetAccountAuthorizationDetails.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to GetAccountAuthorizationDetails.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->GetAccountAuthorizationDetails(Att1 => $value1, Att2 => $value2, ...);
+    my $iam = Paws->service('IAM');
+    my $GetAccountAuthorizationDetailsResponse =
+      $iam->GetAccountAuthorizationDetails(
+      Filter => [
+        'User',
+        ...    # values: User, Role, Group, LocalManagedPolicy, AWSManagedPolicy
+      ],       # OPTIONAL
+      Marker   => 'MymarkerType',    # OPTIONAL
+      MaxItems => 1,                 # OPTIONAL
+      );
+
+    # Results:
+    my $IsTruncated = $GetAccountAuthorizationDetailsResponse->IsTruncated;
+    my $GroupDetailList =
+      $GetAccountAuthorizationDetailsResponse->GroupDetailList;
+    my $Marker   = $GetAccountAuthorizationDetailsResponse->Marker;
+    my $Policies = $GetAccountAuthorizationDetailsResponse->Policies;
+    my $RoleDetailList =
+      $GetAccountAuthorizationDetailsResponse->RoleDetailList;
+    my $UserDetailList =
+      $GetAccountAuthorizationDetailsResponse->UserDetailList;
+
+    # Returns a L<Paws::IAM::GetAccountAuthorizationDetailsResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/iam/GetAccountAuthorizationDetails>
 
 =head1 ATTRIBUTES
 
@@ -78,9 +101,9 @@ This class forms part of L<Paws>, documenting arguments for method GetAccountAut
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

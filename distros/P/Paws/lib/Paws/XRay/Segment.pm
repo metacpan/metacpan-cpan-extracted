@@ -37,12 +37,16 @@ segment can be compiled from documents uploaded with PutTraceSegments,
 or an C<inferred> segment for a downstream service, generated from a
 subsegment sent by the service that called it.
 
+For the full segment document schema, see AWS X-Ray Segment Documents
+(https://docs.aws.amazon.com/xray/latest/devguide/xray-api-segmentdocuments.html)
+in the I<AWS X-Ray Developer Guide>.
+
 =head1 ATTRIBUTES
 
 
 =head2 Document => Str
 
-  The segment document
+  The segment document.
 
 
 =head2 Id => Str
@@ -57,9 +61,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::XRay>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

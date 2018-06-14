@@ -49,6 +49,14 @@ foreach my $status (503, 400) {
     "Paws::Exception",
   );
   cmp_ok($@->code, 'eq', 'InvalidContent', 'Exception of type InvalidContent');
+  throws_ok(
+    sub { 
+      $s->Method3(response => '{"__type":"SerializationException"}', status => $status); 
+    },
+    "Paws::Exception",
+  );
+  cmp_ok($@->code, 'eq', 'SerializationException', 'Exception of type SerializationException');
+  cmp_ok($@->message, 'eq', 'SerializationException', 'Message is not in the json, so the code gets used');
 
   throws_ok(
     sub { 
@@ -79,6 +87,14 @@ foreach my $status (503, 400) {
     "Paws::Exception",
   );
   cmp_ok($@->code, 'eq', 'InvalidContent', 'Exception of type InvalidContent');
+  throws_ok(
+    sub { 
+      $s->Method1(response => '{"__type":"SerializationException"}', status => $status); 
+    },
+    "Paws::Exception",
+  );
+  cmp_ok($@->code, 'eq', 'SerializationException', 'Exception of type SerializationException');
+  cmp_ok($@->message, 'eq', 'SerializationException', 'Message is not in the json, so the code gets used');
 }
 
 foreach my $status (503, 400) {
@@ -199,19 +215,17 @@ foreach my $status (200) {
       $s->Method3(response => q'', status => $status); 
     },
   );
-  throws_ok(
+  lives_ok(
     sub { 
       $s->Method3(response => 'notajsonstring', status => $status); 
     },
-    "Paws::Exception",
+    "A method that doesn't parse the body accepts a response with garbage in it",
   );
-  cmp_ok($@->code, 'eq', 'InvalidContent', 'Exception of type InvalidContent');
   lives_ok(
     sub { 
       $s->Method3(response => '[UNDEF]', status => $status); 
     },
   );
-
   lives_ok(
     sub { 
       $s->Method1(response => q'', status => $status); 
@@ -284,24 +298,20 @@ foreach my $status (200) {
       $s->Method3(response => '[UNDEF]', status => $status) 
     },
   );
-  throws_ok(
-    sub { 
-      $s->Method3(response => 'notajsonstring', status => $status) 
-    },
-    "Paws::Exception",
-  );
-  cmp_ok($@->code, 'eq', 'InvalidContent', 'Exception of type InvalidContent');
-
-  lives_ok(
+  dies_ok(
     sub { 
       $s->Method1(response => q'', status => $status) 
     },
+    'Paws::Exception'
   );
-  lives_ok(
+  cmp_ok($@->code, 'eq', 'InvalidContent', 'Exception of type InvalidContent');
+  dies_ok(
     sub { 
       $s->Method1(response => '[UNDEF]', status => $status) 
     },
+    'Paws::Exception'
   );
+  cmp_ok($@->code, 'eq', 'InvalidContent', 'Exception of type InvalidContent');
   throws_ok(
     sub { 
       $s->Method1(response => 'notajsonstring', status => $status) 

@@ -2,7 +2,7 @@ use 5.008003; use strict; use warnings;
 
 package RT::Extension::RepliesToResolved;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 =head1 NAME
 
@@ -138,7 +138,7 @@ package RT::Interface::Email;
 
         $RT::Logger->info("A reply to resolved ticket #". $ticket->id .", creating a new ticket");
 
-        $entity->head->replace("X-RT-Was-Reply-To" => Encode::encode("UTF-8",$ticket->id));
+        $entity->head->replace("X-RT-Was-Reply-To" => Encode::encode_utf8($ticket->id));
         &RT::Extension::RepliesToResolved::RemoveSubjectTags($entity);
 
         return undef;

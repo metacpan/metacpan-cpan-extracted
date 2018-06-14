@@ -1,5 +1,5 @@
 package Keyword::Declare;
-our $VERSION = '0.001006';
+our $VERSION = '0.001009';
 
 use 5.012;     # required for pluggable keywords plus /.../r
 use warnings;
@@ -244,6 +244,68 @@ sub import {
         }
 
         # Install the keyword, exporting it as well if it's in an import() or unimport() sub...
+        $$src_ref = qq{ if (((caller 0)[3]//q{}) =~ /\\b(?:un)?import\\Z/) { $keyword_defn } }
+                  . qq{ BEGIN{ $keyword_defn } }
+                  . "\n#line $line $file\n"
+                  . $$src_ref;
+    };
+
+    # Install the 'unkeyword' (anti-meta-)keyword...
+    Keyword::Simple::define 'unkeyword', sub {
+        # Unpack trailing code...
+        my ($src_ref) = @_;
+
+        # Where was this keyword declared???
+        my ($file, $line) = (caller)[1,2];
+
+        # Match and extract the keyword definition...
+        use re 'eval';
+        $$src_ref =~ s{
+            \A
+            (?<leadingspace> (?&PerlNWS) )
+            (?:
+                (?<keyword> (?&PerlIdentifier) )
+            |
+                (?<unexpected> \S+ )
+            )
+
+            $PPR::GRAMMAR
+        }{}xms;
+
+        my %keyword_info = %+;
+
+        croak "Invalid unkeyword definition. Expected keyword name (identifier)\n"
+            . " but found: $keyword_info{unexpected}"
+                if defined $keyword_info{unexpected};
+
+        # Check for excessive meta-ness...
+        if ($keyword_info{keyword} =~ /^(?:keyword|keytype)$/) {
+            croak "Can't undefine '$keyword_info{keyword}' keyword";
+        }
+
+        # Report installation of keyword if requested...
+        if (${^H}{"Keyword::Declare debug"}) {
+            my $msg = ("#" x 50) . "\n"
+                      . " Uninstalled keyword macro: $keyword_info{keyword}(...)\n"
+                      . " at $file line $line\n"
+                      . ("#" x 50) . "\n";
+            $msg =~ s{^}{###}gm;
+            warn $msg;
+        }
+
+        # How to remove the Keyword::Simple keyword (with workaround for earlier versions)...
+        my $keyword_defn = q{Keyword::Simple::undefine( 'KEYWORD' );};
+        if ($Keyword::Simple::VERSION < 0.04) {
+            $keyword_defn .= "\$^H{'Keyword::Simple/keywords'} =~ s{ KEYWORD:-?\\d*}{}g;" ;
+        }
+
+        # How to remove the Keyword::Declare keywords...
+        $keyword_defn .= q{
+            delete @^H{ grep m{^ Keyword::Declare \s+ active:KEYWORD:}xms, keys %^H };
+        };
+        $keyword_defn =~ s{KEYWORD}{$keyword_info{keyword}}g;
+
+        # Uninstall the keyword, exporting it as well if it's in an import() or unimport() sub...
         $$src_ref = qq{ if (((caller 0)[3]//q{}) =~ /\\b(?:un)?import\\Z/) { $keyword_defn } }
                   . qq{ BEGIN{ $keyword_defn } }
                   . "\n#line $line $file\n"
@@ -927,7 +989,7 @@ Keyword::Declare - Declare new Perl keywords...via a keyword...named C<keyword>
 
 =head1 VERSION
 
-This document describes Keyword::Declare version 0.001006
+This document describes Keyword::Declare version 0.001009
 
 
 =head1 STATUS
@@ -975,13 +1037,23 @@ They already have in past releases.
         return "use Test::More; subtest $desc => sub $subtests;"
     }
 
-    # Keywords declared in an import() are automatically exported...
+    # Keywords can be removed from the remainder of the lexical scope...
+    unkeyword test;
+
+    # Keywords declared in an import() or unimport() are automatically exported...
     sub import {
 
         keyword debug (Expr $expr) {
             return "" if !$ENV{DEBUG};
             return "use Data::Dump 'ddx'; ddx $expr";
         }
+
+    }
+
+    # Keywords removals in an unimport() or import() are also automatically exported...
+    sub unimport {
+
+        unkeyword debug;
 
     }
 
@@ -1054,7 +1126,6 @@ an existing Perl keyword. However, using the name of an existing keyword
 usually creates an infinite loop of keyword expansion, so it rarely does
 what you actually wanted. In particular, the module will not allow you
 to declare a new keyword named C<keyword>, as that way lies madness.
-
 
 =head2 Specifying keyword parameters
 
@@ -1327,7 +1398,7 @@ named types for it, by conjoining them with a vertical bar (C<|>) like so:
 This is known as a I<disjunctive type>.
 
 Disjunctive types can only be constructed from named types (either built-in
-or defined by a C<keytype>); they cannot include from regex or literal types.
+or defined by a C<keytype>); they cannot include regex or literal types.
 However, this is not an onerous restriction, as it is always possible to
 convert a non-named type to a named type using C<keytype>:
 
@@ -1876,6 +1947,17 @@ compile-time when it can't work out the right thing to do, in which
 case you'll need to think about it some more.
 
 
+=head2 Removing a lexical keyword
+
+The syntax for removing an existing keyword from the remaining lines
+in the current scope is:
+
+    unkeyword NAME;
+
+Any attempts to remove non-existent keywords are silently ignored (in the
+same way that removing a non-existing hash key doesn't trigger a warning).
+
+
 =head2 Exporting keywords
 
 Normally a keyword definition takes effect from the statement after
@@ -1889,6 +1971,13 @@ In other words, simply placing a keyword definition in a module's
 C<import> exports that keyword to the lexical scope in which the
 module is used.
 
+You can also define new keywords in a module's C<unimport> method,
+and they are exported in exactly the same way.
+
+Likewise, if you place an C<unkeyword> declaration in an C<import>
+or C<unimport> subroutine, then the specified keyword is removed from
+the lexical scope in which the module is C<use>'d or C<no>'d.
+
 
 =head2 Debugging keywords
 
@@ -1896,9 +1985,9 @@ If you load the module with the C<'debug'> option:
 
     use Keyword::Declare {debug=>1};
 
-then keywords and keytypes declared in that lexical scope will report
-their own declarations, and will subsequently report how they transform
-the source following them. For example:
+then keywords and keytypes and unkeywords declared in that lexical scope
+will report their own declarations, and will subsequently report how
+they transform the source following them. For example:
 
     use Keyword::Declare {debug=>1};
 
@@ -1955,21 +2044,23 @@ instead of:
     use Keyword::Declare {debug=>1};
 
 
-=item C<< Can't redefine 'keyword' keyword >>
+=item C<< Can't redefine/undefine 'keyword' keyword >>
 
 You attempted to use the C<keyword> keyword to define a new keyword
-named C<keyword>. Isn't your life hard enough without attempting to
-inject that amount of meta into it???
+named C<keyword>. Or you attempted to use the C<unkeyword> keyword
+to remove C<keyword>.
+
+Isn't your life hard enough without attempting to inject that amount of
+meta into it???
 
 Future versions of this module may well allow you to overload the
 C<keyword> keyword, but this version doesn't. You could always use
-C<Keyword> instead.
+C<Keyword> (with a capital 'K') instead.
 
 
-=item C<< Can't redefine 'keytype' keyword >>
+=item C<< Can't redefine/undefine 'keytype' keyword >>
 
-No, you can't redefine the C<keytype> keyword either.
-
+No, you can't mess with the C<keytype> keyword either.
 
 
 =item C<< Unknown type (%s) for keyword parameter. Did you mean: %s", >>
@@ -2078,6 +2169,14 @@ the limitations of that module. Most significantly, it can only create
 keywords that appear at the beginning of a statement (though you can
 almost always code around that limitation by wrapping the keyword in
 a C<do{...}> block.
+
+Moreover, there is a bug in Keyword::Simple 0.04 which causes that
+module to fail under Perl 5.14 and 5.16 (and possibly under later
+versions of Perl as well, through the Keyword::Declare test suite does
+not detect those potential failures). Consequently, Keyword::Declare
+will not install under Perls before 5.18 if Keyword::Simple 0.04 is
+installed. The current workaround is to downgrade to Keyword::Simple 0.03
+under those Perl versions.
 
 Even with the PPR module, parsing Perl code is tricky, and parsing Perl
 code to build Perl code that parses other Perl code is even more so.

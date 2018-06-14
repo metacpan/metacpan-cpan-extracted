@@ -1,4 +1,4 @@
-Getopt-Long-CGI version 0.02
+Getopt-Long-CGI version 0.03
 ============================
 
 Using the same syntax as Getopt::Long, scripts work on the command-line
@@ -21,7 +21,7 @@ in future perl versions require the 'CGI' module.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2014-2017 by Luke Ross
+Copyright (C) 2014-2018 by Luke Ross
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.6.0 or,

@@ -18,21 +18,45 @@ package Paws::EC2::DescribeInstances;
 
 =head1 NAME
 
-Paws::EC2::DescribeInstances - Arguments for method DescribeInstances on Paws::EC2
+Paws::EC2::DescribeInstances - Arguments for method DescribeInstances on L<Paws::EC2>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method DescribeInstances on the 
-Amazon Elastic Compute Cloud service. Use the attributes of this class
+This class represents the parameters used for calling the method DescribeInstances on the
+L<Amazon Elastic Compute Cloud|Paws::EC2> service. Use the attributes of this class
 as arguments to method DescribeInstances.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to DescribeInstances.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->DescribeInstances(Att1 => $value1, Att2 => $value2, ...);
+    my $ec2 = Paws->service('EC2');
+    my $DescribeInstancesResult = $ec2->DescribeInstances(
+      DryRun  => 1,    # OPTIONAL
+      Filters => [
+        {
+          Values => [
+            'MyString', ...    # OPTIONAL
+          ],                   # OPTIONAL
+          Name => 'MyString',  # OPTIONAL
+        },
+        ...
+      ],                       # OPTIONAL
+      InstanceIds => [
+        'MyString', ...        # OPTIONAL
+      ],                       # OPTIONAL
+      MaxResults => 1,             # OPTIONAL
+      NextToken  => 'MyString',    # OPTIONAL
+    );
+
+    # Results:
+    my $NextToken    = $DescribeInstancesResult->NextToken;
+    my $Reservations = $DescribeInstancesResult->Reservations;
+
+    # Returns a L<Paws::EC2::DescribeInstancesResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ec2/DescribeInstances>
 
 =head1 ATTRIBUTES
 
@@ -77,8 +101,8 @@ indicates whether the EBS volume is deleted on instance termination.
 
 =item *
 
-C<block-device-mapping.device-name> - The device name for the EBS
-volume (for example, C</dev/sdh> or C<xvdh>).
+C<block-device-mapping.device-name> - The device name specified in the
+block device mapping (for example, C</dev/sdh> or C<xvdh>).
 
 =item *
 
@@ -404,13 +428,13 @@ launch request, you also get one reservation ID.
 
 =item *
 
-C<root-device-name> - The name of the root device for the instance (for
-example, C</dev/sda1> or C</dev/xvda>).
+C<root-device-name> - The device name of the root device volume (for
+example, C</dev/sda1>).
 
 =item *
 
-C<root-device-type> - The type of root device that the instance uses
-(C<ebs> | C<instance-store>).
+C<root-device-type> - The type of the root device volume (C<ebs> |
+C<instance-store>).
 
 =item *
 
@@ -491,8 +515,7 @@ Default: Describes all your instances.
 The maximum number of results to return in a single call. To retrieve
 the remaining results, make another call with the returned C<NextToken>
 value. This value can be between 5 and 1000. You cannot specify this
-parameter and the instance IDs parameter or tag filters in the same
-call.
+parameter and the instance IDs parameter in the same call.
 
 
 
@@ -509,9 +532,9 @@ This class forms part of L<Paws>, documenting arguments for method DescribeInsta
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

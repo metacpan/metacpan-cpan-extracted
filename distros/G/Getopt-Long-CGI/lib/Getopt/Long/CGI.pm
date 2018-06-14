@@ -15,7 +15,7 @@ our @EXPORT_OK = qw(GetOptions);
 
 our @EXPORT = qw(GetOptions);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my $css_style = <<"END";
 h1, h2 { font-family: sans-serif }
@@ -246,14 +246,11 @@ L<Getopt::Long>
 
 =head1 AUTHOR
 
-Luke Ross, E<lt>lr@lukeross.nameE<gt>
-
-You can report bugs on the issue tracker at
-L<https://github.com/lukeross/Getopt-Long-CGI>
+Luke Ross, E<lt>luke@lukeross.nameE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2017 by Luke Ross
+Copyright (C) 2014-2018 by Luke Ross
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.6.0 or,

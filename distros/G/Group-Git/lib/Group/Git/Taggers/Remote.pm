@@ -16,7 +16,7 @@ use English qw/ -no_match_vars /;
 
 extends 'Group::Git::Taggers';
 
-our $VERSION = version->new('0.6.9');
+our $VERSION = version->new('0.6.10');
 
 sub match {
     my ($self, $project) = @_;

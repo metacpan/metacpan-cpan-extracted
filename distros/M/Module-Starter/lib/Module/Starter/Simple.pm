@@ -17,11 +17,11 @@ Module::Starter::Simple - a simple, comprehensive Module::Starter plugin
 
 =head1 VERSION
 
-Version 1.73
+Version 1.74
 
 =cut
 
-our $VERSION = '1.73';
+our $VERSION = '1.74';
 
 =head1 SYNOPSIS
 
@@ -665,17 +665,17 @@ sub _reference_links {
   return (
       { nickname => 'RT',
         title    => 'CPAN\'s request tracker (report bugs here)',
-        link     => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=%s',
+        link     => 'https://rt.cpan.org/NoAuth/Bugs.html?Dist=%s',
       },
       { nickname => 'AnnoCPAN',
         title    => 'Annotated CPAN documentation',
         link     => 'http://annocpan.org/dist/%s',
       },
       { title    => 'CPAN Ratings',
-        link     => 'http://cpanratings.perl.org/d/%s',
+        link     => 'https://cpanratings.perl.org/d/%s',
       },
       { title    => 'Search CPAN',
-        link     => 'http://search.cpan.org/dist/%s/',
+        link     => 'https://metacpan.org/release/%s',
       },
     );
 }

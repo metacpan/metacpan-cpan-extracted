@@ -85,13 +85,13 @@ exactly.
 
 =head2 B<REQUIRED> Type => Str
 
-  The type of API entity to which the documentation content applies. It
-is a valid and required field for API entity types of C<API>,
-C<AUTHORIZER>, C<MODEL>, C<RESOURCE>, C<METHOD>, C<PATH_PARAMETER>,
-C<QUERY_PARAMETER>, C<REQUEST_HEADER>, C<REQUEST_BODY>, C<RESPONSE>,
-C<RESPONSE_HEADER>, and C<RESPONSE_BODY>. Content inheritance does not
-apply to any entity of the C<API>, C<AUTHORIZER>, C<METHOD>, C<MODEL>,
-C<REQUEST_BODY>, or C<RESOURCE> type.
+  [Required] The type of API entity to which the documentation content
+applies. Valid values are C<API>, C<AUTHORIZER>, C<MODEL>, C<RESOURCE>,
+C<METHOD>, C<PATH_PARAMETER>, C<QUERY_PARAMETER>, C<REQUEST_HEADER>,
+C<REQUEST_BODY>, C<RESPONSE>, C<RESPONSE_HEADER>, and C<RESPONSE_BODY>.
+Content inheritance does not apply to any entity of the C<API>,
+C<AUTHORIZER>, C<METHOD>, C<MODEL>, C<REQUEST_BODY>, or C<RESOURCE>
+type.
 
 
 
@@ -101,9 +101,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::ApiGatewa
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -1,0 +1,42 @@
+--- !!perl/hash:TestML1::Function
+namespace:
+  TestML: !!perl/hash:TestML1::Str
+    value: '0.1.0'
+
+statements:
+- !!perl/hash:TestML1::Assignment
+  name: Plan
+  expr: !!perl/hash:TestML1::Num
+    value: 4
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Point
+    name: foo
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Point
+      name: bar
+  points:
+  - foo
+  - bar
+
+data:
+- !!perl/hash:TestML1::Block
+  label: Test 2
+  points:
+    foo: '02134'
+    bar: '02134'
+- !!perl/hash:TestML1::Block
+  label: Test 1
+  points:
+    foo: '98122'
+    bar: '98122'
+- !!perl/hash:TestML1::Block
+  label: Test 11
+  points:
+    foo: '90210'
+    bar: '90210'
+- !!perl/hash:TestML1::Block
+  label: Test 111
+  points:
+    foo: '60067'
+    bar: '60067'

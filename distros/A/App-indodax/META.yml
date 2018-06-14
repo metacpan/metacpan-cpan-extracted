@@ -17,17 +17,18 @@ meta-spec:
   version: '1.4'
 name: App-indodax
 requires:
-  Data::Sah::Coerce::perl::date::float_epoch: '0'
-  Data::Sah::Coerce::perl::date::obj_DateTime: '0'
-  Data::Sah::Coerce::perl::date::obj_TimeMoment: '0'
-  Data::Sah::Coerce::perl::date::str_iso8601: '0'
+  App::cryp::Exchange::indodax: '0.006'
+  Data::Sah::Coerce::perl::date::float_epoch: '0.025'
+  Data::Sah::Coerce::perl::date::obj_DateTime: '0.025'
+  Data::Sah::Coerce::perl::date::obj_TimeMoment: '0.025'
+  Data::Sah::Coerce::perl::date::str_iso8601: '0.025'
   Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::date: '0'
   Data::Sah::Compiler::perl::TH::float: '0'
   Data::Sah::Compiler::perl::TH::hash: '0'
   Data::Sah::Compiler::perl::TH::int: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
-  Finance::Indodax: '0.007'
+  Finance::Indodax: '0.010'
   Log::ger: '0.023'
   Perinci::CmdLine::Any: '0'
   Sah::Schema::posint: '0'
@@ -38,7 +39,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-indodax
   homepage: https://metacpan.org/release/App-indodax
   repository: git://github.com/perlancar/perl-App-indodax.git
-version: '0.023'
+version: '0.024'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -296,7 +297,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.13'
+      version: '0.142'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'

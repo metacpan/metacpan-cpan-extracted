@@ -30,21 +30,47 @@ package Paws::DynamoDB::Query;
 
 =head1 NAME
 
-Paws::DynamoDB::Query - Arguments for method Query on Paws::DynamoDB
+Paws::DynamoDB::Query - Arguments for method Query on L<Paws::DynamoDB>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method Query on the 
-Amazon DynamoDB service. Use the attributes of this class
+This class represents the parameters used for calling the method Query on the
+L<Amazon DynamoDB|Paws::DynamoDB> service. Use the attributes of this class
 as arguments to method Query.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to Query.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->Query(Att1 => $value1, Att2 => $value2, ...);
+    my $dynamodb = Paws->service('DynamoDB');
+   # To query an item
+   # This example queries items in the Music table. The table has a partition
+   # key and sort key (Artist and SongTitle), but this query only specifies the
+   # partition key value. It returns song titles by the artist named "No One You
+   # Know".
+    my $QueryOutput = $dynamodb->Query(
+      {
+        'KeyConditionExpression'    => 'Artist = :v1',
+        'ProjectionExpression'      => 'SongTitle',
+        'ExpressionAttributeValues' => {
+          ':v1' => {
+            'S' => 'No One You Know'
+          }
+        },
+        'TableName' => 'Music'
+      }
+    );
+
+    # Results:
+    my $Items            = $QueryOutput->Items;
+    my $Count            = $QueryOutput->Count;
+    my $ScannedCount     = $QueryOutput->ScannedCount;
+    my $ConsumedCapacity = $QueryOutput->ConsumedCapacity;
+
+    # Returns a L<Paws::DynamoDB::QueryOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/dynamodb/Query>
 
 =head1 ATTRIBUTES
 
@@ -52,16 +78,18 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 =head2 AttributesToGet => ArrayRef[Str|Undef]
 
 This is a legacy parameter. Use C<ProjectionExpression> instead. For
-more information, see AttributesToGet in the I<Amazon DynamoDB
-Developer Guide>.
+more information, see AttributesToGet
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LegacyConditionalParameters.AttributesToGet.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
 =head2 ConditionalOperator => Str
 
 This is a legacy parameter. Use C<FilterExpression> instead. For more
-information, see ConditionalOperator in the I<Amazon DynamoDB Developer
-Guide>.
+information, see ConditionalOperator
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LegacyConditionalParameters.ConditionalOperator.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 Valid values are: C<"AND">, C<"OR">
 
@@ -125,9 +153,10 @@ C<Percentile>
 
 The name of this attribute conflicts with a reserved word, so it cannot
 be used directly in an expression. (For the complete list of reserved
-words, see Reserved Words in the I<Amazon DynamoDB Developer Guide>).
-To work around this, you could specify the following for
-C<ExpressionAttributeNames>:
+words, see Reserved Words
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ReservedWords.html)
+in the I<Amazon DynamoDB Developer Guide>). To work around this, you
+could specify the following for C<ExpressionAttributeNames>:
 
 =over
 
@@ -152,7 +181,9 @@ Tokens that begin with the B<:> character are I<expression attribute
 values>, which are placeholders for the actual value at runtime.
 
 For more information on expression attribute names, see Accessing Item
-Attributes in the I<Amazon DynamoDB Developer Guide>.
+Attributes
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.AccessingItemAttributes.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
@@ -177,7 +208,9 @@ You could then use these values in an expression, such as this:
 C<ProductStatus IN (:avail, :back, :disc)>
 
 For more information on expression attribute values, see Specifying
-Conditions in the I<Amazon DynamoDB Developer Guide>.
+Conditions
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.SpecifyingConditions.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
@@ -194,8 +227,9 @@ A C<FilterExpression> is applied after the items have already been
 read; the process of filtering does not consume any additional read
 capacity units.
 
-For more information, see Filter Expressions in the I<Amazon DynamoDB
-Developer Guide>.
+For more information, see Filter Expressions
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/QueryAndScan.html#FilteringResults)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
@@ -213,11 +247,12 @@ The condition that specifies the key value(s) for items to be retrieved
 by the C<Query> action.
 
 The condition must perform an equality test on a single partition key
-value. The condition can also perform one of several comparison tests
-on a single sort key value. C<Query> can use C<KeyConditionExpression>
-to retrieve one item with a given partition key value and sort key
-value, or several items that have the same partition key value but
-different sort key values.
+value.
+
+The condition can optionally perform one of several comparison tests on
+a single sort key value. This allows C<Query> to retrieve one item with
+a given partition key value and sort key value, or several items that
+have the same partition key value but different sort key values.
 
 The partition key equality test is required, and must be specified in
 the following format:
@@ -305,20 +340,24 @@ C<#S = :myval>
 
 =back
 
-For a list of reserved words, see Reserved Words in the I<Amazon
-DynamoDB Developer Guide>.
+For a list of reserved words, see Reserved Words
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ReservedWords.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 For more information on C<ExpressionAttributeNames> and
 C<ExpressionAttributeValues>, see Using Placeholders for Attribute
-Names and Values in the I<Amazon DynamoDB Developer Guide>.
+Names and Values
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ExpressionPlaceholders.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
 =head2 KeyConditions => L<Paws::DynamoDB::KeyConditions>
 
 This is a legacy parameter. Use C<KeyConditionExpression> instead. For
-more information, see KeyConditions in the I<Amazon DynamoDB Developer
-Guide>.
+more information, see KeyConditions
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LegacyConditionalParameters.KeyConditions.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
@@ -333,8 +372,9 @@ left off. Also, if the processed data set size exceeds 1 MB before
 DynamoDB reaches this limit, it stops the operation and returns the
 matching values up to the limit, and a key in C<LastEvaluatedKey> to
 apply in a subsequent operation to continue the operation. For more
-information, see Query and Scan in the I<Amazon DynamoDB Developer
-Guide>.
+information, see Query and Scan
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/QueryAndScan.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
@@ -349,15 +389,18 @@ If no attribute names are specified, then all attributes will be
 returned. If any of the requested attributes are not found, they will
 not appear in the result.
 
-For more information, see Accessing Item Attributes in the I<Amazon
-DynamoDB Developer Guide>.
+For more information, see Accessing Item Attributes
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.AccessingItemAttributes.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
 =head2 QueryFilter => L<Paws::DynamoDB::FilterConditionMap>
 
 This is a legacy parameter. Use C<FilterExpression> instead. For more
-information, see QueryFilter in the I<Amazon DynamoDB Developer Guide>.
+information, see QueryFilter
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LegacyConditionalParameters.QueryFilter.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
@@ -376,8 +419,8 @@ is performed in descending order.
 Items with the same partition key value are stored in sorted order by
 sort key. If the sort key data type is Number, the results are stored
 in numeric order. For type String, the results are stored in order of
-ASCII character code values. For type Binary, DynamoDB treats each byte
-of the binary data as unsigned.
+UTF-8 bytes. For type Binary, DynamoDB treats each byte of the binary
+data as unsigned.
 
 If C<ScanIndexForward> is C<true>, DynamoDB returns the results in the
 order in which they are stored (by sort key value). This is the default
@@ -463,9 +506,9 @@ This class forms part of L<Paws>, documenting arguments for method Query in L<Pa
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

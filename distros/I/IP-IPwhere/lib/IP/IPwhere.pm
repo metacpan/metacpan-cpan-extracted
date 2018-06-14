@@ -33,7 +33,7 @@ Version 0.05
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -68,7 +68,7 @@ sub squery {
     return $ip if $ip=~/^IANA/;
     my $result;
     $result .= getTbeIParea($ip);
-    $result .= getSinaIParea($ip);
+    #$result .= getSinaIParea($ip);
     $result .= getBaiduIParea($ip);
     $result .= getPcoIParea($ip);
     return $result;
@@ -100,7 +100,7 @@ sub query {
     for ( validIP( @{$ip} ) ) {
 
         $result .= getTbeIParea($_);
-        $result .= getSinaIParea($_);
+       # $result .= getSinaIParea($_);
         $result .= getBaiduIParea($_);
         $result .= getPcoIParea($_);
     }
@@ -191,12 +191,8 @@ sub getSinaIParea() {
       qq(http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js&ip=$ip);
     my $code = get($url);
     my $jso = $1 if $code =~ /var remote_ip_info =(.*);$/;
-
-    #print $jso,"\n";
     my $json = new JSON;
     my $obj  = $json->decode($jso);
-
-    #print Dumper($obj),"\n";
     my $ipArea =
       "sina $ip:$obj->{country},$obj->{province},$obj->{city},$obj->{isp}\n";
     $ipcache{$key} = $ipArea;
@@ -209,8 +205,6 @@ sub getTbeIParea() {
     unless ( exists( $ipcache{$key} ) ) {
         my $url  = qq(http://ip.taobao.com/service/getIpInfo.php?ip=$ip);
         my $code = get($url);
-
-        #print Dumper($code),"\n";
         my $json = new JSON;
         if (defined $code) {
             my $obj = $json->decode($code);

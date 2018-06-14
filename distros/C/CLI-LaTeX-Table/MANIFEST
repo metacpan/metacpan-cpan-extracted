@@ -13,6 +13,7 @@ scripts/csel
 scripts/saikoro
 scripts/latextable
 scripts/csv2tsv
+README_JP.pdf
 
 META.yml
 META.json

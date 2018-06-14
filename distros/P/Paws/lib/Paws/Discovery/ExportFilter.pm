@@ -2,7 +2,7 @@ package Paws::Discovery::ExportFilter;
   use Moose;
   has Condition => (is => 'ro', isa => 'Str', request_name => 'condition', traits => ['NameInRequest'], required => 1);
   has Name => (is => 'ro', isa => 'Str', request_name => 'name', traits => ['NameInRequest'], required => 1);
-  has Values => (is => 'ro', isa => 'ArrayRef[Str|Undef]', request_name => 'item', request_name => 'values', traits => ['NameInRequest','NameInRequest'], required => 1);
+  has Values => (is => 'ro', isa => 'ArrayRef[Str|Undef]', request_name => 'values', traits => ['NameInRequest'], required => 1);
 1;
 
 ### main pod documentation begin ###
@@ -34,7 +34,9 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Discovery::
 =head1 DESCRIPTION
 
 Used to select which agent's data is to be exported. A single agent ID
-may be selected for export using the StartExportTask action.
+may be selected for export using the StartExportTask
+(http://docs.aws.amazon.com/application-discovery/latest/APIReference/API_StartExportTask.html)
+action.
 
 =head1 ATTRIBUTES
 
@@ -52,8 +54,10 @@ may be selected for export using the StartExportTask action.
 =head2 B<REQUIRED> Values => ArrayRef[Str|Undef]
 
   A single C<agentId> for a Discovery Agent. An C<agentId> can be found
-using the DescribeAgents action. Typically an ADS C<agentId> is in the
-form C<o-0123456789abcdef0>.
+using the DescribeAgents
+(http://docs.aws.amazon.com/application-discovery/latest/APIReference/API_DescribeExportTasks.html)
+action. Typically an ADS C<agentId> is in the form
+C<o-0123456789abcdef0>.
 
 
 
@@ -63,9 +67,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Discovery
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

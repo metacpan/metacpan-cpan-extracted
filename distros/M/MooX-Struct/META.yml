@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
-generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
 keywords: []
 license: perl
 meta-spec:
@@ -25,13 +25,13 @@ optional_features: {}
 provides:
   MooX::Struct:
     file: lib/MooX/Struct.pm
-    version: '0.016'
+    version: '0.017'
   MooX::Struct::Processor:
     file: lib/MooX/Struct.pm
-    version: '0.016'
+    version: '0.017'
   MooX::Struct::Util:
     file: lib/MooX/Struct/Util.pm
-    version: '0.016'
+    version: '0.017'
 requires:
   B::Hooks::EndOfScope: '0'
   Exporter::Tiny: '0.044'
@@ -46,7 +46,7 @@ resources:
   homepage: https://metacpan.org/release/MooX-Struct
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-moox-struct.git
-version: '0.016'
+version: '0.017'
 x_contributors:
   - NOBODY
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

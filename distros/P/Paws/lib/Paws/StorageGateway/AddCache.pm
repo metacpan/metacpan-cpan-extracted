@@ -15,21 +15,38 @@ package Paws::StorageGateway::AddCache;
 
 =head1 NAME
 
-Paws::StorageGateway::AddCache - Arguments for method AddCache on Paws::StorageGateway
+Paws::StorageGateway::AddCache - Arguments for method AddCache on L<Paws::StorageGateway>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method AddCache on the 
-AWS Storage Gateway service. Use the attributes of this class
+This class represents the parameters used for calling the method AddCache on the
+L<AWS Storage Gateway|Paws::StorageGateway> service. Use the attributes of this class
 as arguments to method AddCache.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to AddCache.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->AddCache(Att1 => $value1, Att2 => $value2, ...);
+    my $storagegateway = Paws->service('StorageGateway');
+    # To add a cache
+    # The following example shows a request that activates a gateway-stored
+    # volume.
+    my $AddCacheOutput = $storagegateway->AddCache(
+      {
+        'GatewayARN' =>
+          'arn:aws:storagegateway:us-east-1:111122223333:gateway/sgw-12A3456B',
+        'DiskIds' =>
+          [ 'pci-0000:03:00.0-scsi-0:0:0:0', 'pci-0000:03:00.0-scsi-0:0:1:0' ]
+      }
+    );
+
+    # Results:
+    my $GatewayARN = $AddCacheOutput->GatewayARN;
+
+    # Returns a L<Paws::StorageGateway::AddCacheOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/storagegateway/AddCache>
 
 =head1 ATTRIBUTES
 
@@ -53,9 +70,9 @@ This class forms part of L<Paws>, documenting arguments for method AddCache in L
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -142,7 +142,7 @@
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
-  glibc_date_format => "%Y.%m.%d",
+  glibc_date_format => "%Y-%m-%d",
   glibc_datetime_format => "%Y m. %B %d d. %T",
   glibc_time_12_format => "%I:%M:%S %p",
   glibc_time_format => "%T",

@@ -1,7 +1,7 @@
 package Sah::Schema::fiat_currency;
 
-our $DATE = '2018-06-07'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2018-06-10'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 our $schema = ["currency::code" => {
     summary => 'Alias for currency::code',
@@ -22,7 +22,7 @@ Sah::Schema::fiat_currency - Alias for currency::code
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::Schema::fiat_currency (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-06-07.
+This document describes version 0.011 of Sah::Schema::fiat_currency (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-06-10.
 
 =head1 HOMEPAGE
 

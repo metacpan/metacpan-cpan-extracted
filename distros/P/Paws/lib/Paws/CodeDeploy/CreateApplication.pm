@@ -2,6 +2,7 @@
 package Paws::CodeDeploy::CreateApplication;
   use Moose;
   has ApplicationName => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'applicationName' , required => 1);
+  has ComputePlatform => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'computePlatform' );
 
   use MooseX::ClassAttribute;
 
@@ -14,21 +15,31 @@ package Paws::CodeDeploy::CreateApplication;
 
 =head1 NAME
 
-Paws::CodeDeploy::CreateApplication - Arguments for method CreateApplication on Paws::CodeDeploy
+Paws::CodeDeploy::CreateApplication - Arguments for method CreateApplication on L<Paws::CodeDeploy>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateApplication on the 
-AWS CodeDeploy service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateApplication on the
+L<AWS CodeDeploy|Paws::CodeDeploy> service. Use the attributes of this class
 as arguments to method CreateApplication.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateApplication.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateApplication(Att1 => $value1, Att2 => $value2, ...);
+    my $codedeploy = Paws->service('CodeDeploy');
+    my $CreateApplicationOutput = $codedeploy->CreateApplication(
+      ApplicationName => 'MyApplicationName',
+      ComputePlatform => 'Server',              # OPTIONAL
+    );
+
+    # Results:
+    my $ApplicationId = $CreateApplicationOutput->ApplicationId;
+
+    # Returns a L<Paws::CodeDeploy::CreateApplicationOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/codedeploy/CreateApplication>
 
 =head1 ATTRIBUTES
 
@@ -40,6 +51,13 @@ applicable IAM user or AWS account.
 
 
 
+=head2 ComputePlatform => Str
+
+The destination platform type for the deployment (C<Lambda> or
+C<Server>).
+
+Valid values are: C<"Server">, C<"Lambda">
+
 
 =head1 SEE ALSO
 
@@ -47,9 +65,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateApplica
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

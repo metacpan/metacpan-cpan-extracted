@@ -12,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -97,10 +97,10 @@ requires:
 resources:
   homepage: https://github.com/duckduckgo/p5-app-duckpan
   repository: https://github.com/duckduckgo/p5-app-duckpan.git
-version: '1019'
+version: '1021'
 x_Dist_Zilla:
   perl:
-    version: '5.016003'
+    version: '5.026001'
   plugins:
     -
       class: Dist::Zilla::Plugin::PromptIfStale
@@ -335,7 +335,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '1019'
+          tag: '1021'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -366,7 +366,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ChangelogFromGit
       name: ChangelogFromGit
-      version: '0.016'
+      version: '0.017'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

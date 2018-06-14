@@ -1,7 +1,7 @@
 package App::DuckPAN::Option::Global;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Commands that can be run from anywhere.
-$App::DuckPAN::Option::Global::VERSION = '1019';
+$App::DuckPAN::Option::Global::VERSION = '1021';
 use Moo::Role;
 
 with qw( App::DuckPAN::Cmd );
@@ -20,7 +20,7 @@ App::DuckPAN::Option::Global - Commands that can be run from anywhere.
 
 =head1 VERSION
 
-version 1019
+version 1021
 
 =head1 AUTHOR
 

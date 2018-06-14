@@ -2,13 +2,13 @@ use strict;
 use warnings;
 use Test::More;
 use Net::Azure::NotificationHubs::Request;
-use LWP::UserAgent;
+use HTTP::Tiny;
 
 subtest 'html response' => sub {
     my $uri = URI->new('http://search.cpan.org/search');
     $uri->query_form(query => 'Azure', mode => 'all'); 
     my $req = Net::Azure::NotificationHubs::Request->new(GET => $uri);
-    $req->agent(LWP::UserAgent->new);
+    $req->agent(HTTP::Tiny->new);
     my $res = $req->do;
     can_ok $res, qw/as_hashref/;
     my $data = $res->as_hashref;
@@ -19,7 +19,7 @@ subtest 'json response' => sub {
     my $uri = URI->new('http://fastapi.metacpan.org/v1/release/_search');
     $uri->query_form(q => 'name:Net-Azure-Authorization-SAS-0.02', fields => 'download_url,name'); 
     my $req = Net::Azure::NotificationHubs::Request->new(GET => $uri);
-    $req->agent(LWP::UserAgent->new);
+    $req->agent(HTTP::Tiny->new);
     my $res = $req->do;
     can_ok $res, qw/as_hashref/;
     my $data = $res->as_hashref;

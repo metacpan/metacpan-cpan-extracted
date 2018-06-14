@@ -9,7 +9,7 @@ package Paws::ApiGateway::CreateAuthorizer;
   has IdentityValidationExpression => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'identityValidationExpression');
   has Name => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'name', required => 1);
   has ProviderARNs => (is => 'ro', isa => 'ArrayRef[Str|Undef]', traits => ['NameInRequest'], request_name => 'providerARNs');
-  has RestApiId => (is => 'ro', isa => 'Str', traits => ['ParamInURI'], uri_name => 'restApiId', required => 1);
+  has RestApiId => (is => 'ro', isa => 'Str', traits => ['ParamInURI'], uri_name => 'restapi_id', required => 1);
   has Type => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'type', required => 1);
 
   use MooseX::ClassAttribute;
@@ -18,37 +18,65 @@ package Paws::ApiGateway::CreateAuthorizer;
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/restapis/{restapi_id}/authorizers');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'POST');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::ApiGateway::Authorizer');
-  class_has _result_key => (isa => 'Str', is => 'ro');
 1;
 
 ### main pod documentation begin ###
 
 =head1 NAME
 
-Paws::ApiGateway::CreateAuthorizer - Arguments for method CreateAuthorizer on Paws::ApiGateway
+Paws::ApiGateway::CreateAuthorizer - Arguments for method CreateAuthorizer on L<Paws::ApiGateway>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method CreateAuthorizer on the 
-Amazon API Gateway service. Use the attributes of this class
+This class represents the parameters used for calling the method CreateAuthorizer on the
+L<Amazon API Gateway|Paws::ApiGateway> service. Use the attributes of this class
 as arguments to method CreateAuthorizer.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to CreateAuthorizer.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->CreateAuthorizer(Att1 => $value1, Att2 => $value2, ...);
+    my $apigateway = Paws->service('ApiGateway');
+    my $Authorizer = $apigateway->CreateAuthorizer(
+      Name                         => 'MyString',
+      RestApiId                    => 'MyString',
+      Type                         => 'TOKEN',
+      AuthType                     => 'MyString',                  # OPTIONAL
+      AuthorizerCredentials        => 'MyString',                  # OPTIONAL
+      AuthorizerResultTtlInSeconds => 1,                           # OPTIONAL
+      AuthorizerUri                => 'MyString',                  # OPTIONAL
+      IdentitySource               => 'MyString',                  # OPTIONAL
+      IdentityValidationExpression => 'MyString',                  # OPTIONAL
+      ProviderARNs                 => [ 'MyProviderARN', ... ],    # OPTIONAL
+    );
+
+    # Results:
+    my $Type         = $Authorizer->Type;
+    my $ProviderARNs = $Authorizer->ProviderARNs;
+    my $IdentityValidationExpression =
+      $Authorizer->IdentityValidationExpression;
+    my $AuthorizerResultTtlInSeconds =
+      $Authorizer->AuthorizerResultTtlInSeconds;
+    my $AuthType              = $Authorizer->AuthType;
+    my $Name                  = $Authorizer->Name;
+    my $AuthorizerUri         = $Authorizer->AuthorizerUri;
+    my $Id                    = $Authorizer->Id;
+    my $AuthorizerCredentials = $Authorizer->AuthorizerCredentials;
+    my $IdentitySource        = $Authorizer->IdentitySource;
+
+    # Returns a L<Paws::ApiGateway::Authorizer> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://aws.amazon.com/documentation/apigateway/>
 
 =head1 ATTRIBUTES
 
 
 =head2 AuthorizerCredentials => Str
 
-Specifies the required credentials as an IAM role for Amazon API
-Gateway to invoke the authorizer. To specify an IAM role for Amazon API
-Gateway to assume, use the role's Amazon Resource Name (ARN). To use
+Specifies the required credentials as an IAM role for API Gateway to
+invoke the authorizer. To specify an IAM role for API Gateway to
+assume, use the role's Amazon Resource Name (ARN). To use
 resource-based permissions on the Lambda function, specify null.
 
 
@@ -91,11 +119,11 @@ The identity source for which authorization is requested.
 
 =over
 
-=item * For a C<TOKEN> authorizer, this is required and specifies the
-request header mapping expression for the custom header holding the
-authorization token submitted by the client. For example, if the token
-header name is C<Auth>, the header mapping expression is
-C<method.request.header.Auth>.
+=item * For a C<TOKEN> or C<COGNITO_USER_POOLS> authorizer, this is
+required and specifies the request header mapping expression for the
+custom header holding the authorization token submitted by the client.
+For example, if the token header name is C<Auth>, the header mapping
+expression is C<method.request.header.Auth>.
 
 =item * For the C<REQUEST> authorizer, this is required when
 authorization caching is enabled. The value is a comma-separated string
@@ -113,9 +141,6 @@ string of comma-separated mapping expressions of the specified request
 parameters. When the authorization caching is not enabled, this
 property is optional.
 
-=item * For a C<COGNITO_USER_POOLS> authorizer, this property is not
-used.
-
 =back
 
 
@@ -124,12 +149,12 @@ used.
 =head2 IdentityValidationExpression => Str
 
 A validation expression for the incoming identity token. For C<TOKEN>
-authorizers, this value is a regular expression. Amazon API Gateway
-will match the incoming token from the client against the specified
-regular expression. It will invoke the authorizer's Lambda function
-there is a match. Otherwise, it will return a 401 Unauthorized response
-without calling the Lambda function. The validation expression does not
-apply to the C<REQUEST> authorizer.
+authorizers, this value is a regular expression. API Gateway will match
+the C<aud> field of the incoming token from the client against the
+specified regular expression. It will invoke the authorizer's Lambda
+function when there is a match. Otherwise, it will return a 401
+Unauthorized response without calling the Lambda function. The
+validation expression does not apply to the C<REQUEST> authorizer.
 
 
 
@@ -150,7 +175,7 @@ For a C<TOKEN> or C<REQUEST> authorizer, this is not defined.
 
 =head2 B<REQUIRED> RestApiId => Str
 
-The string identifier of the associated RestApi.
+[Required] The string identifier of the associated RestApi.
 
 
 
@@ -171,9 +196,9 @@ This class forms part of L<Paws>, documenting arguments for method CreateAuthori
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

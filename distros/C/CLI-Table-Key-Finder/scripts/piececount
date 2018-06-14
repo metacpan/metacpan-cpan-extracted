@@ -1,0 +1,103 @@
+#!/usr/bin/perl
+use 5.012; use strict ; use warnings ; 
+use utf8 ; 
+use Getopt::Std ; getopts ':~HKLc:mp:t:vx' , \my %o ; 
+use Encode qw[decode encode_utf8 decode_utf8 FB_DEFAULT FB_CROAK FB_QUIET FB_WARN] ;
+use Term::ANSIColor qw[ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
+use FindBin qw[ $Script ] ; 
+
+binmode STDOUT, ':utf8' ; 
+
+my $mlines = 0 ; #　マッチした行数
+my $char = defined $o{c} ?  decode_utf8 ( $o{c} , Encode::FB_WARN ) : '' ;  # マッチを数える対象の文字列
+my $pattern = defined $o{p} ?  decode_utf8 ( $o{p} , Encode::FB_WARN ) : '' ;  # マッチの指定を正規表現のパターンとする。
+$o{t} = defined $o{t} ? decode_utf8 ( $o{t}, Encode::FB_WARN) : undef ; 
+
+& main () ; 
+exit 0 ;
+
+
+sub eachLine ( $ ) { 
+    $mlines ++ ; 
+    my @out ; 
+    push @out , "$.:\t+$_[0]" if $o{':'} ;
+    push @out , "\t" . $_ if $o{v} ; 
+    print @out, "\n" if @out ;
+}
+
+sub main ( ) { 
+  my $cTotal = 0 ; # 全出現回数
+  my $match ; # 正規表現の格納
+  $match = qr/(\Q$char\E)/ if defined $o{c} ; 
+  $match = qr/($pattern)/ if defined $o{p} ; 
+  $match = qr/([｡｢｣､･ｦｧｨｩｪｫｬｭｮｯｰｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝﾞﾟ])/ if $o{H} ; 
+  $match = qr/([。「」、・ヲァィゥェォャュョッーアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン゛゜])/ if $o{K} ; 
+  $match //= '()' ;
+
+  while ( <> ) { 
+  	chomp ; 
+  	$_ = decode_utf8 ( $_ , Encode::FB_WARN ) ; # ncode::FB_WARN = 1   
+    my $c = defined $o{t} ? s/$match/$o{t}/g : s/$match/$1/g ; # マッチした個数を出力
+    my $m = $& // '' ; 
+    $m = sprintf "U+%X", ord($m) if $o{x} ;
+    $_ = $o{v}? ($m) . "\t$_" : ($m // '' )  if $o{m} ;
+    #my $c = scalar @c  ;
+    $cTotal += $c ;
+    if ( $o{L} ) { print "$c". ($o{v} ? "\t$_" : '') . "\n" ; $mlines ++ if $c ; next }  # -L の場合の処理 数だけをシンプルに表示
+    if ( $c ) { 
+      eachLine ($c) ; 
+  	}
+    else {
+      print "$.\t$_\n" if $o{'~'} ; 
+    }
+  }
+
+  if ( $o{L} ) { select *STDERR ; print color('cyan') ;  }
+  print "$mlines\t$cTotal\t$ARGV\t<- Lines, Freq, FileName\t" ;
+  print "($Script)", color('reset') if $o{L} ;
+  print "\n" ;
+} 
+
+
+
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1 
+
+  $0 
+    半角カナの行数を数える
+
+ オプション:
+
+   -H : 件数を数える対象が半角カナとなる。
+   -K : 件数を数える対象が全角カナとなる。次の文字も含む -->   。「」、・゛゜
+   -: : 各行の様子を出力する。
+   -c char ; 文字 char を含む 行や個数を出す。 char は1文字で無くて良い。
+   -~ : その行に、1つも目的の文字が含まないものを表示する。
+
+   -L : 標準出力には単純に，各行のパターンにマッチした個数のみを出力。最後に標準エラー出力に、全体の集計情報を出力。
+   -v : 各行の文字列も出力する。
+   -m : (実験的なもの) マッチしたパターンで各行で最初のものを出力する。
+   -t str : マッチしたものを str　に変換する。
+   -x : マッチした文字を -m で取り出した場合に、そのユニコードのコードポイントを16進で知る。
+
+ 開発上のメモ: 
+   * (改行文字が、Unix 形式でない場合にも "自動的に" 対処するようにしたい。)
+   * 改行文字やタブ文字を、置換した場合の文字列、さらに、その文字列が他の文字列と一緒になる場合の対策も、実装したい。
+   * そろそろ <> をオーバーライドしたい気がしてきた。
+=cut

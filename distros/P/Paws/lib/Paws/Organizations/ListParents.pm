@@ -16,21 +16,33 @@ package Paws::Organizations::ListParents;
 
 =head1 NAME
 
-Paws::Organizations::ListParents - Arguments for method ListParents on Paws::Organizations
+Paws::Organizations::ListParents - Arguments for method ListParents on L<Paws::Organizations>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method ListParents on the 
-AWS Organizations service. Use the attributes of this class
+This class represents the parameters used for calling the method ListParents on the
+L<AWS Organizations|Paws::Organizations> service. Use the attributes of this class
 as arguments to method ListParents.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to ListParents.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->ListParents(Att1 => $value1, Att2 => $value2, ...);
+    my $organizations = Paws->service('Organizations');
+    my $ListParentsResponse = $organizations->ListParents(
+      ChildId    => 'MyChildId',
+      MaxResults => 1,                # OPTIONAL
+      NextToken  => 'MyNextToken',    # OPTIONAL
+    );
+
+    # Results:
+    my $NextToken = $ListParentsResponse->NextToken;
+    my $Parents   = $ListParentsResponse->Parents;
+
+    # Returns a L<Paws::Organizations::ListParentsResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/organizations/ListParents>
 
 =head1 ATTRIBUTES
 
@@ -40,7 +52,8 @@ Values for attributes that are native types (Int, String, Float, etc) can passed
 The unique identifier (ID) of the OU or account whose parent containers
 you want to list. Do not specify a root.
 
-The regex pattern for a child ID string requires one of the following:
+The regex pattern (http://wikipedia.org/wiki/regex) for a child ID
+string requires one of the following:
 
 =over
 
@@ -91,9 +104,9 @@ This class forms part of L<Paws>, documenting arguments for method ListParents i
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

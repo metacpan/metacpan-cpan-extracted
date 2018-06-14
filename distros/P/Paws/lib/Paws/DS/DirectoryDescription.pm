@@ -7,6 +7,7 @@ package Paws::DS::DirectoryDescription;
   has DesiredNumberOfDomainControllers => (is => 'ro', isa => 'Int');
   has DirectoryId => (is => 'ro', isa => 'Str');
   has DnsIpAddrs => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
+  has Edition => (is => 'ro', isa => 'Str');
   has LaunchTime => (is => 'ro', isa => 'Str');
   has Name => (is => 'ro', isa => 'Str');
   has RadiusSettings => (is => 'ro', isa => 'Paws::DS::RadiusSettings');
@@ -101,6 +102,11 @@ are the IP addresses of the DNS servers or domain controllers in the
 on-premises directory to which the AD Connector is connected.
 
 
+=head2 Edition => Str
+
+  The edition associated with this directory.
+
+
 =head2 LaunchTime => Str
 
   Specifies when the directory was created.
@@ -172,9 +178,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::DS>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

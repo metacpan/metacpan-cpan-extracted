@@ -1,6 +1,7 @@
 package Paws::Health;
   use Moose;
   sub service { 'health' }
+  sub signing_name { 'health' }
   sub version { '2016-08-04' }
   sub target_prefix { 'AWSHealth_20160804' }
   sub json_version { "1.1" }
@@ -11,7 +12,7 @@ package Paws::Health;
   has retriables => (is => 'ro', isa => 'ArrayRef', default => sub { [
   ] });
 
-  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller', 'Paws::Net::JsonResponse';
+  with 'Paws::API::Caller', 'Paws::API::EndpointResolver', 'Paws::Net::V4Signature', 'Paws::Net::JsonCaller';
 
   
   sub DescribeAffectedEntities {
@@ -170,8 +171,9 @@ Paws::Health - Perl Interface to AWS AWS Health APIs and Notifications
 AWS Health
 
 The AWS Health API provides programmatic access to the AWS Health
-information that is presented in the AWS Personal Health Dashboard. You
-can get information about events that affect your AWS resources:
+information that is presented in the AWS Personal Health Dashboard
+(https://phd.aws.amazon.com/phd/home#/). You can get information about
+events that affect your AWS resources:
 
 =over
 
@@ -213,14 +215,17 @@ that meet specified criteria.
 =back
 
 The Health API requires a Business or Enterprise support plan from AWS
-Support. Calling the Health API from an account that does not have a
-Business or Enterprise support plan causes a
-C<SubscriptionRequiredException>.
+Support (http://aws.amazon.com/premiumsupport/). Calling the Health API
+from an account that does not have a Business or Enterprise support
+plan causes a C<SubscriptionRequiredException>.
 
 For authentication of requests, AWS Health uses the Signature Version 4
-Signing Process.
+Signing Process
+(http://docs.aws.amazon.com/general/latest/gr/signature-version-4.html).
 
-See the AWS Health User Guide for information about how to use the API.
+See the AWS Health User Guide
+(http://docs.aws.amazon.com/health/latest/ug/what-is-aws-health.html)
+for information about how to use the API.
 
 B<Service Endpoint>
 
@@ -235,15 +240,31 @@ https://health.us-east-1.amazonaws.com
 =back
 
 
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/health-2016-08-04>
+
+
 =head1 METHODS
 
-=head2 DescribeAffectedEntities(Filter => L<Paws::Health::EntityFilter>, [Locale => Str, MaxResults => Int, NextToken => Str])
+=head2 DescribeAffectedEntities
+
+=over
+
+=item Filter => L<Paws::Health::EntityFilter>
+
+=item [Locale => Str]
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Health::DescribeAffectedEntities>
 
 Returns: a L<Paws::Health::DescribeAffectedEntitiesResponse> instance
 
-  Returns a list of entities that have been affected by the specified
+Returns a list of entities that have been affected by the specified
 events, based on the specified filter criteria. Entities can refer to
 individual customer resources, groups of customer resources, or any
 other construct, depending on the AWS service. Events that have impact
@@ -254,35 +275,64 @@ At least one event ARN is required. Results are sorted by the
 C<lastUpdatedTime> of the entity, starting with the most recent.
 
 
-=head2 DescribeEntityAggregates([EventArns => ArrayRef[Str|Undef]])
+=head2 DescribeEntityAggregates
+
+=over
+
+=item [EventArns => ArrayRef[Str|Undef]]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Health::DescribeEntityAggregates>
 
 Returns: a L<Paws::Health::DescribeEntityAggregatesResponse> instance
 
-  Returns the number of entities that are affected by each of the
+Returns the number of entities that are affected by each of the
 specified events. If no events are specified, the counts of all
 affected entities are returned.
 
 
-=head2 DescribeEventAggregates(AggregateField => Str, [Filter => L<Paws::Health::EventFilter>, MaxResults => Int, NextToken => Str])
+=head2 DescribeEventAggregates
+
+=over
+
+=item AggregateField => Str
+
+=item [Filter => L<Paws::Health::EventFilter>]
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Health::DescribeEventAggregates>
 
 Returns: a L<Paws::Health::DescribeEventAggregatesResponse> instance
 
-  Returns the number of events of each event type (issue, scheduled
+Returns the number of events of each event type (issue, scheduled
 change, and account notification). If no filter is specified, the
 counts of all events in each category are returned.
 
 
-=head2 DescribeEventDetails(EventArns => ArrayRef[Str|Undef], [Locale => Str])
+=head2 DescribeEventDetails
+
+=over
+
+=item EventArns => ArrayRef[Str|Undef]
+
+=item [Locale => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Health::DescribeEventDetails>
 
 Returns: a L<Paws::Health::DescribeEventDetailsResponse> instance
 
-  Returns detailed information about one or more specified events.
+Returns detailed information about one or more specified events.
 Information includes standard event data (region, service, etc., as
 returned by DescribeEvents), a detailed event description, and possible
 additional metadata that depends upon the nature of the event. Affected
@@ -293,13 +343,26 @@ If a specified event cannot be retrieved, an error message is returned
 for that event.
 
 
-=head2 DescribeEvents([Filter => L<Paws::Health::EventFilter>, Locale => Str, MaxResults => Int, NextToken => Str])
+=head2 DescribeEvents
+
+=over
+
+=item [Filter => L<Paws::Health::EventFilter>]
+
+=item [Locale => Str]
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Health::DescribeEvents>
 
 Returns: a L<Paws::Health::DescribeEventsResponse> instance
 
-  Returns information about events that meet the specified filter
+Returns information about events that meet the specified filter
 criteria. Events are returned in a summary form and do not include the
 detailed description, any additional metadata that depends on the event
 type, or any affected resources. To retrieve that information, use the
@@ -309,13 +372,26 @@ If no filter criteria are specified, all events are returned. Results
 are sorted by C<lastModifiedTime>, starting with the most recent.
 
 
-=head2 DescribeEventTypes([Filter => L<Paws::Health::EventTypeFilter>, Locale => Str, MaxResults => Int, NextToken => Str])
+=head2 DescribeEventTypes
+
+=over
+
+=item [Filter => L<Paws::Health::EventTypeFilter>]
+
+=item [Locale => Str]
+
+=item [MaxResults => Int]
+
+=item [NextToken => Str]
+
+
+=back
 
 Each argument is described in detail in: L<Paws::Health::DescribeEventTypes>
 
 Returns: a L<Paws::Health::DescribeEventTypesResponse> instance
 
-  Returns the event types that meet the specified filter criteria. If no
+Returns the event types that meet the specified filter criteria. If no
 filter criteria are specified, all event types are returned, in no
 particular order.
 
@@ -383,9 +459,9 @@ This service class forms part of L<Paws>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

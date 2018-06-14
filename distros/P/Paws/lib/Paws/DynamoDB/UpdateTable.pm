@@ -18,21 +18,39 @@ package Paws::DynamoDB::UpdateTable;
 
 =head1 NAME
 
-Paws::DynamoDB::UpdateTable - Arguments for method UpdateTable on Paws::DynamoDB
+Paws::DynamoDB::UpdateTable - Arguments for method UpdateTable on L<Paws::DynamoDB>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateTable on the 
-Amazon DynamoDB service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateTable on the
+L<Amazon DynamoDB|Paws::DynamoDB> service. Use the attributes of this class
 as arguments to method UpdateTable.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateTable.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateTable(Att1 => $value1, Att2 => $value2, ...);
+    my $dynamodb = Paws->service('DynamoDB');
+   # To modify a table's provisioned throughput
+   # This example increases the provisioned read and write capacity on the Music
+   # table.
+    my $UpdateTableOutput = $dynamodb->UpdateTable(
+      {
+        'ProvisionedThroughput' => {
+          'WriteCapacityUnits' => 10,
+          'ReadCapacityUnits'  => 10
+        },
+        'TableName' => 'MusicCollection'
+      }
+    );
+
+    # Results:
+    my $TableDescription = $UpdateTableOutput->TableDescription;
+
+    # Returns a L<Paws::DynamoDB::UpdateTableOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/dynamodb/UpdateTable>
 
 =head1 ATTRIBUTES
 
@@ -68,8 +86,9 @@ C<Delete> - remove a global secondary index from the table.
 
 =back
 
-For more information, see Managing Global Secondary Indexes in the
-I<Amazon DynamoDB Developer Guide>.
+For more information, see Managing Global Secondary Indexes
+(http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.OnlineOps.html)
+in the I<Amazon DynamoDB Developer Guide>.
 
 
 
@@ -103,9 +122,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateTable i
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

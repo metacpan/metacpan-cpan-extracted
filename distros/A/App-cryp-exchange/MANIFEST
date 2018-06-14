@@ -7,6 +7,16 @@ META.yml
 Makefile.PL
 README
 dist.ini
+lib/App/cryp/Cmd/Exchange/accounts.pm
+lib/App/cryp/Cmd/Exchange/balance.pm
+lib/App/cryp/Cmd/Exchange/cancel_order.pm
+lib/App/cryp/Cmd/Exchange/create_limit_order.pm
+lib/App/cryp/Cmd/Exchange/exchanges.pm
+lib/App/cryp/Cmd/Exchange/get_order.pm
+lib/App/cryp/Cmd/Exchange/open_orders.pm
+lib/App/cryp/Cmd/Exchange/orderbook.pm
+lib/App/cryp/Cmd/Exchange/pairs.pm
+lib/App/cryp/Cmd/Exchange/ticker.pm
 lib/App/cryp/Exchange/gdax.pm
 lib/App/cryp/Exchange/indodax.pm
 lib/App/cryp/Role/Exchange.pm

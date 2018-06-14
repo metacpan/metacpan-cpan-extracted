@@ -38,7 +38,7 @@ Contains information about an SSH public key, without the key's body or
 fingerprint.
 
 This data type is used as a response element in the ListSSHPublicKeys
-action.
+operation.
 
 =head1 ATTRIBUTES
 
@@ -50,15 +50,15 @@ action.
 
 =head2 B<REQUIRED> Status => Str
 
-  The status of the SSH public key. C<Active> means the key can be used
-for authentication with an AWS CodeCommit repository. C<Inactive> means
-the key cannot be used.
+  The status of the SSH public key. C<Active> means that the key can be
+used for authentication with an AWS CodeCommit repository. C<Inactive>
+means that the key cannot be used.
 
 
 =head2 B<REQUIRED> UploadDate => Str
 
-  The date and time, in ISO 8601 date-time format, when the SSH public
-key was uploaded.
+  The date and time, in ISO 8601 date-time format
+(http://www.iso.org/iso/iso8601), when the SSH public key was uploaded.
 
 
 =head2 B<REQUIRED> UserName => Str
@@ -73,9 +73,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::IAM>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

@@ -48,7 +48,8 @@ Event destinations are associated with configuration sets, which enable
 you to publish email sending events to Amazon CloudWatch, Amazon
 Kinesis Firehose, or Amazon Simple Notification Service (Amazon SNS).
 For information about using configuration sets, see the Amazon SES
-Developer Guide.
+Developer Guide
+(http://docs.aws.amazon.com/ses/latest/DeveloperGuide/monitor-sending-activity.html).
 
 =head1 ATTRIBUTES
 
@@ -86,8 +87,8 @@ associated with an Amazon Kinesis Firehose event destination.
 
 =item *
 
-Contain only ASCII letters (a-z, A-Z), numbers (0-9), underscores (_),
-or dashes (-).
+This value can only contain ASCII letters (a-z, A-Z), numbers (0-9),
+underscores (_), or dashes (-).
 
 =item *
 
@@ -110,9 +111,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::SES>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

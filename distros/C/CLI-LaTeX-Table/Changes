@@ -1,5 +1,14 @@
 Revision history for CLI-LaTeX-Table
 
+0.56    2018-06-09 : 
+            Changed slightly on README_JP.pdf
+            latextable got -# and the function for continuous hyphens.
+
+0.55	2018-06-08 :
+			Added README_JP.pdf.
+			Small change on saikoro, how -g works by exchaning horizontal and vertical
+			Large change on csv2tsv.
+
 0.54    2018-06-03 : 
 			Debugging of the installer setup file "Build.PL". I forgot "[" and "]".
 			Also small text change on *.pm 

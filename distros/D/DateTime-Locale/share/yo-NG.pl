@@ -130,7 +130,7 @@
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
   glibc_date_format => "%d/%m/%y",
-  glibc_datetime_format => "\N{U+1ecd}j\N{U+1ecd}\N{U+0301} %A, %d o\N{U+1e63}\N{U+00f9} %B \N{U+1ecd}d\N{U+00fa}n %Y %T %Z",
+  glibc_datetime_format => "\N{U+1ecd}j\N{U+1ecd}\N{U+0301} %a, %d o\N{U+1e63}\N{U+00f9} %b \N{U+1ecd}d\N{U+00fa}n %Y %T %Z",
   glibc_time_12_format => "%I:%M:%S %p",
   glibc_time_format => "%r",
   language => "Yoruba",

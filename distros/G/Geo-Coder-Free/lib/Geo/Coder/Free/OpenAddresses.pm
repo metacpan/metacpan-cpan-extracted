@@ -13,6 +13,7 @@ use Locale::CA;
 use Locale::US;
 use Locale::SubCountry;
 use CHI;
+# use Lingua::EN::AddressParse;
 use Locale::Country;
 use Geo::StreetAddress::US;
 use Digest::MD5;
@@ -50,6 +51,8 @@ our $VERSION = '0.04';
     my $geocoder = Geo::Coder::Free::OpenAddresses->new(openaddr => $ENV{'OPENADDR_HOME'});
     $location = $geocoder->geocode(location => '1600 Pennsylvania Avenue NW, Washington DC, USA');
 
+    my @matches = $geocoder->geocode({ scantext => 'arbitrary text', region => 'GB' });
+
 =head1 DESCRIPTION
 
 Geo::Coder::Free::OpenAddresses provides an interface to the free geolocation database at http://openadresses.io
@@ -59,7 +62,7 @@ Refer to the source URL for licencing information for these files:
 To install:
 
 1. download the data from http://results.openaddresses.io/. You will find licencing information on that page.
-2. unzip the data into a directory.
+2. unzip the data into a directory. To be clear, if you run "ls -l $OPENADDR_HOME" you should see a list of two-lettered countries e.g 'us'.
 3. point the environment variable OPENADDR_HOME to that directory and save in the profile of your choice.
 4. run the createdatabases.PL script which imports the data into an SQLite database.  This process will take some time.
 
@@ -122,15 +125,82 @@ sub geocode {
 	if(ref($_[0]) eq 'HASH') {
 		%param = %{$_[0]};
 	} elsif(ref($_[0])) {
-		Carp::croak('Usage: geocode(location => $location)');
+		Carp::croak('Usage: geocode(location => $location|scantext => $text)');
 	} elsif(@_ % 2 == 0) {
 		%param = @_;
 	} else {
 		$param{location} = shift;
 	}
+	if(my $scantext = $param{'scantext'}) {
+		return if(length($scantext) < 6);
+		# FIXME:  wow this is inefficient
+		$scantext =~ s/\W+/ /g;
+		my @words = split(/\s/, $scantext);
+		my $count = scalar(@words);
+		my $offset = 0;
+		my @rc;
+		while($offset < $count) {
+			if(length($words[$offset]) < 2) {
+				$offset++;
+				next;
+			}
+			my $l;
+			if(($l = $self->geocode(location => $words[$offset])) && ref($l)) {
+				push @rc, $l;
+			}
+			if($offset < $count - 1) {
+				my $addr = join(', ', $words[$offset], $words[$offset + 1]);
+				if(length($addr) == 0) {
+					$offset++;
+				}
+				# https://stackoverflow.com/questions/11160192/how-to-parse-freeform-street-postal-address-out-of-text-and-into-components
+				# TODO: Support longer addresses
+				if($addr =~ /\s+(\d{2,5}\s+)(?![a|p]m\b)(([a-zA-Z|\s+]{1,5}){1,2})?([\s|\,|.]+)?(([a-zA-Z|\s+]{1,30}){1,4})(court|ct|street|st|drive|dr|lane|ln|road|rd|blvd)([\s|\,|.|\;]+)?(([a-zA-Z|\s+]{1,30}){1,2})([\s|\,|.]+)?\b(AK|AL|AR|AZ|CA|CO|CT|DC|DE|FL|GA|GU|HI|IA|ID|IL|IN|KS|KY|LA|MA|MD|ME|MI|MN|MO|MS|MT|NC|ND|NE|NH|NJ|NM|NV|NY|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VA|VI|VT|WA|WI|WV|WY)([\s|\,|.]+)?(\s+\d{5})?([\s|\,|.]+)/i) {
+					if(($l = $self->geocode(location => "$addr, US")) && ref($l)) {
+						$l->{'confidence'} = 0.8;
+						$l->{'location'} = "$addr, USA";
+						push @rc, $l;
+					}
+				} elsif($addr =~ /\s+(\d{2,5}\s+)(?![a|p]m\b)(([a-zA-Z|\s+]{1,5}){1,2})?([\s|\,|.]+)?(([a-zA-Z|\s+]{1,30}){1,4})(court|ct|street|st|drive|dr|lane|ln|road|rd|blvd)([\s|\,|.|\;]+)?(([a-zA-Z|\s+]{1,30}){1,2})([\s|\,|.]+)?\b(AB|BC|MB|NB|NL|NT|NS|ON|PE|QC|SK|YT)([\s|\,|.]+)?(\s+\d{5})?([\s|\,|.]+)/i) {
+					if(($l = $self->geocode(location => "$addr, Canada")) && ref($l)) {
+						$l->{'confidence'} = 0.8;
+						$l->{'location'} = "$addr, Canada";
+						push @rc, $l;
+					}
+				} elsif($addr =~ /([a-zA-Z|\s+]{1,30}){1,2}([\s|\,|.]+)?\b(AK|AL|AR|AZ|CA|CO|CT|DC|DE|FL|GA|GU|HI|IA|ID|IL|IN|KS|KY|LA|MA|MD|ME|MI|MN|MO|MS|MT|NC|ND|NE|NH|NJ|NM|NV|NY|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VA|VI|VT|WA|WI|WV|WY)/i) {
+					if(($l = $self->geocode(location => "$addr, US")) && ref($l)) {
+						$l->{'confidence'} = 0.6;
+						$l->{'location'} = "$addr, USA";
+						push @rc, $l;
+					}
+				} elsif($addr =~ /([a-zA-Z|\s+]{1,30}){1,2}([\s|\,|.]+)?\b(AB|BC|MB|NB|NL|NT|NS|ON|PE|QC|SK|YT)/i) {
+					if(($l = $self->geocode(location => "$addr, Canada")) && ref($l)) {
+						$l->{'confidence'} = 0.6;
+						$l->{'location'} = "$addr, Canada";
+						push @rc, $l;
+					}
+				}
+				if(($l = $self->geocode(location => $addr)) && ref($l)) {
+					$l->{'confidence'} = 0.1;
+					$l->{'location'} = $addr;
+					push @rc, $l;
+				}
+				if($offset < $count - 2) {
+					$addr = join(', ', $words[$offset], $words[$offset + 1], $words[$offset + 2]);
+					if(($l = $self->geocode(location => $addr)) && ref($l)) {
+						$l->{'confidence'} = 1.0;
+						$l->{'location'} = $addr;
+						push @rc, $l;
+					}
+				}
+			}
+			$offset++;
+		}
+		return @rc;
+	}
 
 	my $location = $param{location}
-		or Carp::croak('Usage: geocode(location => $location)');
+		or Carp::croak('Usage: geocode(location => $location|scantext => $text)');
 
 	# ::diag($location);
 
@@ -142,11 +212,12 @@ sub geocode {
 		return $known_locations{$location};
 	}
 
+	$self->{'location'} = $location;
+
 	my $county;
 	my $state;
 	my $country;
 	my $street;
-	my $openaddr_db;
 
 	$location =~ s/\.//g;
 
@@ -159,49 +230,6 @@ sub geocode {
 			}
 		}
 	}
-
-	# ::diag($location);
-	if($location =~ /^(.+?)[,\s]+(United States|USA|US)$/i) {
-		my $l = $1;
-		$l =~ s/,/ /g;
-		$l =~ s/\s\s+/ /g;
-		if(my $href = (Geo::StreetAddress::US->parse_location($l) || Geo::StreetAddress::US->parse_address($l))) {
-			if($state = $href->{'state'}) {
-				if(length($state) > 2) {
-					if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
-						$state = $twoletterstate;
-					}
-				}
-				my $city;
-				if($href->{city}) {
-					$city = uc($href->{city});
-				}
-				if($street = $href->{street}) {
-					if($href->{'type'} && (my $type = $self->_normalize($href->{'type'}))) {
-						$street .= " $type";
-					}
-					if($href->{suffix}) {
-						$street .= ' ' . $href->{suffix};
-					}
-				}
-				if($street) {
-					if(my $prefix = $href->{prefix}) {
-						$street = "$prefix $street";
-					}
-					my $rc;
-					if($href->{'number'}) {
-						if($rc = $self->_get($href->{'number'} . "$street$city$state" . 'US')) {
-							return $rc;
-						}
-					}
-					if($rc = $self->_get("$street$city$state" . 'US')) {
-						return $rc;
-					}
-				}
-			}
-		}
-	}
-
 	if($libpostal_is_installed && (my %addr = Geo::libpostal::parse_address($location))) {
 		# print Data::Dumper->new([\%addr])->Dump();
 		if($addr{'country'} && $addr{'state'} && ($addr{'country'} =~ /^(Canada|United States|USA|US)$/i)) {
@@ -223,6 +251,8 @@ sub geocode {
 					$street = "$1 DR";
 				} elsif($street =~ /(.+)\s+PARKWAY$/) {
 					$street = "$1 PKWY";
+				} elsif($street =~ /(.+)\s+CREEK$/) {
+					$street = "$1 CRK";
 				}
 				$street =~ s/^0+//;	# Turn 04th St into 4th St
 				$addr{'road'} = $street;
@@ -254,6 +284,65 @@ sub geocode {
 			if($addr{'house_number'}) {
 				if(my $rc = $self->_search(\%addr, ('road', 'city', 'state', 'country'))) {
 					return $rc;
+				}
+			}
+		}
+	} elsif($location =~ /^(.+?)[,\s]+(United States|USA|US)$/i) {
+		# Geo::libpostal isn't installed, fail back to Geo::StreetAddress::US, which is rather buggy
+		my $l = $1;
+		$l =~ s/,/ /g;
+		$l =~ s/\s\s+/ /g;
+
+		# my $ap;
+		# if(($location =~ /USA$/) || ($location =~ /United States$/)) {
+			# $ap = Lingua::EN::AddressParse->new(country => 'US', auto_clean => 1, force_case => 1, force_post_code_flag => 0);
+		# } elsif($location =~ /England$/) {
+			# $ap = Lingua::EN::AddressParse->new(country => 'GB', auto_clean => 1, force_case => 1, force_post_code_flag => 0);
+		# }
+		# if($ap) {
+			# if(my $error = $ap->parse($l)) {
+				# ::diag  "$l: !!!!!!!!!!!!!", $error;
+			# } else {
+				# my %c = $ap->address_components();
+				# ::diag('>>>>>>>>>>>>');
+				# ::diag Data::Dumper->new([\%c])->Dump;
+			# }
+		# }
+		# return;
+
+		# Work around for RT#122617
+		if(($location !~ /\sCounty,/i) && (my $href = (Geo::StreetAddress::US->parse_location($l) || Geo::StreetAddress::US->parse_address($l)))) {
+			if($state = $href->{'state'}) {
+				if(length($state) > 2) {
+					if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
+						$state = $twoletterstate;
+					}
+				}
+				my $city;
+				if($href->{city}) {
+					$city = uc($href->{city});
+				}
+				if($street = $href->{street}) {
+					if($href->{'type'} && (my $type = $self->_normalize($href->{'type'}))) {
+						$street .= " $type";
+					}
+					if($href->{suffix}) {
+						$street .= ' ' . $href->{suffix};
+					}
+				}
+				if($street) {
+					if(my $prefix = $href->{prefix}) {
+						$street = "$prefix $street";
+					}
+					my $rc;
+					if($href->{'number'}) {
+						if($rc = $self->_get($href->{'number'} . "$street$city$state" . 'US')) {
+							return $rc;
+						}
+					}
+					if($rc = $self->_get("$street$city$state" . 'US')) {
+						return $rc;
+					}
 				}
 			}
 		}
@@ -383,7 +472,7 @@ sub geocode {
 									}
 								}
 							}
-							return;	 # Not found
+							return;	# Not found
 						}
 						die $city;	# TODO: do something here
 					} elsif($city =~ /^(\w[\w\s]+),\s*([\w\s]+)/) {
@@ -391,6 +480,9 @@ sub geocode {
 						# Rockville Pike, Rockville, MD, USA
 						my $first = uc($1);
 						my $second = uc($2);
+						if($second =~ /(\d+)\s+(.+)/) {
+							$second = "$1$2";
+						}
 						if($rc = $self->_get("$first$second$state" . 'US')) {
 							return $rc;
 						}
@@ -403,6 +495,18 @@ sub geocode {
 						# Not all the database has the county
 						if($rc = $self->_get("$first$state" . 'US')) {
 							return $rc;
+						}
+						# Brute force last ditch approach
+						my $copy = uc($location);
+						$copy =~ s/,\s+//g;
+						$copy =~ s/\s*USA$//;
+						if($rc = $self->_get($copy . 'US')) {
+							return $rc;
+						}
+						if($copy =~ s/(\d+)\s+/$1/) {
+							if($rc = $self->_get($copy . 'US')) {
+								return $rc;
+							}
 						}
 					}
 					# warn "Can't yet parse US location '$location'";
@@ -503,6 +607,8 @@ sub geocode {
 						$street = "$1 DR";
 					} elsif($street =~ /(.+)\s+PARKWAY$/) {
 						$street = "$1 PKWY";
+					} elsif($street =~ /(.+)\s+CREEK$/) {
+						$street = "$1 CRK";
 					}
 					$street =~ s/^0+//;	# Turn 04th St into 4th St
 					if($street =~ /^(\d+)\s+(.+)/) {
@@ -567,6 +673,10 @@ sub _get {
 
 	$location =~ s/,\s*//g;
 	my $digest = substr Digest::MD5::md5_base64(uc($location)), 0, 16;
+	# my @call_details = caller(0);
+	# print "line ", $call_details[2], "\n";
+	# print("$location: $digest\n");
+	# ::diag("line " . $call_details[2]);
 	# ::diag("$location: $digest");
 	if(my $cache = $self->{'cache'}) {
 		if(my $rc = $cache->get_object($digest)) {
@@ -579,10 +689,6 @@ sub _get {
 			cache => $self->{cache} || CHI->new(driver => 'Memory', datastore => {})
 		);
 	$self->{openaddr_db} = $openaddr_db;
-	my @call_details = caller(0);
-	# print "line ", $call_details[2], "\n";
-	# ::diag("line " . $call_details[2]);
-	# print("$location: $digest\n");
 	my $rc = $openaddr_db->fetchrow_hashref(md5 => $digest);
 	if($rc && defined($rc->{'lat'})) {
 		$rc->{'latitude'} = delete $rc->{'lat'};
@@ -615,13 +721,13 @@ sub _normalize {
 	} elsif(($type eq 'ROAD') || ($type eq 'RD')) {
 		return 'RD';
 	} elsif(($type eq 'COURT') || ($type eq 'CT')) {
-		return 'COURT';
+		return 'CT';
 	} elsif(($type eq 'CIR') || ($type eq 'CIRCLE')) {
 		return 'CIR';
 	} elsif(($type eq 'FT') || ($type eq 'FORT')) {
-		return 'FORT';
+		return 'FT';
 	} elsif(($type eq 'CTR') || ($type eq 'CENTER')) {
-		return 'CENTER';
+		return 'CTR';
 	} elsif(($type eq 'PARKWAY') || ($type eq 'PKWY')) {
 		return 'PKWY';
 	} elsif($type eq 'BLVD') {
@@ -630,11 +736,16 @@ sub _normalize {
 		return 'PIKE';
 	} elsif(($type eq 'DRIVE') || ($type eq 'DR')) {
 		return 'DR';
-	} elsif($type eq 'SPG') {
+	} elsif(($type eq 'SPRING') || ($type eq 'SPG')) {
 		return 'SPRING';
+	} elsif(($type eq 'RDG') || ($type eq 'RIDGE')) {
+		return 'RDG';
+	} elsif(($type eq 'CRK') || ($type eq 'CREEK')) {
+		return 'CRK';
 	}
 
-	warn("Add type $type");
+	# Most likely failure of Geo::StreetAddress::US, but warn anyway, just in case
+	warn $self->{'location'}, ": add type $type";
 }
 
 =head2 reverse_geocode
@@ -672,7 +783,7 @@ https://github.com/openaddresses/openaddresses/tree/master/us-data.
 
 Lots of lookups fail at the moment.
 
-The openaddresses.io code has yet to be compeleted.
+The openaddresses.io code has yet to be completed.
 There are die()s where the code path has yet to be written.
 
 The openaddresses data doesn't cover the globe.

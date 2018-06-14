@@ -7,7 +7,7 @@ my $meta = {
   "abstract"         => "make simple lightweight record-like structures that make sounds like cows",
   "author"           => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
   "dynamic_config"   => 0,
-  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005",
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
   "keywords"         => [],
   "license"          => ["perl_5"],
   "meta-spec"        => {
@@ -32,9 +32,9 @@ my $meta = {
                           test => { requires => { "Test::More" => 0.61 } },
                         },
   "provides"         => {
-                          "MooX::Struct"            => { file => "lib/MooX/Struct.pm", version => 0.016 },
-                          "MooX::Struct::Processor" => { file => "lib/MooX/Struct.pm", version => 0.016 },
-                          "MooX::Struct::Util"      => { file => "lib/MooX/Struct/Util.pm", version => 0.016 },
+                          "MooX::Struct"            => { file => "lib/MooX/Struct.pm", version => 0.017 },
+                          "MooX::Struct::Processor" => { file => "lib/MooX/Struct.pm", version => 0.017 },
+                          "MooX::Struct::Util"      => { file => "lib/MooX/Struct/Util.pm", version => 0.017 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -48,7 +48,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/MooX-Struct/project",
                         },
-  "version"          => 0.016,
+  "version"          => 0.017,
   "x_contributors"   => ["NOBODY"],
   "x_static_install" => 1,
 };

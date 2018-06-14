@@ -17,29 +17,48 @@ package Paws::EC2::AttachVolume;
 
 =head1 NAME
 
-Paws::EC2::AttachVolume - Arguments for method AttachVolume on Paws::EC2
+Paws::EC2::AttachVolume - Arguments for method AttachVolume on L<Paws::EC2>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method AttachVolume on the 
-Amazon Elastic Compute Cloud service. Use the attributes of this class
+This class represents the parameters used for calling the method AttachVolume on the
+L<Amazon Elastic Compute Cloud|Paws::EC2> service. Use the attributes of this class
 as arguments to method AttachVolume.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to AttachVolume.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->AttachVolume(Att1 => $value1, Att2 => $value2, ...);
+    my $ec2 = Paws->service('EC2');
+    # To attach a volume to an instance
+    # This example attaches a volume (``vol-1234567890abcdef0``) to an instance
+    # (``i-01474ef662b89480``) as ``/dev/sdf``.
+    my $VolumeAttachment = $ec2->AttachVolume(
+      {
+        'VolumeId'   => 'vol-1234567890abcdef0',
+        'InstanceId' => 'i-01474ef662b89480',
+        'Device'     => '/dev/sdf'
+      }
+    );
+
+    # Results:
+    my $State      = $VolumeAttachment->State;
+    my $VolumeId   = $VolumeAttachment->VolumeId;
+    my $AttachTime = $VolumeAttachment->AttachTime;
+    my $InstanceId = $VolumeAttachment->InstanceId;
+    my $Device     = $VolumeAttachment->Device;
+
+    # Returns a L<Paws::EC2::VolumeAttachment> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ec2/AttachVolume>
 
 =head1 ATTRIBUTES
 
 
 =head2 B<REQUIRED> Device => Str
 
-The device name to expose to the instance (for example, C</dev/sdh> or
-C<xvdh>).
+The device name (for example, C</dev/sdh> or C<xvdh>).
 
 
 
@@ -72,9 +91,9 @@ This class forms part of L<Paws>, documenting arguments for method AttachVolume 
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

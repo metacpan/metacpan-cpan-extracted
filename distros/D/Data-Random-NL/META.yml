@@ -13,7 +13,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,10 +22,12 @@ name: Data-Random-NL
 requires:
   Carp: '0'
   Exporter: '0'
+  Getopt::Long: '0'
+  Pod::Usage: '0'
   perl: '5.006'
   strict: '0'
   warnings: '0'
 resources:
   repository: git://gitlab.com/waterkip/data-random-nl.git
-version: '1.2'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '1.4'
+x_serialization_backend: 'YAML::Tiny version 1.73'

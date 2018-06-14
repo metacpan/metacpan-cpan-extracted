@@ -47,7 +47,7 @@ configuration.
 
 =head2 ComplianceResourceId => Str
 
-  The IDs of the only AWS resource that you want to trigger an evaluation
+  The ID of the only AWS resource that you want to trigger an evaluation
 for the rule. If you specify a resource ID, you must specify one
 resource type for C<ComplianceResourceTypes>.
 
@@ -79,9 +79,9 @@ This class forms part of L<Paws>, describing an object used in L<Paws::Config>
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

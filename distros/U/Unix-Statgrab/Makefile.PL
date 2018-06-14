@@ -23,7 +23,7 @@ my %CONFIGURE_DEPS = (
     'ExtUtils::Constant'  => '0.21',
     'Capture::Tiny'       => '0.06',
     'ExtUtils::CBuilder'  => '0.27',
-    'Config::AutoConf'    => '0.308',
+    'Config::AutoConf'    => '0.317',
     'File::Basename'      => 0,
     'File::Spec'          => 0,
     'Text::ParseWords'    => 0,
@@ -50,14 +50,15 @@ $autoconf->check_device_canonical();
 $autoconf->check_sizeof_IVUV_fit_stat();
 
 my $xsfile = "Statgrab.xs";
-my $config_h = File::Spec->catfile( dirname($xsfile), 'config.h' );
+my $config_h = File::Spec->catfile(dirname($xsfile), 'config.h');
 $autoconf->write_config_h($config_h);
 _write_constants();
 
 WriteMakefile1(
     MIN_PERL_VERSION => '5.008003',
     META_ADD         => {
-        'meta-spec' => { version => 2 },
+        license     => ['perl_5', 'lgpl_2_1'],
+        'meta-spec' => {version => 2},
         resources   => {
             homepage   => 'https://metacpan.org/release/Unix-Statgrab',
             repository => {
@@ -69,7 +70,6 @@ WriteMakefile1(
                 web    => 'http://rt.cpan.org/Public/Dist/Display.html?Name=Unix-Statgrab',
                 mailto => 'bug-Unix-Statgrab@rt.cpan.org',
             },
-            license       => 'http://dev.perl.org/licenses/',
             x_IRC         => "irc://irc.freenode.net/#libstatgrab",
             x_MailingList => "mailto:users\@i-scream.org'",
         },
@@ -89,32 +89,31 @@ WriteMakefile1(
             configure => {
                 requires => {%CONFIGURE_DEPS},
             },
-            build => { requires => {%BUILD_DEPS} },
+            build => {requires => {%BUILD_DEPS}},
             test  => {
-                recommends => { 'Test::LeakTrace' => 0 },
+                recommends => {'Test::LeakTrace' => 0},
                 requires   => {%TEST_DEPS}
             },
             runtime => {
-                requires => { %RUN_DEPS },
+                requires => {%RUN_DEPS},
             },
         },
     },
     NAME               => 'Unix::Statgrab',
     VERSION_FROM       => 'lib/Unix/Statgrab.pm',
     ABSTRACT_FROM      => 'lib/Unix/Statgrab.pm',
-    LICENSE            => 'perl',
-    AUTHOR             => [ 'Tassilo von Parseval <tassilo.von.parseval@rwth-aachen.de>', 'Jens Rehsack <sno@NetBSD.org>' ],
-    XS                 => { $xsfile => "Statgrab.c" },
+    LICENSE            => 'lgpl_2_1',
+    AUTHOR             => ['Tassilo von Parseval <tassilo.von.parseval@rwth-aachen.de>', 'Jens Rehsack <sno@NetBSD.org>'],
+    XS                 => {$xsfile => "Statgrab.c"},
     OBJECT             => q/$(O_FILES)/,
-    INC                => join( " ", @{ $autoconf->{extra_preprocess_flags} } ),
-    EXTRALIBS          => join( " ", @{ $autoconf->{extra_link_flags} } ),
-    LDLOADLIBS         => join( " ", @{ $autoconf->{extra_link_flags} } ),
+    INC                => $autoconf->_get_extra_compiler_flags,
+    LIBS               => $autoconf->_get_extra_linker_flags,
     CONFIGURE_REQUIRES => \%CONFIGURE_DEPS,
     PREREQ_PM          => \%RUN_DEPS,
     BUILD_REQUIRES     => \%BUILD_DEPS,
     TEST_REQUIRES      => \%TEST_DEPS,
-    clean              => { FILES => "Unix-Statgrab-* *.o config.h const-*.inc config.log" },
-    test               => { TESTS => 't/*.t xt/*.t' },
+    clean              => {FILES => "Unix-Statgrab-* *.o config.h const-*.inc config.log"},
+    test               => {TESTS => 't/*.t xt/*.t'},
 );
 
 sub WriteMakefile1
@@ -122,37 +121,37 @@ sub WriteMakefile1
     my %params       = @_;
     my $eumm_version = $ExtUtils::MakeMaker::VERSION;
     $eumm_version = eval $eumm_version;
-    die "EXTRA_META is deprecated" if ( exists( $params{EXTRA_META} ) );
-    die "License not specified"    if ( !exists( $params{LICENSE} ) );
+    die "EXTRA_META is deprecated" if (exists($params{EXTRA_META}));
+    die "License not specified"    if (!exists($params{LICENSE}));
     $params{TEST_REQUIRES}
       and $eumm_version < 6.6303
-      and $params{BUILD_REQUIRES} = { %{ $params{BUILD_REQUIRES} || {} }, %{ delete $params{TEST_REQUIRES} } };
+      and $params{BUILD_REQUIRES} = {%{$params{BUILD_REQUIRES} || {}}, %{delete $params{TEST_REQUIRES}}};
     #EUMM 6.5502 has problems with BUILD_REQUIRES
     $params{BUILD_REQUIRES}
       and $eumm_version < 6.5503
-      and $params{PREREQ_PM} = { %{ $params{PREREQ_PM} || {} }, %{ delete $params{BUILD_REQUIRES} } };
+      and $params{PREREQ_PM} = {%{$params{PREREQ_PM} || {}}, %{delete $params{BUILD_REQUIRES}}};
     ref $params{AUTHOR}
       and "ARRAY" eq ref $params{AUTHOR}
       and $eumm_version < 6.5702
-      and $params{AUTHOR} = join( ", ", @{ $params{AUTHOR} } );
-    delete $params{CONFIGURE_REQUIRES}    if ( $eumm_version < 6.52 );
-    delete $params{MIN_PERL_VERSION}      if ( $eumm_version < 6.48 );
-    delete $params{META_MERGE}            if ( $eumm_version < 6.46 );
-    delete $params{META_ADD}{prereqs}     if ( $eumm_version < 6.58 );
-    delete $params{META_ADD}{'meta-spec'} if ( $eumm_version < 6.58 );
-    delete $params{META_ADD}              if ( $eumm_version < 6.46 );
-    delete $params{LICENSE}               if ( $eumm_version < 6.31 );
-    delete $params{AUTHOR}                if ( $] < 5.005 );
-    delete $params{ABSTRACT_FROM}         if ( $] < 5.005 );
-    delete $params{BINARY_LOCATION}       if ( $] < 5.005 );
+      and $params{AUTHOR} = join(", ", @{$params{AUTHOR}});
+    delete $params{CONFIGURE_REQUIRES}    if ($eumm_version < 6.52);
+    delete $params{MIN_PERL_VERSION}      if ($eumm_version < 6.48);
+    delete $params{META_MERGE}            if ($eumm_version < 6.46);
+    delete $params{META_ADD}{prereqs}     if ($eumm_version < 6.58);
+    delete $params{META_ADD}{'meta-spec'} if ($eumm_version < 6.58);
+    delete $params{META_ADD}              if ($eumm_version < 6.46);
+    delete $params{LICENSE}               if ($eumm_version < 6.31);
+    delete $params{AUTHOR}                if ($] < 5.005);
+    delete $params{ABSTRACT_FROM}         if ($] < 5.005);
+    delete $params{BINARY_LOCATION}       if ($] < 5.005);
 
     # more or less taken from Moose' Makefile.PL
-    if ( $params{CONFLICTS} )
+    if ($params{CONFLICTS})
     {
         my $ok = CheckConflicts(%params);
-        exit(0) if ( $params{PREREQ_FATAL} and not $ok );
+        exit(0) if ($params{PREREQ_FATAL} and not $ok);
         my $cpan_smoker = grep { $_ =~ m/(?:CR_SMOKER|CPAN_REPORTER|AUTOMATED_TESTING)/ } keys %ENV;
-        unless ( $cpan_smoker || $ENV{PERL_MM_USE_DEFAULT} )
+        unless ($cpan_smoker || $ENV{PERL_MM_USE_DEFAULT})
         {
             sleep 4 unless ($ok);
         }
@@ -192,11 +191,11 @@ sub _write_constants
           SG_PROCESS_STATE_UNKNOWN),
     );
 
-    my $c_const  = File::Spec->catfile( dirname($xsfile), 'const-c.inc' );
-    my $xs_const = File::Spec->catfile( dirname($xsfile), 'const-xs.inc' );
+    my $c_const  = File::Spec->catfile(dirname($xsfile), 'const-c.inc');
+    my $xs_const = File::Spec->catfile(dirname($xsfile), 'const-xs.inc');
 
     # workaround #ifdef around each constant (stupid that it's not documented)
-    open( my $c_fh, ">", $c_const ) or die("Cannot open $c_const for writing: $!");
+    open(my $c_fh, ">", $c_const) or die("Cannot open $c_const for writing: $!");
     foreach my $name (@names)
     {
         print $c_fh "#define $name $name\n";
@@ -212,3 +211,26 @@ sub _write_constants
 
     return;
 }
+
+=head1 INSTALL
+
+In case the automatic detection fails, one can use some different attemps
+to succeed configuration:
+
+=over 4
+
+=item C<$ENV{PKG_CONFIG_PATH}>
+
+Prepend or append the path where your C<libstatgrab.pc> resides
+
+=item C<$ENV{libstatgrab_CFLAGS}>
+
+Set this to the CFLAGS suitable to compile against C<statgrab.h>
+
+=item C<$ENV{libstatgrab_LIBS}>
+
+Set this to the LINKFLAGS suitable to link against C<libstatgrab.so>
+
+=back
+
+=cut

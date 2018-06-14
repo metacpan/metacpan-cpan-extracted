@@ -1,0 +1,36 @@
+--- !!perl/hash:TestML1::Function
+namespace:
+  TestML: !!perl/hash:TestML1::Str
+    value: '0.1.0'
+
+statements:
+- !!perl/hash:TestML1::Assignment
+  name: Title
+  expr: !!perl/hash:TestML1::Str
+    value: TestML1 with no data section
+- !!perl/hash:TestML1::Assignment
+  name: Plan
+  expr: !!perl/hash:TestML1::Num
+    value: 2
+- !!perl/hash:TestML1::Assignment
+  name: Label
+  expr: !!perl/hash:TestML1::Str
+    value: Test $TestNumber
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Str
+    value: foo
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Str
+      value: foo
+- !!perl/hash:TestML1::Statement
+  expr: !!perl/hash:TestML1::Expression
+    calls:
+    - !!perl/hash:TestML1::Str
+      value: bar
+    - !!perl/hash:TestML1::Call
+      name: Str
+  assert: !!perl/hash:TestML1::Assertion
+    name: EQ
+    expr: !!perl/hash:TestML1::Str
+      value: bar

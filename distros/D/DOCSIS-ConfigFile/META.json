@@ -3,8 +3,8 @@
    "author" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -21,9 +21,7 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "Test::More" : "0.8"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
@@ -40,6 +38,11 @@
             "bytes" : "1.00",
             "perl" : "5.010001"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.8"
+         }
       }
    },
    "release_status" : "stable",
@@ -49,9 +52,11 @@
       },
       "homepage" : "https://github.com/jhthorsen/docsis-configfile",
       "repository" : {
-         "url" : "https://github.com/jhthorsen/docsis-configfile.git"
+         "type" : "git",
+         "url" : "https://github.com/jhthorsen/docsis-configfile.git",
+         "web" : "https://github.com/jhthorsen/docsis-configfile"
       }
    },
-   "version" : "0.73",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "0.75",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

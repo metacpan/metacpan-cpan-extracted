@@ -29,21 +29,143 @@ package Paws::CodeDeploy::UpdateDeploymentGroup;
 
 =head1 NAME
 
-Paws::CodeDeploy::UpdateDeploymentGroup - Arguments for method UpdateDeploymentGroup on Paws::CodeDeploy
+Paws::CodeDeploy::UpdateDeploymentGroup - Arguments for method UpdateDeploymentGroup on L<Paws::CodeDeploy>
 
 =head1 DESCRIPTION
 
-This class represents the parameters used for calling the method UpdateDeploymentGroup on the 
-AWS CodeDeploy service. Use the attributes of this class
+This class represents the parameters used for calling the method UpdateDeploymentGroup on the
+L<AWS CodeDeploy|Paws::CodeDeploy> service. Use the attributes of this class
 as arguments to method UpdateDeploymentGroup.
 
 You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to UpdateDeploymentGroup.
 
-As an example:
+=head1 SYNOPSIS
 
-  $service_obj->UpdateDeploymentGroup(Att1 => $value1, Att2 => $value2, ...);
+    my $codedeploy = Paws->service('CodeDeploy');
+    my $UpdateDeploymentGroupOutput = $codedeploy->UpdateDeploymentGroup(
+      ApplicationName            => 'MyApplicationName',
+      CurrentDeploymentGroupName => 'MyDeploymentGroupName',
+      AlarmConfiguration         => {
+        enabled => 1,    # OPTIONAL
+        alarms  => [
+          {
+            name => 'MyAlarmName',    # OPTIONAL
+          },
+          ...
+        ],                            # OPTIONAL
+        ignorePollAlarmFailure => 1,  # OPTIONAL
+      },    # OPTIONAL
+      AutoRollbackConfiguration => {
+        enabled => 1,    # OPTIONAL
+        events  => [
+          'DEPLOYMENT_FAILURE',
+          ... # values: DEPLOYMENT_FAILURE, DEPLOYMENT_STOP_ON_ALARM, DEPLOYMENT_STOP_ON_REQUEST
+        ],    # OPTIONAL
+      },    # OPTIONAL
+      AutoScalingGroups => [ 'MyAutoScalingGroupName', ... ],    # OPTIONAL
+      BlueGreenDeploymentConfiguration => {
+        greenFleetProvisioningOption => {
+          action => 'DISCOVER_EXISTING'
+          ,    # values: DISCOVER_EXISTING, COPY_AUTO_SCALING_GROUP; OPTIONAL
+        },    # OPTIONAL
+        terminateBlueInstancesOnDeploymentSuccess => {
+          action => 'TERMINATE',    # values: TERMINATE, KEEP_ALIVE; OPTIONAL
+          terminationWaitTimeInMinutes => 1,    # OPTIONAL
+        },    # OPTIONAL
+        deploymentReadyOption => {
+          actionOnTimeout => 'CONTINUE_DEPLOYMENT'
+          ,    # values: CONTINUE_DEPLOYMENT, STOP_DEPLOYMENT; OPTIONAL
+          waitTimeInMinutes => 1,    # OPTIONAL
+        },    # OPTIONAL
+      },    # OPTIONAL
+      DeploymentConfigName => 'MyDeploymentConfigName',    # OPTIONAL
+      DeploymentStyle      => {
+        deploymentOption => 'WITH_TRAFFIC_CONTROL'
+        ,    # values: WITH_TRAFFIC_CONTROL, WITHOUT_TRAFFIC_CONTROL; OPTIONAL
+        deploymentType => 'IN_PLACE',   # values: IN_PLACE, BLUE_GREEN; OPTIONAL
+      },    # OPTIONAL
+      Ec2TagFilters => [
+        {
+          Key => 'MyKey',    # OPTIONAL
+          Type =>
+            'KEY_ONLY',  # values: KEY_ONLY, VALUE_ONLY, KEY_AND_VALUE; OPTIONAL
+          Value => 'MyValue',    # OPTIONAL
+        },
+        ...
+      ],                         # OPTIONAL
+      Ec2TagSet => {
+        ec2TagSetList => [
+          [
+            {
+              Key  => 'MyKey',     # OPTIONAL
+              Type => 'KEY_ONLY'
+              ,    # values: KEY_ONLY, VALUE_ONLY, KEY_AND_VALUE; OPTIONAL
+              Value => 'MyValue',    # OPTIONAL
+            },
+            ...
+          ],
+          ...
+        ],                           # OPTIONAL
+      },    # OPTIONAL
+      LoadBalancerInfo => {
+        targetGroupInfoList => [
+          {
+            name => 'MyTargetGroupName',    # OPTIONAL
+          },
+          ...
+        ],                                  # OPTIONAL
+        elbInfoList => [
+          {
+            name => 'MyELBName',            # OPTIONAL
+          },
+          ...
+        ],                                  # OPTIONAL
+      },    # OPTIONAL
+      NewDeploymentGroupName       => 'MyDeploymentGroupName',    # OPTIONAL
+      OnPremisesInstanceTagFilters => [
+        {
+          Key => 'MyKey',                                         # OPTIONAL
+          Type =>
+            'KEY_ONLY',  # values: KEY_ONLY, VALUE_ONLY, KEY_AND_VALUE; OPTIONAL
+          Value => 'MyValue',    # OPTIONAL
+        },
+        ...
+      ],                         # OPTIONAL
+      OnPremisesTagSet => {
+        onPremisesTagSetList => [
+          [
+            {
+              Key  => 'MyKey',     # OPTIONAL
+              Type => 'KEY_ONLY'
+              ,    # values: KEY_ONLY, VALUE_ONLY, KEY_AND_VALUE; OPTIONAL
+              Value => 'MyValue',    # OPTIONAL
+            },
+            ...
+          ],
+          ...
+        ],                           # OPTIONAL
+      },    # OPTIONAL
+      ServiceRoleArn        => 'MyRole',    # OPTIONAL
+      TriggerConfigurations => [
+        {
+          triggerName      => 'MyTriggerName',         # OPTIONAL
+          triggerTargetArn => 'MyTriggerTargetArn',    # OPTIONAL
+          triggerEvents    => [
+            'DeploymentStart',
+            ... # values: DeploymentStart, DeploymentSuccess, DeploymentFailure, DeploymentStop, DeploymentRollback, DeploymentReady, InstanceStart, InstanceSuccess, InstanceFailure, InstanceReady
+          ],    # OPTIONAL
+        },
+        ...
+      ],        # OPTIONAL
+    );
+
+    # Results:
+    my $HooksNotCleanedUp = $UpdateDeploymentGroupOutput->HooksNotCleanedUp;
+
+    # Returns a L<Paws::CodeDeploy::UpdateDeploymentGroupOutput> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/codedeploy/UpdateDeploymentGroup>
 
 =head1 ATTRIBUTES
 
@@ -158,7 +280,9 @@ A replacement ARN for the service role, if you want to change it.
 
 Information about triggers to change when the deployment group is
 updated. For examples, see Modify Triggers in an AWS CodeDeploy
-Deployment Group in the AWS CodeDeploy User Guide.
+Deployment Group
+(http://docs.aws.amazon.com/codedeploy/latest/userguide/how-to-notify-edit.html)
+in the AWS CodeDeploy User Guide.
 
 
 
@@ -169,9 +293,9 @@ This class forms part of L<Paws>, documenting arguments for method UpdateDeploym
 
 =head1 BUGS and CONTRIBUTIONS
 
-The source code is located here: https://github.com/pplu/aws-sdk-perl
+The source code is located here: L<https://github.com/pplu/aws-sdk-perl>
 
-Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+Please report bugs to: L<https://github.com/pplu/aws-sdk-perl/issues>
 
 =cut
 

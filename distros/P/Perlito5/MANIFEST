@@ -302,7 +302,6 @@ t/comma_return.t
 t/comma_return_array.t
 t/comma_scalar.t
 t/comment.t
-t/crypt.t
 t/data.t
 t/deref_arrow.t
 t/deref_defined_or.t
@@ -407,7 +406,6 @@ t/sub_bind_param.t
 t/sub_core_global.t
 t/sub_core_global_and_override.t
 t/sub_core_override.t
-t/sub_current.t
 t/sub_defined_later.t
 t/sub_wantarray.t
 t/switch.t
