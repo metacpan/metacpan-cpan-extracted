@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile;
-$Lab::Moose::DataFile::VERSION = '3.651';
+$Lab::Moose::DataFile::VERSION = '3.652';
 #ABSTRACT: Base class for data file types
 
 use 5.010;
@@ -14,7 +14,7 @@ use Lab::Moose::DataFolder;
 
 use File::Basename qw/dirname basename/;
 use File::Path 'make_path';
-use Lab::Moose 'our_catfile';
+use Lab::Moose::Catfile 'our_catfile';
 use IO::Handle;
 
 use Carp;
@@ -122,7 +122,7 @@ Lab::Moose::DataFile - Base class for data file types
 
 =head1 VERSION
 
-version 3.651
+version 3.652
 
 =head1 METHODS
 
@@ -173,6 +173,7 @@ This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
+            2018       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -200,6 +200,13 @@ sub run
                          }
                      );
                   },
+                  on_error => sub{
+                      $result{$node} = $_[2] if $_[2];
+                      undef $hdl;
+		      $percent->add()->print() if $run{verbose};
+                      $work->();
+                      $cv->end;
+                  },
                   on_eof => sub{
                       undef $hdl;
 		      $percent->add()->print() if $run{verbose};

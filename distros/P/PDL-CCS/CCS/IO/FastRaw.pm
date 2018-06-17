@@ -12,7 +12,7 @@ use PDL::IO::FastRaw;
 use Carp qw(confess);
 use strict;
 
-our $VERSION = '1.23.7';
+our $VERSION = '1.23.8';
 our @ISA = ('PDL::Exporter');
 our @EXPORT_OK = qw(ccs_writefraw ccs_readfraw ccs_mapfraw);
 our %EXPORT_TAGS =
@@ -206,9 +206,9 @@ sub ccs_mapfraw {
       or confess("ccs_mapfraw(): failed to read header-file $hFile: $!");
     $header->{$_} //= $hdr->{$_} foreach (keys %$hdr);
   }
-  $header->{pdims} = PDL->topdl(ccs_indx,$header->{pdims}) if (!ref($header->{pdims}));
+  $header->{pdims} = PDL->topdl(ccs_indx(),$header->{pdims}) if (!ref($header->{pdims}));
   $header->{vdims} = $header->{pdims}->sequence if (!defined($header->{vdims}));
-  $header->{vdims} = PDL->topdl(ccs_indx,$header->{vdims}) if (!ref($header->{vdims}));
+  $header->{vdims} = PDL->topdl(ccs_indx(),$header->{vdims}) if (!ref($header->{vdims}));
 
   ##-- get component options
   my %defaults = (map {($_=>$opts->{$_})} grep {exists($opts->{$_})} qw(Creat Trunc ReadOnly));

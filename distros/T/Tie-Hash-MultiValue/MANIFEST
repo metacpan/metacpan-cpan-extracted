@@ -11,6 +11,7 @@ t/003_ref.t
 t/004_unique.t
 t/005_custom.t
 t/007itersmode.t
-xt/pod-coverage.t
-xt/pod.t
+t/pod-coverage.t
+t/pod.t
 Todo
+META.json                                Module JSON meta-data (added by MakeMaker)

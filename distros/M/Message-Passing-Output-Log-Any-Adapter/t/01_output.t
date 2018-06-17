@@ -41,7 +41,7 @@ subtest 'without adapter_params' => sub {
 };
 
 subtest 'with adapter_params' => sub {
-    my ( $fh, $filename ) = tempfile();
+    my ( $fh, $filename ) = tempfile( EXLOCK => 0 );
 
     my $output = new_ok(
         'Message::Passing::Output::Log::Any::Adapter' =>

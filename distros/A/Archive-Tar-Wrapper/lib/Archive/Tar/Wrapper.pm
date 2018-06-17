@@ -18,7 +18,8 @@ use IPC::Open3;
 use Symbol 'gensym';
 use Carp;
 
-our $VERSION = "0.26";
+our $VERSION = "0.27";
+my $logger = get_logger();
 
 ###########################################
 sub new {
@@ -48,11 +49,11 @@ sub new {
 
     bless $self, $class;
 
-    $self->{tar} = which("tar")  unless defined $self->{tar};
-    $self->{tar} = which("gtar") unless defined $self->{tar};
+    $self->{tar} = which('tar')  unless defined $self->{tar};
+    $self->{tar} = which('gtar') unless defined $self->{tar};
 
     unless ( defined $self->{tar} ) {
-        LOGDIE "tar not found in PATH, please specify location";
+        LOGDIE 'tar not found in PATH, please specify location';
     }
 
     if ( defined $self->{ramdisk} ) {
@@ -67,10 +68,11 @@ sub new {
           tempdir( $self->{tmpdir} ? ( DIR => $self->{tmpdir} ) : () );
     }
 
-    $self->{tardir} = File::Spec->catfile( $self->{tmpdir}, "tar" );
+    $self->{tardir} = File::Spec->catfile( $self->{tmpdir}, 'tar' );
     mkpath [ $self->{tardir} ], 0, oct(755)
-      or LOGDIE "Cannot mkpath $self->{tardir} ($!)";
-
+      or LOGDIE 'Cannot create the path ' . $self->{tardir} . ": $!";
+    $logger->debug( 'tardir location: ' . $self->{tardir} )
+      if ( $logger->is_debug );
     $self->{objdir} = tempdir();
 
     return $self;
@@ -137,9 +139,7 @@ sub read {    ## no critic (ProhibitBuiltinHomonyms)
     }
 
     WARN $err if $err;
-
     chdir $cwd or LOGDIE "Cannot chdir to $cwd";
-
     return 1;
 }
 
@@ -175,10 +175,10 @@ sub locate {
         DEBUG "$real_path exists";
         return $real_path;
     }
-    DEBUG "$real_path doesn't exist";
-
-    WARN "$rel_path not found in tarball";
-    return;
+    else {
+        WARN "$rel_path not found in tarball";
+        return;
+    }
 }
 
 ###########################################
@@ -272,10 +272,8 @@ sub perm_cp {
 sub perm_get {
 ######################################
     my ($filename) = @_;
-
     my @stats = ( stat $filename )[ 2, 4, 5 ]
       or LOGDIE "Cannot stat $filename ($!)";
-
     return \@stats;
 }
 
@@ -297,7 +295,7 @@ sub remove {
 ###########################################
     my ( $self, $rel_path ) = @_;
     my $target = File::Spec->catfile( $self->{tardir}, $rel_path );
-    rmtree($target) or LOGDIE "Can't rmtree $target ($!)";
+    rmtree($target) or LOGDIE "Can't rmtree $target: $!";
     return 1;
 }
 
@@ -319,29 +317,33 @@ sub list_all {
 sub list_reset {
 ###########################################
     my ($self) = @_;
-    my $list_file = File::Spec->catfile( $self->{objdir}, "list" );
+
+    #TODO: keep the file list as a fixed attribute of the instance
+    my $list_file = File::Spec->catfile( $self->{objdir}, 'list' );
     my $cwd = getcwd();
-    chdir $self->{tardir} or LOGDIE "Can't chdir to $self->{tardir} ($!)";
-    my @entries_types;
+    chdir $self->{tardir} or LOGDIE "Can't chdir to $self->{tardir}: $!";
+    open( my $fh, '>', $list_file ) or LOGDIE "Can't open $list_file: $!";
+
+    if ( $logger->is_debug ) {
+        $logger->info('List of all files identified inside the tar file');
+    }
 
     find(
         sub {
             my $entry = $File::Find::name;
-            $entry =~ s#^\./##x;
+            $entry =~ s#^\./##o;
             my $type = (
-                  -d $_ ? "d"
-                : -l $_ ? "l"
-                :         "f"
+                  -d $_ ? 'd'
+                : -l $_ ? 'l'
+                :         'f'
             );
-            push( @entries_types, "$type $entry" );
+            print $fh "$type $entry\n";
+            $logger->debug("$type $entry") if ( $logger->is_debug );
         },
-        "."
+        '.'
     );
 
-    open( my $fh, '>', $list_file ) or LOGDIE "Can't open $list_file: $!";
-    for my $entry (@entries_types) {
-        print $fh $entry, "\n";
-    }
+    $logger->debug('All entries listed') if ( $logger->is_debug );
     close($fh);
     chdir $cwd or LOGDIE "Can't chdir to $cwd: $!";
     $self->offset(0);
@@ -353,13 +355,14 @@ sub list_next {
 ###########################################
     my ($self) = @_;
     my $offset = $self->offset();
-    my $list_file = File::Spec->catfile( $self->{objdir}, "list" );
+    my $list_file = File::Spec->catfile( $self->{objdir}, 'list' );
     open my $fh, '<', $list_file or LOGDIE "Can't open $list_file: $!";
     seek $fh, $offset, 0;
     my $data;
 
   REDO: {
         my $line = <$fh>;
+
         unless ( defined($line) ) {
             close($fh);
         }
@@ -381,7 +384,6 @@ sub list_next {
 sub offset {
 ###########################################
     my ( $self, $new_offset ) = @_;
-
     my $offset_file = File::Spec->catfile( $self->{objdir}, "offset" );
 
     if ( defined $new_offset ) {
@@ -405,7 +407,7 @@ sub write {    ## no critic (ProhibitBuiltinHomonyms)
     my ( $self, $tarfile, $compress ) = @_;
 
     my $cwd = getcwd();
-    chdir $self->{tardir} or LOGDIE "Can't chdir to $self->{tardir} ($!)";
+    chdir $self->{tardir} or LOGDIE "Can't chdir to $self->{tardir}: $!";
 
     unless ( File::Spec::Functions::file_name_is_absolute($tarfile) ) {
         $tarfile = File::Spec::Functions::rel2abs( $tarfile, $cwd );
@@ -417,6 +419,7 @@ sub write {    ## no critic (ProhibitBuiltinHomonyms)
     opendir( my $dir, '.' ) or LOGDIE "Cannot open $self->{tardir}: $!";
     my @top_entries = readdir($dir);
     closedir($dir);
+    @top_entries = sort(@top_entries);
 
     # removing the '.' and '..' entries
     shift(@top_entries);
@@ -492,6 +495,7 @@ sub is_gnu {
         return 0;
     }
     else {
+        $self->{version_info} = $output;
         return $output =~ /GNU/;
     }
 }
@@ -532,8 +536,11 @@ sub ramdisk_mount {
     my $rc = system(@cmd);
 
     if ($rc) {
-        LOGWARN "Mount command '@cmd' failed: $?";
-        LOGWARN "Note that this only works on Linux and as root";
+
+        if ( $logger->is_info ) {
+            $logger->info("Mount command '@cmd' failed: $?");
+            $logger->info('Note that this only works on Linux and as root');
+        }
         return;
     }
 
@@ -547,11 +554,11 @@ sub ramdisk_unmount {
 ###########################################
     my ($self) = @_;
 
-    return if !exists $self->{ramdisk}->{mounted};
+    return unless ( exists $self->{ramdisk}->{mounted} );
 
     my @cmd = ( $self->{umount}, $self->{ramdisk}->{tmpdir} );
 
-    INFO "Unmounting ramdisk: @cmd";
+    $logger->info("Unmounting ramdisk: @cmd") if ( $logger->is_info );
 
     my $rc = system(@cmd);
 
@@ -622,11 +629,11 @@ It differs from Archive::Tar in two ways:
 =item *
 
 Archive::Tar::Wrapper doesn't hold anything in memory. Everything is
-stored on disk. 
+stored on disk.
 
 =item *
 
-Archive::Tar::Wrapper is 100% compliant with the platform's C<tar> 
+Archive::Tar::Wrapper is 100% compliant with the platform's C<tar>
 utility, because it uses it internally.
 
 =back
@@ -648,8 +655,8 @@ tar data, the location of the temporary directory can be specified:
 
     my $arch = Archive::Tar::Wrapper->new(tmpdir => '/path/to/tmpdir');
 
-Tremendous performance increases can be achieved if the temporary 
-directory is located on a ram disk. Check the "Using RAM Disks" 
+Tremendous performance increases can be achieved if the temporary
+directory is located on a ram disk. Check the "Using RAM Disks"
 section below for details.
 
 Additional options can be passed to the C<tar> command by using the
@@ -680,8 +687,8 @@ will call the C<tar> utility internally like
 
 when the C<write> method gets called.
 
-By default, the C<list_*()> functions will return only file entries. 
-Directories will be suppressed. To have C<list_*()> 
+By default, the C<list_*()> functions will return only file entries.
+Directories will be suppressed. To have C<list_*()>
 return directories as well, use
 
      my $arch = Archive::Tar::Wrapper->new(
@@ -708,7 +715,7 @@ C<max_cmd_line_args>:
 =item B<$arch-E<gt>read("archive.tgz")>
 
 C<read()> opens the given tarball, expands it into a temporary directory
-and returns 1 on success und C<undef> on failure. 
+and returns 1 on success und C<undef> on failure.
 The temporary directory holding the tar data gets cleaned up when C<$arch>
 goes out of scope.
 
@@ -735,7 +742,7 @@ B<$arch->list_next()>.
 Returns the next item in the tarfile. It returns a list of three scalars:
 the relative path of the item in the tarfile, the physical path
 to the unpacked file or directory on disk, and the type of the entry
-(f=file, d=directory, l=symlink). Note that by default, 
+(f=file, d=directory, l=symlink). Note that by default,
 Archive::Tar::Wrapper won't display directories, unless the C<dirs>
 parameter is set when running the constructor.
 
@@ -762,15 +769,15 @@ C<list_next()> instead of C<list_all>.
 Add a new file to the tarball. C<$logic_path> is the virtual path
 of the file within the tarball. C<$file_or_stringref> is either
 a scalar, in which case it holds the physical path of a file
-on disk to be transferred (i.e. copied) to the tarball. Or it is
+on disk to be transferred (i.e. copied) to the tarball, or it is
 a reference to a scalar, in which case its content is interpreted
 to be the data of the file.
 
-If no additional parameters are given, permissions and user/group 
+If no additional parameters are given, permissions and user/group
 id settings of a file to be added are copied. If you want different
 settings, specify them in the options hash:
 
-    $arch->add($logic_path, $stringref, 
+    $arch->add($logic_path, $stringref,
                { perm => 0755, uid => 123, gid => 10 });
 
 If $file_or_stringref is a reference to a Unicode string, the C<binmode>
@@ -787,7 +794,7 @@ of the file within the tarball.
 =item B<$arch-E<gt>locate($logic_path)>
 
 Finds the physical location of a file, specified by C<$logic_path>, which
-is the virtual path of the file within the tarball. Returns a path to 
+is the virtual path of the file within the tarball. Returns a path to
 the temporary file C<Archive::Tar::Wrapper> created to manipulate the
 tarball on disk.
 
@@ -819,15 +826,15 @@ create the RAM disk by hand by running
    # mkdir -p /mnt/myramdisk
    # mount -t tmpfs -o size=20m tmpfs /mnt/myramdisk
 
-and then feeding the ramdisk as a temporary directory to 
+and then feeding the ramdisk as a temporary directory to
 Archive::Tar::Wrapper, like
 
    my $tar = Archive::Tar::Wrapper->new( tmpdir => '/mnt/myramdisk' );
 
 or using Archive::Tar::Wrapper's built-in option 'ramdisk':
 
-   my $tar = Archive::Tar::Wrapper->new( 
-       ramdisk => { 
+   my $tar = Archive::Tar::Wrapper->new(
+       ramdisk => {
            type => 'tmpfs',
            size => '20m',   # 20 MB
        },
@@ -857,7 +864,7 @@ yourself instead of letting Archive::Tar::Wrapper create it automatically.
 
 =item *
 
-Currently, only C<tar> programs supporting the C<z> option (for 
+Currently, only C<tar> programs supporting the C<z> option (for
 compressing/decompressing) are supported. Future version will use
 C<gzip> alternatively.
 
@@ -869,7 +876,7 @@ C<remove()> the file.
 
 =item *
 
-If you delete a file, the empty directories it was located in 
+If you delete a file, the empty directories it was located in
 stay in the tarball. You could try to C<locate()> them and delete
 them. This will be fixed, though.
 

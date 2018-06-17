@@ -1,5 +1,9 @@
 Revision history for RPi-GPIOExpander-MCP23017
 
+1.00    2018-06-15
+        - added check in Makefile.PL for linux/i2c.h. CPAN Testers was breaking
+          on non-i2c-enabled systems
+
 0.01    2018-06-07
         - initial public release
         - most core registers available

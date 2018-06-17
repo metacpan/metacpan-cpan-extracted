@@ -14,7 +14,7 @@ use warnings;
 our ($_SIGCHLD, $_SIGCHLD_CNT, $REAP) = (0,0,0);
 our (@CHLD_HANDLE_HISTORY, @SIGCHLD_CAUGHT) = (0);
 our $SIG_DEBUG = $ENV{SIG_DEBUG};
-our $VERSION = '0.93';
+our $VERSION = '0.94';
 my %bastards;
 
 #
@@ -101,6 +101,7 @@ sub handle_CHLD {
 		  "but can't find child to reap; pid=$pid") if $DEBUG;
 
 	    $bastards{$pid} = [ scalar Time::HiRes::time(), $status ];
+#print STDERR "$pid is a bastard\n";            
 	}
 	$REAP = 1;
     }
@@ -148,7 +149,7 @@ sub handle_bastards {
     if (@pids == 0) {
 	@pids = keys %bastards;
     }
-    foreach my $pid (@pids) {
+    foreach my $pid (grep { defined } @pids) {
 	my $job = $Forks::Super::ALL_JOBS{$pid};
 	if (defined $job && defined $bastards{$pid}) {
 	    warn 'Forks::Super: ',
@@ -160,7 +161,9 @@ sub handle_bastards {
 		($job->{end}, $job->{status})
 		    = @{delete $bastards{$pid}};
 	    }
-	}
+	} elsif (defined $bastards{$pid}) {
+            warn "Still no initialized parent for $pid";
+        }
     }
     return;
 }

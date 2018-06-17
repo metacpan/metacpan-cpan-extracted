@@ -1,7 +1,7 @@
 package Dancer;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: lightweight yet powerful web application framework
-$Dancer::VERSION = '1.3202';
+$Dancer::VERSION = '1.3400';
 use strict;
 use warnings;
 use Carp;
@@ -511,7 +511,7 @@ Dancer - lightweight yet powerful web application framework
 
 =head1 VERSION
 
-version 1.3202
+version 1.3400
 
 =head1 SYNOPSIS
 
@@ -705,6 +705,10 @@ Use list context to fetch them all:
 
     my @values = cookie "name";
 
+Note that if the client has sent more than one cookie with the same value, the
+one returned will be the last one seen.  This should only happen if you have
+set multiple cookies with the same name but different paths. So, don't do that.
+
 =head2 config
 
 Accesses the configuration of the application:
@@ -844,11 +848,14 @@ only used to change the method of your request. Use with caution.
 
 Deserializes a L<< Data::Dumper >> structure.
 
-=head2 from_json ($structure, %options)
+=head2 from_json ($structure, \%options)
 
 Deserializes a JSON structure. Can receive optional arguments. Those arguments
 are valid L<JSON> arguments to change the behaviour of the default
 C<JSON::from_json> function.
+
+Compatibility notice: C<from_json> changed in 1.3002 to take a hashref as options,
+instead of a hash.
 
 =head2 from_yaml ($structure)
 
@@ -1801,11 +1808,14 @@ L<Dancer::Template::Abstract> for further details.
 
 Serializes a structure with L<< Data::Dumper >>.
 
-=head2 to_json ($structure, %options)
+=head2 to_json ($structure, \%options)
 
 Serializes a structure to JSON. Can receive optional arguments. Thoses arguments
 are valid L<JSON> arguments to change the behaviour of the default
 C<JSON::to_json> function.
+
+Compatibility notice: C<to_json> changed in 1.3002 to take a hashref as options,
+instead of a hash.
 
 =head2 to_yaml ($structure)
 
@@ -1865,6 +1875,12 @@ Returns a fully-qualified URI for the given path:
         redirect uri_for('/path');
         # can be something like: http://localhost:3000/path
     };
+
+Querystring parameters can be provided by passing a hashref as a second param,
+and URL-encoding can be disabled via a third parameter:
+
+    uri_for('/path', { foo => 'bar' }, 1);
+    # would return e.g. http://localhost:3000/path?foo=bar
 
 =head2 captures
 
@@ -1958,9 +1974,7 @@ The following modules are mandatory (Dancer cannot run without them):
 
 =item L<HTTP::Server::Simple::PSGI>
 
-=item L<HTTP::Body>
-
-=item L<LWP>
+=item L<HTTP::Tiny>
 
 =item L<MIME::Types>
 

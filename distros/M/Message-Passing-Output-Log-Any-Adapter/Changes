@@ -1,3 +1,6 @@
+0.004     2018-06-16 01:14:18+02:00 Europe/Vienna
+    - fix locking issue with BSD derived systems in test (RT#120419)
+
 0.003     2015-07-24 10:33:14+02:00 Europe/Vienna
     - fix compatibility with Log::Any 1.x
 

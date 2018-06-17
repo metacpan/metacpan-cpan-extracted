@@ -17,10 +17,10 @@ use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(queue_job);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
-our $VERSION = '0.93';
+our $VERSION = '0.94';
 
 # must sync FIRST_DEFERRED_ID with Win32 code in Forks::Super::Util::isValidPid
-use constant FIRST_DEFERRED_ID => -500000;
+use constant FIRST_DEFERRED_ID => -1_100_000;
 use constant QUEUE_PRIORITY_INCREMENT => 1.0E-6;
 use constant DEFAULT_QUEUE_MONITOR_FREQ => 30;
 
@@ -544,7 +544,7 @@ Forks::Super::Deferred - manage queue of background tasks to perform
 
 =head1 VERSION
 
-0.93
+0.94
 
 =head1 DESCRIPTION
 

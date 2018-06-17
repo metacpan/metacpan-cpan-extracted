@@ -347,6 +347,7 @@ sub run
                if( $pid ) { kill 15, $pid; }
                else
                {
+                    delete $index{$index};
 		    map{ unlink "$tmp/$_" if -e "$tmp/$_" }( $index, "$index.out", "$index.ext" );
                }
             },

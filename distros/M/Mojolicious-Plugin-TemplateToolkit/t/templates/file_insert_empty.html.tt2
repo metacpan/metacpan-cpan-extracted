@@ -1,0 +1,1 @@
+[% INSERT data_empty.html.tt2 %]baz

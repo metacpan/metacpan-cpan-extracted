@@ -1,0 +1,55 @@
+{
+   "abstract" : "A minimal event sourcing framework.",
+   "author" : [
+      "Mirko Westermeier <mirko@westermeier.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "EventStore-Tiny",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Clone" : "0.39",
+            "Data::Compare" : "1.25",
+            "Data::Dump" : "1.23",
+            "Mo" : "0.38",
+            "UUID::Tiny" : "1.04",
+            "perl" : "5.014000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/memowe/EventStore-Tiny/issues"
+      },
+      "repository" : {
+         "url" : "http://github.com/memowe/EventStore-Tiny"
+      }
+   },
+   "version" : "0.2",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

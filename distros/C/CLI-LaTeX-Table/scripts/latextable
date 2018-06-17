@@ -14,23 +14,23 @@ my %del ; # LaTeXで使わないコマンドの指定。
 my @r3 = () ; #  3桁コンマ区切りにして右寄せにしたい列の指定。 Which columns are to be decimal being separated every 3 digits.
 
 # 追加の水平線と垂直線
-my $HL = ! exists $o{'#'} ? '' : $o{'#'} =~ /1/ ? "\\hline" : $o{'#'} =~ m/\./ ? "\\hdashline[1pt/1pt]" : '' ;
+my $hdash = qq[\\hdashline[1pt/1pt]  % "\\hdashline[..]" requires "\\usepackcage{arydshln}"] ; 
+my $HL = ! exists $o{'#'} ? '' : $o{'#'} =~ /1/ ? "\\hline" : $o{'#'} =~ m/\./ ? $hdash : '' ;
 my $VL = ! exists $o{'#'} ? '' : $o{'#'} =~ /1/ ? '|' : $o{'#'} =~ /\./ ? ';{1pt/1pt}' : ' ' ;
 
-
 my $angle = $o{9} ? 90 : 0 ; # 全体を回転する場合の指定  When -9 is specified, the entire table rotates in 90 degree.
-
 my @out ; # $0の出力文字列  The output of this command is accumulated in this variable. 
 
+my $otfFlag = 0 ; # usepackage{otf} が必要かどうかのフラグ
 & main ( ) ; 
 exit 0 ; 
 
-
 sub plain2latex ( $ ) { 
+	local $_ = $_[0] ;
 
+	$otfFlag = 1 if m/\P{ascii}/ ; # <-- 全角ハイフンの時だけに表示する様にするのが、良いのかも知れない。
 	my $hlen = $o{H} if defined $o{H} ;  # ハッシュ値のような16進数の文字列を長い場合に $hlen桁に縮めて .. を続ける。
     s/(?<=[0-9a-f]{$hlen})[0-9a-f]+/../gi if defined $o{H} ; # <-- - (?<= ) で正規表現の後読み
-
 
     # ドル$文字関連 The pre-processing of the character "$ dollar". The completion process will appear much later.
     s|\G(.*?)\$|$1=\$\$=|g ; # ドル文字の前処理。\Gは文字列の先頭、もしくは修飾子 g がついたパターンマッチングが終了した場所を記憶しておき、そこにマッチ
@@ -85,6 +85,7 @@ sub main ( ) {
         $_ = decode_utf8 ( $_ ) ; # <-　括弧が外せるか確認
         $zflag = 1 if m/　/ ; #全角空白 \x{3000} のチェック
         my @F = split /$isep/ , plain2latex ( $_ ) , $tailF ;   # <--- ここでコアとなる処理
+        #$tailF //= @F ; # 1行目で設定することで、LaTeXコンパイル時に列数変動でエラーにならないようにする。
         splice @F , $o{w} if defined $o{w} ; # 列数の最大値が指定された場合の、切り取りの処理。
         $maxF = @F if @F > $maxF ;
         grep { s/$rm//} @F[ $o{1} // 0 .. $#F ] if defined $o{0} and $. > 1 || ! $o{'='} ; # -0の処理
@@ -110,17 +111,10 @@ sub main ( ) {
             s|\Q\\\E||g if $o{C} =~ /0/i ; # -C 0 : 改行を除去する
     	}
 	}
+	$| = 1 ;
     print @out ; 
-
-    print STDERR BRIGHT_BLUE << 'END'  if !$o{p} && ! exists $o{C} ;
-Note: "\usepackage{graphicx}" is required before "\begin{document}" in the LaTeX file to use "\rotatebox" and "\scalebox" commands.
-END
-    print STDERR BRIGHT_BLUE << 'END'  ;
-Also "\usepackage{otf}" may be required. 
-END
-    print STDERR BRIGHT_BLUE << 'END'  if defined $o{'#'} && $o{'#'} =~ /\./ ;
-Also "\usepackage{arydshln}" is required. 
-END
+    #sleep 1 ;
+    print STDERR BRIGHT_BLUE qq[\\usepackage{otf}" may be required because of non-ascii characater(s).\n]  if $otfFlag ; 
     print STDERR CYAN "Full-width space included. Using the option '-_' is advisable.\n" if $zflag && ! $o{'_'} ;
 }
 
@@ -131,13 +125,14 @@ sub tableStart ( $ ) {
     splice @tmp , $_ * 5 , 0 , ' ' for reverse 1 .. @tmp/5 ; # 列指定に5列ごとに空白文字を入れる。
     splice @tmp , 1 , 0 , " | " if $o{1} ; # 縦線を入れる指定 
     $colspec = " | " . ( join '' , @tmp ) . " | " ;
+    my $csCmt = ($colspec =~ m/;\{/ ) ? qq[  % ";\{length/length\}" requires "\\usepackcage{arydshln}"] : '' ;
     my $out =  << "END" ;
 \\begin{table}
     \\center
     \\hspace*{-$o{x}}
-    \\rotatebox{$angle}{
-    \\scalebox{$o{m}}{
-        \\begin{tabular}{$colspec}
+    \\rotatebox{$angle}{   % "\\rotatebox{..}" requires "\\usepackage{graphicx}".
+    \\scalebox{$o{m}}{   % "\\scalebox{..}" requires "\\usepackage{graphicx}".
+        \\begin{tabular}{$colspec}$csCmt
             \\hline
 END
 	$out =~ s/(\Q\hspace*{-0mm}\E)/%$1/ and $del{hspc} = 1 ;
@@ -190,7 +185,6 @@ sub HELP_MESSAGE {
     }
     close $FH ;
     exit 0 ;
-
 }
 
 
@@ -306,9 +300,8 @@ sub HELP_MESSAGE {
    * 3桁区切りにしたい数ではなくて、単に右寄せしたい列の指定をする -r を実装したい。
    * ドルマークとバックスラッシュの処理は内部処理上でトリッキーだった。正規表現の \Gで解決した。<-- テストを書くべし。
    * 列数が変わる場合に警告を出して、可能なら、空文字列で埋めるようにする。
-   * 全角ハイフンが含まれていた場合に、usepackage{otf} が必要であることを表示する様にしたい。要LaTeX参考署参照。
    * 逆にLaTeXのテーブルからTSVファイルに変換する機能を -~のオプションスイッチで実装したい。
-   * 半角ハイフン2個以上を連続して入力した場合 -{}-{}-のように出力される必要があるが、未実装である。
+   * -~は大変なので、その前に，-Rで入力をそのまま \if0 (\iffalse)と\fi 囲んだものも出したい。すると表の修正が楽になる。
 
 # このブログラムは 2018年2月9日(金)から表形式データに対する道具作りの一環として、下野寿之が作成したものである。
 # このプログラムファイルに最近手を加えたのは、2018年6月3日(日), 6月9日(土)である。

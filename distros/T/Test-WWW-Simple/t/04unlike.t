@@ -13,7 +13,7 @@ my $message;
 my @results;
 
 @results = run_tests(
-    sub { page_unlike('http://use.perl.org', qr/The Perl Directory/, "page match") },
+    sub { page_unlike('http://google.com', qr/The Perl Directory/, "page match") },
     {
       ok => 0, # we expect the test to fail
       name => "page match",

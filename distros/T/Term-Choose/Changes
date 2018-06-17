@@ -1,6 +1,12 @@
 Revision history for Term::Choose
 
 
+1.517   2018-06-15
+        - New option 'include_highlighted'.
+        - New option 'meta_items'.
+        - Bugfix backup self.
+        - Update documentation.
+
 1.516   2018-04-20
         - Bugfix prompt-line.
 

@@ -4,6 +4,7 @@ MANIFEST
 MANIFEST.SKIP
 Makefile.PL
 README
+script/csv-pivot
 lib/Text/CSV/Pivot.pm
 t/00-load.t
 t/manifest.t

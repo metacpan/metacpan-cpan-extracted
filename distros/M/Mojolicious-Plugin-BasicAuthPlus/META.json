@@ -54,6 +54,6 @@
          "url" : "http://github.com/stregone/mojolicious-plugin-basicauthplus"
       }
    },
-   "version" : "v0.11.1",
+   "version" : "v0.11.2",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

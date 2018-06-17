@@ -1,5 +1,35 @@
 Changes file for Date-Holidays
 
+1.15 2018-06-16 Feature release, update recommended
+
+- Added implementation of is_holiday method for Date::Holidays::DE
+
+  Ref: https://github.com/jonasbn/perl-date-holidays/issues/18
+
+- Changed the structure returned from Date::Holidays::DE from 
+  a reference to an array to a reference to a hash, which is 
+  easier to work with and seems to be the defacto standard
+
+  This is all done in the adapter.
+
+  Ref: https://github.com/jonasbn/perl-date-holidays/issues/29
+
+
+1.14 2018-06-14 Feature release, update recommended
+
+- Date::Holidays::UK marked as unsupported
+
+- Date::Holidays::UK::EnglandAndWales marked as unsupported 
+
+  Ref: https://github.com/jonasbn/perl-date-holidays/issues/11
+
+- Addressed issue with support for country code UK. This is done with the 
+  adapter Date::Holidays::Adapter::UK, which uses Date::Holidays::GB via 
+  Date::Holidays::Adapter::GB. 
+
+  Ref: https://github.com/jonasbn/perl-date-holidays/issues/14
+
+
 1.13 2018-06-12 Feature release, update recommended
 
 - This release integrates Date::Holidays::CA_ES is does so 

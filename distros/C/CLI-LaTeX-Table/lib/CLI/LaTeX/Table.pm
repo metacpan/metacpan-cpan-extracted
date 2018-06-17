@@ -28,6 +28,7 @@ PROVIDED COMMAND LINE INTERFACE programs :
   3. saikoro -- random number/matrix generators of (various) uniform distributions.
   4. csel -- an command line interface to handle TSV/CSV files easier than cut/AWK commands.
   5. csv2tsv -- TSV formatter for regular CSV format files by Text::CSV_XS module.
+  6. matrixpack -- transforms a TSV into different shaped matrix.
 
   All programs provides help-manual that is availble such as by "latextable --help". 
   If you want to see only "switch options", do "latextable --help opt(ions)". 
@@ -46,11 +47,11 @@ PROVIDED COMMAND LINE INTERFACE programs :
 
 =head1 VERSION
 
-Version 0.56
+Version 0.57
 
 =cut
 
-our $VERSION = '0.56';
+our $VERSION = '0.57';
 
 
 =head1 LICENSE AND COPYRIGHT

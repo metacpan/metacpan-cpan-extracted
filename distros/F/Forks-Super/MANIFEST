@@ -184,6 +184,7 @@ t/67e-emulate.t
 t/67f-emulate.t
 t/67g-emulate.t
 t/67h-emulate.t
+t/68-pmap-pgrep.t
 t/70-cleanse.t
 t/71-config.t
 t/72-deinit.t

@@ -1,5 +1,8 @@
 Revision history for Perl extension File::Rename.
 
+0.35	Robin Barker 2018-06-14
+	Add $File::Rename::Options::VERSION
+
 0.33	Robin Barker 2018-06-13
 	Added return code for File::Rename::rename
 	More tests: in preparation for v1.00

@@ -7,14 +7,15 @@
 # Id definitions should be processed independently of labels
 # What sort of tag is on the end of the link?
 # Report resolved, unresolved, missing links - difficult because of forking
-# Pass Fail statistics shopuld be repeated at bottom to be more usable on terminals
+# Pass Fail statistics should be repeated at bottom to be more usable on terminals
 
 package Data::Edit::Xml::Lint;
-our $VERSION = 20180610;
+our $VERSION = 20180616;
 require v5.16.0;
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(cluck confess);
+use Data::Dump qw(dump);
 use Data::Table::Text qw(:all);
 use Digest::SHA qw(sha256_hex);
 use Encode;
@@ -29,10 +30,13 @@ sub new                                                                         
 
 genLValueScalarMethods(qw(author));                                             # Optional author of the xml - only needed if you want to generate an SDL file map
 genLValueScalarMethods(qw(catalog));                                            # Optional catalog file containing the locations of the DTDs used to validate the xml
+genLValueScalarMethods(qw(compressedErrors));                                   # Number of compressed errors
+genLValueScalarMethods(qw(compressedErrorText));                                # Text of compressed errors
 genLValueScalarMethods(qw(ditaType));                                           # Optional Dita topic type(concept|task|troubleshooting|reference) of the xml - only needed if you want to generate an SDL file map
 genLValueScalarMethods(qw(docType));                                            # The second line: the document type extracted from the L<source|/source>
 genLValueScalarMethods(qw(dtds));                                               # Optional directory containing the DTDs used to validate the xml
-genLValueScalarMethods(qw(errors));                                             # Number of lint errors detected by xmllint
+genLValueScalarMethods(qw(errors));                                             # Number of uncompressed lint errors detected by xmllint
+genLValueScalarMethods(qw(errorText));                                          # Text of uncompressed lint errors detected by xmllint
 genLValueScalarMethods(qw(file));                                               # File that the xml will be written to and read from by L<lint|/lint>, L<read|/read> or L<relint|/relint>
 genLValueScalarMethods(qw(fileNumber));                                         # File number - assigned early on by the caller to help debugging transformations
 genLValueScalarMethods(qw(guid));                                               # Guid for outermost tag - only required if you want to generate an SD file map
@@ -158,8 +162,8 @@ sub lintOP($$@)                                                                 
     my $n = $lint->errors = int @errors / 3;                                    # Three lines per error message
 
     my $t = "<!--errors: $n -->";
-
-    writeFile($file, "$source\n$time$e\n$t");                                   # Update xml file with errors
+    my $c = &compressErrors(@errors);                                           # Compress the errors per Micaela
+    writeFile($file, "$source\n$time$e\n$t$c");                                 # Update xml file with errors
    }
   else                                                                          # No errors detected
    {$lint->errors = 0;
@@ -167,6 +171,31 @@ sub lintOP($$@)                                                                 
 
   exit if $inParallel;
  } # lint
+
+sub compressErrors(@)                                                           #PS Compress the errors so we cound the ones that do not look similar. Errors typically occupy three lines with the last line containing ^ at the end to mark the location of the error.
+ {my (@errors) = @_;                                                            # Errors
+  my %c;
+  my @e;
+
+  for(1..@errors)                                                               # Group errors in threes to make an error line
+   {push @e, $errors[$_-1] if $_ % 3 == 1;
+   }
+  for(@e)                                                                       # Reduce error line
+   {my $c =  s(-:\d+?:) ()sr;                                                   # Remove line number
+       $c =~ s(\s+\^\Z) ()s;                                                    # Remove error pointer
+       $c =~ s(expected:.*) ()s;                                                # Remove expected
+    $c{$c}++;
+   }                                                                            # Format compressed errors block
+  if (my $n = scalar(keys %c))
+   {my @t = (qq(<!--compressedErrors: $n -->));                                 # Number of errors
+    for my $e(sort keys %c)                                                     # Each unique reduced error line
+     {push @t, qq(<!--${e}-->);
+     }
+    my $t = join "\n", '', @t;
+    return $t;
+   }
+  qq(<!--compressedErrors: 0 -->);                                              # No errors
+ }
 
 sub nolint($@)                                                                  # Store just the attributes in a file so that they can be retrieved later to process non xml objects referenced in the xml - like images
  {my ($lint, %attributes) = @_;                                                 # Linter, attributes to be recorded as xml comments
@@ -234,11 +263,27 @@ sub read($)                                                                     
      }
    }
 
-  my $S = $s =~ s/\s+<!--linted:.+\Z//sr;                                       # Remove generated comments at end
-  my $lint = bless {%a, source=>$S, header=>$a[0], docType=>$a[1],              # Create a matching linter
-     idDefs=>$d, labelDefs=>$l, reusedInProject=>[sort keys %$r]};
+  my ($S, @S) = split /(?=<!--linted:)/s, $s;                                   # Split source on errors
+  my ($U, $C) = split /(?=<!--compressedErrors:)/s, $S[-1];                     # Split errors
+  my @U = $U ? split /\n+/, $U : ();                                            # Split uncompressed errors
+  my @C = $C ? split /\n+/, $C : ();                                            # Split   compressed errors
+  shift @C;                                                                     # Remove the number of compressed errors
+  $_ = nws($_) for @C;                                                          # Normalize white space
+
+  my $lint = bless                                                              # Create a matching linter
+   {%a,                                                                         # Directly loaded fields
+    source              =>  $S,                                                 # Computed fields
+    header              =>  $a[0],
+    docType             =>  $a[1],
+    idDefs              =>  $d,
+    labelDefs           =>  $l,
+    reusedInProject     => [sort keys %$r],
+    compressedErrorText => [@C],
+    errorText           => [@U],
+   };
 
   $lint->errors //= 0;
+  $lint->compressedErrors //= 0;
   $lint                                                                         # Return a matching linter
  } # read
 
@@ -454,67 +499,111 @@ sub p4($$)                                                                      
 
 sub report($;$)                                                                 # Analyse the results of prior L<lints|/lint> and return a hash reporting various statistics and a L<printable|/print> report
  {my ($outputDirectory, $filter) = @_;                                          # Directory to search, optional regular expression to filter files
+
   my @x;                                                                        # Lints for all L<files|/file>
   for my $in(findFiles($outputDirectory))                                       # Find files to report on
    {next if $filter and $in !~ m($filter);                                      # Filter files if a filter has been supplied
     push @x, Data::Edit::Xml::Lint::read($in);                                  # Reload a previously written L<file|/file>
    }
-  return "No files selected" unless @x;                                         # No files selected
+  confess "No files selected" unless @x;                                        # No files selected
 
   my %projects;                                                                 # Pass/Fail by project
   my %files;                                                                    # Pass fail by file
   my %filesToProjects;                                                          # Project from file name
   my $totalErrors = 0;                                                          # Total number of errors
+  my $totalCompressedErrorsFileByFile = 0;                                      # Total number of errors summed file by file
+  my %CE;                                                                       # Compressed errors over all files
 
   for my $x(@x)                                                                 # Aggregate the results of individual lints
    {my $project = $x->project // 'unknown';
     my $file    = $x->file;
-    my $errors  = $x->errors;
+    my $cErrors = $x->compressedErrors;                                         # Compressed errors
+    my $errors  = $x->errors;                                                   # Number of uncompressed errors
+    my $cet     = $x->compressedErrorText;                                      # Compressed errors
+    my $et      = $x->errorText;                                                # Uncompressed error text
     $filesToProjects{$file} = $project;
     my $pf = $errors ? qq(fail) : qq(pass);
     $projects{$project}{$pf}++;
-    $files   {$file} = $errors;
-    $totalErrors += $errors;
+    $files{$file}                     = $cErrors;
+    $totalErrors                     += $errors;
+    $totalCompressedErrorsFileByFile += $cErrors;
+
+    if ($cet)                                                                   # Compressed errors over all files
+     {for(@$cet)
+       {$CE{$_}++;
+       }
+     }
    }
 
-  my @project;
+  my @passingProjects;
+  my @failingProjects;
   for my $project(sort keys %projects)                                          # Count pass/fail files by project
    {my $p = $projects{$project}{pass} // 0;
     my $f = $projects{$project}{fail} // 0;
     my $q = p4($p, $f);
 
-    push @project, [$project, $p, $f, $p + $f, p4($p, $f)];
+    if ($f)
+     {push @failingProjects, [$project, $p, $f, $p + $f, p4($p, $f)];
+     }
+    else
+     {push @passingProjects, [$project, $p];
+     }
    }
-  @project = sort {$a->[4] <=> $b->[4]} @project;
+  @failingProjects = sort {$a->[4] <=> $b->[4]} @failingProjects;
+  @passingProjects = sort {$a->[0] cmp $b->[0]} @passingProjects;
 
-  my $totalNumberOfFails   = scalar grep {$files{$_}  > 0} keys %files;
-  my $totalNumberOfPasses  = scalar grep {$files{$_} == 0} keys %files;
-  my $totalPassFailPercent = p4($totalNumberOfPasses, $totalNumberOfFails);
+  my $totalNumberOfFails    = scalar grep {$files{$_}  > 0} keys %files;
+  my $totalNumberOfPasses   = scalar grep {$files{$_} == 0} keys %files;
+  my $totalPassFailPercent  = p4($totalNumberOfPasses, $totalNumberOfFails);
   my $ts = dateTimeStamp;
-  my $numberOfProjects = keys %projects;
-  my $numberOfFiles    = $totalNumberOfPasses + $totalNumberOfFails;
+  my $numberOfProjects      = keys %projects;
+  my $numberOfFiles         = $totalNumberOfPasses + $totalNumberOfFails;
+  my $totalCompressedErrors = scalar keys %CE;
 
   my @report;
-  push @report, <<END;                                                          # Report title
-$totalPassFailPercent % success converting $numberOfProjects projects containing $numberOfFiles xml files on $ts
+  push @report, sprintf(<<END,                                                  # Report title
+$totalPassFailPercent %% success converting $numberOfProjects projects containing $numberOfFiles xml files on $ts
 
-Passes: $totalNumberOfPasses\t\tFails: $totalNumberOfFails\t\tErrors: $totalErrors
+CompressedErrorMessagesByCount (at the end of this file): %8d
 
-ProjectStatistics
+FailingFiles   :  %8d
+PassingFiles   :  %8d
+
+FailingProjects:  %8d
+PassingProjects:  %8d
+
+
+FailingProjects:  %8d
    #  Percent   Pass  Fail  Total  Project
 END
+  scalar keys %CE,
+  $totalNumberOfFails,
+  $totalNumberOfPasses,
+  scalar(@failingProjects),
+  scalar(@passingProjects),
+  scalar(@failingProjects));
 
-  my @passingProjects; my @failingProjects;
-
-  for(1..@project)                                                              # Project statistics
-   {my ($project, $pass, $fail, $total, $percent) = @{$project[$_-1]};
+  for(1..@failingProjects)                                                      # Failing projects
+   {my ($project, $pass, $fail, $total, $percent) = @{$failingProjects[$_-1]};
     push @report, sprintf("%4d %8.4f   %4d  %4d  %5d  %s\n",
       $_, $percent, $pass, $fail, $total, $project);
-    push @failingProjects, $project if     $fail;
-    push @passingProjects, $project unless $fail;
    }
 
-  my @filesFail = sort                                                          # Sort by number of errors, project, file name
+  push @report, sprintf(<<END,                                                  # Passing projects
+
+
+PassingProjects:  %8d
+   #   Files  Project
+END
+  scalar(@passingProjects));
+
+  for(1..@passingProjects)
+   {my ($project, $files) = @{$passingProjects[$_-1]};
+    push @report, sprintf("%4d    %4d  %s\n",
+      $_, $files, $project);
+   }
+
+  my @filesFail = sort                                                          # Failing files: sort by number of errors, project, file name
                    {my $e = $a->[0] <=> $b->[0];
                     my $p = $a->[1] cmp $b->[1];
                     my $f = $a->[2] cmp $b->[2];
@@ -526,10 +615,11 @@ END
                   grep {$files{$_} > 0}
                   keys %files;
 
-  if (my $filesFail = @filesFail)                                               # Failing files report
+  if (my $filesFail = @filesFail)
    {push @report, <<END;
 
-$filesFail Fails: Number of errors per failing file.
+
+FailingFiles: $totalNumberOfFails  Files that failed to pass lint by number of compressed errors
    #  Errors  Project       File
 END
     for(1..@filesFail)
@@ -537,17 +627,38 @@ END
      }
    }
 
-  return bless                                                                  # Return report
-   {passRatePercent  =>$totalPassFailPercent,
-    timestamp        =>$ts,
-    numberOfProjects =>$numberOfProjects,
-    numberOfFiles    =>$numberOfFiles,
-    failingFiles     =>[@filesFail],
-    failingProjects  =>[@failingProjects],
-    passingProjects  =>[@passingProjects],
-    totalErrors      =>$totalErrors,
-    print            =>(join '', @report),
-    projects         =>{map {$_->[0]=>$_} @project},
+  if (my $N = scalar keys %CE)                                                  # Compressed errors
+   {my @ce = sort {$b->[0] <=> $a->[0]}
+             map  {[$CE{$_}, $_]}
+             keys %CE;
+    push @report, <<END;
+
+
+CompressedErrorMessagesByCount: $N
+
+ Count  Message
+END
+    for(@ce)
+     {my ($count, $message) = @$_;
+      $message =~ s(\A<!--) ()gs;
+      $message =~ s(-->\Z)  ()gs;
+      push @report, sprintf("%6d %s\n", $count, $message);
+     }
+   }
+  return bless {                                                                # Return report
+    compressedErrors                => \%CE,
+    failingFiles                    => [@filesFail],
+    failingProjects                 => [@failingProjects],
+    filter                          => $filter,
+    numberOfFiles                   => $numberOfFiles,
+    numberOfProjects                => $numberOfProjects,
+    passingProjects                 => [@passingProjects],
+    passRatePercent                 => $totalPassFailPercent,
+    print                           => (join '', @report),
+    timestamp                       => $ts,
+    totalCompressedErrorsFileByFile => $totalCompressedErrorsFileByFile,
+    totalCompressedErrors           => scalar keys %CE,
+    totalErrors                     => $totalErrors,
    }, 'Data::Edit::Xml::Lint::Report';
  }
 
@@ -556,16 +667,19 @@ END
 if (1)
  {package Data::Edit::Xml::Lint::Report;
   use Data::Table::Text qw(:all);
-  genLValueScalarMethods(qw(passRatePercent));                                  # Total number of passes as a percentage of all input files
-  genLValueScalarMethods(qw(timestamp));                                        # Timestamp of report
-  genLValueScalarMethods(qw(numberOfProjects));                                 # Number of L<projects|/project> defined - each L<project|/project> can contain zero or more L<files|/file>
-  genLValueScalarMethods(qw(numberOfFiles));                                    # Number of L<files|/file> encountered
+  genLValueScalarMethods(qw(compressedErrors));                                 # Compressed errors over all files
   genLValueScalarMethods(qw(failingFiles));                                     # Array of [number of errors, L<project|/project>, L<files|/file>] ordered from least to most errors
   genLValueScalarMethods(qw(failingProjects));                                  # [Projects with xmllint errors]
+  genLValueScalarMethods(qw(filter));                                           # File selection filter
+  genLValueScalarMethods(qw(numberOfFiles));                                    # Number of L<files|/file> encountered
+  genLValueScalarMethods(qw(numberOfProjects));                                 # Number of L<projects|/project> defined - each L<project|/project> can contain zero or more L<files|/file>
   genLValueScalarMethods(qw(passingProjects));                                  # [Projects with no xmllint errors]
-  genLValueScalarMethods(qw(totalErrors));                                      # Total number of errors
-  genLValueScalarMethods(qw(projects));                                         # Hash of "project name"=>[L<project name|/project>, pass, fail, total, percent pass]
+  genLValueScalarMethods(qw(passRatePercent));                                  # Total number of passes as a percentage of all input files
   genLValueScalarMethods(qw(print));                                            # A printable L<report|/report> of the above
+  genLValueScalarMethods(qw(timestamp));                                        # Timestamp of report
+  genLValueScalarMethods(qw(totalCompressedErrorsFileByFile));                  # Total number of errros summed file by file
+  genLValueScalarMethods(qw(totalCompressedErrors));                            # Number of compressed errors
+  genLValueScalarMethods(qw(totalErrors));                                      # Total number of errors
  }
 
 # podDocumentation
@@ -888,6 +1002,21 @@ Number of L<files|/file> encountered
 Array of [number of errors, L<project|/project>, L<files|/file>] ordered from least to most errors
 
 
+=head3 failingProjects :lvalue
+
+[Projects with xmllint errors]
+
+
+=head3 passingProjects :lvalue
+
+[Projects with no xmllint errors]
+
+
+=head3 totalErrors :lvalue
+
+Total number of errors
+
+
 =head3 projects :lvalue
 
 Hash of "project name"=>[L<project name|/project>, pass, fail, total, percent pass]
@@ -936,79 +1065,74 @@ Format a fraction as a percentage to 4 decimal places
 
 7 L<failingFiles|/failingFiles>
 
-8 L<file|/file>
+8 L<failingProjects|/failingProjects>
 
-9 L<fileNumber|/fileNumber>
+9 L<file|/file>
 
-10 L<guid|/guid>
+10 L<fileNumber|/fileNumber>
 
-11 L<header|/header>
+11 L<guid|/guid>
 
-12 L<idDefs|/idDefs>
+12 L<header|/header>
 
-13 L<labelDefs|/labelDefs>
+13 L<idDefs|/idDefs>
 
-14 L<labels|/labels>
+14 L<labelDefs|/labelDefs>
 
-15 L<lint|/lint>
+15 L<labels|/labels>
 
-16 L<linted|/linted>
+16 L<lint|/lint>
 
-17 L<lintNOP|/lintNOP>
+17 L<linted|/linted>
 
-18 L<lintOP|/lintOP>
+18 L<lintNOP|/lintNOP>
 
-19 L<new|/new>
+19 L<lintOP|/lintOP>
 
-20 L<nolint|/nolint>
+20 L<new|/new>
 
-21 L<numberOfFiles|/numberOfFiles>
+21 L<nolint|/nolint>
 
-22 L<numberOfProjects|/numberOfProjects>
+22 L<numberOfFiles|/numberOfFiles>
 
-23 L<p4|/p4>
+23 L<numberOfProjects|/numberOfProjects>
 
-24 L<passRatePercent|/passRatePercent>
+24 L<p4|/p4>
 
-25 L<preferredSource|/preferredSource>
+25 L<passingProjects|/passingProjects>
 
-26 L<print|/print>
+26 L<passRatePercent|/passRatePercent>
 
-27 L<processes|/processes>
+27 L<preferredSource|/preferredSource>
 
-28 L<project|/project>
+28 L<print|/print>
 
-29 L<projects|/projects>
+29 L<processes|/processes>
 
-30 L<report|/report>
+30 L<project|/project>
 
-31 L<reusedInProject|/reusedInProject>
+31 L<projects|/projects>
 
-32 L<sha256|/sha256>
+32 L<report|/report>
 
-33 L<source|/source>
+33 L<reusedInProject|/reusedInProject>
 
-34 L<timestamp|/timestamp>
+34 L<sha256|/sha256>
 
-35 L<title|/title>
+35 L<source|/source>
+
+36 L<timestamp|/timestamp>
+
+37 L<title|/title>
+
+38 L<totalErrors|/totalErrors>
 
 =head1 Installation
 
-This module is written in 100% Pure Perl and, thus, it is easy to read, use,
-modify and install.
+This module is written in 100% Pure Perl and, thus, it is easy to read,
+comprehend, use, modify and install via B<cpan>:
 
-Standard L<Module::Build> process for building and installing modules:
-
-  perl Build.PL
-  ./Build
-  ./Build test
-  ./Build install
-
-You will also need to install B<xmllint>:
-
-  sudo apt-get install libxml2-utils
-
-
+  sudo cpan install Data::Edit::Xml::Lint
 
 =head1 Author
 

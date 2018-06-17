@@ -8,21 +8,100 @@ use base 'Date::Holidays::Adapter';
 
 use vars qw($VERSION);
 
-$VERSION = '1.13';
+my $format = '%#:%m%d';
+
+$VERSION = '1.15';
+
+# Lifted from Date::Holidays::DE example: feiertage.pl
+# Ref: https://metacpan.org/source/MSCHMITT/Date-Holidays-DE-1.9/example/feiertage.pl
+my %holiday_names = (
+    'neuj' => 'Neujahrstag',
+    'hl3k' => 'Hl. 3 Koenige',
+    'weib' => 'Weiberfastnacht',
+    'romo' => 'Rosenmontag',
+    'fadi' => 'Faschingsdienstag',
+    'asmi' => 'Aschermittwoch',
+    'grdo' => 'Gruendonnerstag',
+    'karf' => 'Karfreitag',
+    'kars' => 'Karsamstag',
+    'osts' => 'Ostersonntag',
+    'ostm' => 'Ostermontag',
+    'pfis' => 'Pfingstsonntag',
+    'pfim' => 'Pfingstmontag',
+    'himm' => 'Himmelfahrtstag',
+    'fron' => 'Fronleichnam',
+    '1mai' => 'Maifeiertag',
+    '17ju' => 'Tag der deutschen Einheit (1954-1990)',
+    'mari' => 'Mariae Himmelfahrt',
+    'frie' => 'Augsburger Friedensfest (regional)',
+    '3okt' => 'Tag der deutschen Einheit',
+    'refo' => 'Reformationstag',
+    'alhe' => 'Allerheiligen',
+    'buss' => 'Buss- und Bettag',
+    'votr' => 'Volkstrauertag',
+    'toso' => 'Totensonntag',
+    'adv1' => '1. Advent',
+    'adv2' => '2. Advent',
+    'adv3' => '3. Advent',
+    'adv4' => '4. Advent',
+    'heil' => 'Heiligabend',
+    'wei1' => '1. Weihnachtstag',
+    'wei2' => '2. Weihnachtstag',
+    'silv' => 'Silvester'
+);
 
 sub holidays {
     my ($self, %params) = @_;
 
     if ( $params{'year'} ) {
-        return Date::Holidays::DE::holidays( YEAR => $params{'year'} );
+        $self->_transform_arrayref_to_hashref(
+            Date::Holidays::DE::holidays(
+                YEAR   => $params{'year'},
+                FORMAT => $format,
+            )
+        );
     }
     else {
-        return Date::Holidays::DE::holidays();
+        $self->_transform_arrayref_to_hashref(
+            Date::Holidays::DE::holidays(
+                FORMAT => $format,
+            )
+        );
     }
 }
 
 sub is_holiday {
-    croak "is_holiday is unimplemented for ".__PACKAGE__;
+    my ($self, %params) = @_;
+
+    my $holidays = Date::Holidays::DE::holidays(
+        YEAR   => $params{'year'},
+        FORMAT => $format,
+    );
+
+    my $holidays_hashref = $self->_transform_arrayref_to_hashref($holidays);
+
+    my $holiday_date = sprintf('%02s%02s', $params{month}, $params{day});
+
+    my $holiday = $holidays_hashref->{$holiday_date};
+
+    if ($holiday) {
+        return $holiday;
+    } else {
+        return '';
+    }
+}
+
+sub _transform_arrayref_to_hashref {
+    my ($self, $arrayref_of_holidays) = @_;
+
+    my $hashref_of_holidays;
+
+    foreach my $entry (@{$arrayref_of_holidays}) {
+        my ($shortname, $key) = split /:/, $entry;
+        $hashref_of_holidays->{$key} = $holiday_names{$shortname};
+    }
+
+    return $hashref_of_holidays;
 }
 
 1;
@@ -37,7 +116,7 @@ Date::Holidays::Adapter::DE - an adapter class for Date::Holidays::DE
 
 =head1 VERSION
 
-This POD describes version 1.13 of Date::Holidays::Adapter::DE
+This POD describes version 1.15 of Date::Holidays::Adapter::DE
 
 =head1 DESCRIPTION
 

@@ -31,7 +31,7 @@ foreach (qw<
 }
 
 throws_ok { Date::Easy::Datetime->new(2001, 2, 29, 0, 0, 0) }
-		qr|Illegal datetime: 2001/2/29 0:0:0|, "catches exception from timegm/timelocal";
+		qr|Illegal datetime: 2001/2/29 0:0:0|, "catches exception from Time::Local";
 
 
 # bad number of args when constructing a datetime

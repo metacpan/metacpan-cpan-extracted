@@ -10,8 +10,9 @@ use Lemonldap::NG::Portal::Simple;
 use Lemonldap::NG::Portal::_CAS;
 use base qw(Lemonldap::NG::Portal::_CAS Lemonldap::NG::Portal::_LibAccess);
 use URI;
+use utf8;
 
-our $VERSION = '1.9.16';
+our $VERSION = '1.9.17';
 
 ## @method void issuerDBInit()
 # Nothing to do
@@ -458,8 +459,10 @@ sub issuerForUnAuthUser {
                 my $localSessionValue =
                   $localSession->data->{ $self->{casAttributes}->{$casAttribute}
                   };
-                $attributes->{$casAttribute} = $localSessionValue
-                  if defined $localSessionValue;
+                if ( defined $localSessionValue ) {
+                    utf8::decode($localSessionValue);
+                    $attributes->{$casAttribute} = $localSessionValue;
+                }
             }
         }
 

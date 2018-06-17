@@ -94,6 +94,10 @@ if( $o{stop} )
 }
 if( $o{start} )
 {
+
+    open(STDOUT, '>/dev/null') || die "STDOUT ERROR $!";
+    open(STDERR, '>/dev/null') || die "STDERR ERROR $!";
+
     exit 0 if fork;
     $0 = "$uuid.mydan.bootstrap.master";
     $bootstrap->run();

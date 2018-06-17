@@ -5,7 +5,7 @@ use Tie::Hash;
 
 BEGIN {
 	use vars qw ($VERSION);
-	$VERSION     = 1.02;
+	$VERSION     = 1.05;
 }
 
 =head1 NAME

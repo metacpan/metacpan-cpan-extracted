@@ -10,7 +10,7 @@ use Mojolicious::Renderer;
 use Scalar::Util;
 use Template::Constants;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 Class::Method::Modifiers::after '_init' => sub {
 	my ($self, $params) = @_;
@@ -38,7 +38,7 @@ sub fetch {
 		}
 		
 		# Try DATA section
-		elsif (my $d = $renderer->get_data_template($options)) {
+		elsif (defined(my $d = $renderer->get_data_template($options))) {
 			($data, $error) = $self->_load(\$d);
 			($data, $error) = $self->_compile($data) unless $error;
 			$data = $data->{data} unless $error;
@@ -65,7 +65,7 @@ sub load {
 	}
 	
 	# Try DATA section
-	elsif (my $d = $renderer->get_data_template($options)) {
+	elsif (defined(my $d = $renderer->get_data_template($options))) {
 		# Content is expected to be encoded
 		$d = Mojo::Util::encode $self->{ENCODING}, $d if $self->{UNICODE} and $self->{ENCODING};
 		($data, $error) = ($d, undef);

@@ -1,7 +1,7 @@
 package Dancer::Error;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: class for representing fatal errors
-$Dancer::Error::VERSION = '1.3202';
+$Dancer::Error::VERSION = '1.3400';
 use strict;
 use warnings;
 use Carp;
@@ -327,7 +327,7 @@ Dancer::Error - class for representing fatal errors
 
 =head1 VERSION
 
-version 1.3202
+version 1.3400
 
 =head1 SYNOPSIS
 

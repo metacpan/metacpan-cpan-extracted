@@ -15,40 +15,41 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 1965d069baec9cd20dc7c56828755024dea00f1c CONTRIBUTORS
-SHA1 5a3fd68d009a7da687ff850ea19cc992d7328ca0 Changes
+SHA1 e8fd5e7fa4bd8ad0210a2c9fad770bc8bfbe3941 Changes
 SHA1 ec51b54652836e34dd092b3b3859e9a62fdfcfaa INSTALL
 SHA1 3926c31fe9faa880e4bf454f92ed3e5b23b4f5fc LICENSE
-SHA1 f729b5bca1c08856ac174923069ff33ae95aa7d0 MANIFEST
-SHA1 943c37f5876a7c01474667912a69fccf5b66ef33 META.json
-SHA1 afacfaa8c79bdd46b89d64b42a2dbba1454de944 META.yml
-SHA1 239b96177bc68206f1d0ef7ab7ed2ec0418d0dab Makefile.PL
-SHA1 5887f5935a8c94189cbf98c92903617cbfd008d0 README.mkdn
-SHA1 5ddf32e75e88a9b6f09ae4b1acc6251ae03c6c7f bin/mustache.pl
+SHA1 e1700e479937591006ed23f1b8b48112ff1920a6 MANIFEST
+SHA1 c0a1ac794338d2fdec763e03305194ab8d2d9e71 META.json
+SHA1 f6f00e523785bca4db172621babf3896e92bae3b META.yml
+SHA1 af9df57f1432f1a598c34f2de198f7fed74435f1 Makefile.PL
+SHA1 3cdb6a4ee891d3ea521a03c542cbfee72cd40d6f README.mkdn
+SHA1 b09390a6bab28db1601620147004f41565e62e97 bin/mustache.pl
 SHA1 30d7f4e4cf5a7cf757c6fc1485260d9845b50044 contrib/benchmark.pl
 SHA1 1c1016c6e0a1a934f6f53a7c10b0d942f6d4a317 contrib/gen_grammar.pl
 SHA1 d9154b85be1fba96bbe9604c704575ceaa550994 contrib/print_graph.pl
 SHA1 1d86079439e79689a160c74f67acea204757512e cpanfile
-SHA1 5582fa9a27c4073d85966228d98977553b4f9bbf doap.xml
-SHA1 f7074f75e7b8f66d4a5205e96a7c3baf2cd2296f lib/Template/Mustache.pm
-SHA1 5de56ef7955cb45beaf8b69ebf5943ff531c238d lib/Template/Mustache/Parser.pm
-SHA1 c2f051c63fe1f04e4c6b434c8435143e2be21608 lib/Template/Mustache/Token/Partial.pm
-SHA1 ac1b67101329c8b8dfdb64b5231a3f53403a641b lib/Template/Mustache/Token/Section.pm
-SHA1 469f239e93bde76858c4937d1283ff5ada57b4b3 lib/Template/Mustache/Token/Template.pm
-SHA1 7e5d25279b8e6c751b0c91048b7741e9dc27cfb7 lib/Template/Mustache/Token/Variable.pm
-SHA1 1ade16d6502dc900e8434cd53a5cd1f609f606e2 lib/Template/Mustache/Token/Verbatim.pm
-SHA1 ef0a9b03a188019e3fd9ca77cadae4cd42efae88 lib/Template/Mustache/Trait.pm
+SHA1 5af7851837e5094d06eec3b965d42e9ea3d74b85 doap.xml
+SHA1 d41da9bac5ce6771b88f3d04de9300a3d26d550d lib/Template/Mustache.pm
+SHA1 466147151716c779cfc6ef6629bb25301f30930b lib/Template/Mustache/Parser.pm
+SHA1 16b05774f1fb7b2ef2f987982cec6e01fc29d801 lib/Template/Mustache/Token/Partial.pm
+SHA1 b583d0c91007e25cb2ecd9ce79c6384774045247 lib/Template/Mustache/Token/Section.pm
+SHA1 968d9d4fc40f7641cd2970d4f6b09f19faffe63b lib/Template/Mustache/Token/Template.pm
+SHA1 780b38216bb67558676120d0d786239b4b99f86c lib/Template/Mustache/Token/Variable.pm
+SHA1 ceea33a4bdbae02966ba96e409f4a099a1a67fe0 lib/Template/Mustache/Token/Verbatim.pm
+SHA1 0d3eebb2d443f8e4cfd5a80706f84b00387c5e8a lib/Template/Mustache/Trait.pm
 SHA1 5c3178fb2a44b640b9f968e0955727cfa9e0e3f3 t/00-compile.t
 SHA1 ce8ed245f5ff1e97eb4a2ff0881932ae2327a8ee t/00-report-prereqs.dd
 SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
 SHA1 767abd548c23a1b6560a83e7665c3a46e714acb7 t/001_spec_compatibility.t
 SHA1 eeccc992a1383dac5187ee1b8ac25e4600a56f9c t/basic.t
+SHA1 b03fd92df824f744eafce7a4945827eda5efe819 t/corpus/partials/inner.mustache
 SHA1 a0b3afd6a86cf8fd1bedb3a573c524e68becf251 t/corpus/partials/list1.mustache
 SHA1 0807b14ffbce6995e259de5efd2b19874d6c14bd t/corpus/partials/list2.mustache
 SHA1 07be109561b47e15d58b02e290bee2fd33cba935 t/corpus/partials/sub/list3.mustache
 SHA1 7287ded1c5a72996c9e2888e6e1c6a7dd4c0a874 t/lambdas_receive_render_helper.t
 SHA1 59f0c4bab0ac10e270fe979f5c1f8d3575d3ab3c t/moose-trait.t
 SHA1 148a021381cb1b377489839ec9562f50e87b53f3 t/parse_errors.t
-SHA1 7f294e3a98322f19682bf4546afd59b8bc1ace17 t/partials.t
+SHA1 3254cac0642afe3308c787af551210ee4440dec4 t/partials.t
 SHA1 142b8a0080628f47fe4d3f663aba64996bee97a8 t/read_data_from_classes.t
 SHA1 f6e7141a519b6f07a547eb85e117057c6f6a3fc9 t/read_data_from_hashes.t
 SHA1 ab79d0761a72e76ac87b1a45022506003ce87625 t/read_data_from_instances.t
@@ -64,7 +65,7 @@ SHA1 ccfd69e89272d3c8414d526e679df27bf61e1cbd t/variable-resolution.t
 SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
 
-iEYEARECAAYFAlsh0Z0ACgkQ34Hwf+GwC4y5fACg7qAukvhm1MrlCftb/nLhRCSh
-O7IAoNUOEGOTvc7IfJ7ckBpucVp5/RkS
-=VYMI
+iEYEARECAAYFAlskfocACgkQ34Hwf+GwC4wA5ACdH9kPAfZqcuaKUZebdgQ4H+wF
+OX4Anjwal3oLHSqqefeU2w8LHnqjbZaG
+=PGC/
 -----END PGP SIGNATURE-----

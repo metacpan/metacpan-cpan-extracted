@@ -5,9 +5,12 @@ use warnings;
 use Carp 'croak';
 use Config;
 use File::Basename 'dirname', 'basename';
+use File::Path 'mkpath';
+
+use SPVM::Build::Setting;
 
 # SPVM::Build::tUtil is used from Makefile.PL
-# so this module must be wrote as pure per script, not contain XS and don't use any other SPVM modules.
+# so this module must be wrote as pure per script, not contain XS and don't use any other SPVM modules except for SPVM::Build::Config.
 
 sub get_shared_lib_func_address {
   my ($shared_lib_file, $shared_lib_func_name) = @_;
@@ -77,33 +80,49 @@ sub create_package_make_rule {
   my $package_name_under_score = $package_name;
   $package_name_under_score =~ s/:/_/g;
   
+  my $target_name = "spvm_${category}_$package_name_under_score ";
   $make_rule
-    .= "shared_lib_$package_name_under_score ";
+    .= "$target_name ";
   $make_rule .= "\n\n";
   
   my $module_base_name = $package_name;
   $module_base_name =~ s/^.+:://;
   
-  my $src_dir = $package_name;
-  $src_dir =~ s/::/\//g;
-  $src_dir = "lib/$src_dir." . $category;
+  my $input_dir = 'lib';
+
+  my $work_dir = "spvm_build/work";
+  mkpath $work_dir;
+
+  my $output_dir = 'blib/lib';
   
-  # Dependency
-  my @deps = grep { $_ ne '.' && $_ ne '..' } glob "$src_dir/*";
+  my $package_path = convert_package_name_to_path($package_name, $category);
+  my $input_src_dir = "$input_dir/$package_path";
+  
+  my $spvm_file = $package_path;
+  $spvm_file =~ s/\.[^\.]+$//;
+  $spvm_file .= '.spvm';
+  $spvm_file = "$input_dir/$spvm_file";
+  
+  # Dependency files
+  my @deps;
+  
+  # Dependency c source files
+  push @deps, grep { $_ ne '.' && $_ ne '..' } glob "$input_src_dir/*";
+  
+  # Dependency module file
+  push @deps, $spvm_file;
   
   # Shared library file
   my $shared_lib_rel_file = convert_package_name_to_shared_lib_rel_file($package_name, $category);
   my $shared_lib_file = "blib/lib/$shared_lib_rel_file";
   
   # Get source files
-  my $module_category = $category;
-  $module_category = ucfirst $module_category;
   $make_rule
-    .= "shared_lib_$package_name_under_score :: $shared_lib_file\n\n";
+    .= "$target_name :: $shared_lib_file\n\n";
   $make_rule
     .= "$shared_lib_file :: @deps\n\n";
   $make_rule
-    .= "\tperl -Mblib -MSPVM::Build -e \"SPVM::Build->new(build_dir => 'spvm_build')->create_shared_lib_${category}_dist('$package_name')\"\n\n";
+    .= "\t$^X -Mblib -MSPVM::Build -e \"SPVM::Build->new(build_dir => 'spvm_build')->create_shared_lib_${category}_dist('$package_name')\"\n\n";
   
   return $make_rule;
 }
@@ -145,22 +164,21 @@ sub convert_package_name_to_shared_lib_dir {
   return $shared_lib_dir;
 }
 
-sub default_extra_compiler_flags {
-  my $default_extra_compiler_flags = '-std=c99';
+sub default_build_setting {
+  my $build_setting = SPVM::Build::Setting->new;
   
+  $build_setting->add_extra_compiler_flag('-std=c99');
+
   # I want to print warnings, but if gcc version is different, can't suppress no needed warning message.
   # so I dicide not to print warning in release version
   if ($ENV{SPVM_TEST_ENABLE_WARNINGS}) {
-    $default_extra_compiler_flags .= " -Wall -Wextra -Wno-unused-label -Wno-unused-function -Wno-unused-label -Wno-unused-parameter -Wno-unused-variable";
+    $build_setting->add_extra_compiler_flag("-Wall -Wextra -Wno-unused-label -Wno-unused-function -Wno-unused-label -Wno-unused-parameter -Wno-unused-variable");
   }
   
-  return $default_extra_compiler_flags;
-}
-
-sub default_optimize {
-  my $default_optimize = '-O3';
+  # Config
+  $build_setting->set_config(optimize => '-O3');
   
-  return $default_optimize;
+  return $build_setting;
 }
 
 1;

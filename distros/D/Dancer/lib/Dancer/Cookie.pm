@@ -1,7 +1,7 @@
 package Dancer::Cookie;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: class representing cookies
-$Dancer::Cookie::VERSION = '1.3202';
+$Dancer::Cookie::VERSION = '1.3400';
 use strict;
 use warnings;
 
@@ -132,7 +132,7 @@ Dancer::Cookie - class representing cookies
 
 =head1 VERSION
 
-version 1.3202
+version 1.3400
 
 =head1 SYNOPSIS
 

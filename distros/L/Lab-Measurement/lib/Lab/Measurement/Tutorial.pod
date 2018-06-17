@@ -14,7 +14,7 @@ Lab::Measurement::Tutorial - Lab::Measurement tutorial
 
 =head1 VERSION
 
-version 3.651
+version 3.652
 
 =head1 How to read the documentation
 
@@ -820,6 +820,17 @@ The C<before_loop> coderef is used to execute arbitrary code at the start of a s
  );
 
 The C<$before_loop> code is called after a possible C<delay_before_loop> delay.
+
+=head3 Adding entries to META.yml
+
+An arbitray hash of metadata can be added to F<META.yml> my providing a
+C<meta_data> attribute to the C<start> method:
+
+ $sweep->start(
+     measurement => $meas,
+     datafile   => $datafile,
+     meta_data => {foo_string => "123", bar_array => [1, 2, 3]},
+ );
 
 =head1 Writing new instrument drivers
 

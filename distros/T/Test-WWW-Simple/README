@@ -1,4 +1,4 @@
-Test-WWW version 0.11
+Test-WWW version 0.35
 =====================
 
 Test::WWW is a basic module for the testing of Web applications. It is based
@@ -13,6 +13,10 @@ Both Test::WWW::Simple and simlpe_scan provide a means of controlling whether
 or not page fetches are cached; using caching for pages which do not change
 on each fetch can dramatically decrease the runtime of tests which do multiple
 checks on the same URL.
+
+Test::WWW::Simple has been upgraded to make sure that it can handle https 
+connections; older releases were prior to the web's shift to primarily
+https connections instead of http. The http protocol is still supported.
 
 INSTALLATION
 

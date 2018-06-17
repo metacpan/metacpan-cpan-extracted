@@ -9,7 +9,7 @@ use PDL::VectorValued;
 use PDL;
 use strict;
 
-our $VERSION = '1.23.7'; ##-- update with perl-reversion from Perl::Version module
+our $VERSION = '1.23.8'; ##-- update with perl-reversion from Perl::Version module
 our @ISA = ('PDL::Exporter');
 our @EXPORT_OK =
   (

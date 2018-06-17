@@ -206,14 +206,30 @@ sub install_bundled_modules {
 }
 
 sub probe_system {
-    unless ($ENV{NOLIMITS}) {
-	print STDERR "Gathering information on current system $^O.$]\n";
-	print STDERR "and creating Forks::Super::SysInfo package.\n";
-	system($^X, 'SysInfo.pm.PL', 'lib/Forks/Super/SysInfo.pm');
+    return if $ENV{NOLIMITS};
+
+    print STDERR "Gathering information on current system $^O.$]\n";
+    print STDERR "and creating Forks::Super::SysInfo package.\n";
+
+    if ($^O eq 'darwin') {
+        print STDERR <<'<><><>';
+*******************************************************
+* a special plea to MacOS users
+*
+* This module is not receiving any cpantesters.org
+* reports from MacOS users, and I'm not sure why.
+* If this build fails for you, please consider sending
+* a bug report including all output produced in the
+* build process to   bug-Forks-Super@rt.cpan.org
+* or to me personally at   mob@cpan.org  .
+*******************************************************
+<><><>
     }
+        
+    system($^X, 'SysInfo.pm.PL', 'lib/Forks/Super/SysInfo.pm');
 }
 
-# Exclude some long-running tests from the testing stage.
+# Excludes some long-running tests from the testing stage.
 #
 # We'll randomize the exact set of tests so that, over time, there will
 # still be full coverage for the tests
@@ -274,3 +290,4 @@ __END_POSTAMBLE__
 
     return $postamble;
 }
+

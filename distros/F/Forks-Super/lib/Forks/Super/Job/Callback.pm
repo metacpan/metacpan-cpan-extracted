@@ -18,11 +18,13 @@ use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(run_callback);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
-our $VERSION = '0.93';
+our $VERSION = '0.94';
+our $IN_CALLBACK;
 
 sub run_callback {
     my ($job, $callback) = @_;
     my $key = "_callback_$callback";
+    local $IN_CALLBACK = $callback;
     if (!defined $job->{$key}) {
 	return;
     }

@@ -1,3 +1,17 @@
+2018-06-14T19:10:21+08:00 : 发布0.1.51到cpan.org
+2018-06-14T19:03:48+08:00 : lib/MYDan/Monitor/Collector.pm 处理tcp on_error
+2018-06-14T19:02:57+08:00 : lib/MYDan/Agent/Client/Proxy.pm 处理tcp on_error
+2018-06-14T19:01:52+08:00 : lib/MYDan/Agent/Load.pm 处理tcp on_error
+2018-06-14T19:00:08+08:00 : dan/agent/code/proxy 处理tcp on_error
+2018-06-14T18:56:32+08:00 : Agent::Client 处理tcp on_error
+2018-06-14T18:00:47+08:00 : bin.bootstrap 标准输出错误输出指向/dev/null
+2018-06-14T17:53:50+08:00 : tools/supervisor 输出和标准输出不能关闭，指到/dev/null
+2018-06-14T16:26:42+08:00 : dan/tools/deploy工具添加备份软链,同时处理backup\d*
+2018-05-29T14:38:26+08:00 : 发布0.1.50到cpan.org
+2018-05-29T14:37:45+08:00 : Util::TcpServer on_error 时删除index
+2018-05-29T14:35:20+08:00 : agent/code/scripts 默认使用标准输出和错误输出
+2018-05-24T15:49:42+08:00 : 发布0.1.49到cpan.org
+2018-05-24T15:49:03+08:00 : 修复Agent::Proxy 解析json问题
 2018-05-23T17:36:49+08:00 : 发布0.1.48到cpan.org
 2018-05-23T17:35:55+08:00 : dump load grsync文件,如果没有目录创建目录
 2018-05-22T15:51:32+08:00 : 发布0.1.47到cpan.org

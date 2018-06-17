@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SR830;
-$Lab::Moose::Instrument::SR830::VERSION = '3.651';
+$Lab::Moose::Instrument::SR830::VERSION = '3.652';
 #ABSTRACT: Stanford Research SR830 Lock-In Amplifier
 
 use 5.010;
@@ -396,7 +396,7 @@ Lab::Moose::Instrument::SR830 - Stanford Research SR830 Lock-In Amplifier
 
 =head1 VERSION
 
-version 3.651
+version 3.652
 
 =head1 SYNOPSIS
 

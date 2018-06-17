@@ -1,7 +1,7 @@
 package Dancer::Session::Abstract;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: abstract class for session engine
-$Dancer::Session::Abstract::VERSION = '1.3202';
+$Dancer::Session::Abstract::VERSION = '1.3400';
 use strict;
 use warnings;
 use Carp;
@@ -104,7 +104,23 @@ sub read_session_id {
 
     my $name = $class->session_name();
     my $c    = Dancer::Cookies->cookies->{$name};
-    return (defined $c) ? $c->value : undef;
+    return unless defined $c;
+    if ($class->validate_session_id($c->value)) {
+        return $c->value;
+    } else {
+        warn "Rejecting invalid session ID ". $c->value;
+        return;
+    }
+}
+
+# Validate session ID (base64 chars plus hyphen by default) to avoid potential
+# issues, e.g. if the ID is used insecurely elsewhere.  If a session provider
+# expects more unusual IDs, it can override this class method with one that
+# validates according to that provider's expectation of how a session ID should
+# look.
+sub validate_session_id {
+    my ($class, $id) = @_;
+    return $id =~ m{^[A-Za-z0-9_\-~]+$};
 }
 
 sub write_session_id {
@@ -144,7 +160,7 @@ Dancer::Session::Abstract - abstract class for session engine
 
 =head1 VERSION
 
-version 1.3202
+version 1.3400
 
 =head1 DESCRIPTION
 
@@ -241,7 +257,7 @@ Build a new uniq id.
 
 =item B<read_session_id>
 
-Reads the C<dancer.session> cookie.
+Reads the session ID from the cookie, ensuring it's syntactically valid.
 
 =item B<write_session_id>
 

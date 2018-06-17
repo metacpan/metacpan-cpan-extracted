@@ -1,7 +1,7 @@
 package Dancer::Logger;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: common interface for logging in Dancer
-$Dancer::Logger::VERSION = '1.3202';
+$Dancer::Logger::VERSION = '1.3400';
 # Factory for logger engines
 
 use strict;
@@ -51,7 +51,7 @@ Dancer::Logger - common interface for logging in Dancer
 
 =head1 VERSION
 
-version 1.3202
+version 1.3400
 
 =head1 DESCRIPTION
 

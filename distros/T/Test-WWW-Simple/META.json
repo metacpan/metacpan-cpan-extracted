@@ -4,7 +4,7 @@
       "Joe McMahon <mcmahon@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "HTML::Tree" : "0",
+            "LWP::Protocol::https" : "0",
             "Mojolicious::Lite" : "0",
             "Regexp::Common" : "0",
             "Test::Builder" : "0",
@@ -44,5 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.34"
+   "version" : "0.38",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

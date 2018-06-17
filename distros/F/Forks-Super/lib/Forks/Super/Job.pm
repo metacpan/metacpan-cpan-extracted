@@ -26,7 +26,7 @@ use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(@ALL_JOBS %ALL_JOBS PREFORK POSTFORK 
                  POSTFORK_PARENT POSTFORK_CHILD);
-our $VERSION = '0.93';
+our $VERSION = '0.94';
 
 our (@ALL_JOBS, %ALL_JOBS, @ARCHIVED_JOBS, $WIN32_PROC, $WIN32_PROC_PID);
 our $OVERLOAD_ENABLED = 0;
@@ -634,7 +634,6 @@ sub _emulate {
 sub _postlaunch_parent1 {
     my ($pid, $job) = @_;
 
-    $ALL_JOBS{$pid} = $job;
     if (defined($job->{state}) &&
 	$job->{state} ne 'NEW' &&
 	$job->{state} ne 'LAUNCHING' &&
@@ -650,7 +649,8 @@ sub _postlaunch_parent1 {
 	# handler should have made an entry in 
 	# %Forks::Super::Sigchld::BASTARD_DATA  for this process.
 	#
-	Forks::Super::Sigchld::handle_bastards($pid);
+        $job->{_check_bastard} = 1;
+#	Forks::Super::Sigchld::handle_bastards($pid);
     }
     if ($job->{signal_ipc_pipe}) {
         close $job->{signal_ipc_pipe}[1];
@@ -666,6 +666,7 @@ sub _postlaunch_parent1 {
     $job->{start} = Time::HiRes::time();
 
     $job->_config_parent(1);
+    $ALL_JOBS{$pid} = $job;
     return;
 }
 
@@ -679,6 +680,9 @@ sub _postlaunch_parent2 {
 	$XSIG{CHLD}[-1] ||= \&Forks::Super::handle_CHLD;
     }
     $job->_read_signal_pid;
+    if ($job->{_check_bastard}) {
+        Forks::Super::Sigchld::handle_bastards($job->{pid}, $job->{signal_pid});
+    }
     return $OVERLOAD_ENABLED ? $job : $job->{pid};
 }
 
@@ -1386,10 +1390,12 @@ sub set_signal_pid {
 
     # sometimes a background task in Forks::Super will launch another
     # process
+    #
     #    * when a daemon is desired
     #    * in a system call from a child process
     #    * to emulate exec on Windows
     #    * a process launched on a remote server
+    #
     # so that when the user wants to send a signal to the task, he/she
     # really intends to send the signal to the second background process.
     # When a second background process is created, we will record its
@@ -1493,7 +1499,9 @@ sub _read_signal_pid {
 
     if (defined $job->{signal_ipc_pipe}) {
         my $pid = __read_from_pipe( $job->{signal_ipc_pipe}[0] );
-        ($pid) = $pid =~ /([-\d]+)/;
+        if ($pid) {
+            ($pid) = $pid =~ /([-\d]+)/;
+        }
         if ($pid) {
             $job->{signal_pid} = $pid;
             if ($^O eq 'MSWin32') {
@@ -1546,7 +1554,8 @@ sub _read_signal_pid {
 	    }
 	}
     } elsif ($job->{debug}) {
-	debug('no ', ($job->{signal_ipc} || '<not specified>'), ' signal ipc file ...');
+	debug('no ', ($job->{signal_ipc} || '<not specified>'),
+              ' signal ipc file ...');
     }
     return;
 }
@@ -2535,6 +2544,7 @@ sub get_cpu_load {
 sub dispose {
     my @jobs = @_;
     foreach my $job (@jobs) {
+        next if $job->{disposed};
 
 	my $pid = $job->{pid};
 	my $real_pid = $job->{real_pid} || $pid;
@@ -2566,7 +2576,7 @@ sub dispose {
 	    }
 	}
 
-	my @k = grep { $ALL_JOBS{$_} eq $job } keys %ALL_JOBS;
+	my @k = grep { ($ALL_JOBS{$_} || "") eq $job } keys %ALL_JOBS;
 	for my $j (@k) {
 	    delete $ALL_JOBS{$j};
 	}
@@ -2575,7 +2585,14 @@ sub dispose {
 	# disposed jobs go to ARCHIVED_JOBS
 	push @ARCHIVED_JOBS, $job;
     }
-    @ALL_JOBS = grep { !$_->{disposed} } @ALL_JOBS;
+
+    # this causes segfaults inside a callback
+    if (!$Forks::Super::Job::Callback::IN_CALLBACK) {
+        @ALL_JOBS = grep { $_ && !$_->{disposed} } @ALL_JOBS;
+    } else {
+        # someday, we'll do something with this.
+        $Forks::Super::Job::DISPOSE_DEFERRED++;
+    }
     return;
 }
 
@@ -2625,7 +2642,7 @@ Forks::Super::Job - object representing a background task
 
 =head1 VERSION
 
-0.93
+0.94
 
 =head1 SYNOPSIS
 
@@ -3142,21 +3159,29 @@ Method to access the job's current state. See L</ATTRIBUTES>.
 
 =back
 
-=head3 status, exit_status
+=head3 status
 
 =over 4
 
 =item C<< $status = $job->status >>
 
+For completed jobs (i.e., where C<< $job->is_complete >>
+returns a true value), the C<<status>> method returns the job's
+exit status. See L</ATTRIBUTES>.
+
+=back
+
+=head3 exit_status
+
+=over 4
+
 =item C<< $short_status = $job->exit_status >>
 
 =item C<< ($exit_code,$signal,$coredump) = $job->exit_status >>
 
-For completed jobs, the C<<status>> method returns the job's
-exit status. See L</ATTRIBUTES>.
-
-C<<exit_status>> is a convenience method for retrieving the
-more intuitive exit value of a background task.
+C<<exit_status>> is an alternative method to L<"status">
+for retrieving the exit value of a background task
+that may be more intuitive.
 
 In scalar context,
 it returns the exit status of the program (as returned by the

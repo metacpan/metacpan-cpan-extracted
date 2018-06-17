@@ -2,7 +2,7 @@
 # Copyright (C) YEAR Free Software Foundation, Inc.
 #
 # Translators:
-# Carl Andersen <carl@freeos.dk>, 2015
+# Carl Andersen <carl@black-pearl.dk>, 2015
 # Keld Simonsen <keld@dkuug.dk>, 2003-2005,2007-2009
 # Keld Simonsen <keld@rap.dk>, 2003,2006
 # Kenneth Christiansen, 2000
@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
 "POT-Creation-Date: 2014-09-13 21:15+0200\n"
-"PO-Revision-Date: 2017-04-16 20:08+0000\n"
+"PO-Revision-Date: 2017-11-19 18:21+0000\n"
 "Last-Translator: scootergrisen\n"
 "Language-Team: Danish (http://www.transifex.com/MageiaLinux/mageia/language/"
 "da/)\n"
@@ -83,7 +83,7 @@ msgstr "RPM-installering"
 #: ../gurpmi:63
 #, c-format
 msgid "Error: unable to find file %s, will cancel operation"
-msgstr "Fejl: kunne ikke finde fil %s, vil afbryde handling"
+msgstr "Fejl: kan ikke finde fil %s, vil afbryde handling"
 
 #: ../gurpmi:64 ../gurpmi2:173 ../gurpmi2:203
 #, c-format
@@ -136,7 +136,7 @@ msgid ""
 "\n"
 "You may prefer to just save it. What is your choice?"
 msgstr ""
-"Du er ved at installere den følgende programmelpakke på din maskine:\n"
+"Du er ved at installere den følgende softwarepakke på din maskine:\n"
 "\n"
 "%s\n"
 "\n"
@@ -303,7 +303,7 @@ msgstr "Pakkevalg"
 #: ../gurpmi2:174
 #, c-format
 msgid "One of the following packages is needed:"
-msgstr "Der er brug for en af de følgende pakker:"
+msgstr "Der er brug for en af følgende pakker:"
 
 #: ../gurpmi2:204
 #, c-format
@@ -317,7 +317,7 @@ msgid ""
 "%s\n"
 "Continue installation anyway?"
 msgstr ""
-"De følgende pakker skal fjernes for at andre kan opgraderes:\n"
+"Følgende pakker skal fjernes for at andre kan opgraderes:\n"
 "%s\n"
 "Skal installationen fortsættes alligevel?"
 
@@ -365,12 +365,12 @@ msgstr "kan ikke hente kilde-pakker, afslutter med fejl"
 #: ../gurpmi2:287 ../urpmi:634
 #, c-format
 msgid "Please insert the medium named \"%s\""
-msgstr "Vær venlig at indsætte mediet med navnet %s"
+msgstr "Indsæt venligst mediet med navnet \"%s\""
 
 #: ../gurpmi2:307
 #, c-format
 msgid "An error occurred:"
-msgstr "Der er opstået en fejl:"
+msgstr "Der opstod en fejl:"
 
 #: ../gurpmi2:319
 #, c-format
@@ -488,7 +488,7 @@ msgstr "bruger særligt miljø på %s\n"
 #: ../urpm.pm:423
 #, c-format
 msgid "unable to open rpmdb"
-msgstr "kunne ikke åbne rpmdb"
+msgstr "kan ikke åbne rpmdb"
 
 #: ../urpm.pm:442
 #, c-format
@@ -508,17 +508,17 @@ msgstr "...hentning færdig"
 #: ../urpm.pm:458
 #, c-format
 msgid "unable to access rpm file [%s]"
-msgstr "kunne ikke nå rpm fil [%s]"
+msgstr "kan ikke nå rpm fil [%s]"
 
 #: ../urpm.pm:463
 #, c-format
 msgid "unable to parse spec file %s [%s]"
-msgstr "kunne ikke fortolke spec-fil '%s [%s]"
+msgstr "kan ikke fortolke spec-fil '%s [%s]"
 
 #: ../urpm.pm:471
 #, c-format
 msgid "unable to register rpm file"
-msgstr "kunne ikke registrere rpm-fil"
+msgstr "kan ikke registrere rpm-fil"
 
 #: ../urpm.pm:473
 #, c-format
@@ -602,7 +602,7 @@ msgid ""
 msgstr ""
 "%s version %s\n"
 "%s\n"
-"Dette er frit programmel og kan redistribueres under vilkårene for GNU GPL.\n"
+"Dette er frit software og kan redistribueres under vilkårene for GNU GPL.\n"
 "\n"
 "brug:\n"
 
@@ -638,7 +638,7 @@ msgstr "medie \"%s\" er ikke tilgængeligt"
 #: ../urpm/cdrom.pm:218
 #, c-format
 msgid "unable to read rpm file [%s] from medium \"%s\""
-msgstr "kunne ikke læse rpm-fil [%s] fra medie \"%s\""
+msgstr "kan ikke læse rpm-fil [%s] fra medie \"%s\""
 
 #: ../urpm/cfg.pm:74
 #, c-format
@@ -648,7 +648,7 @@ msgstr "Syntaksfejl i opsætningfilen, linje %s."
 #: ../urpm/cfg.pm:107
 #, c-format
 msgid "unable to read config file [%s]"
-msgstr "kunne ikke læse config-fil [%s]"
+msgstr "kan ikke læse config-fil [%s]"
 
 #: ../urpm/cfg.pm:133
 #, c-format
@@ -658,7 +658,7 @@ msgstr "Mediet '%s' er defineret to gange. Afbryder"
 #: ../urpm/cfg.pm:249 ../urpm/media.pm:556
 #, c-format
 msgid "unable to write config file [%s]"
-msgstr "kunne ikke skrive config-fil [%s]"
+msgstr "kan ikke skrive config-fil [%s]"
 
 #: ../urpm/download.pm:93
 #, c-format
@@ -784,7 +784,7 @@ msgstr "Ingen webhentning fundet, understøttede webhentninger er: %s\n"
 #: ../urpm/download.pm:1018
 #, c-format
 msgid "unable to handle protocol: %s"
-msgstr "kunne ikke behandle protokol: %s"
+msgstr "kan ikke behandle protokol: %s"
 
 #: ../urpm/get_pkgs.pm:29
 #, c-format
@@ -814,7 +814,7 @@ msgstr "kan ikke udpakke rpm fra delta-rpm pakke %s"
 #: ../urpm/install.pm:242
 #, c-format
 msgid "unable to install package %s"
-msgstr "kunne ikke installere pakke %s"
+msgstr "kan ikke installere pakke %s"
 
 #: ../urpm/install.pm:245
 #, c-format
@@ -937,7 +937,7 @@ msgstr "Den følgende pakke har dårlig signatur"
 #: ../urpm/main_loop.pm:139
 #, c-format
 msgid "The following packages have bad signatures"
-msgstr "De følgende pakker har dårlige signaturer"
+msgstr "Følgende pakker har dårlige signaturer"
 
 #: ../urpm/main_loop.pm:140
 #, c-format
@@ -1013,7 +1013,7 @@ msgstr "kan ikke få adgang til filen \"%s\", medie ignoreret"
 #: ../urpm/media.pm:273
 #, c-format
 msgid "unable to access synthesis file of \"%s\", medium ignored"
-msgstr "kunne ikke nå syntese-fil af \"%s\", medie ignoreret"
+msgstr "kan ikke nå syntese-fil af \"%s\", medie ignoreret"
 
 #: ../urpm/media.pm:299
 #, c-format
@@ -1117,12 +1117,12 @@ msgstr "denne adresse ser ikke ud til at indeholde nogen distribution"
 #: ../urpm/media.pm:1124
 #, c-format
 msgid "unable to parse media.cfg"
-msgstr "kunne ikke læse media.cfg"
+msgstr "kan ikke læse media.cfg"
 
 #: ../urpm/media.pm:1127
 #, c-format
 msgid "unable to access the distribution medium (no media.cfg file found)"
-msgstr "kunne ikke få fat på distributionsmedie (ingen media.cfg fil fundet)"
+msgstr "kan ikke få fat på distributionsmedie (ingen media.cfg fil fundet)"
 
 #: ../urpm/media.pm:1149
 #, c-format
@@ -1267,7 +1267,7 @@ msgstr "...importeret nøgle %s fra pubkey-fil for \"%s\""
 #: ../urpm/media.pm:1913
 #, c-format
 msgid "unable to import pubkey file of \"%s\""
-msgstr "kunne ikke importere pubkey-fil for \"%s\""
+msgstr "kan ikke importere pubkey-fil for \"%s\""
 
 #: ../urpm/media.pm:1954
 #, c-format
@@ -1442,7 +1442,7 @@ msgstr[1] ""
 #: ../urpm/parallel.pm:15
 #, c-format
 msgid "unable to parse \"%s\" in file [%s]"
-msgstr "kunne ikke tolke '%s' i fil [%s]"
+msgstr "kan ikke tolke '%s' i fil [%s]"
 
 #: ../urpm/parallel.pm:24
 #, c-format
@@ -1501,7 +1501,7 @@ msgstr ""
 #: ../urpm/removable.pm:46
 #, c-format
 msgid "unable to access medium \"%s\"."
-msgstr "kunne ikke nå medie \"%s\"."
+msgstr "kan ikke nå medie \"%s\"."
 
 #: ../urpm/removable.pm:86 ../urpm/removable.pm:101
 #, c-format
@@ -1593,7 +1593,7 @@ msgid ""
 "The following packages have to be removed for others to be upgraded:\n"
 "%s"
 msgstr ""
-"De følgende pakker skal fjernes for at andre kan opgraderes:\n"
+"Følgende pakker skal fjernes for at andre kan opgraderes:\n"
 "%s"
 
 #: ../urpm/select.pm:702
@@ -1841,7 +1841,7 @@ msgstr ""
 #: ../urpmf:38
 #, c-format
 msgid "  --use-distrib  - use the given path to access media\n"
-msgstr "  --use-distrib  - Brug denne sti for adgang til media.\n"
+msgstr "  --use-distrib  - Brug denne sti for adgang til medie.\n"
 
 #: ../urpmf:39 ../urpmi:73 ../urpmq:47
 #, c-format
@@ -2084,12 +2084,12 @@ msgstr "ingen syntese-fil tilgængelig for medie \"%s\""
 #: ../urpmf:303
 #, c-format
 msgid "no xml-info available for medium \"%s\""
-msgstr "ingen xml-info-fil tilgængelig for medie \"%s\""
+msgstr "ingen xml-info-fil tilgængelig for mediet \"%s\""
 
 #: ../urpmi:76
 #, c-format
 msgid "  --auto-update  - update media then upgrade the system.\n"
-msgstr "  --auto-update  - opdatér media, og opdatér så systemet.\n"
+msgstr "  --auto-update  - opdatér medie, og opdatér så systemet.\n"
 
 #: ../urpmi:77
 #, c-format
@@ -2123,7 +2123,7 @@ msgstr ""
 #: ../urpmi:82
 #, c-format
 msgid "  --no-install   - don't install packages (only download)\n"
-msgstr "  --no-install   - installér ikke pakker (kun nedhentning)\n"
+msgstr "  --no-install   - installér ikke pakker (kun hentning)\n"
 
 #: ../urpmi:83 ../urpmq:54
 #, c-format
@@ -2443,7 +2443,7 @@ msgstr ""
 #: ../urpmi:251
 #, c-format
 msgid "Unable to create directory [%s] for bug report"
-msgstr "kunne ikke oprette katalog [%s] til fejlrapport"
+msgstr "Kan ikke oprette katalog [%s] til fejlrapport"
 
 #: ../urpmi:272
 #, c-format
@@ -2484,8 +2484,7 @@ msgid ""
 "In order to satisfy the '%s' dependency, one of the following packages is "
 "needed:"
 msgstr ""
-"For at tilfredsstille afhængigheden af %s er én af de følgende pakker "
-"nødvendig:"
+"For at tilfredsstille afhængigheden af %s er én af følgende pakker nødvendig:"
 
 #: ../urpmi:443
 #, c-format
@@ -2510,7 +2509,7 @@ msgid ""
 "that are older than the installed ones:\n"
 "%s"
 msgstr ""
-"De følgende pakker kan ikke installeres, fordi de afhænger af pakker,\n"
+"Følgende pakker kan ikke installeres, fordi de afhænger af pakker,\n"
 "som er ældre end de installerede:\n"
 "%s"
 
@@ -2585,7 +2584,7 @@ msgstr ""
 msgid "The following orphan package will be removed."
 msgid_plural "The following orphan packages will be removed."
 msgstr[0] "Den følgende forældreløse pakke vil blive fjernet."
-msgstr[1] "De følgende forældreløse pakker vil blive fjernet."
+msgstr[1] "Følgende forældreløse pakker vil blive fjernet."
 
 #: ../urpmi:597
 #, c-format
@@ -2713,7 +2712,7 @@ msgid ""
 "  --distrib      - automatically create all media from an installation\n"
 "                   medium.\n"
 msgstr ""
-"  --distrib      - opret automatisk alle media fra et installationsmedium.\n"
+"  --distrib      - opret automatisk alle medier fra et installationsmedium.\n"
 
 #: ../urpmi.addmedia:76
 #, c-format
@@ -2803,7 +2802,7 @@ msgstr ""
 #: ../urpmi.addmedia:156 ../urpmi.addmedia:181
 #, c-format
 msgid "unable to add medium"
-msgstr "kunne ikke tilføje medie"
+msgstr "kan ikke tilføje medie"
 
 #: ../urpmi.addmedia:164
 #, c-format
@@ -3173,25 +3172,25 @@ msgstr "brug -l for at liste filer"
 #: ../urpmq:415
 #, c-format
 msgid "no xml info for medium \"%s\", only partial result for package %s"
-msgstr "Ingen 'xml-info for medie '%s', kun delvist resultat for pakken '%s'"
+msgstr "Ingen 'xml-info for mediet '%s', kun delvist resultat for pakken '%s'"
 
 #: ../urpmq:416
 #, c-format
 msgid "no xml info for medium \"%s\", only partial result for packages %s"
-msgstr "Ingen xml-info for medie'%s', kun delvist resultat for pakkerne '%s'"
+msgstr "Ingen xml-info for mediet '%s', kun delvist resultat for pakkerne '%s'"
 
 #: ../urpmq:419
 #, c-format
 msgid ""
 "no xml info for medium \"%s\", unable to return any result for package %s"
 msgstr ""
-"Ingen 'xml-info for medie '%s', kan ikke vise noget resultat for pakken %s"
+"Ingen 'xml-info for mediet '%s', kan ikke vise noget resultat for pakken %s"
 
 #: ../urpmq:420
 #, c-format
 msgid ""
 "no xml info for medium \"%s\", unable to return any result for packages %s"
-msgstr "Ingen xml-info for medie '%s', kan ikke vise resultat for pakkerne %s"
+msgstr "Ingen xml-info for mediet '%s', kan ikke vise resultat for pakkerne %s"
 
 #: ../urpmq:487
 #, c-format
@@ -3200,7 +3199,7 @@ msgstr "Ingen ændringslog fundet\n"
 
 #: ../gurpmi.desktop.in.h:1
 msgid "Software Installer"
-msgstr "Programmel-installering"
+msgstr "softwareinstallering"
 
 #: ../gurpmi.desktop.in.h:2
 msgid "Graphical front end to install RPM files"

@@ -29,7 +29,7 @@ urpm::lock - urpm/rpm DB locking related routines for urpmi
 
 =item rpm_db($urpm, $b_exclusive, %options)
 
-Lock urpmi DB.
+Lock rpm DB.
 
 Lock policy concerning chroot : lock rpm db in chroot
 

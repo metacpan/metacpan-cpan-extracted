@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+use 5.014 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts "!:p:rx" , \my%o ; 
+
+my @widths = () ; 
+my @cols = ()  ; 
+&choreOpts ; 
+unless ( @widths ||  @cols ) { *STDOUT = *STDERR ; &HELP_MESSAGE } 
+if ( defined $o{p} ) { &packing ; exit 0 } 
+if ( defined $o{'!'} ) { &takehead ; exit 0 }  
+exit 0 ;
+
+sub choreOpts { 
+  @widths = grep { $_ >= 0 } split/,|\n|\t/,$o{p},0 if defined $o{p} ; 
+  @cols = split/,|\n|\t/,$o{'!'}, 0 if defined $o{'!'} ;
+}
+
+sub takehead { 
+  my @_c = @cols ; 
+  while ( <> ) { 
+    my $c = shift @_c ; 
+    if ( ! defined $c ) { if ( $o{r} ) { @_c = @cols ; $c = shift @_c } else { last } }  
+    chomp ; 
+    my @F = split /\t/,$_,-1 ; 
+    print join ( "\t" , splice @F , ($c>0?0:$c) , abs($c) ) , "\n" ; 
+  }
+}
+
+sub packing {
+  my $indicator =  0 ;
+  my @_w = @widths ; 
+
+  while ( <> ) { 
+   if ( $indicator == 0 ) { $indicator = shift @_w  }
+   if ( ! defined $indicator ) { 
+      if ( $o{r} ) { @_w = @widths ; $indicator = shift @_w } 
+      else { last } 
+   }
+   chomp $_ ;
+   if ( $indicator > 1 ) { print $_ , "\t" } 
+   elsif ( $indicator ==1 )  { print $_ , "\n" } 
+   else { print "\n" ;  redo } 
+   $indicator-- ; 
+  }
+
+  if ( ! $o{x} ) { 
+    for ( @_w ) { print "\n" ; } 
+  }
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1 
+
+ $0 [-r] -(p|n) num1,num2,num3 ... < somefile
+
+  指定された数に応じて、入力の複数の行をまとめたり、先頭から指定の数だけ抽出したりする。
+
+   $0 -[r]p n1,n2,..,nk < somefile 
+   $0 -[r]! n1,n2,..,nk < somefile 
+
+ オプション: 
+
+ -p : 入力行を逐次n1行、n2行、...、nk行を1行ずつにまとめる。
+ -! : 入力のx行目についてからnx個取り出す(nxが負なら末尾から-nx個を取り出す)。
+ -r : 引数に与えられた n1,n2,..,nk は無限に繰り返されると見なす。
+ -x : 入力が尽きるか、指定された数が尽きた場合でも、出力指定がある限り、空行を出力。(-pの場合のみ)
+
+   --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+   --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+ 
+ 開発上のメモ : 
+  * -x の場合について、動作をよく確認せよ。説明が正しいか。プログラムに一貫性があるか確認すること。
+  * $0 -rp num で 入力データの行数が num の倍数で無いときに、出力の最後が 改行文字では無くなる。要対策。
+=cut 

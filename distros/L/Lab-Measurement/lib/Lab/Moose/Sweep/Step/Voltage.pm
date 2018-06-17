@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step::Voltage;
-$Lab::Moose::Sweep::Step::Voltage::VERSION = '3.651';
+$Lab::Moose::Sweep::Step::Voltage::VERSION = '3.652';
 #ABSTRACT: Voltage sweep.
 
 
@@ -11,6 +11,9 @@ extends 'Lab::Moose::Sweep::Step';
 has filename_extension => ( is => 'ro', isa => 'Str', default => 'Voltage=' );
 
 has setter => ( is => 'ro', isa => 'CodeRef', builder => '_build_setter' );
+
+has instrument =>
+    ( is => 'ro', isa => 'Lab::Moose::Instrument', required => 1 );
 
 sub _build_setter {
     return \&_voltage_setter;
@@ -37,7 +40,7 @@ Lab::Moose::Sweep::Step::Voltage - Voltage sweep.
 
 =head1 VERSION
 
-version 3.651
+version 3.652
 
 =head1 DESCRIPTION
 

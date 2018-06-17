@@ -13,6 +13,7 @@ scripts/csel
 scripts/saikoro
 scripts/latextable
 scripts/csv2tsv
+scripts/matrixpack
 README_JP.pdf
 
 META.yml

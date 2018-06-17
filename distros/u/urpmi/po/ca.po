@@ -3,15 +3,15 @@
 #
 # Translators:
 # Francesc Pinyol Margalef, 2012-2014
-# Davidmp <medipas@gmail.com>, 2015-2016
+# Davidmp <medipas@gmail.com>, 2015-2018
 # Robert Antoni Buj Gelonch <rbuj@fedoraproject.org>, 2017
 # Robert Antoni Buj Gelonch <rbuj@fedoraproject.org>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
 "POT-Creation-Date: 2014-09-13 21:15+0200\n"
-"PO-Revision-Date: 2017-03-31 08:54+0000\n"
-"Last-Translator: Robert Antoni Buj Gelonch <rbuj@fedoraproject.org>\n"
+"PO-Revision-Date: 2018-04-20 12:39+0000\n"
+"Last-Translator: Davidmp <medipas@gmail.com>\n"
 "Language-Team: Catalan (http://www.transifex.com/MageiaLinux/mageia/language/"
 "ca/)\n"
 "Language: ca\n"
@@ -75,7 +75,7 @@ msgstr "...ha fallat la recuperació: %s"
 #: ../gurpmi:49
 #, c-format
 msgid "RPM installation"
-msgstr "Instal·lació RPM"
+msgstr "Instal·lació d'RPM"
 
 #: ../gurpmi:63
 #, c-format
@@ -99,7 +99,7 @@ msgid ""
 "\n"
 "What would you like to do?"
 msgstr ""
-"Heu seleccionat un paquet de les fonts:\n"
+"Heu seleccionat un paquet de fonts:\n"
 "\n"
 "%s\n"
 "\n"
@@ -198,8 +198,8 @@ msgstr ""
 msgid ""
 "  --force        - force invocation even if some packages do not exist.\n"
 msgstr ""
-"  --force        - força l'execució encara que hi hagin alguns paquets que "
-"no existeixin.\n"
+"  --force        - força l'execució encara que hi hagi alguns paquets que no "
+"existeixin.\n"
 
 #: ../gurpmi.pm:61 ../urpmi:131
 #, c-format
@@ -235,7 +235,7 @@ msgstr ""
 #, c-format
 msgid "  --root         - use another root for rpm installation.\n"
 msgstr ""
-"  --root         - utilitza una altra arrel per a la instal·lació rpm.\n"
+"  --root         - utilitza una altra arrel per a la instal·lació dels rpm.\n"
 
 #: ../gurpmi.pm:67 ../urpmi:133
 #, c-format
@@ -272,7 +272,7 @@ msgid ""
 "Some requested packages cannot be installed:\n"
 "%s"
 msgstr ""
-"Alguns dels paquets demanats no es poden instal·lar:\n"
+"No es poden instal·lar alguns paquets sol·licitats:\n"
 "%s"
 
 #: ../gurpmi2:99
@@ -282,7 +282,7 @@ msgid ""
 "%s\n"
 "Continue installation anyway?"
 msgstr ""
-"Alguns dels paquets demanats no s'han pogut instal·lar:\n"
+"No es poden instal·lar alguns paquets sol·licitats:\n"
 "%s\n"
 "Voleu continuar igualment?"
 
@@ -323,7 +323,7 @@ msgid ""
 "%s\n"
 "Continue installation anyway?"
 msgstr ""
-"Els paquets següents s'han d'eliminar per poder actualitzar uns altres:\n"
+"Els paquets següents s'han d'eliminar per actualitzar-ne uns altres:\n"
 "%s\n"
 "Voleu continuar igualment?"
 
@@ -353,18 +353,18 @@ msgstr[1] "Voleu continuar la instal·lació dels %d paquets?"
 #, c-format
 msgid ""
 "To satisfy dependencies, the following package is going to be installed:"
-msgstr "Per complir les dependències, s'instal·larà el paquet següent:"
+msgstr "Per satisfer les dependències, s'instal·larà el paquet següent:"
 
 #: ../gurpmi2:260 ../urpmi:607
 #, c-format
 msgid ""
 "To satisfy dependencies, the following packages are going to be installed:"
-msgstr "Per complir les dependències, s'instal·laran els paquets següents:"
+msgstr "Per satisfer les dependències, s'instal·laran els paquets següents:"
 
 #: ../gurpmi2:270 ../urpm/main_loop.pm:467
 #, c-format
 msgid "unable to get source packages, aborting"
-msgstr "no es poden recuperar els paquets de les fonts. S'interromp"
+msgstr "no es poden recuperar els paquets de les fonts, s'avorta"
 
 #: ../gurpmi2:287 ../urpmi:634
 #, c-format
@@ -393,7 +393,7 @@ msgstr ""
 #: ../gurpmi2:339
 #, c-format
 msgid "You may want to update your urpmi database."
-msgstr "Pot ser necessari actualitzar la base de dades urpmi."
+msgstr "És possible que vulgueu actualitzar la vostra base de dades d'urpmi."
 
 #: ../gurpmi2:343 ../urpm/main_loop.pm:288 ../urpm/main_loop.pm:580
 #, c-format
@@ -421,7 +421,7 @@ msgid ""
 "usage: %s [options]\n"
 "where [options] are from\n"
 msgstr ""
-"sintaxi: %s [opcions]\n"
+"ús: %s [opcions]\n"
 "on [opcions] pot ser\n"
 
 #: ../rpm-find-leaves:17
@@ -487,7 +487,7 @@ msgstr "El directori d'entorn %s no existeix"
 #: ../urpm.pm:255 ../urpmf:244 ../urpmq:163
 #, c-format
 msgid "using specific environment on %s\n"
-msgstr "s'usa un entorn específic a %s\n"
+msgstr "s'utilitza un entorn específic a %s\n"
 
 #: ../urpm.pm:423
 #, c-format
@@ -573,7 +573,8 @@ msgstr "no hi ha expressió per tancar"
 #, c-format
 msgid "by default urpmf awaits a regexp. you should use option \"--literal\""
 msgstr ""
-"per defecte urpmf espera un regexp. Hauríeu d'usar l'opció \"--literal\""
+"per defecte urpmf espera una regexp. Hauríeu d'utilitzar l'opció \"--literal"
+"\""
 
 #: ../urpm/args.pm:483
 #, c-format
@@ -610,12 +611,12 @@ msgstr ""
 "Aquest programa és lliure i es pot redistribuir sota els termes de la GPL de "
 "GNU.\n"
 "\n"
-"sintaxi:\n"
+"ús:\n"
 
 #: ../urpm/args.pm:534
 #, c-format
 msgid "Copyright (C) %s by %s"
-msgstr "Copyright (C) %s per %s"
+msgstr "Drets d'autor (C) %s per %s"
 
 #: ../urpm/bug_report.pm:67 ../urpmi:256
 #, c-format
@@ -676,15 +677,14 @@ msgstr "%s no està disponible, recorrent a %s"
 #, c-format
 msgid "can not read proxy settings (not enough rights to read %s)"
 msgstr ""
-"no s'ha pogut llegir la configuració del proxy (sense prou drets per llegir "
-"%s)"
+"no s'han pogut llegir els paràmetres del servidor intermediari (sense prou "
+"drets per llegir %s)"
 
 #: ../urpm/download.pm:199
 #, c-format
 msgid "Please enter your credentials for accessing proxy\n"
 msgstr ""
-"Si us plau, introduïu les vostres credencials per accedir al servidor "
-"intermediari\n"
+"Introduïu les vostres credencials per accedir al servidor intermediari\n"
 
 #: ../urpm/download.pm:200
 #, c-format
@@ -821,7 +821,7 @@ msgstr "s'està eliminant %s"
 #: ../urpm/install.pm:215
 #, c-format
 msgid "unable to extract rpm from delta-rpm package %s"
-msgstr "no s'ha pogut extreure l'rpm del paquet delta-rpm %s"
+msgstr "no s'ha pogut extreure el rpm a partir de la delta rpm del paquet %s"
 
 #: ../urpm/install.pm:242
 #, c-format
@@ -894,18 +894,18 @@ msgstr "No s'ha pogut connectar amb l'uri del ldap:"
 #: ../urpm/lock.pm:99
 #, c-format
 msgid "%s database is locked, process %d is already using it"
-msgstr "la base de dades %s està blocada, el procés %d l'està fent servir"
+msgstr "la base de dades %s està bloquejada, el procés %d l'està utilitzant"
 
 #: ../urpm/lock.pm:101
 #, c-format
 msgid "%s database is locked (another program is already using it)"
 msgstr ""
-"la base de dades %s està bloquejada (ja l'està fent servir un altre programa)"
+"la base de dades %s està bloquejada (ja l'està utilitzant un altre programa)"
 
 #: ../urpm/lock.pm:115
 #, c-format
 msgid "%s database is locked. Waiting..."
-msgstr "La base de dades %s està blocada. Esperant..."
+msgstr "La base de dades %s està bloquejada. Esperant..."
 
 #: ../urpm/lock.pm:116
 #, c-format
@@ -920,7 +920,7 @@ msgstr "Ho torno a intentar?"
 #: ../urpm/main_loop.pm:85
 #, c-format
 msgid "You may need to update your urpmi database."
-msgstr "Pot ser necessari actualitzar la base de dades urpmi."
+msgstr "És possible que vulgueu actualitzar la vostra base de dades d'urpmi."
 
 #: ../urpm/main_loop.pm:89
 #, c-format
@@ -928,7 +928,7 @@ msgid ""
 "Installation failed, bad rpms:\n"
 "%s"
 msgstr ""
-"La instal·lació ha fallat, rpms dolents:\n"
+"La instal·lació ha fallat, els rpm són dolents:\n"
 "%s"
 
 #: ../urpm/main_loop.pm:108
@@ -940,7 +940,7 @@ msgid ""
 msgstr ""
 "No hi ha prou espai al sistema de fitxers per a baixar tots els paquets (cal "
 "%s, disponible %s).\n"
-"Esteu segurs de voler continuar?"
+"Esteu segur que voleu continuar?"
 
 #: ../urpm/main_loop.pm:138
 #, c-format
@@ -966,7 +966,7 @@ msgstr "La instal·lació ha fallat"
 #: ../urpm/main_loop.pm:159
 #, c-format
 msgid "removing installed rpms (%s)"
-msgstr "s'estan eliminant els rpms instal·lats (%s)"
+msgstr "s'estan eliminant els rpm instal·lats (%s)"
 
 #: ../urpm/main_loop.pm:185
 #, c-format
@@ -1046,7 +1046,7 @@ msgstr "s'ha escrit el fitxer de configuració [%s]"
 #: ../urpm/media.pm:649
 #, c-format
 msgid "Can't use parallel mode with use-distrib mode"
-msgstr "No es pot usar el mode paral·lel amb el mode use-distrib"
+msgstr "No es pot utilitzar el mode paral·lel amb el mode use-distrib"
 
 #: ../urpm/media.pm:657
 #, c-format
@@ -1059,7 +1059,7 @@ msgid ""
 "--synthesis cannot be used with --media, --excludemedia, --sortmedia, --"
 "update, --use-distrib or --parallel"
 msgstr ""
-"--synthesis no es pot usar amb --media, --excludemedia, --sortmedia, --"
+"--synthesis no es pot utilitzar amb --media, --excludemedia, --sortmedia, --"
 "update, --use-distrib ni --parallel"
 
 #: ../urpm/media.pm:786
@@ -1160,7 +1160,7 @@ msgstr "s'ha intentat seleccionar un mitjà inexistent «%s»"
 #: ../urpm/media.pm:1253
 #, c-format
 msgid "selecting multiple media: %s"
-msgstr "s'estan seleccionant múltiples mitjans: %s"
+msgstr "s'estan seleccionant diversos mitjans: %s"
 
 #: ../urpm/media.pm:1312
 #, c-format
@@ -1475,7 +1475,7 @@ msgstr "s'ha trobat un gestor paral·lel per als nodes: %s"
 #: ../urpm/parallel.pm:39
 #, c-format
 msgid "unable to use parallel option \"%s\""
-msgstr "no s'ha pogut usar l'opció de paral·lel «%s»"
+msgstr "no s'ha pogut utilitzar l'opció de paral·lel «%s»"
 
 #: ../urpm/parallel.pm:94
 #, c-format
@@ -1583,7 +1583,7 @@ msgstr "a causa de conflictes amb %s"
 #: ../urpm/select.pm:626 ../urpm/select.pm:706
 #, c-format
 msgid "due to unsatisfied %s"
-msgstr "a causa de %s no satisfetes"
+msgstr "a causa de la no satisfacció de %s"
 
 #: ../urpm/select.pm:632
 #, c-format
@@ -1593,7 +1593,7 @@ msgstr "s'està intentant promoure %s"
 #: ../urpm/select.pm:633
 #, c-format
 msgid "in order to keep %s"
-msgstr "per tal de mantenir %s"
+msgstr "per mantenir %s"
 
 #: ../urpm/select.pm:674
 #, c-format
@@ -1601,7 +1601,7 @@ msgid ""
 "The following package has to be removed for others to be upgraded:\n"
 "%s"
 msgstr ""
-"Els paquets següents s'han d'eliminar per actualitzar uns altres:\n"
+"El paquet següent s'ha d'eliminar per actualitzar-ne uns altres:\n"
 "%s"
 
 #: ../urpm/select.pm:675
@@ -1610,7 +1610,7 @@ msgid ""
 "The following packages have to be removed for others to be upgraded:\n"
 "%s"
 msgstr ""
-"Els paquets següents s'han d'eliminar per poder actualitzar uns altres:\n"
+"Els paquets següents s'han d'eliminar per actualitzar-ne uns altres:\n"
 "%s"
 
 #: ../urpm/select.pm:702
@@ -1621,7 +1621,7 @@ msgstr "per tal d'instal·lar %s"
 #: ../urpm/select.pm:708
 #, c-format
 msgid "due to missing %s"
-msgstr "a causa que no hi ha %s"
+msgstr "perquè falta %s"
 
 #: ../urpm/signature.pm:62
 #, c-format
@@ -1696,8 +1696,7 @@ msgstr "No s'ha pogut moure el fitxer %s a %s"
 #: ../urpme:43
 #, c-format
 msgid "  --auto         - automatically select a package in choices.\n"
-msgstr ""
-"  --auto         - en escollir, selecciona un paquets automàticament.\n"
+msgstr "  --auto         - en escollir, selecciona un paquet automàticament.\n"
 
 #: ../urpme:44
 #, c-format
@@ -1712,7 +1711,7 @@ msgstr "  --test         - verifica si l'eliminació pot ser duta a terme.\n"
 #: ../urpme:47 ../urpmi:106 ../urpmq:66
 #, c-format
 msgid "  --parallel     - distributed urpmi across machines of alias.\n"
-msgstr "  --parallel     - urpmi distribuït pels ordinadors de l'àlias.\n"
+msgstr "  --parallel     - urpmi distribuït a través de màquines d'àlies.\n"
 
 #: ../urpme:48
 #, c-format
@@ -1724,8 +1723,8 @@ msgstr "  --root         - utilitza una altra arrel per a l'eliminació rpm.\n"
 #, c-format
 msgid "  --urpmi-root   - use another root for urpmi db & rpm installation.\n"
 msgstr ""
-"  --urpmi-root   - utilitza una altra arrel per a la instal·lació de la base "
-"de dades urpmi i rpm.\n"
+"  --urpmi-root   - utilitza una altra arrel per a la base de dades d'urpmi i "
+"la instal·lació dels rpm.\n"
 
 #: ../urpme:50 ../urpmi:96
 #, c-format
@@ -1737,7 +1736,7 @@ msgstr ""
 #: ../urpme:51
 #, c-format
 msgid "  --noscripts    - do not execute package scriptlet(s).\n"
-msgstr "  --noscripts    - no executis scriptlet(s) de paquet.\n"
+msgstr "  --noscripts    - no executis el(s) scriptlet(s) del paquet.\n"
 
 #: ../urpme:52
 #, c-format
@@ -1799,7 +1798,8 @@ msgid "To satisfy dependencies, the following package will be removed"
 msgid_plural ""
 "To satisfy dependencies, the following %d packages will be removed"
 msgstr[0] "Per complir les dependències, s'eliminarà el paquet següent:"
-msgstr[1] "Per complir les dependències, s'eliminaran els %d paquets següents:"
+msgstr[1] ""
+"Per satisfer les dependències, s'eliminaran els %d paquets següents:"
 
 #: ../urpme:151
 #, c-format
@@ -1839,21 +1839,22 @@ msgstr "  --help         - mostra la informació de la versió.\n"
 #, c-format
 msgid "  --env          - use specific environment (typically a bug report).\n"
 msgstr ""
-"  --env          - utilitza un entorn concret (normalment un\n"
-"                   informe d'errors).\n"
+"  --env          - utilitza un entorn concret (normalment un informe "
+"d'errors).\n"
 
 #: ../urpmf:33 ../urpmi:69 ../urpmq:45
 #, c-format
 msgid "  --excludemedia - do not use the given media, separated by comma.\n"
-msgstr "  --excludemedia - no usis els mitjans donats, separats per comes.\n"
+msgstr ""
+"  --excludemedia - no utilitzis els mitjans donats, separats per comes.\n"
 
 #: ../urpmf:34
 #, c-format
 msgid ""
 "  --literal, -l  - don't match patterns, use argument as a literal string.\n"
 msgstr ""
-"  --literal, -l  - no facis coincidir patrons, usa l'argument com a cadena "
-"literal.\n"
+"  --literal, -l  - no facis coincidir patrons, utilitza l'argument com a "
+"cadena literal.\n"
 "\n"
 
 #: ../urpmf:37 ../urpmi:72 ../urpmq:46
@@ -1867,13 +1868,14 @@ msgstr ""
 #: ../urpmf:38
 #, c-format
 msgid "  --use-distrib  - use the given path to access media\n"
-msgstr "  --use-distrib  - usa el camí donat per accedir al mitjà\n"
+msgstr "  --use-distrib  - utilitza el camí donat per accedir al mitjà\n"
 
 #: ../urpmf:39 ../urpmi:73 ../urpmq:47
 #, c-format
 msgid "  --synthesis    - use the given synthesis instead of urpmi db.\n"
 msgstr ""
-"  --synthesis    - utilitza la síntesi donada en comptes de la bd de urpmi.\n"
+"  --synthesis    - utilitza la síntesi donada en comptes de la base de dades "
+"d'urpmi.\n"
 
 #: ../urpmf:40
 #, c-format
@@ -1918,7 +1920,7 @@ msgstr "Expressions patró:\n"
 msgid "  text           - any text is parsed as a regexp, unless -l is used.\n"
 msgstr ""
 "  text           - qualsevol text és analitzat com a regexp, si no és que "
-"s'usa -l.\n"
+"s'utilitza -l.\n"
 
 #: ../urpmf:48
 #, c-format
@@ -1944,7 +1946,7 @@ msgstr "  !              - NOT unari.\n"
 #, c-format
 msgid "  ( )            - left and right parentheses.\n"
 msgstr ""
-"  ( )            - parentesis esquerre i dret per expressions de grup.\n"
+"  ( )            - parèntesis esquerre i dret per expressions de grup.\n"
 
 #: ../urpmf:53
 #, c-format
@@ -2059,7 +2061,7 @@ msgstr "  --size         - mida un cop instal·lat\n"
 #: ../urpmf:74
 #, c-format
 msgid "  --sourcerpm    - source rpm name\n"
-msgstr "  --sourcerpm    - nom de l'rpm de les fonts\n"
+msgstr "  --sourcerpm    - nom del rpm de les fonts\n"
 
 #: ../urpmf:75
 #, c-format
@@ -2100,7 +2102,7 @@ msgstr "expressió inacabada (%s)"
 #: ../urpmf:194
 #, c-format
 msgid "Incorrect format: you may use only one multi-valued tag"
-msgstr "Format incorrecte: podeu usar només una etiqueta multivalor"
+msgstr "Format incorrecte: podeu utilitzar només una etiqueta multivalor"
 
 #: ../urpmf:287
 #, c-format
@@ -2126,7 +2128,7 @@ msgstr ""
 #: ../urpmi:77
 #, c-format
 msgid "    --no-md5sum    - disable MD5SUM file checking.\n"
-msgstr "    --no-md5sum    - deshabilita la comprovació MD5SUM.\n"
+msgstr "    --no-md5sum    - inhabilita la comprovació del fitxer MD5SUM.\n"
 
 #: ../urpmi:78
 #, c-format
@@ -2136,7 +2138,7 @@ msgstr "    --force-key    - força l'actualització de la clau gpg.\n"
 #: ../urpmi:79
 #, c-format
 msgid "  --auto-orphans - remove orphans without asking\n"
-msgstr "  --auto-orphans - esborra els fitxers orfes sense preguntar\n"
+msgstr "  --auto-orphans - esborra els orfes sense preguntar\n"
 
 #: ../urpmi:80 ../urpmq:52
 #, c-format
@@ -2164,8 +2166,8 @@ msgid ""
 "  --keep         - keep existing packages if possible, reject requested\n"
 "                   packages that lead to removals.\n"
 msgstr ""
-"  --keep         - manté els paquets existents si és possible, rebutja els "
-"paquets demanats\n"
+"  --keep         - mantén els paquets existents si és possible, rebutja els "
+"paquets sol·licitats\n"
 "                   que porten a l'eliminació d'altres paquets.\n"
 
 #: ../urpmi:85
@@ -2176,13 +2178,14 @@ msgid ""
 "                   default is %d.\n"
 msgstr ""
 "  --split-level  - divideix en una transacció petita si s'han d'instal·lar o "
-"actualitzar més més paquets dels indicats,\n"
+"actualitzar més dels paquets donats,\n"
 "                   per defecte és %d.\n"
 
 #: ../urpmi:89
 #, c-format
 msgid "  --split-length - small transaction length, default is %d.\n"
-msgstr "  --split-length - llargada de transacció petita, per defecte és %d.\n"
+msgstr ""
+"  --split-length - llargada de la transacció petita, per defecte és %d.\n"
 
 #: ../urpmi:91
 #, c-format
@@ -2193,7 +2196,7 @@ msgstr "  --fuzzy, -y    - utilitza cerca difusa.\n"
 #, c-format
 msgid "  --buildrequires - install the buildrequires of the packages\n"
 msgstr ""
-"  --buildrequires - instal·la els requeriments de construcció dels paquets\n"
+"  --buildrequires - instal·la els requisits de construcció dels paquets\n"
 
 #: ../urpmi:93
 #, c-format
@@ -2210,7 +2213,7 @@ msgstr ""
 #: ../urpmi:95
 #, c-format
 msgid "  --noclean      - don't clean rpms from cache.\n"
-msgstr "  --noclean      - no netegis els rpms de la cau.\n"
+msgstr "  --noclean      - no netegis els rpm de la memòria cau.\n"
 
 #: ../urpmi:97
 #, c-format
@@ -2261,14 +2264,14 @@ msgid ""
 "  --use-distrib  - configure urpmi on the fly from a distrib tree, useful\n"
 "                   to install a chroot with --root option.\n"
 msgstr ""
-"  --use-distrib  - configura l'urpmi al vol des d'un agre de distribució, "
-"útil\n"
+"  --use-distrib  - configura urpmi al vol a partir d'un arbre de "
+"distribució, útil\n"
 "                   per instal·lar un chroot amb l'opció --root.\n"
 
 #: ../urpmi:111 ../urpmi.addmedia:60 ../urpmi.update:37
 #, c-format
 msgid "  --metalink     - generate and use a local metalink.\n"
-msgstr "  --metalink     - genera i usa un metaenllaç local.\n"
+msgstr "  --metalink     - genera i utilitza un metaenllaç local.\n"
 
 #: ../urpmi:112
 #, c-format
@@ -2285,33 +2288,35 @@ msgid ""
 "  --downloader   - program to use to retrieve distant files. \n"
 "                   known programs: %s\n"
 msgstr ""
-"  --downloader   - programa per obtenir fitxers distants. \n"
+"  --downloader   - programa que s'utilitzarà per recuperar els fitxers "
+"distants. \n"
 "                   programes coneguts: %s\n"
 
 #: ../urpmi:116
 #, c-format
 msgid "  --curl-options - additional options to pass to curl\n"
-msgstr "  --curl-options - opcions addicionals que es passen a curl\n"
+msgstr "  --curl-options - opcions addicionals que es passaran a curl\n"
 
 #: ../urpmi:117
 #, c-format
 msgid "  --rsync-options- additional options to pass to rsync\n"
-msgstr "  --rsync-options- opcions addicionals per passar a rsync\n"
+msgstr "  --rsync-options- opcions addicionals que es passaran a rsync\n"
 
 #: ../urpmi:118
 #, c-format
 msgid "  --wget-options - additional options to pass to wget\n"
-msgstr "  --wget-options - opcions addicionals que es passen a wget\n"
+msgstr "  --wget-options - opcions addicionals que es passaran a wget\n"
 
 #: ../urpmi:119
 #, c-format
 msgid "  --prozilla-options - additional options to pass to prozilla\n"
-msgstr "  --prozilla-options - opcions addicionals que es passen a prozilla\n"
+msgstr ""
+"  --prozilla-options - opcions addicionals que es passaran a prozilla\n"
 
 #: ../urpmi:120
 #, c-format
 msgid "  --aria2-options - additional options to pass to aria2\n"
-msgstr "  --aria2-options - opcions addicionals que es passen a aria2\n"
+msgstr "  --aria2-options - opcions addicionals que es passaran a aria2\n"
 
 #: ../urpmi:121 ../urpmi.addmedia:61 ../urpmi.update:38
 #, c-format
@@ -2334,10 +2339,10 @@ msgid ""
 "  --proxy        - use specified HTTP proxy, the port number is assumed\n"
 "                   to be 1080 by default (format is <proxyhost[:port]>).\n"
 msgstr ""
-"  --proxy        - utilitza el proxy HTTP especificat, el número de port "
-"s'assumeix\n"
+"  --proxy        - utilitza el servidor intermediari HTTP especificat, el "
+"número de port s'assumeix\n"
 "                   que és el 1080 per defecte (el format és "
-"<ordinadorcentralproxy[:port]>).\n"
+"<servidorintermediari[:port]>).\n"
 
 #: ../urpmi:126 ../urpmi.addmedia:64 ../urpmi.update:41 ../urpmq:76
 #, c-format
@@ -2345,9 +2350,10 @@ msgid ""
 "  --proxy-user   - specify user and password to use for proxy\n"
 "                   authentication (format is <user:password>).\n"
 msgstr ""
-"  --proxy-user   - especifica l'usuari i la contrasenya per a utilitzar "
-"l'autenticació\n"
-"                   del proxy (el format és <usuari:contrasenya>).\n"
+"  --proxy-user   - especifica l'usuari i la contrasenya que s'ha d'utilitzar "
+"per a l'autenticació\n"
+"                   del servidor intermediari (el format és <usuari:"
+"contrasenya>).\n"
 
 #: ../urpmi:128
 #, c-format
@@ -2355,8 +2361,8 @@ msgid ""
 "  --bug          - output a bug report in directory indicated by\n"
 "                   next arg.\n"
 msgstr ""
-"  --bug          - crea un informe d'errors en el directori\n"
-"                   que s'indica en l'argument següent.\n"
+"  --bug          - crea un informe d'errors al directori\n"
+"                   que s'indica amb l'argument següent.\n"
 
 #: ../urpmi:134
 #, c-format
@@ -2378,13 +2384,13 @@ msgstr ""
 #, c-format
 msgid "  --ignorearch   - allow to install rpms for unmatched architectures.\n"
 msgstr ""
-"  --ignorearch   - permet instal·lar rpms per a arquitectures no "
+"  --ignorearch   - permet instal·lar els rpm per a les arquitectures no "
 "coincidents.\n"
 
 #: ../urpmi:138
 #, c-format
 msgid "  --noscripts    - do not execute package scriptlet(s)\n"
-msgstr "  --noscripts    - no executis scriptlet(s) de paquet \n"
+msgstr "  --noscripts    - no executis el(s) scriptlet(s) del paquet \n"
 
 #: ../urpmi:139
 #, c-format
@@ -2413,13 +2419,14 @@ msgstr ""
 #: ../urpmi:144
 #, c-format
 msgid "  --nolock       - don't lock rpm db.\n"
-msgstr "  --nolock       - no bloca la base de dades rpm.\n"
+msgstr "  --nolock       - no bloquegis la base de dades dels rpm.\n"
 
 #: ../urpmi:145
 #, c-format
 msgid "  --strict-arch  - upgrade only packages with the same architecture.\n"
 msgstr ""
-"  --strict-arch  - actualitza només paquets de la mateixa arquitectura.\n"
+"  --strict-arch  - actualitza només els paquets amb la mateixa "
+"arquitectura.\n"
 
 #: ../urpmi:146 ../urpmq:95
 #, c-format
@@ -2448,7 +2455,8 @@ msgstr ""
 #, c-format
 msgid "Error: can't use --auto-select along with package list.\n"
 msgstr ""
-"Error: no es pot usar --auto-select conjuntament amb una llista de paquets.\n"
+"Error: no es pot utilitzar --auto-select conjuntament amb una llista de "
+"paquets.\n"
 
 #: ../urpmi:187
 #, c-format
@@ -2462,7 +2470,7 @@ msgstr ""
 #: ../urpmi:217
 #, c-format
 msgid "You can't install binary rpm files when using --install-src"
-msgstr "No podeu instal·lar fitxers rpm binaris quan s'usa --install-src"
+msgstr "No podeu instal·lar fitxers rpm binaris quan s'utilitza --install-src"
 
 #: ../urpmi:218
 #, c-format
@@ -2479,7 +2487,7 @@ msgstr "es torna per defecte a --buildrequires"
 msgid ""
 "please use --buildrequires or --install-src, defaulting to --buildrequires"
 msgstr ""
-"si us plau, useu --buildrequires o --install-src, es torna per defecte a --"
+"utilitzeu --buildrequires o --install-src, es torna per defecte a --"
 "buildrequires"
 
 #: ../urpmi:250
@@ -2534,7 +2542,9 @@ msgstr "%s (per instal·lar)"
 msgid ""
 "In order to satisfy the '%s' dependency, one of the following packages is "
 "needed:"
-msgstr "Per satisfer la dependència de '%s', cal un dels paquets següents:"
+msgstr ""
+"Amb la intenció de satisfer la dependència de '%s', cal un dels paquets "
+"següents:"
 
 #: ../urpmi:443
 #, c-format
@@ -2549,7 +2559,7 @@ msgid ""
 "%s"
 msgstr ""
 "El paquet següent no es pot instal·lar perquè depèn de paquets que són més "
-"antics que els que hi ha instal·lats:\n"
+"antics que als ja instal·lats:\n"
 "%s"
 
 #: ../urpmi:487
@@ -2560,7 +2570,7 @@ msgid ""
 "%s"
 msgstr ""
 "Els paquets següents no es poden instal·lar perquè depenen de paquets que "
-"són més antics que els que hi ha instal·lats:\n"
+"són més antics que als ja instal·lats:\n"
 "%s"
 
 #: ../urpmi:493 ../urpmi:511
@@ -2583,7 +2593,7 @@ msgid ""
 "A requested package cannot be installed:\n"
 "%s"
 msgstr ""
-"Un paquet demanat no es pot instal·lar:\n"
+"No es pot instal·lar un paquet sol·licitat:\n"
 "%s"
 
 #: ../urpmi:526
@@ -2599,7 +2609,7 @@ msgid ""
 "%s\n"
 msgstr ""
 "La instal·lació no pot continuar, ja que el paquet següent \n"
-"s'ha d'eliminar per poder actualitzar-ne uns altres:\n"
+"s'ha d'eliminar per actualitzar-ne uns altres:\n"
 "%s\n"
 
 #: ../urpmi:536
@@ -2610,7 +2620,7 @@ msgid ""
 "%s\n"
 msgstr ""
 "La instal·lació no pot continuar, ja que els paquets següents\n"
-"s'han d'eliminar per poder actualitzar-ne uns altres:\n"
+"s'han d'eliminar per actualitzar-ne uns altres:\n"
 "%s\n"
 
 #: ../urpmi:544
@@ -2640,7 +2650,7 @@ msgstr[1] "S'eliminaran els paquets orfes següents:"
 #, c-format
 msgid "WARNING: %s option is in use. Some strange problems may happen"
 msgstr ""
-"AVÍS: s'està usant l'opció %s. Poden ocórrer alguns problemes estranys."
+"AVÍS: s'està utilitzant l'opció %s. Poden ocórrer alguns problemes estranys."
 
 #: ../urpmi:609
 #, c-format
@@ -2678,7 +2688,7 @@ msgid ""
 "and [options] are from\n"
 msgstr ""
 "ús: urpmi.addmedia [opcions] <nom> <url>\n"
-"en què <url> és un d'aquets valors:\n"
+"en què <url> és un d'aquests valors:\n"
 "       [file:/]/<path>\n"
 "       ftp://<login>:<password>@<host>/<path>\n"
 "       ftp://<host>/<path>\n"
@@ -2700,17 +2710,18 @@ msgstr ""
 #: ../urpmi.addmedia:56 ../urpmi.update:33 ../urpmq:71
 #, c-format
 msgid "  --wget         - use wget to retrieve distant files.\n"
-msgstr "  --wget         - usa wget per a recuperar fitxers llunyans.\n"
+msgstr "  --wget         - utilitza wget per a recuperar fitxers llunyans.\n"
 
 #: ../urpmi.addmedia:57 ../urpmi.update:34 ../urpmq:72
 #, c-format
 msgid "  --curl         - use curl to retrieve distant files.\n"
-msgstr "  --curl         - usa curl per a recuperar fitxers llunyans.\n"
+msgstr "  --curl         - utilitza curl per a recuperar fitxers llunyans.\n"
 
 #: ../urpmi.addmedia:58 ../urpmi.update:35 ../urpmq:73
 #, c-format
 msgid "  --prozilla     - use prozilla to retrieve distant files.\n"
-msgstr "  --prozilla     - usa prozilla per a recuperar fitxers llunyans.\n"
+msgstr ""
+"  --prozilla     - utilitza prozilla per a recuperar fitxers llunyans.\n"
 
 #: ../urpmi.addmedia:59 ../urpmi.update:36
 #, c-format
@@ -2743,12 +2754,13 @@ msgstr ""
 #: ../urpmi.addmedia:70
 #, c-format
 msgid "  --probe-synthesis - use synthesis file.\n"
-msgstr "  --probe-synthesis - usa el fitxer de síntesi.\n"
+msgstr "  --probe-synthesis - utilitza el fitxer de síntesi.\n"
 
 #: ../urpmi.addmedia:71
 #, c-format
 msgid "  --probe-rpms   - use rpm files (instead of synthesis).\n"
-msgstr "  --probe-rpms   - utilitza fitxers rpm (en lloc de la síntesi).\n"
+msgstr ""
+"  --probe-rpms   - utilitza els fitxers rpm (en comptes de la síntesi).\n"
 
 #: ../urpmi.addmedia:72
 #, c-format
@@ -2784,7 +2796,7 @@ msgstr ""
 #: ../urpmi.addmedia:79 ../urpmi.update:44
 #, c-format
 msgid "  --no-md5sum    - disable MD5SUM file checking.\n"
-msgstr "  --no-md5sum    - deshabilita la comprovació MD5SUM.\n"
+msgstr "  --no-md5sum    - inhabilita la comprovació del fitxer MD5SUM.\n"
 
 #: ../urpmi.addmedia:80
 #, c-format
@@ -2842,7 +2854,7 @@ msgstr "No s'ha pogut crear el fitxer de configuració [%s]"
 #: ../urpmi.addmedia:128
 #, c-format
 msgid "no need to give <relative path of synthesis> with --distrib"
-msgstr "no cal donar el <relative path of synthesis> amb --distrib"
+msgstr "no cal donar <relative path of synthesis> amb --distrib"
 
 #: ../urpmi.addmedia:136
 #, c-format
@@ -2866,7 +2878,7 @@ msgstr "falta <relative path of synthesis> \n"
 #: ../urpmi.addmedia:167
 #, c-format
 msgid "Can't use %s with remote medium"
-msgstr "No es pot fer servir «%s» amb el mitjà remot"
+msgstr "No es pot utilitzar «%s» amb el mitjà remot"
 
 #: ../urpmi.removemedia:38
 #, c-format
@@ -2874,8 +2886,8 @@ msgid ""
 "usage: urpmi.removemedia (-a | <name> ...)\n"
 "where <name> is a medium name to remove.\n"
 msgstr ""
-"sintaxi: urpmi.removemedia (-a | <nom> ...)\n"
-"on <nom> és el nom del mitjà a eliminar.\n"
+"ús: urpmi.removemedia (-a | <nom> ...)\n"
+"on <nom> és el nom del mitjà que s'ha d'eliminar.\n"
 
 #: ../urpmi.removemedia:41
 #, c-format
@@ -2913,8 +2925,8 @@ msgid ""
 "usage: urpmi.update [options] <name> ...\n"
 "where <name> is a medium name to update.\n"
 msgstr ""
-"sintaxi: urpmi.update [opcions] <nom> ...\n"
-"on <nom> és el nom del mitjà a actualitzar.\n"
+"ús: urpmi.update [opcions] <nom> ...\n"
+"on <nom> és el nom del mitjà que s'ha d'actualitzar.\n"
 
 #: ../urpmi.update:43
 #, c-format
@@ -2939,7 +2951,9 @@ msgstr "  --no-ignore    - no actualitzis, marca el mitjà com a habilitat.\n"
 #: ../urpmi.update:49
 #, c-format
 msgid "  --probe-rpms   - do not use synthesis, use rpm files directly\n"
-msgstr "  --probe-rpms   - no usis síntesis, usa fitxers rpm directament\n"
+msgstr ""
+"  --probe-rpms   - no utilitzis la síntesi, utilitza directament els fitxers "
+"rpm\n"
 
 #: ../urpmi.update:50
 #, c-format
@@ -3001,7 +3015,7 @@ msgid ""
 "packages.\n"
 msgstr ""
 "  --searchmedia  - utilitza només els mitjans donats per cercar paquets "
-"demanats (o actualitzats).\n"
+"sol·licitats (o actualitzats).\n"
 
 #: ../urpmq:49
 #, c-format
@@ -3036,7 +3050,7 @@ msgstr "  --list-media   - llista els mitjans disponibles.\n"
 #: ../urpmq:58
 #, c-format
 msgid "  --list-url     - list available media and their url.\n"
-msgstr "  --list-url     - llista els mitjans disponibles i l'url.\n"
+msgstr "  --list-url     - llista els mitjans disponibles i el seu url.\n"
 
 #: ../urpmq:59
 #, c-format
@@ -3047,7 +3061,7 @@ msgstr ""
 #: ../urpmq:60
 #, c-format
 msgid "  --list-aliases - list available parallel aliases.\n"
-msgstr "  --list-aliases - llista els àlias paral·lels disponibles.\n"
+msgstr "  --list-aliases - llista els àlies paral·lels disponibles.\n"
 
 #: ../urpmq:61
 #, c-format
@@ -3074,7 +3088,7 @@ msgstr ""
 #, c-format
 msgid "  --ignorearch   - allow to query rpms for unmatched architectures.\n"
 msgstr ""
-"  --ignorearch   - permet consultar rpms per a arquitectures no "
+"  --ignorearch   - permet consultar els rpm per a les arquitectures no "
 "coincidents.\n"
 
 #: ../urpmq:69
@@ -3089,7 +3103,7 @@ msgstr ""
 #: ../urpmq:79
 #, c-format
 msgid "  --changelog    - print changelog.\n"
-msgstr "  --changelog    - mostra els canvis.\n"
+msgstr "  --changelog    - mostra el registre de canvis.\n"
 
 #: ../urpmq:80
 #, c-format
@@ -3109,7 +3123,7 @@ msgstr "  --provides     - mostra els subministraments.\n"
 #: ../urpmq:83
 #, c-format
 msgid "  --requires     - print requires.\n"
-msgstr "  --requires     - mostra els requeriments.\n"
+msgstr "  --requires     - mostra els requisits.\n"
 
 #: ../urpmq:84
 #, c-format
@@ -3119,7 +3133,7 @@ msgstr "  --recommends   - mostra les recomanacions.\n"
 #: ../urpmq:85
 #, c-format
 msgid "  --sourcerpm    - print sourcerpm.\n"
-msgstr "  --sourcerpm    - mostra l'rpm de les fonts.\n"
+msgstr "  --sourcerpm    - mostra el rpm de les fonts.\n"
 
 #: ../urpmq:86
 #, c-format
@@ -3230,12 +3244,12 @@ msgstr ""
 #: ../urpmq:154
 #, c-format
 msgid "usage: \"urpmq --auto-orphans\" with no argument"
-msgstr "utilització: «urpmq --auto-orphans» sense arguments"
+msgstr "ús: «urpmq --auto-orphans» sense arguments"
 
 #: ../urpmq:207
 #, c-format
 msgid "--list-nodes can only be used with --parallel"
-msgstr "--list-nodes només es pot usar amb --parallel"
+msgstr "--list-nodes només es pot utilitzar amb --parallel"
 
 #: ../urpmq:231
 #, c-format
@@ -3275,7 +3289,7 @@ msgstr ""
 #: ../urpmq:487
 #, c-format
 msgid "No changelog found\n"
-msgstr "No s'ha trobat la llista de canvis\n"
+msgstr "No s'ha trobat el registre de canvis\n"
 
 #: ../gurpmi.desktop.in.h:1
 msgid "Software Installer"

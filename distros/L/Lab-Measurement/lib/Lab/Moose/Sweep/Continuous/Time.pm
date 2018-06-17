@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Continuous::Time;
-$Lab::Moose::Sweep::Continuous::Time::VERSION = '3.651';
+$Lab::Moose::Sweep::Continuous::Time::VERSION = '3.652';
 #ABSTRACT: Time sweep
 
 
@@ -16,28 +16,62 @@ extends 'Lab::Moose::Sweep::Continuous';
 
 has [qw/ +instrument +points +rates/] => ( required => 0 );
 
-#has interval => ( is => 'ro', isa => 'Num', default => 0 );
+has duration => ( is => 'ro', isa => 'Lab::Moose::PosNum' );
+
 has durations => (
     is      => 'ro',
     isa     => 'ArrayRef[Lab::Moose::PosNum]',
     traits  => ['Array'],
     handles => {
-        get_duration  => 'get', shift_durations => 'shift',
-        num_durations => 'count'
+        get_duration  => 'get',   shift_durations => 'shift',
+        num_durations => 'count', durations_array => 'elements',
     },
-    required => 1
+    writer => '_durations'
 );
 
-# FIXME: make copy of original arrays.
-# TODO: interval/duration scalars
 # TODO: make duration optional => infinite
-# use go_to_next_point from Continuous.pm
 
 sub BUILD {
     my $self = shift;
+
+    # Do not mess with intervals/durations attribute arrays. Make copies of them.
+    my @intervals;
+    my @durations;
+
+    if ( defined $self->interval ) {
+        if ( defined $self->intervals ) {
+            croak "Use either interval or intervals attribute";
+        }
+        @intervals = ( $self->interval );
+    }
+    elsif ( defined $self->intervals ) {
+        @intervals = $self->intervals_array;
+    }
+    else {
+        # default interval
+        @intervals = (0);
+    }
+
+    if ( defined $self->duration ) {
+        if ( defined $self->durations ) {
+            croak "Use either duration or durations attribute";
+        }
+        @durations = ( $self->duration );
+    }
+    elsif ( defined $self->durations ) {
+        @durations = $self->durations_array;
+    }
+    else {
+        croak "Missing mandatory duration or durations argument";
+    }
+
+    $self->_intervals( \@intervals );
+    $self->_durations( \@durations );
+
     if ( $self->num_intervals < 1 ) {
         croak "need at least one interval";
     }
+
     if ( $self->num_intervals != $self->num_durations ) {
         croak "need same number of intervals and durations";
     }
@@ -96,7 +130,7 @@ Lab::Moose::Sweep::Continuous::Time - Time sweep
 
 =head1 VERSION
 
-version 3.651
+version 3.652
 
 =head1 SYNOPSIS
 
@@ -104,8 +138,16 @@ version 3.651
 
  my $sweep = sweep(
      type => 'Continuous::Time',
-     interval => 0.5,
+     interval => 0.5, # optional, default is 0 (no delay)
      duration => 60
+ );
+
+ # Multiple segments with different intervals
+ my $sweep = sweep(
+     type => 'Continuous::Time',
+     # 60s with 0.5s interval followed by 120s with 1s interval
+     durations => [60, 120],
+     intervals => [0.5, 1],
  );
 
 =head1 COPYRIGHT AND LICENSE

@@ -1,7 +1,7 @@
 package Template::Mustache::Token::Partial;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Object representing a Partial block
-$Template::Mustache::Token::Partial::VERSION = '1.3.0';
+$Template::Mustache::Token::Partial::VERSION = '1.3.1';
 use Moo;
 
 use MooseX::MungeHas { has_ro => [ 'is_ro' ], has_rw => [ 'is_rw' ] };
@@ -24,6 +24,11 @@ sub render {
         $partial = $partials->{$self->name} or return '';
     }
 
+    if( ref $partial eq 'Template::Mustache' ) {
+        $partials = $partial->partials;
+        $partial = $partial->parsed;
+    }
+
     return $partial->render( $context, $partials, $self->indent );
 }
 
@@ -41,7 +46,7 @@ Template::Mustache::Token::Partial - Object representing a Partial block
 
 =head1 VERSION
 
-version 1.3.0
+version 1.3.1
 
 =head1 AUTHORS
 

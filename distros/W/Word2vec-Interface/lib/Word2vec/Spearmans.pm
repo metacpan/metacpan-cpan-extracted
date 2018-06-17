@@ -4,7 +4,7 @@
 #                                                                                    #
 #    Author: Clint Cuffy                                                             #
 #    Date:    05/09/2016                                                             #
-#    Revised: 09/09/2017                                                             #
+#    Revised: 03/06/2018                                                             #
 #    UMLS Similarity Word2Phrase Executable Interface Module                         #
 #                                                                                    #
 ######################################################################################
@@ -213,10 +213,10 @@ sub CalculateSpearmans
         }
         else
         {
-            $term1 =~ /(C[0-9]+)/;
+            $term1 =~ /(c[0-9]+)/;
             $cui1 = $1 if defined( $1 );
 
-            $term2 =~ /(C[0-9]+)/;
+            $term2 =~ /(c[0-9]+)/;
             $cui2 = $1 if defined( $1 );
         }
 
@@ -272,8 +272,8 @@ sub CalculateSpearmans
             $self->SetIsFileOfWords( 1 ) if( $isCUI1 == 0 && $isCUI2 == 0 );
             $self->SetIsFileOfWords( 0 ) if( $isCUI1 == 1 && $isCUI2 == 1 );
 
-            $fileAIsCUIFile = 0 if ( $isCUI1 == 0 && $isCUI2 == 0 );
-            $fileAIsCUIFile = 1 if ( $isCUI1 == 1 && $isCUI2 == 1 );
+            $fileBIsCUIFile = 0 if ( $isCUI1 == 0 && $isCUI2 == 0 );
+            $fileBIsCUIFile = 1 if ( $isCUI1 == 1 && $isCUI2 == 1 );
             $bCUICheck = 1;
 
             # Check(s)
@@ -297,10 +297,10 @@ sub CalculateSpearmans
         }
         else
         {
-            $term1 =~ /(C[0-9]+)/;
+            $term1 =~ /(c[0-9]+)/;
             $cui1 = $1 if defined( $1 );
 
-            $term2 =~ /(C[0-9]+)/;
+            $term2 =~ /(c[0-9]+)/;
             $cui2 = $1 if defined( $1 );
         }
 
@@ -716,12 +716,12 @@ sub WriteLog
     {
         if( ref ( $self ) ne "Word2vec::Spearmans" )
         {
-            print( GetDate() . " " . GetTime() . " - word2phrase: Cannot Call WriteLog() From Outside Module!\n" );
+            print( GetDate() . " " . GetTime() . " - Word2phrase: Cannot Call WriteLog() From Outside Module!\n" );
             return;
         }
 
         $string = "" if !defined ( $string );
-        print GetDate() . " " . GetTime() . " - word2phrase::$string";
+        print GetDate() . " " . GetTime() . " - Word2phrase::$string";
         print "\n" if( $printNewLine != 0 );
     }
 
@@ -729,7 +729,7 @@ sub WriteLog
     {
         if( ref ( $self ) ne "Word2vec::Spearmans" )
         {
-            print( GetDate() . " " . GetTime() . " - word2phrase: Cannot Call WriteLog() From Outside Module!\n" );
+            print( GetDate() . " " . GetTime() . " - Word2phrase: Cannot Call WriteLog() From Outside Module!\n" );
             return;
         }
 
@@ -737,7 +737,7 @@ sub WriteLog
 
         if( defined( $fileHandle ) )
         {
-            print( $fileHandle GetDate() . " " . GetTime() . " - word2phrase::$string" );
+            print( $fileHandle GetDate() . " " . GetTime() . " - Word2phrase::$string" );
             print( $fileHandle "\n" ) if( $printNewLine != 0 );
         }
     }

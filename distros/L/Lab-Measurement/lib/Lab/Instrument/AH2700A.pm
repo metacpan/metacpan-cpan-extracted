@@ -1,6 +1,6 @@
 package Lab::Instrument::AH2700A;
 #ABSTRACT: Andeen-Hagerling AH2700A ultra-precision capacitance bridge
-$Lab::Instrument::AH2700A::VERSION = '3.651';
+$Lab::Instrument::AH2700A::VERSION = '3.652';
 use strict;
 use Time::HiRes qw (usleep);
 use Lab::Instrument;
@@ -479,7 +479,7 @@ Lab::Instrument::AH2700A - Andeen-Hagerling AH2700A ultra-precision capacitance 
 
 =head1 VERSION
 
-version 3.651
+version 3.652
 
 =head1 COPYRIGHT AND LICENSE
 

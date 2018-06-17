@@ -4,7 +4,7 @@
 # Translators:
 # Andreas Bergstrøm <abergstr@halden.net>, 2001
 # Eskild Hustvedt <zerodogg@skolelinux.no>, 2005
-# Karl Morten Ramberg <karl.m.ramberg@gmail.com>, 2017
+# Karl Morten Ramberg <karl.m.ramberg@gmail.com>, 2017-2018
 # Olav Dahlum <odahlum@gmail.com>, 2009-2010
 # Per Øyvind Karlsen <peroyvind@linux-mandrake.com>, 2004-2005
 # Per Øyvind Karlsen <peroyvind@mandriva.org>, 2007
@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
 "POT-Creation-Date: 2014-09-13 21:15+0200\n"
-"PO-Revision-Date: 2017-04-26 18:09+0000\n"
+"PO-Revision-Date: 2018-02-14 21:54+0000\n"
 "Last-Translator: Karl Morten Ramberg <karl.m.ramberg@gmail.com>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/MageiaLinux/mageia/"
 "language/nb/)\n"
@@ -85,7 +85,7 @@ msgstr "RPM-installasjon"
 #: ../gurpmi:63
 #, c-format
 msgid "Error: unable to find file %s, will cancel operation"
-msgstr "Feil: klarte ikke å finne fila %s, vil avbryte operasjon."
+msgstr "Feil: klarte ikke å finne filen %s,  avbryter operasjonen."
 
 #: ../gurpmi:64 ../gurpmi2:173 ../gurpmi2:203
 #, c-format
@@ -161,7 +161,7 @@ msgstr "_Avbryt"
 #: ../gurpmi:126
 #, c-format
 msgid "Choose location to save file"
-msgstr "Velg hvor fila skal lagres."
+msgstr "Velg hvor filen skal lagres."
 
 #: ../gurpmi:126 ../gurpmi2:119
 #, c-format
@@ -513,7 +513,7 @@ msgstr "Klarte ikke lese fila [%s]."
 #: ../urpm.pm:463
 #, c-format
 msgid "unable to parse spec file %s [%s]"
-msgstr "Klarte ikke tolke spesifikasjonsfila %s [%s]."
+msgstr "Klarte ikke tolke spesifikasjonsfilen %s [%s]."
 
 #: ../urpm.pm:471
 #, c-format
@@ -644,12 +644,12 @@ msgstr "klarte ikke lese rpm-fil [%s] fra mediet «%s»"
 #: ../urpm/cfg.pm:74
 #, c-format
 msgid "syntax error in config file at line %s"
-msgstr "Syntaksfeil på linje %s i oppsettfila."
+msgstr "Syntaksfeil på linje %s i oppsettfilen."
 
 #: ../urpm/cfg.pm:107
 #, c-format
 msgid "unable to read config file [%s]"
-msgstr "klarte ikke lese oppsettfila [%s]."
+msgstr "klarte ikke lese oppsettfilen [%s]."
 
 #: ../urpm/cfg.pm:133
 #, c-format
@@ -659,7 +659,7 @@ msgstr "mediet «%s» er spesifisert to ganger, avbryter"
 #: ../urpm/cfg.pm:249 ../urpm/media.pm:556
 #, c-format
 msgid "unable to write config file [%s]"
-msgstr "klarer ikke å skrive oppsettfila [%s]."
+msgstr "klarer ikke å skrive oppsettfilen [%s]."
 
 #: ../urpm/download.pm:93
 #, c-format
@@ -670,7 +670,7 @@ msgstr "%s er ikke tilgjengelig, faller tilbake til %s"
 #, c-format
 msgid "can not read proxy settings (not enough rights to read %s)"
 msgstr ""
-"kan ikke lese innstillingene for mellomtjeneren (ikke nok rettigheter til å "
+"kan ikke lese innstillingene for proxyserveren (ikke nok rettigheter til å "
 "lese%s)"
 
 #: ../urpm/download.pm:199
@@ -796,7 +796,7 @@ msgstr "renser %s og %s"
 #: ../urpm/get_pkgs.pm:141
 #, c-format
 msgid "package %s is not found."
-msgstr "fant ikke pakka «%s»."
+msgstr "fant ikke pakken «%s»."
 
 #: ../urpm/get_pkgs.pm:269
 #, c-format
@@ -854,7 +854,7 @@ msgstr "fjerner installerte pakker (%s) fra %s"
 #: ../urpm/install.pm:381
 #, c-format
 msgid "More information on package %s"
-msgstr "Mer informasjon om pakka %s"
+msgstr "Mer informasjon om pakken %s"
 
 #: ../urpm/ldap.pm:42
 #, c-format
@@ -1010,7 +1010,7 @@ msgstr "det virtuelle mediet «%s» bør ha en entydig adresse, overser mediet"
 #: ../urpm/media.pm:270
 #, c-format
 msgid "unable to access list file of \"%s\", medium ignored"
-msgstr "klarte ikke åpne listefila til «%s», overser mediet"
+msgstr "klarte ikke åpne listefilen til «%s», overser mediet"
 
 #: ../urpm/media.pm:273
 #, c-format
@@ -1030,7 +1030,7 @@ msgstr "migrering av flyttbar enhet feilet, overser mediet"
 #: ../urpm/media.pm:558
 #, c-format
 msgid "wrote config file [%s]"
-msgstr "skrev oppsettfila [%s]."
+msgstr "skrev oppsettfilen [%s]."
 
 #: ../urpm/media.pm:649
 #, c-format
@@ -2286,8 +2286,8 @@ msgid ""
 "  --proxy        - use specified HTTP proxy, the port number is assumed\n"
 "                   to be 1080 by default (format is <proxyhost[:port]>).\n"
 msgstr ""
-"  --proxy        – bruk spesifisert HTTP-mellomtjener, portnummeret antas\n"
-"                   å være 1080 som standard (format er <tjenernavn[:"
+"  --proxy        – bruk spesifisert HTTP-proxy, portnummeret antas\n"
+"                   å være 1080 som standard (format er <servernavn[:"
 "port]>).\n"
 
 #: ../urpmi:126 ../urpmi.addmedia:64 ../urpmi.update:41 ../urpmq:76

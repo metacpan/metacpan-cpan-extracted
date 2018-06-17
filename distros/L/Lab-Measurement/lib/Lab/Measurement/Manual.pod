@@ -1,6 +1,6 @@
 #DistZilla: +PodWeaver
 #PODNAME: Lab::Measurement::Manual
-#ABSTRACT: API documentation for Lab::Measurement
+#ABSTRACT: API documentation manual for Lab::Measurement
 
 __END__
 
@@ -10,11 +10,11 @@ __END__
 
 =head1 NAME
 
-Lab::Measurement::Manual - API documentation for Lab::Measurement
+Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.651
+version 3.652
 
 =head1 OVERVIEW
 
@@ -24,15 +24,13 @@ Currently, the Lab::Measurement API consists of:
 
 =item *
 
-L</Lab::Moose> is the recommended API, it is based on B<Modern Perl>
-techniques.
+L</Lab::Moose>, the recommended, current API, based on B<Modern Perl>
+techniques
 
 =item *
 
-The hisorical API, consisting of the Lab::Instrument virtual
-instruments and the high-level Lab::XPRESS interface, which provides simple
-generation of nested sweeps and logging of output data into a customizable
-folder structure.
+the historical API, consisting of the Lab::Instrument virtual
+instruments and the high-level Lab::XPRESS interface
 
 =back
 
@@ -78,6 +76,8 @@ folder structure.
 
 =item * L<Lab::Moose::Countdown>
 
+=item * L<Lab::Moose::Catfile>
+
 =back
 
 =head2 Sweep classes
@@ -95,6 +95,8 @@ folder structure.
 =item * L<Lab::Moose::Sweep::Step::Magnet>
 
 =item * L<Lab::Moose::Sweep::Step::Temperature>
+
+=item * L<Lab::Moose::Sweep::Step::Repeat>
 
 =item * L<Lab::Moose::Sweep::Continuous>
 
@@ -130,6 +132,8 @@ alias: L<Lab::Moose::Instrument::Agilent34410A>
 
 =item * L<Lab::Moose::Instrument::Keysight34470A>
 
+=item * L<Lab::Moose::Instrument::HP34420A>
+
 =back
 
 =head3 Voltage sources
@@ -139,6 +143,8 @@ alias: L<Lab::Moose::Instrument::Agilent34410A>
 =item * L<Lab::Moose::Instrument::YokogawaGS200>
 
 =item * L<Lab::Moose::Instrument::Yokogawa7651>
+
+=item * L<Lab::Moose::Instrument::Keithley2400>
 
 =item * L<Lab::Moose::Instrument::DummySource>
 
@@ -251,6 +257,8 @@ contains support for temperature sensor and He/N2 level meters.
 =item * L<Lab::Moose::Instrument::SCPI::Sense::NPLC>
 
 =item * L<Lab::Moose::Instrument::SCPI::Sense::Power>
+
+=item * L<Lab::Moose::Instrument::SCPI::Sense::Protection>
 
 =item * L<Lab::Moose::Instrument::SCPI::Sense::Range>
 

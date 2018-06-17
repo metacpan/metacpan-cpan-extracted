@@ -1,0 +1,180 @@
+---
+id: 0
+method: Clear
+---
+command: '*CLS'
+id: 1
+method: Write
+---
+command: ROUT:TERM FRON2
+id: 2
+method: Write
+---
+command: ROUT:TERM?
+id: 3
+method: Query
+retval: "FRON2\n"
+---
+command: ROUT:TERM FRON
+id: 4
+method: Write
+---
+command: ROUT:TERM?
+id: 5
+method: Query
+retval: "FRON\n"
+---
+command: ROUT:TERM FRON1
+id: 6
+method: Write
+---
+command: SENS:FUNC 'VOLT'
+id: 7
+method: Write
+---
+command: SENS:FUNC?
+id: 8
+method: Query
+retval: "\"VOLT\"\n"
+---
+command: SENS:FUNC 'RES'
+id: 9
+method: Write
+---
+command: SENS:FUNC?
+id: 10
+method: Query
+retval: "\"RES\"\n"
+---
+command: SENS:FUNC 'VOLT'
+id: 11
+method: Write
+---
+command: SENS:VOLT:RANG 0.001
+id: 12
+method: Write
+---
+command: SENS:VOLT:RANG?
+id: 13
+method: Query
+retval: '+1.00000000E-03
+
+'
+---
+command: SENS:VOLT:RANG 0.1
+id: 14
+method: Write
+---
+command: SENS:VOLT:RANG?
+id: 15
+method: Query
+retval: '+1.00000000E-01
+
+'
+---
+command: SENS:VOLT:RANG 1
+id: 16
+method: Write
+---
+command: SENS:VOLT:RANG?
+id: 17
+method: Query
+retval: '+1.00000000E+00
+
+'
+---
+command: SENS:VOLT:RANG 10
+id: 18
+method: Write
+---
+command: SENS:VOLT:RANG?
+id: 19
+method: Query
+retval: '+1.00000000E+01
+
+'
+---
+command: SENS:VOLT:NPLC 0.02
+id: 20
+method: Write
+---
+command: SENS:VOLT:NPLC?
+id: 21
+method: Query
+retval: '+2.00000000E-02
+
+'
+---
+command: SENS:VOLT:NPLC 0.2
+id: 22
+method: Write
+---
+command: SENS:VOLT:NPLC?
+id: 23
+method: Query
+retval: '+2.00000000E-01
+
+'
+---
+command: SENS:VOLT:NPLC 1
+id: 24
+method: Write
+---
+command: SENS:VOLT:NPLC?
+id: 25
+method: Query
+retval: '+1.00000000E+00
+
+'
+---
+command: SENS:VOLT:NPLC 2
+id: 26
+method: Write
+---
+command: SENS:VOLT:NPLC?
+id: 27
+method: Query
+retval: '+2.00000000E+00
+
+'
+---
+command: SENS:VOLT:NPLC 10
+id: 28
+method: Write
+---
+command: SENS:VOLT:NPLC?
+id: 29
+method: Query
+retval: '+1.00000000E+01
+
+'
+---
+command: SENS:VOLT:NPLC 100
+id: 30
+method: Write
+---
+command: SENS:VOLT:NPLC?
+id: 31
+method: Query
+retval: '+1.00000000E+02
+
+'
+---
+command: SENS:VOLT:RANG 0.1
+id: 32
+method: Write
+---
+command: SENS:VOLT:NPLC 10
+id: 33
+method: Write
+---
+command: READ?
+id: 34
+method: Query
+retval: '+6.80000000E-08
+
+'
+---
+command: '*RST'
+id: 35
+method: Write

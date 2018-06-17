@@ -1,0 +1,50 @@
+---
+abstract: 'AWS X-Ray tracing library'
+author:
+  - 'FUJIWARA Shunichiro <fujiwara.shunichiro@gmail.com>'
+build_requires:
+  IO::Scalar: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.11, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AWS-XRay
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  AWS::XRay:
+    file: lib/AWS/XRay.pm
+    version: '0.02'
+  AWS::XRay::Segment:
+    file: lib/AWS/XRay/Segment.pm
+  AWS::XRay::Segment::NoTrace:
+    file: lib/AWS/XRay/Segment.pm
+requires:
+  Crypt::URandom: '0'
+  IO::Socket::INET: '0'
+  JSON::XS: '0'
+  Time::HiRes: '0'
+  Types::Serialiser: '0'
+  perl: '5.012000'
+resources:
+  bugtracker: https://github.com/fujiwara/AWS-XRay/issues
+  homepage: https://github.com/fujiwara/AWS-XRay
+  repository: git://github.com/fujiwara/AWS-XRay.git
+version: '0.02'
+x_authority: cpan:FUJIWARA
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution Crypt-EAMessage,
-version 1.003:
+version 1.005:
 
   Simple-to-use Abstraction of Encrypted Authenticated Messages
 
-This software is copyright (c) 2016 by J. Maslak.
+This software is copyright (c) 2018 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

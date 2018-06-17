@@ -6,7 +6,7 @@ use Authen::Simple::Password;
 use Authen::Simple::Passwd;
 use Net::LDAP;
 
-our $VERSION = '0.11.1';
+our $VERSION = '0.11.2';
 
 sub register {
     my ($plugin, $app) = @_;
@@ -124,9 +124,9 @@ sub _check_ldap {
 
     my $ldap = Net::LDAP->new(
         $params->{host},
-        port    => $params->{port}    // 389,
-        scheme  => $params->{scheme}  // 'ldap',
-        debug   => $params->{debug}   // 0,
+        port    => $params->{port} // 389,
+        scheme  => $params->{scheme} // 'ldap',
+        debug   => $params->{debug} // 0,
         timeout => $params->{timeout} // 120,
         version => $params->{version} // 3,
     );
@@ -136,22 +136,37 @@ sub _check_ldap {
         return 0;
     }
 
-    unless (defined($params->{start_tls}) && $params->{start_tls} == 0) {
-        my $dse = $ldap->root_dse();
+    my $socket_type = ref $ldap->{net_ldap_socket};
+    $c->app->log->warn("LDAP socket type: $socket_type") if $logging;
+
+    unless (
+        # SSL connection already established
+        ($socket_type eq 'IO::Socket::SSL')
+
+        # Or user doesn't want TLS
+        || (defined($params->{start_tls}) && $params->{start_tls} == 0)
+        )
+    {
+        my $dse     = $ldap->root_dse();
         my $has_tls = $dse->supported_extension('1.3.6.1.4.1.1466.20037');
+
         if ($has_tls) {
             my $mesg = $ldap->start_tls(
-                verify  => $params->{tls_verify} // 'optional',
-                cafile  => $params->{cafile} // '',
+                verify => $params->{tls_verify} // 'optional',
+                cafile => $params->{cafile} // '',
             );
-            if ($mesg->code) {
-            	my $text = "start_tls() failed for $params->{host}. " .
-            		"[$mesg->code] $mesg->error_name: $mesg->error_text" ;
-                $c->app->log->warn( $text ) if $logging;
+            if ($mesg->is_error) {
+                my $text = "start_tls() failed for $params->{host}. "
+                    . "[$mesg->code] $mesg->error_name: $mesg->error_text";
+                $c->app->log->warn($text) if $logging;
                 $ldap->unbind;
                 return 0;
             }
         }
+
+        $socket_type = ref $ldap->{net_ldap_socket};
+        $c->app->log->warn("LDAP socket type after start_tls(): $socket_type")
+            if $logging;
     }
 
     my @credentials
@@ -161,9 +176,9 @@ sub _check_ldap {
 
     my $mesg = $ldap->bind(@credentials);
     if ($mesg->is_error) {
-        $c->app->log->warn("LDAP bind failed" . ($params->{binddn}
-            ? " for $params->{binddn}: "
-            : ": ") . $mesg->error)
+        $c->app->log->warn("LDAP bind failed"
+                . ($params->{binddn} ? " for $params->{binddn}: " : ": ")
+                . $mesg->error)
             if $logging;
         $ldap->unbind;
         return 0;
@@ -188,8 +203,8 @@ sub _check_ldap {
 
     if ($search->count == 0) {
         $c->app->log->warn(
-            qq{User '$username' not found with filter '$filter' and scope '$scope'})
-            if $logging;
+            qq{User '$username' not found with filter '$filter' and scope '$scope'}
+        ) if $logging;
         $ldap->unbind;
         return 0;
     }
@@ -248,7 +263,7 @@ Mojolicious::Plugin::BasicAuthPlus - Basic HTTP Auth Helper Plus
 
 =head1 VERSION
 
-Version 0.11.1
+Version 0.11.2
 
 =head1 SYNOPSIS
 

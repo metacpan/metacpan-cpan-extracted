@@ -27,7 +27,8 @@ $option->assert( 'cmd', 'log' );
 
 $0 = $o{name} if $o{name};
 
-close STDOUT;close STDERR;
+open(STDOUT, '>/dev/null') || die "STDOUT ERROR $!";
+open(STDERR, '>/dev/null') || die "STDERR ERROR $!";
 
 exit if fork;
 

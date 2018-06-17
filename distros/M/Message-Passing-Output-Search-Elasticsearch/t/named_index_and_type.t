@@ -4,7 +4,7 @@ use Test::More;
 use Test::Exception;
 use Search::Elasticsearch::TestServer;
 use Message::Passing::Output::Search::Elasticsearch;
-use Search::Elasticsearch::Client::5_0::Async::Bulk;
+use Search::Elasticsearch::Client::6_0::Async::Bulk;
 use Search::Elasticsearch;
 use AnyEvent;
 use File::Temp qw( tempdir );
@@ -14,7 +14,7 @@ my $tempdir = tempdir( CLEANUP => 1);
 my $server =
     Search::Elasticsearch::TestServer->new(
         es_home     => '/usr/share/elasticsearch',
-        es_version  => '5_0',
+        es_version  => '6_0',
         conf        => [
             "path.conf=$tempdir",
             "path.data=$tempdir",
@@ -61,7 +61,7 @@ lives_ok {
 
 lives_ok {
     $out_es = Message::Passing::Output::Search::Elasticsearch->new(
-        es_bulk    => Search::Elasticsearch::Client::5_0::Async::Bulk->new( es => $es ),
+        es_bulk    => Search::Elasticsearch::Client::6_0::Async::Bulk->new( es => $es ),
         type       => 'syslog',
         index_name => 'syslog',
     );

@@ -1,0 +1,33 @@
+---
+abstract: 'A base class for Mattermost bots.'
+author:
+  - 'Mike Jones <mike@netsplit.org.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Mattermost-Bot
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  FindBin: '0'
+  Furl: '0'
+  HTTP::Status: '0'
+  JSON::MaybeXS: '0'
+  List::Util: '0'
+  Mojo::IOLoop: '0'
+  Mojo::UserAgent: '0'
+  Moo: '0'
+  MooX::HandlesVia: '0'
+  Types::Standard: '0'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

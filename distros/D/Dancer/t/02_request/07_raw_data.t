@@ -10,24 +10,40 @@ plan skip_all => "skip test with Test::TCP in win32/cygwin" if ($^O eq 'MSWin32'
 plan skip_all => "Test::TCP is needed for this test"
     unless Dancer::ModuleLoader->load("Test::TCP" => "1.30");
 
-use LWP::UserAgent;
+use HTTP::Tiny;
 
 use constant RAW_DATA => "var: 2; foo: 42; bar: 57\nHey I'm here.\r\n\r\n";
 
-plan tests => 2;
+my $host = '127.0.0.1';
+
+plan tests => 6;
 Test::TCP::test_tcp(
     client => sub {
         my $port = shift;
         my $rawdata = RAW_DATA;
-        my $ua = LWP::UserAgent->new;
-        my $req = HTTP::Request->new(PUT => "http://127.0.0.1:$port/jsondata");
+        my $ua = HTTP::Tiny->new;
         my $headers = { 'Content-Length' => length($rawdata) };
-        $req->push_header($_, $headers->{$_}) foreach keys %$headers;
-        $req->content($rawdata);
-        my $res = $ua->request($req);
+        my $res = $ua->put("http://$host:$port/jsondata", { headers => $headers, content => $rawdata });
 
-        ok $res->is_success, 'req is success';
-        is $res->content, $rawdata, "raw_data is OK";
+        ok $res->{success}, 'req is success';
+        is $res->{content}, $rawdata, "raw_data is OK";
+
+        # Now, turn off storing raw request body in RAM, check that it was
+        # effective
+        $res = $ua->put("http://$host:$port/setting/raw_request_body_in_ram/0");
+        is $res->{status}, 200, 'success changing setting';
+        diag($res->{content});
+
+        $res = $ua->get("http://$host:$port/setting/raw_request_body_in_ram");
+        is $res->{content}, "0", "setting change was stored";
+
+        $res = $ua->put("http://$host:$port/jsondata", { headers => $headers, content => $rawdata });
+
+        ok $res->{success}, 'req is success';
+        is $res->{content}, "", "request body was empty with raw_request_body_in_ram false";
+
+        
+
     },
     server => sub {
         my $port = shift;
@@ -37,7 +53,7 @@ Test::TCP::test_tcp(
 
         set( environment  => 'production',
              port         => $port,
-             server       => '127.0.0.1',
+             server       => $host,
              startup_info => 0);
         Dancer->dance();
     },

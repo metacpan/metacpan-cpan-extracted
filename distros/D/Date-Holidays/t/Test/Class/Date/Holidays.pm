@@ -253,10 +253,10 @@ sub test_cn : Test(3) {
     }
 }
 
-sub test_de : Test(3) {
+sub test_de : Test(6) {
     SKIP: {
         eval { require Date::Holidays::DE };
-        skip "Date::Holidays::DE not installed", 3 if $@;
+        skip "Date::Holidays::DE not installed", 6 if $@;
 
         ok( my $dh = Date::Holidays->new( countrycode => 'de' ),
             'Testing Date::Holidays::DE' );
@@ -266,6 +266,21 @@ sub test_de : Test(3) {
 
         ok( $dh->holidays( year => 2006 ),
             'Testing holidays with argument for Date::Holidays::DE' );
+
+        is( ref $dh->holidays( year => 2006 ), 'HASH',
+            'Testing return value of holidays with argument for Date::Holidays::DE' );
+
+        ok( $dh->is_holiday(day => 1, month => 1, year => 2018), 'Testing the adapted implementation of is_holidays for DE');
+
+        my $holidays_hashref = Date::Holidays->is_holiday(
+            year  => 2017,
+            month => 1,
+            day   => 1,
+            countries => [ 'de' ],
+        );
+
+        ok( $holidays_hashref->{'de'},
+            'Checking for German first day of year' );
     }
 }
 
@@ -583,23 +598,21 @@ sub test_sk : Test(4) {
     }
 }
 
-# TODO: Get UK under control
-# SKIP: {
-#     eval { require Date::Holidays::UK };
-#     skip "Date::Holidays::UK not installed", 3 if $@;
+sub test_uk : Test(3) {
+    SKIP: {
+        eval { require Date::Holidays::GB };
+        skip "Date::Holidays::UK not installed", 3 if $@;
 
-#     ok( $dh = Date::Holidays->new( countrycode => 'uk' ),
-#         'Testing Date::Holidays::UK' );
+        ok( my $dh = Date::Holidays->new( countrycode => 'uk', nocheck => 1 ),
+            'Testing Date::Holidays::Adapter::UK' );
 
-#     use Data::Dumper;
-#     print STDERR Dumper $dh;
+        dies_ok { $dh->holidays() }
+            'Testing holidays without argument for Date::Holidays::Adapter::UK';
 
-#     dies_ok { $dh->holidays() }
-#         'Testing holidays without argument for Date::Holidays::UK';
-
-#     dies_ok { $dh->holidays( year => 2014 ) }
-#         'Testing holidays with argument for Date::Holidays::UK';
-# }
+        dies_ok { $dh->holidays( year => 2014 ) }
+            'Testing holidays with argument for Date::Holidays::Adapter::UK';
+    }
+}
 
 sub test_jp : Test(3) {
     SKIP: {

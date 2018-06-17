@@ -2,16 +2,22 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0'
+                                      },
+                        'suggests' => {
+                                        'JSON::PP' => '2.27300'
                                       }
                       },
        'develop' => {
                       'requires' => {
-                                      'Test::PAUSE::Permissions' => '0'
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::Pod' => '1.41'
                                     }
                     },
        'runtime' => {
                       'recommends' => {
-                                        'YAML' => '0'
+                                        'MIME::Types' => '2.17',
+                                        'YAML' => '0',
+                                        'YAML::XS' => '0'
                                       },
                       'requires' => {
                                       'Carp' => '0',
@@ -33,9 +39,9 @@ do { my $x = {
                                       'HTTP::Date' => '0',
                                       'HTTP::Headers' => '0',
                                       'HTTP::Server::Simple::PSGI' => '0',
+                                      'HTTP::Tiny' => '0.014',
                                       'Hash::Merge::Simple' => '0',
                                       'IO::File' => '0',
-                                      'LWP::UserAgent' => '0',
                                       'MIME::Types' => '0',
                                       'Module::Runtime' => '0',
                                       'POSIX' => '0',
@@ -63,14 +69,18 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'Data::Dump' => '0',
                                    'Devel::Hide' => '0',
                                    'Digest::MD5' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'HTTP::Cookies' => '0',
+                                   'HTTP::CookieJar' => '0.008',
                                    'HTTP::Request' => '0',
+                                   'HTTP::Tiny' => '0.014',
                                    'IO::Handle' => '0',
+                                   'IO::Socket::INET' => '0',
                                    'IPC::Open3' => '0',
+                                   'JSON' => '2.90',
                                    'Plack::Builder' => '0',
                                    'Test::More' => '0',
                                    'Test::NoWarnings' => '0',

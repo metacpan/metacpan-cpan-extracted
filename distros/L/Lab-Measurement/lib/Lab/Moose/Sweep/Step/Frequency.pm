@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step::Frequency;
-$Lab::Moose::Sweep::Step::Frequency::VERSION = '3.651';
+$Lab::Moose::Sweep::Step::Frequency::VERSION = '3.652';
 #ABSTRACT: Frequency sweep.
 
 
@@ -12,6 +12,9 @@ has filename_extension =>
     ( is => 'ro', isa => 'Str', default => 'Frequency=' );
 
 has setter => ( is => 'ro', isa => 'CodeRef', builder => '_build_setter' );
+
+has instrument =>
+    ( is => 'ro', isa => 'Lab::Moose::Instrument', required => 1 );
 
 sub _build_setter {
     return \&_frq_setter;
@@ -38,7 +41,7 @@ Lab::Moose::Sweep::Step::Frequency - Frequency sweep.
 
 =head1 VERSION
 
-version 3.651
+version 3.652
 
 =head1 Description
 

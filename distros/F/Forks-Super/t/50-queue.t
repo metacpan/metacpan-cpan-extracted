@@ -17,7 +17,7 @@ my $pid1 = fork sub { sleep 5 };
 my $pid2 = fork sub { sleep 5 };
 ok(isValidPid($pid1) && isValidPid($pid2), "two successful fork calls");
 my $pid3 = fork sub { sleep 5 };
-ok(@Forks::Super::Deferred::QUEUE == 1, "third fork call is deferred")    ### 3 ###
+ok(@Forks::Super::Deferred::QUEUE == 1, "third fork call is deferred") ### 3 ###
     or diag("script time is ", time-$^T);
 ok($pid3 < -10000, "deferred job has large negative id");
 my $j = Forks::Super::Job::get($pid3);

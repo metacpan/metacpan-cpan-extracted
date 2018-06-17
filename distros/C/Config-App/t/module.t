@@ -16,24 +16,24 @@ ok( @{ $obj->get( qw( config_app includes ) ) } == 2, 'new() included 2 files' )
 ok( length( $obj->get( qw( config_app root_dir ) ) ) > 0, 'root_dir established' );
 is( $obj->get('answer'), 2048, 'Included file overrides correctly' );
 
-ok( $obj = MODULE->new( 'config/alt.yaml', 1 ), MODULE . '->new( $file, 1 )' );
+ok( $obj = MODULE->new( 'config/alt.yaml', 1 ), MODULE . '->new( "alt.yaml", 1 )' );
 is( $obj->get('answer'), 45, 'Alt file with no include works correctly' );
 
-ok( $obj = MODULE->new( 'config/app_optional.yaml', 1 ), MODULE . '->new( $file, 1 )' );
+ok( $obj = MODULE->new( 'config/app_optional.yaml', 1 ), MODULE . '->new( "app_optional.yaml", 1 )' );
 is( $obj->get('answer'), 2048, 'Optional existing included file overrides correctly' );
 
-ok( $obj = MODULE->new( 'config/app_optional_missing.yaml', 1 ), MODULE . '->new( $file, 1 )' );
+ok( $obj = MODULE->new( 'config/app_optional_missing.yaml', 1 ), MODULE . '->new( "app_optional_missing.yaml", 1 )' );
 is( $obj->get('answer'), 42, 'Optional non-existing included file silently skipped' );
 
 my $env = $ENV{CONFIGAPPINIT};
 $ENV{CONFIGAPPINIT} = 'config/alt.yaml';
-ok( $obj = MODULE->new( undef, 1 ), MODULE . '->new( $file, 1 )' );
+ok( $obj = MODULE->new( undef, 1 ), MODULE . '->new( undef, 1 )' );
 is( $obj->get('answer'), 45, 'Alt file with no include works correctly' );
 $ENV{CONFIGAPPINIT} = $env;
 
 $env = $ENV{CONFIGAPPENV};
 $ENV{CONFIGAPPENV} = 'test';
-ok( $obj = MODULE->new( 'config/alt.yaml', 1 ), MODULE . '->new( $file, 1 )' );
+ok( $obj = MODULE->new( 'config/alt.yaml', 1 ), MODULE . '->new( "alt.yaml", 1 )' );
 is( $obj->get('env'), 'works', 'Setting CONFIGAPPENV works' );
 $ENV{CONFIGAPPENV} = $env;
 
@@ -55,5 +55,7 @@ is_deeply(
     },
     'conf() works as expected',
 );
+
+ok( $obj = MODULE->new( 'config/libs.yaml', 1 ), MODULE . '->new( "libs.yaml", 1 )' );
 
 done_testing;

@@ -4,7 +4,7 @@
 #                                                                                    #
 #    Author: Clint Cuffy                                                             #
 #    Date:    10/01/2016                                                             #
-#    Revised: 11/14/2017                                                             #
+#    Revised: 03/06/2018                                                             #
 #    UMLS Similarity Word2Vec Package Interface Driver                               #
 #                                                                                    #
 ######################################################################################
@@ -32,7 +32,7 @@ use Word2vec::Interface;
 
 use vars qw($VERSION);
 
-$VERSION = '0.037';
+$VERSION = '0.038';
 
 # Check For No Command-Line Arguments
 AskHelp() if @ARGV == 0;
@@ -529,7 +529,7 @@ sub SortVectorFile
     my %options = %{ $optionsHash };
 
     # Check(s)
-    print( "Error: No Options Specified\n" ) if keys( %options ) == 0;
+    print( "Error: No Options Specified\n" ) if scalar keys( %options ) == 0;
 
     if( !defined( $options{ "-filepath" } ) )
     {
@@ -540,7 +540,7 @@ sub SortVectorFile
         return;
     }
 
-    return if keys( %options ) == 0;
+    return if scalar keys( %options ) == 0;
 
     my $result = $packageInterface->CLSortVectorFile( $optionsHash );
     print "Finished Sort And Save\n" if $result == 0;
@@ -551,30 +551,32 @@ sub SortVectorFile
 
 sub FindSimilarTerms
 {
-    my $vectorDataFilePath = $ARGV[ $argIndex + 1 ];
-    my $term               = $ARGV[ $argIndex + 2 ];
-    my $numberOfNeighbors  = $ARGV[ $argIndex + 3 ];
+    my $optionsHash = GetCommandOptions( $argIndex );
+    my %options     = %{ $optionsHash };
 
     # Check(s)
-    if( !defined( $vectorDataFilePath ) || !defined( $term ) || !defined( $numberOfNeighbors ) || $vectorDataFilePath eq "" || $term eq "" || $numberOfNeighbors eq "" )
+    if( scalar keys %options == 0 || !defined( $options{ "-vectors" } ) || !defined( $options{ "-term" } ) )
     {
         print "Warning: Improper format\n";
-        print "Format: --findnearestterms vector_binary_file_path term number_of_neighbors\n";
+        print "Format: --findnearestterms -vectors vector_binary_file_path -term term -neighbors #_of_neighbors #_of_threads\n";
         return;
     }
-
-    my $result = $packageInterface->W2VReadTrainedVectorDataFromFile( "$vectorDataFilePath" );
+    
+    my $result = $packageInterface->W2VReadTrainedVectorDataFromFile( $options{ "-vectors" } );
 
     # Check(s)
-    print "Error Reading Vector Binary File: \"$vectorDataFilePath\"\n" if $result == -1;
+    print "Error Reading Vector Binary File: \"" . $options{ "-vectors" } ."\"\n" if $result == -1;
     return if $result == -1;
 
-    my $neighbors = $packageInterface->CLFindSimilarTerms( $term, $numberOfNeighbors );
+    my $neighbors = $packageInterface->CLFindSimilarTerms( $options{ "-term" }, $options{ "-neighbors" }, $options{ "-threads" } );
+    
+    print "Error Finding Similar Terms\n" if !defined( $neighbors );
+    return                                if !defined( $neighbors );
 
     # Results
-    print "=========\n";
-    print " Results\n";
-    print "=========\n";
+    print "\n===========\n";
+    print "- Results -\n";
+    print "===========\n";
 
     for my $neighboringTerm ( @{ $neighbors } )
     {
@@ -629,7 +631,7 @@ sub Similarity
     {
         print "Warning: Improper format\n";
         print "Format: --similarity -sim similarity_file_or_directory -vectors vector_data_file_path\n";
-        print "Note: Not specifying \"-sim\" implies performing comparisons all standardized files.\n";
+        print "Note: Not specifying \"-sim\" implies performing comparisons against all standardized files.\n";
         print "    : Using directory option, files must have \".sim\" extension.\n";
         print "    : \"-a\", \"-s\", \"-c\" or \"-all\" options can be added to determine which calculations are computed.\n";
         print "      No specified options implies \"-all\".\n";
@@ -753,40 +755,40 @@ sub Similarity
         # CUI Term Files
         if( $isWordOrCUIVectorData eq "cui" )
         {
-            $results{ "MayoSRS.cuis.avg_results"                 }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MayoSRS.cuis.avg_results"            , "./../Similarity/MayoSRS.gold"           , 1 ) if ( -e "$similarityFilePath/MayoSRS.cuis.avg_results"             && $averageOptionEnabled  == 1 );
-            $results{ "MayoSRS.cuis.comp_results"                }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MayoSRS.cuis.comp_results"           , "./../Similarity/MayoSRS.gold"           , 1 ) if ( -e "$similarityFilePath/MayoSRS.cuis.comp_results"            && $compoundOptionEnabled == 1 );
-            $results{ "MayoSRS.cuis.sum_results"                 }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MayoSRS.cuis.sum_results"            , "./../Similarity/MayoSRS.gold"           , 1 ) if ( -e "$similarityFilePath/MayoSRS.cuis.sum_results"             && $summedOptionedEnabled == 1 );
-            $results{ "MiniMayoSRS.cuis.coders.avg_results"      }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.cuis.avg_results"        , "./../Similarity/MiniMayoSRS.coders"     , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.cuis.avg_results"         && $averageOptionEnabled  == 1 );
-            $results{ "MiniMayoSRS.cuis.coders.comp_results"     }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.cuis.comp_results"       , "./../Similarity/MiniMayoSRS.coders"     , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.cuis.comp_results"        && $compoundOptionEnabled == 1 );
-            $results{ "MiniMayoSRS.cuis.coders.sum_results"      }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.cuis.sum_results"        , "./../Similarity/MiniMayoSRS.coders"     , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.cuis.sum_results"         && $summedOptionedEnabled == 1 );
-            $results{ "MiniMayoSRS.cuis.physicians.avg_results"  }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.cuis.avg_results"        , "./../Similarity/MiniMayoSRS.physicians" , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.cuis.avg_results"         && $averageOptionEnabled  == 1 );
-            $results{ "MiniMayoSRS.cuis.physicians.comp_results" }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.cuis.comp_results"       , "./../Similarity/MiniMayoSRS.physicians" , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.cuis.comp_results"        && $compoundOptionEnabled == 1 );
-            $results{ "MiniMayoSRS.cuis.physicians.sum_results"  }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.cuis.sum_results"        , "./../Similarity/MiniMayoSRS.physicians" , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.cuis.sum_results"         && $summedOptionedEnabled == 1 );
-            $results{ "UMNSRS_reduced_rel.cuis.avg_results"      }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_rel.cuis.avg_results" , "./../Similarity/UMNSRS_reduced_rel.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_rel.cuis.avg_results"  && $averageOptionEnabled  == 1 );
-            $results{ "UMNSRS_reduced_rel.cuis.comp_results"     }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_rel.cuis.comp_results", "./../Similarity/UMNSRS_reduced_rel.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_rel.cuis.comp_results" && $compoundOptionEnabled == 1 );
-            $results{ "UMNSRS_reduced_rel.cuis.sum_results"      }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_rel.cuis.sum_results" , "./../Similarity/UMNSRS_reduced_rel.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_rel.cuis.sum_results"  && $summedOptionedEnabled == 1 );
-            $results{ "UMNSRS_reduced_sim.cuis.avg_results"      }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_sim.cuis.avg_results" , "./../Similarity/UMNSRS_reduced_sim.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_sim.cuis.avg_results"  && $averageOptionEnabled  == 1 );
-            $results{ "UMNSRS_reduced_sim.cuis.comp_results"     }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_sim.cuis.comp_results", "./../Similarity/UMNSRS_reduced_sim.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_sim.cuis.comp_results" && $compoundOptionEnabled == 1 );
-            $results{ "UMNSRS_reduced_sim.cuis.sum_results"      }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_sim.cuis.sum_results" , "./../Similarity/UMNSRS_reduced_sim.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_sim.cuis.sum_results"  && $summedOptionedEnabled == 1 );
+            $results{ "MayoSRS.cuis.avg_results"                 }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MayoSRS.cuis.avg_results"            , "./../Similarity/MayoSRS.cuis.gold"                , 1 ) if ( -e "$similarityFilePath/MayoSRS.cuis.avg_results"             && $averageOptionEnabled  == 1 );
+            $results{ "MayoSRS.cuis.comp_results"                }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MayoSRS.cuis.comp_results"           , "./../Similarity/MayoSRS.cuis.gold"                , 1 ) if ( -e "$similarityFilePath/MayoSRS.cuis.comp_results"            && $compoundOptionEnabled == 1 );
+            $results{ "MayoSRS.cuis.sum_results"                 }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MayoSRS.cuis.sum_results"            , "./../Similarity/MayoSRS.cuis.gold"                , 1 ) if ( -e "$similarityFilePath/MayoSRS.cuis.sum_results"             && $summedOptionedEnabled == 1 );
+            $results{ "MiniMayoSRS.cuis.coders.avg_results"      }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.cuis.avg_results"        , "./../Similarity/MiniMayoSRS.cuis.coders.gold"     , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.cuis.avg_results"         && $averageOptionEnabled  == 1 );
+            $results{ "MiniMayoSRS.cuis.coders.comp_results"     }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.cuis.comp_results"       , "./../Similarity/MiniMayoSRS.cuis.coders.gold"     , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.cuis.comp_results"        && $compoundOptionEnabled == 1 );
+            $results{ "MiniMayoSRS.cuis.coders.sum_results"      }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.cuis.sum_results"        , "./../Similarity/MiniMayoSRS.cuis.coders.gold"     , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.cuis.sum_results"         && $summedOptionedEnabled == 1 );
+            $results{ "MiniMayoSRS.cuis.physicians.avg_results"  }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.cuis.avg_results"        , "./../Similarity/MiniMayoSRS.cuis.physicians.gold" , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.cuis.avg_results"         && $averageOptionEnabled  == 1 );
+            $results{ "MiniMayoSRS.cuis.physicians.comp_results" }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.cuis.comp_results"       , "./../Similarity/MiniMayoSRS.cuis.physicians.gold" , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.cuis.comp_results"        && $compoundOptionEnabled == 1 );
+            $results{ "MiniMayoSRS.cuis.physicians.sum_results"  }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.cuis.sum_results"        , "./../Similarity/MiniMayoSRS.cuis.physicians.gold" , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.cuis.sum_results"         && $summedOptionedEnabled == 1 );
+            $results{ "UMNSRS_reduced_rel.cuis.avg_results"      }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_rel.cuis.avg_results" , "./../Similarity/UMNSRS_reduced_rel.cuis.gold"     , 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_rel.cuis.avg_results"  && $averageOptionEnabled  == 1 );
+            $results{ "UMNSRS_reduced_rel.cuis.comp_results"     }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_rel.cuis.comp_results", "./../Similarity/UMNSRS_reduced_rel.cuis.gold"     , 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_rel.cuis.comp_results" && $compoundOptionEnabled == 1 );
+            $results{ "UMNSRS_reduced_rel.cuis.sum_results"      }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_rel.cuis.sum_results" , "./../Similarity/UMNSRS_reduced_rel.cuis.gold"     , 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_rel.cuis.sum_results"  && $summedOptionedEnabled == 1 );
+            $results{ "UMNSRS_reduced_sim.cuis.avg_results"      }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_sim.cuis.avg_results" , "./../Similarity/UMNSRS_reduced_sim.cuis.gold"     , 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_sim.cuis.avg_results"  && $averageOptionEnabled  == 1 );
+            $results{ "UMNSRS_reduced_sim.cuis.comp_results"     }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_sim.cuis.comp_results", "./../Similarity/UMNSRS_reduced_sim.cuis.gold"     , 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_sim.cuis.comp_results" && $compoundOptionEnabled == 1 );
+            $results{ "UMNSRS_reduced_sim.cuis.sum_results"      }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_sim.cuis.sum_results" , "./../Similarity/UMNSRS_reduced_sim.cuis.gold"     , 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_sim.cuis.sum_results"  && $summedOptionedEnabled == 1 );
         }
         # Word Term Files
         elsif( $isWordOrCUIVectorData eq "word" )
         {
-            $results{ "MayoSRS.terms.avg_results"                 }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MayoSRS.terms.avg_results"            , "./../Similarity/MayoSRS.terms.gold"           , 1 ) if ( -e "$similarityFilePath/MayoSRS.terms.avg_results"             && $averageOptionEnabled  == 1 );
-            $results{ "MayoSRS.terms.comp_results"                }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MayoSRS.terms.comp_results"           , "./../Similarity/MayoSRS.terms.gold"           , 1 ) if ( -e "$similarityFilePath/MayoSRS.terms.comp_results"            && $compoundOptionEnabled == 1 );
-            $results{ "MayoSRS.terms.sum_results"                 }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MayoSRS.terms.sum_results"            , "./../Similarity/MayoSRS.terms.gold"           , 1 ) if ( -e "$similarityFilePath/MayoSRS.terms.sum_results"             && $summedOptionedEnabled == 1 );
-            $results{ "MiniMayoSRS.terms.coders.avg_results"      }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.terms.avg_results"        , "./../Similarity/MiniMayoSRS.terms.coders"     , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.terms.avg_results"         && $averageOptionEnabled  == 1 );
-            $results{ "MiniMayoSRS.terms.coders.comp_results"     }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.terms.comp_results"       , "./../Similarity/MiniMayoSRS.terms.coders"     , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.terms.comp_results"        && $compoundOptionEnabled == 1 );
-            $results{ "MiniMayoSRS.terms.coders.sum_results"      }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.terms.sum_results"        , "./../Similarity/MiniMayoSRS.terms.coders"     , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.terms.sum_results"         && $summedOptionedEnabled == 1 );
-            $results{ "MiniMayoSRS.terms.physicians.avg_results"  }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.terms.avg_results"        , "./../Similarity/MiniMayoSRS.terms.physicians" , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.terms.avg_results"         && $averageOptionEnabled  == 1 );
-            $results{ "MiniMayoSRS.terms.physicians.comp_results" }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.terms.comp_results"       , "./../Similarity/MiniMayoSRS.terms.physicians" , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.terms.comp_results"        && $compoundOptionEnabled == 1 );
-            $results{ "MiniMayoSRS.terms.physicians.sum_results"  }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.terms.sum_results"        , "./../Similarity/MiniMayoSRS.terms.physicians" , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.terms.sum_results"         && $summedOptionedEnabled == 1 );
-            $results{ "UMNSRS_reduced_rel.terms.avg_results"      }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_rel.terms.avg_results" , "./../Similarity/UMNSRS_reduced_rel.terms.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_rel.terms.avg_results"  && $averageOptionEnabled  == 1 );
-            $results{ "UMNSRS_reduced_rel.terms.comp_results"     }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_rel.terms.comp_results", "./../Similarity/UMNSRS_reduced_rel.terms.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_rel.terms.comp_results" && $compoundOptionEnabled == 1 );
-            $results{ "UMNSRS_reduced_rel.terms.sum_results"      }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_rel.terms.sum_results" , "./../Similarity/UMNSRS_reduced_rel.terms.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_rel.terms.sum_results"  && $summedOptionedEnabled == 1 );
-            $results{ "UMNSRS_reduced_sim.terms.avg_results"      }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_sim.terms.avg_results" , "./../Similarity/UMNSRS_reduced_sim.terms.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_sim.terms.avg_results"  && $averageOptionEnabled  == 1 );
-            $results{ "UMNSRS_reduced_sim.terms.comp_results"     }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_sim.terms.comp_results", "./../Similarity/UMNSRS_reduced_sim.terms.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_sim.terms.comp_results" && $compoundOptionEnabled == 1 );
-            $results{ "UMNSRS_reduced_sim.terms.sum_results"      }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_sim.terms.sum_results" , "./../Similarity/UMNSRS_reduced_sim.terms.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_sim.terms.sum_results"  && $summedOptionedEnabled == 1 );
+            $results{ "MayoSRS.terms.avg_results"                 }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MayoSRS.terms.avg_results"            , "./../Similarity/MayoSRS.terms.gold"                , 1 ) if ( -e "$similarityFilePath/MayoSRS.terms.avg_results"             && $averageOptionEnabled  == 1 );
+            $results{ "MayoSRS.terms.comp_results"                }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MayoSRS.terms.comp_results"           , "./../Similarity/MayoSRS.terms.gold"                , 1 ) if ( -e "$similarityFilePath/MayoSRS.terms.comp_results"            && $compoundOptionEnabled == 1 );
+            $results{ "MayoSRS.terms.sum_results"                 }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MayoSRS.terms.sum_results"            , "./../Similarity/MayoSRS.terms.gold"                , 1 ) if ( -e "$similarityFilePath/MayoSRS.terms.sum_results"             && $summedOptionedEnabled == 1 );
+            $results{ "MiniMayoSRS.terms.coders.avg_results"      }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.terms.avg_results"        , "./../Similarity/MiniMayoSRS.terms.coders.gold"     , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.terms.avg_results"         && $averageOptionEnabled  == 1 );
+            $results{ "MiniMayoSRS.terms.coders.comp_results"     }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.terms.comp_results"       , "./../Similarity/MiniMayoSRS.terms.coders.gold"     , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.terms.comp_results"        && $compoundOptionEnabled == 1 );
+            $results{ "MiniMayoSRS.terms.coders.sum_results"      }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.terms.sum_results"        , "./../Similarity/MiniMayoSRS.terms.coders.gold"     , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.terms.sum_results"         && $summedOptionedEnabled == 1 );
+            $results{ "MiniMayoSRS.terms.physicians.avg_results"  }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.terms.avg_results"        , "./../Similarity/MiniMayoSRS.terms.physicians.gold" , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.terms.avg_results"         && $averageOptionEnabled  == 1 );
+            $results{ "MiniMayoSRS.terms.physicians.comp_results" }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.terms.comp_results"       , "./../Similarity/MiniMayoSRS.terms.physicians.gold" , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.terms.comp_results"        && $compoundOptionEnabled == 1 );
+            $results{ "MiniMayoSRS.terms.physicians.sum_results"  }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.terms.sum_results"        , "./../Similarity/MiniMayoSRS.terms.physicians.gold" , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.terms.sum_results"         && $summedOptionedEnabled == 1 );
+            $results{ "UMNSRS_reduced_rel.terms.avg_results"      }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_rel.terms.avg_results" , "./../Similarity/UMNSRS_reduced_rel.terms.gold"     , 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_rel.terms.avg_results"  && $averageOptionEnabled  == 1 );
+            $results{ "UMNSRS_reduced_rel.terms.comp_results"     }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_rel.terms.comp_results", "./../Similarity/UMNSRS_reduced_rel.terms.gold"     , 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_rel.terms.comp_results" && $compoundOptionEnabled == 1 );
+            $results{ "UMNSRS_reduced_rel.terms.sum_results"      }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_rel.terms.sum_results" , "./../Similarity/UMNSRS_reduced_rel.terms.gold"     , 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_rel.terms.sum_results"  && $summedOptionedEnabled == 1 );
+            $results{ "UMNSRS_reduced_sim.terms.avg_results"      }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_sim.terms.avg_results" , "./../Similarity/UMNSRS_reduced_sim.terms.gold"     , 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_sim.terms.avg_results"  && $averageOptionEnabled  == 1 );
+            $results{ "UMNSRS_reduced_sim.terms.comp_results"     }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_sim.terms.comp_results", "./../Similarity/UMNSRS_reduced_sim.terms.gold"     , 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_sim.terms.comp_results" && $compoundOptionEnabled == 1 );
+            $results{ "UMNSRS_reduced_sim.terms.sum_results"      }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_sim.terms.sum_results" , "./../Similarity/UMNSRS_reduced_sim.terms.gold"     , 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_sim.terms.sum_results"  && $summedOptionedEnabled == 1 );
         }
 
         my @scores = sort keys( %results );

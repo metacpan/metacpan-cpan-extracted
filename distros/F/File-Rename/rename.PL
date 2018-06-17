@@ -36,13 +36,13 @@ __END__
 #
 
 use strict;
-use File::Rename ();
+require File::Rename;
 use Pod::Usage;
 
 main() unless caller;
 
 sub main {
-    my $options = File::Rename::Options::GetOptions
+    my $options = File::Rename::Options::GetOptions()
         or pod2usage;
 
     mod_version() if $options->{show_version};
@@ -55,9 +55,11 @@ sub main {
 }
 
 sub mod_version {
-    print __FILE__ .
-	' using File::Rename version '.
-        $File::Rename::VERSION ."\n\n";
+    print __FILE__;
+    print ' using File::Rename version '.  $File::Rename::VERSION;
+    print ', File::Rename::Options version '. $File::Rename::Options::VERSION
+    	if (eval $File::Rename::Options::VERSION) < (eval $File::Rename::VERSION);
+    print "\n\n";
     exit 0
 }   
 

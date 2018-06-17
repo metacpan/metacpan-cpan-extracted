@@ -29,7 +29,7 @@ is $c->render_to_string(inline => '[% foo %]', foo => '☃'), '☃', 'encoding w
 
 # Set configuration
 $app = Mojolicious->new(secrets => ['works']);
-my $tt_config = { INTERPOLATE => 1, START_TAG => '<%', END_TAG => '%>', OUTLINE_TAG => '%=' };
+my $tt_config = { INTERPOLATE => 1, START_TAG => '<%', END_TAG => '%>' };
 $app->plugin(TemplateToolkit => { name => 'foo', template => $tt_config });
 $c = $app->build_controller;
 $c->app->log->level('fatal');
@@ -37,6 +37,5 @@ $c->app->log->level('fatal');
 is $c->render_to_string(inline => 'foo', handler => 'foo'), 'foo', 'name works';
 is $c->render_to_string(inline => '$foo', handler => 'foo', foo => 'bar'), 'bar', 'interpolate works';
 is $c->render_to_string(inline => '<% foo %>', handler => 'foo', foo => 'bar'), 'bar', 'tags work';
-is $c->render_to_string(inline => "%= foo\nbar", handler => 'foo', foo => 'bar'), "barbar", 'outline tag works';
 
 done_testing();

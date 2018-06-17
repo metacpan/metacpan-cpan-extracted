@@ -2,6 +2,11 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
+if (! -f '/usr/include/linux/i2c.h' && ! -f '/usr/local/include/linux/i2c.h'){
+    print "i2c is not available, exiting...\n";
+    exit;
+}
+
 WriteMakefile(
     NAME             => 'RPi::GPIOExpander::MCP23017',
     AUTHOR           => q{Steve Bertrand <steveb@cpan.org>},

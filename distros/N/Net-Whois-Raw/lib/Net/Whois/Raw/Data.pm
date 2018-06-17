@@ -1,5 +1,5 @@
 package Net::Whois::Raw::Data;
-$Net::Whois::Raw::Data::VERSION = '2.99014';
+$Net::Whois::Raw::Data::VERSION = '2.99015';
 # ABSTRACT: Config for Net::Whois::Raw.
 
 use utf8;
@@ -14,9 +14,9 @@ our @www_whois = qw(
 
 our %servers = qw(
     RU                  whois.ripn.net
-    NET.RU              whois.ripn.net
-    ORG.RU              whois.ripn.net
-    PP.RU               whois.ripn.net
+    NET.RU              whois.nic.net.ru
+    ORG.RU              whois.nic.net.ru
+    PP.RU               whois.nic.net.ru
     SU                  whois.ripn.net
     XN--P1AI            whois.ripn.net
     XN--D1ACJ3B         whois.ripn.net
@@ -4280,7 +4280,7 @@ Net::Whois::Raw::Data - Config for Net::Whois::Raw.
 
 =head1 VERSION
 
-version 2.99014
+version 2.99015
 
 =head1 AUTHOR
 

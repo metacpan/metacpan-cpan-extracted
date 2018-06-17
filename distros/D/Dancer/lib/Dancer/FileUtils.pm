@@ -1,7 +1,7 @@
 package Dancer::FileUtils;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: helper providing file utilities
-$Dancer::FileUtils::VERSION = '1.3202';
+$Dancer::FileUtils::VERSION = '1.3400';
 use strict;
 use warnings;
 
@@ -157,7 +157,7 @@ Dancer::FileUtils - helper providing file utilities
 
 =head1 VERSION
 
-version 1.3202
+version 1.3400
 
 =head1 SYNOPSIS
 

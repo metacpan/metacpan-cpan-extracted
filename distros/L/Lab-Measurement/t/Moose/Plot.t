@@ -8,6 +8,7 @@ use Test::More;
 use Test::File;
 use Lab::Test import => [qw/is_relative_error/];
 use Lab::Moose;
+use Lab::Moose::Catfile 'our_catfile';
 use Module::Load 'autoload';
 use File::Temp qw/tempfile tempdir/;
 use File::Slurper 'read_binary';

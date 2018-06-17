@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/env perl
 use Test::More tests=>7;
 use FindBin;
 use File::Temp qw(tempfile);

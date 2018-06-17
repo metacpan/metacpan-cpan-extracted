@@ -8,7 +8,7 @@ use strict;
 use warnings;
 
 our @ISA = qw(Forks::Super::Sync);
-our $VERSION = '0.93';
+our $VERSION = '0.94';
 our $NOWAIT_YIELD_DURATION = 50; # milliseconds
 
 # Something we have to watch out for is a process dying without
@@ -158,7 +158,7 @@ Forks::Super::Sync::Win32Mutex
 
 =head1 VERSION
 
-0.93
+0.94
 
 =head1 SYNOPSIS
 

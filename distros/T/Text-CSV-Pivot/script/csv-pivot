@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+
+use strict; use warnings;
+use Getopt::Long;
+use Text::CSV::Pivot;
+
+my $help;
+my ($input_file, $output_file);
+my ($col_key_idx, $col_name_idx, $col_value_idx, @col_skip_idx);
+
+GetOptions("input-file|i=s"    => \$input_file,
+           "output-file|o=s"   => \$output_file,
+           "col-key-idx|k=i"   => \$col_key_idx,
+           "col-name-idx|n=i"  => \$col_name_idx,
+           "col-value-idx|v=i" => \$col_value_idx,
+           "col-skip-idx|s=s"  => \@col_skip_idx,
+           "help!"             => \$help);
+die help_text() if ($help);
+
+die help_text("ERROR: Missing input file.")         unless defined $input_file;
+die help_text("ERROR: Missing column key index.")   unless defined $col_key_idx;
+die help_text("ERROR: Missing column name index.")  unless defined $col_name_idx;
+die help_text("ERROR: Missing column value index.") unless defined $col_value_idx;
+
+die help_text("ERROR: Unable to locate input file [$input_file]")   unless -f $input_file;
+die help_text("ERROR: Invalid column key index [$col_key_idx]")     unless ($col_key_idx   =~ /^\d+$/);
+die help_text("ERROR: Invalid column name index [$col_name_idx]")   unless ($col_name_idx  =~ /^\d+$/);
+die help_text("ERROR: Invalid column value index [$col_value_idx]") unless ($col_value_idx =~ /^\d+$/);
+
+@col_skip_idx = map {
+    die help_text("ERROR: Invalid column skip index [$_]") unless (/^\d+$/);
+    $_ + 0
+} split /,/, join ",", @col_skip_idx;
+
+my $params = {
+    input_file    => $input_file,
+    col_key_idx   => $col_key_idx,
+    col_name_idx  => $col_name_idx,
+    col_value_idx => $col_value_idx,
+};
+
+$params->{output_file}  = $output_file if defined $output_file;
+$params->{col_skip_idx} = \@col_skip_idx;
+
+Text::CSV::Pivot->new($params)->transform;
+
+sub help_text {
+    my $message   = shift||'';
+    my $help_text = <<"HELP";
+$message
+Usage: csv-pivot [OPTIONS]...
+
+  OPTIONS:
+    -i, --i, -input-file,    --input-file=s     input file (required)
+    -o, --o, -output-file,   --output-file=s    output file (optional)
+    -k, --k, -col-key-idx,   --col-key-idx=i    key column index (required)
+    -n, --n, -col-name-idx,  --col-name-idx=i   name column index (required)
+    -v, --v, -col-value-idx, --col-value-idx=i  value column index (required)
+    -s, --s, -col-skip-idx,  --col-skip-idx=s   comma separated skip column index (optional)
+    -h, --help                                  print this message
+
+HELP
+
+    return $help_text;
+}

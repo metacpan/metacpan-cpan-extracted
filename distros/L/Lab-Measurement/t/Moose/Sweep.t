@@ -9,6 +9,7 @@ use Lab::Test import => ['file_ok'];
 use File::Glob 'bsd_glob';
 use File::Spec::Functions 'catfile';
 use Lab::Moose;
+use YAML::XS 'LoadFile';
 
 use File::Temp qw/tempdir/;
 
@@ -54,6 +55,7 @@ sub dummysource {
         datafile    => $datafile,
         folder      => $dir,
         date_prefix => 1,
+        meta_data   => { foo => 1, bar => 2 },
 
         # use default datafile_dim and point_dim
     );
@@ -74,6 +76,10 @@ EOF
     );
     my $path = catfile( $sweep->foldername, 'data.dat' );
     file_ok( $path, $expected, "basic 1D sweep: datafile" );
+    my $meta_file = catfile( $sweep->foldername, 'META.yml' );
+    my $meta = LoadFile($meta_file);
+    is( $meta->{foo}, 1, "meta data: foo => 1" );
+    is( $meta->{bar}, 2, "meta data: bar => 2" );
 }
 
 {
@@ -668,6 +674,48 @@ EOF
         \@files, \@expected_files,
         "1D Sweep with 1D data: output folder"
     );
+}
+
+{
+    #
+    # Step::Repeat
+    #
+
+    my $sweep = sweep(
+        type  => 'Step::Repeat',
+        count => 10,
+
+    );
+
+    my $datafile = sweep_datafile( columns => ['count'] );
+
+    my $meas = sub {
+        my $sweep = shift;
+        my $c     = $sweep->get_value();
+        $sweep->log( count => $c );
+    };
+
+    $sweep->start(
+        measurement => $meas,
+        datafile    => $datafile,
+        folder      => $dir,
+    );
+
+    my $expected = <<"EOF";
+# count
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+EOF
+    my $path = catfile( $sweep->foldername, 'data.dat' );
+    file_ok( $path, $expected, "Step::Repeat: datafile" );
 }
 
 done_testing();

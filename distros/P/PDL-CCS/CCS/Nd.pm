@@ -3,7 +3,7 @@
 ## Description: N-dimensional CCS-encoded pseudo-PDL
 
 package PDL::CCS::Nd;
-use PDL::Lite;
+use PDL::Lite qw();
 use PDL::VectorValued;
 use PDL::CCS::Config qw(ccs_indx);
 use PDL::CCS::Functions qw(ccs_decode ccs_pointerlen ccs_qsort);
@@ -19,7 +19,7 @@ BEGIN {
   *can = \&UNIVERSAL::can;
 }
 
-our $VERSION = '1.23.7'; ##-- update with perl-reversion from Perl::Version module
+our $VERSION = '1.23.8'; ##-- update with perl-reversion from Perl::Version module
 our @ISA = qw();
 our %EXPORT_TAGS =
   (
@@ -203,7 +203,7 @@ sub insertWhich :lvalue {
 
   ##-- sanity check
   if ($which->dim(0) != $ccs->[$WHICH]->dim(0)) {
-    barf(ref($ccs)."::insertWhich(): wrong number of index dimensions in whichND argument:",
+    PDL::Lite::barf(ref($ccs)."::insertWhich(): wrong number of index dimensions in whichND argument:",
 	 " is ", $which->dim(0), ", should be ", $ccs->[$WHICH]->dim(0));
   }
 
@@ -231,7 +231,7 @@ sub appendWhich :lvalue {
   #if ($which->dim(0) != $ccs->[$WHICH]->dim(0))
   if ($which->dim(0) != $ccs->[$PDIMS]->nelem)
     {
-      barf(ref($ccs)."::appendWhich(): wrong number of index dimensions in whichND argument:",
+      PDL::Lite::barf(ref($ccs)."::appendWhich(): wrong number of index dimensions in whichND argument:",
 	   " is ", $which->dim(0), ", should be ", $ccs->[$PDIMS]->nelem);
     }
 
@@ -741,7 +741,7 @@ sub dummy  :lvalue {
   $vdimi    = 0 if (!defined($vdimi));
   $vdimi    = @vdims + $vdimi + 1 if ($vdimi < 0);
   if ($vdimi < 0) {
-    barf(ref($ccs). "::dummy(): negative dimension number ", ($vdimi+@vdims), " exceeds number of dims ", scalar(@vdims));
+    PDL::Lite::barf(ref($ccs). "::dummy(): negative dimension number ", ($vdimi+@vdims), " exceeds number of dims ", scalar(@vdims));
   }
   splice(@vdims,$vdimi,0,-$vdimsize);
   my $ccs2 = $ccs->copyShallow;
@@ -798,7 +798,7 @@ sub transpose  :lvalue {
 ## PDL API: Indexing
 
 sub slice {  #:lvalue
-  barf(ref($_[0])."::slice() is not implemented yet (try dummy, dice_axis, indexND, etc.)");
+  PDL::Lite::barf(ref($_[0])."::slice() is not implemented yet (try dummy, dice_axis, indexND, etc.)");
 }
 
 ## $nzi = $ccs->indexNDi($ndi)
@@ -920,14 +920,14 @@ sub dice_axis  :lvalue {
   ##-- get
   my $ndims = $ccs->ndims;
   $axis_v = $ndims + $axis_v if ($axis_v < 0);
-  barf(ref($ccs)."::dice_axis(): axis ".($axis_v<0 ? ($axis_v+$ndims) : $axis_v)." out of range: should be 0<=dim<$ndims")
+  PDL::Lite::barf(ref($ccs)."::dice_axis(): axis ".($axis_v<0 ? ($axis_v+$ndims) : $axis_v)." out of range: should be 0<=dim<$ndims")
     if ($axis_v < 0 || $axis_v >= $ndims);
   my $axis  = $ccs->[$VDIMS]->at($axis_v);
   my $asize = $axis < 0 ? -$axis : $ccs->[$PDIMS]->at($axis);
   $axisi    = PDL->topdl($axisi);
   my ($aimin,$aimax) = $axisi->minmax;
-  barf(ref($ccs)."::dice_axis(): invalid index $aimin (valid range 0..".($asize-1).")") if ($aimin < 0);
-  barf(ref($ccs)."::dice_axis(): invalid index $aimax (valid range 0..".($asize-1).")") if ($aimax >= $asize);
+  PDL::Lite::barf(ref($ccs)."::dice_axis(): invalid index $aimin (valid range 0..".($asize-1).")") if ($aimin < 0);
+  PDL::Lite::barf(ref($ccs)."::dice_axis(): invalid index $aimax (valid range 0..".($asize-1).")") if ($aimax >= $asize);
   ##
   ##-- check for virtual
   if ($axis < 0) {
@@ -1049,7 +1049,7 @@ sub ispresent  :lvalue {
 ## $ufunc_sub = _ufuncsub($subname, \&ccs_accum_sub, $allow_bad_missing)
 sub _ufuncsub {
   my ($subname,$accumsub,$allow_bad_missing) = @_;
-  barf(__PACKAGE__, "::_ufuncsub($subname): no underlying CCS accumulator func!") if (!defined($accumsub));
+  PDL::Lite::barf(__PACKAGE__, "::_ufuncsub($subname): no underlying CCS accumulator func!") if (!defined($accumsub));
   return sub :lvalue {
     my $ccs = shift;
     ##
@@ -1152,7 +1152,7 @@ sub isgood {
 
 sub _ufunc_ind_sub {
   my ($subname,$accumsub,$allow_bad_missing) = @_;
-  barf(__PACKAGE__, "::_ufuncsub($subname): no underlying CCS accumulator func!") if (!defined($accumsub));
+  PDL::Lite::barf(__PACKAGE__, "::_ufuncsub($subname): no underlying CCS accumulator func!") if (!defined($accumsub));
   return sub :lvalue {
     my $ccs = shift;
     ##
@@ -1296,7 +1296,7 @@ sub _ccsnd_binop_align_dims {
 
     ##-- check for (virtual) size mismatch
     next if ($dimsza==1 || $dimszb==1);   ##... ignoring (virtual) dims of size 1
-    barf( __PACKAGE__ , "::$opname(): dimension size mismatch on dim($_): $dimsza != $dimszb")
+    PDL::Lite::barf( __PACKAGE__ , "::$opname(): dimension size mismatch on dim($_): $dimsza != $dimszb")
       if ($dimsza != $dimszb);
 
     ##-- dims match: only align if both are physical
@@ -1776,7 +1776,7 @@ sub inner  :lvalue { $_[0]->mult_mia($_[1],0)->sumover; }
 ## $c = $a->matmult($b)
 ##  + mostly ganked from PDL::Primitive::matmult
 sub matmult :lvalue {
-  barf("Invalid number of arguments for ", __PACKAGE__, "::matmult") if ($#_ < 1);
+  PDL::Lite::barf("Invalid number of arguments for ", __PACKAGE__, "::matmult") if ($#_ < 1);
   my ($a,$b,$c) = @_; ##-- no $c!
   $c = undef if (!ref($c) && defined($c) && $c eq ''); ##-- strangeness: getting $c=''
 
@@ -1793,7 +1793,7 @@ sub matmult :lvalue {
   }
 
   if ($b->dim(1) != $a->dim(0)) {
-    barf(sprintf("Dim mismatch in ", __PACKAGE__ , "::matmult of [%dx%d] x [%dx%d]: %d != %d",
+    PDL::Lite::barf(sprintf("Dim mismatch in ", __PACKAGE__ , "::matmult of [%dx%d] x [%dx%d]: %d != %d",
 		 $a->dim(0),$a->dim(1),$b->dim(0),$b->dim(1),$a->dim(0),$b->dim(1)));
   }
 
@@ -1824,7 +1824,7 @@ sub matmult2d_sdd :lvalue {
 
   ##-- check dim sizes
   if ($b->dim(1) != $a->dim(0)) {
-    barf(sprintf("Dim mismatch in ", __PACKAGE__, "::matmult2d [%dx%d] x [%dx%d] : %d != %d",
+    PDL::Lite::barf(sprintf("Dim mismatch in ", __PACKAGE__, "::matmult2d [%dx%d] x [%dx%d] : %d != %d",
 		 $a->dims,$b->dims, $a->dim(0),$b->dim(1)));
   }
 
@@ -1865,7 +1865,7 @@ sub matmult2d_zdd  :lvalue {
 
   ##-- check dim sizes
   if ($b->dim(1) != $a->dim(0)) {
-    barf(sprintf("Dim mismatch in ", __PACKAGE__, "::matmult2d [%dx%d] x [%dx%d] : %d != %d",
+    PDL::Lite::barf(sprintf("Dim mismatch in ", __PACKAGE__, "::matmult2d [%dx%d] x [%dx%d] : %d != %d",
 		 $a->dims,$b->dims, $a->dim(0),$b->dim(1)));
   }
 

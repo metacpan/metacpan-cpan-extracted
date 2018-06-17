@@ -21,4 +21,6 @@ WriteMakefile(
 	  ABSTRACT_FROM	=> 'lib/File/Rename.pm',
 					# retrieve abstract from module
 	  AUTHOR     	=> 'Robin Barker <RMBarker@cpan.org>',
+
+	  NORECURS	=> 1,
 );

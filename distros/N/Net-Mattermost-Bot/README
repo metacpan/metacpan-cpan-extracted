@@ -1,0 +1,103 @@
+Net-Mattermost-Bot version 0.01
+===============================
+
+A base class for Mattermost bots. Provides a websocket connection and basic API
+controls for creating a simple Mattermost bot.
+
+Several methods are provided which may be overridden in your own bot:
+
+    - event_emit_connection() - The bot connected to the chat server ($self).
+    - event_emit_typing() - Someone started typing ($self, $args).
+    - event_emit_channel_viewed() - A channel was viewed ($self, $args).
+    - event_emit_posted() - A message was posted to a channel ($self, $args).
+
+    Extend Net::Mattermost::Bot in a C<Moo> or C<Moose> package.
+
+    my $bot = Local::MyBot->new({
+        username  => 'username here',
+        password  => 'password here',
+        team_name => 'team name here',
+        base_url  => 'Mattermost server\'s base URL here',
+    });
+
+    $bot->connect();
+
+    package Local::MyBot;
+
+    use Moo;
+
+    extends 'Net::Mattermost::Bot';
+
+    # A message was posted to the channel
+    sub event_emit_posted {
+        my $self = shift;
+        my $args = shift;
+
+        # $args contains data from Mattermost
+
+        return $self->_post_to_channel({
+            channel_id => 1234,
+            message    => 'This will be output to channel with ID "1234"',
+        });
+    }
+
+    1;
+
+API calls can also be made directly to Mattermost using their v4 API (using
+Furl):
+
+    sub event_emit_posted {
+        my $self = shift;
+
+        # Get a list of your team's custom emoticons
+        my $res = $self->furl->get($self->api_url.'/emoji', $self->headers);
+
+        # ...
+    }
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    - FindBin
+    - JSON::MaybeXS
+    - Moo
+    - MooX::HandlesVia
+    - Types::Standard
+    - Carp
+    - Furl
+    - HTTP::Status
+    - List::Util
+    - Mojolicious (Mojo::IOLoop and Mojo::UserAgent)   
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2018 Mike Jones
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+

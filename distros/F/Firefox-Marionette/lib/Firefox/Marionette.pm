@@ -40,7 +40,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.54';
+our $VERSION = '0.56';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -61,6 +61,7 @@ sub _MILLISECONDS_IN_ONE_SECOND     { return 1000 }
 sub _DEFAULT_PAGE_LOAD_TIMEOUT      { return 300_000 }
 sub _DEFAULT_SCRIPT_TIMEOUT         { return 30_000 }
 sub _DEFAULT_IMPLICIT_TIMEOUT       { return 0 }
+sub _WIN32_CONNECTION_REFUSED       { return 10_061 }
 
 sub BY_XPATH {
     Carp::carp(
@@ -858,28 +859,37 @@ sub _binary {
     }
     else {
         if ( $OSNAME eq 'MSWin32' ) {
-            my $program_files_key;
-            foreach my $possible ( 'ProgramFiles(x86)', 'ProgramFiles' ) {
-                if ( $ENV{$possible} ) {
-                    $program_files_key = $possible;
+          SEARCH:
+            foreach my $possible ( 'ProgramFiles', 'ProgramFiles(x86)' ) {
+                if (
+                    ( $ENV{$possible} )
+                    && (
+                        -e File::Spec->catfile(
+                            $ENV{$possible}, 'Mozilla Firefox',
+                            'firefox.exe'
+                        )
+                    )
+                  )
+                {
+                    $binary =
+                      File::Spec->catfile( $ENV{$possible}, 'Mozilla Firefox',
+                        'firefox.exe' );
                     last;
                 }
             }
-            $binary = File::Spec->catfile(
-                $ENV{$program_files_key},
-                'Mozilla Firefox',
-                'firefox.exe'
-            );
         }
         elsif ( $OSNAME eq 'darwin' ) {
             $binary = '/Applications/Firefox.app/Contents/MacOS/firefox';
         }
         elsif ( $OSNAME eq 'cygwin' ) {
-            if ( -e "$ENV{PROGRAMFILES} (x86)" ) {
+            if (   ( -e "$ENV{PROGRAMFILES} (x86)" )
+                && ( -e "$ENV{PROGRAMFILES} (x86)/Mozilla Firefox/firefox.exe" )
+              )
+            {
                 $binary =
                   "$ENV{PROGRAMFILES} (x86)/Mozilla Firefox/firefox.exe";
             }
-            else {
+            elsif ( -e "$ENV{PROGRAMFILES}/Mozilla Firefox/firefox.exe" ) {
                 $binary = "$ENV{PROGRAMFILES}/Mozilla Firefox/firefox.exe";
             }
         }
@@ -999,6 +1009,11 @@ sub _setup_local_connection_to_firefox {
             $connected = 1;
         }
         elsif ( $EXTENDED_OS_ERROR == POSIX::ECONNREFUSED() ) {
+            sleep 1;
+        }
+        elsif (( $OSNAME eq 'MSWin32' )
+            && ( $EXTENDED_OS_ERROR == _WIN32_CONNECTION_REFUSED() ) )
+        {
             sleep 1;
         }
         else {
@@ -1158,7 +1173,11 @@ sub _proxy_from_env {
         }
         if ( $ENV{$full_name} ) {
             $build->{proxyType} = 'manual';
-            my $uri       = URI->new("$ENV{$full_name}");
+            my $value = $ENV{$full_name};
+            if ( $value !~ /^\w+:\/\//smx ) { # add an http scheme if none exist
+                $value = 'http://' . $value;
+            }
+            my $uri       = URI->new($value);
             my $build_key = $key;
             if ( $key eq 'https' ) {
                 $build_key = 'ssl';
@@ -1317,7 +1336,7 @@ sub _create_capabilities {
         ),
         browser_version => $parameters->{browserVersion},
         platform_name   => $parameters->{platformName},
-        rotatable => $parameters->{rotatable} ? 1 : 0,
+        rotatable        => $parameters->{rotatable} ? 1 : 0,
         platform_version => $parameters->{platformVersion},
         moz_profile      => $parameters->{'moz:profile'}
           || $self->{profile_directory},
@@ -3076,7 +3095,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.54
+Version 0.56
 
 =head1 SYNOPSIS
 
@@ -3089,11 +3108,11 @@ Version 0.54
 
     $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
 
-    my $file_handle = $firefox->selfie(highlights => [ $firefox->find_name('lucky') ])
+    my $file_handle = $firefox->selfie(highlights => [ $firefox->find_name('lucky') ]);
 
     $firefox->find('//button[@name="lucky"]')->click();
 
-    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click()
+    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
 
 =head1 DESCRIPTION
 
@@ -3375,7 +3394,7 @@ returns a list of file paths (including partial downloads) of downloads during t
 
     $firefox->find('//button[@name="lucky"]')->click();
 
-    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click()
+    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
 
     while(!$firefox->downloads()) { sleep 1 }
 
@@ -3395,7 +3414,7 @@ returns true if any files in L<downloads|Firefox::Marionette#downloads> end in C
 
     $firefox->find('//button[@name="lucky"]')->click();
 
-    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click()
+    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
 
     while(!$firefox->downloads()) { sleep 1 }
 
@@ -3492,7 +3511,7 @@ accepts a subroutine reference as a parameter and then executes the subroutine. 
 
     $firefox->find_name('lucky')->click();
 
-    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click()
+    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
 
 =head2 bye
 
@@ -3506,7 +3525,7 @@ accepts a subroutine reference as a parameter and then executes the subroutine. 
 
     $firefox->find_name('lucky')->click();
 
-    $firefox->bye(sub { $firefox->find_name('lucky') })->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click()
+    $firefox->bye(sub { $firefox->find_name('lucky') })->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
 
 =head2 sleep_time_in_ms
 

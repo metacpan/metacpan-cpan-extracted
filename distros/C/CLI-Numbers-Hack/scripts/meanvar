@@ -1,0 +1,109 @@
+#!/usr/bin/perl
+
+use 5.001 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts 'mMP' , \my %o ; 
+use Scalar::Util qw[ looks_like_number ] ; 
+
+$o{m} //= $o{M} ; # 3次モーメントと4次モーメントを使った計算をするか否か 
+sub lln ( $ ) ; * lln = * looks_like_number ; 
+
+sub reading ( ) ; # 入力から読取り 
+sub outbasic ( ) ; # 基本的な情報を出力
+sub outMore ( ) ; # 
+
+my $notcount = 0 ; # 計数対象とならなかった個数
+my $count = 0 ; # 対象となった件数 
+my $sum = 0 ; 
+my $sqsum = 0 ; # squared sum  
+my $cbsum = 0 ; # 3乗和 cubic 
+my $qusum = 0 ; # 4乗和 quartic
+
+reading ; 
+outbasic if $o{M} || ! $o{m} ;
+print "\n" if $o{M} ; 
+outMore if $o{m} ; 
+exit 0 ;
+
+sub reading () { 
+    while ( <> )  { 
+        chomp ; 
+        do { $notcount += 1 ; next } if $o{P} && ! looks_like_number $_  ;
+        
+        $count += 1 ; 
+        $_ += 0 ; # baseed on `perldoc POSIX`'s strtod advice. 
+        $sum += $_ ; 
+        $sqsum += $_ ** 2 ; 
+        next if ! $o{m} ;
+        $cbsum += $_ ** 3 ; 
+        $qusum += $_ ** 4 ;
+    }
+} 
+
+sub outbasic () { 
+    my $sqres = $sqsum - $sum ** 2 / $count ; 
+    my $s_var = $sqres / $count ; 
+    my $u_var = $sqres / ( $count - 1 ) ; 
+
+    print join "\t" , qw [ average  s_var u_var s_stdev u_stdev ; count not-count ] ; 
+    print "\n" ; 
+    my $fmt = "%g\t"x5 .";\t"."%g\t%g" ; 
+    printf $fmt  , $sum/$count , $s_var , $u_var , sqrt $s_var , sqrt $u_var , $count , $notcount ;
+    print "\n" ; 
+} 
+
+sub outMore ()  { 
+    # moments 
+    my $m1 = $sum / $count ; 
+    my $m2 = $sqsum / $count ; 
+    my $m3 = $cbsum / $count ; 
+    my $m4 = $qusum / $count ; 
+    # cumulants 
+    my $c1 = $m1 ; 
+    my $c2 = $m2 - $m1 ** 2 ; 
+    my $c3 = $m3 - 3 * $m1 * $m2 + 2 * $m1 ** 3 ;
+    my $c4 = $m4 - 4 * $m3 * $m1 - 3 * $m2 ** 2 + 12 * $m2 * $m1 ** 2 - 6 * $m1 ** 4 ;
+
+    sub f ( $ ) { sprintf "%0.4g" , $_[0] } ; 
+
+    print join ( "\t" , qw [ order moment central cumulant derived ] ) , "\n" ; 
+    print join ( "\t" , 1 , f $m1 , 0     , f $c1 ) , "\n" ;
+    print join ( "\t" , 2 , f $m2 , f $c2 , f $c2 ) , "\n" ; 
+    print join ( "\t" , 3 , f $m3 , f $c3 , f $c3 , f $c3 / $c2 ** 1.5 , '<- skewness' ) , "\n" ; 
+    print join ( "\t" , 4 , f $m4 , f $c4 , f $c4 + 3*$c2**2 , f +($c4+3*$c2**2) / $c2 ** 2 , '<- kurtosis(>=3)' ) , "\n" ; 
+}
+
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE{
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if $ARGV[1] eq 'opt' ? m/^\ +\-/ : s/^=head1// .. s/^=cut// ;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8 
+
+=head1
+
+ $0 
+   入力の各行を各数値と見なして、それらの平均、分散などを表示する。
+   出力は、平均、標本分散、不偏分散、標本分散の平方根、不偏分散の平方根
+   及び、入力の個数、入力に計数されなかった個数である。
+
+ オプション: 
+
+   -P : PerlのScalar::Utilモジュールのlooks_like_numberで数かどうかを判定する。
+
+ 注意点: 
+
+   分散の計算に単純な足し合わせをしているのみなので、絶対値の大きく異なる数を
+   百万個程度以上入力すると、誤差が大きくなるかも知れない。
+   (計算上の工夫は後日の課題とする。)
+
+=cut

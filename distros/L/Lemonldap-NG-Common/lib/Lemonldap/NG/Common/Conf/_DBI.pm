@@ -62,8 +62,10 @@ sub _dbh {
         $self->{_dbh}->{sqlite_unicode} = 1;
     }
     elsif ( $self->{dbiChain} =~ /^dbi:mysql/i ) {
-        $self->{_dbh}->{mysql_enable_utf8} = 1;
-        $self->{_dbh}->do("set names 'utf8'");
+        eval {
+            $self->{_dbh}->{mysql_enable_utf8} = 1;
+            $self->{_dbh}->do("set names 'utf8'");
+        };
     }
     elsif ( $self->{dbiChain} =~ /^dbi:pg/i ) {
         $self->{_dbh}->{pg_enable_utf8} = 1;

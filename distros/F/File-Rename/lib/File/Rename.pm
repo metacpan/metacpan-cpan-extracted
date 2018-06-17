@@ -3,7 +3,16 @@ package File::Rename;
 use strict;
 BEGIN { eval { require warnings; warnings->import } }
 
+use base qw(Exporter);
+use vars qw(@EXPORT_OK $VERSION);
+
+@EXPORT_OK = qw( rename );
+$VERSION = '0.35';
+
 package File::Rename::Options;
+
+use vars qw($VERSION);
+$VERSION = '0.33';
 
 use Getopt::Long ();
 
@@ -54,12 +63,6 @@ sub GetOptions {
 }
  
 package File::Rename;
-
-use base qw(Exporter);
-use vars qw(@EXPORT_OK $VERSION);
-
-@EXPORT_OK = qw( rename );
-$VERSION = '0.33';
 
 sub rename_files {
     my $code = shift;

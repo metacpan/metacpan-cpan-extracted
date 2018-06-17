@@ -23,4 +23,15 @@ WriteMakefile(
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Mojolicious-Command-generate-DBIxCustomModel-*' },
+    META_MERGE         => {
+        dynamic_config => 0,
+        'meta-spec'    => {version => 2},
+        resources      => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/wfso-perler/Mojolicious-Command-generate-DBIxCustomModel.git',
+                web  => 'https://github.com/wfso-perler/Mojolicious-Command-generate-DBIxCustomModel',
+            },
+        },
+    },
 );

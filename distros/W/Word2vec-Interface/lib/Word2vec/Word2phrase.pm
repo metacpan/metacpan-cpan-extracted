@@ -436,12 +436,12 @@ sub WriteLog
     {
         if( ref ( $self ) ne "Word2vec::Word2phrase" )
         {
-            print( GetDate() . " " . GetTime() . " - word2phrase: Cannot Call WriteLog() From Outside Module!\n" );
+            print( GetDate() . " " . GetTime() . " - Word2phrase: Cannot Call WriteLog() From Outside Module!\n" );
             return;
         }
 
         $string = "" if !defined ( $string );
-        print GetDate() . " " . GetTime() . " - word2phrase::$string";
+        print GetDate() . " " . GetTime() . " - Word2phrase::$string";
         print "\n" if( $printNewLine != 0 );
     }
 
@@ -449,7 +449,7 @@ sub WriteLog
     {
         if( ref ( $self ) ne "Word2vec::Word2phrase" )
         {
-            print( GetDate() . " " . GetTime() . " - word2phrase: Cannot Call WriteLog() From Outside Module!\n" );
+            print( GetDate() . " " . GetTime() . " - Word2phrase: Cannot Call WriteLog() From Outside Module!\n" );
             return;
         }
 
@@ -457,7 +457,7 @@ sub WriteLog
 
         if( defined( $fileHandle ) )
         {
-            print( $fileHandle GetDate() . " " . GetTime() . " - word2phrase::$string" );
+            print( $fileHandle GetDate() . " " . GetTime() . " - Word2phrase::$string" );
             print( $fileHandle "\n" ) if( $printNewLine != 0 );
         }
     }

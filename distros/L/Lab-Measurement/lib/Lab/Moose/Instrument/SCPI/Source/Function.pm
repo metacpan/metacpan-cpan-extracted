@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Source::Function;
-$Lab::Moose::Instrument::SCPI::Source::Function::VERSION = '3.651';
+$Lab::Moose::Instrument::SCPI::Source::Function::VERSION = '3.652';
 #ABSTRACT: Role for the SCPI SOURce:FUNCtion subsystem
 
 use Moose::Role;
@@ -21,10 +21,7 @@ sub source_function_query {
 }
 
 sub source_function {
-    my ( $self, $value, %args ) = validated_setter(
-        \@_,
-        value => { isa => enum( [qw/VOLT CURR/] ) }
-    );
+    my ( $self, $value, %args ) = validated_setter( \@_ );
     $self->write( command => "SOUR:FUNC $value", %args );
     $self->cached_source_function($value);
 }
@@ -43,7 +40,7 @@ Lab::Moose::Instrument::SCPI::Source::Function - Role for the SCPI SOURce:FUNCti
 
 =head1 VERSION
 
-version 3.651
+version 3.652
 
 =head1 METHODS
 
@@ -53,13 +50,13 @@ version 3.651
 
  $self->source_function(value => 'VOLT');
 
-Query/Set the type of output signal. Can be B<VOLT> or B<CURR>.
+Query/Set the type of output signal.
 
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
-  Copyright 2017       Simon Reinhardt
+  Copyright 2017-2018  Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

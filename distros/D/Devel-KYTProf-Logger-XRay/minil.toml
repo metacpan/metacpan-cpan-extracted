@@ -1,0 +1,6 @@
+name = "Devel-KYTProf-Logger-XRay"
+# badges = ["travis"]
+authority="cpan:FUJIWARA"
+
+module_maker="ModuleBuildTiny"
+

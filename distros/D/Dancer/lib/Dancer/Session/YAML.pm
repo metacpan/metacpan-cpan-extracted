@@ -1,7 +1,7 @@
 package Dancer::Session::YAML;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: YAML-file-based session backend for Dancer
-$Dancer::Session::YAML::VERSION = '1.3202';
+$Dancer::Session::YAML::VERSION = '1.3400';
 use strict;
 use warnings;
 use Carp;
@@ -83,7 +83,12 @@ sub retrieve {
 sub yaml_file {
     my $id = shift;
 
-    return path(setting('session_dir'), "$id.yml");
+    # Untaint Session ID before using it in file actions
+    # required when running under Perl Taint mode
+    $id =~ m/^([\d]*)$/;
+    my $yaml_file = "$1.yml";
+
+    return path(setting('session_dir'), $yaml_file);
 }
 
 sub destroy {
@@ -117,7 +122,7 @@ Dancer::Session::YAML - YAML-file-based session backend for Dancer
 
 =head1 VERSION
 
-version 1.3202
+version 1.3400
 
 =head1 DESCRIPTION
 

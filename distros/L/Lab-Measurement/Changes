@@ -4,6 +4,15 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.652 2018-06-15
+
+  * Add Step::Repeat sweep for repeating something
+  * Allow adding of arbitrary metadata to META.yml, ensure logging
+    of command line arguments
+  * Add Moose driver for Keithley 2400 (source and measurement function)
+  * Add Moose driver for HP 34420A Nanovoltmeter
+  * Language fixes in the manual
+
 3.651 2018-05-22
 
   * OI_Triton: Make maximum T setpoint configurable

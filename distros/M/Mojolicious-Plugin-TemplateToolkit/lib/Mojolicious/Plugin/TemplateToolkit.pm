@@ -5,7 +5,7 @@ use Mojo::Util qw(encode md5_sum);
 use Template;
 use Template::Provider::Mojo;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 sub register {
 	my ($self, $app, $conf) = @_;
@@ -18,11 +18,9 @@ sub register {
 	$app->renderer->add_handler($conf->{name} || 'tt2' => sub {
 		my ($renderer, $c, $output, $options) = @_;
 		
-		my $log = $c->app->log;
-		
 		my $inline = $options->{inline};
 		my $name = defined $inline ? md5_sum encode('UTF-8', $inline) : undef;
-		return undef unless defined($name //= $renderer->template_name($options));
+		return unless defined($name //= $renderer->template_name($options));
 		
 		my %params;
 		
@@ -38,7 +36,7 @@ sub register {
 		
 		# Inline
 		if (defined $inline) {
-			$log->debug(qq{Rendering inline template "$name"});
+			$c->app->log->debug(qq{Rendering inline template "$name"});
 			$tt->process(\$inline, \%params, $output) or die $tt->error, "\n";
 		}
 		
@@ -46,21 +44,19 @@ sub register {
 		else {
 			# Try template
 			if (defined(my $path = $renderer->template_path($options))) {
-				$log->debug(qq{Rendering template "$name"});
+				$c->app->log->debug(qq{Rendering template "$name"});
 				$tt->process($name, \%params, $output) or die $tt->error, "\n";
 			}
 			
 			# Try DATA section
-			elsif (my $d = $renderer->get_data_template($options)) {
-				$log->debug(qq{Rendering template "$name" from DATA section});
+			elsif (defined(my $d = $renderer->get_data_template($options))) {
+				$c->app->log->debug(qq{Rendering template "$name" from DATA section});
 				$tt->process(\$d, \%params, $output) or die $tt->error, "\n";
 			}
 			
 			# No template
-			else { $log->debug(qq{Template "$name" not found}) and return undef }
+			else { $c->app->log->debug(qq{Template "$name" not found}) }
 		}
-		
-		return 1;
 	});
 }
 

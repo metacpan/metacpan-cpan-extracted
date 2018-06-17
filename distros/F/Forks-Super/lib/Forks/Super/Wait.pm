@@ -21,7 +21,7 @@ use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(waitall TIMEOUT WREAP_BG_OK);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
-our $VERSION = '0.93';
+our $VERSION = '0.94';
 
 my ($productive_waitpid_code);
 my $respect_SIGCHLD_ignore = 1;
@@ -352,7 +352,7 @@ sub _waitpid_target {
     my $job = $ALL_JOBS{$target};
 
     if (not defined $job) {
-	debug('_waitpid_target: bogus target') if $job->{debug} & 2;
+	debug('_waitpid_target: bogus target'); # if $job->{debug} & 2;
 	return _bogus_waitpid_result();
     } 
 
@@ -532,7 +532,7 @@ Forks::Super::Wait - manage background processes at the end of their life cycle
 
 =head1 VERSION
 
-0.93
+0.94
 
 =head1 DESCRIPTION
 

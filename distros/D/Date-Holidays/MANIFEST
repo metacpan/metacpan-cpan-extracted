@@ -35,6 +35,7 @@ lib/Date/Holidays/Adapter/PL.pm
 lib/Date/Holidays/Adapter/PT.pm
 lib/Date/Holidays/Adapter/RU.pm
 lib/Date/Holidays/Adapter/SK.pm
+lib/Date/Holidays/Adapter/UK.pm
 lib/Date/Holidays/Adapter/US.pm
 lib/Date/Holidays/Adapter/USFederal.pm
 perl-date-holidays.code-workspace

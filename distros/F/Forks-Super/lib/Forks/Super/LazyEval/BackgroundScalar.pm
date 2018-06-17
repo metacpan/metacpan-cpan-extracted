@@ -56,7 +56,7 @@ use overload
 		         : atan2($_[0]->_fetch, $_[1]) }
 ;
 
-our $VERSION = '0.93';
+our $VERSION = '0.94';
 
 # "protocols" for serializing data and the methods used
 # to carry out the serialization
@@ -212,6 +212,15 @@ sub _fetch {
     return $value;
 }
 
+sub _job {
+    my $self = shift;
+    my $class = ref $self;
+    bless $self, '!@#$%';
+    my $job = $self->{job};
+    bless $self, $class;
+    return $job;
+}
+
 sub Forks::Super::LazyEval::BackgroundScalar::AUTOLOAD {
     my $obj = shift->_fetch;
     my $ref = ref($obj);
@@ -233,7 +242,7 @@ Forks::Super::LazyEval::BackgroundScalar
 
 =head1 VERSION
 
-0.93
+0.94
 
 =head1 DESCRIPTION
 

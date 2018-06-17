@@ -17,13 +17,14 @@ name: JSON-ize
 provides:
   JSON::ize:
     file: lib/JSON/ize.pm
-    version: '0.103'
+    version: '0.104'
 requires:
   JSON: '2'
+  PerlIO::gzip: '0'
   perl: v5.8.0
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=JSON::ize
   license: http://www.apache.org/licenses/LICENSE-2.0.txt
   repository: https://github.com/majensen/jsonize
-version: '0.103'
+version: '0.104'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

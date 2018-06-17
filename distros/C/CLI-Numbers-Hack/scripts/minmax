@@ -1,0 +1,132 @@
+#!/usr/bin/perl
+use 5.014 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts 'k:lsuv0=' , \my%o ; 
+use Scalar::Util qw/looks_like_number/ ;
+my ( @mins, @maxs , @tmp , $linecount ) ;
+my $lineproc ; 
+&initProc ; 
+&mainProc ; 
+exit 0 ; 
+
+sub mainProc { 
+  while ( 1 ) { 
+      last if eof ()  ; 
+      &chunkProc ; 
+  }
+}
+
+sub chunkProc  { 
+    $linecount = 0 ;
+    @mins = () ; @maxs = () ; 
+    my $header = <> if $o{'='} ;
+    while ( <> ) { 
+        chomp ; 
+        #next unless looks_like_number( $_ ) ; 
+        $linecount ++ ; 
+        $lineproc -> () ; 
+        last if eof || m/^$/ ; 
+    }
+    ( $mins[0], $maxs[0] ) = &minmax( @tmp ) if $o{0} ; 
+    &malign if $o{k} ;
+    &resultOut  ; 
+}
+
+sub malign { 
+    push @maxs , @tmp ; push @mins , @tmp ; 
+    if ( $o{u} ) { @maxs = &uniq(  @maxs ) ; @mins = &uniq ( @mins ) } ;
+    @maxs = $o{s} ? sort {$b cmp $a} @maxs : sort {$b<=>$a} @maxs ; 
+    @mins = $o{s} ? sort {$a cmp $b} @mins : sort {$a<=>$b} @mins ; 
+    splice @maxs , $o{k} ;
+    splice @mins , $o{k} ; 
+    @tmp = () ; 
+}
+
+sub resultOut { 
+    if ( $o{l} ) { 
+      for ( @mins , @maxs ) { print $_ , "\n" } 
+      print $linecount , "\n" if $o{v} ;
+    } elsif ( $o{v} )  { 
+      print join( ", " , @mins) , " - " , join( ", " , reverse @maxs) , " (", $linecount, " lines)\n" ; 
+    } else { 
+      print join "\t" , @mins , '-' , reverse @maxs ; 
+      print "\n" ; 
+    } 
+}
+
+sub initProc { 
+  $o{k} = 3 unless grep { m/^[0k]$/ } keys %o ;
+
+  $lineproc = 
+    defined $o{k} ? 
+      sub { push @tmp , $_ ; &malign if @tmp > $o{k} * 2 + 25 ; }  : 
+    defined $o{0}  ? 
+      sub { push @tmp , $_ } : 
+      sub { 1 } ;   
+}    
+
+sub uniq (@) {
+  my %seen = ();
+  grep { not $seen{$_}++ } @_;
+}
+
+sub minmax (@) {
+  return unless @_;
+  my $min = my $max = $_[0];
+
+  for ( my $i = 1; $i < @_; $i += 2 ) {
+    if ( $_[$i-1] <= $_[$i] ) {
+      $min = $_[$i-1] if $min > $_[$i-1];
+      $max = $_[$i]   if $max < $_[$i];
+    } else {
+      $min = $_[$i]   if $min > $_[$i];
+      $max = $_[$i-1] if $max < $_[$i-1];
+    }
+  }
+  if ( @_ & 1 ) {
+    my $i = $#_;
+    if ($_[$i-1] <= $_[$i]) {
+      $min = $_[$i-1] if $min > $_[$i-1];
+      $max = $_[$i]   if $max < $_[$i];
+    } else {
+      $min = $_[$i]   if $min > $_[$i];
+      $max = $_[$i-1] if $max < $_[$i-1];
+    }
+  }
+  return ($min, $max);
+}
+
+sub VERSION_MESSAGE {} 
+sub HELP_MESSAGE{
+    $0=~s|.*/|| ; $ARGV[1] //= '' ;
+    while(<DATA>){
+        s/\$0/$0/g ;
+        print $_ if $ARGV[1] =~ /opt/ ? m/^\ +\-/ : s/^=head1// .. s/^=cut// ; 
+    }
+    exit 0 ;
+}
+
+__END__
+
+=encoding utf8 
+=head1
+ $0
+
+    入力された数値の下位3個と上位3個を出力する。
+    異なるファイルによる入力、および、空行区切りは、別のデータセットと見なされる。
+    最小と最大のそれぞれ指定個数を -k で変更することも出来る。
+
+ オプション: 
+    -k num : 最小値と最大値の上からそれぞれ何個を表示するか。3倍くらい時間がかかる。
+    -s : 文字列として大小関係を比較する。
+    -u : 同じ値は一つにまとめる。
+    -l : 出力の区切りを改行文字にする。
+    -v : 人の目で読みやすい表示形式にする。処理行数も出力する。
+    -= : 最初の行は読み飛ばす。
+
+ 開発上のメモ: 
+    高速化をしたい。(sort , 情報科学上のツリーの活用など)
+    数の最小と最大では無くて、文字列の最小と最大も表示できるようにしたい。
+    #-k だと -3や-2 の、2倍程度時間がかかる。
+    他、-b でバブルソートをしたが、-kと同じ程度に時間がかかり、さらに算出する個数を増やすと
+    それに比例して遅くなる。
+=cut

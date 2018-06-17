@@ -24,7 +24,7 @@ use File::HomeDir;
 use File::Spec::Functions;
 
 # Main version number that the rest of the modules pick up off of.
-our $VERSION = qv("5.3.0");
+our $VERSION = qv("5.4.0");
 
 use constant DEFAULT_PROPERTIES_FILE =>
   catfile(File::HomeDir->my_home, "adwords.properties");
@@ -36,7 +36,7 @@ use constant PROXY_FORMAT_STRING => "%s/api/adwords/%s/%s/%s";
 
 # Default current version used if the client is created without the version
 # parameter.
-use constant DEFAULT_VERSION => "v201802";
+use constant DEFAULT_VERSION => "v201806";
 
 # Default alternate URL that points to production servers.
 use constant DEFAULT_ALTERNATE_URL => "https://adwords.google.com";
@@ -63,8 +63,10 @@ our %SERVICE_TO_GROUP = (
   AdGroupFeedService              => "cm",
   AdGroupService                  => "cm",
   AdParamService                  => "cm",
+  AdService                       => "cm",
   AdwordsUserListService          => "rm",
   AlertService                    => "mcm",
+  AssetService                    => "cm",
   BatchJobService                 => 'cm',
   BiddingStrategyService          => "cm",
   BudgetOrderService              => "billing",
@@ -80,6 +82,7 @@ our %SERVICE_TO_GROUP = (
   CampaignSharedSetService        => "cm",
   ConstantDataService             => "cm",
   ConversionTrackerService        => "cm",
+  CustomAffinityService           => "rm",
   CustomerService                 => "mcm",
   CustomerExtensionSettingService => "cm",
   CustomerFeedService             => "cm",
@@ -99,6 +102,7 @@ our %SERVICE_TO_GROUP = (
   ManagedCustomerService          => "mcm",
   MediaService                    => "cm",
   OfflineCallConversionFeedService => "cm",
+  OfflineConversionAdjustmentFeedService => "cm",
   OfflineConversionFeedService    => "cm",
   OfflineDataUploadService        => "rm",
   ReportDefinitionService         => "cm",

@@ -28,6 +28,7 @@
       "runtime" : {
          "requires" : {
             "JSON" : "2",
+            "PerlIO::gzip" : "0",
             "perl" : "v5.8.0"
          }
       }
@@ -35,7 +36,7 @@
    "provides" : {
       "JSON::ize" : {
          "file" : "lib/JSON/ize.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       }
    },
    "release_status" : "stable",
@@ -50,6 +51,6 @@
          "url" : "https://github.com/majensen/jsonize"
       }
    },
-   "version" : "0.103",
+   "version" : "0.104",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

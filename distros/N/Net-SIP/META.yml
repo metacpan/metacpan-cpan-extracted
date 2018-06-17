@@ -24,4 +24,4 @@ resources:
   homepage: https://github.com/noxxi/p5-net-sip
   license: http://dev.perl.org/licenses/
   repository: https://github.com/noxxi/p5-net-sip
-version: '0.814'
+version: '0.815'

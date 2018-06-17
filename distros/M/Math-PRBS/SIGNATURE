@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 c0facb3119a420ce9813f297cbe2f52b9fee52d1 CHANGES
+SHA1 82b454a3b5089560d06b4187703574e030e1e6a6 LICENSE
+SHA1 5442ad06dae5808f756861e42e233ddab3e119c4 MANIFEST
+SHA1 a1aa1e057615c51a072ef72f1a9bc73f2a4511c1 MANIFEST.SKIP
+SHA1 5a382445fde1ee29fa94d637df0516d839aeb993 META.json
+SHA1 2735d2ab357448c62cb29d3f2512d11d70ed34ce META.yml
+SHA1 7e947cdb8d64109ddd7da40fc61974f2b49ad492 Makefile.PL
+SHA1 80a5a056cc57cc985d0f53e7042685a3a4c3100d README.md
+SHA1 5f2b8528cc8b13b2da217b436e07342a4a596621 lib/Math/PRBS.pm
+SHA1 3907d4ab8dac9d59ec5b0496dc7fa60061c06d77 t/00-load.t
+SHA1 36982f3ad641fd6b85dd09b83959192c64e0e809 t/err.t
+SHA1 c408137c149c1f0ce4bee33e9d23945fe1b7e8c1 t/intseq.t
+SHA1 48a09051ab292707051040488ff602779317e943 t/limits.t
+SHA1 ff6ca19a34cb3d47fff7dd1cd2e18f8dedb96388 t/poly.t
+SHA1 cdfc6a9eee8e4b4d4d10774060538cbd7c46dbd2 t/prbs.t
+SHA1 a4dbcbbb58d0975f8fd2864574e6fd98e057e0cd t/seek.t
+SHA1 f96f5f4bfa0dbe522be0ad4c19915917803821cb t/taps.t
+SHA1 1f4c9004ce1dca49c3bd1edfa9617f0ab6017429 xt/oeis-number.t
+SHA1 5765460f55662aec01237f36915c18dadf972b25 xt/signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJbJEdfAAoJEPos/OVopa3PvLAQAKi2A2oBfgiqK4UEJ16q6TrB
+UGJhcOq9xYNARLyDnOyV8P4ZEOZYnyZwlkPkzx+Bb2oKJY3dwuLIpDJhd1hmjqLZ
+48kS3woAjNx4zYsQddvOpn5JEncPgcMIJg75ZMo/dx6aLX4jc3Lqoe9gQrLLWKIx
+kvI41Rp5deym+pjBK7WtCu90LoC2ah/s6qKNBx7D5Xv1RlyypGwRIZNlJqK5Sc1e
+bjFgLC/s6UiiwB6BdQfHTvjJs/rtlmVSvlu4vZH7jMTAbnjlHYY1hkxiDUTvbkhd
+ynbTDr4eC1yVXB9UYklv5UYhqtewXRhulUFj5C7BY4Ur2ukM1O5bvPGqYVZzNur/
+rrUP8hW1P2FbHwbJlJybdUneFr7C6XSeOHsOC4yOm2DjnrGhIHY0OMpdcYJIAihE
+yfppeCg1Y56F91sWAjnTmSaR/ixuOlGYK+Y4hvMw9uOuSI2SbKlLvT173a7vE8M+
+mzyXcpIC+MEW49/R3APSsqxdi+7mHrhpSwSNWo0l0/EN72/VWZkS9R2jEFcTkHmm
+DKETkoYuBPA2mA1llI4TKiIVH/sbxqopOMZ5WOeDOdL8fvo3vuJMT2wSY6++zX3+
+7ufhKCXDXJE4nWgodWKW4fm7fINWx4vLU5lhSemQbRerXhZllUb3Y3AQx94OySws
+E61NjGzM7qoXoe5THeXn
+=n8jS
+-----END PGP SIGNATURE-----

@@ -8,5 +8,6 @@ t/001_simple.t
 t/002_pod.t
 t/sample/bad.json
 t/sample/good.json
+t/sample/good.json.gz
 META.yml
 META.json

@@ -1,11 +1,10 @@
-
 package Devel::Hide;
 
 use 5.006001;
 use strict;
 use warnings;
 
-our $VERSION = '0.0009';
+our $VERSION = '0.0010';
 
 # blech! package variables
 use vars qw( @HIDDEN $VERBOSE );
@@ -368,7 +367,7 @@ Nothing is exported.
 DEVEL_HIDE_PM - if defined, the list of modules is added
    to the list of hidden modules
 
-DEVEL_HIDE_VERBOSE - on by default. If off, supresses
+DEVEL_HIDE_VERBOSE - on by default. If off, suppresses
    the initial message which shows the list of hidden modules
    in effect
 
@@ -396,7 +395,7 @@ with contributions from David Cantrell E<lt>dcantrell@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2007 by Adriano R. Ferreira
+Copyright (C) 2005-2007, 2018 by Adriano R. Ferreira
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

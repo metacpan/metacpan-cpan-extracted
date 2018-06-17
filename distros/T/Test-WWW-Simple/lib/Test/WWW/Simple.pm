@@ -3,7 +3,7 @@ package Test::WWW::Simple;
 use strict;
 use warnings;
 
-our $VERSION = '0.34';
+our $VERSION = '0.38';
 
 use Test::Builder;
 use Test::LongString;
@@ -342,7 +342,7 @@ Joe McMahon, E<lt>mcmahon@yahoo-inc.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005 by Yahoo!
+Copyright (C) 2005 by Yahoo!, 2018 by Joe McMahon
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.6.1 or,

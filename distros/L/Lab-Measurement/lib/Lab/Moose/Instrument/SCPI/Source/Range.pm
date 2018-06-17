@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Source::Range;
-$Lab::Moose::Instrument::SCPI::Source::Range::VERSION = '3.651';
+$Lab::Moose::Instrument::SCPI::Source::Range::VERSION = '3.652';
 #ABSTRACT: Role for the SCPI SOURce:RANGe subsystem.
 
 use Moose::Role;
@@ -17,8 +17,9 @@ cache source_range => ( getter => 'source_range_query' );
 sub source_range_query {
     my ( $self, %args ) = validated_getter( \@_ );
 
+    my $function = $self->cached_source_function();
     return $self->cached_source_range(
-        $self->query( command => "SOUR:RANG?", %args ) );
+        $self->query( command => "SOUR:$function:RANG?", %args ) );
 }
 
 sub source_range {
@@ -26,7 +27,8 @@ sub source_range {
         \@_,
     );
 
-    $self->write( command => "SOUR:RANG $value", %args );
+    my $function = $self->cached_source_function();
+    $self->write( command => "SOUR:$function:RANG $value", %args );
 
     $self->cached_source_range($value);
 }
@@ -45,7 +47,7 @@ Lab::Moose::Instrument::SCPI::Source::Range - Role for the SCPI SOURce:RANGe sub
 
 =head1 VERSION
 
-version 3.651
+version 3.652
 
 =head1 METHODS
 
@@ -61,7 +63,7 @@ Query/Set the output range.
 
 This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
-  Copyright 2017       Simon Reinhardt
+  Copyright 2017-2018  Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

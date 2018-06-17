@@ -612,9 +612,9 @@ msgid "unable to read rpm file [%s] from medium \"%s\""
 msgstr "n'hellan ket lenn ar restr rpm [%s] eus ar mediom « %s »"
 
 #: ../urpm/cfg.pm:74
-#, fuzzy, c-format
+#, c-format
 msgid "syntax error in config file at line %s"
-msgstr "n'hellan ket skrivañ restr ar c'hefluniadur [%s]"
+msgstr "bez euz ur fazi er restr khefluniadur el liennen %s"
 
 #: ../urpm/cfg.pm:107
 #, c-format

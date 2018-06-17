@@ -54,6 +54,7 @@
       },
       "runtime" : {
          "recommends" : {
+            "List::MoreUtils" : "0.428",
             "Params::Util" : "1.07"
          },
          "requires" : {
@@ -81,6 +82,6 @@
          "web" : "https://github.com/perl5-utils/File-ShareDir"
       }
    },
-   "version" : "1.106",
+   "version" : "1.110",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

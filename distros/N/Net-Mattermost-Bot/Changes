@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::Mattermost::Bot.
+
+0.01  Thu Jun 14 16:22:17 2018
+	- original version; created by h2xs 1.23 with options
+		-AX Net::Mattermost::Bot
+

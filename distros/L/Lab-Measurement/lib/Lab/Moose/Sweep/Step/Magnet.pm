@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step::Magnet;
-$Lab::Moose::Sweep::Step::Magnet::VERSION = '3.651';
+$Lab::Moose::Sweep::Step::Magnet::VERSION = '3.652';
 #ABSTRACT: Step/list sweep of magnetic field
 
 
@@ -7,6 +7,9 @@ use 5.010;
 use Moose;
 
 extends 'Lab::Moose::Sweep::Step';
+
+has instrument =>
+    ( is => 'ro', isa => 'Lab::Moose::Instrument', required => 1 );
 
 has start_rate =>
     ( is => 'ro', isa => 'Lab::Moose::PosNum', writer => '_start_rate' );
@@ -61,7 +64,7 @@ Lab::Moose::Sweep::Step::Magnet - Step/list sweep of magnetic field
 
 =head1 VERSION
 
-version 3.651
+version 3.652
 
 =head1 SYNOPSIS
 

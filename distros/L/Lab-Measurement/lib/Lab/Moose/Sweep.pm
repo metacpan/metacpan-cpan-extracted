@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep;
-$Lab::Moose::Sweep::VERSION = '3.651';
+$Lab::Moose::Sweep::VERSION = '3.652';
 #ABSTRACT: Base class for high level sweeps
 
 # Step/List and Continuous sweep are implemented as subclasses
@@ -15,7 +15,7 @@ use Lab::Moose::Countdown 'countdown';
 use Data::Dumper;
 
 # Do not import all functions as they clash with the attribute methods.
-use Lab::Moose qw/our_catfile/;
+use Lab::Moose::Catfile qw/our_catfile/;
 
 use Carp;
 
@@ -173,6 +173,7 @@ sub start {
         point_dim => { isa => enum( [qw/1 0/] ), default => 0 },
         folder      => { isa => 'Str|Lab::Moose::DataFolder', optional => 1 },
         date_prefix => { isa => 'Bool',                       default  => 0 },
+        meta_data   => { isa => 'HashRef',                    optional => 1 },
     );
 
     my $slaves          = _parse_slave_arg(%args);
@@ -182,6 +183,7 @@ sub start {
     my $point_dim       = $args{point_dim};
     my $folder          = $args{folder};
     my $date_prefix     = $args{date_prefix};
+    my $meta_data       = $args{meta_data};
 
     $self->_ensure_no_slave();
 
@@ -268,6 +270,10 @@ sub start {
     }
 
     $self->_foldername( $datafolder->path() );
+
+    if ($meta_data) {
+        $datafolder->meta_file->log( meta => $meta_data );
+    }
 
     my $datafiles;
 
@@ -474,7 +480,7 @@ Lab::Moose::Sweep - Base class for high level sweeps
 
 =head1 VERSION
 
-version 3.651
+version 3.652
 
 =head1 DESCRIPTION
 

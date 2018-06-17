@@ -1,5 +1,11 @@
 Revision history for Firefox-Marionette
 
+0.56  Fri Jun 15 22:02:00 2018
+       Defining Win32 Connection Refused error code during initial startup
+
+0.55  Fri Jun 15 18:43:00 2018
+       Allowing test suite to run with an existing proxy, handling bad window width on darwin, other test fixes
+
 0.54  Mon Jun 11 13:30:00 2018
        Coping with the little changes for Firefox 60
 

@@ -71,6 +71,7 @@ EOF
 
 ##-- config hash
 use Data::Dumper;
+$Data::Dumper::Sortkeys=1; # reproducible order of hash keys
 print CONFIGPM Data::Dumper->Dump([\%cconfig],['*ccsConfig']), "\n";
 
 ##-- type conversion sub

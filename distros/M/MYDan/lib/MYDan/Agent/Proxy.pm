@@ -47,7 +47,7 @@ sub new
                 $res = $ua->get($addr);
                 last if $res->is_success;
             }
-    		my $data = eval{ JSON::from_json $res->content };
+            my $data = eval{ JSON->new->allow_nonref->utf8(1)->decode( $res->content ); };
             die "from_json fail: $@" if $@;
             $self{conf} = $data->{stat} ? $data->{data} : die "stat fail";
     

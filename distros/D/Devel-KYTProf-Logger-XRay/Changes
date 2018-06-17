@@ -1,0 +1,9 @@
+Revision history for Perl extension Devel-KYTProf-Logger-XRay
+
+0.02 2018-06-15T15:17:16Z
+    - follow to AWS::XRay 0.02
+
+0.01 2018-06-15T05:53:58Z
+
+    - original version
+

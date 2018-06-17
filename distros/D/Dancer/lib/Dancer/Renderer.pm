@@ -1,7 +1,7 @@
 package Dancer::Renderer;
 our $AUTHORITY = 'cpan:SUKRIA';
 # ABSTRACT: Rendering class for Dancer
-$Dancer::Renderer::VERSION = '1.3202';
+$Dancer::Renderer::VERSION = '1.3400';
 use strict;
 use warnings;
 use Carp;
@@ -61,7 +61,7 @@ sub response_with_headers {
 
     if (Dancer::Config::setting('server_tokens')) {
         $response->{headers} ||= HTTP::Headers->new;
-        my $powered_by = "Perl Dancer " . Dancer->VERSION;
+        my $powered_by = "Perl Dancer " . ( Dancer->VERSION || '' );
         $response->header('X-Powered-By' => $powered_by);
         $response->header('Server'       => $powered_by);
     }
@@ -331,7 +331,7 @@ Dancer::Renderer - Rendering class for Dancer
 
 =head1 VERSION
 
-version 1.3202
+version 1.3400
 
 =head1 AUTHOR
 

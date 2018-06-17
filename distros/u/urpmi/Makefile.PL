@@ -140,10 +140,29 @@ package main;
 
 WriteMakefile(
     NAME		=> 'urpmi',
+    ABSTRACT		=> 'Tools to handle the rpm & urpmi databases (install, query, remove installed/available packages)',
+    LICENSE		=> 'gpl_2',
+    AUTHOR		=> 'Thierry Vignaud',
+    'CONFIGURE_REQUIRES' => {
+	'ExtUtils::MakeMaker' => '6.64'
+    },
     PREREQ_PM		=> {
+	'Filesys::Df'		=> '0',
+	'Getopt::Long'		=> '0',
 	'Locale::gettext'	=> '1.01',
-	'MDV::Packdrakeng'	=> '1.01',
-	'URPM'			=> '4.15',
+	'MDV::Distribconf'	=> '0',
+	'Net::LDAP'		=> '0',
+	'Time::ZoneInfo'	=> '0',
+	'URPM'			=> '5.15',
+	'XML::LibXML'		=> '0',
+	'XML::LibXML::Reader'	=> '0',
+    },
+    'TEST_REQUIRES' => {
+	'Expect'		=> '0',
+	'File::Slurp'		=> '0',
+	'Net::Server'		=> '0',
+	'Test::Pod'		=> '0',
+	'Test::Pod::Coverage'	=> '0',
     },
     VERSION_FROM	=> 'urpm.pm',
     macro		=> {
@@ -166,9 +185,15 @@ WriteMakefile(
     },
     ( $ExtUtils::MakeMaker::VERSION >= 6.46 ? (
         'META_MERGE' => {
+	  "meta-spec" => { version => 2 },
             resources => {
-                repository  =>      'http://gitweb.mageia.org/software/rpm/urpmi/',
+                repository  => {
+		    type => 'git',
+		    url => 'git://git.mageia.org/software/rpm/urpmi/',
+		    web =>  'http://gitweb.mageia.org/software/rpm/urpmi/',
+		},
             },
+	    release_status => 'stable',
         } ) : ()
     ),
     EXE_FILES		=> [ @bin_scripts, @sbin_scripts, @libexec_scripts ],

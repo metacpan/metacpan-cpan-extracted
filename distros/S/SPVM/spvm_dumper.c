@@ -28,17 +28,16 @@
 #include "spvm_basic_type.h"
 
 void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
-  int32_t depth = 0;
+  int32_t indent = 8;
   
   // Run OPs
   SPVM_OP* op_cur = op_base;
   _Bool finish = 0;
   while (op_cur) {
     // [START]Preorder traversal position
-    
     {
       int32_t i;
-      for (i = 0; i < depth; i++) {
+      for (i = 0; i < indent; i++) {
         printf(" ");
       }
     }
@@ -106,13 +105,6 @@ void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
         printf(" \"Unknown\"");
       }
     }
-    else if (id == SPVM_OP_C_ID_PACKAGE) {
-      if (strcmp(op_cur->uv.package->op_name->uv.name, "SPVM::CORE") == 0) {
-        printf(" std(omit)\n");
-        op_cur = op_cur->sibparent;
-        continue;
-      }
-    }
     else if (id == SPVM_OP_C_ID_BLOCK) {
       if (op_cur->uv.block->id == SPVM_BLOCK_C_ID_IF) {
         printf(" IF");
@@ -142,7 +134,7 @@ void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
     
     if (op_cur->first) {
       op_cur = op_cur->first;
-      depth++;
+      indent++;
     }
     else {
       while (1) {
@@ -163,7 +155,7 @@ void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
         // Next is parent
         else {
           op_cur = op_cur->sibparent;
-          depth--;
+          indent--;
         }
       }
       if (finish) {
@@ -174,9 +166,6 @@ void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
 }
 
 void SPVM_DUMPER_dump_all(SPVM_COMPILER* compiler) {
-  
-  printf("\n[AST]\n");
-  SPVM_DUMPER_dump_ast(compiler, compiler->op_grammar);
   
   printf("\n[Basic types]\n");
   SPVM_DUMPER_dump_basic_types(compiler, compiler->basic_types);
@@ -389,7 +378,7 @@ void SPVM_DUMPER_dump_sub(SPVM_COMPILER* compiler, SPVM_SUB* sub) {
       for (i = 0; i < op_args->length; i++) {
         SPVM_OP* op_arg = SPVM_LIST_fetch(sub->op_args, i);
         SPVM_MY* my = op_arg->uv.my;
-        printf("        arg[%" PRId32 "]\n", i);
+        printf("        [%" PRId32 "] ", i);
         SPVM_DUMPER_dump_my(compiler, my);
       }
     }
@@ -402,12 +391,16 @@ void SPVM_DUMPER_dump_sub(SPVM_COMPILER* compiler, SPVM_SUB* sub) {
         for (i = 0; i < op_mys->length; i++) {
           SPVM_OP* op_my = SPVM_LIST_fetch(sub->op_mys, i);
           SPVM_MY* my = op_my->uv.my;
-          printf("        my[%" PRId32 "]\n", i);
+          printf("        [%" PRId32 "] ", i);
           SPVM_DUMPER_dump_my(compiler, my);
         }
       }
       
       printf("      call_sub_arg_stack_max => %" PRId32 "\n", sub->call_sub_arg_stack_max);
+      
+      printf("      AST\n");
+      SPVM_DUMPER_dump_ast(compiler, sub->op_block);
+      printf("\n");
       
       printf("      opcode_array\n");
       SPVM_DUMPER_dump_opcode_array(compiler, compiler->opcode_array, sub->opcode_base, sub->opcode_length);
@@ -457,14 +450,12 @@ void SPVM_DUMPER_dump_my(SPVM_COMPILER* compiler, SPVM_MY* my) {
   (void)compiler;
 
   if (my) {
-    printf("          name => \"%s\"\n", my->op_name->uv.name);
-    
+    printf("name => %s, type => ", my->op_name->uv.name);
     SPVM_TYPE* type = my->op_type->uv.type;
-    printf("          type => ");
     SPVM_TYPE_fprint_type_name(compiler, stdout, type->basic_type->id, type->dimension);
     printf("\n");
   }
   else {
-    printf("          None\n");
+    printf("(Unexpected)\n");
   }
 }

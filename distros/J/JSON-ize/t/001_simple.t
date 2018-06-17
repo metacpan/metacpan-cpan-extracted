@@ -10,7 +10,9 @@ my $tdir = (-d 't') ? 't/sample' : 'sample';
 
 is ref jsonize('{ "this":"hash"}'), 'HASH';
 is ref jsonise('["is","array"]'), 'ARRAY';
+is ref J(File::Spec->catfile($tdir,"good.json.gz")), 'HASH';
 is ref J(File::Spec->catfile($tdir,"good.json")), 'HASH';
+
 
 open my $f, File::Spec->catfile($tdir,"good.json");
 my $j;

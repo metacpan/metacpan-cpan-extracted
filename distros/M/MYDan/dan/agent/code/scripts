@@ -63,12 +63,12 @@ map
     {
         if( $type )
         {
-            exec "$type $filename $argv";
+            exec "$type $filename $argv 2>&1";
         }
         else
         {
             chmod 0755, $filename;
-            exec "$filename $argv";
+            exec "$filename $argv 2>&1";
         }
     }
 }@{$param{argv}};

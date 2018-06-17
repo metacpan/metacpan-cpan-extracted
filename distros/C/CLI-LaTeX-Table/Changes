@@ -1,5 +1,10 @@
 Revision history for CLI-LaTeX-Table
 
+0.57    2018-06-15 : 
+            README_JP.pdf updated a lot.
+            latextable updated. 
+            matrixpack is added.
+
 0.56    2018-06-09 : 
             Changed slightly on README_JP.pdf
             latextable got -# and the function for continuous hyphens.

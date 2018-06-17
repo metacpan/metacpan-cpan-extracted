@@ -32,7 +32,7 @@
             "Date::Parse" : "1.17",
             "Exporter" : "0",
             "Scalar::Util" : "0",
-            "Time::Local" : "0",
+            "Time::Local" : "1.26",
             "Time::ParseDate" : "2015.0925",
             "Time::Piece" : "1.30",
             "autodie" : "0",
@@ -61,19 +61,19 @@
    "provides" : {
       "Date::Easy" : {
          "file" : "lib/Date/Easy.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Date::Easy::Date" : {
          "file" : "lib/Date/Easy/Date.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Date::Easy::Datetime" : {
          "file" : "lib/Date/Easy/Datetime.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Date::Easy::Units" : {
          "file" : "lib/Date/Easy/Units.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -88,7 +88,7 @@
          "web" : "https://github.com/barefootcoder/date-easy"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

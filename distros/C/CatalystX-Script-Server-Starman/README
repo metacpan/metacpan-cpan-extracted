@@ -6,8 +6,6 @@ SYNOPSIS
         myapp_server.pl [options]
 
            -d --debug           force debug mode
-           -f --fork            handle each request in a new process
-                                (defaults to false)
            -? --help            display this help and exits
            -h --host            host (defaults to all)
            -p --port            port (defaults to 3000)

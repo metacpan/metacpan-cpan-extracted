@@ -1,5 +1,73 @@
 Revision history for Dancer
 
+1.3400    2018-06-15 23:08:34+01:00 Europe/London
+ Promoting previous trial releases to stable.
+
+1.3205    2018-06-13 22:59:32+01:00 Europe/London (TRIAL RELEASE)
+ [ENHANCEMENTS]
+ - require MIME::Types 2.17, as 2.16 has some funny ideas, like responding to a
+   ZIP file with 'application/vnd.easykaraoke.cdgdownload'
+ - Fix YAML-related test failures if YAML::XS not installed
+   (GH 1184, PR 1189, bigpresh)
+
+ [BUG FIXES]
+ - Avoid accidental route matches if a previous successful match had left %+
+   populated (GH 1187, PR 1188, bigpresh, reported by skington)
+
+
+
+1.3204    2018-05-23 14:40:33+01:00 Europe/London (TRIAL RELEASE)
+ [ENHANCEMENTS]
+ - Try to use 127.0.0.11 for listen tests, fall back to 127.0.0.1
+   on systems that don't have 127/8, e.g. FreeBSD (GH 1183, PR 1185, bigpresh)
+
+1.3203    2018-05-20 20:44:30+01:00 Europe/London (TRIAL RELEASE)
+ [DOCUMENTATION]
+ - Add environment var hint to cookbook (PR 1161, castaway)
+
+ [ENHANCEMENTS]
+ - Make it possible to switch out YAML for YAML::XS for config parsing and
+   serialisation (there was already an attempt at this in place, and it was
+   documented as posisble, but didn't work) (PR 1164, 1nickt)
+ - New test method response_redirect_like (PR 1159, 1nickt)
+ - New config option raw_request_body_in_ram, which controls whether the
+   raw request body is available via request->body or not.  See Issue #1140
+   for the problems the previous approach, of getting it from the temp file
+   that HTTP::Body might (or might not) have written it to.
+ - Validate session IDs read from client - GH #1172 - potential security
+   risk if the session provider in use passes the session ID in a way
+   where injection is possible.
+
+
+
+1.3301 2016-02-16
+ [BUG FIXES]
+ - Reverted session ID validation (PR-1155) as it breaks
+   Dancer::Session::Cookie (bigpresh)
+
+1.3300 2016-02-15
+ [BUG FIXES]
+ - More temp directory handling fixes (Issue #1147)
+ - Avoid request body truncation in hand-assembled requests in tests (PR
+   1148, skington)
+ - Avoid tests failing when "localhost" doesn't resolve (PR 1142, gbarco)
+ - Avoid test failures due to race condition in selecting a port to listen
+   on by using 127.0.0.10 instead (more of a hacky workaround than a fix,
+   but should help (bigpresh)
+ - Fix YAML session handler under taint mode (chrisjrob)
+ - Make request->body work again for URL-encoded POST requests - Issue 1140
+   reported by miyagawa (bigpresh)
+ - Validate session IDs read from cookies before passing to session engine,
+   to protect against any engine that might feed that value straight to a
+   file path for security - Issue 1118 (bigpresh)
+
+ [DOCUMENTATION]
+ - Better doc for forward_for_address (PR 1146, Relequestual)
+
+ [ENHANCEMENTS]
+ - Let Dancer::Test::dancer_response() handle supplying multiple params
+   with the same name - Issue 1116 (bigpresh)
+
 1.3202 2015-11-07
  - Re-releasing 1.3200 again now CPAN perms should be fully sorted.
 
@@ -13,8 +81,8 @@ Revision history for Dancer
  - Fix temporary directory handling in serialiser tests (PR 1133, nanis)
 
  [ENHANCEMENTS]
- - Promoting 1.3144 to stable.	      Only one odd, rare failure remains on
-   CPAN Testers, which I cannot reproduce.
+ - Promoting 1.3144 to stable.		    Only one odd, rare failure
+   remains on CPAN Testers, which I cannot reproduce.
  - Bind to 127.0.0.1 in tests to avoid occasional spurious failures on busy
    build hosts (PR 1136, thanks to @redbaron)
  - More efficient handling of large requests - don't store the raw request
@@ -135,7 +203,7 @@ Revision history for Dancer
  [ENHANCEMENTS]
  - Skip tests requiring 'fork' if on a perl that doesn't implement it.
    (GH#1094, Steve Hay) - Using ':script' disable command-line argument
-   munging globally. (GH#1098,		   Brad Macpherson)
+   munging globally. (GH#1098,		       Brad Macpherson)
 
  [STATISTICS]
  - code churn: 33 files changed, 173 insertions(+), 113 deletions(-)
@@ -259,8 +327,8 @@ Revision history for Dancer
  [BUG FIXES]
  - Remove print statement in Dancer::ModuleLoad::require.  (GH#1021, John
    Wittkoski)
- - Test was failing if JSON module was absent.		       (GH#1022,
-   Yanick Champoux)
+ - Test was failing if JSON module was absent.			    
+   (GH#1022, Yanick Champoux)
  - Allow for routes evaluating to false ('0', '', etc).  (GH#1020, Yanick
    Champoux)
 
@@ -899,7 +967,7 @@ Revision history for Dancer
 
 1.3069_02 2011-07-10
  [BUG FIXES]
- - Fix a bunch of cpan testers reports			     (Alberto
+ - Fix a bunch of cpan testers reports				   (Alberto
    Simões)
 
 1.3069_01 2011-07-07
@@ -1912,7 +1980,7 @@ Revision history for Dancer
  - Added Dancer::Test to provide helpers for writing test script for Dancer
    applications
  - FIX bug when returning a void context after redirecting a route. Thanks
-   to Juan J. Martínez		    for the report.
+   to Juan J. Martínez			  for the report.
  - Add support for request headers in Dancer::Request
  - Add support for halt() in Dancer's syntax.
 

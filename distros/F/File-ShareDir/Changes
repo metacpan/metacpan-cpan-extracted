@@ -1,5 +1,17 @@
 Revision history for Perl extension File-ShareDir
 
+1.110	2018-06-16
+    - remove unused/incomplete _dist_packfile
+    - increase test coverage
+    - refactor _search_inc_path
+    - add badges to POD
+
+1.108	2018-06-15
+    - Fix RT#125582: Undefined subroutine &File::ShareDir::croak
+      called reported by yseto and Andreas Koenig (via RT#125575)
+    - Improve tests a little (a higher test coverage would be great)
+    - Update README.md
+
 1.106	2018-06-10
     - Add support for overriding the resolved path for a given
       Module or Dist (Thanks to Kent Fredric <kentnl@cpan.org>)

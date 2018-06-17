@@ -23,5 +23,5 @@ requires:
 resources:
   bugtracker: https://github.com/stevieb9/rpi-gpioexpander-mcp23017/issues
   repository: https://github.com/stevieb9/rpi-gpioexpander-mcp23017.git
-version: '0.01'
+version: '1.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

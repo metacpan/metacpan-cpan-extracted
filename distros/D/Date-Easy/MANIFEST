@@ -29,6 +29,7 @@ t/lib/TimeParseDateTests.pm
 t/module-load.t
 t/release-timezones.t
 t/require.t
+t/str2time-bug.t
 t/units.t
 t/zonespec00.t
 t/zonespec01.t

@@ -10,16 +10,8 @@ BEGIN
     $^W = 1;
 }
 
-use Test::More tests => 31;
+use Test::More;
 use File::ShareDir;
-
-sub dies
-{
-    my $code    = shift;
-    my $message = shift || 'Code dies as expected';
-    my $rv      = eval { &$code() };
-    ok($@, $message);
-}
 
 # Print the contents of @INC
 #diag("\@INC = qw{");
@@ -63,10 +55,6 @@ ok($module_dir,    'Can find our own module dir');
 ok(-d $module_dir, '... and is a dir');
 ok(-r $module_dir, '... and have read permissions');
 
-dies(sub { module_dir() },                      'No params to module_dir dies');
-dies(sub { module_dir('') },                    'Null param to module_dir dies');
-dies(sub { module_dir('File::ShareDir::Bad') }, 'Getting module dir for known non-existanct module dies',);
-
 my $module_file = module_file('File::ShareDir', 'test_file.txt');
 ok(-f $module_file, 'module_file ok');
 
@@ -87,14 +75,4 @@ ok(-r $dist_file, '... and have read permissions');
 # Bug found in Module::Install 0.54, fixed in 0.55
 is(File::Spec->catfile($dist_dir, 'sample.txt'), $dist_file, 'dist_dir and dist_file find the same directory',);
 
-#####################################################################
-# Class Tests
-
-{
-    local @INC;
-    push @INC, "." unless grep { $_ eq "." } @INC;
-    use_ok("t::lib::ShareDir");
-}
-my $class_file = class_file('t::lib::ShareDir', 'test_file.txt');
-ok(-f $class_file, 'class_file ok');
-is($class_file, $module_file, 'class_file matches module_file for subclass');
+done_testing;

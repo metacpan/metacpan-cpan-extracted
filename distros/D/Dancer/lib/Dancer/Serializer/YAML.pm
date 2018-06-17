@@ -1,7 +1,7 @@
 package Dancer::Serializer::YAML;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: serializer for handling YAML data
-$Dancer::Serializer::YAML::VERSION = '1.3202';
+$Dancer::Serializer::YAML::VERSION = '1.3400';
 use strict;
 use warnings;
 use Carp;
@@ -29,7 +29,7 @@ sub to_yaml {
 sub loaded { 
     my $module = Dancer::Config::settings->{engines}{YAML}{module} || 'YAML';
 
-    raise core_serializer => q{Dancer::Serializer::YAML only support 'YAML' or 'YAML::XS', not $module}
+    raise core_serializer => q{Dancer::Serializer::YAML only supports 'YAML' or 'YAML::XS', not $module}
         unless $module =~ /^YAML(?:::XS)?$/;
 
     Dancer::ModuleLoader->load($module) 
@@ -43,12 +43,20 @@ sub init {
 
 sub serialize {
     my ($self, $entity) = @_;
-    YAML::Dump($entity);
+    my $module = Dancer::Config::settings->{engines}{YAML}{module} || 'YAML';
+    {
+        no strict 'refs';
+        &{ $module . '::Dump' }($entity);
+    }
 }
 
 sub deserialize {
     my ($self, $content) = @_;
-    YAML::Load($content);
+    my $module = Dancer::Config::settings->{engines}{YAML}{module} || 'YAML';
+    {
+        no strict 'refs';
+        &{ $module . '::Load' }($content);
+    }
 }
 
 sub content_type {'text/x-yaml'}
@@ -67,7 +75,7 @@ Dancer::Serializer::YAML - serializer for handling YAML data
 
 =head1 VERSION
 
-version 1.3202
+version 1.3400
 
 =head1 SYNOPSIS
 

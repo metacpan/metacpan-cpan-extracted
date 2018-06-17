@@ -1,7 +1,7 @@
 package Dancer::Config;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT:  how to configure Dancer to suit your needs
-$Dancer::Config::VERSION = '1.3202';
+$Dancer::Config::VERSION = '1.3400';
 use strict;
 use warnings;
 use base 'Exporter';
@@ -197,7 +197,7 @@ sub load {
         unless $result;
 
     unless ($_LOADED{conffile()}) {
-        load_settings_from_yaml(conffile);
+        load_settings_from_yaml(conffile, $module);
         $_LOADED{conffile()}++;
     }
 
@@ -206,7 +206,7 @@ sub load {
     # don't load the same env twice
     unless( $_LOADED{$env} ) {
         if (-f $env ) {
-            load_settings_from_yaml($env);
+            load_settings_from_yaml($env, $module);
             $_LOADED{$env}++;
         }
         elsif (setting('require_environment')) {
@@ -226,10 +226,14 @@ sub load {
 }
 
 sub load_settings_from_yaml {
-    my ($file) = @_;
+    my ($file, $module) = @_;
 
-    my $config = eval { YAML::LoadFile($file) }
+    my $config;
+    {
+        no strict 'refs';
+        $config = eval { &{ $module . '::LoadFile' }($file) }
         or confess "Unable to parse the configuration file: $file: $@";
+    }
 
     $SETTINGS = Hash::Merge::Simple::merge( $SETTINGS, {
         map {
@@ -278,7 +282,7 @@ Dancer::Config - how to configure Dancer to suit your needs
 
 =head1 VERSION
 
-version 1.3202
+version 1.3400
 
 =head1 DESCRIPTION
 

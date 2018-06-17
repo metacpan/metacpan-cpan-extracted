@@ -1,16 +1,28 @@
+1.005 - Jun 14, 2018
+Joelle Maslak <jmaslak@antelope.net>
+ * Improve testing
+ * Make module pass Critic
+ * Enable TravisCI
+ * Fix error message for wrong key length (s/bits/bytes/)
+ * Allow ASCII cypertext line endings to be configurable
+ * Released as DEV version.
+
+1.004 - June 14, 2018
+ * Trial version released to validate 1.005 changes
+
 1.003 - Aug 19, 2017
-J. Maslak <jmaslak@antelope.net>
+Joelle Maslak <jmaslak@antelope.net>
  * Update author information only
 
 1.002 - Oct 17, 2016
-J. Maslak <jmaslak@antelope.net>
+Joelle Maslak <jmaslak@antelope.net>
  * Don't re-initialize Crypt::Bytes::Random after initial initialization
 
 1.001 - Oct 09, 2016
-J. Maslak <jmaslak@antelope.net>
+Joelle Maslak <jmaslak@antelope.net>
  * One test was pulling in JCM::Boilerplate which is EXTREMELY heavy
    on dependencies.  Removed!
 
 1.000 - Oct 03, 2016
-J. Maslak <jmaslak@antelope.net>
+Joelle Maslak <jmaslak@antelope.net>
  * Initial Version

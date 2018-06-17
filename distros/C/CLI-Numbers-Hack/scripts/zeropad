@@ -1,0 +1,101 @@
+#!/usr/bin/perl 
+
+use 5.001 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts "C:d:qx=" , \my %o ; 
+use Term::ANSIColor qw[ :constants color ] ; $Term::ANSIColor::AUTORESET = 1 ;
+
+sub min ( $$ ) ; 
+sub zero_pad ( $$ ) ; 
+
+my $digits = $o{d} // 6 ; 
+my @zeros = map { "0" x $_ } reverse 0 .. $digits  ; 
+my $exit_code = 0 ;
+
+my @C = split /,/ , $o{C} // ''  ;
+grep { $_ > 0 and $_ -- } @C ; 
+
+do{ print my $head = <> } if $o{'='} ;
+SomeCol () if exists $o{C} ;
+LineWhole () unless exists $o{C} ;
+exit $exit_code ; 
+
+sub SomeCol { 
+  while ( <> ) { 
+    chomp ; 
+    my @F = split /\t/ , $_ , -1 ; 
+    grep { $_ = zero_pad ( $_ , $digits ) } $o{C} ? @F[ @C ] : @F ; 
+    print join ( "\t" , @F )  , "\n" ; 
+  }
+}
+
+sub LineWhole { 
+  while ( <> ) { 
+    chomp ; 
+    print zero_pad ( $_ , $digits ) ; 
+    print "\n" ;
+  }
+}
+
+
+sub min ( $$ ) { 
+  if ( $_[0] > $_[1] ) { 
+    print STDERR YELLOW "The number string length over occurred.\n" unless $o{q} ;
+    $exit_code = 1 ;
+    return $_[1] ; 
+  }
+  else { 
+    return $_[0] ; 
+  }
+}
+
+sub zero_pad ($$) { 
+  my $org = $_[0] ; 
+  my $dig = $_[1] ; 
+  $org =~ m/^(\+|\-|)([0-9]+)(.*)$/ ? $1.$zeros[min length($2),$digits ].$2.$3 : $org ;  
+}
+
+
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+  $0 -d 桁数
+
+   標準入力から各行が数で構成されたデータを読取り、指定された桁数で、
+   ゼロ埋めをする。
+
+ 返り値: 
+   $0 から始めたコマンドが終了した直後に echo $? とする。
+   0 であれば正常終了
+   1 であれば、どれかのゼロ埋めがうまくいっていないことを示す。
+
+ オプション: 
+
+   -d 桁数 : 0で左から埋めて、合計何桁にするか。
+   -q     : 桁数超過の警告表示を抑制する。ただし、$0 のコマンドの返り値は変わらない。
+
+   -C num[,num][,num] : タブ区切りで、狙った列だけをゼロ埋め処理の対象とする。列の数え方は1始まりまたは-1終わり。
+   -C 0 : タブ区切りの全ての列に対して、丸め変換を行う。
+
+   -=    :  最初の行は、ヘッダ行と見なして、何も処理をしないで、そのまま出力する。
+
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+
+
+=cut

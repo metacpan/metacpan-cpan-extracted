@@ -1,5 +1,5 @@
 {
-   "abstract" : "Provides a Geo-Coding functionality for the US using http:://geocoding.geo.census.gov",
+   "abstract" : "Provides a Geo-Coding functionality for the US using L<https://geocoding.geo.census.gov>",
    "author" : [
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
@@ -66,6 +66,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-US-Census"
       }
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

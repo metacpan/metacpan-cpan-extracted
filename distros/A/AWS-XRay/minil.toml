@@ -1,0 +1,6 @@
+name = "AWS-XRay"
+# badges = ["travis"]
+authority="cpan:FUJIWARA"
+
+module_maker="ModuleBuildTiny"
+

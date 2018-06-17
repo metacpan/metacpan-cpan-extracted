@@ -7,6 +7,7 @@ my $build = Module::Build->new(
   license => 'apache',
   requires => {
     'JSON' => 2,
+    'PerlIO::gzip' => 0,
     'perl' => '5.8.0'
    },
   build_requires => {

@@ -9,7 +9,7 @@ my $builder = Module::Build->new(
     dist_author         => q{"Toshiyuki Shimono" <bin4tsv@gmail.com>},
     dist_version_from   => 'lib/CLI/LaTeX/Table.pm',
     release_status      => 'stable',
-    script_files        => [qw[ scripts/transpose scripts/csel scripts/saikoro scripts/latextable scripts/csv2tsv] ],
+    script_files        => [map{"scripts/$_"}qw[ transpose csel saikoro latextable csv2tsv matrixpack ] ],
     configure_requires => {
         'Module::Build' => '0',
     },

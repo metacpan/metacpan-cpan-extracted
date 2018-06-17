@@ -1,5 +1,17 @@
 Revision history for Perl extension JavaScript-V8-CommonJS
 
+0.09 2018-06-14T20:15:12Z
+
+    - small fix (commented out Data::Printer)
+
+0.08 2018-06-13T21:30:17Z
+
+    - implemented nodejs-style module resolution
+      - module.js
+      - module.json
+      - module/index.js
+      - module/package.json
+
 0.07 2018-05-25T10:58:00Z
 
     - fixed throw syntax on require.js

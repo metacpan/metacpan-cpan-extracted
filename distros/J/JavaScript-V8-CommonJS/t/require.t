@@ -25,7 +25,11 @@ subtest 'resolveModule - json' => sub {
 
 
 subtest 'resolveModule - relative' => sub {
-    is $js->eval("typeof require('1.0/relative/submodule/a').foo"), 'function';
+    is $js->_resolveModule("./exception", "$FindBin::Bin/modules/foo.js"), "$FindBin::Bin/modules/exception.js", './';
+    is $js->_resolveModule("../exception", "$FindBin::Bin/modules/1.0/foo.js"), "$FindBin::Bin/modules/exception.js", '../';
+    is $js->_resolveModule("./pkgModule", "$FindBin::Bin/modules/foo.js"), "$FindBin::Bin/modules/pkgModule/lib/module.js", 'package.json';
+    is $js->_resolveModule("./pkgModule", "$FindBin::Bin/modules/foo.js"), "$FindBin::Bin/modules/pkgModule/lib/module.js", 'package.json';
+    is $js->_resolveModule("indexModule"), "$FindBin::Bin/modules/indexModule/index.js", 'index.js';
 };
 
 
@@ -40,6 +44,7 @@ subtest 'require' => sub {
 subtest 'require unknown' => sub {
     like dies { $js->eval("require('unknown')") }, qr/Can't find module 'unknown'/, 'unkown module exception';
 };
+
 
 subtest 'require json' => sub {
     is $js->eval("require('json/file').foo"), 'bar';

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.001
+    Version 0.002
 
 SYNOPSIS
 
@@ -16,7 +16,8 @@ DESCRIPTION
 
     There are some modules where you'll always depend on a minimal version,
     either because of a bug or because of an API change. A good example
-    would be Test::More where version 0.88 introduced done_testing().
+    would be Test::More where version 0.88 introduced done_testing() or
+    version which strongly urges to set 0.77 as a minimum in your code.
 
     This test can be used to check that, whenever you use these modules,
     you also declare the minimum version.
@@ -27,7 +28,7 @@ DESCRIPTION
 
 USAGE
 
- new( [ ARGS ] )
+ new( ARGS )
 
     Returns a new Test::RequiredMinimumDependencyVersion instance. new
     takes a hash with its arguments.
@@ -53,21 +54,21 @@ USAGE
     run in advance. Use done_testing from Test::More if you call this test
     directly instead of a plan.
 
-    file_ok returns something true if all web links are reachable and false
-    otherwise.
+    file_ok returns something true if all checked dependencies are at least
+    of the required minimal version and false otherwise.
 
  all_files_ok( [ @entries ] )
 
-    Checks all the files under @entries by calling pod_file_ok on every
-    file. Directories are recursive searched for files. Everything not a
-    file and not a directory (e.g. a symlink) is ignored. It calls
-    done_testing or skip_all so you can't have already called plan.
+    Checks all the files under @entries by calling file_ok on every file.
+    Directories are recursive searched for files. Everything not a file and
+    not a directory (e.g. a symlink) is ignored. It calls done_testing or
+    skip_all so you can't have already called plan.
 
-    If @entries is empty default directories are searched for files
-    containing Pod. The default directories are blib, or lib if it doesn't
-    exist, bin and script.
+    If @entries is empty default directories are searched for files. The
+    default directories are blib, or lib if it doesn't exist, bin and
+    script.
 
-    <all_files_ok> returns something true if all files test ok and false
+    all_files_ok returns something true if all files test ok and false
     otherwise.
 
 EXAMPLES
@@ -84,7 +85,7 @@ EXAMPLES
 
         Test::RequiredMinimumDependencyVersion->new(
             module => {
-                'Test::More' => '0.88',
+                'version' => '0.77',
             },
         )->all_files_ok;
 
@@ -99,13 +100,9 @@ EXAMPLES
         Test::RequiredMinimumDependencyVersion->new(
             module => {
                 'Test::More' => '0.88',
+                'version'    => '0.77',
             },
-        )->all_pod_files_ok(qw(
-            corpus/hello
-            corpus/world.pl
-            lib
-            tools
-        ));
+        )->all_files_ok(qw(bin lib t xt corpus/hello_world.pl));
 
  Example 3 Call file_ok directly
 
@@ -121,12 +118,12 @@ EXAMPLES
                 'Test::More' => '0.88',
             },
         );
-        $trmdv->pod_file_ok('corpus/7_links.pod');
-        $trmdv->pod_file_ok('corpus/hello');
+        $trmdv->file_ok('t/00-load.t');
+        $trmdv->file_ok('xt/author/pod-links.t');
 
         done_testing();
 
-    head1 SEE ALSO
+SEE ALSO
 
     Test::More
 

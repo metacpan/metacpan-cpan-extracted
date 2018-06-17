@@ -5,7 +5,7 @@ use Pod::Usage;
 use Pod::Find qw(pod_where);
 use namespace::autoclean;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 extends 'Catalyst::Script::Server';
 
@@ -52,7 +52,7 @@ around _plack_loader_args => sub {
     return %out;
 };
 
-sub _getopt_full_usage {
+sub print_usage_text {
     my $self = shift;
     pod2usage( -input => pod_where({-inc => 1}, __PACKAGE__), -verbose => 2 );
     exit 0;
@@ -69,8 +69,6 @@ CatalystX::Script::Server::Starman - Replace the development server with Starman
     myapp_server.pl [options]
 
        -d --debug           force debug mode
-       -f --fork            handle each request in a new process
-                            (defaults to false)
        -? --help            display this help and exits
        -h --host            host (defaults to all)
        -p --port            port (defaults to 3000)

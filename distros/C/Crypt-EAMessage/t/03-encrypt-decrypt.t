@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #
-# Copyright (C) 2016 J. Maslak
+# Copyright (C) 2016-2018 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -39,16 +39,31 @@ foreach my $msg (@MSG) {
 
     my $eamsg = Crypt::EAMessage->new( hex_key => $key );
 
-    my $encrypted = $eamsg->encrypt_auth($txt);
-    my $ascii     = $eamsg->encrypt_auth_ascii($txt);
+    my $encrypted  = $eamsg->encrypt_auth($txt);
+    my $ascii      = $eamsg->encrypt_auth_ascii($txt);
+    my $ascii_crlf = $eamsg->encrypt_auth_ascii($txt, "\r\n");
+    my $ascii_nolf = $eamsg->encrypt_auth_ascii($txt, "");
 
     ok(length($encrypted) < length($ascii), "ASCII encrypted message is longer for msg $cnt");
+    ok(length($encrypted) < length($ascii_crlf), "ASCII CRLF encrypted message is longer for msg $cnt");
+    ok(length($encrypted) < length($ascii_nolf), "ASCII no-LF encrypted message is longer for msg $cnt");
+    ok(length($ascii) <= length($ascii_crlf), "ASCII CRLF encrypted message is longer than or same length as LF encrypted for msg $cnt");
+    ok(length($ascii_nolf) <= length($ascii), "ASCII no-LF encrypted message is longer than or same length as ascii encrypted for msg $cnt");
+    ok(length($ascii_nolf) < length($ascii_crlf), "ASCII CRLF encrypted message is longer than CRLF encrypted for msg $cnt");
 
-    my ($plain, $plain2);
+    my ($plain, $plain2, $plain3, $plain4);
+
     ok(lives( sub { $plain = $eamsg->decrypt_auth($encrypted) } ), "Decrypted raw msg $cnt");
     is( $plain, $txt, "Decrypted raw msg $cnt correctly" );
+
     ok(lives( sub { $plain2 = $eamsg->decrypt_auth($ascii) } ), "Decrypted B64 msg $cnt");
     is( $plain2, $txt, "Decrypted B64 msg $cnt correctly" );
+
+    ok(lives( sub { $plain3 = $eamsg->decrypt_auth($ascii_crlf) } ), "Decrypted B64 CRLF msg $cnt");
+    is( $plain3, $txt, "Decrypted B64 CRLF msg $cnt correctly" );
+
+    ok(lives( sub { $plain4 = $eamsg->decrypt_auth($ascii_nolf) } ), "Decrypted B64 NOLF msg $cnt");
+    is( $plain4, $txt, "Decrypted B64 msg $cnt correctly" );
 
     my $badkey = '11112222333344445555666677778888';
     $eamsg = Crypt::EAMessage->new( hex_key => $badkey );
@@ -56,7 +71,7 @@ foreach my $msg (@MSG) {
 
     $encrypted =~ s/.$//;
     ok(dies( sub { $eamsg->decrypt_auth($encrypted) } ), "Can't decrypt msg $cnt with tampered-with message");
-    
+
     my $encrypted2 = $eamsg->encrypt_auth($txt);
     isnt($encrypted2, $encrypted, "Two encrypts of msg $cnt return different values");
 }

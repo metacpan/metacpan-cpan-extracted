@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie;
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 use Exporter;
 use parent 'Exporter';
@@ -12,9 +12,9 @@ our @EXPORT_OK = qw< datetime now >;
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
 use Carp;
-use Time::Local;
 use Time::Piece;
 use Scalar::Util 'blessed';
+use Time::Local 1.26, qw< timegm_modern timelocal_modern >;
 
 
 # this can be modified (preferably using `local`) to use GMT/UTC as the default
@@ -58,18 +58,117 @@ sub datetime
 sub now () { Date::Easy::Datetime->new }
 
 
+sub _strptime
+{
+	require Date::Parse;
+	# Most of this code is stolen from Date::Parse, by Graham Barr.  It is used here (see _str2time,
+	# below), but its true raison d'etre is for use by Date::Easy::Date.
+	#
+	# In an ideal world, I would just use the code from Date::Parse and not repeat it here.
+	# However, the problem is that str2time() calls strptime() to generate the pieces of a datetime,
+	# then does some validation, then returns epoch seconds by calling timegm (from Time::Local) on
+	# it.  For dates, I don't _want_ to call str2time because I'm just going to take the epoch
+	# seconds and turn them back into pieces, so it's inefficicent.  But more importantly I _can't_
+	# call str2time because it converts to UTC, and I want the pieces as they are relative to
+	# whatever timezone the parsed date has.
+	#
+	# On the other hand, the problem with calling strptime directly is that str2time is doing two
+	# things there: the conversion to epoch seconds, which I don't want or need for dates, and the
+	# validation, which, it turns out, I *do* want, and need, even for dates.  For instance,
+	# strptime will happily return a month of -1 if it hits a parsing hiccough.  Which then str2time
+	# will turn into undef, as you would expect.  But, if you're just calling strptime, that doesn't
+	# help you much. :-(
+	#
+	# Thus, for dates in particular, I'm left with 3 possibilities, none of them very palatable:
+	# 	#	call strptime, then call str2time as well
+	#	#	repeat at least some of the code from str2time here
+	#	#	do Something Devious, like wrap/monkey-patch strptime
+	# #1 doesn't seem practical, because it means that every string that has to be parsed this way
+	# has to be parsed twice, meaning it will take twice as long.  #3 seems too complex--since the
+	# call to strptime is out of my control, I can't add arguments to it, or get any extra data out
+	# of it, which means I have to store things in global variables, which means it wouldn't be
+	# reentrant ... it would be a big mess.  So #2, unpalatable as it is, is what we're going with.
+	#
+	# Of course, this gives me the opportunity to tweak a few things.  Primarily, we can tweak our
+	# code to fix RT/105031 et al (see comments below, in _str2time).  There's a few minor
+	# efficiency gains we can get from not doing things the older code seemed to think was
+	# necessary.  (Of course, maybe it really is, in which case I'll have to put it all back.)
+	#
+	# The code in _strptime is as much of Date::Parse::str2time as is necessary to handle all the
+	# validation and still return separate time values.  This way it can be used by both dates and
+	# datetimes.
+
+	my ($str, $zonespec) = @_;
+
+	my ($sec, $min, $hour, $day, $month, $year, $zone)
+			= Date::Parse::strptime($str, $zonespec eq 'local' ? () : $zonespec);
+	my $num_defined = defined($day) + defined($month) + defined($year);
+	return () if $num_defined == 0;
+	if ($num_defined < 3)
+	{
+		my @lt  = localtime(time);
+
+		$month = $lt[4] unless defined $month;
+		$day  = $lt[3] unless defined $day;
+		$year = ($month > $lt[4]) ? ($lt[5] - 1) : $lt[5] unless defined $year;
+	}
+	$hour ||= 0; $min ||= 0; $sec ||= 0;			# default time components to zero
+	my $subsec = $sec - int($sec); $sec = int($sec);# extract any fractional part (e.g. milliseconds)
+	$year += 1900 if $year < 1000;					# undo timelocal funkiness and adjust for RT/53413 / RT/105031
+
+	return () unless $month >= 0 and $month <= 11 and $day >= 1 and $day <= 31
+						and $hour <= 23 and $min <= 59 and $sec <= 59;
+
+	return ($sec, $min, $hour, $day, $month, $year, $zone, $subsec);
+}
+
 sub _str2time
 {
 	require Date::Parse;
-	my ($time, $zone) = @_;
-	return Date::Parse::str2time($time, $zone eq 'local' ? () : $zone);
+	# Most of this code is also stolen from Date::Parse, by Graham Barr.  This is the remainder of
+	# Date::Parse::str2time, which takes the separate values (from _strptime, above) and turns them
+	# into an epoch seconds value.  See also the big comment block below.
+
+	my ($time, $zonespec) = @_;
+	my ($sec, $min, $hour, $day, $month, $year, $zone, $subsec) = _strptime($time, $zonespec);
+	# doesn't really matter which one we check (other than $zone); either they're all defined, or none are
+	return undef unless defined $year;
+
+	# This block is changed from the original in Date::Parse in the following ways:
+	#	*	We're using timegm_modern/timelocal_modern instead of timegm/timelocal.  This fixes all
+	#		sorts of gnarly issues, but most especially the heinous RT/53413 / RT/105031 bug.  (Side
+	#		note: perhaps Parse::Date could use these as well?  If so, that would close that raft of
+	#		bugs and then we wouldn't need to reimplement the guts of `str2time` at all.)
+	#	*	The original code set the __DIE__ sig handler to ignore in the `eval`s.  But I'm not
+	#		comfortable doing that, and I'm not convinced it's necessary.
+	#	*	The original code did a little dance to make sure that a -1 return from timegm/timelocal
+	#		was a valid return and not an indication of an error.  But I can't see any indication
+	#		that they ever actually return -1 on error, either in the current Time::Local code, or
+	#		in its Changes file (e.g. for older versions).  And, since our version of `strptime`
+	#		specifically adds 1900 to the year (sometimes) to avoid Time::Local's horrible
+	#		"two-digit year" handling, it makes coming up with a value to compare -1 against more of
+	#		a PITA.  Plus it's inefficient for what appears to be no real gain.
+	my $result;
+	if (defined $zone)
+	{
+		$result = eval { timegm_modern($sec, $min, $hour, $day, $month, $year) };
+		return undef unless defined $result;
+		$result -= $zone;
+	}
+	else
+	{
+		$result = eval { timelocal_modern($sec, $min, $hour, $day, $month, $year) };
+		return undef unless defined $result;
+	}
+
+	return $result + $subsec;
 }
 
 sub _parsedate
 {
 	require Time::ParseDate;
-	my ($time, $zone) = @_;
-	return scalar Time::ParseDate::parsedate($time, $zone eq 'local' ? () : (GMT => 1));
+	my ($time, $zonespec) = @_;
+	return scalar Time::ParseDate::parsedate($time, $zonespec eq 'local' ? () : (GMT => 1));
 }
 
 
@@ -92,7 +191,11 @@ sub new
 	{
 		my ($y, $m, $d, $H, $M, $S) = @_;
 		--$m;										# timelocal/timegm will expect month as 0..11
-		$t = eval { $zonespec eq 'local' ? timelocal($S, $M, $H, $d, $m, $y) : timegm($S, $M, $H, $d, $m, $y) };
+		# but we'll use timelocal_modern/timegm_modern so we don't need to twiddle the year number
+		$t = eval {		$zonespec eq 'local'
+							? timelocal_modern($S, $M, $H, $d, $m, $y)
+							:    timegm_modern($S, $M, $H, $d, $m, $y)
+		};
 		croak("Illegal datetime: $y/" . ($m + 1) . "/$d $H:$M:$S") unless defined $t;
 	}
 	elsif (@_ == 1)
@@ -291,7 +394,7 @@ Date::Easy::Datetime - easy datetime class
 
 =head1 VERSION
 
-This document describes version 0.05 of Date::Easy::Datetime.
+This document describes version 0.06 of Date::Easy::Datetime.
 
 =head1 SYNOPSIS
 
@@ -358,13 +461,14 @@ There are three zone specifiers that Date::Easy::Datetime understands:
 
 'local' means to use the local timezone, however that is determined (often this is via the C<$TZ>
 environment variable, but your system may differ).  That is, under 'local' Date::Easy::Datetime will
-use C<localtime> and C<timelocal> (from L<Time::Local>) to deal with epoch seconds.
+use C<localtime> and C<timelocal> (technically, C<timelocal_modern>, from L<Time::Local>) to deal
+with epoch seconds.
 
 =head3 UTC
 
 'UTC' means to use the UTC timzeone, which essentialy means to ignore timezone altogether.  That is,
-under 'UTC' Date::Easy::Datetime will use C<gmtime> and C<timegm> (from L<Time::Local>) to deal with
-epcoh seconds.
+under 'UTC' Date::Easy::Datetime will use C<gmtime> and C<timegm> (technically, C<timegm_local>,
+from L<Time::Local>) to deal with epcoh seconds.
 
 =head3 GMT
 
@@ -413,15 +517,15 @@ Takes the given epoch seconds and turns it into a datetime using the given zone 
 
 Takes the given year, month, day, hours, minutes, and seconds, and turns them into a datetime
 object, using the default zone specifier.  Month and day are human-centric (i.e., 1-based, not
-0-based).  Year should probably be a 4-digit year; if you pass in a 2-digit year, you get whatever
-century C<timegm>/C<timelocal> thinks you should get, which may or may not be what you expected.
+0-based).  Year should be a 4-digit year; if you pass in a 2-digit year, you get a year bewteen 1900
+and 1999, even if you use the last 2 digits of the current year.
 
 =head3 Date::Easy::Datetime->new($zone_spec => $y, $m, $d, $hr, $mi, $sc)
 
 Takes the given year, month, day, hours, minutes, and seconds, and turns them into a datetime
 object, using the given zone specifier.  Month and day are human-centric (i.e., 1-based, not
-0-based).  Year should probably be a 4-digit year; if you pass in a 2-digit year, you get whatever
-century C<timegm>/C<timelocal> thinks you should get, which may or may not be what you expected.
+0-based).  Year should be a 4-digit year; if you pass in a 2-digit year, you get a year bewteen 1900
+and 1999, even if you use the last 2 digits of the current year.
 
 =head3 Date::Easy::Datetime->new($obj)
 
@@ -688,16 +792,6 @@ If the DST flag (i.e. the condition of either being on daylight savings or not) 
 Hopefully this means hitting this bug will be rare.  An upstream bug L<has been
 filed|https://github.com/muir/Time-modules/issues/8>.
 
-There is a bug in L<Date::Parse> which causes the supplied century of a 4-digit year to be ignored
-when it is outside the sliding window that L<Time::Local> uses to guess the century for a 2-digit
-year.  This simple code demonstrates the problem:
-
-    say datetime("1/1/1965") # Thu Jan  1 00:00:00 2065
-
-Any year which is 50 years or more in the past will have this behavior.  There is an outstanding
-L<upstream bug|https://rt.cpan.org/Public/Bug/Display.html?id=105031> for this issue.  Note that
-dates don't have this problem; only datetimes.
-
 If your local timezone contains leap seconds, you will likely get funky results with UTC datetimes,
 such as this being true:
 
@@ -707,6 +801,16 @@ in all cases except, of course, datetimes from before the first leap second was 
 30-Jun-1972 23:59:60).  Weirdly, this isn't a problem with local datetimes.  An upstream bug L<has
 been filed|https://github.com/rjbs/Time-Piece/issues/23>, although there is still some ongoing
 discussion about whether this is a bug or not, and whether it's fixable even if it is.
+
+If you pass a 2-digit year to `datetime`, it will always come back in the 20th century:
+
+    say datetime("2/1/17"); # Thu Feb  1 00:00:00 1917
+
+Avoiding this is simple: always use 4-digit dates (which is a good habit to get into anyway).  This
+could be considered a bug, since Time::Local uses a 50-year sliding window, which I<might> be
+considered to be more correct behavior.  However, by suffering this "bug," we avoid a bigger one
+(see L<RT/53413|https://rt.cpan.org/Public/Bug/Display.html?id=53413> and
+L<RT/105031|https://rt.cpan.org/Public/Bug/Display.html?id=105031>).
 
 See also L<Date::Easy/"Limitations">.
 

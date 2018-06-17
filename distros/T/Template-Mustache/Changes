@@ -1,5 +1,12 @@
 Revision history for Template-Mustache
 
+1.3.1 2018-06-15
+  [ BUG FIXES ]
+    - partials were incorrectly inherited for file-based partials.
+
+  [ STATISTICS ]
+    - code churn: 5 files changed, 39 insertions(+), 3 deletions(-)
+
 1.3.0 2018-06-13
   [ DOCUMENTATION ]
     - Fixed broken link in pod. (GH#53, Mohammad S Anwar)

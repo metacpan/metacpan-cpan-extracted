@@ -1,5 +1,14 @@
 Revision history for Perl module Math::PRBS.
 
+v0.004  2018-Jun-14
+    - Fix documentation (closed #3)
+    - Add oeis_anum coverage (closed #4)
+    - Add generate_int() and generate_all_int() to generate a sequence of integers rather than just a binary sequence (closed #5)
+    - Add k_bits() to indicate how many bits from the sequence go into each integer (closed #6)
+
+v0.003  2018-Jun-14
+    - Internal development
+
 v0.002  2016-Sep-12
     - Initial public release
 

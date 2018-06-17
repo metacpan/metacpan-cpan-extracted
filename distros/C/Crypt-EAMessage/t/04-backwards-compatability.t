@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #
-# Copyright (C) 2016 J. Maslak
+# Copyright (C) 2016-2018 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -18,9 +18,9 @@ use Crypt::EAMessage;
 
 my (@MSG) = (
     {
-        ct => '311a725f4c3ed0693673b8a2303ea6f8c38a6f62c93bafc5395'
-          . '12eacdc075106d21b2c6a412129407a6cde2b824f2d60a3fdcd9b'
-          . '88d9714269ce85cd066748115470bf',
+        ct => '311a725f4c3ed0693673b8a2303ea6f8c38a6f62c93bafc53'
+          . '9512eacdc075106d21b2c6a412129407a6cde2b824f2d60a3fd'
+          . 'cd9b88d9714269ce85cd066748115470bf',
         key  => 'abcd1234abcd1234abcd1234abcd1234',
         text => 'Plain Text Message RAW encoded',
     },
@@ -31,6 +31,22 @@ my (@MSG) = (
           . '6670a564254744b584c4457496a5a574e413d0a',
         key  => 'abcd1234abcd1234abcd1234abcd1234',
         text => 'Plain Text Message ASCII encoded',
+    },
+    {
+        ct => '323762596650674451455a6c5664346c634e76493170552f6'
+          . 'f713433555838487370306d594f2b55665a37532b4f53335241'
+          . '636d59626336387048582f596d3355515371693133596c356c6'
+          . '2560d0a3265434f61713335444638643243733d0d0a',
+        key  => 'abcd1234abcd1234abcd1234abcd1234',
+        text => 'Plain Text Message CR-LF encoded',
+    },
+    {
+        ct => '323454774c437a664764356f4a41756636794a312f466a564'
+          . 'c4a38546c362b55466e44646d6d6b4c71726b6677784b2b546d'
+          . '41754a5032477038516571614d3973727967535153754f54526'
+          . 'c6870772f4c64384d6b72536859764a773d',
+        key  => 'abcd1234abcd1234abcd1234abcd1234',
+        text => 'Plain Text Message no-LF encoded',
     },
 );
 

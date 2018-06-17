@@ -118,10 +118,6 @@ Possible TODOs:
 
     _o_ setuid =>  option to fork
 
-    _x_ daemon support depends on file-based IPC?
-        make a socket-based alternative. Let $job->{signal_ipc}, {daemon_ipc}
-	be sockets?
-
     ___ Anything to learn from python  multiprocessing  module? See   
         stackoverflow.com/questions/7931455/
 	_X_ synchronization objects, acquire and release methods
@@ -179,11 +175,15 @@ Possible TODOs:
 
     ___ FS::Config::enable_signal_config not being tested?
 
-    ___ Pool, Queue objects to share data between parent and children (workers)
-        ___ Are there existing modules for this? To add and subtract from a
-            queue or stack from separate processes?
-        _X_ rename Forks::Super::Queue so this package name is available later
-
     ___ determine in system-limits.PL if alternate alarm is needed
 
-    _X_ exec should use  exec { $args[0] } @args  idiom
+    _X_ parallel map? on_finish code that uses data returned by the
+        child process?
+
+    ___ pmap or pgrep with chunking, more like mce_grep
+
+    ___ is "share" the right framework to return data from a background job?
+
+    ___ job groups, where we can call wait or kill all of the jobs
+        in the group.
+

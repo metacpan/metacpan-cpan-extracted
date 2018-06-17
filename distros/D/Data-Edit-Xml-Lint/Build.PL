@@ -9,6 +9,7 @@ my $b = Module::Build->new
   perl          => '5.16.0',
   requires      =>
    {Data::Edit::Xml  =>20180610,
+    Data::Dump       =>0,
     Data::Table::Text=>20180610,
     Carp=>0,
     Digest::SHA=>0,

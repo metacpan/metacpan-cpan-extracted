@@ -1,0 +1,151 @@
+#!/usr/bin/perl -T
+use 5.014 ; use strict ; use warnings ;
+use Getopt::Std ; getopts 'c:gCS,:', \my %o ;
+
+HELP_MESSAGE ()  unless @ARGV ; 
+
+sub main ( ) ; 
+sub expandArg ( @ ) ; # 与えられた引数を、解釈する。(..を範囲とみなし、,で区切りと見なす) 
+sub operateN ( @ ) ; # 数を出力。
+sub operateC ( @ ) ; # awk文を生成。取り出したい列だけを取り出す。
+sub operateS ( @ ) ; # awk文を生成。取り出したい列の列和を計算する awk文を取り出す。
+
+$o{','} = do { $o{','} //= "\n" ; eval qq[qq[$o{','}]]}  ; # 数を出力するときの、区切り文字の指定
+$o{c} //= '' ; # -Cでgawkコマンド分を出力するときの、awk条件節を表す文字列を指定
+my $awk = $o{g} ? ' gawk ' : ' awk ' ; # <-- - local としようとしたが、うまくいかなかった。
+
+main ;
+exit 0 ;
+
+sub main ( ) { 
+	my @arg = expandArg @ARGV ;	
+	if    ( $o{C} ) { operateC @arg } 
+	elsif ( $o{S} ) { operateS @arg } 
+	else  { operateN @arg } 
+} 
+
+sub expandArg ( @ ) {
+
+    # コンマ区切りの展開
+    for ( reverse 0 .. $#_ ) {
+        splice @_ , $_ , 1 , split /,/ , $_[$_] , 0 ;
+    }
+
+    # ".."  の展開
+    for ( reverse 0..$#_ ) {
+        #if ( $_[$_] =~ /^(-?\d+)\.\.(-?\d+)$/ ) {
+
+        if ( $_[$_] =~ /^(.*)\.\.(.*)$/ ) {
+            my ( $n1 , $n2 ) = ( $1, $2 ) ;
+            my $reg = qr/^([+-]?)(?=[0-9]|\.[0-9])[0-9]*(\.[0-9]*)?([Ee]([+-]?[0-9]+))?$/ ;
+            $n1 !~ $reg || $n2 !~ $reg and next ;
+            my @tmp =  $n1 <= $n2 ?  $n1..$n2 : reverse $n2..$n1  ;
+            splice @_ , $_ , 1 , @tmp ;
+        }
+    }
+    # ちょっとした後処理
+    @_ = grep {$_ ne ''} @_ ;
+    return @_
+}
+
+
+sub operateN ( @ ) {
+    my $sep = eval qq[qq[$o{','}]]  ;
+    print join $sep, @_ ;
+    print "\n" ;
+}
+
+sub operateC ( @ ) {
+    my $out = '' ;
+    $out .= $awk ;  # q[ gawk ] ;
+    $out .= q[-F\t -vOFS=\t ] ;
+    $out .= $o{c} ;
+    $out .= q[ {print] ;
+     # -Cで動作させて、bashでエラーにならないようにするため、
+     # print の後ろに空白文字は入れてはいけないようだ。
+    $out .= join ',' , map { '$'.$_ } @_ ;
+    $out .= q[}] ;
+    print $out ;
+}
+
+sub operateS ( @ ) {
+    my $out = '' ;
+    $out .= $awk ; # q[ gawk ] ;
+    $out .= q[-F\t -vOFS=\t ] ;
+    $out .= $o{c} ;
+    $out .= q[ {] ;
+    $out .= join ';' , map { "s$_+=\$$_" } @_ ;
+    $out .= q[}] ;
+    $out .= q[END{print(] ;
+    $out .= join ',' , map { "s$_" } @_ ;
+    $out .= q[)}] ;
+    print $out ;
+}
+
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8 
+
+=head1
+ $0 arg
+
+    arg で指定される数を出力する。
+    -C により、指定された列のみを取り出す、gawkのコマンド文を生成する。
+    .. で範囲を指定できるし、9..1のように降順指定もできるが、この場合整数のみ扱う。
+
+ オプション:
+
+    -, char  : 数を出力するときに、区切り文字を改行文字から変更する。
+               例: -, \t 　でタブ文字を指定。
+                   -,,   コンマ文字を指定。
+                   -, '' 区切り文字は0文字、つまり、何もはさまないで数を並べて出力。(-, と ''　の間は必ず空白を入れる。)
+
+    -C  : gawkのコマンド文を出力する。どの列を出力するかは、argにより指定される。
+    -S  : 指定された各列の列和を求めるgawkのコマンド文を出力する。
+    -c  'str' : gawk文のコマンド文に 条件節を追加する。-Cまたは-Sと共に用いる。
+
+    --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+    --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+
+ 使用例1 (単に数のリストを出力する場合)
+
+     $0 5..10   # ->  5から10までの数を改行区切りで出力。
+     $0 5,3 2,1  # -> 5,3,2,1を改行区切りで出力。空白区切りもコンマ区切りも同じ区切りと見なす。
+     $0 10..5 -3  # -> 10,9,8,7,6,5 と -3 を出力。
+
+ 使用例2 (gawkコマンド文を出力する場合)
+
+    `$0 -C 5..10, 1 ` file
+
+      # バッククォーテーションで囲まれている部分が、gawk のコマンドに置き換わる。
+      # この場合は、gawk -F\t -vOFS=\t {print$5,$6,$7,$8,$9,$10,$1} となる。
+
+    `$0 -c'$1==10' -C 1..3 `
+     $( $0 -c '$1==10' -C 1..3 )
+
+       # 1列目が値10であるときのみ、1列目から3列目を出力する。
+       # 条件節を表す文字列は必ず ''で囲うこと。シェルが$1などを解釈してしまうため
+       # 条件節に  || や && を使うときは、前後に空白を入れないこと。
+
+  使用例3 (列を選択して、その各列の和を求めるためのgawkコマンド文を生成)
+     `$0 -S 3 `    # 3番目の列の和を求める
+
+
+ 注意点:
+    引数に与えられた数は整数として扱われやすい。Perlの .. 演算子を使っているため。
+=cut
+
+

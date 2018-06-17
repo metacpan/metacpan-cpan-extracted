@@ -12,7 +12,7 @@ use Scalar::Util qw(blessed);
 
 use base 'Date::Holidays::Adapter';
 
-$VERSION = '1.13';
+$VERSION = '1.15';
 
 sub new {
     my ( $class, %params ) = @_;
@@ -313,7 +313,7 @@ Date::Holidays - Date::Holidays::* adapter and aggregator for all your holiday n
 
 =head1 VERSION
 
-The documentation describes version 1.13 of Date::Holidays
+The documentation describes version 1.15 of Date::Holidays
 
 =head1 FEATURES
 
@@ -447,7 +447,7 @@ You can specify either month plus day for a recurring holiday. If you you want t
 a holiday for a specific year, simply extend the date with year:
 
     {
-        "201.1325" : ""
+        "201.1525" : ""
     }
 
 In order for the calendar to be picked up by Date::Holidays, set the environment variable:
@@ -527,7 +527,7 @@ Takes 6 optional named arguments:
 
 =item * year, four digit parameter representing year
 
-=item * month, 1.13, representing month
+=item * month, 1.15, representing month
 
 =item * day, 1-31, representing day
 
@@ -747,8 +747,17 @@ Please see the F<cpanfile> included in the distribution for a complete listing.
 
 =head1 INCOMPATIBILITIES
 
-None known at the moment, please refer to BUGS AND LIMITATIONS and or the
-specific adapter classes or their respective adaptees.
+Currently the following CPAN Date::Holidays distributions are unsupported:
+
+=over
+
+=item * L<Date::Holidays::UK> only supports bank holidays until 2007
+
+=item * L<Date::Holidays::UK::EnglandAndWales> only supports bank holidays until 2014
+
+=back
+
+Additional issues might be described the specific adapter classes or their respective adaptees.
 
 =head1 BUGS AND LIMITATIONS
 
@@ -759,7 +768,7 @@ for L<Date::Holidays::AU> for documentation on this.
 L<Date::Holidays::DE> and L<Date::Holidays::UK> does not implement the
 B<holidays> methods
 
-The adaptee module for L<Date::Holidays::Adapter> is named:
+The adaptee module for L<Date::Holidays::Adapter::JP> is named:
 L<Date::Japanese::Holiday>, but the adapter class is following the general
 adapter naming of Date::Holidays::Adapter::<countrycode>.
 

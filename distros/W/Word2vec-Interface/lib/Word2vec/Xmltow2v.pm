@@ -4,7 +4,7 @@
 #                                                                                    #
 #    Author: Clint Cuffy                                                             #
 #    Date:    06/16/2016                                                             #
-#    Revised: 10/10/2017                                                             #
+#    Revised: 12/08/2017                                                             #
 #    UMLS Similarity - Medline XML-To-Word2Vec Input Format Conversion Module        #
 #                                                                                    #
 ######################################################################################
@@ -49,7 +49,7 @@ use Word2vec::Bst;
 
 use vars qw($VERSION);
 
-$VERSION = '0.021';
+$VERSION = '0.022';
 
 
 # Global Variables
@@ -492,10 +492,18 @@ sub _ParseMedlineCitationSet
         # Compoundify String If Option Is Enabled
         if( $self->GetCompoundifyText() == 1 && ( $self->IsDateInSpecifiedRange( $self->GetTempDate(), $self->GetBeginDate(), $self->GetEndDate() ) == 1 ) )
         {
-            my $tempStr = $self->CompoundifyString( lc( $self->GetTempStr() ) );
-
+            my $tempStr = "";
+            my @sentences = split( '\n', lc( $self->GetTempStr() ) );
+            
+            for my $sentence ( @sentences )
+            {
+                $tempStr .= ( $self->CompoundifyString( $sentence ) . "\n" );
+            }
+    
             # Append Article Data To Text Corpus
             $self->AppendStrToTextCorpus( $tempStr );
+            
+            undef( @sentences );
         }
         elsif( $self->IsDateInSpecifiedRange( $self->GetTempDate(), $self->GetBeginDate(), $self->GetEndDate() ) == 1 )
         {
@@ -600,7 +608,14 @@ sub _ParseArticle
             chomp( $tempStr );
             
             # Store String
-            $self->AppendToTempStr( $tempStr ) if ( $self->GetStoreTitle() == 1 );
+            if( $self->GetStoreTitle() == 1 && $self->GetStoreAsSentencePerLine() == 1 && substr( $tempStr, -1 ) ne "." )
+            {
+                $self->AppendToTempStr( "$tempStr." );
+            }
+            else
+            {
+                $self->AppendToTempStr( "$tempStr"  );
+            }
 
             $self->WriteLog( "_ParseArticle - Tag: " . $articleChild->tag() . ", Field: " . $tempStr );
         }
@@ -635,7 +650,14 @@ sub _ParseJournal
             chomp( $tempStr );
 
             # Store String
-            $self->AppendToTempStr( $tempStr ) if ( $self->GetStoreTitle() == 1 );
+            if( $self->GetStoreTitle() == 1 && $self->GetStoreAsSentencePerLine() == 1 && substr( $tempStr, -1 ) ne "." )
+            {
+                $self->AppendToTempStr( "$tempStr." );
+            }
+            else
+            {
+                $self->AppendToTempStr( "$tempStr"  );
+            }
 
             $self->WriteLog( "_ParseJournal - Tag: " . $journalChild->tag() . ", Field: " . $tempStr );
         }
@@ -718,7 +740,14 @@ sub _QuickParseJournal
             chomp( $tempStr );
 
             # Store String
-            $self->AppendToTempStr( $tempStr ) if ( $self->GetStoreTitle() == 1 );
+            if( $self->GetStoreTitle() == 1 && $self->GetStoreAsSentencePerLine() == 1 && substr( $tempStr, -1 ) ne "." )
+            {
+                $self->AppendToTempStr( "$tempStr." );
+            }
+            else
+            {
+                $self->AppendToTempStr( "$tempStr"  );
+            }
 
             $self->WriteLog( "_QuickParseJournal - Tag: " . $journalChild->tag() . ", Field: " . $tempStr );
         }
@@ -731,10 +760,18 @@ sub _QuickParseJournal
     # Compoundify String If Option Is Enabled
     if( $self->GetCompoundifyText() == 1 && ( $self->IsDateInSpecifiedRange( $self->GetTempDate(), $self->GetBeginDate(), $self->GetEndDate() ) == 1 ) )
     {
-        my $tempStr = $self->CompoundifyString( lc( $self->GetTempStr() ) );
+        my $tempStr = "";
+        my @sentences = split( '\n', lc( $self->GetTempStr() ) );
+        
+        for my $sentence ( @sentences )
+        {
+            $tempStr .= ( $self->CompoundifyString( $sentence ) . "\n" );
+        }
 
         # Append Article Data To Text Corpus
         $self->AppendStrToTextCorpus( $tempStr );
+        
+        undef( @sentences );
     }
     elsif( $self->IsDateInSpecifiedRange( $self->GetTempDate(), $self->GetBeginDate(), $self->GetEndDate() ) == 1 )
     {
@@ -763,7 +800,14 @@ sub _QuickParseArticle
             chomp( $tempStr );
 
             # Store String
-            $self->AppendToTempStr( $tempStr ) if ( $self->GetStoreTitle() == 1 );
+            if( $self->GetStoreTitle() == 1 && $self->GetStoreAsSentencePerLine() == 1 && substr( $tempStr, -1 ) ne "." )
+            {
+                $self->AppendToTempStr( "$tempStr." );
+            }
+            else
+            {
+                $self->AppendToTempStr( "$tempStr"  );
+            }
 
             $self->WriteLog( "_QuickParseArticle - Tag: " . $articleChild->tag() . ", Field: " . $tempStr );
         }
@@ -786,10 +830,18 @@ sub _QuickParseArticle
     # Compoundify String If Option Is Enabled
     if( $self->GetCompoundifyText() == 1 && ( $self->IsDateInSpecifiedRange( $self->GetTempDate(), $self->GetBeginDate(), $self->GetEndDate() ) == 1 ) )
     {
-        my $tempStr = $self->CompoundifyString( lc( $self->GetTempStr() ) );
+        my $tempStr = "";
+        my @sentences = split( '\n', lc( $self->GetTempStr() ) );
+        
+        for my $sentence ( @sentences )
+        {
+            $tempStr .= ( $self->CompoundifyString( $sentence ) . "\n" );
+        }
 
         # Append Article Data To Text Corpus
         $self->AppendStrToTextCorpus( $tempStr );
+        
+        undef( @sentences );
     }
     elsif( $self->IsDateInSpecifiedRange( $self->GetTempDate(), $self->GetBeginDate(), $self->GetEndDate() ) == 1 )
     {
@@ -1020,7 +1072,7 @@ sub ReadCompoundWordDataFromFile
 
     while( my $row = <$fileHandle> )
     {
-        chomp( $row );
+        $row = $self->RemoveLineEndings( $row );
         $row = $self->RemoveSpecialCharactersFromString( $row );
         push( @dataAry, $row );
 
@@ -1309,6 +1361,19 @@ sub RemoveSpecialCharactersFromString
     
     # Removes Spaces At Both Ends Of String And More Than Once Space In-Between Ends
     $str =~ s/^\s+|\s(?=\s)|\s+$//g if ( $self->GetStoreAsSentencePerLine() == 0 );
+    
+    return $str;
+}
+
+sub RemoveLineEndings
+{
+    my ( $self, $str ) = @_;
+    
+    # Check(s)
+    $self->WriteLog( "RemoveLineEndings - Error: String Parameter Not Defined" ) if !defined( $str );
+    
+    # Remove All Known Line Endings
+    $str =~ s/\015|\012//g;
     
     return $str;
 }
@@ -1689,6 +1754,9 @@ sub AppendStrToTextCorpus
         # Removes Spaces At Both Ends Of String And More Than Once Space In-Between Ends
         $str =~ s/^\s+|\s(?=\s)|\s+$//g if ( $self->GetStoreAsSentencePerLine() == 0 );
         
+        # Removes Spaces At Left Side Of Sentence
+        $str =~ s/\n /\n/g               if ( $self->GetStoreAsSentencePerLine() == 1 );
+        
         # Append string to text corpus
         if( substr( $str, -1 ) eq "\n" )
         {
@@ -1725,12 +1793,6 @@ sub AppendToTempStr
     # Convert String To UTF8 Format Encoding (Removes Special Characters / Fixes Wide Character Bug)
     $str = $self->RemoveSpecialCharactersFromString( $str );
     $str = Text::Unidecode::unidecode( $str );
-    
-    # Removes Spaces At Left Side Of String
-    $str =~ s/^\s+//                if ( $self->GetStoreAsSentencePerLine() == 1 );
-    
-    # Removes Spaces At Both Ends Of String And More Than Once Space In-Between Ends
-    $str =~ s/^\s+|\s(?=\s)|\s+$//g if ( $self->GetStoreAsSentencePerLine() == 0 );
     
     # Increment Word Counter
     my @words = split( ' ', $str );
@@ -1847,12 +1909,12 @@ sub WriteLog
     {
         if( ref ( $self ) ne "Word2vec::Xmltow2v" )
         {
-            print( GetDate() . " " . GetTime() . " - xmltow2v: Cannot Call WriteLog() From Outside Module!\n" );
+            print( GetDate() . " " . GetTime() . " - Xmltow2v: Cannot Call WriteLog() From Outside Module!\n" );
             return;
         }
 
         $string = "" if !defined ( $string );
-        print GetDate() . " " . GetTime() . " - xmltow2v::$string";
+        print GetDate() . " " . GetTime() . " - Xmltow2v::$string";
         print "\n" if( $printNewLine != 0 );
     }
 
@@ -1860,7 +1922,7 @@ sub WriteLog
     {
         if( ref ( $self ) ne "Word2vec::Xmltow2v" )
         {
-            print( GetDate() . " " . GetTime() . " - xmltow2v: Cannot Call WriteLog() From Outside Module!\n" );
+            print( GetDate() . " " . GetTime() . " - Xmltow2v: Cannot Call WriteLog() From Outside Module!\n" );
             return;
         }
 
@@ -1868,7 +1930,7 @@ sub WriteLog
 
         if( defined( $fileHandle ) )
         {
-            print( $fileHandle GetDate() . " " . GetTime() . " - xmltow2v::$string" );
+            print( $fileHandle GetDate() . " " . GetTime() . " - Xmltow2v::$string" );
             print( $fileHandle "\n" ) if( $printNewLine != 0 );
         }
     }

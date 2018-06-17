@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step;
-$Lab::Moose::Sweep::Step::VERSION = '3.651';
+$Lab::Moose::Sweep::Step::VERSION = '3.652';
 #ABSTRACT: Base class for step/list sweeps
 
 
@@ -19,15 +19,15 @@ extends 'Lab::Moose::Sweep';
 # Public attributes set by the user
 #
 
-has instrument =>
-    ( is => 'ro', isa => 'Lab::Moose::Instrument', required => 1 );
-
 has from => ( is => 'ro', isa => 'Num', predicate => 'has_from' );
 has to   => ( is => 'ro', isa => 'Num', predicate => 'has_to' );
 has step =>
     ( is => 'ro', isa => 'Lab::Moose::PosNum', predicate => 'has_step' );
 
-has list => ( is => 'ro', isa => 'ArrayRef[Num]', predicate => 'has_list' );
+has list => (
+    is     => 'ro', isa => 'ArrayRef[Num]', predicate => 'has_list',
+    writer => '_list'
+);
 has backsweep => ( is => 'ro', isa => 'Bool', default => 0 );
 
 has setter => ( is => 'ro', isa => 'CodeRef', required => 1 );
@@ -167,7 +167,7 @@ Lab::Moose::Sweep::Step - Base class for step/list sweeps
 
 =head1 VERSION
 
-version 3.651
+version 3.652
 
 =head1 SYNOPSIS
 

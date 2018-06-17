@@ -57,7 +57,7 @@
    "provides" : {
       "Test::RequiredMinimumDependencyVersion" : {
          "file" : "lib/Test/RequiredMinimumDependencyVersion.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,7 @@
          "web" : "https://github.com/skirmess/Test-RequiredMinimumDependencyVersion"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_generated_by_perl" : "v5.24.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
 }

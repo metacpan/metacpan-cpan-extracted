@@ -12,7 +12,7 @@ use Carp;
 use strict;
 use warnings;
 
-our $VERSION = '0.93';
+our $VERSION = '0.94';
 
 if (!&IS_CYGWIN) {
     Carp::confess "Loaded Cygwin-only module into \$^O=$^O!\n";

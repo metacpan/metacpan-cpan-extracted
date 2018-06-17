@@ -9,7 +9,7 @@ package Lemonldap::NG::Portal::_Choice;
 use Lemonldap::NG::Portal::Simple;
 use Scalar::Util 'weaken';
 
-our $VERSION = '1.9.16';
+our $VERSION = '1.9.17';
 
 ## @cmethod Lemonldap::NG::Portal::_Choice new(Lemonldap::NG::Portal::Simple portal)
 # Constructor
@@ -197,55 +197,69 @@ sub _buildAuthLoop {
         $name =~ s/\_/ /g;
 
         # Find modules associated to authChoice
-        my ( $auth, $userDB, $passwordDB, $url ) =
+        my ( $auth, $userDB, $passwordDB, $url, $condition ) =
           split( /[;\|]/, $self->{authChoiceModules}->{$_} );
 
-        if ( $auth and $userDB and $passwordDB ) {
+        # Fill sessionInfo to eval rule if empty (unauthenticated user)
+        $self->{sessionInfo}->{_url}   ||= $self->{urldc};
+        $self->{sessionInfo}->{ipAddr} ||= $self->ipAddr;
 
-            # Default URL
-            if ( defined $url
-                and not $self->checkXSSAttack( 'URI', $ENV{'REQUEST_URI'} ) )
-            {
-                $url .= $ENV{'REQUEST_URI'};
+        if ( defined $condition and !$self->safe->reval($condition) ) {
+            $self->lmLog(
+"Condition returns false, authentication choice $name will not be displayed",
+                'debug'
+            );
+        }
+        else {
+            if ( $auth and $userDB and $passwordDB ) {
+
+                # Default URL
+                if ( defined $url
+                    and not $self->checkXSSAttack( 'URI', $ENV{'REQUEST_URI'} )
+                  )
+                {
+                    $url .= $ENV{'REQUEST_URI'};
+                }
+                else {
+                    $url .= '#';
+                }
+                $self->lmLog( "Use URL $url", 'debug' );
+
+                # Options to store in the loop
+                my $optionsLoop =
+                  { name => $name, key => $_, module => $auth, url => $url };
+
+                # Get displayType for this module
+                my $modulePrefix = 'Lemonldap::NG::Portal::';
+                my $authModule   = $modulePrefix . 'Auth' . $auth;
+                $self->loadModule($authModule);
+                my $displayType = &{ $authModule . '::getDisplayType' };
+
+                $self->lmLog( "Display type $displayType for module $auth",
+                    'debug' );
+                $optionsLoop->{$displayType} = 1;
+
+                # If displayType is logo, check if key.png is available
+                if (  -e $self->getApacheHtdocsPath
+                    . "/skins/common/"
+                    . $_
+                    . ".png" )
+                {
+                    $optionsLoop->{logoFile} = $_ . ".png";
+                }
+                else { $optionsLoop->{logoFile} = $auth . ".png"; }
+
+                # Register item in loop
+                push @authLoop, $optionsLoop;
+
+                $self->lmLog( "Authentication choice $name will be displayed",
+                    'debug' );
+
             }
             else {
-                $url .= '#';
+                $self->abort("Authentication choice $_ value is invalid");
             }
-            $self->lmLog( "Use URL $url", 'debug' );
-
-            # Options to store in the loop
-            my $optionsLoop =
-              { name => $name, key => $_, module => $auth, url => $url };
-
-            # Get displayType for this module
-            my $modulePrefix = 'Lemonldap::NG::Portal::';
-            my $authModule   = $modulePrefix . 'Auth' . $auth;
-            $self->loadModule($authModule);
-            my $displayType = &{ $authModule . '::getDisplayType' };
-
-            $self->lmLog( "Display type $displayType for module $auth",
-                'debug' );
-            $optionsLoop->{$displayType} = 1;
-
-            # If displayType is logo, check if key.png is available
-            if (
-                -e $self->getApacheHtdocsPath . "/skins/common/" . $_ . ".png" )
-            {
-                $optionsLoop->{logoFile} = $_ . ".png";
-            }
-            else { $optionsLoop->{logoFile} = $auth . ".png"; }
-
-            # Register item in loop
-            push @authLoop, $optionsLoop;
-
-            $self->lmLog( "Authentication choice $name will be displayed",
-                'debug' );
         }
-
-        else {
-            $self->abort("Authentication choice $_ value is invalid");
-        }
-
     }
 
     return \@authLoop;

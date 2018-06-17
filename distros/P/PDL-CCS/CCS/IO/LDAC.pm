@@ -13,7 +13,7 @@ use Fcntl qw(:seek);	   ##-- for rewinding
 use Carp qw(confess);
 use strict;
 
-our $VERSION = '1.23.7';
+our $VERSION = '1.23.8';
 our @ISA = ('PDL::Exporter');
 our @EXPORT_OK =
   (
@@ -194,13 +194,13 @@ sub ccs_readldac {
   ##-- get nnz (per doc)
   seek($fh,0,SEEK_SET)
     or confess("ccs_readldac(): seek() failed for input file '$file': $!");
-  my $nnz0 = PDL->rcols($fh, [0], { TYPES=>[ccs_indx], IGNORE=>qr{^\s*[^0-9]} });
+  my $nnz0 = PDL->rcols($fh, [0], { TYPES=>[ccs_indx()], IGNORE=>qr{^\s*[^0-9]} });
   my $nnz  = $nnz0->sum;
   my $nlines = $nnz0->nelem;
   undef($nnz0);
 
   ##-- allocate output pdls
-  my $ix   = zeroes(ccs_indx, 2,$nnz);
+  my $ix   = zeroes(ccs_indx(), 2,$nnz);
   my $nz   = zeroes($type, $nnz+1);
 
   ##-- process input

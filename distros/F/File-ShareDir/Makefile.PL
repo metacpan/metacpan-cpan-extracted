@@ -86,7 +86,10 @@ WriteMakefile1(
             test    => {requires => {%TEST_DEPS}},
             runtime => {
                 requires   => {%RUN_DEPS},
-                recommends => {'Params::Util' => '1.07'},
+                recommends => {
+                    'Params::Util'    => '1.07',
+                    'List::MoreUtils' => '0.428'
+                },
             },
         },
     },

@@ -94,7 +94,6 @@ pod/8/urpmi.removemedia.pod
 pod/8/urpmi.update.pod
 pod/8/urpmihowto.pod
 pod/8/urpmq.pod
-polkit/org.mageia.urpmi.update.policy.in
 polkit/org.mageia.gurpmi2.policy.in
 polkit/Makefile
 rpm-find-leaves

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::HP34410A;
-$Lab::Moose::Instrument::HP34410A::VERSION = '3.651';
+$Lab::Moose::Instrument::HP34410A::VERSION = '3.652';
 #ABSTRACT: HP 34410A digital multimeter.
 
 use 5.010;
@@ -63,7 +63,7 @@ Lab::Moose::Instrument::HP34410A - HP 34410A digital multimeter.
 
 =head1 VERSION
 
-version 3.651
+version 3.652
 
 =head1 SYNOPSIS
 
@@ -72,7 +72,10 @@ version 3.651
     connection_type => 'VXI11',
     connection_options => {host => '192.168.3.27'},
     );
-    
+
+ $dmm->sense_range(value => 10);
+ $dmm->sense_nplc(value => 2);  
+      
  my $voltage = $dmm->get_value();
 
 =head1 METHODS

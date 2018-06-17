@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.516';
+our $VERSION = '1.517';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -39,6 +39,8 @@ sub new {
         $self->__validate_and_add_options( $opt );
     }
     $self->{plugin} = $Plugin_Package->new();
+    my $backup_self = { map{ $_ => $self->{$_} } keys %$self };  ##
+    $self->{backup_self} = $backup_self;
     return $self;
 }
 
@@ -53,29 +55,30 @@ sub __defaults {        #hae
     my ( $self ) = @_;
     my $prompt = defined $self->{wantarray} ? 'Your choice:' : 'Close with ENTER';
     return {
-        prompt       => $prompt,
-        info         => '',
-        beep         => 0,
-        clear_screen => 0,
-        #default     => undef,
-        empty        => '<empty>',
-        hide_cursor  => 1,
-        include_highlighted => 1,
-        index        => 0,
-        justify      => 0,
-        keep         => 5,
-        layout       => 1,
-        #lf          => undef,
-        #ll          => undef,
-        #mark        => undef,
-        #max_height  => undef,
-        #max_width   => undef,
-        mouse        => 0,
-        #no_spacebar => undef,
-        order        => 1,
-        pad          => 2,
-        page         => 1,
-        undef        => '<undef>',
+        prompt              => $prompt,
+        info                => '',
+        beep                => 0,
+        clear_screen        => 0,
+        #default            => undef,
+        empty               => '<empty>',
+        hide_cursor         => 1,
+        include_highlighted => 1, # ###
+        index               => 0,
+        justify             => 0,
+        keep                => 5,
+        layout              => 1,
+        #lf                 => undef,
+        #ll                 => undef,
+        #mark               => undef,
+        #max_height         => undef,
+        #max_width          => undef,
+        mouse               => 0,
+        #no_spacebar        => undef,
+        #meta_items         => undef,
+        order               => 1,
+        pad                 => 2,
+        page                => 1,
+        undef               => '<undef>',
     };
 }
 
@@ -91,30 +94,31 @@ sub __undef_to_defaults {
 
 sub __valid_options {       #hae
     return {
-        beep            => '[ 0 1 ]',
-        clear_screen    => '[ 0 1 ]',
-        hide_cursor     => '[ 0 1 ]',
-        include_highlighted => '[ 0 1 ]',
-        index           => '[ 0 1 ]',
-        order           => '[ 0 1 ]',
-        page            => '[ 0 1 ]',
-        justify         => '[ 0 1 2 ]',
-        layout          => '[ 0 1 2 3 ]',
-        mouse           => '[ 0 1 2 3 4 ]',
-        keep            => '[ 1-9 ][ 0-9 ]*',
-        ll              => '[ 1-9 ][ 0-9 ]*',
-        max_height      => '[ 1-9 ][ 0-9 ]*',
-        max_width       => '[ 1-9 ][ 0-9 ]*',
-        default         => '[ 0-9 ]+',
-        pad             => '[ 0-9 ]+',
-        pad_one_row     => '[ 0-9 ]+', # removed ###
-        lf              => 'ARRAY',
-        mark            => 'ARRAY',
-        no_spacebar     => 'ARRAY',
-        empty           => 'Str',
-        info            => 'Str',       # documentation
-        prompt          => 'Str',
-        undef           => 'Str',
+        beep                => '[ 0 1 ]',
+        clear_screen        => '[ 0 1 ]',
+        hide_cursor         => '[ 0 1 ]',
+        index               => '[ 0 1 ]',
+        order               => '[ 0 1 ]',
+        page                => '[ 0 1 ]',
+        include_highlighted => '[ 0 1 2 ]', # '[ 0 1 ]'
+        justify             => '[ 0 1 2 ]',
+        layout              => '[ 0 1 2 3 ]',
+        mouse               => '[ 0 1 2 3 4 ]',
+        keep                => '[ 1-9 ][ 0-9 ]*',
+        ll                  => '[ 1-9 ][ 0-9 ]*',
+        max_height          => '[ 1-9 ][ 0-9 ]*',
+        max_width           => '[ 1-9 ][ 0-9 ]*',
+        default             => '[ 0-9 ]+',
+        pad                 => '[ 0-9 ]+',
+        pad_one_row         => '[ 0-9 ]+', # removed ###
+        lf                  => 'ARRAY',
+        mark                => 'ARRAY',
+        no_spacebar         => 'ARRAY',
+        meta_items          => 'ARRAY',
+        empty               => 'Str',
+        info                => 'Str',
+        prompt              => 'Str',
+        undef               => 'Str',
     };
 };
 
@@ -171,10 +175,15 @@ sub __reset_term {
     if ( defined $self->{plugin} ) {
         $self->{plugin}->__reset_mode( $self->{mouse}, $self->{hide_cursor} );
     }
-    if ( defined $self->{backup_opt} ) {
-        my $backup_opt = delete $self->{backup_opt};
-        for my $key ( keys %$backup_opt ) {
-            $self->{$key} = $backup_opt->{$key};
+    if ( defined $self->{backup_self} ) {
+        my $backup_self = delete $self->{backup_self};
+        for my $key ( keys %$self ) {
+            if ( defined $backup_self->{$key} ) {
+                $self->{$key} = $backup_self->{$key};
+            }
+            else {
+                delete $self->{$key};
+            }
         }
     }
 }
@@ -210,7 +219,7 @@ sub choose {      #hae
         return Term::Choose->new()->__choose( @_ );
     }
     my $self = shift;
-    return $self->__choose( @_ );
+    return $self->__choose( @_ ); # 1 backup_self
 }
 
 sub __choose {
@@ -220,7 +229,6 @@ sub __choose {
     croak "choose: the first argument must be an ARRAY reference" if ref $orig_list_ref ne 'ARRAY';
     if ( defined $opt ) {
         croak "choose: the (optional) second argument must be a HASH reference" if ref $opt ne 'HASH';
-        $self->{backup_opt} = { map{ $_ => $self->{$_} } keys %$opt };
         $self->__validate_and_add_options( $opt );
     }
     if ( ! @$orig_list_ref ) {
@@ -510,10 +518,21 @@ sub __choose {
                 return;
             }
             elsif ( $self->{wantarray} ) {
-                if ( $self->{include_highlighted} ) {
+                if ( $self->{include_highlighted} == 1 ) {
                     $self->{marked}[$self->{pos}[ROW]][$self->{pos}[COL]] = 1;
                 }
+                elsif ( defined $self->{meta_items} ) {
+                    for my $meta_item ( @{$self->{meta_items}} ) {
+                        if ( $meta_item == $self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]] ) {
+                            $self->{marked}[$self->{pos}[ROW]][$self->{pos}[COL]] = 1;
+                            last;
+                        }
+                    }
+                }
                 my $chosen = $self->__marked_rc2idx();
+                if ( ! @$chosen && $self->{include_highlighted} == 2 ) {
+                    $chosen = [ $self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]] ];
+                }
                 $self->__reset_term( 1 );
                 return $index ? @$chosen : @{$orig_list_ref}[@$chosen];
             }
@@ -527,8 +546,8 @@ sub __choose {
         elsif ( $key == KEY_SPACE ) {
             if ( $self->{wantarray} ) {
                 my $locked = 0;
-                if ( $self->{no_spacebar} ) {
-                    for my $no_spacebar ( @{$self->{no_spacebar}} ) {
+                if ( defined $self->{no_spacebar} || defined $self->{meta_items} ) {
+                    for my $no_spacebar ( @{$self->{no_spacebar}||[]}, @{$self->{meta_items}||[]} ) {
                         if ( $self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]] == $no_spacebar ) {
                             ++$locked;
                             last;
@@ -546,20 +565,11 @@ sub __choose {
         }
         elsif ( $key == CONTROL_SPACE ) {
             if ( $self->{wantarray} ) {
-                #if ( $self->{pos}[ROW] == 0 ) {
-                    for my $i ( 0 .. $#{$self->{rc2idx}} ) {
-                        for my $j ( 0 .. $#{$self->{rc2idx}[$i]} ) {
-                            $self->{marked}[$i][$j] = ! $self->{marked}[$i][$j];
-                        }
+                for my $i ( 0 .. $#{$self->{rc2idx}} ) {
+                    for my $j ( 0 .. $#{$self->{rc2idx}[$i]} ) {
+                        $self->{marked}[$i][$j] = ! $self->{marked}[$i][$j];
                     }
-                #}
-                #else {
-                #    for my $i ( $self->{p_begin} .. $self->{p_end} ) {
-                #        for my $j ( 0 .. $#{$self->{rc2idx}[$i]} ) {
-                #            $self->{marked}[$i][$j] = ! $self->{marked}[$i][$j];
-                #        }
-                #    }
-                #}
+                }
                 if ( defined $self->{no_spacebar} ) {
                     $self->__marked_idx2rc( $self->{no_spacebar}, 0 );
                 }
@@ -1091,7 +1101,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.516
+Version 1.517
 
 =cut
 
@@ -1216,7 +1226,8 @@ C<choose> then returns the chosen item.
 
 If C<choose> is called in an I<list context>, the user can also mark an item with the C<SpaceBar>.
 
-C<choose> then returns - when C<Return> is pressed - the list of marked items including the highlighted item.
+C<choose> then returns - when C<Return> is pressed - the list of marked items (including the highlighted item if the
+option I<include_highlighted> is set to C<1>).
 
 In I<list context> C<Ctrl-SpaceBar> (or C<Ctrl-@>) inverts the choices: marked items are unmarked and unmarked items are
 marked.
@@ -1333,19 +1344,19 @@ The category of C<utf8> C<warnings> is disabled.
 
 Options which expect a number as their value expect integers.
 
-=head2 beep
+=head3 beep
 
 0 - off (default)
 
 1 - on
 
-=head2 clear_screen
+=head3 clear_screen
 
 0 - off (default)
 
 1 - clears the screen before printing the choices
 
-=head2 default
+=head3 default
 
 With the option I<default> it can be selected an element, which will be highlighted as the default instead of the first
 element.
@@ -1358,32 +1369,32 @@ Allowed values: 0 or greater
 
 (default: undefined)
 
-=head2 empty
+=head3 empty
 
 Sets the string displayed on the screen instead an empty string.
 
 (default: "<empty>")
 
-=head2 hide_cursor
+=head3 hide_cursor
 
 0 - keep the terminals highlighting of the cursor position
 
 1 - hide the terminals highlighting of the cursor position (default)
 
-=head2 info
+=head3 info
 
 Expects as its value a string. The string is printed above the prompt string.
 
 (default: not set)
 
-=head2 index
+=head3 index
 
 0 - off (default)
 
 1 - return the index of the chosen element instead of the chosen element respective the indices of the chosen elements
 instead of the chosen elements.
 
-=head2 justify
+=head3 justify
 
 0 - elements ordered in columns are left justified (default)
 
@@ -1391,7 +1402,7 @@ instead of the chosen elements.
 
 2 - elements ordered in columns are centered
 
-=head2 keep
+=head3 keep
 
 I<keep> prevents that all the terminal rows are used by the prompt lines.
 
@@ -1403,7 +1414,7 @@ Allowed values: 1 or greater
 
 (default: 5)
 
-=head2 layout
+=head3 layout
 
 From broad to narrow: 0 > 1 > 2 > 3
 
@@ -1463,7 +1474,7 @@ From broad to narrow: 0 > 1 > 2 > 3
 
 =back
 
-=head2 lf
+=head3 lf
 
 If I<prompt> lines are folded the option I<lf> allows one to insert spaces at beginning of the folded lines.
 
@@ -1480,7 +1491,7 @@ See C<INITIAL_TAB> and C<SUBSEQUENT_TAB> in L<Text::LineFold>.
 
 (default: undefined)
 
-=head2 ll
+=head3 ll
 
 If all elements have the same length, the length can be passed with this option.
 
@@ -1511,15 +1522,7 @@ Allowed values: 1 or greater
 
 (default: undefined)
 
-=head2 mark
-
-I<mark> expects as its value a reference to an array. The elements of the array are list indexes. C<choose> preselects
-the list-elements correlating to these indexes. This option has only meaning in list context. Elements greater than the
-last index of the list are ignored.
-
-(default: undefined)
-
-=head2 max_height
+=head3 max_height
 
 If defined sets the maximal number of rows used for printing list items.
 
@@ -1533,7 +1536,7 @@ Allowed values: 1 or greater
 
 (default: undefined)
 
-=head2 max_width
+=head3 max_width
 
 If defined, sets the maximal output width to I<max_width> if the terminal width is greater than I<max_width>.
 
@@ -1545,7 +1548,7 @@ Allowed values: 1 or greater
 
 (default: undefined)
 
-=head2 mouse
+=head3 mouse
 
 For MSWin32 see also the end of this section.
 
@@ -1566,17 +1569,7 @@ marked as C<UTF-8> with C<:encoding(UTF-8)>. This doesn't apply if the OS is MSW
 If the OS is MSWin32 there is no difference between the mouse modes 1, 3, and 4 - the all enable the mouse with the help
 of L<Win32::Console>.
 
-=head2 no_spacebar
-
-I<no_spacebar> expects as its value a reference to an array. The elements of the array are indexes of the list which
-should not be markable with the C<SpaceBar> or with the right mouse key. This option has only meaning in list context.
-If an element is preselected with the option I<mark> and also marked as not selectable with the option I<no_spacebar>,
-the user can not remove the preselection of this element. I<no_spacebar> elements greater than the last index of the
-list are ignored.
-
-(default: undefined)
-
-=head2 order
+=head3 order
 
 If the output has more than one row and more than one column:
 
@@ -1586,19 +1579,19 @@ If the output has more than one row and more than one column:
 
 Default may change in a future release.
 
-=head2 pad
+=head3 pad
 
 Sets the number of whitespaces between columns. (default: 2)
 
 Allowed values: 0 or greater
 
-=head2 page
+=head3 page
 
 0 - off
 
 1 - print the page number on the bottom of the screen if there is more then one page. (default)
 
-=head2 prompt
+=head3 prompt
 
 If I<prompt> is undefined a default prompt-string will be shown.
 
@@ -1608,11 +1601,58 @@ default in list and scalar context: C<Your choice:>
 
 default in void context: C<Close with ENTER>
 
-=head2 undef
+=head3 undef
 
 Sets the string displayed on the screen instead an undefined element.
 
 default: "<undef>"
+
+=head2 Options List Context
+
+=head3 include_highlighted
+
+0 - In list context C<choose> returns the items marked with the C<SpaceBar>.
+
+1 - In list context C<choose> returns the items marked with the C<SpaceBar> plus the highlighted item. (default)
+
+The default value of this option will change with the next release.
+
+=head3 mark
+
+I<mark> expects as its value a reference to an array. The elements of the array are list indexes. C<choose> preselects
+the list-elements correlating to these indexes.
+
+Elements greater than the last index of the list are ignored.
+
+This option has only meaning in list context.
+
+(default: undefined)
+
+=head3 meta_items
+
+I<meta_items> expects as its value a reference to an array. The elements of the array are list indexes. These elements
+can not be marked with the C<SpaceBar> or with the right mouse key but if one of these elements is the highlighted item
+it is added to the chosen items when C<Return> is pressed.
+
+Elements greater than the last index of the list are ignored.
+
+This option has only meaning in list context.
+
+(default: undefined)
+
+=head3 no_spacebar
+
+I<no_spacebar> expects as its value a reference to an array. The elements of the array are indexes of the list which
+should not be markable with the C<SpaceBar> or with the right mouse key.
+
+If an element is preselected with the option I<mark> and also marked as not selectable with the option I<no_spacebar>,
+the user can not remove the preselection of this element.
+
+I<no_spacebar> elements greater than the last index of the list are ignored.
+
+This option has only meaning in list context.
+
+(default: undefined)
 
 =head1 ERROR HANDLING
 

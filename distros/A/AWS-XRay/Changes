@@ -1,0 +1,9 @@
+Revision history for Perl extension AWS-XRay
+
+0.02 2018-06-15T14:44:09Z
+    - interface changed. (trace -> capture)
+
+0.01 2018-06-15T05:32:35Z
+
+    - original version
+

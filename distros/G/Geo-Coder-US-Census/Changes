@@ -1,5 +1,11 @@
 Revision history for Geo-Coder-US-Census
 
+0.05	Thu Jun 14 13:58:23 EDT 2018
+	Fix http://www.cpantesters.org/cpan/report/06c7f8a0-6fe9-11e8-81cb-9beef726102b
+
+0.04	Thu Jun 14 10:55:14 EDT 2018
+	Fix http://www.cpantesters.org/cpan/report/0541ec06-6d74-11e8-bd63-bc3713bf8fb6
+
 0.03	Sun Jun 10 20:26:36 EDT 2018
 	Added the run() method
 	Allow counties in the location. Caveat: they will be ignored

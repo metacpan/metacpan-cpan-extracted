@@ -2,14 +2,15 @@
 # Copyright (C) YEAR Free Software Foundation, Inc.
 #
 # Translators:
+# Panwar108 <caspian7pena@gmail.com>, 2018
 # धनञ्जय शर्मा (Dhananjaya Sharma), 2003-2005
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
 "POT-Creation-Date: 2014-09-13 21:15+0200\n"
-"PO-Revision-Date: 2015-02-13 05:26+0000\n"
-"Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
-"Language-Team: Hindi (http://www.transifex.com/projects/p/mageia/language/"
+"PO-Revision-Date: 2018-05-14 14:27+0000\n"
+"Last-Translator: Panwar108 <caspian7pena@gmail.com>\n"
+"Language-Team: Hindi (http://www.transifex.com/MageiaLinux/mageia/language/"
 "hi/)\n"
 "Language: hi\n"
 "MIME-Version: 1.0\n"
@@ -45,7 +46,7 @@ msgstr "तैयारी की जा रही है..."
 #: ../gurpm/RPMProgressDialog.pm:313
 #, c-format
 msgid "Removing package `%s' ..."
-msgstr ""
+msgstr "पैकेज हटाया जा रहा है '%s' ..."
 
 #: ../gurpm/RPMProgressDialog.pm:316
 #, c-format
@@ -163,7 +164,7 @@ msgstr "ओ०के०"
 #: ../gurpmi.pm:56
 #, c-format
 msgid "Options:"
-msgstr ""
+msgstr "विकल्प :"
 
 #: ../gurpmi.pm:57 ../urpme:42 ../urpmf:30 ../urpmi:67 ../urpmi.addmedia:55
 #: ../urpmi.removemedia:40 ../urpmi.update:32 ../urpmq:41

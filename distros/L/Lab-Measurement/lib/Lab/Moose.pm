@@ -1,5 +1,5 @@
 package Lab::Moose;
-$Lab::Moose::VERSION = '3.651';
+$Lab::Moose::VERSION = '3.652';
 #ABSTRACT: Convenient loaders and constructors for L<Lab::Moose::Instrument>, L<Lab::Moose::Sweep>, L<Lab::Moose::DataFolder> and L<Lab::Moose::DataFile>
 
 use warnings;
@@ -10,6 +10,7 @@ use MooseX::Params::Validate;
 use Moose::Util::TypeConstraints qw/subtype as where message/;
 use Module::Load;
 use Lab::Moose::Connection;
+use Lab::Moose::DataFolder;
 use Carp;
 
 our @ISA = qw(Exporter);
@@ -17,7 +18,7 @@ our @ISA = qw(Exporter);
 # FIXME: export 'use warnings; use strict; into caller'
 
 our @EXPORT
-    = qw/instrument datafolder datafile linspace sweep sweep_datafile our_catfile/;
+    = qw/instrument datafolder datafile linspace sweep sweep_datafile/;
 
 
 # Enable "use warnings; use strict" in caller.
@@ -51,7 +52,6 @@ sub instrument {
 
 
 sub datafolder {
-    load 'Lab::Moose::DataFolder';
     return Lab::Moose::DataFolder->new(@_);
 }
 
@@ -125,14 +125,6 @@ sub sweep_datafile {
     return $class->new( params => \%args );
 }
 
-# PDL::Graphics::Gnuplot <= 2.011 cannot handle backslashes on windows.
-sub our_catfile {
-    if ( @_ == 0 ) {
-        return undef;
-    }
-    return join( '/', @_ );
-}
-
 # Some often used subtypes
 
 subtype 'Lab::Moose::PosNum',
@@ -159,7 +151,7 @@ Lab::Moose - Convenient loaders and constructors for L<Lab::Moose::Instrument>, 
 
 =head1 VERSION
 
-version 3.651
+version 3.652
 
 =head1 SYNOPSIS
 
@@ -233,7 +225,7 @@ This can be useful when testing out new equipment before writing a new driver.
 
  my $folder = datafolder(%args);
 
-Load L<Lab::Moose::DataFolder> and call it's C<new> method with C<%args>.
+Create a new L<Lab::Moose::DataFolder>.
 
 =head2 datafile
 

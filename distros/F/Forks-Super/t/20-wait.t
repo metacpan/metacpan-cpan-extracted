@@ -16,7 +16,7 @@ my $s = $?;
 ok(isValidPid($pid), "fork was successful");
 ok($p == $pid, "wait captured correct pid");
 okl($t <= 1.05, "fast wait took ${t}s, expected <=1s");
-ok($s == 512, "wait set exit STATUS in \$\?");
+ok($s == 256 * 2, "wait set exit STATUS in \$\?");
 
 ############################################
 
@@ -28,8 +28,8 @@ my $v = Time::HiRes::time();
 ($u,$t) = ($v-$u,$v-$t);
 $s = $?;
 ok(isValidPid($pid) && $p==$pid, "successful fork+wait");
-okl($u >= 2.9, "child completed in ${t}s ${u}s, expected ~3s"); ### 6 ###
-ok($s == 768, "correct exit STATUS captured");
+okl($u >= 2.25, "child completed in ${t}s ${u}s, expected ~3s");   ### 6 ###
+ok($s == 256 * 3, "correct exit STATUS captured");
 
 ############################################
 

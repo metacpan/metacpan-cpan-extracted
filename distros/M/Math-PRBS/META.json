@@ -1,5 +1,5 @@
 {
-   "abstract" : "Generate Pseudorandom Binary Sequences using an Iterator-based Linear Feedback Shift Register",
+   "abstract" : "Generate Pseudorandom Binary Sequences using an iterator-based Linear Feedback Shift Register",
    "author" : [
       "Peter C. jones <petercj AT cpan.org>"
    ],
@@ -64,7 +64,7 @@
    "provides" : {
       "Math::PRBS" : {
          "file" : "lib/Math/PRBS.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.4.0"
       }
    },
    "release_status" : "stable",
@@ -79,6 +79,6 @@
          "web" : "https://github.com/pryrt/Math-PRBS"
       }
    },
-   "version" : "v0.002",
+   "version" : "v0.004",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

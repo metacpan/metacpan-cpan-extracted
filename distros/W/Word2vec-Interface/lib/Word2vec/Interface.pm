@@ -4,7 +4,7 @@
 #                                                                                    #
 #    Author: Clint Cuffy                                                             #
 #    Date:    06/16/2016                                                             #
-#    Revised: 11/14/2017                                                             #
+#    Revised: 03/15/2018                                                             #
 #    UMLS Similarity Word2Vec Package Interface Module                               #
 #                                                                                    #
 ######################################################################################
@@ -23,7 +23,9 @@ use warnings;
 
 # Standard Package(s)
 use Cwd;
+use threads;
 use File::Type;
+use threads::shared;
 use Sys::CpuAffinity;
 
 # Word2Vec Utility Package(s)
@@ -37,7 +39,7 @@ use Word2vec::Util;
 
 use vars qw($VERSION);
 
-$VERSION = '0.037';
+$VERSION = '0.038';
 
 
 ######################################################################################
@@ -644,6 +646,7 @@ sub CLStartWord2VecTraining
         $word2vec->SetBinaryOutput( $options{$option} )             if $option eq "-binary";
         $word2vec->SetNumOfThreads( $options{$option} )             if $option eq "-threads";
         $word2vec->SetNumOfIterations( $options{$option} )          if $option eq "-iter";
+        $word2vec->SetMinCount( $options{$option} )                 if $option eq "-min-count";
         $word2vec->SetUseCBOW( $options{$option} )                  if $option eq "-cbow";
         $word2vec->SetClasses( $options{$option} )                  if $option eq "-classes";
         $word2vec->SetReadVocabFilePath( $options{$option} )        if $option eq "-read-vocab";
@@ -1143,7 +1146,7 @@ sub CLSortVectorFile
 
 sub CLFindSimilarTerms
 {
-    my ( $self, $term, $numberOfSimilarTerms ) = @_;
+    my ( $self, $term, $numberOfSimilarTerms, $numberOfThreads ) = @_;
 
     # Check(s)
     $self->WriteLog( "CLFindSimilarTerms - Error: Term Not Defined" )     if !defined( $term );
@@ -1152,37 +1155,92 @@ sub CLFindSimilarTerms
 
     $self->WriteLog( "CLFindSimilarTerms - Warning: Number Of Similar Terms Not Defined / Using Default = 10" ) if !defined( $numberOfSimilarTerms );
     $numberOfSimilarTerms = 10 if !defined( $numberOfSimilarTerms );
+    
+    $self->WriteLog( "CLFindSimilarTerms - Warning: Number Of Threads Not Defined / Using Default = # Of CPUs" ) if !defined( $numberOfThreads );
+    $numberOfThreads  = Sys::CpuAffinity::getNumCpus() if !defined( $numberOfThreads );
 
     $self->WriteLog( "CLFindSimilarTerms - Error: Vocabulary Is Empty / No Vector Data In Memory" ) if $self->W2VIsVectorDataInMemory() == 0;
     return undef if $self->W2VIsVectorDataInMemory() == 0;
 
     # Get Nearest Similar Neighbors
-    my %similarWords = ();
     my @returnWords  = ();
     my $vocabularyHash = $self->W2VGetVocabularyHash();
 
     # Check To See If The "$term" Parameters Exists Within The Vocabulary
     my $result = $vocabularyHash->{ $term };
-
+    
     $self->WriteLog( "CLFindSimilarTerms - Error: \"$term\" Does Not Exist Within The Vocabulary" ) if !defined( $result );
     return undef if !defined( $result );
-
-    for my $word ( keys %{ $vocabularyHash } )
+    
+    my @remainingWords   = keys %{ $vocabularyHash };
+    my %similarWords     = ();
+    my $threadListLength = scalar @remainingWords / $numberOfThreads;
+    
+    my $workerThreadFunction = sub
     {
-        # Skip Number Of Words and Vector Length Information
-        next if ( $word eq $self->W2VGetNumberOfWords() );
-
-        $result = $self->W2VComputeCosineSimilarity( $term, $word );
-        $similarWords{ $result } = $word if defined( $result );
-    }
-
-    my @sortedValues = sort {$b <=> $a} keys( %similarWords );
-
-    for( 0..$numberOfSimilarTerms )
+        my ( $comparisonTerm, $comparisonWords ) = @_;
+        
+        my @comparisonWords = @{ $comparisonWords };
+        my %resultHash      = ();
+        my $tid             = threads->tid();
+        
+        $self->WriteLog( "CLFindSimilarTerms - Starting Thread: $tid" );
+        
+        for( my $index = 0; $index < scalar @comparisonWords; $index++ )
+        {
+            my $word = $comparisonWords[$index];
+                
+            #print "$tid -> Count: $index\n";
+            
+            if( defined( $word ) )
+            {
+                # Skip Number Of Words and Vector Length Information
+                next if ( $word eq $self->W2VGetNumberOfWords() );
+                
+                my $value = $self->W2VComputeCosineSimilarity( $comparisonTerm, $word );
+                $resultHash{ $value } = $word if defined( $value );
+            }
+        }
+        
+        # Clean Up
+        undef( @comparisonWords );
+        $comparisonWords = undef;
+        
+        $self->WriteLog( "CLFindSimilarTerms - Ending Thread: $tid" );
+        return \%resultHash;
+    };
+    
+    for( my $i = 0; $i < $numberOfThreads; $i++ )
     {
-        push( @returnWords, $similarWords{ $sortedValues[ $_] } . " : " . $sortedValues[ $_ ] );
+        my @comparisonWords = splice( @remainingWords, 0, $threadListLength );
+        my $thread = threads->create( $workerThreadFunction, $term, \@comparisonWords );
     }
+    
+    # Join All Running Threads Prior To Termination
+    my @threadAry = threads->list();
 
+    $self->WriteLog( "CLFindSimilarTerms - Waiting For Threads To Finish" );
+    
+    for my $thread ( @threadAry )
+    {
+        my $resultHashRef = $thread->join() if ( $thread->is_running() || $thread->is_joinable() );
+        %similarWords = ( %similarWords, %{ $resultHashRef } );
+    }
+    
+    $self->WriteLog( "CLFindSimilarTerms - Sorting Results" );
+    
+    my @sortedValues = sort { $b <=> $a } keys( %similarWords );
+    
+    # Check
+    $numberOfSimilarTerms = scalar @sortedValues if scalar @sortedValues < $numberOfSimilarTerms;
+
+    for( 0..$numberOfSimilarTerms - 1 )
+    {
+        push( @returnWords, $similarWords{ $sortedValues[ $_ ] } . " : " . $sortedValues[ $_ ] );
+    }
+    
+    $self->WriteLog( "CLFindSimilarTerms - Finished" );
+    
     return \@returnWords;
 }
 
@@ -1954,7 +2012,8 @@ sub WSDCalculateCosineAvgSimilarity
     my @senseAry = $self->GetSenseAry();
 
     # Check(s)
-    $self->WriteLog( "WSDCalculateCosineAvgSimilarity - Error: Instance Or Sense Array Equals Zero - Cannot Continue" ) if ( @instanceAry == 0 || @senseAry == 0 );
+    $self->WriteLog( "WSDCalculateCosineAvgSimilarity - Error: Instance Array Size Equals Zero - Cannot Continue" ) if ( scalar @instanceAry == 0 );
+    $self->Writelog( "WSDCalculateCosineAvgSimilarity - Error: Sense Array Size Equals Zero - Cannot Continue" )    if ( scalar @senseAry == 0 );
     return -1 if ( @instanceAry == 0 || @senseAry == 0 );
 
     $self->WriteLog( "WSDCalculateCosineAvgSimilarity - Starting Word Sense Disambiguation Computations" );
@@ -2572,12 +2631,12 @@ sub WriteLog
     {
         if( ref ( $self ) ne "Word2vec::Interface" )
         {
-            print( GetDate() . " " . GetTime() . " - interface: Cannot Call WriteLog() From Outside Module!\n" );
+            print( GetDate() . " " . GetTime() . " - Interface: Cannot Call WriteLog() From Outside Module!\n" );
             return;
         }
 
         $string = "" if !defined ( $string );
-        print GetDate() . " " . GetTime() . " - interface::$string";
+        print GetDate() . " " . GetTime() . " - Interface::$string";
         print "\n" if( $printNewLine != 0 );
     }
 
@@ -2585,7 +2644,7 @@ sub WriteLog
     {
         if( ref ( $self ) ne "Word2vec::Interface" )
         {
-            print( GetDate() . " " . GetTime() . " - interface: Cannot Call WriteLog() From Outside Module!\n" );
+            print( GetDate() . " " . GetTime() . " - Interface: Cannot Call WriteLog() From Outside Module!\n" );
             return;
         }
 
@@ -2593,7 +2652,7 @@ sub WriteLog
 
         if( defined( $fileHandle ) )
         {
-            print( $fileHandle GetDate() . " " . GetTime() . " - interface::$string" );
+            print( $fileHandle GetDate() . " " . GetTime() . " - Interface::$string" );
             print( $fileHandle "\n" ) if( $printNewLine != 0 );
         }
     }

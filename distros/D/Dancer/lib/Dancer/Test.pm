@@ -1,7 +1,7 @@
 package Dancer::Test;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: Test helpers to test a Dancer application
-$Dancer::Test::VERSION = '1.3202';
+$Dancer::Test::VERSION = '1.3400';
 # test helpers for Dancer apps
 
 use strict;
@@ -47,6 +47,7 @@ use vars '@EXPORT';
   response_headers_are_deeply
   response_headers_include
   response_redirect_location_is
+  response_redirect_location_like
 
   dancer_response
 
@@ -271,6 +272,15 @@ sub response_redirect_location_is {
     return  $tb->is_eq($response->header('location'), $expected, $test_name);
 }
 
+sub response_redirect_location_like {
+    my ($req, $matcher, $test_name) = @_;
+    $test_name ||= "redirect location looks good for " . _req_label($req);
+    my $tb = Test::Builder->new;
+
+    my $response = _req_to_response($req);
+    return  $tb->like($response->header('location'), $matcher, $test_name);
+}
+
 
 # make sure the given header sublist is included in the full headers array
 sub _include_in_headers {
@@ -321,8 +331,11 @@ sub dancer_response {
                 my @tokens;
                 while ( my ( $name, $value ) = each %{$content} ) {
                     $name  = _url_encode($name);
-                    $value = _url_encode($value);
-                    push @tokens, "${name}=${value}";
+                    my @values = ref $value eq 'ARRAY' ? @$value : ($value);
+                    for my $value (@values) {
+                        $value = _url_encode($value);
+                        push @tokens, "${name}=${value}";
+                    }
                 }
                 $content = join( '&', @tokens );
                 $content_type = 'application/x-www-form-urlencoded';
@@ -455,7 +468,7 @@ Dancer::Test - Test helpers to test a Dancer application
 
 =head1 VERSION
 
-version 1.3202
+version 1.3400
 
 =head1 SYNOPSIS
 
@@ -598,10 +611,17 @@ Asserts that the response headers data structure includes some of the defined on
 
 =head2 response_redirect_location_is([$method, $path], $expected, $test_name)
 
-Asserts that the location header send with a 302 redirect equals to the C<$expected>
+Asserts that the location header sent with a 302 redirect is equal to the C<$expected>
 location.
 
     response_redirect_location_is [GET => '/'], 'http://localhost/index.html';
+
+=head2 response_redirect_location_like([$method, $path], $regexp, $test_name)
+
+Asserts that the location header sent with a 302 redirect matches the C<$regexp>
+provided. Useful if the redirect location includes a query string. 
+
+    response_redirect_location_like [GET => '/'], qr/some_pattern/;
 
 =head2 dancer_response($method, $path, { params => $params, body => $body, headers => $headers, files => [{filename => '/path/to/file', name => 'my_file'}] })
 

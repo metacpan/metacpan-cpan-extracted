@@ -1,5 +1,10 @@
 Changelog for HTML-Widget-Plugin-JS
 
+0.006     2018-06-15 10:18:26-04:00 America/New_York
+        - escape "</" when it appears in a string, because if this is for HTML
+          interpolation, which it is, you don't want to accidentally close
+          script tags!
+
 0.005     2014-06-03 08:40:10-04:00 America/New_York
         - update tests for new-style plugin loading
 

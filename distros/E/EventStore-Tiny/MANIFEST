@@ -1,0 +1,23 @@
+Changes
+EventStore-Tiny-0.2/META.json
+EventStore-Tiny-0.2/META.yml
+lib/EventStore/Tiny.pm
+lib/EventStore/Tiny/DataEvent.pm
+lib/EventStore/Tiny/Event.pm
+lib/EventStore/Tiny/EventStream.pm
+lib/EventStore/Tiny/Logger.pm
+lib/EventStore/Tiny/Snapshot.pm
+LICENSE.txt
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/1_unit/event.t
+t/1_unit/eventstream.t
+t/2_integration/api.t
+t/2_integration/caching.t
+t/2_integration/logging.t
+t/2_integration/storage.t
+t/9_demo/lib/Tamagotchi.pm
+t/9_demo/tamagotchi.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -10,6 +10,7 @@ use lib "$Bin/../lib";
 eval {
 	doit();
 };
+
 die $@ if $@;
 
 sub doit

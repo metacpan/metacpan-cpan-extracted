@@ -205,6 +205,10 @@ sub run
                    }
                );
             },
+            on_error => sub{
+                undef $hdl;
+                 $cv->send;
+            },
             on_eof => sub{
                 undef $hdl;
                  $cv->send;

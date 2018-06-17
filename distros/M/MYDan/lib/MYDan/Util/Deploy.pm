@@ -44,8 +44,9 @@ sub deploy
 
     my $temp = "$link.backup";
 
-    if( $version eq 'backup' )
+    if( $version =~ /^backup\d*$/ )
     {
+        $temp = "$link.$version";
         die "$temp: No such directory.\n" unless -d $temp;
         die "link $link fail.\n" if syscmd( "ln -fsn '$temp' '$link'" );
         return $this;
@@ -53,12 +54,12 @@ sub deploy
 
     $this->_explain();
 
-    if( -d $link && ! -l $link )
+    if( -d $link && ! -e $temp )
     {
-        die "$temp already used.\n" if -e $temp;
         die "backup old link fail.\n" if syscmd( "mv '$link' '$temp'" );
     }
 
+    die "link $link may be a directory.\n" if -d $link && ! -l $link;
     die "link $link fail.\n" if syscmd( "ln -fsn '$path/$version' '$link'" );
 
     $this->_clean();

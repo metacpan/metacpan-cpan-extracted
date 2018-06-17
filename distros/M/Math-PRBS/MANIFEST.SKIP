@@ -1,0 +1,15 @@
+#defaults
+^Makefile$
+^blib/
+^pm_to_blib
+^blibdirs
+#Module::Build = n/a, but included anyway
+^Build$
+^_build/
+# pcj
+pod.css
+^.svn/
+^MYMETA
+.travis.yml$
+appveyor.yml$
+^RELEASE.md$

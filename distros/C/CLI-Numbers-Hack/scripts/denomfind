@@ -1,0 +1,151 @@
+#!/usr/bin/perl -T
+
+#
+# denomfind 
+#    小数がいくつか与えられたら、それはどんな(共通する)分母の分数であるかを推定する
+#   -- developed by 下野寿之 Toshiyuki Shimono in Tokyo, Japan, 2016-06-20
+#
+
+use 5.001 ; use strict ; use warnings ;  # 5.014 で動作確認済み
+use Getopt::Std ; getopts "cfirm:n:qv%!" , \my%o ; 
+use POSIX qw[ ceil floor ] ; 
+use Term::ANSIColor qw[ :constants color ] ; $Term::ANSIColor::AUTORESET = 1 ;
+sub initOpt ( ) ; # 初期のコマンドオプションの処理
+sub readNums ( ) ; # 入力の数の読取り。-i があるかないかで、標準入力/ファイルの中を読むか、コマンド引数を採用するか
+sub main ( ) ; 
+sub exNum ( $ ) ; # 数を与えたら、それがどのような数であり得たかを、半区間[x,y) の形で返す。
+sub decDig ( $ ) ; # 小数点以下が何桁であるか。
+sub numInt ( $$ ) ; # 引数(x,y)が与えられた時に、区間[x,y] から、yを除いた半区間に整数が、何個含まれるか
+
+$| = 1 if $o{'!'} ;
+HELP_MESSAGE () unless @ARGV ; 
+initOpt ; 
+main ; 
+exit 0 ;
+
+sub main ( ) { 
+	my @nums = readNums () ; 
+
+	my ( @n0 , @n1 ) ; 
+	for ( @nums ) { 
+		my ( $n0 , $n1 ) = exNum $_  ;
+		push @n0 , $n0 ; 
+		push @n1 , $n1 ; 
+	}
+
+  my $t = 1 ; 
+	while( $t <= $o{m} ) { 
+		my $kosu = 0 ; 
+        my @outstr = () ; 
+		push @outstr , $t. ":"  ;
+		for my $i ( 0 .. $#nums ) { 
+			my ($m0,$m1) = ( "$n0[$i]" * "$t" , "$n1[$i]" * "$t" ) ; 
+			my $flag = ( numInt "$m0" , "$m1" )  ? 1 : 0 ;
+            $kosu += $flag ; 
+            if ( $o{v} ) { 
+                my $str = $m0 < $m1 ? "[$m0 $m1)" : "($m1 $m0]" ; 
+			    push @outstr , $flag && ! $o{q} ? color('cyan').$str.color('reset') : $str ; 
+            }
+		}
+		$kosu .= $kosu == @nums ? "*" : $kosu+1== @nums ? "-" : '' ; 
+    splice @outstr , 1,0, $kosu ; 
+    print join "\t" , @outstr ; 
+    print "\n" ;
+    $t++ ;
+  }
+}
+
+# 半区間 [ $x , $y ) when $x<$y または ( $y , $x ] when $y<$x に、何個の整数が含まれるか。
+sub numInt ( $$ ) { 
+	my ( $x, $y ) = @_  ;
+	return $x < $y ? ceil($y)-ceil($x) : floor($x)-floor($y) ; 
+}
+
+sub exNum ( $ ) { 
+	my $num = "$_[0]" ; 
+	my $dig = decDig $num ; 
+	my $eps = "0.1" ** $dig ; # 10進数文字列を使っている。これで、内部2進数の問題を回避。
+	my $epsH = "$eps" * "0.5" ;   # 区間の半分の幅である。
+	my $numB = "$num" + "$eps" ; #  区間 [ $num , $numU ) 画
+
+	( $num, $numB ) = ( "$num" - "$epsH" , "$numB" - "$epsH" ) if ! $o{f}  ;
+	$numB = "$num" - "$eps" if $o{c} ; 
+	return $num, $numB ;
+}
+
+sub decDig ( $ ) { 
+	return 0 if rindex ( $_[0] , '.' ) == -1 ; 
+	return length ( $_[0] )  - rindex ( $_[0] , '.' ) - 1 ; # 小数点以下に数が何桁あるか?
+}
+
+sub initOpt ( ) { 
+  $o{m} //= 13 ;
+  $o{n} //= 20 ;
+
+    if ( ! $o{i} ) { 
+    pipe *STDIN , my $WH ; 
+    print {$WH} join "\n" , splice @ARGV , 0 ; 
+    close $WH ; 
+  } 
+}
+
+sub readNums ( ) { 
+	my @nums = () ; 
+	while ( <> ) { 
+		chomp ; 
+		push @nums , $_ ; 
+	}
+
+	@nums = map { "$_" * "0.01" } @nums if $o{'%'} ; 
+	return @nums ; 
+}
+
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ;
+  $ARGV[1] //= '' ;
+  open my $FH , '<' , $0 ;
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if $ARGV[1] eq 'opt' ? m/^\ +\-/ : s/^=head1// .. s/^=cut// ;
+  }
+  close $FH ;
+  exit 0 ;
+}
+
+
+=encoding utf8
+
+=head1
+
+ $0 
+
+   小数がいくつか与えられたら、それらがどんな共通する分母の、分数であったかの推定を
+   するための数値計算プログラム。切り捨てと切り上げも仮定できるが、未指定なら四捨五入を仮定。
+
+ 使用例: 
+    $0 -vm 50 0.25 0.33 
+     # 四捨五入して、0.25 と 0.33 になるような分数で同じ分母を持つものを見つける。
+     # 出力される各行の最終行が 2 となるものを探せば良い。
+
+ オブション: 
+
+  -v : 分子を知るべく、その半区間を表示。(verbose)
+  -m num : 分母の数をどこまで大きくするか。未指定なら13。"Inf" も指定可能。(max-denominator)
+
+  -c : 入力された数は、切り上げられた数であるとみなす。(ceil)
+  -f : 入力された数は、切り捨てられた数であると見なす。(floor)
+
+  -% : 入力された数はパーセンテージ表記(百分率)であると見なし、内部的には100分の1倍される。
+  -q : -v において色をつけない。(quiet)
+  -i : 数をコマンド引数でなくて、標準入力または引数で指定されるファイルの中から読み取る。
+
+  ここで言う半区間とは、数学的な区間[x,y)または(x,y]のような、それぞれ、x以上y未満、x超y以下のような数全体を表している。
+
+  開発メモ: 
+     * 引数に並べた数の小数点以下の桁数で、出力すべき最大数は決まるので、自動的に決めても良い。
+     * 最大何個をとりだすかを指定したい。 -g か何かで。
+     * -m のオプションで、既に見つけた数の倍数は表示しないようにしたい。
+     * ただ1個の小数点以下8桁の数が渡された場合の良いアルゴリズムを考えたい。
+     * 使用時に使い易いように、さらにオプションを整理しよう。
+=cut

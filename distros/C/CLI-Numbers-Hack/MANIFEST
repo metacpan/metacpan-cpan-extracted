@@ -1,0 +1,19 @@
+Build.PL
+Changes
+lib/CLI/Numbers/Hack.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+scripts/denomfind
+scripts/zeropad
+scripts/rounding
+scripts/minmax
+scripts/meanvar
+scripts/cumsum
+scripts/nums
+META.yml
+META.json
+scripts/init.sh

@@ -3,13 +3,19 @@ lib/Math/PRBS.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-README
+MANIFEST.SKIP		Files to skip for the dist/tarball/SIGNATURE
+README.md
 t/00-load.t
-t/01-err.t
-t/02-prbs.t
-t/03-taps.t
-t/04-poly.t
-t/05-seek.t
-t/06-limits.t
+t/err.t
+t/intseq.t
+t/limits.t
+t/poly.t
+t/prbs.t
+t/seek.t
+t/taps.t
+xt/oeis-number.t
+xt/signature.t
+# the META files and SIGNATURE should be automatically generated during the build process.
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

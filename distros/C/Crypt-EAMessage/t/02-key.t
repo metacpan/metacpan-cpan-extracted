@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #
-# Copyright (C) 2016 J. Maslak
+# Copyright (C) 2016 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -49,7 +49,7 @@ foreach my $test (@KEYS) {
         my $hex_key = $ea->hex_key();
 
         isnt($raw_key, $hex_key, "Key $cnt has different hex and raw");
-        
+
         if ($type eq 'hex_key') {
             my $k = $key;
             $k =~ s/^0x//;

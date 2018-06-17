@@ -166,6 +166,7 @@ lib/Lab/Measurement/Manual.pod
 lib/Lab/Measurement/Roadmap.pod
 lib/Lab/Measurement/Tutorial.pod
 lib/Lab/Moose.pm
+lib/Lab/Moose/Catfile.pm
 lib/Lab/Moose/Connection.pm
 lib/Lab/Moose/Connection/Debug.pm
 lib/Lab/Moose/Connection/LinuxGPIB.pm
@@ -192,8 +193,10 @@ lib/Lab/Moose/Instrument/Common.pm
 lib/Lab/Moose/Instrument/DisplayXY.pm
 lib/Lab/Moose/Instrument/DummySource.pm
 lib/Lab/Moose/Instrument/HP34410A.pm
+lib/Lab/Moose/Instrument/HP34420A.pm
 lib/Lab/Moose/Instrument/HP3458A.pm
 lib/Lab/Moose/Instrument/HP8596E.pm
+lib/Lab/Moose/Instrument/Keithley2400.pm
 lib/Lab/Moose/Instrument/Keysight34470A.pm
 lib/Lab/Moose/Instrument/LinearStepSweep.pm
 lib/Lab/Moose/Instrument/Log.pm
@@ -216,6 +219,7 @@ lib/Lab/Moose/Instrument/SCPI/Sense/Frequency.pm
 lib/Lab/Moose/Instrument/SCPI/Sense/Function.pm
 lib/Lab/Moose/Instrument/SCPI/Sense/NPLC.pm
 lib/Lab/Moose/Instrument/SCPI/Sense/Power.pm
+lib/Lab/Moose/Instrument/SCPI/Sense/Protection.pm
 lib/Lab/Moose/Instrument/SCPI/Sense/Range.pm
 lib/Lab/Moose/Instrument/SCPI/Sense/Sweep.pm
 lib/Lab/Moose/Instrument/SCPI/Source/Function.pm
@@ -243,6 +247,7 @@ lib/Lab/Moose/Sweep/DataFile.pm
 lib/Lab/Moose/Sweep/Step.pm
 lib/Lab/Moose/Sweep/Step/Frequency.pm
 lib/Lab/Moose/Sweep/Step/Magnet.pm
+lib/Lab/Moose/Sweep/Step/Repeat.pm
 lib/Lab/Moose/Sweep/Step/Temperature.pm
 lib/Lab/Moose/Sweep/Step/Voltage.pm
 lib/Lab/MultiChannelInstrument.pm
@@ -295,8 +300,12 @@ t/Moose/DataFile/Read.t
 t/Moose/DataFolder.t
 t/Moose/Instrument/HP34410A.t
 t/Moose/Instrument/HP34410A.yml
+t/Moose/Instrument/HP34420A.t
+t/Moose/Instrument/HP34420A.yml
 t/Moose/Instrument/HP8596E.t
 t/Moose/Instrument/HP8596E.yml
+t/Moose/Instrument/Keithley2400.t
+t/Moose/Instrument/Keithley2400.yml
 t/Moose/Instrument/MockTest.pm
 t/Moose/Instrument/OI_Mercury/Magnet.t
 t/Moose/Instrument/OI_Mercury/Magnet.yml

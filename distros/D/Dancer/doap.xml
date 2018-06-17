@@ -13,8 +13,20 @@
   </developer>
   <helper>
     <foaf:Person>
+      <foaf:name>1nickt</foaf:name>
+      <foaf:mbox rdf:resource="mailto:nickt@broadbean.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>a-adam</foaf:name>
       <foaf:mbox rdf:resource="mailto:ac@univie.ac.at" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Achim Adam</foaf:name>
+      <foaf:mbox rdf:resource="mailto:achim.adam@(none).com" />
     </foaf:Person>
   </helper>
   <helper>
@@ -50,12 +62,6 @@
   <helper>
     <foaf:Person>
       <foaf:name>Alberto Simoes</foaf:name>
-      <foaf:mbox rdf:resource="mailto:ambs@cpan.org" />
-    </foaf:Person>
-  </helper>
-  <helper>
-    <foaf:Person>
-      <foaf:name>Alberto Simões</foaf:name>
       <foaf:mbox rdf:resource="mailto:ambs@cpan.org" />
     </foaf:Person>
   </helper>
@@ -193,8 +199,8 @@
   </helper>
   <helper>
     <foaf:Person>
-      <foaf:name>brian</foaf:name>
-      <foaf:mbox rdf:resource="mailto:brian@massassi.com" />
+      <foaf:name>Breno G. de Oliveira</foaf:name>
+      <foaf:mbox rdf:resource="mailto:garu@cpan.org" />
     </foaf:Person>
   </helper>
   <helper>
@@ -217,8 +223,20 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>burnersk</foaf:name>
+      <foaf:mbox rdf:resource="mailto:burnersk@(none.com)" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Chris Andrews</foaf:name>
       <foaf:mbox rdf:resource="mailto:chrisandrews@venda.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>chrisjrob</foaf:name>
+      <foaf:mbox rdf:resource="mailto:chrisjrob@gmail.com" />
     </foaf:Person>
   </helper>
   <helper>
@@ -273,6 +291,24 @@
     <foaf:Person>
       <foaf:name>Damien Krotkine</foaf:name>
       <foaf:mbox rdf:resource="mailto:dams@cpan.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Damien Krotkine</foaf:name>
+      <foaf:mbox rdf:resource="mailto:dkrotkine@booking.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Dan Book</foaf:name>
+      <foaf:mbox rdf:resource="mailto:grinnz@gmail.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Dan Book</foaf:name>
+      <foaf:mbox rdf:resource="mailto:grinnz@grinnz.com" />
     </foaf:Person>
   </helper>
   <helper>
@@ -397,12 +433,6 @@
   </helper>
   <helper>
     <foaf:Person>
-      <foaf:name>franck cuny</foaf:name>
-      <foaf:mbox rdf:resource="mailto:franck.cuny@gmail.com" />
-    </foaf:Person>
-  </helper>
-  <helper>
-    <foaf:Person>
       <foaf:name>François Charlier</foaf:name>
       <foaf:mbox rdf:resource="mailto:fcharlier@ploup.net" />
     </foaf:Person>
@@ -429,6 +459,18 @@
     <foaf:Person>
       <foaf:name>geistteufel</foaf:name>
       <foaf:mbox rdf:resource="mailto:geistteufel@yahoo.fr" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Gonzalo Barco</foaf:name>
+      <foaf:mbox rdf:resource="mailto:gbarcouy@gmail.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Graham Knop</foaf:name>
+      <foaf:mbox rdf:resource="mailto:haarg@haarg.org" />
     </foaf:Person>
   </helper>
   <helper>
@@ -500,19 +542,13 @@
   <helper>
     <foaf:Person>
       <foaf:name>jamhed</foaf:name>
-      <foaf:mbox rdf:resource="mailto:ip@ncom-ufa.ru" />
-    </foaf:Person>
-  </helper>
-  <helper>
-    <foaf:Person>
-      <foaf:name>jamhed</foaf:name>
       <foaf:mbox rdf:resource="mailto:jamhed@lenobook.jh" />
     </foaf:Person>
   </helper>
   <helper>
     <foaf:Person>
-      <foaf:name>jamhed.nb</foaf:name>
-      <foaf:mbox rdf:resource="mailto:ip@ncom-ufa.ru" />
+      <foaf:name>Jess</foaf:name>
+      <foaf:mbox rdf:resource="mailto:castaway@desert-island.me.uk" />
     </foaf:Person>
   </helper>
   <helper>
@@ -643,12 +679,6 @@
   </helper>
   <helper>
     <foaf:Person>
-      <foaf:name>LoonyPandora</foaf:name>
-      <foaf:mbox rdf:resource="mailto:loonypandora@gmail.com" />
-    </foaf:Person>
-  </helper>
-  <helper>
-    <foaf:Person>
       <foaf:name>Manuel Weiss</foaf:name>
       <foaf:mbox rdf:resource="mailto:manuel@weiss.io" />
     </foaf:Person>
@@ -740,8 +770,14 @@
   </helper>
   <helper>
     <foaf:Person>
-      <foaf:name>mokko</foaf:name>
-      <foaf:mbox rdf:resource="mailto:mauricemengel@gmail.com" />
+      <foaf:name>mlbarrow</foaf:name>
+      <foaf:mbox rdf:resource="mailto:mlbarrow@(none)" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Mohammad S Anwar</foaf:name>
+      <foaf:mbox rdf:resource="mailto:mohammad.anwar@yahoo.com" />
     </foaf:Person>
   </helper>
   <helper>
@@ -790,6 +826,12 @@
     <foaf:Person>
       <foaf:name>Neil Hooey</foaf:name>
       <foaf:mbox rdf:resource="mailto:neil@shutterstock.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Nick Tonkin</foaf:name>
+      <foaf:mbox rdf:resource="mailto:1nickt@users.noreply.github.com" />
     </foaf:Person>
   </helper>
   <helper>
@@ -885,6 +927,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>ppisar</foaf:name>
+      <foaf:mbox rdf:resource="mailto:ppisar@(none)" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Richard Simões</foaf:name>
       <foaf:mbox rdf:resource="mailto:rsimoes@cpan.org" />
     </foaf:Person>
@@ -927,12 +975,6 @@
   </helper>
   <helper>
     <foaf:Person>
-      <foaf:name>rowanthorpe</foaf:name>
-      <foaf:mbox rdf:resource="mailto:rowanthorpe@gmail.com" />
-    </foaf:Person>
-  </helper>
-  <helper>
-    <foaf:Person>
       <foaf:name>Russell Jenkins</foaf:name>
       <foaf:mbox rdf:resource="mailto:veryrusty@gmail.com" />
     </foaf:Person>
@@ -941,6 +983,12 @@
     <foaf:Person>
       <foaf:name>Sam Kington</foaf:name>
       <foaf:mbox rdf:resource="mailto:github@illuminated.co.uk" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Sapphire Paw</foaf:name>
+      <foaf:mbox rdf:resource="mailto:devel@sapphirepaw.org" />
     </foaf:Person>
   </helper>
   <helper>
@@ -957,19 +1005,25 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Scott Penrose</foaf:name>
+      <foaf:mbox rdf:resource="mailto:scott.penrose@(none)" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>sdeseille</foaf:name>
       <foaf:mbox rdf:resource="mailto:sebastien.deseille@gmail.com" />
     </foaf:Person>
   </helper>
   <helper>
     <foaf:Person>
-      <foaf:name>Sebastian de Castelberg</foaf:name>
-      <foaf:mbox rdf:resource="mailto:sebu@kpricorn.org" />
+      <foaf:name>Sean Smith</foaf:name>
+      <foaf:mbox rdf:resource="mailto:ssmith@empoweredbenefits.com" />
     </foaf:Person>
   </helper>
   <helper>
     <foaf:Person>
-      <foaf:name>sebastian de castelberg</foaf:name>
+      <foaf:name>Sebastian de Castelberg</foaf:name>
       <foaf:mbox rdf:resource="mailto:sebu@kpricorn.org" />
     </foaf:Person>
   </helper>
@@ -983,12 +1037,6 @@
     <foaf:Person>
       <foaf:name>Slaven Rezic</foaf:name>
       <foaf:mbox rdf:resource="mailto:slaven@rezic.de" />
-    </foaf:Person>
-  </helper>
-  <helper>
-    <foaf:Person>
-      <foaf:name>smashz</foaf:name>
-      <foaf:mbox rdf:resource="mailto:mestre.smash@gmail.com" />
     </foaf:Person>
   </helper>
   <helper>
@@ -1020,6 +1068,12 @@
     <foaf:Person>
       <foaf:name>Tatsuhiko Miyagawa</foaf:name>
       <foaf:mbox rdf:resource="mailto:miyagawa@bulknews.net" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>tednolan</foaf:name>
+      <foaf:mbox rdf:resource="mailto:tednolan@(none).com" />
     </foaf:Person>
   </helper>
   <helper>
@@ -1060,12 +1114,6 @@
   </helper>
   <helper>
     <foaf:Person>
-      <foaf:name>Xaerxess</foaf:name>
-      <foaf:mbox rdf:resource="mailto:xaerxess@gmail.com" />
-    </foaf:Person>
-  </helper>
-  <helper>
-    <foaf:Person>
       <foaf:name>Yanick Champoux</foaf:name>
       <foaf:mbox rdf:resource="mailto:yanick@cpan.org" />
     </foaf:Person>
@@ -1074,6 +1122,12 @@
     <foaf:Person>
       <foaf:name>YOUR_NAME</foaf:name>
       <foaf:mbox rdf:resource="mailto:YOUR_EMAIL" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Zefram</foaf:name>
+      <foaf:mbox rdf:resource="mailto:zefram@fysh.org" />
     </foaf:Person>
   </helper>
   <license rdf:resource="http://dev.perl.org/licenses/" />
@@ -1971,6 +2025,42 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.3201</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-11-07</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.3202</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-11-07</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.3203</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-05-20T20:44:30+01:00</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.3204</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-05-23T14:40:33+01:00</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.3205</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-06-13T22:59:32+01:00</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.3300</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2016-02-15</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.3301</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2016-02-16</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

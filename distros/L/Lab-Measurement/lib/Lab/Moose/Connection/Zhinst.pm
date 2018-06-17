@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::Zhinst;
-$Lab::Moose::Connection::Zhinst::VERSION = '3.651';
+$Lab::Moose::Connection::Zhinst::VERSION = '3.652';
 #ABSTRACT: Connection back end to Zurich Instrument's LabOne measurement control API
 
 
@@ -199,7 +199,7 @@ Lab::Moose::Connection::Zhinst - Connection back end to Zurich Instrument's LabO
 
 =head1 VERSION
 
-version 3.651
+version 3.652
 
 =head1 SYNOPSIS
 

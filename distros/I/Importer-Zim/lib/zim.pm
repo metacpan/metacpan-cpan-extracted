@@ -5,7 +5,7 @@ BEGIN {
 }
 
 package zim;
-$zim::VERSION = '0.9.2';
+$zim::VERSION = '0.10.1';
 # ABSTRACT: Import functions à la Invader Zim
 
 1;
@@ -44,7 +44,7 @@ zim - Import functions à la Invader Zim
 
 =head1 VERSION
 
-version 0.9.2
+version 0.10.1
 
 =head1 SYNOPSIS
 

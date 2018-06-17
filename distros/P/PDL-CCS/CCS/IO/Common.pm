@@ -9,7 +9,7 @@ use PDL;
 use Carp qw(confess);
 use strict;
 
-our $VERSION = '1.23.7';
+our $VERSION = '1.23.8';
 our @ISA = ('PDL::Exporter');
 our @EXPORT_OK =
   (
@@ -99,8 +99,8 @@ sub _ccsio_parse_header {
   my ($magic,$pdims,$vdims,$flags,$iotype) = map {chomp;$_} @$hlines;
   return {
 	  magic=>$magic,
-	  (defined($pdims) && $pdims ne '' ? (pdims=>pdl(ccs_indx,[split(' ',$pdims)])) : qw()),
-	  (defined($vdims) && $vdims ne '' ? (vdims=>pdl(ccs_indx,[split(' ',$vdims)])) : qw()),
+	  (defined($pdims) && $pdims ne '' ? (pdims=>pdl(ccs_indx(),[split(' ',$pdims)])) : qw()),
+	  (defined($vdims) && $vdims ne '' ? (vdims=>pdl(ccs_indx(),[split(' ',$vdims)])) : qw()),
 	  (defined($flags) && $flags ne '' ? (flags=>$flags) : qw()),
 	  (defined($iotype) && $iotype ne ''  ? (iotype=>$iotype) : qw()), ##-- added in v1.22.6
 	 };

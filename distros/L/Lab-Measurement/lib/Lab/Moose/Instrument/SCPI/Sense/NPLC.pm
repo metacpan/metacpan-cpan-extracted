@@ -1,9 +1,8 @@
 package Lab::Moose::Instrument::SCPI::Sense::NPLC;
-$Lab::Moose::Instrument::SCPI::Sense::NPLC::VERSION = '3.651';
+$Lab::Moose::Instrument::SCPI::Sense::NPLC::VERSION = '3.652';
 #ABSTRACT: Role for the SCPI SENSe:$function:NPLC subsystem
 
 use Moose::Role;
-use Moose::Util::TypeConstraints 'enum';
 use Lab::Moose::Instrument::Cache;
 use Lab::Moose::Instrument qw/validated_getter validated_setter/;
 
@@ -50,7 +49,7 @@ Lab::Moose::Instrument::SCPI::Sense::NPLC - Role for the SCPI SENSe:$function:NP
 
 =head1 VERSION
 
-version 3.651
+version 3.652
 
 =head1 METHODS
 
@@ -66,7 +65,7 @@ Query/Set the input nplc.
 
 This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
-  Copyright 2017       Simon Reinhardt
+  Copyright 2017-2018  Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

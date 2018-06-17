@@ -8,7 +8,7 @@ use Test::More;
 my @long = qw( pad empty undef ll default max_height max_width lf keep no_spacebar mark );
 my @simple = qw( justify layout order clear_screen page mouse beep hide_cursor index ); # prompt
 my @all = ( @long, @simple );
-my @skip = qw(info prompt include_highlighted);
+my @skip = qw(info prompt include_highlighted meta_items);
 
 
 plan tests => 2 + scalar @all;
@@ -41,7 +41,7 @@ for my $key ( @all ) {
     next if $key ~~ @skip;
     open $fh, '<', $file or die $!;
     while ( my $line = <$fh> ) {
-        if ( $line =~ /^=head2\s\Q$key\E/ ... $line =~ /^=head/ ) {
+        if ( $line =~ /^=head3\s\Q$key\E/ ... $line =~ /^=head/ ) { #head2
             chomp $line;
             next if $line =~ /^\s*\z/;
             push @{$pod{$key}}, $line;

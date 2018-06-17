@@ -1,3 +1,11 @@
+NAME
+
+    Dancer - lightweight yet powerful web application framework
+
+VERSION
+
+    version 1.3400
+
 SYNOPSIS
 
         #!/usr/bin/perl
@@ -198,6 +206,11 @@ FUNCTIONS
 
         my @values = cookie "name";
 
+    Note that if the client has sent more than one cookie with the same
+    value, the one returned will be the last one seen. This should only
+    happen if you have set multiple cookies with the same name but
+    different paths. So, don't do that.
+
  config
 
     Accesses the configuration of the application:
@@ -243,7 +256,6 @@ FUNCTIONS
     Logs a message of debug level:
 
         debug "This is a debug message";
-        
 
     See Dancer::Logger for details on how to configure where log messages
     go.
@@ -342,11 +354,14 @@ FUNCTIONS
 
     Deserializes a Data::Dumper structure.
 
- from_json ($structure, %options)
+ from_json ($structure, \%options)
 
     Deserializes a JSON structure. Can receive optional arguments. Those
     arguments are valid JSON arguments to change the behaviour of the
     default JSON::from_json function.
+
+    Compatibility notice: from_json changed in 1.3002 to take a hashref as
+    options, instead of a hash.
 
  from_yaml ($structure)
 
@@ -1302,11 +1317,14 @@ FUNCTIONS
 
     Serializes a structure with Data::Dumper.
 
- to_json ($structure, %options)
+ to_json ($structure, \%options)
 
     Serializes a structure to JSON. Can receive optional arguments. Thoses
     arguments are valid JSON arguments to change the behaviour of the
     default JSON::to_json function.
+
+    Compatibility notice: to_json changed in 1.3002 to take a hashref as
+    options, instead of a hash.
 
  to_yaml ($structure)
 
@@ -1366,6 +1384,12 @@ FUNCTIONS
             redirect uri_for('/path');
             # can be something like: http://localhost:3000/path
         };
+
+    Querystring parameters can be provided by passing a hashref as a second
+    param, and URL-encoding can be disabled via a third parameter:
+
+        uri_for('/path', { foo => 'bar' }, 1);
+        # would return e.g. http://localhost:3000/path?foo=bar
 
  captures
 
@@ -1461,9 +1485,7 @@ DEPENDENCIES
 
     HTTP::Server::Simple::PSGI
 
-    HTTP::Body
-
-    LWP
+    HTTP::Tiny
 
     MIME::Types
 
@@ -1487,4 +1509,15 @@ SEE ALSO
 
     The concept behind this module comes from the Sinatra ruby project, see
     http://www.sinatrarb.com/ for details.
+
+AUTHOR
+
+    Dancer Core Developers
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2010 by Alexis Sukrieh.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

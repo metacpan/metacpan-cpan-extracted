@@ -10,10 +10,10 @@ use File::Basename 'dirname';
 use File::Spec::Functions qw' rel2abs catdir catfile ';
 use Cwd qw' getcwd realpath ';
 use Data::Dumper;
-use Data::Printer;
+# use Data::Printer;
 use Carp qw' croak confess ';
 
-our $VERSION = "0.07";
+our $VERSION = "0.09";
 
 my $scripts_dir = realpath catdir(dirname(rel2abs(__FILE__)), '../../../share');
 $scripts_dir = catdir(dist_dir('JavaScript-V8-CommonJS'))
@@ -85,15 +85,14 @@ sub _requireNative {
 sub _resolveModule {
     my ($self, $id, $current_module_file) = @_;
 
-    confess "Can't traverse up the module paths." if $id =~ /\.\./;
 
     # relative
-    if ($id =~ /^\.\//) {
+    if ($id =~ /^\.\.?\//) {
 
         confess "Can't load relative module '$id' without current_module_file" unless $current_module_file;
+
         my $dir = dirname($current_module_file);
-        my $file = catfile($dir, $id.'.js');
-        return -e $file ? $file : undef;
+        return $self->_resolve_relative_module_node($dir, $id);
     }
 
 
@@ -102,14 +101,70 @@ sub _resolveModule {
 
     # module id
     foreach my $path (@{$self->paths}) {
-        for my $file (catfile($path, $id.".js"), catfile($path, $id.".json")) {
-            return $file if -f $file;
-        }
+        # for my $file (catfile($path, $id.".js"), catfile($path, $id.".json")) {
+        #     return $file if -f $file;
+        # }
+        my $file = $self->_resolve_relative_module_node($path, $id);
+        return $file if $file;
     }
 
     return undef;
 }
 
+sub _resolve_relative_module_node {
+    my ($self, $dir, $path) = @_;
+
+    my $basepath = catdir($dir, $path);
+
+    # warn "# basepath($basepath)\n";
+
+    # module.js
+    if (-f "$basepath.js") {
+
+        return $self->_validate_module_path("$basepath.js");
+    }
+
+    # module.json
+    if (-f "$basepath.json") {
+
+        return $self->_validate_module_path("$basepath.json");
+    }
+
+    # module/package.json
+    if (-f (my $package_file = catfile($basepath, "package.json"))) {
+
+        # parse JSON
+        my $json = _slurp($package_file);
+        my $main = $self->eval("($json).main");
+
+        if ($main) {
+            my $file = catfile($basepath, $main);
+            return $self->_validate_module_path($file) 
+                if -f $file;
+        }
+        else {
+            warn "module package file exists but no main entry defined ($package_file)";
+        }
+    }
+
+    # module/index.js
+    if (-f (my $file = catfile($basepath, "index.js"))) {        
+        return $self->_validate_module_path($file);
+    }
+}
+
+sub _validate_module_path {
+    my ($self, $path) = @_;
+    $path = realpath $path;
+    foreach (@{$self->paths}) {
+        if (index($path, $_) == 0) {
+            return $path;
+        }
+    }
+
+    warn "Requested commonjs module '$path' is outside of valid root paths! Returning nothing.";
+    return;
+}
 
 sub _readFile {
     my ($self, $path) = @_;

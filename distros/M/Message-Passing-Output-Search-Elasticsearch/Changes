@@ -1,3 +1,6 @@
+0.005     2018-06-15 23:16:04+02:00 Europe/Vienna
+    - compatible with Elasticsearch 6
+
 0.004     2017-11-14 09:32:13+01:00 Europe/Vienna
     - fix missing es_version when using Search::Elasticsearch 5.02 (RT#121186)
 

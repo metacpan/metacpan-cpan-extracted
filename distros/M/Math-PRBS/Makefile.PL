@@ -36,9 +36,6 @@ use 5.006;
                 },
             },
             keywords => [ 'Pseudorandom Binary Sequence', 'PRBS', 'Linear Feedback Shift Register', 'LFSR'],
-            # don't use manual 'provides', because it's an extra step to maintain, and
-            # can cause problems (getting a mismatch between the $VERSION string and the
-            # provides->{version} will really make it hard to release a next version into CPAN
         },
         # automatically determine the versions for 'provides'; MM->parse_version exists as of MM v6.31, so not a problem with >= 6.46
         #   => this comes out right when printed... but MYMETA.* shows values that look wrong
@@ -74,12 +71,9 @@ use 5.006;
             'Config' => 0,
         };
     }
-    #if(1) {
-    #    $mm_args{postamble} = {
-    #        blah => 0,
-    #        pcj => 1975,
-    #    }
-    #}
+    if( $ExtUtils::MakeMaker::VERSION >= '6.18' ) {
+        $mm_args{SIGN} = 1 if MM->can('signature_target') && $ENV{MM_SIGN_DIST};
+    }
 }
 
 sub MY::postamble {
@@ -87,18 +81,39 @@ sub MY::postamble {
     #require Data::Dumper;
     #print STDERR Data::Dumper->Dump([\%h], [qw(mm_args{postamble})]);
     return <<'POSTAMBLE';
+# TEST_D is used to test for the existence of a directory
 TEST_D = $(ABSPERLRUN) -MExtUtils::Command -e test_d --
 
-pcj_clean :: realclean
-	$(NOECHO) ( $(TEST_F) pod.html && $(RM_F) pod.html  ) || $(ECHO) pcj_clean: skip "rm -f pod.html"
-	$(NOECHO) ( $(TEST_D) cover_db && $(RM_RF) cover_db ) || $(ECHO) pcj_clean: skip "rm -rf cover_db"
-
+# run a test coverage report
 testcover :: lib/Math/PRBS.pm
 	$(NOECHO) cover -test -report html
 
-pod.html :: lib/Math/PRBS.pm
-	$(NOECHO) $(TEST_F) pod.css && pod2html --css=pod.css --outfile=pod.html lib/Math/PRBS.pm
-	$(NOECHO) ( $(TEST_F) pod2htmd.tmp && $(RM_F) pod2htmd.tmp ) || $(ECHO) pod.html: skip "rm -f pod2htmd.tmp"
+# run author-tests on the original
+authtest ::
+	$(TEST_D) xt && $(MAKE) test TEST_FILES='xt/*.t'
+
+# run author-tests on the distribution
+distauthtest :: disttest
+	cd $(DISTVNAME) && $(TEST_D) xt && $(MAKE) test TEST_FILES='xt/*.t'
+
+# addition to realclean: also delete coverage database, if testcover was run
+realclean ::
+	$(NOECHO) ( $(TEST_D) cover_db && $(RM_RF) cover_db ) || $(ECHO) realclean:: skip "rm -rf cover_db"
+	$(NOECHO) ( $(TEST_F) MYMETA.json.lock && $(RM_RF) MYMETA.json.lock ) || $(ECHO) realclean:: skip "rm -rf MYMETA.json.lock"
+
+# auto-generate the README from the lib/Math/PRBS.pm
+README.md :: lib/Math/PRBS.pm
+	podselect -section "NAME|SYNOPSIS|DESCRIPTION|INSTALLATION|AUTHOR|COPYRIGHT|LICENSE" lib/Math/PRBS.pm > README.pod
+	pod2markdown README.pod README.md
+	$(RM_F) README.pod
+
+# auto-generate the LICENSE file from the lib/Math/PRBS.pm
+LICENSE :: lib/Math/PRBS.pm
+	podselect -section "AUTHOR|COPYRIGHT|LICENSE" lib/Math/PRBS.pm > LICENSE.pod
+	pod2text LICENSE.pod LICENSE
+	$(RM_F) LICENSE.pod
+
+docs :: README.md LICENSE
 
 POSTAMBLE
 }

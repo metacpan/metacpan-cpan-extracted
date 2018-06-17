@@ -1,5 +1,15 @@
 Revision history for Perl module Tie::Hash::MultiValue
 
+1.05 Fri Jun 15 01:01:24 PDT 2018
+    - Corrected address for the FSF in LICENSE. 
+    - Consistency with this being v2 of the GPL.
+
+1.04 Fri June 15 
+    - Bad upload.
+
+1.03 Thu Jun 14 17:17:17 PDT 2018
+    - Erroneous license update; deleted.
+
 1.02 Wed Dec 16 13:33:32 PST 2009
 	- Author should actually run author tests. POD tests now pass.
 

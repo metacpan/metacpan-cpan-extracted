@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie;
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 use Carp;
 
@@ -109,7 +109,7 @@ Date::Easy::Units - units objects for easy date/datetime math
 
 =head1 VERSION
 
-This document describes version 0.05 of Date::Easy::Units.
+This document describes version 0.06 of Date::Easy::Units.
 
 =head1 SYNOPSIS
 

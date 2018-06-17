@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Whois::Raw.
 
+2.99015  Jun 14 2018 Sergei Sedinkin
+    - new whois server for .net.ru, .org.ru and .pp.ru domains
+
 2.99014  May 8 2018 Alexander Nalobin
     - whois.unitedtld.com is no longer a whois server (https://github.com/regru/Net-Whois-Raw/issues/16)
 

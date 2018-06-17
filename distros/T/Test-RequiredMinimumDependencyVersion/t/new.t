@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-use version;
+use version 0.77;
 
 use Test::Fatal;
 use Test::More 0.88;

@@ -10,7 +10,7 @@
 # Line 220 - the & problem 21.04.2018
 
 package Data::Edit::Xml;
-our $VERSION = 20180613;
+our $VERSION = 20180617;
 use v5.8.0;
 use warnings FATAL => qw(all);
 use strict;
@@ -153,7 +153,7 @@ sub disconnectLeafNode($)                                                       
 sub reindexNode($)                                                              #P Index the children of a node so that we can access them by tag and number.
  {my ($node) = @_;                                                              # Node to index.
   delete $node->{indexes};                                                      # Delete the indexes
-  for my $n($node->contents)                                                          # Index content
+  for my $n($node->contents)                                                    # Index content
    {push @{$node->indexes->{$n->tag}}, $n;                                      # Indices to sub nodes
    }
  }
@@ -223,7 +223,7 @@ genLValueScalarMethods(qw(input));                                              
 genLValueScalarMethods(qw(inputString));                                        # Source string of the parse if this is the parser root node. Use this parameter to explicitly set the string to be parsed.
 genLValueScalarMethods(qw(numbering));                                          # Last number used to number a node in this parse tree.
 genLValueScalarMethods(qw(number));                                             # Number of this node, see L<findByNumber|/findByNumber>.
-genLValueScalarMethods(qw(parent));                                             # Parent node of this node or undef if the parser root node. See also L</Traversal> and L</Navigation>. Consider as read only.
+genLValueScalarMethods(qw(parent));                                             # Parent node of this node or B<undef> if the parser root node. See also L</Traversal> and L</Navigation>. Consider as read only.
 genLValueScalarMethods(qw(parser));                                             # Parser details: the root node of a tree is the parse node for that tree. Consider as read only.
 genLValueScalarMethods(qw(tag));                                                # Tag name for this node, see also L</Traversal> and L</Navigation>. Consider as read only.
 genLValueScalarMethods(qw(text));                                               # Text of this node but only if it is a text node, i.e. the tag is cdata() <=> L</isText> is true.
@@ -494,7 +494,7 @@ sub stringWithConditions($@)                                                    
 sub condition($$@)                                                              #CX  Return the node if it has the specified condition and is in the optional context, else return B<undef>
  {my ($node, $condition, @context) = @_;                                        # Node, condition to check, optional context
   return undef if @context and !$node->at(@context);                            # Check optional context
-  $node->conditions->{$condition} ? $node : undef                               # Return node if it has the specified condition, else undef
+  $node->conditions->{$condition} ? $node : undef                               # Return node if it has the specified condition, else B<undef>
  }
 
 sub anyCondition($@)                                                            #X  Return the node if it has any of the specified conditions, else return B<undef>
@@ -979,7 +979,7 @@ sub over($$@)                                                                   
   $node->contentAsTags =~ m/$re/ ? $node : undef
  }
 
-sub over2($$@)                                                                   #CX Confirm that the string representing the tags at the level below this node match a regular expression where each pair of tags have two spaces between them and the first tag is preceded by a space and the last tag is followed by a space.  This arrangement simplifies the regular expression used to detect combinations like p+ q? . Use L<contentAsTags2|/contentAsTags2> to visualize the tags at the next level.
+sub over2($$@)                                                                   #CX Confirm that the string representing the tags at the level below this node match a regular expression where each pair of tags have two spaces between them and the first tag is preceded by a single space and the last tag is followed by a single space.  This arrangement simplifies the regular expression used to detect combinations like p+ q? . Use L<contentAsTags2|/contentAsTags2> to visualize the tags at the next level.
  {my ($node, $re, @context) = @_;                                               # Node, regular expression, optional context.
   return undef if @context and !$node->at(@context);                            # Not in specified context
   $node->contentAsTags2 =~ m/$re/ ? $node : undef
@@ -991,7 +991,7 @@ sub matchAfter($$@)                                                             
   $node->contentAfterAsTags =~ m/$re/ ? $node : undef
  }
 
-sub matchAfter2($$@)                                                             #CX Confirm that the string representing the tags following this node matches a regular expression where each pair of tags have two spaces between them and the first tag is preceded by a space and the last tag is followed by a space.  This arrangement simplifies the regular expression used to detect combinations like p+ q? Use L<contentAfterAsTags2|/contentAfterAsTags2> to visualize these tags.
+sub matchAfter2($$@)                                                             #CX Confirm that the string representing the tags following this node matches a regular expression where each pair of tags have two spaces between them and the first tag is preceded by a single space and the last tag is followed by a single space.  This arrangement simplifies the regular expression used to detect combinations like p+ q? Use L<contentAfterAsTags2|/contentAfterAsTags2> to visualize these tags.
  {my ($node, $re, @context) = @_;                                               # Node, regular expression, optional context.
   return undef if @context and !$node->at(@context);                            # Not in specified context
   $node->contentAfterAsTags2 =~ m/$re/ ? $node : undef
@@ -1003,13 +1003,13 @@ sub matchBefore($$@)                                                            
   $node->contentBeforeAsTags =~ m/$re/ ? $node : undef
  }
 
-sub matchBefore2($$@)                                                           #CX Confirm that the string representing the tags preceding this node matches a regular expression where each pair of tags have two spaces between them and the first tag is preceded by a space and the last tag is followed by a space.  This arrangement simplifies the regular expression used to detect combinations like p+ q?  Use L<contentBeforeAsTags2|/contentBeforeAsTags2> to visualize these tags.
+sub matchBefore2($$@)                                                           #CX Confirm that the string representing the tags preceding this node matches a regular expression where each pair of tags have two spaces between them and the first tag is preceded by a single space and the last tag is followed by a single space.  This arrangement simplifies the regular expression used to detect combinations like p+ q?  Use L<contentBeforeAsTags2|/contentBeforeAsTags2> to visualize these tags.
  {my ($node, $re, @context) = @_;                                               # Node, regular expression, optional context.
   return undef if @context and !$node->at(@context);                            # Not in specified context
   $node->contentBeforeAsTags2 =~ m/$re/ ? $node : undef
  }
 
-sub path($)                                                                     # Return a list representing the path to a node which can then be reused by L<get|/get> to retrieve the node as long as the structure of the parse tree has not changed along the path.
+sub path($)                                                                     # Return a list representing the path to a node which can then be reused by L<go|/go> to retrieve the node as long as the structure of the parse tree has not changed along the path.
  {my ($node) = @_;                                                              # Node.
   my $p = $node;                                                                # Current node
   my @p;                                                                        # Path
@@ -1068,7 +1068,7 @@ sub first($@)                                                                   
   $c ? $c->at(@context) : undef;                                                # Return first node if in specified context
  }
 
-sub firstText($@)                                                               #CX Return the first node if it is a text node otherwise undef
+sub firstText($@)                                                               #CX Return the first node if it is a text node otherwise B<undef>
  {my ($node, @context) = @_;                                                    # Node, optional context.
   my $l = &first(@_);                                                           # First node
   $l ? $l->isText : undef                                                       # Test whether the first node exists and is a text node
@@ -1151,13 +1151,13 @@ sub last($@)                                                                    
   $c ? $c->at(@context) : undef;                                                # Return last node if in specified context
  }
 
-sub lastText($@)                                                              #CX Return the last node if it is a text node otherwise undef
+sub lastText($@)                                                                #CX Return the last node if it is a text node otherwise B<undef>
  {my ($node, @context) = @_;                                                    # Node, optional context.
   my $l = &last(@_);                                                            # Last node
   $l ? $l->isText : undef                                                       # Test whether the last node exists and is a text node
  }
 
-sub lastBy($@)                                                                  # Return a list of the last instance of each specified tag encountered in a post-order traversal from the specified node or a hash of all first instances if no tags are specified.
+sub lastBy($@)                                                                  # Return a list of the last instance of each specified tag encountered in a post-order traversal from the specified node or a hash of all last instances if no tags are specified.
  {my ($node, @tags) = @_;                                                       # Node, tags to search for.
   my %tags;                                                                     # Tags found first
   $node->by(sub {$tags{$_->tag} = $_});                                         # Save last instance of each node
@@ -1165,7 +1165,7 @@ sub lastBy($@)                                                                  
   map {$tags{$_}} @tags;                                                        # Nodes in the requested order
  }
 
-sub lastDown($@)                                                                # Return a list of the last instance of each specified tag encountered in a pre-order traversal from the specified node or a hash of all first instances if no tags are specified.
+sub lastDown($@)                                                                # Return a list of the last instance of each specified tag encountered in a pre-order traversal from the specified node or a hash of all last instances if no tags are specified.
  {my ($node, @tags) = @_;                                                       # Node, tags to search for.
   my %tags;                                                                     # Tags found first
   $node->down(sub {$tags{$_->tag} = $_});                                       # Save last instance of each node
@@ -1242,7 +1242,7 @@ sub next($@)                                                                    
   confess "Node not found in parent";                                           # Something wrong with parent/child relationship
  }
 
-sub nextText($@)                                                                #CX Return the next node if it is a text node otherwise undef
+sub nextText($@)                                                                #CX Return the next node if it is a text node otherwise B<undef>
  {my ($node, @context) = @_;                                                    # Node, optional context.
   my $n = &next(@_);                                                            # Next node
   $n ? $n->isText : undef                                                       # Test whether the next node exists and is a text node
@@ -1299,7 +1299,7 @@ sub prev($@)                                                                    
   confess "Node not found in parent";                                           # Something wrong with parent/child relationship
  }
 
-sub prevText($@)                                                                #CX Return the previous node if it is a text node otherwise undef
+sub prevText($@)                                                                #CX Return the previous node if it is a text node otherwise B<undef>
  {my ($node, @context) = @_;                                                    # Node, optional context.
   my $p = &prev(@_);                                                            # Previous node
   $p ? $p->isText : undef                                                       # Test whether the previous node exists and is a text node
@@ -1654,6 +1654,53 @@ sub replaceContentWithText($@)                                                  
 
 #2 Swap                                                                         # Swap nodes both singly and in blocks
 
+sub invert($@)                                                                  #C Swap a parent and child node where the child is the only child of the parent and return the parent.
+ {my ($parent, @context) = @_;                                                  # Parent, context
+  return undef unless my $child = $parent->singleChild(@context);               # Single child
+  my $grandParent = $parent->parent;                                            # Grandparent
+  $grandParent or confess "Cannot invert the outer most node";                  # Cannot invert root
+  $parent->unwrap;                                                              # Unwrap parent
+  my $content = $child->content;                                                # Child content
+  $child->content  = [$parent];                                                 # Place parent under child
+  $parent->content = $content;                                                  # Place child content under parent
+  $child->parent   = $grandParent;                                              # Grand parent
+  $parent->parent  = $child;                                                    # Parent
+  $_->indexNode for $child, $parent, $grandParent;                              # Index modified nodes
+  $parent                                                                       # Return parent
+ }
+
+sub invertFirst($@)                                                             #C Swap a parent and child node where the child is the first child of the parent by placing the parent last in the child. Return the parent.
+ {my ($parent, @context) = @_;                                                  # Parent, context
+  return undef if @context and !$parent->at(@context);                          # Not in specified context
+  return undef unless my $child = $parent->first;                               # First child
+  my $grandParent = $parent->parent;                                            # Grandparent
+  $grandParent or confess "Cannot invertFirst the outer most node";             # Cannot invert root
+  my $i = $parent->index;                                                       # Position of parent in grandparent
+  $parent->cut;                                                                 # Cut out parent
+  $child->cut;                                                                  # Cut out child
+  $child->putLast($parent);                                                     # Put parent last under child
+  $grandParent->content->[$i] = $child;                                         # Put child in position in grandparent
+  $_->indexNode for $child, $parent, $grandParent;                              # Index modified nodes
+  $child->parent = $grandParent;                                                # Grand parent
+  $parent                                                                       # Return parent
+ }
+
+sub invertLast($@)                                                              #C Swap a parent and child node where the child is the last child of the parent by placing the parent first in the child. Return the parent.
+ {my ($parent, @context) = @_;                                                  # Parent, context
+  return undef if @context and !$parent->at(@context);                          # Not in specified context
+  return undef unless my $child = $parent->last;                                # Last child
+  my $grandParent = $parent->parent;                                            # Grandparent
+  $grandParent or confess "Cannot invertLast the outer most node";              # Cannot invert root
+  my $i = $parent->index;                                                       # Position of parent in grandparent
+  $parent->cut;                                                                 # Cut out parent
+  $child->cut;                                                                  # Cut out child
+  $child->putFirst($parent);                                                    # Put parent last under child
+  $grandParent->content->[$i] = $child;                                         # Put child in position in grandparent
+  $child->parent = $grandParent;                                                # Grand parent
+  $_->indexNode for $child, $parent, $grandParent;                              # Index modified nodes
+  $parent                                                                       # Return parent
+ }
+
 sub swap($$@)                                                                   #CX Swap two nodes optionally checking that the first node is in the specified context and return the first node.
  {my ($first, $second, @context) = @_;                                          # First node, second node, optional context
   return undef if @context and !$first->at(@context);                           # First node not in specified context
@@ -1761,7 +1808,7 @@ sub unwrapParentsWithSingleChild($)                                             
   $o                                                                            # Return node
  }
 
-sub unwrapContentsKeepingText($@)                                               #CX Unwrap all the non text nodes below a specified node adding a leading and a trailing space to prevent unwrapped content from being elided and return the specified node else undef if not in the optional context.
+sub unwrapContentsKeepingText($@)                                               #CX Unwrap all the non text nodes below a specified node adding a leading and a trailing space to prevent unwrapped content from being elided and return the specified node else B<undef> if not in the optional context.
  {my ($node, @context) = @_;                                                    # Node to unwrap, optional context.
   return undef if @context and !$node->at(@context);                            # Not in specified context
   $node->by(sub
@@ -1812,37 +1859,37 @@ sub contentBefore($@)                                                           
   confess "Node not found in parent";                                           # Something wrong with parent/child relationship
  }
 
-sub contentAsTags($@)                                                           #KX Return a string containing the tags of all the child nodes of this node separated by single spaces or the empty string if the node is empty or undef if the node does not match the optional context. Use L<over|/over> to test the sequence of tags with a regular expression.
+sub contentAsTags($@)                                                           #KX Return a string containing the tags of all the child nodes of this node separated by single spaces or the empty string if the node is empty or B<undef> if the node does not match the optional context. Use L<over|/over> to test the sequence of tags with a regular expression.
  {my ($node, @context) = @_;                                                    # Node, optional context.
   return undef if @context and !$node->at(@context);                            # Optionally check the context
   join ' ', map {$_->tag} $node->contents
  }
 
-sub contentAsTags2($@)                                                          #KX Return a string containing the tags of all the child nodes of this node separated by two spaces with a single space preceding the first tag and a single space following the last tag or the empty string if the node is empty or undef if the node does not match the optional context. Use L<over2|/over2> to test the sequence of tags with a regular expression. Use L<over2|/over2> to test the sequence of tags with a regular expression.
+sub contentAsTags2($@)                                                          #KX Return a string containing the tags of all the child nodes of this node separated by two spaces with a single space preceding the first tag and a single space following the last tag or the empty string if the node is empty or B<undef> if the node does not match the optional context. Use L<over2|/over2> to test the sequence of tags with a regular expression. Use L<over2|/over2> to test the sequence of tags with a regular expression.
  {my ($node, @context) = @_;                                                    # Node, optional context.
   return undef if @context and !$node->at(@context);                            # Optionally check the context
   join '', map {' '.$_->tag.' '} $node->contents
  }
 
-sub contentAfterAsTags($@)                                                      #K Return a string containing the tags of all the sibling nodes following this node separated by single spaces or the empty string if the node is empty or undef if the node does not match the optional context. Use L<matchAfter|/matchAfter> to test the sequence of tags with a regular expression.
+sub contentAfterAsTags($@)                                                      #K Return a string containing the tags of all the sibling nodes following this node separated by single spaces or the empty string if the node is empty or B<undef> if the node does not match the optional context. Use L<matchAfter|/matchAfter> to test the sequence of tags with a regular expression.
  {my ($node, @context) = @_;                                                    # Node, optional context.
   return undef if @context and !$node->at(@context);                            # Optionally check the context
   join ' ', map {$_->tag} $node->contentAfter
  }
 
-sub contentAfterAsTags2($@)                                                     #K Return a string containing the tags of all the sibling nodes following this node separated by two spaces with a single space preceding the first tag and a single space following the last tag or the empty string if the node is empty or undef if the node does not match the optional context. Use L<matchAfter2|/matchAfter2> to test the sequence of tags with a regular expression.
+sub contentAfterAsTags2($@)                                                     #K Return a string containing the tags of all the sibling nodes following this node separated by two spaces with a single space preceding the first tag and a single space following the last tag or the empty string if the node is empty or B<undef> if the node does not match the optional context. Use L<matchAfter2|/matchAfter2> to test the sequence of tags with a regular expression.
  {my ($node, @context) = @_;                                                    # Node, optional context.
   return undef if @context and !$node->at(@context);                            # Optionally check the context
   join '', map {' '.$_->tag.' '} $node->contentAfter
  }
 
-sub contentBeforeAsTags($@)                                                     #K Return a string containing the tags of all the sibling nodes preceding this node separated by single spaces or the empty string if the node is empty or undef if the node does not match the optional context. Use L<matchBefore|/matchBefore> to test the sequence of tags with a regular expression.
+sub contentBeforeAsTags($@)                                                     #K Return a string containing the tags of all the sibling nodes preceding this node separated by single spaces or the empty string if the node is empty or B<undef> if the node does not match the optional context. Use L<matchBefore|/matchBefore> to test the sequence of tags with a regular expression.
  {my ($node, @context) = @_;                                                    # Node, optional context.
   return undef if @context and !$node->at(@context);                            # Optionally check the context
   join ' ', map {$_->tag} $node->contentBefore
  }
 
-sub contentBeforeAsTags2($@)                                                    #K Return a string containing the tags of all the sibling nodes preceding this node separated by two spaces with a single space preceding the first tag and a single space following the last tag or the empty string if the node is empty or undef if the node does not match the optional context.  Use L<matchBefore2|/matchBefore2> to test the sequence of tags with a regular expression.
+sub contentBeforeAsTags2($@)                                                    #K Return a string containing the tags of all the sibling nodes preceding this node separated by two spaces with a single space preceding the first tag and a single space following the last tag or the empty string if the node is empty or B<undef> if the node does not match the optional context.  Use L<matchBefore2|/matchBefore2> to test the sequence of tags with a regular expression.
  {my ($node, @context) = @_;                                                    # Node, optional context.
   return undef if @context and !$node->at(@context);                            # Optionally check the context
   join '', map {' '.$_->tag.' '} $node->contentBefore
@@ -2399,6 +2446,17 @@ sub replaceWithRequiredCleanUp($$)                                              
   $node->replaceWithText(qq(<required-cleanup>$text</required-cleanup>));
  }
 
+sub putPrevRequiredCleanUp($$)                                                  # Place a required cleanup tag before a node.
+ {my ($node, $text) = @_;                                                       # Node to be replace, clean up message
+  my $r = qq(<required-cleanup>$text</required-cleanup>);                       # Required clean up tag
+  if ($node->parent)                                                            # Place before non root node
+   {$node->putPrevAsText($r);
+   }
+  else                                                                          # Place first under a root node
+   {$node->putFirstAsText($r);
+   }
+ }
+
 #1 Dita                                                                         # Methods useful for convertions to L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html>.
 
 sub ditaListToSteps($@)                                                         #C Change the specified node to B<steps> and its contents to B<cmd\step> optionally only in the specified context.
@@ -2430,20 +2488,23 @@ sub ditaObviousChanges($)                                                       
     my %change =                                                                # Tags that should be changed
      (book         => q(bookmap),
       code         => q(codeph),
+      command      => q(codeph),                                                # Needs approval from Micalea
       emphasis     => q(b),
       figure       => q(fig),
       guibutton    => q(uicontrol),
       guilabel     => q(uicontrol),
       guimenu      => q(uicontrol),
       itemizedlist => q(ol),
+      link         =>q(xref),
       listitem     => q(li),
       menuchoice   => q(uicontrol),
       orderedlist  => q(ol),
       para         => q(p),
+      quote        => q(q),
       replaceable  => q(varname),
+      subscript    => q(sub),
       variablelist => q(dl),
       varlistentry => q(dlentry),
-      command      => q(codeph),                                                # Needs approval from Micalea
      );
 
     my %deleteAttributesDependingOnValue =                                      # Attributes that should be deleted if they have specified values
@@ -2454,8 +2515,9 @@ sub ditaObviousChanges($)                                                       
      qw(version xml:id xmlns xmlns:xi xmlns:xl xmlns:d);
 
     my %renameAttributes =                                                      # Attributes that should be renamed
-     (xref=>[[qw(linkend href)]],
+     (xref=>[[qw(linkend href)], [qw(xrefstyle outputclass)]],                  # 2018.06.14 added xrefstyle->outputclass
       fig =>[[qw(role outputclass)], [qw(xml:id id)]],
+      example   =>[[qw(role outputclass)]],
       imagedata =>[[qw(contentwidth width)], [qw(fileref href)]],
      );
 
@@ -2499,7 +2561,7 @@ sub ditaTopicHeaders($)                                                         
 END
  }
 
-sub htmlHeadersToSections($)                                                    # Position sections just before html header tags so that subsequently the document can be divided into L<divided into sections|/divideIntoSections>.
+sub htmlHeadersToSections($)                                                    # Position sections just before html header tags so that subsequently the document can be divided into L<divided document into sections|/divideDocumentIntoSections>.
  {my ($node) = @_;                                                              # Parse tree
 
   $node->by(sub                                                                 # Move each section definition upwards so that its parent is another section. Intervening container tags such as <div> or <span> should have been unwrapped by this point as they might move the section further back than is desired.
@@ -2660,13 +2722,13 @@ sub nn($)                                                                       
 sub extractDocumentationFlags($$)                                               # Generate documentation for a method with a user flag.
  {my ($flags, $method) = @_;                                                    # Flags, method name.
   my $b = "${method}NonBlank";                                                  # Not blank method name
-  my $x = "${method}NonBlankX";                                                 # Not blank, die on undef method name
+  my $x = "${method}NonBlankX";                                                 # Not blank, die on B<undef> method name
   my $m = $method;                                                              # Second action method
      $m =~ s/\Afirst/next/gs;
      $m =~ s/\Alast/prev/gs;
   my @doc; my @code;
 
-  if ($flags =~ m/C/s)                                                          # Context flag for a method that returns a single node or undef if in the wrong context
+  if ($flags =~ m/C/s)                                                          # Context flag for a method that returns a single node or B<undef> if in the wrong context
    {push @doc, <<'END';
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -3181,7 +3243,7 @@ Number of this node, see L<findByNumber|/findByNumber>.
 
 =head3 parent :lvalue
 
-Parent node of this node or undef if the parser root node. See also L</Traversal> and L</Navigation>. Consider as read only.
+Parent node of this node or B<undef> if the parser root node. See also L</Traversal> and L</Navigation>. Consider as read only.
 
 
 =head3 parser :lvalue
@@ -5165,7 +5227,7 @@ Use B<isOnlyChildX> to execute L<isOnlyChild|/isOnlyChild> but B<die> 'isOnlyChi
 
 =head2 singleChild($@)
 
-Return the only child of a specified node if the child is the only node under its parent ignoring any surrounding blank text, esle return B<undef>.
+Return the only child of a specified node if the child is the only node under its parent ignoring any surrounding blank text, else return B<undef>.
 
      Parameter  Description
   1  $parent    Node
@@ -5269,7 +5331,7 @@ Use B<overX> to execute L<over|/over> but B<die> 'over' instead of returning B<u
 
 =head2 over2($$@)
 
-Confirm that the string representing the tags at the level below this node match a regular expression where each pair of tags have two spaces between them and the first tag is preceded by a space and the last tag is followed by a space.  This arrangement simplifies the regular expression used to detect combinations like p+ q? . Use L<contentAsTags2|/contentAsTags2> to visualize the tags at the next level.
+Confirm that the string representing the tags at the level below this node match a regular expression where each pair of tags have two spaces between them and the first tag is preceded by a single space and the last tag is followed by a single space.  This arrangement simplifies the regular expression used to detect combinations like p+ q? . Use L<contentAsTags2|/contentAsTags2> to visualize the tags at the next level.
 
      Parameter  Description
   1  $node      Node
@@ -5335,7 +5397,7 @@ Use B<matchAfterX> to execute L<matchAfter|/matchAfter> but B<die> 'matchAfter' 
 
 =head2 matchAfter2($$@)
 
-Confirm that the string representing the tags following this node matches a regular expression where each pair of tags have two spaces between them and the first tag is preceded by a space and the last tag is followed by a space.  This arrangement simplifies the regular expression used to detect combinations like p+ q? Use L<contentAfterAsTags2|/contentAfterAsTags2> to visualize these tags.
+Confirm that the string representing the tags following this node matches a regular expression where each pair of tags have two spaces between them and the first tag is preceded by a single space and the last tag is followed by a single space.  This arrangement simplifies the regular expression used to detect combinations like p+ q? Use L<contentAfterAsTags2|/contentAfterAsTags2> to visualize these tags.
 
      Parameter  Description
   1  $node      Node
@@ -5399,7 +5461,7 @@ Use B<matchBeforeX> to execute L<matchBefore|/matchBefore> but B<die> 'matchBefo
 
 =head2 matchBefore2($$@)
 
-Confirm that the string representing the tags preceding this node matches a regular expression where each pair of tags have two spaces between them and the first tag is preceded by a space and the last tag is followed by a space.  This arrangement simplifies the regular expression used to detect combinations like p+ q?  Use L<contentBeforeAsTags2|/contentBeforeAsTags2> to visualize these tags.
+Confirm that the string representing the tags preceding this node matches a regular expression where each pair of tags have two spaces between them and the first tag is preceded by a single space and the last tag is followed by a single space.  This arrangement simplifies the regular expression used to detect combinations like p+ q?  Use L<contentBeforeAsTags2|/contentBeforeAsTags2> to visualize these tags.
 
      Parameter  Description
   1  $node      Node
@@ -5431,7 +5493,7 @@ Use B<matchBefore2X> to execute L<matchBefore2|/matchBefore2> but B<die> 'matchB
 
 =head2 path($)
 
-Return a list representing the path to a node which can then be reused by L<get|/get> to retrieve the node as long as the structure of the parse tree has not changed along the path.
+Return a list representing the path to a node which can then be reused by L<go|/go> to retrieve the node as long as the structure of the parse tree has not changed along the path.
 
      Parameter  Description
   1  $node      Node.
@@ -5630,7 +5692,7 @@ Use B<firstX> to execute L<first|/first> but B<die> 'first' instead of returning
 
 =head3 firstText($@)
 
-Return the first node if it is a text node otherwise undef
+Return the first node if it is a text node otherwise B<undef>
 
      Parameter  Description
   1  $node      Node
@@ -5995,7 +6057,7 @@ Use B<lastX> to execute L<last|/last> but B<die> 'last' instead of returning B<u
 
 =head3 lastText($@)
 
-Return the last node if it is a text node otherwise undef
+Return the last node if it is a text node otherwise B<undef>
 
      Parameter  Description
   1  $node      Node
@@ -6035,7 +6097,7 @@ Use B<lastTextX> to execute L<lastText|/lastText> but B<die> 'lastText' instead 
 
 =head3 lastBy($@)
 
-Return a list of the last instance of each specified tag encountered in a post-order traversal from the specified node or a hash of all first instances if no tags are specified.
+Return a list of the last instance of each specified tag encountered in a post-order traversal from the specified node or a hash of all last instances if no tags are specified.
 
      Parameter  Description
   1  $node      Node
@@ -6082,7 +6144,7 @@ Example:
 
 =head3 lastDown($@)
 
-Return a list of the last instance of each specified tag encountered in a pre-order traversal from the specified node or a hash of all first instances if no tags are specified.
+Return a list of the last instance of each specified tag encountered in a pre-order traversal from the specified node or a hash of all last instances if no tags are specified.
 
      Parameter  Description
   1  $node      Node
@@ -6358,7 +6420,7 @@ Use B<nextX> to execute L<next|/next> but B<die> 'next' instead of returning B<u
 
 =head3 nextText($@)
 
-Return the next node if it is a text node otherwise undef
+Return the next node if it is a text node otherwise B<undef>
 
      Parameter  Description
   1  $node      Node
@@ -6526,7 +6588,7 @@ Use B<prevX> to execute L<prev|/prev> but B<die> 'prev' instead of returning B<u
 
 =head3 prevText($@)
 
-Return the previous node if it is a text node otherwise undef
+Return the previous node if it is a text node otherwise B<undef>
 
      Parameter  Description
   1  $node      Node
@@ -7067,7 +7129,7 @@ Example:
 
 =head3 mergeDuplicateChildWithParent($@)
 
-Merge a parent node with its only child if their tags are the same and their attributes do not collide other than possibly the id in which case the parent id is used. Any labels on the child are transferrred to the parent. The child node is then unwrapped and the parent node is returned.
+Merge a parent node with its only child if their tags are the same and their attributes do not collide other than possibly the id in which case the parent id is used. Any labels on the child are transferred to the parent. The child node is then unwrapped and the parent node is returned.
 
      Parameter  Description
   1  $parent    Parent this node
@@ -7655,6 +7717,165 @@ Example:
 
 Swap nodes both singly and in blocks
 
+=head3 invert($@)
+
+Swap a parent and child node where the child is the only child of the parent and return the parent.
+
+     Parameter  Description
+  1  $parent    Parent
+  2  @context   Context
+
+Use the B<@context> parameter to provide an optional context for this method as
+understood by method L<at|/at> .  If a context is supplied and the node
+specified by the first parameter is not in this context then this method
+returns B<undef> immediately.
+
+
+
+Example:
+
+
+  my $a = Data::Edit::Xml::new(<<END);
+  <a>
+    <b id="b">
+      <c id="c">
+        <d/>
+        <e/>
+      </c>
+    </b>
+  </a>
+  END
+
+  $a->first->invert;
+
+  ok -p $a eq <<END;
+  <a>
+    <c id="c">
+      <b id="b">
+        <d/>
+        <e/>
+      </b>
+    </c>
+  </a>
+  END
+
+  $a->first->invert;
+
+  ok -p $a eq <<END;
+  <a>
+    <b id="b">
+      <c id="c">
+        <d/>
+        <e/>
+      </c>
+    </b>
+  </a>
+  END
+
+
+=head3 invertFirst($@)
+
+Swap a parent and child node where the child is the first child of the parent by placing the parent last in the child. Return the parent.
+
+     Parameter  Description
+  1  $parent    Parent
+  2  @context   Context
+
+Use the B<@context> parameter to provide an optional context for this method as
+understood by method L<at|/at> .  If a context is supplied and the node
+specified by the first parameter is not in this context then this method
+returns B<undef> immediately.
+
+
+
+Example:
+
+
+  my $a = Data::Edit::Xml::new(<<END);
+  <a>
+    <b>
+      <c>
+        <d/>
+        <e/>
+      </c>
+      <f/>
+      <g/>
+    </b>
+  </a>
+  END
+
+  ok -p $a eq <<END;
+  <a>
+    <c>
+      <d/>
+      <e/>
+      <b>
+        <f/>
+        <g/>
+      </b>
+    </c>
+  </a>
+  END
+
+
+=head3 invertLast($@)
+
+Swap a parent and child node where the child is the last child of the parent by placing the parent first in the child. Return the parent.
+
+     Parameter  Description
+  1  $parent    Parent
+  2  @context   Context
+
+Use the B<@context> parameter to provide an optional context for this method as
+understood by method L<at|/at> .  If a context is supplied and the node
+specified by the first parameter is not in this context then this method
+returns B<undef> immediately.
+
+
+
+Example:
+
+
+  my $a = Data::Edit::Xml::new(<<END);
+  <a>
+    <b>
+      <c>
+        <d/>
+        <e/>
+      </c>
+      <f/>
+      <g/>
+    </b>
+  </a>
+  END
+
+  ok -p $a eq <<END;
+  <a>
+    <c>
+      <d/>
+      <e/>
+      <b>
+        <f/>
+        <g/>
+      </b>
+    </c>
+  </a>
+  END
+
+  ok -p $a eq <<END;
+  <a>
+    <b>
+      <c>
+        <d/>
+        <e/>
+      </c>
+      <f/>
+      <g/>
+    </b>
+  </a>
+  END
+
+
 =head3 swap($$@)
 
 Swap two nodes optionally checking that the first node is in the specified context and return the first node.
@@ -8027,7 +8248,7 @@ Use B<unwrapParentsWithSingleChildX> to execute L<unwrapParentsWithSingleChild|/
 
 =head3 unwrapContentsKeepingText($@)
 
-Unwrap all the non text nodes below a specified node adding a leading and a trailing space to prevent unwrapped content from being elided and return the specified node else undef if not in the optional context.
+Unwrap all the non text nodes below a specified node adding a leading and a trailing space to prevent unwrapped content from being elided and return the specified node else B<undef> if not in the optional context.
 
      Parameter  Description
   1  $node      Node to unwrap
@@ -8162,7 +8383,7 @@ Example:
 
 =head2 contentAsTags($@)
 
-Return a string containing the tags of all the child nodes of this node separated by single spaces or the empty string if the node is empty or undef if the node does not match the optional context. Use L<over|/over> to test the sequence of tags with a regular expression.
+Return a string containing the tags of all the child nodes of this node separated by single spaces or the empty string if the node is empty or B<undef> if the node does not match the optional context. Use L<over|/over> to test the sequence of tags with a regular expression.
 
      Parameter  Description
   1  $node      Node
@@ -8193,7 +8414,7 @@ Use B<contentAsTagsX> to execute L<contentAsTags|/contentAsTags> but B<die> 'con
 
 =head2 contentAsTags2($@)
 
-Return a string containing the tags of all the child nodes of this node separated by two spaces with a single space preceding the first tag and a single space following the last tag or the empty string if the node is empty or undef if the node does not match the optional context. Use L<over2|/over2> to test the sequence of tags with a regular expression. Use L<over2|/over2> to test the sequence of tags with a regular expression.
+Return a string containing the tags of all the child nodes of this node separated by two spaces with a single space preceding the first tag and a single space following the last tag or the empty string if the node is empty or B<undef> if the node does not match the optional context. Use L<over2|/over2> to test the sequence of tags with a regular expression. Use L<over2|/over2> to test the sequence of tags with a regular expression.
 
      Parameter  Description
   1  $node      Node
@@ -8216,7 +8437,7 @@ Use B<contentAsTags2X> to execute L<contentAsTags2|/contentAsTags2> but B<die> '
 
 =head2 contentAfterAsTags($@)
 
-Return a string containing the tags of all the sibling nodes following this node separated by single spaces or the empty string if the node is empty or undef if the node does not match the optional context. Use L<matchAfter|/matchAfter> to test the sequence of tags with a regular expression.
+Return a string containing the tags of all the sibling nodes following this node separated by single spaces or the empty string if the node is empty or B<undef> if the node does not match the optional context. Use L<matchAfter|/matchAfter> to test the sequence of tags with a regular expression.
 
      Parameter  Description
   1  $node      Node
@@ -8247,7 +8468,7 @@ Example:
 
 =head2 contentAfterAsTags2($@)
 
-Return a string containing the tags of all the sibling nodes following this node separated by two spaces with a single space preceding the first tag and a single space following the last tag or the empty string if the node is empty or undef if the node does not match the optional context. Use L<matchAfter2|/matchAfter2> to test the sequence of tags with a regular expression.
+Return a string containing the tags of all the sibling nodes following this node separated by two spaces with a single space preceding the first tag and a single space following the last tag or the empty string if the node is empty or B<undef> if the node does not match the optional context. Use L<matchAfter2|/matchAfter2> to test the sequence of tags with a regular expression.
 
      Parameter  Description
   1  $node      Node
@@ -8276,7 +8497,7 @@ Example:
 
 =head2 contentBeforeAsTags($@)
 
-Return a string containing the tags of all the sibling nodes preceding this node separated by single spaces or the empty string if the node is empty or undef if the node does not match the optional context. Use L<matchBefore|/matchBefore> to test the sequence of tags with a regular expression.
+Return a string containing the tags of all the sibling nodes preceding this node separated by single spaces or the empty string if the node is empty or B<undef> if the node does not match the optional context. Use L<matchBefore|/matchBefore> to test the sequence of tags with a regular expression.
 
      Parameter  Description
   1  $node      Node
@@ -8307,7 +8528,7 @@ Example:
 
 =head2 contentBeforeAsTags2($@)
 
-Return a string containing the tags of all the sibling nodes preceding this node separated by two spaces with a single space preceding the first tag and a single space following the last tag or the empty string if the node is empty or undef if the node does not match the optional context.  Use L<matchBefore2|/matchBefore2> to test the sequence of tags with a regular expression.
+Return a string containing the tags of all the sibling nodes preceding this node separated by two spaces with a single space preceding the first tag and a single space following the last tag or the empty string if the node is empty or B<undef> if the node does not match the optional context.  Use L<matchBefore2|/matchBefore2> to test the sequence of tags with a regular expression.
 
      Parameter  Description
   1  $node      Node
@@ -9857,7 +10078,7 @@ Example:
 
 =head2 htmlHeadersToSections($)
 
-Position sections just before html header tags so that subsequently the document can be divided into L<divided into sections|/divideIntoSections>.
+Position sections just before html header tags so that subsequently the document can be divided into L<divided document into sections|/divideDocumentIntoSections>.
 
      Parameter  Description
   1  $node      Parse tree
@@ -9937,6 +10158,23 @@ Divide a parse tree into sections by moving non B<section> tags into their corre
 
 Example:
 
+
+  my $x = Data::Edit::Xml::new(<<END);
+  <x>
+  <h1>h1</h1>
+    H1
+  <h2>h2</h2>
+    H2
+  <h3>h3</h3>
+    H3
+  <h3>h3</h3>
+    H3
+  <h2>h2</h2>
+    H2
+  <h4>h4</h4>
+    H4
+  </x>
+  END
 
   $x->htmlHeadersToSections;
 
@@ -10615,515 +10853,533 @@ Replace new lines in a string with N to make testing easier.
 
 205 L<inputString|/inputString>
 
-206 L<isAllBlankText|/isAllBlankText>
+206 L<invert|/invert>
 
-207 L<isAllBlankTextNonBlank|/isAllBlankText>
+207 L<invertFirst|/invertFirst>
 
-208 L<isAllBlankTextNonBlankX|/isAllBlankText>
+208 L<invertFirstNonBlank|/invertFirst>
 
-209 L<isAllBlankTextX|/isAllBlankText>
+209 L<invertFirstNonBlankX|/invertFirst>
 
-210 L<isBlankText|/isBlankText>
+210 L<invertLast|/invertLast>
 
-211 L<isBlankTextNonBlank|/isBlankText>
+211 L<invertLastNonBlank|/invertLast>
 
-212 L<isBlankTextNonBlankX|/isBlankText>
+212 L<invertLastNonBlankX|/invertLast>
 
-213 L<isBlankTextX|/isBlankText>
+213 L<invertNonBlank|/invert>
 
-214 L<isEmpty|/isEmpty>
+214 L<invertNonBlankX|/invert>
 
-215 L<isEmptyNonBlank|/isEmpty>
+215 L<isAllBlankText|/isAllBlankText>
 
-216 L<isEmptyNonBlankX|/isEmpty>
+216 L<isAllBlankTextNonBlank|/isAllBlankText>
 
-217 L<isEmptyX|/isEmpty>
+217 L<isAllBlankTextNonBlankX|/isAllBlankText>
 
-218 L<isFirst|/isFirst>
+218 L<isAllBlankTextX|/isAllBlankText>
 
-219 L<isFirstNonBlank|/isFirst>
+219 L<isBlankText|/isBlankText>
 
-220 L<isFirstNonBlankX|/isFirst>
+220 L<isBlankTextNonBlank|/isBlankText>
 
-221 L<isFirstText|/isFirstText>
+221 L<isBlankTextNonBlankX|/isBlankText>
 
-222 L<isFirstTextNonBlank|/isFirstText>
+222 L<isBlankTextX|/isBlankText>
 
-223 L<isFirstTextNonBlankX|/isFirstText>
+223 L<isEmpty|/isEmpty>
 
-224 L<isFirstTextX|/isFirstText>
+224 L<isEmptyNonBlank|/isEmpty>
 
-225 L<isFirstX|/isFirst>
+225 L<isEmptyNonBlankX|/isEmpty>
 
-226 L<isLast|/isLast>
+226 L<isEmptyX|/isEmpty>
 
-227 L<isLastNonBlank|/isLast>
+227 L<isFirst|/isFirst>
 
-228 L<isLastNonBlankX|/isLast>
+228 L<isFirstNonBlank|/isFirst>
 
-229 L<isLastText|/isLastText>
+229 L<isFirstNonBlankX|/isFirst>
 
-230 L<isLastTextNonBlank|/isLastText>
+230 L<isFirstText|/isFirstText>
 
-231 L<isLastTextNonBlankX|/isLastText>
+231 L<isFirstTextNonBlank|/isFirstText>
 
-232 L<isLastTextX|/isLastText>
+232 L<isFirstTextNonBlankX|/isFirstText>
 
-233 L<isLastX|/isLast>
+233 L<isFirstTextX|/isFirstText>
 
-234 L<isOnlyChild|/isOnlyChild>
+234 L<isFirstX|/isFirst>
 
-235 L<isOnlyChildNonBlank|/isOnlyChild>
+235 L<isLast|/isLast>
 
-236 L<isOnlyChildNonBlankX|/isOnlyChild>
+236 L<isLastNonBlank|/isLast>
 
-237 L<isOnlyChildX|/isOnlyChild>
+237 L<isLastNonBlankX|/isLast>
 
-238 L<isText|/isText>
+238 L<isLastText|/isLastText>
 
-239 L<isTextNonBlank|/isText>
+239 L<isLastTextNonBlank|/isLastText>
 
-240 L<isTextNonBlankX|/isText>
+240 L<isLastTextNonBlankX|/isLastText>
 
-241 L<isTextX|/isText>
+241 L<isLastTextX|/isLastText>
 
-242 L<labels|/labels>
+242 L<isLastX|/isLast>
 
-243 L<lang|/lang>
+243 L<isOnlyChild|/isOnlyChild>
 
-244 L<last|/last>
+244 L<isOnlyChildNonBlank|/isOnlyChild>
 
-245 L<lastBy|/lastBy>
+245 L<isOnlyChildNonBlankX|/isOnlyChild>
 
-246 L<lastContextOf|/lastContextOf>
+246 L<isOnlyChildX|/isOnlyChild>
 
-247 L<lastContextOfX|/lastContextOf>
+247 L<isText|/isText>
 
-248 L<lastDown|/lastDown>
+248 L<isTextNonBlank|/isText>
 
-249 L<lastIn|/lastIn>
+249 L<isTextNonBlankX|/isText>
 
-250 L<lastInIndex|/lastInIndex>
+250 L<isTextX|/isText>
 
-251 L<lastInIndexNonBlank|/lastInIndex>
+251 L<labels|/labels>
 
-252 L<lastInIndexNonBlankX|/lastInIndex>
+252 L<lang|/lang>
 
-253 L<lastInIndexX|/lastInIndex>
+253 L<last|/last>
 
-254 L<lastInX|/lastIn>
+254 L<lastBy|/lastBy>
 
-255 L<lastNonBlank|/last>
+255 L<lastContextOf|/lastContextOf>
 
-256 L<lastNonBlankX|/last>
+256 L<lastContextOfX|/lastContextOf>
 
-257 L<lastOf|/lastOf>
+257 L<lastDown|/lastDown>
 
-258 L<lastSibling|/lastSibling>
+258 L<lastIn|/lastIn>
 
-259 L<lastSiblingNonBlank|/lastSibling>
+259 L<lastInIndex|/lastInIndex>
 
-260 L<lastSiblingNonBlankX|/lastSibling>
+260 L<lastInIndexNonBlank|/lastInIndex>
 
-261 L<lastSiblingX|/lastSibling>
+261 L<lastInIndexNonBlankX|/lastInIndex>
 
-262 L<lastText|/lastText>
+262 L<lastInIndexX|/lastInIndex>
 
-263 L<lastTextNonBlank|/lastText>
+263 L<lastInX|/lastIn>
 
-264 L<lastTextNonBlankX|/lastText>
+264 L<lastNonBlank|/last>
 
-265 L<lastTextX|/lastText>
+265 L<lastNonBlankX|/last>
 
-266 L<lastX|/last>
+266 L<lastOf|/lastOf>
 
-267 L<listConditions|/listConditions>
+267 L<lastSibling|/lastSibling>
 
-268 L<matchAfter|/matchAfter>
+268 L<lastSiblingNonBlank|/lastSibling>
 
-269 L<matchAfter2|/matchAfter2>
+269 L<lastSiblingNonBlankX|/lastSibling>
 
-270 L<matchAfter2NonBlank|/matchAfter2>
+270 L<lastSiblingX|/lastSibling>
 
-271 L<matchAfter2NonBlankX|/matchAfter2>
+271 L<lastText|/lastText>
 
-272 L<matchAfter2X|/matchAfter2>
+272 L<lastTextNonBlank|/lastText>
 
-273 L<matchAfterNonBlank|/matchAfter>
+273 L<lastTextNonBlankX|/lastText>
 
-274 L<matchAfterNonBlankX|/matchAfter>
+274 L<lastTextX|/lastText>
 
-275 L<matchAfterX|/matchAfter>
+275 L<lastX|/last>
 
-276 L<matchBefore|/matchBefore>
+276 L<listConditions|/listConditions>
 
-277 L<matchBefore2|/matchBefore2>
+277 L<matchAfter|/matchAfter>
 
-278 L<matchBefore2NonBlank|/matchBefore2>
+278 L<matchAfter2|/matchAfter2>
 
-279 L<matchBefore2NonBlankX|/matchBefore2>
+279 L<matchAfter2NonBlank|/matchAfter2>
 
-280 L<matchBefore2X|/matchBefore2>
+280 L<matchAfter2NonBlankX|/matchAfter2>
 
-281 L<matchBeforeNonBlank|/matchBefore>
+281 L<matchAfter2X|/matchAfter2>
 
-282 L<matchBeforeNonBlankX|/matchBefore>
+282 L<matchAfterNonBlank|/matchAfter>
 
-283 L<matchBeforeX|/matchBefore>
+283 L<matchAfterNonBlankX|/matchAfter>
 
-284 L<matchesText|/matchesText>
+284 L<matchAfterX|/matchAfter>
 
-285 L<matchesTextNonBlank|/matchesText>
+285 L<matchBefore|/matchBefore>
 
-286 L<matchesTextNonBlankX|/matchesText>
+286 L<matchBefore2|/matchBefore2>
 
-287 L<matchesTextX|/matchesText>
+287 L<matchBefore2NonBlank|/matchBefore2>
 
-288 L<mergeDuplicateChildWithParent|/mergeDuplicateChildWithParent>
+288 L<matchBefore2NonBlankX|/matchBefore2>
 
-289 L<mergeDuplicateChildWithParentNonBlank|/mergeDuplicateChildWithParent>
+289 L<matchBefore2X|/matchBefore2>
 
-290 L<mergeDuplicateChildWithParentNonBlankX|/mergeDuplicateChildWithParent>
+290 L<matchBeforeNonBlank|/matchBefore>
 
-291 L<moveAttrs|/moveAttrs>
+291 L<matchBeforeNonBlankX|/matchBefore>
 
-292 L<moveLabels|/moveLabels>
+292 L<matchBeforeX|/matchBefore>
 
-293 L<moveNewAttrs|/moveNewAttrs>
+293 L<matchesText|/matchesText>
 
-294 L<navtitle|/navtitle>
+294 L<matchesTextNonBlank|/matchesText>
 
-295 L<new|/new>
+295 L<matchesTextNonBlankX|/matchesText>
 
-296 L<newTag|/newTag>
+296 L<matchesTextX|/matchesText>
 
-297 L<newText|/newText>
+297 L<mergeDuplicateChildWithParent|/mergeDuplicateChildWithParent>
 
-298 L<newTree|/newTree>
+298 L<mergeDuplicateChildWithParentNonBlank|/mergeDuplicateChildWithParent>
 
-299 L<next|/next>
+299 L<mergeDuplicateChildWithParentNonBlankX|/mergeDuplicateChildWithParent>
 
-300 L<nextIn|/nextIn>
+300 L<moveAttrs|/moveAttrs>
 
-301 L<nextInX|/nextIn>
+301 L<moveLabels|/moveLabels>
 
-302 L<nextNonBlank|/next>
+302 L<moveNewAttrs|/moveNewAttrs>
 
-303 L<nextNonBlankX|/next>
+303 L<navtitle|/navtitle>
 
-304 L<nextOn|/nextOn>
+304 L<new|/new>
 
-305 L<nextText|/nextText>
+305 L<newTag|/newTag>
 
-306 L<nextTextNonBlank|/nextText>
+306 L<newText|/newText>
 
-307 L<nextTextNonBlankX|/nextText>
+307 L<newTree|/newTree>
 
-308 L<nextTextX|/nextText>
+308 L<next|/next>
 
-309 L<nextX|/next>
+309 L<nextIn|/nextIn>
 
-310 L<nn|/nn>
+310 L<nextInX|/nextIn>
 
-311 L<normalizeWhiteSpace|/normalizeWhiteSpace>
+311 L<nextNonBlank|/next>
 
-312 L<number|/number>
+312 L<nextNonBlankX|/next>
 
-313 L<numbering|/numbering>
+313 L<nextOn|/nextOn>
 
-314 L<numberNode|/numberNode>
+314 L<nextText|/nextText>
 
-315 L<numbers|/numbers>
+315 L<nextTextNonBlank|/nextText>
 
-316 L<numberTree|/numberTree>
+316 L<nextTextNonBlankX|/nextText>
 
-317 L<opString|/opString>
+317 L<nextTextX|/nextText>
 
-318 L<ordered|/ordered>
+318 L<nextX|/next>
 
-319 L<orderedX|/ordered>
+319 L<nn|/nn>
 
-320 L<otherprops|/otherprops>
+320 L<normalizeWhiteSpace|/normalizeWhiteSpace>
 
-321 L<outputclass|/outputclass>
+321 L<number|/number>
 
-322 L<over|/over>
+322 L<numbering|/numbering>
 
-323 L<over2|/over2>
+323 L<numberNode|/numberNode>
 
-324 L<over2NonBlank|/over2>
+324 L<numbers|/numbers>
 
-325 L<over2NonBlankX|/over2>
+325 L<numberTree|/numberTree>
 
-326 L<over2X|/over2>
+326 L<opString|/opString>
 
-327 L<overNonBlank|/over>
+327 L<ordered|/ordered>
 
-328 L<overNonBlankX|/over>
+328 L<orderedX|/ordered>
 
-329 L<overX|/over>
+329 L<otherprops|/otherprops>
 
-330 L<parent|/parent>
+330 L<outputclass|/outputclass>
 
-331 L<parse|/parse>
+331 L<over|/over>
 
-332 L<parser|/parser>
+332 L<over2|/over2>
 
-333 L<path|/path>
+333 L<over2NonBlank|/over2>
 
-334 L<pathString|/pathString>
+334 L<over2NonBlankX|/over2>
 
-335 L<position|/position>
+335 L<over2X|/over2>
 
-336 L<present|/present>
+336 L<overNonBlank|/over>
 
-337 L<prettyString|/prettyString>
+337 L<overNonBlankX|/over>
 
-338 L<prettyStringCDATA|/prettyStringCDATA>
+338 L<overX|/over>
 
-339 L<prettyStringContent|/prettyStringContent>
+339 L<parent|/parent>
 
-340 L<prettyStringContentNumbered|/prettyStringContentNumbered>
+340 L<parse|/parse>
 
-341 L<prettyStringEnd|/prettyStringEnd>
+341 L<parser|/parser>
 
-342 L<prettyStringNumbered|/prettyStringNumbered>
+342 L<path|/path>
 
-343 L<prev|/prev>
+343 L<pathString|/pathString>
 
-344 L<prevIn|/prevIn>
+344 L<position|/position>
 
-345 L<prevInX|/prevIn>
+345 L<present|/present>
 
-346 L<prevNonBlank|/prev>
+346 L<prettyString|/prettyString>
 
-347 L<prevNonBlankX|/prev>
+347 L<prettyStringCDATA|/prettyStringCDATA>
 
-348 L<prevOn|/prevOn>
+348 L<prettyStringContent|/prettyStringContent>
 
-349 L<prevText|/prevText>
+349 L<prettyStringContentNumbered|/prettyStringContentNumbered>
 
-350 L<prevTextNonBlank|/prevText>
+350 L<prettyStringEnd|/prettyStringEnd>
 
-351 L<prevTextNonBlankX|/prevText>
+351 L<prettyStringNumbered|/prettyStringNumbered>
 
-352 L<prevTextX|/prevText>
+352 L<prev|/prev>
 
-353 L<prevX|/prev>
+353 L<prevIn|/prevIn>
 
-354 L<printAttributes|/printAttributes>
+354 L<prevInX|/prevIn>
 
-355 L<printAttributesReplacingIdsWithLabels|/printAttributesReplacingIdsWithLabels>
+355 L<prevNonBlank|/prev>
 
-356 L<printNode|/printNode>
+356 L<prevNonBlankX|/prev>
 
-357 L<props|/props>
+357 L<prevOn|/prevOn>
 
-358 L<putFirst|/putFirst>
+358 L<prevText|/prevText>
 
-359 L<putFirstAsText|/putFirstAsText>
+359 L<prevTextNonBlank|/prevText>
 
-360 L<putFirstAsTextNonBlank|/putFirstAsText>
+360 L<prevTextNonBlankX|/prevText>
 
-361 L<putFirstAsTextNonBlankX|/putFirstAsText>
+361 L<prevTextX|/prevText>
 
-362 L<putFirstNonBlank|/putFirst>
+362 L<prevX|/prev>
 
-363 L<putFirstNonBlankX|/putFirst>
+363 L<printAttributes|/printAttributes>
 
-364 L<putLast|/putLast>
+364 L<printAttributesReplacingIdsWithLabels|/printAttributesReplacingIdsWithLabels>
 
-365 L<putLastAsText|/putLastAsText>
+365 L<printNode|/printNode>
 
-366 L<putLastAsTextNonBlank|/putLastAsText>
+366 L<props|/props>
 
-367 L<putLastAsTextNonBlankX|/putLastAsText>
+367 L<putFirst|/putFirst>
 
-368 L<putLastNonBlank|/putLast>
+368 L<putFirstAsText|/putFirstAsText>
 
-369 L<putLastNonBlankX|/putLast>
+369 L<putFirstAsTextNonBlank|/putFirstAsText>
 
-370 L<putNext|/putNext>
+370 L<putFirstAsTextNonBlankX|/putFirstAsText>
 
-371 L<putNextAsText|/putNextAsText>
+371 L<putFirstNonBlank|/putFirst>
 
-372 L<putNextAsTextNonBlank|/putNextAsText>
+372 L<putFirstNonBlankX|/putFirst>
 
-373 L<putNextAsTextNonBlankX|/putNextAsText>
+373 L<putLast|/putLast>
 
-374 L<putNextNonBlank|/putNext>
+374 L<putLastAsText|/putLastAsText>
 
-375 L<putNextNonBlankX|/putNext>
+375 L<putLastAsTextNonBlank|/putLastAsText>
 
-376 L<putPrev|/putPrev>
+376 L<putLastAsTextNonBlankX|/putLastAsText>
 
-377 L<putPrevAsText|/putPrevAsText>
+377 L<putLastNonBlank|/putLast>
 
-378 L<putPrevAsTextNonBlank|/putPrevAsText>
+378 L<putLastNonBlankX|/putLast>
 
-379 L<putPrevAsTextNonBlankX|/putPrevAsText>
+379 L<putNext|/putNext>
 
-380 L<putPrevNonBlank|/putPrev>
+380 L<putNextAsText|/putNextAsText>
 
-381 L<putPrevNonBlankX|/putPrev>
+381 L<putNextAsTextNonBlank|/putNextAsText>
 
-382 L<reindexNode|/reindexNode>
+382 L<putNextAsTextNonBlankX|/putNextAsText>
 
-383 L<renameAttr|/renameAttr>
+383 L<putNextNonBlank|/putNext>
 
-384 L<renameAttrValue|/renameAttrValue>
+384 L<putNextNonBlankX|/putNext>
 
-385 L<renew|/renew>
+385 L<putPrev|/putPrev>
 
-386 L<renewNonBlank|/renew>
+386 L<putPrevAsText|/putPrevAsText>
 
-387 L<renewNonBlankX|/renew>
+387 L<putPrevAsTextNonBlank|/putPrevAsText>
 
-388 L<replaceContentWith|/replaceContentWith>
+388 L<putPrevAsTextNonBlankX|/putPrevAsText>
 
-389 L<replaceContentWithMovedContent|/replaceContentWithMovedContent>
+389 L<putPrevNonBlank|/putPrev>
 
-390 L<replaceContentWithText|/replaceContentWithText>
+390 L<putPrevNonBlankX|/putPrev>
 
-391 L<replaceSpecialChars|/replaceSpecialChars>
+391 L<reindexNode|/reindexNode>
 
-392 L<replaceWith|/replaceWith>
+392 L<renameAttr|/renameAttr>
 
-393 L<replaceWithBlank|/replaceWithBlank>
+393 L<renameAttrValue|/renameAttrValue>
 
-394 L<replaceWithBlankNonBlank|/replaceWithBlank>
+394 L<renew|/renew>
 
-395 L<replaceWithBlankNonBlankX|/replaceWithBlank>
+395 L<renewNonBlank|/renew>
 
-396 L<replaceWithNonBlank|/replaceWith>
+396 L<renewNonBlankX|/renew>
 
-397 L<replaceWithNonBlankX|/replaceWith>
+397 L<replaceContentWith|/replaceContentWith>
 
-398 L<replaceWithRequiredCleanUp|/replaceWithRequiredCleanUp>
+398 L<replaceContentWithMovedContent|/replaceContentWithMovedContent>
 
-399 L<replaceWithText|/replaceWithText>
+399 L<replaceContentWithText|/replaceContentWithText>
 
-400 L<replaceWithTextNonBlank|/replaceWithText>
+400 L<replaceSpecialChars|/replaceSpecialChars>
 
-401 L<replaceWithTextNonBlankX|/replaceWithText>
+401 L<replaceWith|/replaceWith>
 
-402 L<requiredCleanUp|/requiredCleanUp>
+402 L<replaceWithBlank|/replaceWithBlank>
 
-403 L<restore|/restore>
+403 L<replaceWithBlankNonBlank|/replaceWithBlank>
 
-404 L<restoreX|/restore>
+404 L<replaceWithBlankNonBlankX|/replaceWithBlank>
 
-405 L<save|/save>
+405 L<replaceWithNonBlank|/replaceWith>
 
-406 L<set|/set>
+406 L<replaceWithNonBlankX|/replaceWith>
 
-407 L<setAttr|/setAttr>
+407 L<replaceWithRequiredCleanUp|/replaceWithRequiredCleanUp>
 
-408 L<singleChild|/singleChild>
+408 L<replaceWithText|/replaceWithText>
 
-409 L<singleChildNonBlank|/singleChild>
+409 L<replaceWithTextNonBlank|/replaceWithText>
 
-410 L<singleChildNonBlankX|/singleChild>
+410 L<replaceWithTextNonBlankX|/replaceWithText>
 
-411 L<singleChildX|/singleChild>
+411 L<requiredCleanUp|/requiredCleanUp>
 
-412 L<string|/string>
+412 L<restore|/restore>
 
-413 L<stringContent|/stringContent>
+413 L<restoreX|/restore>
 
-414 L<stringNode|/stringNode>
+414 L<save|/save>
 
-415 L<stringQuoted|/stringQuoted>
+415 L<set|/set>
 
-416 L<stringReplacingIdsWithLabels|/stringReplacingIdsWithLabels>
+416 L<setAttr|/setAttr>
 
-417 L<stringWithConditions|/stringWithConditions>
+417 L<singleChild|/singleChild>
 
-418 L<style|/style>
+418 L<singleChildNonBlank|/singleChild>
 
-419 L<swap|/swap>
+419 L<singleChildNonBlankX|/singleChild>
 
-420 L<swapNonBlank|/swap>
+420 L<singleChildX|/singleChild>
 
-421 L<swapNonBlankX|/swap>
+421 L<string|/string>
 
-422 L<swapX|/swap>
+422 L<stringContent|/stringContent>
 
-423 L<tag|/tag>
+423 L<stringNode|/stringNode>
 
-424 L<text|/text>
+424 L<stringQuoted|/stringQuoted>
 
-425 L<through|/through>
+425 L<stringReplacingIdsWithLabels|/stringReplacingIdsWithLabels>
 
-426 L<throughX|/throughX>
+426 L<stringWithConditions|/stringWithConditions>
 
-427 L<to|/to>
+427 L<style|/style>
 
-428 L<tocNumbers|/tocNumbers>
+428 L<swap|/swap>
 
-429 L<topicTypeAndBody|/topicTypeAndBody>
+429 L<swapNonBlank|/swap>
 
-430 L<tree|/tree>
+430 L<swapNonBlankX|/swap>
 
-431 L<type|/type>
+431 L<swapX|/swap>
 
-432 L<unwrap|/unwrap>
+432 L<tag|/tag>
 
-433 L<unwrapContentsKeepingText|/unwrapContentsKeepingText>
+433 L<text|/text>
 
-434 L<unwrapContentsKeepingTextNonBlank|/unwrapContentsKeepingText>
+434 L<through|/through>
 
-435 L<unwrapContentsKeepingTextNonBlankX|/unwrapContentsKeepingText>
+435 L<throughX|/throughX>
 
-436 L<unwrapContentsKeepingTextX|/unwrapContentsKeepingText>
+436 L<to|/to>
 
-437 L<unwrapNonBlank|/unwrap>
+437 L<tocNumbers|/tocNumbers>
 
-438 L<unwrapNonBlankX|/unwrap>
+438 L<topicTypeAndBody|/topicTypeAndBody>
 
-439 L<unwrapParentsWithSingleChild|/unwrapParentsWithSingleChild>
+439 L<tree|/tree>
 
-440 L<unwrapParentsWithSingleChildNonBlank|/unwrapParentsWithSingleChild>
+440 L<type|/type>
 
-441 L<unwrapParentsWithSingleChildNonBlankX|/unwrapParentsWithSingleChild>
+441 L<unwrap|/unwrap>
 
-442 L<unwrapParentsWithSingleChildX|/unwrapParentsWithSingleChild>
+442 L<unwrapContentsKeepingText|/unwrapContentsKeepingText>
 
-443 L<unwrapX|/unwrap>
+443 L<unwrapContentsKeepingTextNonBlank|/unwrapContentsKeepingText>
 
-444 L<up|/up>
+444 L<unwrapContentsKeepingTextNonBlankX|/unwrapContentsKeepingText>
 
-445 L<upNonBlank|/up>
+445 L<unwrapContentsKeepingTextX|/unwrapContentsKeepingText>
 
-446 L<upNonBlankX|/up>
+446 L<unwrapNonBlank|/unwrap>
 
-447 L<upTo|/upTo>
+447 L<unwrapNonBlankX|/unwrap>
 
-448 L<upToX|/upTo>
+448 L<unwrapParentsWithSingleChild|/unwrapParentsWithSingleChild>
 
-449 L<upWhile|/upWhile>
+449 L<unwrapParentsWithSingleChildNonBlank|/unwrapParentsWithSingleChild>
 
-450 L<upWhileX|/upWhile>
+450 L<unwrapParentsWithSingleChildNonBlankX|/unwrapParentsWithSingleChild>
 
-451 L<upX|/up>
+451 L<unwrapParentsWithSingleChildX|/unwrapParentsWithSingleChild>
 
-452 L<wrapContentWith|/wrapContentWith>
+452 L<unwrapX|/unwrap>
 
-453 L<wrapDown|/wrapDown>
+453 L<up|/up>
 
-454 L<wrapFrom|/wrapFrom>
+454 L<upNonBlank|/up>
 
-455 L<wrapFromX|/wrapFrom>
+455 L<upNonBlankX|/up>
 
-456 L<wrapTo|/wrapTo>
+456 L<upTo|/upTo>
 
-457 L<wrapToX|/wrapTo>
+457 L<upToX|/upTo>
 
-458 L<wrapUp|/wrapUp>
+458 L<upWhile|/upWhile>
 
-459 L<wrapWith|/wrapWith>
+459 L<upWhileX|/upWhile>
 
-460 L<xmlHeader|/xmlHeader>
+460 L<upX|/up>
+
+461 L<wrapContentWith|/wrapContentWith>
+
+462 L<wrapDown|/wrapDown>
+
+463 L<wrapFrom|/wrapFrom>
+
+464 L<wrapFromX|/wrapFrom>
+
+465 L<wrapTo|/wrapTo>
+
+466 L<wrapToX|/wrapTo>
+
+467 L<wrapUp|/wrapUp>
+
+468 L<wrapWith|/wrapWith>
+
+469 L<xmlHeader|/xmlHeader>
 
 =head1 Installation
 
@@ -11340,7 +11596,7 @@ __DATA__
 #Test::More->builder->output("/dev/null");                                       # Show only errors during testing - but this must be commented out for production
 use warnings FATAL=>qw(all);
 use strict;
-use Test::More tests=>660;
+use Test::More tests=>666;
 use Data::Table::Text qw(:all);
 
 sub sample1{my $x = Data::Edit::Xml::new(); $x->input = <<END; $x->parse}       # Sample test XML
@@ -14279,6 +14535,112 @@ END
  }
 
 if (1)
+ {my $a = Data::Edit::Xml::new(<<END);                                          #TputPrevRequiredCleanUp
+<a>
+  <b/>
+</a>
+END
+  my ($b) = @$a;                                                                #TputPrevRequiredCleanUp
+  $b->putPrevRequiredCleanUp(qq(cleanup required\n));                           #TputPrevRequiredCleanUp
+  ok -p $a eq <<END;                                                            #TputPrevRequiredCleanUp
+<a><required-cleanup>cleanup required
+</required-cleanup>
+  <b/>
+</a>
+END
+
+  $a->putPrevRequiredCleanUp(qq(more cleanup required\n));                      #TputPrevRequiredCleanUp
+  ok -p $a eq <<END;                                                            #TputPrevRequiredCleanUp
+<a><required-cleanup>more cleanup required
+</required-cleanup><required-cleanup>cleanup required
+</required-cleanup>
+  <b/>
+</a>
+END
+ }
+
+
+if (1)
+ {my $a = Data::Edit::Xml::new(<<END);                                          #Tinvert
+<a>
+  <b id="b">
+    <c id="c">
+      <d/>
+      <e/>
+    </c>
+  </b>
+</a>
+END
+
+  $a->first->invert;                                                            #Tinvert
+  ok -p $a eq <<END;                                                            #Tinvert
+<a>
+  <c id="c">
+    <b id="b">
+      <d/>
+      <e/>
+    </b>
+  </c>
+</a>
+END
+
+  $a->first->invert;                                                            #Tinvert
+  ok -p $a eq <<END;                                                            #Tinvert
+<a>
+  <b id="b">
+    <c id="c">
+      <d/>
+      <e/>
+    </c>
+  </b>
+</a>
+END
+ }
+
+if (1)
+ {my $a = Data::Edit::Xml::new(<<END);                                          #TinvertFirst #TinvertLast
+<a>
+  <b>
+    <c>
+      <d/>
+      <e/>
+    </c>
+    <f/>
+    <g/>
+  </b>
+</a>
+END
+
+  $a->first->invertFirst;
+  ok -p $a eq <<END;                                                            #TinvertFirst #TinvertLast
+<a>
+  <c>
+    <d/>
+    <e/>
+    <b>
+      <f/>
+      <g/>
+    </b>
+  </c>
+</a>
+END
+
+  $a->first->invertLast;
+  ok -p $a eq <<END;                                                            #TinvertLast
+<a>
+  <b>
+    <c>
+      <d/>
+      <e/>
+    </c>
+    <f/>
+    <g/>
+  </b>
+</a>
+END
+ }
+
+if (1)
  {my $a = Data::Edit::Xml::new(<<END);                                          #TmergeDuplicateChildWithParent #TsingleChild
 <a>
   <b   id="b" b="bb">
@@ -14296,6 +14658,7 @@ END
   <b b="bb" c="cc" id="b"/>
 </a>
 END
+
   ok $b == $a->singleChild;                                                     #TmergeDuplicateChildWithParent #TsingleChild
  }
 
@@ -14356,7 +14719,7 @@ END
  }
 
 if (1)
- {my $x = Data::Edit::Xml::new(<<END);                                          #ThtmlHeadersToSections #TdivideIntoSections
+ {my $x = Data::Edit::Xml::new(<<END);                                          #ThtmlHeadersToSections #TdivideDocumentIntoSections
 <x>
 <h1>h1</h1>
   H1

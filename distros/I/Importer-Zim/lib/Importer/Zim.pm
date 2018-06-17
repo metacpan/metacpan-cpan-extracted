@@ -1,7 +1,7 @@
 
 package Importer::Zim;
-$Importer::Zim::VERSION = '0.9.2';
-# ABSTRACT: Import functions à la Invader Zim
+$Importer::Zim::VERSION = '0.10.1';
+# ABSTRACT: Import functions without namespace pollution
 
 use 5.010001;
 use warnings;
@@ -15,6 +15,21 @@ BEGIN {
     *DEFAULT_BACKEND = sub () {$v};
 }
 
+my %MIN_VERSION = do {
+    my %v = (
+        '+Lexical'    => '0.10.0',
+        '+EndOfScope' => '0.5.0',
+        '+Unit'       => '0.6.0',
+        '+Bogus'      => '0.12.0',
+    );
+    /^\+/ and $v{ _backend_class($_) } = $v{$_} for keys %v;
+    %v;
+};
+
+sub backend { _backend( ref $_[2] eq 'HASH' ? $_[2]{-how} // '' : '' ) }
+
+sub export_to { goto &{ __PACKAGE__->backend->can('export_to') } }
+
 sub import {    # Load +Base if import() is called
     require Importer::Zim::Base;
     Importer::Zim::Base->VERSION('0.12.1');
@@ -23,45 +38,26 @@ sub import {    # Load +Base if import() is called
     goto &_import;
 }
 
-sub _import {
-    unshift @_, shift->backend(@_);
-    goto &Importer::Zim::Base::import_into;
-}
+sub _backend_class { $_[0] =~ s/^\+// ? __PACKAGE__ . '::' . $_[0] : $_[0] }
 
-my %MIN_VERSION = do {
-    my %v = (
-        '+Lexical'    => '0.10.0',
-        '+EndOfScope' => '0.5.0',
-        '+Unit'       => '0.6.0',
-        '+Bogus'      => '0.12.0',
-    );
-    /^\+/ and $v{ backend_class($_) } = $v{$_} for keys %v;
-    %v;
-};
-
-sub backend_class {
-    my $how = shift;
-    return ( $how =~ s/^\+// )
-      ? ( __PACKAGE__ . '::' . $how )
-      : $how;
-}
-
-sub backend {
-    my @how = split ',',
-      ( ( ref $_[2] eq 'HASH' ? $_[2]->{-how} : undef ) // DEFAULT_BACKEND );
+sub _backend {
+    state $BACKEND_FOR;
+    return $BACKEND_FOR->{ $_[0] } if exists $BACKEND_FOR->{ $_[0] };
+    my @how = split ',', length $_[0] ? $_[0] : DEFAULT_BACKEND;
     for my $how (@how) {
-        my $backend = backend_class($how);
+        my $backend = _backend_class($how);
         my @version
           = exists $MIN_VERSION{$backend} ? ( $MIN_VERSION{$backend} ) : ();
         my $mod = eval { &Module::Runtime::use_module( $backend, @version ) };
         _trace_backend( $mod, $backend, @version ) if DEBUG;
-        return $mod if $mod;
+        return $BACKEND_FOR->{ $_[0] } = $mod if $mod;
     }
     croak qq{Can't load any backend};
 }
 
-sub export_to {
-    goto &{ __PACKAGE__->backend->can('export_to') };
+sub _import {
+    unshift @_, shift->backend(@_);
+    goto &Importer::Zim::Base::import_into;
 }
 
 sub _trace_backend {
@@ -75,7 +71,7 @@ sub _trace_backend {
     carp qq{Loaded "$backend"$rv ($v) backend};
 }
 
-no Importer::Zim::Utils qw(DEBUG carp);
+no Importer::Zim::Utils qw(DEBUG carp croak);
 
 1;
 
@@ -99,13 +95,15 @@ no Importer::Zim::Utils qw(DEBUG carp);
 #pod      – Zim
 #pod
 #pod This pragma imports subroutines from other modules in a clean way.
-#pod "Clean imports" here mean that the import symbols are available
-#pod only at some scope.
+#pod "Clean imports" here mean that the imported symbols will
+#pod be available for compilation and will not pollute
+#pod the user namespace at runtime.
 #pod
 #pod L<Importer::Zim> relies on pluggable backends which give a precise
-#pod meaning to "available at some scope". For example,
-#pod L<Importer::Zim::Lexical> creates lexical subs that go away
-#pod as soon the lexical scope ends.
+#pod meaning to "clean imports". For example,
+#pod L<Importer::Zim::Lexical> uses lexical subs that are bound
+#pod to the surrounding lexical scope and never touch the target
+#pod namespace.
 #pod
 #pod By default, L<Importer::Zim> looks at package variables
 #pod C<@EXPORT>, C<@EXPORT_OK> and C<%EXPORT_TAGS> to decide
@@ -154,7 +152,7 @@ no Importer::Zim::Utils qw(DEBUG carp);
 #pod =head1 DEBUGGING
 #pod
 #pod You can set the C<IMPORTER_ZIM_DEBUG> environment variable
-#pod for get some diagnostics information printed to C<STDERR>.
+#pod to get some diagnostics information printed to C<STDERR>.
 #pod
 #pod     IMPORTER_ZIM_DEBUG=1
 #pod
@@ -178,11 +176,11 @@ __END__
 
 =head1 NAME
 
-Importer::Zim - Import functions à la Invader Zim
+Importer::Zim - Import functions without namespace pollution
 
 =head1 VERSION
 
-version 0.9.2
+version 0.10.1
 
 =head1 SYNOPSIS
 
@@ -202,13 +200,15 @@ version 0.9.2
      – Zim
 
 This pragma imports subroutines from other modules in a clean way.
-"Clean imports" here mean that the import symbols are available
-only at some scope.
+"Clean imports" here mean that the imported symbols will
+be available for compilation and will not pollute
+the user namespace at runtime.
 
 L<Importer::Zim> relies on pluggable backends which give a precise
-meaning to "available at some scope". For example,
-L<Importer::Zim::Lexical> creates lexical subs that go away
-as soon the lexical scope ends.
+meaning to "clean imports". For example,
+L<Importer::Zim::Lexical> uses lexical subs that are bound
+to the surrounding lexical scope and never touch the target
+namespace.
 
 By default, L<Importer::Zim> looks at package variables
 C<@EXPORT>, C<@EXPORT_OK> and C<%EXPORT_TAGS> to decide
@@ -257,7 +257,7 @@ Read also L<Importer::Zim::Cookbook/WHICH BACKEND?>.
 =head1 DEBUGGING
 
 You can set the C<IMPORTER_ZIM_DEBUG> environment variable
-for get some diagnostics information printed to C<STDERR>.
+to get some diagnostics information printed to C<STDERR>.
 
     IMPORTER_ZIM_DEBUG=1
 

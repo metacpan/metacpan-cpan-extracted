@@ -16,7 +16,7 @@ use constant IS_CYGWIN => $^O =~ /cygwin/i;
 use constant IS_WIN32ish => &IS_WIN32 || &IS_CYGWIN;
 
 our @ISA = qw(Exporter);
-our $VERSION = '0.93';
+our $VERSION = '0.94';
 our @EXPORT_OK = qw(Ctime is_number isValidPid pause qualify_sub_name shquote
 		    is_socket is_pipe IS_WIN32 IS_CYGWIN okl DEVNULL DEVTTY);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
@@ -104,9 +104,11 @@ sub isValidPid {
     }
     return 0 if !defined($pid) || !is_number($pid);
     if (&IS_WIN32) {
-	# -200000 is too high to be a pseudo-process id on Windows?
+        # cpantesters.org/cpan/report/63eac3f0-6dd0-1014-86c2-87c612744995:
+        # v0.94 raised FIRST_DEFERRED_ID from -500_000 to -1_100_000
+        #
 	# also see &Forks::Super::Deferred::FIRST_DEFERRED_ID
-	return $pid > 0 || ($pid > -200000 && $pid <= -2);
+	return $pid > 0 || ($pid > -1000000 && $pid <= -2);
     } else {
 	return $pid > 0;
     }
@@ -395,7 +397,7 @@ Forks::Super::Util - utility routines for Forks::Super module
 
 =head1 VERSION
 
-0.93
+0.94
 
 =head1 SYNOPSIS
 

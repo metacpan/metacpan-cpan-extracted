@@ -3,6 +3,8 @@ use strict;
 use warnings;
 
 use Dancer ':syntax';
+use File::Basename;
+use lib dirname(__FILE__) . "/lib";
 
 # XXX appdir is set to the path of the current test
 use Dancer::Test appdir => path($0);

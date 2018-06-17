@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie;
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 use Exporter;
 use parent 'Exporter';
@@ -14,8 +14,8 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 use parent 'Date::Easy::Datetime';
 
 use Carp;
-use Time::Local;
 use Scalar::Util 'blessed';
+use Time::Local 1.26, qw< timegm_modern >;
 
 
 ##############################
@@ -43,10 +43,12 @@ sub date
 	}
 	else
 	{
-		my ($d, $m, $y) = _strptime($date);
+		my (undef,undef,undef, $d, $m, $y)								# ignore first 3 values (time portion)
+			= Date::Easy::Datetime::_strptime($date, 'local');			# remember: parse as local, store as UTC
 		if (defined $y)													# they're either all defined, or it's bogus
 		{
-			return Date::Easy::Date->new($y, $m, $d);
+			# return value from _strptime for month is still in the funky 0 - 11 range
+			return Date::Easy::Date->new($y, $m + 1, $d);
 		}
 		else
 		{
@@ -59,68 +61,6 @@ sub date
 }
 
 sub today () { Date::Easy::Date->new }
-
-
-sub _strptime
-{
-	require Date::Parse;
-	# Most of this code is stolen from Date::Parse, by Graham Barr.
-	#
-	# In an ideal world, I would just use the code from there and not repeat it here.  However, the
-	# problem is that str2time() calls strptime() to generate the pieces of a datetime, then does
-	# some validation, then returns epoch seconds by calling timegm (from Time::Local) on it.  I
-	# don't _want_ to call str2time because I'm just going to take the epoch seconds and turn them
-	# back into pieces, so it's inefficicent.  But more importantly I _can't_ call str2time because
-	# it converts to UTC, and I want the pieces as they are relative to whatever timezone the
-	# parsed date has.
-	#
-	# On the other hand, the problem with calling strptime directly is that str2time is doing two
-	# things there: the conversion to epoch seconds, which I don't want or need, and the validation,
-	# which, it turns out, I *do* want, and need.  For instance, strptime will happily return a
-	# month of -1 if it hits a parsing hiccough.  Which then strftime will turn into undef, as you
-	# would expect.  But, if you're just calling strptime, that doesn't help you much. :-(
-	#
-	# Thus, I'm left with 3 possibilities, none of them very palatable:
-	# 	#	call strptime, then call str2time as well
-	#	#	repeat at least some of the code from str2time here
-	#	#	do Something Devious, like wrap/monkey-patch strptime
-	# #1 doesn't seem practical, because it means that every string that has to be parsed this way
-	# has to be parsed twice, meaning it will take twice as long.  #3 seems too complex--since the
-	# call to strptime is out of my control, I can't add arguments to it, or get any extra data out
-	# of it, which means I have to store things in global variables, which means it wouldn't be
-	# reentrant ... it would be a big mess.  So #2, unpalatable as it is, is what we're going with.
-	#
-	# Of course, this gives me the opportunity to tweak a few things.  For instance, we can tweak
-	# the year value to fix RT/105031 (noted below).  Also, since this is only used by our ::Date
-	# class, we don't give a crap about times or timezones, so we can totally ignore those parts.
-	# (Well, *almost* totally: we still want to verify that we're getting valid values for them.)
-	# Which makes this code actually much smaller than its Date::Parse equivalent.
-	#
-	# On top of that, this is a tiny bit more efficient.
-
-	my ($str) = @_;
-
-	# don't really care about seconds, minutes, or hours, but need to verify them
-	# don't care about timezone at all
-	my ($ss,$mm,$hh, $day, $month, $year, undef) = Date::Parse::strptime($str);
-	my $num_defined = defined($day) + defined($month) + defined($year);
-	return undef if $num_defined == 0;
-	if ($num_defined < 3)
-	{
-		my @lt  = localtime(time);
-
-		$month = $lt[4] unless defined $month;
-		$day  = $lt[3] unless defined $day;
-		$year = ($month > $lt[4]) ? ($lt[5] - 1) : $lt[5] unless defined $year;
-	}
-	$year += 1900; ++$month;											# undo timelocal's funkiness
-																		# (this also corrects RT/105031)
-
-	return undef unless $month >= 1 and $month <= 12 and $day >= 1 and $day <= 31;
-	# we don't actually care about the hours/mins/secs, but if they're illegal, we should still fail
-	return undef unless ($hh || 0) <= 23 and ($mm || 0) <= 59 and ($ss || 0) <= 59;
-	return ($day, $month, $year);
-}
 
 
 sub _parsedate
@@ -178,13 +118,13 @@ sub new
 		}
 		else
 		{
-			($d, $m, $y) = (localtime $time)[3..5];	# `Date`s are parsed relative to local time ...
-			$y += 1900;								# (timelocal/timegm does odd things w/ 2-digit dates)
+			($d, $m, $y) = (localtime $time)[3..5];						# `Date`s are parsed relative to local time ...
+			$y += 1900;			# (no 2-digit dates allowed!)
 		}
 	}
 
 	my $truncated_date =
-			eval { timegm( 0,0,0, $d,$m,$y ) };		# ... but stored as UTC
+			eval { timegm_modern( 0,0,0, $d,$m,$y ) };					# ... but stored as UTC
 	croak("Illegal date: $y/" . ($m + 1) . "/$d") unless defined $truncated_date;
 	return $class->_mkdate($truncated_date);
 }
@@ -243,7 +183,7 @@ Date::Easy::Date - easy date class
 
 =head1 VERSION
 
-This document describes version 0.05 of Date::Easy::Date.
+This document describes version 0.06 of Date::Easy::Date.
 
 =head1 SYNOPSIS
 
@@ -298,9 +238,8 @@ the time portion and constructs a date object with the remainder.
 =head3 Date::Easy::Date->new($y, $m, $d)
 
 Takes the given year, month, and day, and turns it into a date object.  Month and day are
-human-centric (i.e., 1-based, not 0-based).  Year should probably be a 4-digit year; if you pass in
-a 2-digit year, you get whatever century C<timegm> thinks you should get, which may or may not be
-what you expected.
+human-centric (i.e., 1-based, not 0-based).  Year should be a 4-digit year; if you pass in a 2-digit
+year, you get a year bewteen 1900 and 1999, even if you use the last 2 digits of the current year.
 
 =head3 Date::Easy::Date->new($obj)
 
@@ -419,14 +358,15 @@ via C<date>.  That range is 26-Apr-1970 17:46:40 to 2-Dec-1970 15:33:19.
 
 Any timezone portion specified in a string passed to C<date> is completely ignored.
 
-Because dates I<don't> have the same bug with 4-digit years that are 50+ years old that datetimes
-do, they have a different bug instead.  If you pass a 2-digit year to `date` and it gets handled by
-L<Date::Parse>, it will always come back in the 20th century:
+If you pass a 2-digit year to `date`, it will always come back in the 20th century:
 
     say date("2/1/17"); # Thu Feb  1 00:00:00 1917
 
-Avoiding this is simple: always use 4-digit dates (which is a good habit to get into anyway).  Given
-the choice between the two bugs, this was considered the lesser of two weevils.
+Avoiding this is simple: always use 4-digit dates (which is a good habit to get into anyway).  This
+could be considered a bug, since Time::Local uses a 50-year sliding window, which I<might> be
+considered to be more correct behavior.  However, by suffering this "bug," we avoid a bigger one
+(see L<RT/53413|https://rt.cpan.org/Public/Bug/Display.html?id=53413> and
+L<RT/105031|https://rt.cpan.org/Public/Bug/Display.html?id=105031>).
 
 See also L<Date::Easy/"Limitations">.
 

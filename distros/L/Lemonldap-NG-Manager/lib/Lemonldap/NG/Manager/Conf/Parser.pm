@@ -912,6 +912,12 @@ sub _unitTest {
     my $attrs = &Lemonldap::NG::Manager::Attributes::attributes();
     my $res   = 1;
     foreach my $key ( keys %$conf ) {
+        if (    $self->{skippedUnitTests}
+            and $self->{skippedUnitTests} =~ /\b$key\b/ )
+        {
+            $self->lmLog( "Ignore test for $key", 'debug' );
+            next;
+        }
         hdebug("Testing $key");
         my $attr = $attrs->{$key};
         my $type = $types->{ $attr->{type} };
@@ -1046,6 +1052,12 @@ sub _globalTest {
     my $result = 1;
     my $tests  = &Lemonldap::NG::Manager::Conf::Tests::tests( $self->newConf );
     foreach my $name ( keys %$tests ) {
+        if (    $self->{skippedGlobalTests}
+            and $self->{skippedGlobalTests} =~ /\b$name\b/ )
+        {
+            $self->lmLog( "Ignore test for $name", 'debug' );
+            next;
+        }
         my $sub = $tests->{$name};
         my ( $res, $msg );
         eval {

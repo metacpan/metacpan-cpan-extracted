@@ -13,7 +13,7 @@ use Fcntl qw(:seek);	   ##-- for rewinding
 use Carp qw(confess);
 use strict;
 
-our $VERSION = '1.23.7';
+our $VERSION = '1.23.8';
 our @ISA = ('PDL::Exporter');
 our @EXPORT_OK =
   (
@@ -233,7 +233,7 @@ sub ccs_readmm {
   my $nnz  = pop(@dims);
 
   ##-- update ccs header if required
-  my $mmdims = pdl(ccs_indx,\@dims);
+  my $mmdims = pdl(ccs_indx(),\@dims);
   if (defined($header->{pdims}) && ($header->{pdims}->nelem != $mmdims->nelem || !all($header->{pdims}==$mmdims))) {
     $header->{pdims} = $mmdims;
     $header->{vdims} = undef;

@@ -1,3 +1,5 @@
+use warnings;
+use strict;
 use ExtUtils::MakeMaker;
 
 my $meta_merge = {
@@ -23,6 +25,8 @@ WriteMakefile(
         'Log::Log4perl' => 0,
         'IPC::Run'      => 0,
         'File::Which'   => 0,
+        'Test::Simple'  => 1.302073 # default for perl 5.8.9,
+                                    # we require Test::More::is_deeply
     },
     $ExtUtils::MakeMaker::VERSION >= 6.50 ? (%$meta_merge) : (),
     (

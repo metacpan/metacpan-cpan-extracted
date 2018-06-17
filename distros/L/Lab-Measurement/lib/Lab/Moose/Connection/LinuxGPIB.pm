@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::LinuxGPIB;
-$Lab::Moose::Connection::LinuxGPIB::VERSION = '3.651';
+$Lab::Moose::Connection::LinuxGPIB::VERSION = '3.652';
 #ABSTRACT: Connection back end to the LinuxGpib library and kernel drivers
 
 
@@ -300,7 +300,7 @@ Lab::Moose::Connection::LinuxGPIB - Connection back end to the LinuxGpib library
 
 =head1 VERSION
 
-version 3.651
+version 3.652
 
 =head1 SYNOPSIS
 

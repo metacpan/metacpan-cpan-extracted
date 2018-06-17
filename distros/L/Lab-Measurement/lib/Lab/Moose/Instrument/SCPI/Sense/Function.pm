@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Sense::Function;
-$Lab::Moose::Instrument::SCPI::Sense::Function::VERSION = '3.651';
+$Lab::Moose::Instrument::SCPI::Sense::Function::VERSION = '3.652';
 #ABSTRACT: Role for the SCPI SENSe:FUNCtion subsystem
 
 use Moose::Role;
@@ -29,6 +29,26 @@ sub sense_function {
     return $self->cached_sense_function($value);
 }
 
+
+cache sense_function_concurrent => ( getter => 'sense_function_concurrent' );
+
+sub sense_function_concurrent_query {
+    my ( $self, $channel, %args ) = validated_channel_getter( \@_ );
+
+    my $value = $self->query( command => "SENS${channel}:FUNC:CONC?", %args );
+    return $self->cached_sense_function_concurrent($value);
+}
+
+sub sense_function_concurrent {
+    my ( $self, $channel, $value, %args ) = validated_channel_setter(
+        \@_,
+        value => { isa => 'Bool' }
+    );
+
+    $self->write( command => "SENS${channel}:FUNC:CONC $value", %args );
+    return $self->cached_sense_function_concurrent($value);
+}
+
 1;
 
 __END__
@@ -43,7 +63,7 @@ Lab::Moose::Instrument::SCPI::Sense::Function - Role for the SCPI SENSe:FUNCtion
 
 =head1 VERSION
 
-version 3.651
+version 3.652
 
 =head1 METHODS
 
@@ -53,12 +73,17 @@ version 3.651
 
 Query/Set the function used by the instrument.
 
+=head2 sense_function_concurrent_query/sense_function_concurrent
+
+Set/Get concurrent property of sensor block. Allowed values: C<0> or C<1>.
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
+            2018       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

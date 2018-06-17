@@ -1,4 +1,16 @@
 Revision history for Perl extension Test::WWW::Simple.
+0.38   Fri Jun 15 21:46:34 PDT 2018
+    - ONE MORE backticked string invoking a Perl script.
+0.37   Fri Jun 15 00:14:35 PST 2018
+    - Fix a few more tests that used backticks to execute a Perl
+      script without `$^X`.
+    - Remove a redundant POD coverage test.
+0.36   Thu Jun 14 17:04:23 PST 2018
+    - Remove references to `perl` in the tests; replace with `$^X`.
+0.35   Thu Jun 14 11:30:00 PST 2018
+    - Add prereq for LWP::Protocol::https to reflect shift to primarily
+      https connections for sites.
+    - Rework tests to pass after Mojolicious PI changes.
 0.34   Fri Jan 25 19:11:49 PST 2013
     - update Mojolicious::Lite invocation to match current Mojolicious.
     - proper Meta.yml for CPANTS

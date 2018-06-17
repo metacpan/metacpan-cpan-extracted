@@ -18,6 +18,7 @@ $| ++;
 
     Version 'release-x.x.x' and 'rollback:release-x.x.x' are the same
     Version backup refers to the $link.backup
+    Version backup\d* refers to the $link.backup\d*
 
 =cut
 

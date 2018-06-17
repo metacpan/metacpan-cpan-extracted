@@ -21,6 +21,7 @@ if ($^O eq 'MSWin32') {
 }
 
 my $pid = fork sub { sleep 5 };
+
 my $base_priority = get_os_priority($pid);
 my $np = Forks::Super::Config::CONFIG_module("Sys::CpuAffinity")
     ? Sys::CpuAffinity::getNumCpus() : 0;

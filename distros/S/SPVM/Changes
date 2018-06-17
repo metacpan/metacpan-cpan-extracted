@@ -1,3 +1,60 @@
+0.0349 2018-06-15
+  - rename SPVM::Build::Base to SPVM::Build::CBuilder
+  - rename SPVM::Build::Native to SPVM::Build::CBuilder::Native
+  - rename SPVM::Build::Precompile to SPVM::Build::CBuilder::Precompile
+  - rename SPVM::Build::SPVMInfo to SPVM::Build::Info
+  - fix dynamic link library c func names
+0.0348 2018-06-15
+  - add SPVM::Build::Setting
+    
+    This module is to do setting ExtUtils::CBuilder. ExtUtils::CBuilder is used for native compile and precompile.
+  - fix config path bug
+  - add runtime allocator again to check objects count.
+      spvm_runtime_allocator.h
+      spvm_runtime_allocator.c
+  - fix native function name set_object_array_element, get_object_array_element. this name was wrong by wrong replacing.
+  - fix weaken memory broken bug
+  - add C/C++ struct/class binding features
+      add Native interface new_struct and get_struct
+      new_struct create object which have C/C++ struct/class
+      get_struct get struct/class from SPVM object
+0.0347 2018-06-13
+  - fix bug : [rt.cpan.org #125541] System perl used in build process
+    
+    I receive a advice
+    
+      "
+       It seems that the system perl is used here (/usr/bin/perl),
+       not the perl used for building the distribution. Typically this can 
+       be fixed by using something like $^X.
+      "
+    
+    This bug is fixed by using $^X.
+0.0346 2018-06-12
+  - fix Makefile.PL native and precompile make rule bug
+    
+    The following output become printed to Makefile
+    
+      dynamic :: spvm_native_SPVM__Example  
+
+      spvm_native_SPVM__Example  :: blib/lib/SPVM/Example.native/Example.so
+
+      blib/lib/SPVM/Example.native/Example.so :: lib/SPVM/Example.native/Example.c lib/SPVM/Example.spvm
+
+      	perl -Mblib -MSPVM::Build -e "SPVM::Build->new(build_dir => 'spvm_build')->create_shared_lib_native_dist('SPVM::Example')"
+
+      dynamic :: spvm_precompile_SPVM__Example  
+
+      spvm_precompile_SPVM__Example  :: blib/lib/SPVM/Example.precompile/Example.so
+
+      blib/lib/SPVM/Example.precompile/Example.so :: lib/SPVM/Example.spvm
+
+      	perl -Mblib -MSPVM::Build -e "SPVM::Build->new(build_dir => 'spvm_build')->create_shared_lib_precompile_dist('SPVM::Example')"
+
+  - fix INT64_MIN bugs
+    In native function, -9223372036854775808LL is changed to -9223372036854775808ULL
+  - fix INT32_MIN bugs
+    In native function, -2147483648L is changed to -2147483648UL
 0.0345 2018-06-12
   - Support precompile subroutine in distribution
     In this version, spvm subroutine can be precompiled before runtime.

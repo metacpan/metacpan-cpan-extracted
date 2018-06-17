@@ -163,6 +163,11 @@ sub run
  
                      );
                   },
+                  on_error => sub{
+                      undef $hdl;
+                      $cv->end;
+                      $work->();
+                  },
                   on_eof => sub{
                       undef $hdl;
                       $cv->end;

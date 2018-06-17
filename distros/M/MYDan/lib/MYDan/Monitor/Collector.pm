@@ -82,6 +82,11 @@ sub run
                          sub { $result{$node} .= $_[1];}
                      );
                   },
+                  on_error => sub{
+                      undef $hdl;
+                      $cv->end;
+                      $work->();
+                  },
                   on_eof => sub{
                       undef $hdl;
                       $cv->end;

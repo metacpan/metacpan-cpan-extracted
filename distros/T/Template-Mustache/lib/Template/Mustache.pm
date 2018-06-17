@@ -1,7 +1,7 @@
 package Template::Mustache;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Drawing Mustaches on Perl for fun and profit
-$Template::Mustache::VERSION = '1.3.0';
+$Template::Mustache::VERSION = '1.3.1';
 use 5.12.0;
 
 use Moo;
@@ -382,7 +382,7 @@ Template::Mustache - Drawing Mustaches on Perl for fun and profit
 
 =head1 VERSION
 
-version 1.3.0
+version 1.3.1
 
 =head1 SYNOPSIS
 

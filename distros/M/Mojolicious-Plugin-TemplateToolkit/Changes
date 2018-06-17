@@ -1,3 +1,7 @@
+0.003     2018-06-14 17:45:49 EDT
+  - Removed randomly failing OUTLINE_TAG test
+  - Fix rendering and including empty data templates
+
 0.002     2015-10-20 20:03:54 EDT
   - Added Template::Provider::Mojo to resolve templates using
     Mojolicious::Renderer directly

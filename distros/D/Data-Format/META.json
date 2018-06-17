@@ -1,0 +1,77 @@
+{
+   "abstract" : "Perl module to format data",
+   "author" : [
+      "Israel Costa <israel.batista@univem.edu.br>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Format",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Simple" : "1.302136"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "v1.3.8",
+            "POSIX" : "v1.7.6",
+            "Scalar::Util" : "v1.5.0",
+            "aliased" : "v0.3.4"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Format" : {
+         "file" : "lib/Data/Format.pm",
+         "version" : "0.2"
+      },
+      "Data::Format::Error" : {
+         "file" : "lib/Data/Format/Error.pm",
+         "version" : "0.2"
+      },
+      "Data::Format::Error::ValueNumericException" : {
+         "file" : "lib/Data/Format/Error/ValueNumericException.pm",
+         "version" : "0.2"
+      },
+      "Data::Format::Error::ValueProvideException" : {
+         "file" : "lib/Data/Format/Error/ValueProvideException.pm",
+         "version" : "0.2"
+      },
+      "Data::Format::Sanitize" : {
+         "file" : "lib/Data/Format/Sanitize.pm",
+         "version" : "0.2"
+      },
+      "Data::Format::Sanitize::Number" : {
+         "file" : "lib/Data/Format/Sanitize/Number.pm",
+         "version" : "0.2"
+      },
+      "Data::Format::Validate" : {
+         "file" : "lib/Data/Format/Validate.pm",
+         "version" : "0.2"
+      },
+      "Data::Format::Validate::Number" : {
+         "file" : "lib/Data/Format/Validate/Number.pm",
+         "version" : "0.2"
+      },
+      "Data::Format::Validate::String" : {
+         "file" : "lib/Data/Format/Validate/String.pm",
+         "version" : "0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ]
+   },
+   "version" : "0.2",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

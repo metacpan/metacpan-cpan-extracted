@@ -14,15 +14,15 @@ use Geo::StreetAddress::US;
 
 =head1 NAME
 
-Geo::Coder::US::Census - Provides a Geo-Coding functionality for the US using http:://geocoding.geo.census.gov
+Geo::Coder::US::Census - Provides a Geo-Coding functionality for the US using L<https://geocoding.geo.census.gov>
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -212,7 +212,7 @@ sub run {
 
 Nigel Horne <njh@bandsman.co.uk>
 
-Based on L<Geo::Coder::Coder::Googleplaces>.
+Based on L<Geo::Coder::GooglePlaces>.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

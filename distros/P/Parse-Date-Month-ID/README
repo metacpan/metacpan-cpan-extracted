@@ -1,0 +1,75 @@
+NAME
+    Parse::Date::Month::ID - Parse month name from Indonesian text
+
+VERSION
+    This document describes version 0.001 of Parse::Date::Month::ID (from
+    Perl distribution Parse-Date-Month-ID), released on 2018-06-16.
+
+SYNOPSIS
+     use Parse::Date::Month::ID qw(parse_date_month_id);
+
+     my $m = parse_date_month_id(text => "sept"); # 9
+     $m = parse_date_month_id(text => "mars"); # undef
+
+DESCRIPTION
+    The goal of this module is to parse month names commonly found in
+    Indonesian text. It currently parses abbreviated and full month names in
+    Indonesian as well as English, since English date are also mixed in
+    Indonesian text.
+
+VARIABLES
+    None are exported by default, but they are exportable.
+
+  $Pat
+    A regex.
+
+FUNCTIONS
+  parse_date_month_id
+    Usage:
+
+     parse_date_month_id(%args) -> any
+
+    Parse month name from Indonesian text.
+
+    Returns undef when month name is unrecognized.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   text* => *str*
+
+        The input text that contains month name.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Parse-Date-Month-ID>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Parse-Date-Month-ID>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Parse-Date-Month-ID>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    A more full-fledged Indonesian date parsing module:
+    DateTime::Format::Alami::ID, with more dependencies.
+
+    Somewhat related: Parse::Number::ID
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

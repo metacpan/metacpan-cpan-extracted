@@ -8,7 +8,10 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Simple-to-use Abstraction of Encrypted Authenticated Messages",
-  "AUTHOR" => "J. Maslak <jmaslak\@antelope.net>",
+  "AUTHOR" => "Joelle Maslak <jmaslak\@antelope.net>",
+  "BUILD_REQUIRES" => {
+    "Test::UseAllModules" => "0.17"
+  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -31,9 +34,10 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Test2::Bundle::Extended" => "0.000058"
+    "Test2::Bundle::Extended" => "0.000058",
+    "Test::UseAllModules" => "0.17"
   },
-  "VERSION" => "1.003",
+  "VERSION" => "1.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,6 +53,7 @@ my %FallbackPrereqs = (
   "Moose::Util::TypeConstraints" => 0,
   "Storable" => 0,
   "Test2::Bundle::Extended" => "0.000058",
+  "Test::UseAllModules" => "0.17",
   "autodie" => 0,
   "feature" => 0,
   "namespace::autoclean" => 0,

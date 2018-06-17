@@ -27,7 +27,7 @@ $| = 1;
 our @EXPORT = qw(fork wait waitall waitpid BG_QX BG_EVAL
                  PREFORK POSTFORK POSTFORK_CHILD POSTFORK_PARENT);
 my @export_ok_func = qw(isValidPid pause Time read_stdout read_stderr
-			getc_stdout getc_stderr
+			getc_stdout getc_stderr pmap pgrep
                         bg_eval bg_qx  open2 open3);
 my @export_ok_vars = qw(%CHILD_STDOUT %CHILD_STDERR %CHILD_STDIN);
 our @EXPORT_OK = (@export_ok_func, @export_ok_vars);
@@ -39,7 +39,7 @@ our %EXPORT_TAGS =
       'filehandles'  => [ @export_ok_vars, @EXPORT ],
       'vars'         => [ @export_ok_vars, @EXPORT ],
       'all'          => [ @EXPORT_OK, @EXPORT ] );
-our $VERSION = '0.93';
+our $VERSION = '0.94';
 
 our $SOCKET_READ_TIMEOUT = 0.05;  # seconds
 our $MAIN_PID;
@@ -368,7 +368,7 @@ sub Forks::Super::Impl::_fork {
 	    } else {
 		return $job->{pid};
 	    }
-	} else {
+	} else {  # BLOCK
 	    pause();
 	}
     }
@@ -460,7 +460,6 @@ sub write_stdin {
 #
 sub read_stdout {
     goto &Forks::Super::Job::read_stdout;
-#    return Forks::Super::Job::read_stdout(@_);
 }
 
 #
@@ -468,22 +467,18 @@ sub read_stdout {
 #
 sub read_stderr {
     goto &Forks::Super::Job::read_stderr;
-#   return Forks::Super::Job::read_stderr(@_);
 }
 
 sub getc_stdout {
     goto &Forks::Super::Job::getc_stdout;
-#    return Forks::Super::Job::getc_stdout(@_);
 }
 
 sub getc_stderr {
     goto &Forks::Super::Job::getc_stderr;
-#    return Forks::Super::Job::getc_stderr(@_);
 }
 
 sub close_fh {
     goto &Forks::Super::Job::close_fh;
-#    return Forks::Super::Job::close_fh(@_);
 }
 
 ######################################################################
@@ -718,6 +713,86 @@ sub open3 {
 	    $pid, $job);
 }
 
+sub pmap (&@) {
+    my ($code,@list) = @_;
+    my %opts = ();
+    if (@list > 0 && ref($list[0]) eq 'HASH') {
+        %opts = %{shift @list};
+    }
+    my @pmap = [] x @list;
+    my @jobs;
+    my %disposed = ();
+    for (my $i=0; $i<@list; $i++) {
+        my @result;
+        local $_ = $list[$i];
+        push @jobs, Forks::Super::fork {
+            sub => sub { @result = $code->() },
+            %opts,
+            share => [\@result],
+            _pmap_id => $i,
+            on_finish => sub {
+                my ($job,$pid) = @_;
+                #$job->wait;
+                $pmap[$job->{_pmap_id}] = [ @result ];
+                $job->dispose;
+                $disposed{$pid}++;
+            }
+        };
+    }
+    while ( grep {
+        $_->is_complete || $_->wait;
+        !$_->is_complete && !$disposed{$_->{pid}}
+            } @jobs ) {
+        Forks::Super::Sigchld::handle_bastards();
+        Forks::Super::Util::pause();
+    }
+    @ALL_JOBS = values %ALL_JOBS;
+    return map @$_, grep { defined } @pmap;
+}
+
+sub pgrep (&@) {
+    my ($code,@list) = @_;
+    my %opts = ();
+    if (@list > 0 && ref($list[0]) eq 'HASH') {
+        %opts = %{shift @list};
+    }
+    my @pgrep;
+    my @jobs;
+    my %disposed = ();
+    for (my $i=0; $i<@list; $i++) {
+        my $result;
+        local $_ = $list[$i];
+        push @jobs, Forks::Super::Impl::fork {
+            sub => sub { $result = $code->() },
+            %opts,
+            share => [\$result],
+            _pgrep_id => $i,
+            on_finish => sub {
+                my ($job,$pid) = @_;
+                if ($result) {
+                    push @pgrep, $job->{_pgrep_id};
+                }
+                $job->dispose;
+                $disposed{$pid}++;
+            },
+            on_fail => sub {
+                my ($job,$pid) = @_;
+                $disposed{$pid}++;
+                warn "pgrep: fail $job";
+            },
+        };
+    }
+    while ( grep {
+        $_->is_complete || $_->wait;
+        !$_->is_complete && !$disposed{$_->{pid}}
+            } @jobs ) {
+        Forks::Super::Sigchld::handle_bastards();
+        Forks::Super::Util::pause();
+    }
+    @ALL_JOBS = values %ALL_JOBS;
+    @list = @list[sort { $a <=> $b } @pgrep];
+}
+
 ###################################################################
 
 1;
@@ -732,7 +807,7 @@ Forks::Super - extensions and convenience methods to manage background processes
 
 =head1 VERSION
 
-Version 0.93
+Version 0.94
 
 =head1 SYNOPSIS
 
@@ -841,7 +916,7 @@ Version 0.93
     # --- try to fork no matter how busy the system is
     $pid = fork { sub => \&MyMethod, force => 1 }
 
-    # when system is busy, queue jobs. When system is not busy,
+    # when system is busy, queue jobs. When system becomes less busy,
     #     some jobs on the queue will start.
     # if job is queued, return value from fork() is a very negative number
     $Forks::Super::ON_BUSY = 'queue';
@@ -912,6 +987,11 @@ Version 0.93
     my ($fh_in, $fh_out, $pid, $job) = Forks::Super::open2(@command);
     my ($fh_in, $fh_out, $fh_err, $pid, $job)
             = Forks::Super::open3(@command, { timeout => 60 });
+
+    # --- parallel grep, map operations ---
+    use Forks::Super qw(pmap pgrep);
+    @files_with_errors = pgrep { qx(cat $_) =~ /error/i } @files;
+    @result = pmap { long_running_calculation($_) } {timeout => 10}, @list;
 
     # --- run a background process as a *daemon*
     $job = fork { cmd => $cmd, daemon => 1 };
@@ -1122,7 +1202,7 @@ C<chdir> and C<dir> are synonyms.
 
 =item C<< fork { env => \%values } >>
 
-Passes additional environment variable settings to a child process.
+Passes additional environment variables to a child process.
 
 =back
 
@@ -1167,7 +1247,7 @@ called a job ID. See the section on L<"Deferred processes">
 for information on what to do with a job ID.
 
 A deferred job will start B<no earlier> than its appointed time
-in the future. Depending on what circumstances the queued jobs
+in the future. Depending on the circumstances when the queued jobs
 are examined, B<the actual start time of the job could be significantly
 later than the appointed time>.
 
@@ -1560,58 +1640,6 @@ the specified name.
 
 =back
 
-=head3 daemon
-
-=over 4
-
-=item C<< fork { daemon => 1 } >>
-
-Launches the background process as a I<daemon>, partially severing
-the relationship between the parent and child process.
-
-Features of daemon process:
-
-=over 4
-
-=item * closes all open file descriptors from the parent
-
-=item * begins in root directory C<"/"> unless the
-C<< dir => ... >> option is specified
-
-=item * has umask of zero unless  umask => ...  option specified
-
-=item * daemon will not be affected by signals to the parent
-
-=back
-
-The following restrictions apply to C<daemon> processes:
-
-=over 4
-
-=item * the C<finish> callback (see L<callbacks|"callback">), if any,
-will never be called for a daemon
-
-=item * the L<< Forks::Super::Job::is_XXX|Forks::Super::Job/"is_<state>" >>,
-L<state|Forks::Super::Job/"state"> methods may not give correct
-results for a daemon
-
-=item * the L<Forks::Super::Job::status|Forks::Super::Job/status>
-method will not work on a daemon
-
-=item * you cannot use L<"waitpid"> on a daemon process
-
-=item * on MSWin32, must be used with C<< cmd => ... >> or C<< exec => ... >>
-option
-
-=item * on MSWin32, this feature requires L<Win32::Process|Win32::Process>
-
-=back
-
-Also note that C<daemon> processes will B<not> count against the
-C<$Forks::Super::MAX_PROC> limits.
-
-=back
-
 =head3 max_proc
 
 =over 4
@@ -1835,68 +1863,6 @@ job, if any).
 
 =back
 
-=head3 remote
-
-=over 4
-
-=item C<< fork { remote => 'hostname', cmd => \@cmd, ... } >>
-
-=item C<< fork { remote => '[user[:pass]@]host[:port]', cmd => \@cmd, ... } >>
-
-=item C<< fork { remote => \%remote_opts, cmd => \@cmd, ... } >>
-
-=item C<< fork { remote => [host1,host2,...], cmd => \@cmd, ... } >>
-
-=item C<< fork { remote => [\%opts1,\%opts2,...], cmd => \@cmd, ... } >>
-
-Runs the external command specified in C<@cmd> on a remote host with C<ssh>
-(other protocols like C<rsh> may be supported in the future).
-C<Forks::Super> will connect to the remote host in a background process
-and run the command through the L<Net::OpenSSH|Net::OpenSSH> module
-or other available method.
-
-The C<remote> parameter value is either a remote host specification,
-or a reference to an array of remote host specifications. A remote host
-specification can be a simple scalar consisting of a hostname or IP
-address with optional username, password, or port
-
-    remote => 'machine73.example.com'
-    remote => 'root@machine72'
-    remote => 'bob:pwdofbob@172.14.18.119:30022'
-
-or it can be a hash reference with a C<host> key and optional entries
-for C<user>, C<port>, C<password>, and other options accepted by the
-L<constructor for Net::OpenSSH|Net::OpenSSH/"new">
-
-    remote => { host => '172.14.18.119', user => 'bob', proto => 'ssh',
-                port => 30022, key_path => "$ENV{HOME}/.ssh/id_dsa" }
-
-A C<host> parameter is required. C<user> and C<port>
-values default to the user executing the current program, and the
-default ssh port. A C<password> parameter need not be used when a 
-sufficient password-less public key authentication scheme is in place.
-
-If the C<remote> parameter value is an array reference, then the
-elements of that array are considered separate allowable
-remote host specifications. When a background job is ready to be
-launched, C<Forks::Super> will iterate over the specifications in
-a random order looking for a specification that can be used to run
-the job on a remote host.
-
-The C<remote> feature only works with the C<cmd> style
-calls to C<fork>. For other styles of C<fork> calls,
-the information in the C<remote> option will be
-ignored.
-
-A background process run on the local host has a different
-impact on the local machine's resources than a process run
-on a remote host, so a different scheme to decide when
-a job can be started is used for remote jobs.
-See L<"%MAX_PROC" in MODULE VARIABLES|"MAX_PROC">.
-
-=back
-
-
 
 =head3 can_launch
 
@@ -1969,49 +1935,6 @@ delayed if the callback functions take too long to run.
 
 =back
 
-=head3 suspend
-
-=over 4
-
-=item C<< fork { suspend => 'subroutineName' } } >>
-
-=item C<< fork { suspend => \&subroutineName } } >>
-
-=item C<< fork { suspend => sub { ... anonymous sub ... } } >>
-
-Registers a callback function that can indicate when a background
-process should be suspended and when it should be resumed.
-The callback function will receive one argument -- the
-L<Forks::Super::Job|Forks::Super::Job> object that owns the
-callback -- and is expected to return a numerical value. The callback
-function will be evaluated periodically (for example, during the
-productive downtime of a L<"wait">/L<"waitpid"> call or
-C<Forks::Super::Util::pause()> call).
-
-When the callback function returns a negative value
-and the process is active, the process will be suspended.
-
-When the callback function returns a positive value
-while the process is suspended, the process will be resumed.
-
-When the callback function returns 0, the job will
-remain in its current state.
-
-    my $pid = fork { exec => "run-the-heater",
-                     suspend => sub {
-                       my $t = get_temperature(); # in degrees Fahrenheit
-                       if ($t < 68) {
-                           return +1;  # too cold, make sure heater is on
-                       } elsif ($t > 72) {
-                           return -1;  # too warm, suspend the heater process
-                       } else {
-                           return 0;   # leave it on or off
-                       }
-                    } };
-
-
-=back
-
 =head3 share
 
 =over 4
@@ -2048,6 +1971,112 @@ This option is not meaningful when used with the C<cmd> or C<exec> options.
 
 If you use the C<share> option in perl's "taint" mode, you will also
 need to pass an C<< untaint => 1 >> option to the C<fork> call.
+
+=back
+
+=head3 remote
+
+=over 4
+
+=item C<< fork { remote => 'hostname', cmd => \@cmd, ... } >>
+
+=item C<< fork { remote => '[user[:pass]@]host[:port]', cmd => \@cmd, ... } >>
+
+=item C<< fork { remote => \%remote_opts, cmd => \@cmd, ... } >>
+
+=item C<< fork { remote => [host1,host2,...], cmd => \@cmd, ... } >>
+
+=item C<< fork { remote => [\%opts1,\%opts2,...], cmd => \@cmd, ... } >>
+
+Runs the external command specified in C<@cmd> on a remote host with C<ssh>
+(other protocols like C<rsh> may be supported in the future).
+C<Forks::Super> will connect to the remote host in a background process
+and run the command through the L<Net::OpenSSH|Net::OpenSSH> module
+or other available method.
+
+The C<remote> parameter value is either a remote host specification,
+or a reference to an array of remote host specifications. A remote host
+specification can be a simple scalar consisting of a hostname or IP
+address with optional username, password, or port
+
+    remote => 'machine73.example.com'
+    remote => 'root@machine72'
+    remote => 'bob:pwdofbob@172.14.18.119:30022'
+
+or it can be a hash reference with a C<host> key and optional entries
+for C<user>, C<port>, C<password>, and other options accepted by the
+L<constructor for Net::OpenSSH|Net::OpenSSH/"new">
+
+    remote => { host => '172.14.18.119', user => 'bob', proto => 'ssh',
+                port => 30022, key_path => "$ENV{HOME}/.ssh/id_dsa" }
+
+A C<host> parameter is required. C<user> and C<port>
+values default to the user executing the current program, and the
+default ssh port. A C<password> parameter need not be used when a 
+sufficient password-less public key authentication scheme is in place.
+
+If the C<remote> parameter value is an array reference, then the
+elements of that array are considered separate allowable
+remote host specifications. When a background job is ready to be
+launched, C<Forks::Super> will iterate over the specifications in
+a random order looking for a specification that can be used to run
+the job on a remote host.
+
+The C<remote> feature only works with the C<cmd> style
+calls to C<fork>. For other styles of C<fork> calls,
+the information in the C<remote> option will be
+ignored.
+
+A background process run on the local host has a different
+impact on the local machine's resources than a process run
+on a remote host, so a different scheme to decide when
+a job can be started is used for remote jobs.
+See L<"%MAX_PROC" in MODULE VARIABLES|"MAX_PROC">.
+
+=back
+
+=head3 suspend
+
+=over 4
+
+=item C<< fork { suspend => 'subroutineName' } } >>
+
+=item C<< fork { suspend => \&subroutineName } } >>
+
+=item C<< fork { suspend => sub { ... anonymous sub ... } } >>
+
+Registers a callback function that can indicate when a background
+process should be suspended and when it should be resumed.
+The callback function will receive one argument -- the
+L<Forks::Super::Job|Forks::Super::Job> object that owns the
+callback -- and is expected to return a numerical value. The callback
+function will be evaluated periodically (for example, during the
+productive downtime of a L<"wait">/L<"waitpid"> call or
+C<Forks::Super::Util::pause()> call).
+
+When the callback function returns a negative value
+and the process is active, the process will be suspended.
+
+When the callback function returns a positive value
+while the process is suspended, the process will be resumed.
+
+When the callback function returns 0, the job will
+remain in its current state.
+
+    my $pid = fork {
+        cmd => "run-the-heater",
+        suspend => sub {
+            my $t = get_temperature()->Fahrenheit;
+            if ($t < 68) {
+                return +1;  # too cold, make sure heater is on
+            } elsif ($t > 72) {
+                return -1;  # too warm, suspend the heater process
+            } else {
+                return 0;   # leave it on or off
+            }
+        }
+    };
+
 
 =back
 
@@ -2168,6 +2197,58 @@ or it may be obtained from CPAN.
 
 =back
 
+=head3 daemon
+
+=over 4
+
+=item C<< fork { daemon => 1 } >>
+
+Launches the background process as a I<daemon>, partially severing
+the relationship between the parent and child process.
+
+Features of daemon process:
+
+=over 4
+
+=item * closes all open file descriptors from the parent
+
+=item * begins in root directory C<"/"> unless the
+C<< dir => ... >> option is specified
+
+=item * has umask of zero unless  umask => ...  option specified
+
+=item * daemon will not be affected by signals to the parent
+
+=back
+
+The following restrictions apply to C<daemon> processes:
+
+=over 4
+
+=item * the C<finish> callback (see L<callbacks|"callback">), if any,
+will never be called for a daemon
+
+=item * the L<< Forks::Super::Job::is_XXX|Forks::Super::Job/"is_<state>" >>,
+L<state|Forks::Super::Job/"state"> methods may not give correct
+results for a daemon
+
+=item * the L<Forks::Super::Job::status|Forks::Super::Job/status>
+method will not work on a daemon
+
+=item * you cannot use L<"waitpid"> on a daemon process
+
+=item * on MSWin32, must be used with C<< cmd => ... >> or C<< exec => ... >>
+option
+
+=item * on MSWin32, this feature requires L<Win32::Process|Win32::Process>
+
+=back
+
+Also note that C<daemon> processes will B<not> count against the
+C<$Forks::Super::MAX_PROC> limits.
+
+=back
+
 =head3 debug
 
 =head3 undebug
@@ -2266,7 +2347,7 @@ eligible to be launched.
 When a C<fork()> call fails to spawn a child process but instead
 defers the job by adding it to the queue, the C<fork()> call will
 return a unique, large negative number called the job ID. The
-number will be negative and large enough (E<lt>= -100000) so
+number will be negative and large enough (E<lt>=E<nbsp>-1_000_000) so
 that it can be distinguished from any possible PID,
 Windows pseudo-process ID, process group ID, or C<fork()>
 failure code.
@@ -2694,7 +2775,7 @@ is equivalent to calling
     scalar $job->read_stdout()
 
 (Due to a limitation of overloading in Perl, this construction
-cannot be used in a list context.)
+cannot be used in list context.)
 
 =back
 
@@ -2716,42 +2797,6 @@ so you should use this function when you are finished communicating with
 a child process so that you don't run into that limit.
 
 See also L<Forks::Super::Job/"close_fh">.
-
-=back
-
-=head3 open2
-
-=head3 open3
-
-=over 4
-
-=item C< ($in,$out,$pid,$job) = Forks::Super::open2(
-@command [, \%options ] )>
-
-=item C< ($in,$out,$err,$pid,$job) = Forks::Super::open3(
-@command [, \%options] )>
-
-Starts a background process and returns file handles to the process's
-standard input and standard output (and standard error in the case
-of the C<open3> call). Also returns the process id and the
-L<Forks::Super::Job|Forks::Super::Job> object associated with
-the background process.
-
-Compare these methods to the main functions of the
-L<IPC::Open2|IPC::Open2> and L<IPC::Open3|IPC::Open3> modules.
-
-Many of the options that can be passed to C<Forks::Super::fork> can also
-be passed to C<Forks::Super::open2> and C<Forks::Super::open3>:
-
-    # run a command but kill it after 30 seconds
-    ($in,$out,$pid) =
-         Forks::Super::open2("ssh me\@mycomputer ./runCommand.sh",
-                             { timeout => 30 });
-
-    # invoke a callback when command ends
-    ($in,$out,$err,$pid,$job) =
-         Forks::Super::open3(@cmd,
-                             {callback => sub { print "\@cmd finished!\n" }});
 
 =back
 
@@ -2952,7 +2997,121 @@ expressions as
 
 =back
 
+=head3 open2
 
+=head3 open3
+
+=over 4
+
+=item C< ($in,$out,$pid,$job) = Forks::Super::open2(
+@command [, \%options ] )>
+
+=item C< ($in,$out,$err,$pid,$job) = Forks::Super::open3(
+@command [, \%options] )>
+
+Starts a background process and returns file handles to the process's
+standard input and standard output (and standard error in the case
+of the C<open3> call). Also returns the process id and the
+L<Forks::Super::Job|Forks::Super::Job> object associated with
+the background process.
+
+Compare these methods to the main functions of the
+L<IPC::Open2|IPC::Open2> and L<IPC::Open3|IPC::Open3> modules.
+
+Many of the options that can be passed to C<Forks::Super::fork> can also
+be passed to C<Forks::Super::open2> and C<Forks::Super::open3>:
+
+    # run a command but kill it after 30 seconds
+    ($in,$out,$pid) =
+         Forks::Super::open2("ssh me\@mycomputer ./runCommand.sh",
+                             { timeout => 30 });
+
+    # invoke a callback when command ends
+    ($in,$out,$err,$pid,$job) =
+         Forks::Super::open3(@cmd,
+                             {callback => sub { print "\@cmd finished!\n" }});
+
+=back
+
+=cut
+
+# the inspiration for  pmap  is R's  mclapply  function.
+
+=head3 pmap
+
+=over4
+
+=item C<< @result = pmap BLOCK LIST >>
+
+=item C<< @result = pmap BLOCK \%opts, LIST >>
+
+Like the C<map BLOCK LIST> syntax for 
+the builtin L<map|perlfunc/"map"> function, 
+evaluates C<BLOCK> in list context for each element of C<LIST> 
+and returns the list value composed of the results
+of each evaluation. Each evaluation is performed in a background
+process, so the evaluations may be done in parallel.
+
+Each element if the list is aliased to C<$_> prior to evaluation of
+the C<BLOCK>, just like C<map>.
+
+    @result = Forks::Super::pmap { evaluate_element($_) } @elements;
+
+If the first element after C<BLOCK> or C<EXPR> is an unblessed
+hash reference, it will be treated as a set of options to be passed
+to the underlying L<"fork"> call.
+
+    use Forks::Super 'pmap';
+    # process a set of URLs, but skip any URLs that take more than 10s
+    @result = pmap {; {url=>$_,result=>process_url($_)} } {timeout => 10}, @urls;
+
+In the edge case that your C<LIST> might contains hash references but you 
+don't want the first one to be interpreted as a set of options to C<fork>,
+you can always safely pass a reference to an empty hash
+
+    # always safe to do this
+    @result = pmap { CODE } {}, @list;
+
+=back
+
+=head3 pgrep
+
+=over4
+
+=item C<< @match = pgrep BLOCK LIST >>
+
+=item C<< @match = pgrep BLOCK \%opts, LIST >>
+
+=item C<< $count = pgrep BLOCK LIST >>
+
+=item C<< $count = pgrep BLOCK \%opts, LIST >>
+
+Like the C<grep BLOCK LIST> syntax for the 
+builtin L<grep|perlfunc/"grep"> function, 
+evaluates C<BLOCK> in list context for each element of C<LIST> 
+and returns the subset of list elements for which the expression
+evaluated to true. Each evaluation is performed in a background
+process, so the evaluations may be done in parallel.
+
+Each element if the list is aliased to C<$_> prior to evaluation of
+the C<BLOCK>, just like C<grep>.
+
+    @success = Forks::Super::pgrep { evaluate($_) =~ /OK/ } @elements;
+
+If the first element after C<BLOCK> or C<EXPR> is an unblessed
+hash reference, it will be treated as a set of options to be passed
+to the underlying L<"fork"> call. 
+In the edge case that your C<LIST> might contains hash references but you 
+don't want the first one to be interpreted as a set of options to C<fork>,
+you can always safely pass a reference to an empty hash
+
+    # always safe to do this
+    @match = pgrep { CODE } {}, @list;
+
+In scalar context, returns the number of elements
+in the list for which the evaluation is true, like C<grep>.
+
+=back
 
 =head2 Obtaining job information
 
@@ -3031,6 +3190,8 @@ and attempt to dispatch jobs on the queue.
 On other systems, using C<Forks::Super::pause> is less vulnerable
 than C<sleep> to interruptions from this module (See
 L</"BUGS AND LIMITATIONS"> below).
+
+=back
 
 =head3 init_pkg
 
@@ -3585,6 +3746,8 @@ Functions that can be exported to the caller's package include
     Forks::Super::open2
     Forks::Super::open3
     Forks::Super::pause
+    Forks::Super::pgrep
+    Forks::Super::pmap
     Forks::Super::read_stderr
     Forks::Super::read_stdout
 
@@ -3910,9 +4073,9 @@ C<sleep>.
     3: Forks::Super::pause(5);
 
 The C<pause> call itself has the limitation that it may
-sleep for B<longer> than the desired time. This is because
-the "productive" code executed in a C<pause> function
-call can take an arbitrarily long time to run.
+sleep for B<longer> than the desired time, because the
+C<pause> function executes "productive" code that can
+run for an arbitrarily long time.
 
 =head2 Idiosyncratic behavior on some systems
 
@@ -3939,8 +4102,8 @@ notified of progress on your bug as I make changes.
 
 There are reams of other modules on CPAN for managing background
 processes. See Parallel::*, L<Proc::Parallel|Proc::Parallel>,
-L<Proc::Queue|Proc::Queue>,
-L<Proc::Fork|Proc::Fork>, L<Proc::Launcher|Proc::Launcher>.
+L<Proc::Queue|Proc::Queue>, L<Proc::Fork|Proc::Fork>,
+L<Proc::Launcher|Proc::Launcher>, L<MCE>.
 Also L<Win32::Job|Win32::Job>.
 
 Inspiration for L<"bg_eval"> function from

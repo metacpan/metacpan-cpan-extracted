@@ -9,7 +9,7 @@ use Lab::Test import => ['file_ok'];
 use File::Temp qw/tempdir/;
 use Test::File;
 use File::Path 'remove_tree';
-use Lab::Moose qw/our_catfile/;
+use Lab::Moose::Catfile qw/our_catfile/;
 use YAML::XS 'LoadFile';
 use POSIX 'strftime';
 use Lab::Moose;

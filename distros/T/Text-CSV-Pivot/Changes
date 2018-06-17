@@ -1,5 +1,12 @@
 Revision history for Text::CSV::Pivot
 
+0.06  2018-06-15
+      - Added handy tool csv-pivot to play with it.
+
+0.05  2018-06-14
+      - Upgraded minimum perl version to v5.8.0 to get around the fail report.
+        http://www.cpantesters.org/cpan/report/1fec5222-6efe-11e8-8fb1-ef5133556b3f
+
 0.04  2018-06-13
       - Removed dependency on Moo as suggested by Steven Bray.
 

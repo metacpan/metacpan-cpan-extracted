@@ -12,13 +12,13 @@ enum {
 
 // SPVM_OBJECT
 struct SPVM_VALUE_object {
-  SPVM_OBJECT** weaken_back_refs;
+  void** weaken_back_refs;
   int32_t weaken_back_refs_length;
   int32_t weaken_back_refs_capacity;
   int32_t ref_count;
   int32_t basic_type_id;
-  int32_t units_length;
-  uint16_t unit_byte_size;
+  int32_t elements_length;
+  uint16_t element_byte_size;
   uint16_t dimension;
   unsigned has_destructor : 1;
   unsigned in_destroy : 1;

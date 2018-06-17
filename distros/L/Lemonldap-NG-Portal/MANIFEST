@@ -38,6 +38,7 @@ example/skins/bootstrap/js/bootstrap.js
 example/skins/bootstrap/js/bootstrap.min.js
 example/skins/bootstrap/js/skin.js
 example/skins/bootstrap/js/skin.min.js
+example/skins/bootstrap/kerberos.tpl
 example/skins/bootstrap/login.tpl
 example/skins/bootstrap/mail.tpl
 example/skins/bootstrap/menu.tpl
@@ -115,6 +116,7 @@ example/skins/common/js/jquery.base64.min.js
 example/skins/common/js/jquery.cookie.js
 example/skins/common/js/jquery.cookie.min.js
 example/skins/common/js/kerberos.js
+example/skins/common/js/kerberos.min.js
 example/skins/common/js/portal.js
 example/skins/common/js/portal.min.js
 example/skins/common/js/sha256.js
@@ -158,6 +160,7 @@ example/skins/dark/footer.tpl
 example/skins/dark/header.tpl
 example/skins/dark/images/lock.png
 example/skins/dark/info.tpl
+example/skins/dark/kerberos.tpl
 example/skins/dark/login.tpl
 example/skins/dark/mail.tpl
 example/skins/dark/menu.tpl
@@ -187,6 +190,7 @@ example/skins/impact/images/logo-lock.png
 example/skins/impact/images/logo-ok.png
 example/skins/impact/images/logo-warn.png
 example/skins/impact/info.tpl
+example/skins/impact/kerberos.tpl
 example/skins/impact/login.tpl
 example/skins/impact/mail.tpl
 example/skins/impact/menu.tpl
@@ -211,6 +215,7 @@ example/skins/pastel/header.tpl
 example/skins/pastel/images/hatch.gif
 example/skins/pastel/images/lock.png
 example/skins/pastel/info.tpl
+example/skins/pastel/kerberos.tpl
 example/skins/pastel/login.tpl
 example/skins/pastel/mail.tpl
 example/skins/pastel/menu.tpl

@@ -54,8 +54,11 @@ my $r = $j->read_stderr();
 ok(!defined($r) || $r eq '', "stderr not accessible after dispose");
 ok(! -f $f_out && ! -f $f_err && ! -f $f_in,
    "temp IPC files deleted after dispose");
-ok(! grep( { $_ eq $j } @Forks::Super::Job::ALL_JOBS),
-   "job not present in \@ALL_JOBS after dispose");
+ SKIP: {
+     # skip "job not present in \@ALL_JOBS after dispose", 1;
+     ok(! grep( { $_ eq $j } @Forks::Super::Job::ALL_JOBS),
+        "job not present in \@ALL_JOBS after dispose");
+}
 ok(! exists $Forks::Super::Job::ALL_JOBS{$pid},
    "job not present in \%ALL_JOBS after dispose");
 

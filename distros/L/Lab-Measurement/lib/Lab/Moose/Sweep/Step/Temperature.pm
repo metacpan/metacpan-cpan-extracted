@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step::Temperature;
-$Lab::Moose::Sweep::Step::Temperature::VERSION = '3.651';
+$Lab::Moose::Sweep::Step::Temperature::VERSION = '3.652';
 #ABSTRACT: Step/list sweep of temperature
 
 
@@ -9,6 +9,9 @@ use Moose;
 extends 'Lab::Moose::Sweep::Step';
 
 with 'Lab::Moose::Stabilizer';
+
+has instrument =>
+    ( is => 'ro', isa => 'Lab::Moose::Instrument', required => 1 );
 
 has filename_extension => ( is => 'ro', isa => 'Str', default => 'T=' );
 
@@ -60,7 +63,7 @@ Lab::Moose::Sweep::Step::Temperature - Step/list sweep of temperature
 
 =head1 VERSION
 
-version 3.651
+version 3.652
 
 =head1 SYNOPSIS
 

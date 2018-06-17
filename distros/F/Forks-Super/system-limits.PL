@@ -17,7 +17,7 @@ use warnings;
 use Config;
 use POSIX;
 
-our $VERSION = '0.93';
+our $VERSION = '0.94';
 
 my $limits_file = $ARGV[0] || "t/out/limits.$^O.$]";
 my $limits2 = $ARGV[1] || "t/out/limits.$^O";
@@ -112,6 +112,9 @@ write_limits();
 # XXX - what else is interesting? 
 #       max pending signals?
 
+our $DARWIN = $^O eq 'darwin' || $^O eq 'MacOS';
+# MacOS hangs somewhere in this script.
+
 &get_Time_HiRes_tolerance;
 &count_number_of_cpus;
 &find_max_open_filehandles;     # on some systems:  ulimit -n
@@ -137,6 +140,8 @@ close LOCK;
 #############################################################################
 
 sub write_limits {
+    $DARWIN && print STDERR "    write_limits(@_)\n";
+
     my (%new_data) = @_;
     $LIMITS{$_}=$new_data{$_} for keys %new_data;
     my @l2 = ();
@@ -160,6 +165,8 @@ sub write_limits {
 #############################################################################
 
 sub get_Time_HiRes_tolerance {
+    $DARWIN && print STDERR "  in get_Time_HiRes_tolerance()\n";
+
     # I found an insidious bug where this code:
     #    do {
     #       $t1 = Time::HiRes::time();
@@ -178,7 +185,6 @@ sub get_Time_HiRes_tolerance {
     #
 
     # Ideally, this subroutine is run on a lightly loaded system.
-
     return if defined $LIMITS{'sys|TimeHiRes_tol'};
     unless (eval 'use Time::HiRes (); 1') {
 	write_limits(TimeHiRes_tol => '0E0');
@@ -209,7 +215,12 @@ sub get_Time_HiRes_tolerance {
 # determine the maximum number of simultaneous background processes
 #
 sub find_max_fork {
+    $DARWIN && print STDERR "  in find_max_fork\n";
+
     return if $LIMITS{'sys|maxfork'};
+    if ($DARWIN) {
+        &write_limits('sys|maxfork' => 10);
+    }
     my $N = shift;
     my $limits_file = $LIMITS{file};
     if (-f $limits_file) {
@@ -257,7 +268,8 @@ sub find_max_fork {
 # do anything with this information.
 #
 sub find_max_open_filehandles {
-
+    $DARWIN && print STDERR "  in find_max_open_filehandles\n";
+    
     # in BSD, this information can be obtained from
     # sysctl kern.maxfiles[=new_value]
     # sysctl kern.maxfilesperproc[=new_value]
@@ -278,6 +290,16 @@ sub find_max_open_filehandles {
     # "Too many open files" and "No such file or directory"
     # error messages -- in a different locale we cannot
     # count on $! containing any particular text.
+
+    if ($DARWIN) {
+        # sensible defaults for MacOS until we figure out where MacOS
+        # is hanging in this script
+        &write_limits('maxfilehandle' => 1024,
+                      'maxfilehandle_msg' => "Too many open filehandles",
+                      'maxfilehandle_errno' => 24);
+        return;
+    }
+
 
     my $i = 0;
     undef $!;
@@ -317,6 +339,8 @@ sub find_max_open_sockets {
 # what values do CORE::wait and CORE::waitpid return
 # for bogus inputs? What are the side effects on $? ?
 sub wait_waitpid_results {
+    $DARWIN && print STDERR "  in wait_waitpid_results\n";
+
     use POSIX ':sys_wait_h';
     my %info = ();
     my $pid = CORE::fork();
@@ -355,6 +379,8 @@ sub wait_waitpid_results {
 # what options are available to this system for interprocess synchronization?
 #
 sub explore_sync_options {
+    $DARWIN && print STDERR "  in explore_sync_options\n";
+
     my @sync = ();
     @_ = ();
 
@@ -387,8 +413,8 @@ sub explore_sync_options {
 	$sem->setval(1,1);
 	$sem->remove;
 	eval { alarm 0 };
-	1
-	} ) {
+	1 } ) {
+
 	print "SysV semaphores are available for ipc synchronization\n";
 	push @sync, "IPCSemaphore";
 	write_limits( sync_options => join('/', @sync) );
@@ -448,6 +474,8 @@ sub signame_to_signum {
 #
 # RT#118474 - maybe MacOS/darwin should use the alt alarm
 sub explore_alternate_alarm {
+    $DARWIN && print STDERR "  in explore_alternate_alarm\n";
+
     if (defined $ENV{PREFER_ALT_ALARM}) {
         write_limits( prefer_alt_alarm => $ENV{PREFER_ALT_ALARM}+0 );
     } elsif ($^O =~ /bsd|darwin/) {
@@ -461,6 +489,8 @@ sub explore_alternate_alarm {
 # There exist systems where Proc::ProcessTable is installed
 # but it segfaults anyway.
 sub check_proc_process_table {
+    $DARWIN && print STDERR "  in check_proc_process_table\n";
+
     my $pid = fork;
     if ($pid == 0) {
 	require Proc::ProcessTable;
@@ -485,6 +515,8 @@ sub check_proc_process_table {
 #           Forks::Super::Job::OS::get_number_of_processors() method
 #
 sub count_number_of_cpus {
+    $DARWIN && print STDERR "  in count_number_of_cpus\n";
+
     my ($ncpu, $fh);
     return if $LIMITS{'sys|ncpu'};
 
@@ -556,6 +588,8 @@ sub count_number_of_cpus {
 
 # does this host have a simple way to conduct the remote tests (t/49*.t)?
 sub probe_ssh_test_env {
+    $DARWIN && print STDERR "  in probe_ssh_test_env\n";
+
     return if $LIMITS{'sys|test_ssh_target'};
     write_limits( 'sys|test_ssh_target', '0');
 
@@ -598,7 +632,15 @@ sub probe_ssh_test_env {
 }
 
 sub find_socket_capacity {
+    $DARWIN && print STDERR "  in find_socket_capacity\n";
+
     return if $LIMITS{'sys|socket_capacity'};
+
+    if ($DARWIN) {
+        write_limits("sys|socket_capacity" => 16384);
+        return;
+    }
+    
     my $socket_capacity = 
 	_get_capacity(16384, 1,
 		      qq[use Socket;
@@ -610,7 +652,13 @@ sub find_socket_capacity {
 }
 
 sub find_pipe_capacity {
+    $DARWIN && print STDERR "  in find_pipe_capacity\n";
+
     return if $LIMITS{'sys|pipe_capacity'};
+    if ($DARWIN) {
+        write_limits("sys|pipe_capacity" => 4096);
+        return;
+    }
     my $pipe_capacity =
 	_get_capacity(256, 2, qq[pipe DUMMY,WRITER]);
     print "Default pipe capacity is about $pipe_capacity bytes\n";

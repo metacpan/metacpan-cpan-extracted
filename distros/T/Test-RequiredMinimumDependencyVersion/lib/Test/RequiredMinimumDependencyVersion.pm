@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Carp                ();
 use File::Find          ();
@@ -210,7 +210,7 @@ Test::RequiredMinimumDependencyVersion - Require a minimum version for your depe
 
 =head1 VERSION
 
-Version 0.001
+Version 0.002
 
 =head1 SYNOPSIS
 
@@ -221,7 +221,8 @@ Version 0.001
 
 There are some modules where you'll always depend on a minimal version,
 either because of a bug or because of an API change. A good example would be
-L<Test::More|Test::More> where version 0.88 introduced C<done_testing()>.
+L<Test::More|Test::More> where version 0.88 introduced C<done_testing()> or
+L<version|version> which strongly urges to set 0.77 as a minimum in your code.
 
 This test can be used to check that, whenever you use these modules, you also
 declare the minimum version.
@@ -231,7 +232,7 @@ Recommendation is to put it into your F<xt> instead of your F<t> directory.
 
 =head1 USAGE
 
-=head2 new( [ ARGS ] )
+=head2 new( ARGS )
 
 Returns a new C<Test::RequiredMinimumDependencyVersion> instance. C<new>
 takes a hash with its arguments.
@@ -258,21 +259,21 @@ to know the exact number of tests that will run in advance. Use
 C<done_testing> from L<Test::More|Test::More> if you call this test directly
 instead of a C<plan>.
 
-C<file_ok> returns something I<true> if all web links are reachable
-and I<false> otherwise.
+C<file_ok> returns something I<true> if all checked dependencies are at least
+of the required minimal version and I<false> otherwise.
 
 =head2 all_files_ok( [ @entries ] )
 
-Checks all the files under C<@entries> by calling C<pod_file_ok> on every
+Checks all the files under C<@entries> by calling C<file_ok> on every
 file. Directories are recursive searched for files. Everything not a file and
 not a directory (e.g. a symlink) is ignored. It calls C<done_testing> or
 C<skip_all> so you can't have already called C<plan>.
 
-If C<@entries> is empty default directories are searched for files
-containing Pod. The default directories are F<blib>, or F<lib> if it doesn't
+If C<@entries> is empty default directories are searched for files.
+The default directories are F<blib>, or F<lib> if it doesn't
 exist, F<bin> and F<script>.
 
-<all_files_ok> returns something I<true> if all files test ok and I<false>
+C<all_files_ok> returns something I<true> if all files test ok and I<false>
 otherwise.
 
 =head1 EXAMPLES
@@ -289,7 +290,7 @@ Check all files in the F<bin>, F<script> and F<lib> directory.
 
     Test::RequiredMinimumDependencyVersion->new(
         module => {
-            'Test::More' => '0.88',
+            'version' => '0.77',
         },
     )->all_files_ok;
 
@@ -304,13 +305,9 @@ Check all files in the F<bin>, F<script> and F<lib> directory.
     Test::RequiredMinimumDependencyVersion->new(
         module => {
             'Test::More' => '0.88',
+            'version'    => '0.77',
         },
-    )->all_pod_files_ok(qw(
-        corpus/hello
-        corpus/world.pl
-        lib
-        tools
-    ));
+    )->all_files_ok(qw(bin lib t xt corpus/hello_world.pl));
 
 =head2 Example 3 Call C<file_ok> directly
 
@@ -326,12 +323,12 @@ Check all files in the F<bin>, F<script> and F<lib> directory.
             'Test::More' => '0.88',
         },
     );
-    $trmdv->pod_file_ok('corpus/7_links.pod');
-    $trmdv->pod_file_ok('corpus/hello');
+    $trmdv->file_ok('t/00-load.t');
+    $trmdv->file_ok('xt/author/pod-links.t');
 
     done_testing();
 
-head1 SEE ALSO
+=head1 SEE ALSO
 
 L<Test::More|Test::More>
 

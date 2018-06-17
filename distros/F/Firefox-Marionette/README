@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.54
+    Version 0.56
 
 SYNOPSIS
 
@@ -18,11 +18,11 @@ SYNOPSIS
     
         $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
     
-        my $file_handle = $firefox->selfie(highlights => [ $firefox->find_name('lucky') ])
+        my $file_handle = $firefox->selfie(highlights => [ $firefox->find_name('lucky') ]);
     
         $firefox->find('//button[@name="lucky"]')->click();
     
-        $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click()
+        $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
 
 DESCRIPTION
 
@@ -363,7 +363,7 @@ SUBROUTINES/METHODS
     
         $firefox->find('//button[@name="lucky"]')->click();
     
-        $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click()
+        $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
     
         while(!$firefox->downloads()) { sleep 1 }
     
@@ -383,7 +383,7 @@ SUBROUTINES/METHODS
     
         $firefox->find('//button[@name="lucky"]')->click();
     
-        $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click()
+        $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
     
         while(!$firefox->downloads()) { sleep 1 }
     
@@ -509,7 +509,7 @@ SUBROUTINES/METHODS
     
         $firefox->find_name('lucky')->click();
     
-        $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click()
+        $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
 
  bye
 
@@ -527,7 +527,7 @@ SUBROUTINES/METHODS
     
         $firefox->find_name('lucky')->click();
     
-        $firefox->bye(sub { $firefox->find_name('lucky') })->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click()
+        $firefox->bye(sub { $firefox->find_name('lucky') })->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
 
  sleep_time_in_ms
 

@@ -25,6 +25,11 @@ ok($tt->process('data_section.html.tt2', { foo => 'bar' }, \$output), 'processed
 is $output, "bar ☃\n", 'right template output';
 
 undef $output;
+ok($tt->process('data_empty.html.tt2', { foo => 'bar' }, \$output), 'processed empty data template')
+	or diag $tt->error;
+is $output, '', 'right template output';
+
+undef $output;
 ok($tt->process('tmpl_file.html.tt2', { foo => 'bar' }, \$output), 'processed file template')
 	or diag $tt->error;
 is $output, "bar ☃\n", 'right template output';
@@ -34,6 +39,11 @@ undef $output;
 ok($tt->process(\'[% INCLUDE data_section.html.tt2 %]baz', { foo => 'bar' }, \$output),
 	'processed inline template with included data template') or diag $tt->error;
 is $output, "bar ☃\nbaz", 'right template output';
+
+undef $output;
+ok($tt->process(\'[% INCLUDE data_empty.html.tt2 %]baz', { foo => 'bar' }, \$output),
+	'processed inline template with included empty data template') or diag $tt->error;
+is $output, "baz", 'right template output';
 
 undef $output;
 ok($tt->process(\'[% INCLUDE tmpl_file.html.tt2 %]baz', { foo => 'bar' }, \$output),
@@ -47,6 +57,11 @@ ok($tt->process('data_include_data.html.tt2', { foo => 'bar' }, \$output),
 is $output, "bar ☃\nbaz\n", 'right template output';
 
 undef $output;
+ok($tt->process('data_include_empty.html.tt2', { foo => 'bar' }, \$output),
+	'processed data template with included empty data template') or diag $tt->error;
+is $output, "baz\n", 'right template output';
+
+undef $output;
 ok($tt->process('data_include_file.html.tt2', { foo => 'bar' }, \$output),
 	'processed data template with included file template') or diag $tt->error;
 is $output, "bar ☃\nbaz\n", 'right template output';
@@ -56,6 +71,11 @@ undef $output;
 ok($tt->process('file_include_data.html.tt2', { foo => 'bar' }, \$output),
 	'processed file template with included data template') or diag $tt->error;
 is $output, "bar ☃\nbaz\n", 'right template output';
+
+undef $output;
+ok($tt->process('file_include_empty.html.tt2', { foo => 'bar' }, \$output),
+	'processed file template with included empty data template') or diag $tt->error;
+is $output, "baz\n", 'right template output';
 
 undef $output;
 ok($tt->process('file_include_file.html.tt2', { foo => 'bar' }, \$output),
@@ -71,6 +91,11 @@ ok($tt->process(\'[% INSERT data_section.html.tt2 %]baz', { foo => 'bar' }, \$ou
 is $output, "${inserted}baz", 'right template output';
 
 undef $output;
+ok($tt->process(\'[% INSERT data_empty.html.tt2 %]baz', { foo => 'bar' }, \$output),
+	'processed inline template with inserted empty data template') or diag $tt->error;
+is $output, "baz", 'right template output';
+
+undef $output;
 ok($tt->process(\'[% INSERT tmpl_file.html.tt2 %]baz', { foo => 'bar' }, \$output),
 	'processed inline template with inserted file template') or diag $tt->error;
 is $output, "${inserted}baz", 'right template output';
@@ -80,6 +105,11 @@ undef $output;
 ok($tt->process('data_insert_data.html.tt2', { foo => 'bar' }, \$output),
 	'processed data template with inserted data template') or diag $tt->error;
 is $output, "${inserted}baz\n", 'right template output';
+
+undef $output;
+ok($tt->process('data_insert_empty.html.tt2', { foo => 'bar' }, \$output),
+	'processed data template with inserted empty data template') or diag $tt->error;
+is $output, "baz\n", 'right template output';
 
 undef $output;
 ok($tt->process('data_insert_file.html.tt2', { foo => 'bar' }, \$output),
@@ -93,6 +123,11 @@ ok($tt->process('file_insert_data.html.tt2', { foo => 'bar' }, \$output),
 is $output, "${inserted}baz\n", 'right template output';
 
 undef $output;
+ok($tt->process('file_insert_empty.html.tt2', { foo => 'bar' }, \$output),
+	'processed file template with inserted empty data template') or diag $tt->error;
+is $output, "baz\n", 'right template output';
+
+undef $output;
 ok($tt->process('file_insert_file.html.tt2', { foo => 'bar' }, \$output),
 	'processed file template with inserted file template') or diag $tt->error;
 is $output, "${inserted}baz\n", 'right template output';
@@ -103,12 +138,17 @@ __DATA__
 
 @@ data_section.html.tt2
 [% foo %] ☃
+@@ data_empty.html.tt2
 @@ data_include_data.html.tt2
 [% INCLUDE data_section.html.tt2 %]baz
+@@ data_include_empty.html.tt2
+[% INCLUDE data_empty.html.tt2 %]baz
 @@ data_include_file.html.tt2
 [% INCLUDE tmpl_file.html.tt2 %]baz
 @@ data_insert_data.html.tt2
 [% INSERT data_section.html.tt2 %]baz
+@@ data_insert_empty.html.tt2
+[% INSERT data_empty.html.tt2 %]baz
 @@ data_insert_file.html.tt2
 [% INSERT tmpl_file.html.tt2 %]baz
 __END__

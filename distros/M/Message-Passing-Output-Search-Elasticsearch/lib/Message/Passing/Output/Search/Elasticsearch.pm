@@ -1,5 +1,5 @@
 package Message::Passing::Output::Search::Elasticsearch;
-$Message::Passing::Output::Search::Elasticsearch::VERSION = '0.004';
+$Message::Passing::Output::Search::Elasticsearch::VERSION = '0.005';
 # ABSTRACT: index messages in Elasticsearch
 
 use Moo;
@@ -42,7 +42,7 @@ has es_bulk => (
     is   => 'ro',
     lazy => 1,
     isa  => ConsumerOf [
-        'Search::Elasticsearch::Client::5_0::Role::Bulk',
+        'Search::Elasticsearch::Client::6_0::Role::Bulk',
         'Search::Elasticsearch::Role::Is_Async'
     ],
     builder => sub {
@@ -119,7 +119,7 @@ Message::Passing::Output::Search::Elasticsearch - index messages in Elasticsearc
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 
@@ -142,12 +142,12 @@ gets constructed from L</es_params>.
 =head2 es_bulk_params
 
 A hashref of
-L<Search::Elasticsearch::Client::5_0::Async::Bulk/"CREATING A NEW INSTANCE">
+L<Search::Elasticsearch::Client::6_0::Async::Bulk/"CREATING A NEW INSTANCE">
 parameters.
 
 =head2 es_bulk
 
-A L<Search::Elasticsearch::Client::5_0::Async::Bulk> instance. Can either be
+A L<Search::Elasticsearch::Client::6_0::Async::Bulk> instance. Can either be
 passed directly or gets constructed from L</es> and L</es_bulk_params> using
 bulk_helper.
 
@@ -182,7 +182,7 @@ Alexander Hartmaier <abraxxa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Alexander Hartmaier.
+This software is copyright (c) 2018 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

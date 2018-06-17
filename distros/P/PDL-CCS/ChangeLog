@@ -1,3 +1,7 @@
+v1.23.8 Fri, 15 Jun 2018 13:45:06 +0200 moocow
+	+ various fixes for debian packaging (RT bug #125587),
+	  patches provided by L. Baillet and G. Herrmann
+
 v1.23.7 Wed, 06 Jun 2018 09:18:55 +0200 moocow
 	+ CCS/IO 'clean' target: remove test temporaries t/ccs3.* t/dense3.*
 

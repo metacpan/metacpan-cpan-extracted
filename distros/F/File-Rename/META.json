@@ -41,10 +41,11 @@
    "provides" : {
       "File::Rename" : {
          "file" : "lib/File/Rename.pm",
-         "version" : "0.33"
+         "version" : "0.35"
       },
       "File::Rename::Options" : {
-         "file" : "lib/File/Rename.pm"
+         "file" : "lib/File/Rename.pm",
+         "version" : "0.33"
       }
    },
    "release_status" : "stable",
@@ -53,6 +54,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.33",
+   "version" : "0.35",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

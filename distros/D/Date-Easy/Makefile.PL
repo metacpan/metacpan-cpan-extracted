@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "Date::Parse" => "1.17",
     "Exporter" => 0,
     "Scalar::Util" => 0,
-    "Time::Local" => 0,
+    "Time::Local" => "1.26",
     "Time::ParseDate" => "2015.0925",
     "Time::Piece" => "1.30",
     "autodie" => 0,
@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "Time::JulianDay" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -64,7 +64,7 @@ my %FallbackPrereqs = (
   "Test::Most" => "0.25",
   "Time::DaysInMonth" => 0,
   "Time::JulianDay" => 0,
-  "Time::Local" => 0,
+  "Time::Local" => "1.26",
   "Time::ParseDate" => "2015.0925",
   "Time::Piece" => "1.30",
   "autodie" => 0,

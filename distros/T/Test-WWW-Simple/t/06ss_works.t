@@ -1,7 +1,7 @@
-#!/usr/local/bin/perl
+#!/usr/bin/env perl
 use Test::More tests=>1;
 
-@output = `examples/simple_scan<examples/ss.in`;
+@output = `$^X examples/simple_scan<examples/ss.in`;
 @expected = map {"$_\n"} split /\n/,<<EOF;
 1..4
 ok 1 - No python on perl.org [http://perl.org/] [/python/ shouldn't match]

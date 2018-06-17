@@ -1,10 +1,10 @@
 {
    "abstract" : "Forces the unavailability of specified Perl modules (for testing)",
    "author" : [
-      "A. R. Ferreira <ferreira@cpan.org>"
+      "Adriano Ferreira <ferreira@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.113640",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,29 +22,40 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.18",
+            "Test::Pod::Coverage" : "1.04"
          }
       },
       "runtime" : {
-         "recommends" : {
-            "Test::Pod" : "1.18",
-            "Test::Pod::Coverage" : "1.04"
-         },
          "requires" : {
-            "Test::More" : 0
+            "File::Temp" : "0",
+            "perl" : "5.006001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "url" : "https://github.com/aferreira/cpan-Devel-Hide"
+         "type" : "git",
+         "url" : "https://github.com/aferreira/cpan-Devel-Hide.git",
+         "web" : "https://github.com/aferreira/cpan-Devel-Hide"
       }
    },
-   "version" : "0.0009"
+   "version" : "0.0010",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

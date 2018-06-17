@@ -1,5 +1,5 @@
 ---
-abstract: 'Provides a Geo-Coding functionality for the US using http:://geocoding.geo.census.gov'
+abstract: 'Provides a Geo-Coding functionality for the US using L<https://geocoding.geo.census.gov>'
 author:
   - 'Nigel Horne <njh@bandsman.co.uk>'
 build_requires:
@@ -36,5 +36,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-US-Census
   repository: git://github.com/nigelhorne/Geo-Coder-US-Census.git
-version: '0.03'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

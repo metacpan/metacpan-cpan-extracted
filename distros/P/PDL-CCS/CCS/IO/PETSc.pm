@@ -12,7 +12,7 @@ use Fcntl qw(:seek);	   ##-- for rewinding
 use Carp qw(confess);
 use strict;
 
-our $VERSION = '1.23.7';
+our $VERSION = '1.23.8';
 our @ISA = ('PDL::Exporter');
 our @EXPORT_OK =
   (
@@ -202,7 +202,7 @@ sub ccs_rpetsc {
 
   ##-- read input data: row-lengths
   #     int    *number nonzeros in each row
-  my $plen = zeroes(ccs_indx, $m);
+  my $plen = zeroes(ccs_indx(), $m);
   my ($i,$j,$blen,$tmp);
   for ($i=0; $i < $m; $i=$j+1) {
     $j = $i+$ioblock;
@@ -210,11 +210,11 @@ sub ccs_rpetsc {
     $blen = $ilen * (1+$j-$i);
     read($fh,$buf,$blen)==$blen
       or confess("ccs_rpetsc(): failed to read $blen bytes of length data from '$file': $!");
-    ($tmp=$plen->slice("$i:$j")) .= pdl(ccs_indx, [unpack("($pack_int)*", $buf)]);
+    ($tmp=$plen->slice("$i:$j")) .= pdl(ccs_indx(), [unpack("($pack_int)*", $buf)]);
   }
 
   ##-- setup index pdl
-  my $ix = zeroes(ccs_indx,2,$nnz);
+  my $ix = zeroes(ccs_indx(),2,$nnz);
   $plen->rld($plen->sequence, $ix->slice("(0),"));
   undef $plen;
 
@@ -226,7 +226,7 @@ sub ccs_rpetsc {
     $blen = $ilen * (1+$j-$i);
     read($fh,$buf,$blen)==$blen
       or confess("ccs_rpetsc(): failed to read $blen bytes of column-index data from '$file': $!");
-    ($tmp=$ix->slice("(1),$i:$j")) .= pdl(ccs_indx, [unpack("($pack_int)*", $buf)]);
+    ($tmp=$ix->slice("(1),$i:$j")) .= pdl(ccs_indx(), [unpack("($pack_int)*", $buf)]);
   }
 
   ##-- read input data: nzvals

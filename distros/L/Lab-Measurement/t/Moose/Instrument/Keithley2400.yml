@@ -1,0 +1,302 @@
+---
+id: 0
+method: Clear
+---
+command: '*CLS'
+id: 1
+method: Write
+---
+command: SENS:FUNC:CONC 0
+id: 2
+method: Write
+---
+command: '*RST'
+id: 3
+method: Write
+---
+command: SENS:FUNC:CONC 0
+id: 4
+method: Write
+---
+command: SENS:FUNC:CONC?
+id: 5
+method: Query
+retval: '0
+
+'
+---
+command: SENS:FUNC:CONC 1
+id: 6
+method: Write
+---
+command: SENS:FUNC:CONC?
+id: 7
+method: Query
+retval: '1
+
+'
+---
+command: SENS:FUNC:CONC 0
+id: 8
+method: Write
+---
+command: SENS:FUNC 'CURR:DC'
+id: 9
+method: Write
+---
+command: SENS:FUNC?
+id: 10
+method: Query
+retval: "\"CURR:DC\"\n"
+---
+command: SENS:FUNC 'VOLT:DC'
+id: 11
+method: Write
+---
+command: SENS:FUNC?
+id: 12
+method: Query
+retval: "\"VOLT:DC\"\n"
+---
+command: SENS:FUNC 'CURR'
+id: 13
+method: Write
+---
+command: SENS:CURR:RANG 1.05e-6
+id: 14
+method: Write
+---
+command: SENS:CURR:RANG?
+id: 15
+method: Query
+retval: '1.050000E-06
+
+'
+---
+command: SENS:CURR:RANG 1.05e-5
+id: 16
+method: Write
+---
+command: SENS:CURR:RANG?
+id: 17
+method: Query
+retval: '1.050000E-05
+
+'
+---
+command: SENS:CURR:RANG 1.05e-4
+id: 18
+method: Write
+---
+command: SENS:CURR:RANG?
+id: 19
+method: Query
+retval: '1.050000E-04
+
+'
+---
+command: SENS:CURR:PROT 1e-6
+id: 20
+method: Write
+---
+command: SENS:CURR:PROT?
+id: 21
+method: Query
+retval: '1.000000E-06
+
+'
+---
+command: SENS:CURR:PROT 1e-5
+id: 22
+method: Write
+---
+command: SENS:CURR:PROT?
+id: 23
+method: Query
+retval: '1.000000E-05
+
+'
+---
+command: SENS:CURR:PROT 1e-4
+id: 24
+method: Write
+---
+command: SENS:CURR:PROT?
+id: 25
+method: Query
+retval: '1.000000E-04
+
+'
+---
+command: SOUR:FUNC CURR
+id: 26
+method: Write
+---
+command: SOUR:FUNC?
+id: 27
+method: Query
+retval: "CURR\n"
+---
+command: SOUR:FUNC VOLT
+id: 28
+method: Write
+---
+command: SOUR:FUNC?
+id: 29
+method: Query
+retval: "VOLT\n"
+---
+command: SOUR:VOLT:RANG 0.21
+id: 30
+method: Write
+---
+command: SOUR:VOLT:RANG?
+id: 31
+method: Query
+retval: '0.21
+
+'
+---
+command: SOUR:VOLT:RANG 2.1
+id: 32
+method: Write
+---
+command: SOUR:VOLT:RANG?
+id: 33
+method: Query
+retval: '2.10
+
+'
+---
+command: SOUR:VOLT:RANG 21
+id: 34
+method: Write
+---
+command: SOUR:VOLT:RANG?
+id: 35
+method: Query
+retval: '21.00
+
+'
+---
+command: SOUR:VOLT:RANG 210
+id: 36
+method: Write
+---
+command: SOUR:VOLT:RANG?
+id: 37
+method: Query
+retval: '210.00
+
+'
+---
+command: SOUR:VOLT:RANG 21
+id: 38
+method: Write
+---
+command: SOUR:VOLT:LEV 1.111
+id: 39
+method: Write
+---
+command: SOUR:VOLT:LEV?
+id: 40
+method: Query
+retval: '1.111000E+00
+
+'
+---
+command: SOUR:VOLT:LEV 2.222
+id: 41
+method: Write
+---
+command: SOUR:VOLT:LEV?
+id: 42
+method: Query
+retval: '2.222000E+00
+
+'
+---
+command: SOUR:VOLT:LEV 3.333
+id: 43
+method: Write
+---
+command: SOUR:VOLT:LEV?
+id: 44
+method: Query
+retval: '3.333000E+00
+
+'
+---
+command: SOUR:VOLT:LEV 0
+id: 45
+method: Write
+---
+command: SOUR:VOLT:LEV 0.1
+id: 46
+method: Write
+---
+command: SOUR:VOLT:LEV 0.2
+id: 47
+method: Write
+---
+command: SOUR:VOLT:LEV 0.3
+id: 48
+method: Write
+---
+command: SOUR:VOLT:LEV 0.4
+id: 49
+method: Write
+---
+command: SOUR:VOLT:LEV 0.5
+id: 50
+method: Write
+---
+command: SOUR:VOLT:LEV 0.6
+id: 51
+method: Write
+---
+command: SOUR:VOLT:LEV 0.7
+id: 52
+method: Write
+---
+command: SOUR:VOLT:LEV 0.8
+id: 53
+method: Write
+---
+command: SOUR:VOLT:LEV 0.9
+id: 54
+method: Write
+---
+command: SOUR:VOLT:LEV 1
+id: 55
+method: Write
+---
+command: SOUR:VOLT:LEV 1.1
+id: 56
+method: Write
+---
+command: SOUR:VOLT:LEV 1.2
+id: 57
+method: Write
+---
+command: SOUR:VOLT:LEV 1.234
+id: 58
+method: Write
+---
+command: SOUR:VOLT:LEV?
+id: 59
+method: Query
+retval: '1.234000E+00
+
+'
+---
+command: SENS:CURR:PROT:TRIP?
+id: 60
+method: Query
+retval: '0
+
+'
+---
+command: '*RST'
+id: 61
+method: Write

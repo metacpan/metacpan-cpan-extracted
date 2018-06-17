@@ -14,3 +14,4 @@ Geo-Coder-CA-*
 *.swp
 .appveyor.yml
 .travis.yml
+t/online.enabled

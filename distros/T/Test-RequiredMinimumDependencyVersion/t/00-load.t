@@ -6,7 +6,7 @@ use warnings;
 
 # Automatically generated file; DO NOT EDIT.
 
-use Test::More;
+use Test::More 0.88;
 
 use lib qw(lib);
 

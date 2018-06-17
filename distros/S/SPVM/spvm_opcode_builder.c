@@ -260,7 +260,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       SPVM_TYPE* arg_type = SPVM_OP_get_type(compiler, op_arg);
                       
                       if (SPVM_TYPE_is_undef(compiler, arg_type)) {
-                        assert(!sub_call_sub->op_package->uv.package->is_interface);
+                        assert(!sub_call_sub->op_package->uv.package->category == SPVM_PACKAGE_C_CATEGORY_INTERFACE);
                         opcode.id = SPVM_OPCODE_C_ID_PUSH_ARG_UNDEF;
                         SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
                       }
@@ -312,7 +312,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                     
                     opcode.operand0 = index_out;
 
-                    if (sub_call_sub->op_package->uv.package->is_interface) {
+                    if (sub_call_sub->op_package->uv.package->category == SPVM_PACKAGE_C_CATEGORY_INTERFACE) {
                       opcode.id = SPVM_OPCODE_C_ID_CALL_INTERFACE_METHOD;
                       opcode.operand1 = sub_call_sub->id;
                       opcode.operand2 = first_arg_index;
@@ -1399,7 +1399,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           int32_t index_index = SPVM_OP_get_my_index(compiler, op_assign_from->first->last);
                           
                           opcode.operand0 = index_out;
-                          opcode.operand1 = ((uint32_t)type->basic_type->id + ((uint32_t)type->dimension - 1 << 24));
+                          opcode.operand1 = ((uint32_t)type->basic_type->id + ((uint32_t)(type->dimension - 1) << 24));
                           opcode.operand2 = index_index;
 
                           SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
@@ -2608,7 +2608,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                     SPVM_TYPE* arg_type = SPVM_OP_get_type(compiler, op_arg);
                     
                     if (SPVM_TYPE_is_undef(compiler, arg_type)) {
-                      assert(!sub_call_sub->op_package->uv.package->is_interface);
+                      assert(!sub_call_sub->op_package->uv.package->category == SPVM_PACKAGE_C_CATEGORY_INTERFACE);
                       opcode.id = SPVM_OPCODE_C_ID_PUSH_ARG_UNDEF;
                       SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
                     }
@@ -2655,7 +2655,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                   SPVM_OPCODE opcode;
                   memset(&opcode, 0, sizeof(SPVM_OPCODE));
                   
-                  if (sub_call_sub->op_package->uv.package->is_interface) {
+                  if (sub_call_sub->op_package->uv.package->category == SPVM_PACKAGE_C_CATEGORY_INTERFACE) {
                     opcode.id = SPVM_OPCODE_C_ID_CALL_INTERFACE_METHOD;
                     opcode.operand1 = sub_call_sub->id;
                     opcode.operand2 = first_arg_index;

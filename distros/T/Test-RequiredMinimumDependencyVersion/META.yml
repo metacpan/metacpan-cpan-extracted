@@ -31,7 +31,7 @@ no_index:
 provides:
   Test::RequiredMinimumDependencyVersion:
     file: lib/Test/RequiredMinimumDependencyVersion.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Carp: '0'
   File::Find: '0'
@@ -45,6 +45,6 @@ resources:
   bugtracker: https://github.com/skirmess/Test-RequiredMinimumDependencyVersion/issues
   homepage: https://github.com/skirmess/Test-RequiredMinimumDependencyVersion
   repository: https://github.com/skirmess/Test-RequiredMinimumDependencyVersion.git
-version: '0.001'
+version: '0.002'
 x_generated_by_perl: v5.24.0
 x_serialization_backend: 'YAML::Tiny version 1.70'

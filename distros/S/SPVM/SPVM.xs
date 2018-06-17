@@ -726,47 +726,20 @@ to_bin(...)
   XSRETURN(1);
 }
 
-MODULE = SPVM::Build::SPVMInfo		PACKAGE = SPVM::Build::SPVMInfo
+MODULE = SPVM::Build::Info		PACKAGE = SPVM::Build::Info
 
 SV*
-get_sub_names(...)
+get_subs(...)
   PPCODE:
 {
   (void)RETVAL;
-  
-  SV* sv_compiler = ST(0);
+  SV* sv_self = ST(0);
+  HV* hv_self = (HV*)SvRV(sv_self);
+
+  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
   SPVM_COMPILER* compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
-  
-  AV* av_sub_names = (AV*)sv_2mortal((SV*)newAV());
-  
-  {
-    int32_t sub_index;
-    for (sub_index = 0; sub_index < compiler->op_subs->length; sub_index++) {
-      SPVM_OP* op_sub = SPVM_LIST_fetch(compiler->op_subs, sub_index);
-      SPVM_SUB* sub = op_sub->uv.sub;
 
-      const char* sub_name = sub->abs_name;
-      
-      SV* sv_sub_name = sv_2mortal(newSVpvn(sub_name, strlen(sub_name)));
-      av_push(av_sub_names, SvREFCNT_inc(sv_sub_name));
-    }
-  }
-  
-  SV* sv_sub_names = sv_2mortal(newRV_inc((SV*)av_sub_names));
-  
-  XPUSHs(sv_sub_names);
-  XSRETURN(1);
-}
-
-SV*
-get_subs_from_package_name(...)
-  PPCODE:
-{
-  (void)RETVAL;
-
-  SV* sv_compiler = ST(0);
-  SPVM_COMPILER* compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
-  
   SV* sv_package_name = ST(1);
   const char* package_name = SvPV_nolen(sv_package_name);
 
@@ -780,10 +753,14 @@ get_subs_from_package_name(...)
       
       SPVM_OP* op_sub = SPVM_LIST_fetch(package->op_subs, sub_index);
       SPVM_SUB* sub = op_sub->uv.sub;
+
+      // Subroutine name
+      const char* sub_name = sub->op_name->uv.name;
+      SV* sv_sub_name = sv_2mortal(newSVpvn(sub_name, strlen(sub_name)));
       
       // Subroutine name
-      const char* sub_name = sub->abs_name;
-      SV* sv_sub_name = sv_2mortal(newSVpvn(sub_name, strlen(sub_name)));
+      const char* sub_abs_name = sub->abs_name;
+      SV* sv_sub_abs_name = sv_2mortal(newSVpvn(sub_abs_name, strlen(sub_abs_name)));
       
       // Subroutine id
       int32_t sub_id = sub->id;
@@ -797,18 +774,18 @@ get_subs_from_package_name(...)
       int32_t sub_have_native_desc = sub->have_native_desc;
       SV* sv_sub_have_native_desc = sv_2mortal(newSViv(sub_have_native_desc));
 
-      // Subroutine have_compile_desc
-      int32_t sub_have_compile_desc = sub->have_compile_desc;
-      SV* sv_sub_have_compile_desc = sv_2mortal(newSViv(sub_have_compile_desc));
+      // Subroutine have_precompile_desc
+      int32_t sub_have_precompile_desc = sub->have_precompile_desc;
+      SV* sv_sub_have_precompile_desc = sv_2mortal(newSViv(sub_have_precompile_desc));
 
       // Subroutine
       HV* hv_sub = (HV*)sv_2mortal((SV*)newHV());
       
       hv_store(hv_sub, "name", strlen("name"), SvREFCNT_inc(sv_sub_name), 0);
-      hv_store(hv_sub, "id", strlen("id"), SvREFCNT_inc(sv_sub_id), 0);
+      hv_store(hv_sub, "abs_name", strlen("abs_name"), SvREFCNT_inc(sv_sub_abs_name), 0);
       hv_store(hv_sub, "is_enum", strlen("is_enum"), SvREFCNT_inc(sv_sub_is_enum), 0);
       hv_store(hv_sub, "have_native_desc", strlen("have_native_desc"), SvREFCNT_inc(sv_sub_have_native_desc), 0);
-      hv_store(hv_sub, "have_compile_desc", strlen("have_compile_desc"), SvREFCNT_inc(sv_sub_have_compile_desc), 0);
+      hv_store(hv_sub, "have_precompile_desc", strlen("have_precompile_desc"), SvREFCNT_inc(sv_sub_have_precompile_desc), 0);
       
       SV* sv_sub = sv_2mortal(newRV_inc((SV*)hv_sub));
       av_push(av_subs, SvREFCNT_inc((SV*)sv_sub));
@@ -822,20 +799,62 @@ get_subs_from_package_name(...)
 }
 
 SV*
-get_packages(...)
+get_sub_names(...)
   PPCODE:
 {
   (void)RETVAL;
+  SV* sv_self = ST(0);
+  HV* hv_self = (HV*)SvRV(sv_self);
+
+  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
+  SPVM_COMPILER* compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+
+  SV* sv_package_name = ST(1);
+  const char* package_name = SvPV_nolen(sv_package_name);
+
+  SPVM_OP* op_package = SPVM_HASH_search(compiler->op_package_symtable, package_name, strlen(package_name));
+  SPVM_PACKAGE* package = op_package->uv.package;
   
-  SV* sv_compiler = ST(0);
+  AV* av_sub_names = (AV*)sv_2mortal((SV*)newAV());
+  {
+    int32_t sub_index;
+    for (sub_index = 0; sub_index < package->op_subs->length; sub_index++) {
+      
+      SPVM_OP* op_sub = SPVM_LIST_fetch(package->op_subs, sub_index);
+      SPVM_SUB* sub = op_sub->uv.sub;
+      
+      // Subroutine name
+      const char* sub_name = sub->op_name->uv.name;
+      SV* sv_sub_name = sv_2mortal(newSVpvn(sub_name, strlen(sub_name)));
+      
+      av_push(av_sub_names, SvREFCNT_inc((SV*)sv_sub_name));
+    }
+  }
+  
+  SV* sv_subs = sv_2mortal(newRV_inc((SV*)av_sub_names));
+  
+  XPUSHs(sv_subs);
+  XSRETURN(1);
+}
+
+SV*
+get_package_names(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  SV* sv_self = ST(0);
+  HV* hv_self = (HV*)SvRV(sv_self);
+
+  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
   SPVM_COMPILER* compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
   
-  AV* av_packages = (AV*)sv_2mortal((SV*)newAV());
+  AV* av_package_names = (AV*)sv_2mortal((SV*)newAV());
   
   {
     int32_t package_index;
     for (package_index = 0; package_index < compiler->op_packages->length; package_index++) {
-  
       SPVM_OP* op_package = SPVM_LIST_fetch(compiler->op_packages, package_index);
       SPVM_PACKAGE* package = op_package->uv.package;
       
@@ -843,29 +862,13 @@ get_packages(...)
       const char* package_name = package->op_name->uv.name;
       SV* sv_package_name = sv_2mortal(newSVpvn(package_name, strlen(package_name)));
       
-      // Package id
-      int32_t package_id = package->id;
-      SV* sv_package_id = sv_2mortal(newSViv(package_id));
-
-      // Is interface
-      int32_t package_is_interface = package->is_interface;
-      SV* sv_package_is_interface = sv_2mortal(newSViv(package_is_interface));
-      
-      // Package
-      HV* hv_package = (HV*)sv_2mortal((SV*)newHV());
-      
-      hv_store(hv_package, "name", strlen("name"), SvREFCNT_inc(sv_package_name), 0);
-      hv_store(hv_package, "id", strlen("id"), SvREFCNT_inc(sv_package_id), 0);
-      hv_store(hv_package, "is_interface", strlen("is_interface"), SvREFCNT_inc(sv_package_is_interface), 0);
-      
-      SV* sv_package = sv_2mortal(newRV_inc((SV*)hv_package));
-      av_push(av_packages, SvREFCNT_inc((SV*)sv_package));
+      av_push(av_package_names, SvREFCNT_inc((SV*)sv_package_name));
     }
   }
   
-  SV* sv_packages = sv_2mortal(newRV_inc((SV*)av_packages));
+  SV* sv_package_names = sv_2mortal(newRV_inc((SV*)av_package_names));
   
-  XPUSHs(sv_packages);
+  XPUSHs(sv_package_names);
   XSRETURN(1);
 }
 
@@ -874,8 +877,12 @@ get_package_load_path(...)
   PPCODE:
 {
   (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  HV* hv_self = (HV*)SvRV(sv_self);
 
-  SV* sv_compiler = ST(0);
+  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
   SPVM_COMPILER* compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
   
   SV* sv_package_name = ST(1);
@@ -1060,7 +1067,7 @@ free_compiler(...)
   XSRETURN(0);
 }
 
-MODULE = SPVM::Build::Native		PACKAGE = SPVM::Build::Native
+MODULE = SPVM::Build::CBuilder::Native		PACKAGE = SPVM::Build::CBuilder::Native
 
 SV*
 bind_sub(...)
@@ -1092,7 +1099,7 @@ bind_sub(...)
   XSRETURN(0);
 }
 
-MODULE = SPVM::Build::Precompile		PACKAGE = SPVM::Build::Precompile
+MODULE = SPVM::Build::CBuilder::Precompile		PACKAGE = SPVM::Build::CBuilder::Precompile
 
 SV*
 build_package_csource(...)

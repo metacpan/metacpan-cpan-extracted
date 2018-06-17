@@ -1,7 +1,7 @@
 package Dancer::Route;
 our $AUTHORITY = 'cpan:SUKRIA';
 # ABSTRACT: Class to represent a route in Dancer
-$Dancer::Route::VERSION = '1.3202';
+$Dancer::Route::VERSION = '1.3400';
 use strict;
 use warnings;
 use Carp;
@@ -88,9 +88,13 @@ sub match {
 
     my @values = $path =~ $self->{_compiled_regexp};
 
-    Dancer::Logger::core("  --> got ".
-        map { defined $_ ? $_ : 'undef' } @values)
-        if @values;
+    return unless @values;
+
+    Dancer::Logger::core(
+        "  --> got " .
+        map { defined $_ ? $_ : 'undef' } @values
+    );
+
 
     # if some named captures found, return captures
     # no warnings is for perl < 5.10
@@ -104,7 +108,6 @@ sub match {
         return $self->save_match_data($request, {captures => \%captures});
     }
 
-    return unless @values;
 
     # save the route pattern that matched
     # TODO : as soon as we have proper Dancer::Internal, we should remove
@@ -134,7 +137,7 @@ sub match {
 
             # megasplat values are split on '/'
             if ($token_or_splat[$i] eq 'megasplat') {
-                $values[$i] = [ split '/' => $values[$i] ];
+                $values[$i] = [ split '/', $values[$i] || '' ];
             }
             push @splat, $values[$i];
         }
@@ -375,7 +378,7 @@ Dancer::Route - Class to represent a route in Dancer
 
 =head1 VERSION
 
-version 1.3202
+version 1.3400
 
 =head1 AUTHOR
 

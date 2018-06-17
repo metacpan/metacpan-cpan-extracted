@@ -16,7 +16,7 @@ use Crypt::OpenSSL::Bignum;
 use utf8;
 use base qw(Lemonldap::NG::Portal::_Browser);
 
-our $VERSION = '1.9.13';
+our $VERSION = '1.9.17';
 our $oidcCache;
 
 BEGIN {
@@ -1056,7 +1056,7 @@ sub returnJSONStatus {
     my ( $self, $content, $status_code ) = @_;
 
     # We use to_json because values are already UTF-8 encoded
-    my $json = to_json( $content, { pretty => 1 } );
+    my $json = to_json( $content, { pretty => 1, allow_nonref => 1 } );
 
     if ( $ENV{MOD_PERL} ) {
         my $r = CGI->new->r;
@@ -1249,13 +1249,17 @@ sub createJWT {
     my ( $self, $payload, $alg, $rp ) = @_;
 
     # Payload encoding
-    my $jwt_payload = encode_base64( to_json($payload), "" );
+    my $jwt_payload =
+      encode_base64( to_json( $payload, { allow_nonref => 1 } ), "" );
 
     # JWT header
     my $jwt_header_hash = { typ => "JWT", alg => $alg };
-    $jwt_header_hash->{kid} = $self->{oidcServiceKeyIdSig}
-      if $self->{oidcServiceKeyIdSig};
-    my $jwt_header = encode_base64( to_json($jwt_header_hash), "" );
+    if ( $alg eq "RS256" or $alg eq "RS384" or $alg eq "RS512" ) {
+        $jwt_header_hash->{kid} = $self->{oidcServiceKeyIdSig}
+          if $self->{oidcServiceKeyIdSig};
+    }
+    my $jwt_header =
+      encode_base64( to_json( $jwt_header_hash, { allow_nonref => 1 } ), "" );
 
     if ( $alg eq "none" ) {
 

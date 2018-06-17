@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::YokogawaGS200;
-$Lab::Moose::Instrument::YokogawaGS200::VERSION = '3.651';
+$Lab::Moose::Instrument::YokogawaGS200::VERSION = '3.652';
 #ABSTRACT: YokogawaGS200 voltage/current source.
 
 use 5.010;
@@ -56,6 +56,29 @@ sub BUILD {
     $self->cls();
 }
 
+
+# The Source:Range commands are NOT SCPI compliant, as they do not include
+# the Source:Function, like in SOUR:VOLT:RANG
+
+
+cache source_range => ( getter => 'source_range_query' );
+
+sub source_range_query {
+    my ( $self, %args ) = validated_getter( \@_ );
+
+    return $self->cached_source_range(
+        $self->query( command => "SOUR:RANG?", %args ) );
+}
+
+sub source_range {
+    my ( $self, $value, %args ) = validated_setter(
+        \@_,
+    );
+
+    $self->write( command => "SOUR:RANG $value", %args );
+
+    $self->cached_source_range($value);
+}
 
 cache source_level => ( getter => 'source_level_query' );
 
@@ -237,7 +260,6 @@ sub sweep_to_level {
 with qw(
     Lab::Moose::Instrument::Common
     Lab::Moose::Instrument::SCPI::Source::Function
-    Lab::Moose::Instrument::SCPI::Source::Range
     Lab::Moose::Instrument::LinearStepSweep
 );
 
@@ -257,7 +279,7 @@ Lab::Moose::Instrument::YokogawaGS200 - YokogawaGS200 voltage/current source.
 
 =head1 VERSION
 
-version 3.651
+version 3.652
 
 =head1 SYNOPSIS
 
@@ -292,11 +314,13 @@ Used roles:
 
 =item L<Lab::Moose::Instrument::SCPI::Source::Function>
 
-=item L<Lab::Moose::Instrument::SCPI::Source::Range>
-
 =item L<Lab::Moose::Instrument::LinearStepSweep>
 
 =back
+
+=head2 source_range/source_range_query
+
+Set/Get the output source range.
 
 =head2 set_level
 

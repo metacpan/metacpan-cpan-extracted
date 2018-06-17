@@ -9,6 +9,7 @@ use Lab::Test import => ['file_ok'];
 use Test::File;
 use Module::Load 'autoload';
 use Lab::Moose;
+use Lab::Moose::Catfile 'our_catfile';
 use File::Glob 'bsd_glob';
 use File::Spec::Functions 'catfile';
 
