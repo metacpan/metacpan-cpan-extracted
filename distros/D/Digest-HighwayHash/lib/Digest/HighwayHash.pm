@@ -8,7 +8,7 @@ use parent qw/Exporter/;
 our @EXPORT_OK = qw/highway_hash64 highway_hash128 highway_hash256/;
 our @EXPORT = @EXPORT_OK;
 
-our $VERSION = '0.001';
+our $VERSION = '0.001001';
 
 use Math::Int64;
 

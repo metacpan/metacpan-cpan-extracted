@@ -1,101 +1,155 @@
 #!/usr/bin/perl -w
 
-BEGIN { local $| = 1; print "1..52\n"; }
-use Net::Netmask;
-$loaded = 1;
-print "ok 1\n";
-END { print "not ok 1\n" unless $loaded; }
-
-sub test {
-    local ($^W) = 0;
-    my ( $num, $true, $msg ) = @_;
-    print( $true ? "ok $num\n" : "not ok $num $msg\n" );
-    return;
-}
-################################################################################
-
 use strict;
+
+use Test2::V0;
+
+use Net::Netmask;
 
 my $debug = 0;
 
-test( 2, Net::Netmask->debug($debug) == $debug, "unable to set debug" );
+ok( Net::Netmask->debug($debug) == $debug, "unable to set debug" );
 
 # test a variety of ip's with bytes greater than 255.
 # all these tests should return undef
 
-test( 3, !defined( Net::Netmask->new2('209.256.68.22:255.255.224.0') ), "bad net byte" );
-test( 4, scalar( Net::Netmask->errstr =~ /^could not parse / ),         "errstr mismatch" );
-test( 5, !defined( Net::Netmask->new2('209.180.68.22:256.255.224.0') ), "bad mask byte" );
-test( 6, scalar( Net::Netmask->errstr =~ /^illegal netmask:/ ),         "errstr mismatch" );
-test( 7, !defined( Net::Netmask->new2( '209.157.300.22', '255.255.224.0' ) ), "bad net byte" );
-test( 8, scalar( Net::Netmask->errstr =~ /^could not parse / ), "errstr mismatch" );
-test( 9, !defined( Net::Netmask->new2( '300.157.70.33', '0xffffe000' ) ), "bad net byte" );
-test( 10, scalar( Net::Netmask->errstr =~ /^could not parse / ),         "errstr mismatch" );
-test( 11, !defined( Net::Netmask->new2('209.500.70.33/19') ),            "bad net byte" );
-test( 12, scalar( Net::Netmask->errstr =~ /^could not parse / ),         "errstr mismatch" );
-test( 13, !defined( Net::Netmask->new2('140.999.82') ),                  "bad net byte" );
-test( 14, scalar( Net::Netmask->errstr =~ /^could not parse / ),         "errstr mismatch" );
-test( 15, !defined( Net::Netmask->new2('899.174') ),                     "bad net byte" );
-test( 16, scalar( Net::Netmask->errstr =~ /^could not parse / ),         "errstr mismatch" );
-test( 17, !defined( Net::Netmask->new2('900') ),                         "bad net byte" );
-test( 18, scalar( Net::Netmask->errstr =~ /^could not parse / ),         "errstr mismatch" );
-test( 19, !defined( Net::Netmask->new2('209.157.300/19') ),              "bad net byte" );
-test( 20, scalar( Net::Netmask->errstr =~ /^could not parse / ),         "errstr mismatch" );
-test( 21, !defined( Net::Netmask->new2('209.300.64.0-209.157.95.255') ), "bad net byte" );
-test( 22, scalar( Net::Netmask->errstr =~ /^illegal dotted quad/ ),      "errstr mismatch" );
-test( 23, !defined( Net::Netmask->new2('209.300/17') ),                  "bad net byte" );
-test( 24, scalar( Net::Netmask->errstr =~ /^could not parse / ),         "errstr mismatch" );
-
-# test whois numbers with space between dash
-
-test(
-    25,
-    Net::Netmask->new2('209.157.64.0 - 209.157.95.255'),
-    "whois with single space around dash"
+my @tests = (
+    {
+        input => ['209.256.68.22:255.255.224.0'],
+        error => qr/^could not parse /,
+        type  => 'bad net byte',
+    },
+    {
+        input => ['209.180.68.22:256.255.224.0'],
+        error => qr/^illegal netmask: /,
+        type  => 'bad mask byte',
+    },
+    {
+        input => [ '209.157.300.22', '255.255.224.0' ],
+        error => qr/^could not parse /,
+        type  => 'bad net byte',
+    },
+    {
+        input => [ '300.157.70.33', '0xffffe000' ],
+        error => qr/^could not parse /,
+        type  => 'bad net byte',
+    },
+    {
+        input => ['209.500.70.33/19'],
+        error => qr/^could not parse /,
+        type  => 'bad net byte',
+    },
+    {
+        input => ['140.999.82'],
+        error => qr/^could not parse /,
+        type  => 'bad net byte',
+    },
+    {
+        input => ['899.174'],
+        error => qr/^could not parse /,
+        type  => 'bad net byte',
+    },
+    {
+        input => ['900'],
+        error => qr/^could not parse /,
+        type  => 'bad net byte',
+    },
+    {
+        input => ['209.157.300/19'],
+        error => qr/^could not parse /,
+        type  => 'bad net byte',
+    },
+    {
+        input => ['209.300.64.0-209.157.95.255'],
+        error => qr/^illegal dotted quad/,
+        type  => 'bad net byte',
+    },
+    # test ranges that are a power-of-two big, but are not legal blocks
+    {
+        input => ['218.0.0.0 - 211.255.255.255'],
+        error => qr/^could not find exact fit/,
+        type  => 'inexact fit',
+    },
+    # test some more bad nets/masks
+    {
+        input => ['218.0.0.4 - 218.0.0.11'],
+        error => qr/^could not find exact fit/,
+        type  => 'inexact fit',
+    },
+    {
+        input => ['10.10.10.10#256.0.0.0'],
+        error => qr/^illegal hostmask:/,
+        type  => 'bad mask byte',
+    },
+    {
+        input => [ '209.157.200.22', '256.255.224.0' ],
+        error => qr/^illegal netmask:/,
+        type  => 'bad mask byte',
+    },
+    {
+        input => [ '10.10.10.10', '0xF' ],
+        error => qr/^illegal netmask:/,
+        type  => 'bad mask',
+    },
+    {
+        input => ['209.200.70.33/33'],
+        error => qr/^illegal number of bits/,
+        type  => 'bad mask',
+    },
+    {
+        input => ['209.200.64.0-309.157.95.255'],
+        error => qr/^illegal dotted quad/,
+        type  => 'bad mask byte',
+    },
+    # completely invalid args
+    {
+        input => ['foo'],
+        error => qr/^could not parse /,
+        type  => 'bad net',
+    },
+    {
+        input => [ '10.10.10.10', 'foo' ],
+        error => qr/^could not parse /,
+        type  => 'bad mask',
+    },
+    {
+        input => [ '10.10.10', 'foo' ],
+        error => qr/^could not parse /,
+        type  => 'bad mask',
+    },
+    {
+        input => [ '10.10', 'foo' ],
+        error => qr/^could not parse /,
+        type  => 'bad mask',
+    },
+    {
+        input => [ '10', 'foo' ],
+        error => qr/^could not parse /,
+        type  => 'bad mask',
+    },
+    {
+        input => [ '10.10.10.10', '0xYYY' ],
+        error => qr/^could not parse /,
+        type  => 'bad mask',
+    },
 );
-test(
-    26,
-    Net::Netmask->new2('209.157.64.0   -   209.157.95.255'),
-    "whois with mulitple spaces around dash"
-);
 
-# test ranges that are a power-of-two big, but are not legal blocks
-test(
-    27,
-    !Net::Netmask->new2('218.0.0.0 - 221.255.255.255'),
-    "could not find exact fit for 218.0.0.0 - 221.255.255.255"
-);
-test( 28, scalar( Net::Netmask->errstr =~ /^could not find exact fit/ ), "errstr mismatch" );
-test(
-    29,
-    !Net::Netmask->new2('218.0.0.4 - 218.0.0.11'),
-    "could not find exact fit for 218.0.0.4 - 218.0.0.11"
-);
-test( 30, scalar( Net::Netmask->errstr =~ /^could not find exact fit/ ), "errstr mismatch" );
+foreach my $test (@tests) {
+    my $input = $test->{input};
+    my $err   = $test->{error};
+    my $name  = ( join ', ', @{ $test->{input} } );
+    my $type  = $test->{type};
 
-# test some more bad nets/masks
-test( 31, !defined( Net::Netmask->new2('10.10.10.10#256.0.0.0') ), "bad mask byte" );
-test( 32, scalar( Net::Netmask->errstr =~ /^illegal hostmask:/ ),  "errstr mismatch" );
-test( 33, !defined( Net::Netmask->new2( '209.157.200.22', '256.255.224.0' ) ), "bad mask" );
-test( 34, scalar( Net::Netmask->errstr =~ /^illegal netmask:/ ), "errstr mismatch" );
-test( 35, !defined( Net::Netmask->new2( '10.10.10.10', '0xF' ) ), "bad mask" );
-test( 36, scalar( Net::Netmask->errstr =~ /^illegal netmask:/ ),         "errstr mismatch" );
-test( 37, !defined( Net::Netmask->new2('209.200.70.33/33') ),            "bad mask" );
-test( 38, scalar( Net::Netmask->errstr =~ /^illegal number of bits:/ ),  "errstr mismatch" );
-test( 39, !defined( Net::Netmask->new2('209.200.64.0-309.157.95.255') ), "bad mask byte" );
-test( 40, scalar( Net::Netmask->errstr =~ /^illegal dotted quad/ ),      "errstr mismatch" );
+    my $result = Net::Netmask->new2(@$input);
 
-# test completely invalid args
-test( 41, !defined( Net::Netmask->new2('foo') ), "bad net" );
-test( 42, scalar( Net::Netmask->errstr =~ /^could not parse / ), "errstr mismatch" );
-test( 43, !defined( Net::Netmask->new2( '10.10.10.10', 'foo' ) ), "bad mask" );
-test( 44, scalar( Net::Netmask->errstr =~ /^could not parse / ), "errstr mismatch" );
-test( 45, !defined( Net::Netmask->new2( '10.10.10', 'foo' ) ), "bad mask" );
-test( 46, scalar( Net::Netmask->errstr =~ /^could not parse / ), "errstr mismatch" );
-test( 47, !defined( Net::Netmask->new2( '10.10', 'foo' ) ), "bad mask" );
-test( 48, scalar( Net::Netmask->errstr =~ /^could not parse / ), "errstr mismatch" );
-test( 49, !defined( Net::Netmask->new2( '10', 'foo' ) ), "bad mask" );
-test( 50, scalar( Net::Netmask->errstr =~ /^could not parse / ), "errstr mismatch" );
-test( 51, !defined( Net::Netmask->new2( '10.10.10.10', '0xYYY' ) ), "bad mask" );
-test( 52, scalar( Net::Netmask->errstr =~ /^could not parse/ ), "errstr mismatch" );
+    is( $result, undef, "$name $type" );
+    like( Net::Netmask->errstr, $err, "$name errstr mismatch" );
+}
+
+# test whois numbers with space between dash (valid!)
+ok( Net::Netmask->new2('209.157.64.0 - 209.157.95.255'), "whois with single space around dash" );
+ok( Net::Netmask->new2('209.157.64.0   -   209.157.95.255'),
+    "whois with mulitple spaces around dash" );
+
+done_testing;
 

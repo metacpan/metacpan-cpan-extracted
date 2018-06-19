@@ -1,3 +1,61 @@
+* 2018-06-18 3.0.2.6
+  bugfix and improvement in get_snmp_table_objects
+* 2018-03-29 3.0.2.5
+  convert more extended ascii characters to ascii
+* 2018-03-26 3.0.2.4
+  fix an obvious bug in quantum-midrange-tape-library-mib
+* 2018-03-23 3.0.2.3
+  fix quantim-small-library id, add quantum-midrange
+* 2018-03-07 3.0.2.2
+  fix Sparseseen warning for older perls
+  update f5-bigip-system-mib
+* 2018-03-01 3.0.2.1
+  fix DateAndTime parsing in Mib2Mib
+* 2018-02-15 3.0.2
+  add MIB-Dell-10892
+  rfc3986:// can now be used for --namex too
+* 2018-01-29 3.0.1.3
+  fix a bug in --environment restart
+  If you like this bugfix, go buy an Audi. They found the bug.
+* 2018-01-25 3.0.1.2
+  fix ADIC_TAPE_LIBRARY_MIB name
+* 2018-01-25 3.0.1.1
+  fix adic/quantum signatures
+* 2018-01-25 3.0.1
+  add ADIC-TAPE-LIBRARY-MIB
+* 2018-01-15 3.0.0.5
+  fix fix fix mib2 DateAndTime returns epoch
+* 2018-01-11 3.0.0.4
+  fix fix mib2 DateAndTime returns epoch
+* 2018-01-11 3.0.0.3
+  fix mib2 DateAndTime returns epoch
+* 2018-01-09 3.0.0.2
+  mib2 DateAndTime returns epoch
+* 2018-01-08 3.0.0.1
+  bugfix in get_table
+* 2018-01-05 3.0
+  performance improvements for snmp
+* 2017-12-21 2.4.15
+  add IANAIFTYPEMIB and DELLRACMIB
+* 2017-12-20 2.4.14.15
+  rename ETHERLIKE-MIB
+* 2017-12-14 2.4.14.14
+  re-introduce session timeout
+* 2017-12-14 2.4.14.13
+  Prevent uninitialized in valdiff
+* 2017-12-13 2.4.14.12
+  Prevent uninitialized in valdiff
+* 2017-12-06 2.4.14.11
+  Improved  messages for state/cache loading errors
+* 2017-12-06 2.4.14.10
+  rename Netvision-v6 file
+* 2017-12-01 2.4.14.9
+  allow dots in blacklists
+* 2017-11-27 2.4.14.8
+  don't classify_as monitoring-glplugin
+* 2017-11-26 2.4.14.7
+  update UCD-DISKIO-MIB
+  remove prettySysDescr
 * 2017-11-26 2.4.14.6
   update UCD-SNMP-MIB
 * 2017-11-26 2.4.14.5

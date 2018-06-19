@@ -8,7 +8,8 @@ use Test::EOL;
 
 my @files = (
     'lib/File/Update.pm',
-    't/00-compile.t'
+    't/00-compile.t',
+    't/test1.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

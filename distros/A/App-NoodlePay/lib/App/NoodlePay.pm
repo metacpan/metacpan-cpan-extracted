@@ -4,7 +4,7 @@
 # App::NoodlePay - Convenient way to securely send Bitcoin from cold storage
 # Copyright (c) Ashish Gulhati <noodlepay at hash.neo.tc>
 #
-# $Id: lib/App/NoodlePay.pm v1.005 Fri Mar 23 18:47:36 PDT 2018 $
+# $Id: lib/App/NoodlePay.pm v1.006 Tue Jun 19 01:28:57 PDT 2018 $
 
 package App::NoodlePay;
 
@@ -17,7 +17,7 @@ use GD::Barcode::QRcode;
 use Math::Prime::Util qw(fromdigits todigitstring);
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.005 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.006 $' =~ /\s+([\d\.]+)/;
 
 1;
 
@@ -29,8 +29,8 @@ App::NoodlePay - Convenient way to securely send Bitcoin from cold storage
 
 =head1 VERSION
 
- $Revision: 1.005 $
- $Date: Fri Mar 23 18:47:36 PDT 2018 $
+ $Revision: 1.006 $
+ $Date: Tue Jun 19 01:28:57 PDT 2018 $
 
 =head1 SYNOPSIS
 
@@ -72,7 +72,7 @@ and when you click OK it is broadcast.
 
 Your private keys always stay secure on the offline Noodle Air.
 
-Noodle Air provides a truly mobile, wire-free and convenient cold
+Noodle Pay provides a truly mobile, wire-free and convenient cold
 storage payment solution. Most hardware wallets require the use of a
 desktop or laptop computer, and a USB cable to connect it to the
 hardware wallet device.

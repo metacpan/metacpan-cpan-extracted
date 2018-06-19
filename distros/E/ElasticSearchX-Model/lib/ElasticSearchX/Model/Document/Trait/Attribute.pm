@@ -8,7 +8,7 @@
 #   The (three-clause) BSD License
 #
 package ElasticSearchX::Model::Document::Trait::Attribute;
-$ElasticSearchX::Model::Document::Trait::Attribute::VERSION = '1.0.3';
+$ElasticSearchX::Model::Document::Trait::Attribute::VERSION = '2.0.0';
 # ABSTRACT: Trait that extends the meta class of a document class
 use Moose::Role;
 use ElasticSearchX::Model::Document::Mapping;
@@ -121,7 +121,7 @@ ElasticSearchX::Model::Document::Trait::Attribute - Trait that extends the meta 
 
 =head1 VERSION
 
-version 1.0.3
+version 2.0.0
 
 =head1 ATTRIBUTES
 

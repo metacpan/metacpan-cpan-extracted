@@ -18,6 +18,10 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Text::CSV::Pivot:
+    file: lib/Text/CSV/Pivot.pm
+    version: '0.08'
 requires:
   File::Basename: '2.6'
   Getopt::Long: '2.48'
@@ -25,5 +29,5 @@ requires:
   perl: '5.008'
 resources:
   repository: https://github.com/manwar/Text-CSV-Pivot.git
-version: '0.06'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

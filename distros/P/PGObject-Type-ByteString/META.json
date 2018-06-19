@@ -1,10 +1,10 @@
 {
-   "abstract" : "Wrapper for raw strings mapping to BYTEA columns",
+   "abstract" : "Wrapper for raw strings mapping to BYTEA columns.",
    "author" : [
       "Erik Huelsmann <ehuels@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "bsd"
    ],
@@ -34,7 +34,8 @@
       "runtime" : {
          "requires" : {
             "DBD::Pg" : "1.20",
-            "PGObject" : "v1.403.2"
+            "PGObject" : "v1.403.2",
+            "Ref::Util" : "0"
          }
       }
    },
@@ -46,6 +47,5 @@
          "web" : "https://github.com/ledgersmb/PGObject-Type-ByteString"
       }
    },
-   "version" : "v1.2.0",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "v1.2.3"
 }

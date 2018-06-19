@@ -13,16 +13,16 @@
 static I32
 S_sv_ncmp(pTHX_ SV *a, SV *b)
 {
-    const char *ia = (const char *) SvPVbyte_nolen(a);
-    const char *ib = (const char *) SvPVbyte_nolen(b);
+    const char *ia = (const char *) SvPVutf8_nolen(a);
+    const char *ib = (const char *) SvPVutf8_nolen(b);
     return _ncmp(ia, ib, 0, 0);
 }
 
 static I32
 S_sv_ncmp_reverse(pTHX_ SV *a, SV *b)
 {
-    const char *ia = (const char *) SvPVbyte_nolen(a);
-    const char *ib = (const char *) SvPVbyte_nolen(b);
+    const char *ia = (const char *) SvPVutf8_nolen(a);
+    const char *ib = (const char *) SvPVutf8_nolen(b);
     return _ncmp(ia, ib, 1, 0);
 }
 
@@ -60,7 +60,7 @@ nsort(...)
     PROTOTYPE: @
     CODE:
         if (!items) {
-            XSRETURN_UNDEF;
+            XSRETURN(0);
         }
         AV * array = newAV();
         int i;

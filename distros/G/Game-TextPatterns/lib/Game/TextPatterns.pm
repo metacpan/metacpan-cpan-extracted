@@ -9,22 +9,37 @@ package Game::TextPatterns;
 use 5.14.0;
 use warnings;
 use Carp qw(croak);
+use List::Util qw(min);
 use Moo;
 use namespace::clean;
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.01';
+our $VERSION = '0.42';
 
-with 'MooX::Rebuild';    # for ->rebuild (which differs from clone)
+with 'MooX::Rebuild';    # for ->rebuild (which differs from ->clone)
 
 has pattern => (
     is     => 'rw',
     coerce => sub {
         my $type = ref $_[0];
-        if ( $type eq "" ) { return [ split $/, $_[0] ] }
-        elsif ( $type eq 'ARRAY' )      { return [ @{ $_[0] } ] }
-        elsif ( $_[0]->can("pattern") ) { return [ @{ $_[0]->pattern } ] }
-        else                            { die "unknown pattern type '$type'" }
+        if ( $type eq "" ) {
+            my @pat = split $/, $_[0];
+            my $len = length $pat[0];
+            for my $i ( 1 .. $#pat ) {
+                die "columns must be of equal length" if length $pat[$i] != $len;
+            }
+            return \@pat;
+        } elsif ( $type eq 'ARRAY' ) {
+            my $len = length $_[0]->[0];
+            for my $i ( 1 .. $#{ $_[0] } ) {
+                die "columns must be of equal length" if length $_[0]->[$i] != $len;
+            }
+            return [ @{ $_[0] } ];
+        } elsif ( $_[0]->can("pattern") ) {
+            return [ @{ $_[0]->pattern } ];
+        } else {
+            die "unknown pattern type '$type'";
+        }
     },
 );
 
@@ -37,19 +52,68 @@ sub BUILD {
 #
 # METHODS
 
-# TODO append by cols or by rows with handling of not-same-size cases somehow
 sub append_cols {
-    my ( $self, $pattern ) = @_;
-    my $pat = $self->pattern;
-    my $len = length $pat->[0];
+    my ( $self, $fill, $pattern ) = @_;
+    croak "need append_cols(fill, pattern)" if !defined $pattern;
+    my ( $fill_cur, $fill_new );
+    if ( ref $fill eq 'ARRAY' ) {
+        ( $fill_cur, $fill_new ) = @$fill;
+    } else {
+        $fill_cur = $fill_new = $fill;
+    }
+    my $pat     = $self->pattern;
+    my @cur_dim = ( length $_[0]->pattern->[0], scalar @{ $_[0]->pattern } );
+    my @new_dim = $pattern->dimensions;
+    if ( $cur_dim[1] > $new_dim[1] ) {
+        # fill for new below where the
+        for my $i ( 1 .. $cur_dim[1] - $new_dim[1] ) {
+            $pat->[ -$i ] .= $fill_new x $new_dim[0];
+        }
+    } elsif ( $cur_dim[1] < $new_dim[1] ) {
+        for my $i ( 1 .. $new_dim[1] - $cur_dim[1] ) {
+            push @$pat, $fill_cur x $cur_dim[0];
+        }
+    }
+    my $new = $pattern->pattern;
+    for my $i ( 0 .. $new_dim[1] - 1 ) {
+        $pat->[$i] .= $new->[$i];
+    }
     return $self;
 }
 
 sub append_rows {
-    my ( $self, $new ) = @_;
-    my $pat = $self->pattern;
-    push @$pat, @{ $new->pattern };
+    my ( $self, $fill, $pattern ) = @_;
+    croak "need append_rows(fill, pattern)" if !defined $pattern;
+    my ( $fill_cur, $fill_new );
+    if ( ref $fill eq 'ARRAY' ) {
+        ( $fill_cur, $fill_new ) = @$fill;
+    } else {
+        $fill_cur = $fill_new = $fill;
+    }
+    my $pat     = $self->pattern;
+    my @cur_dim = ( length $_[0]->pattern->[0], scalar @{ $_[0]->pattern } );
+    my @new_dim = $pattern->dimensions;
+    push @$pat, @{ $pattern->pattern };
+    if ( $cur_dim[0] > $new_dim[0] ) {
+        for my $i ( 0 .. $new_dim[1] - 1 ) {
+            $pat->[ $cur_dim[1] + $i ] .= $fill_new x ( $cur_dim[0] - $new_dim[0] );
+        }
+    } elsif ( $cur_dim[0] < $new_dim[0] ) {
+        for my $i ( 0 .. $cur_dim[1] - 1 ) {
+            $pat->[$i] .= $fill_cur x ( $new_dim[0] - $cur_dim[0] );
+        }
+    }
     return $self;
+}
+
+sub as_array {
+    my ($self) = @_;
+    my $pat = $self->pattern;
+    my @array;
+    for my $row (@$pat) {
+        push @array, [ split //, $row ];
+    }
+    return \@array;
 }
 
 sub border {
@@ -85,6 +149,62 @@ sub cols       { length $_[0]->pattern->[0] }
 sub dimensions { length $_[0]->pattern->[0], scalar @{ $_[0]->pattern } }
 sub rows       { scalar @{ $_[0]->pattern } }
 
+sub _normalize_rectangle {
+    my ( $self, $p1, $p2, $cols, $rows ) = @_;
+    for my $p ( $p1, $p2 ) {
+        $p->[0] += $cols - 1 if $p->[0] < 0;
+        $p->[1] += $rows - 1 if $p->[1] < 0;
+        if ( $p->[0] < 0 or $p->[0] >= $cols or $p->[1] < 0 or $p->[1] >= $rows ) {
+            local $" = ',';
+            return undef, "crop point @$p out of bounds";
+        }
+    }
+    ( $p1->[0], $p2->[0] ) = ( $p2->[0], $p1->[0] ) if $p1->[0] > $p2->[0];
+    ( $p1->[1], $p2->[1] ) = ( $p2->[1], $p1->[1] ) if $p1->[1] > $p2->[1];
+    return $p1, $p2;
+}
+
+sub crop {
+    my ( $self, $p1, $p2 ) = @_;
+    my $pat = $self->pattern;
+    my ( $cols, $rows ) = ( length $pat->[0], scalar @$pat );
+    if ( !$p2 ) {
+        $p2 = $p1;
+        $p1 = [ 0, 0 ];
+    }
+    ( $p1, $p2 ) = $self->_normalize_rectangle( $p1, $p2, $cols, $rows );
+    croak $p2 unless defined $p1;
+    my @new;
+    unless ( $p2->[0] == 0 or $p2->[1] == 0 ) {
+        for my $rnum ( $p1->[1] .. $p2->[1] ) {
+            push @new, substr $pat->[$rnum], $p1->[0], $p2->[0] - $p1->[0] + 1;
+        }
+    }
+    $self->pattern( \@new );
+    return $self;
+}
+
+sub draw_in {
+    my ( $self, $p1, $p2, $pattern ) = @_;
+    my $pat = $self->pattern;
+    my ( $cols, $rows ) = ( length $pat->[0], scalar @$pat );
+    if ( !defined $pattern ) {
+        $pattern = $p2;
+        croak "need pattern to draw into the object" if !defined $pattern;
+        $p2 = [ $cols - 1, $rows - 1 ];
+    }
+    ( $p1, $p2 ) = $self->_normalize_rectangle( $p1, $p2, $cols, $rows );
+    my $draw = $pattern->pattern;
+    my ( $draw_cols, $draw_rows ) = ( length $draw->[0], scalar @$draw );
+    my $ccount = min( $draw_cols, $p2->[0] - $p1->[0] + 1 );
+    my $rcount = min( $draw_rows, $p2->[1] - $p1->[1] + 1 );
+    for my $rnum ( 0 .. $rcount - 1 ) {
+        substr( $pat->[ $p1->[1] + $rnum ], $p1->[0], $ccount ) =
+          substr( $draw->[$rnum], 0, $ccount );
+    }
+    return $self;
+}
+
 # "mirrors are abominable" (Jorge L. Borges. "Tlön, Uqbar, Orbis Tertuis")
 # so the term flip is here used instead
 sub flip_both {
@@ -105,10 +225,82 @@ sub flip_cols {
     return $self;
 }
 
+sub flip_four {
+    my ($self) = @_;
+    my @quads = $self->clone;
+    push @quads, $quads[0]->clone->flip_cols;
+    push @quads, $quads[-1]->clone->flip_rows;
+    push @quads, $quads[0]->clone->flip_rows;
+    $quads[1]->append_cols( '?', $quads[0] );
+    $quads[2]->append_cols( '?', $quads[3] );
+    $quads[1]->append_rows( '?', $quads[2] );
+    return $quads[1];
+}
+
 sub flip_rows {
     my ($self) = @_;
     my $pat = $self->pattern;
     @$pat = reverse @$pat if @$pat > 1;
+    return $self;
+}
+
+sub four_up {
+    my ( $self, $fill, $do_crop ) = @_;
+    if ( defined $fill ) {
+        croak "fill to four_up must not be a ref" if ref $fill;
+    } else {
+        $fill = '?';
+    }
+    my @quads = $self->clone;
+    my $pat   = $quads[0]->pattern;
+    my ( $cols, $rows ) = ( length $pat->[0], scalar @$pat );
+    if ($do_crop) {
+        my $rownum = $rows - 1;
+        if ( $cols > $rows ) {    # wide
+            $quads[0]->crop( [ 0, 0 ], [ $rownum, $rownum ] );
+        } elsif ( $cols < $rows ) {    # tall
+            my $colnum = $cols - 1;
+            $quads[0]->crop( [ 0, $rownum - $colnum ], [ $colnum, $rownum ] );
+        }
+    } else {
+        if ( $cols > $rows ) {         # wide
+            my $add = $cols - $rows;
+            my $pad = __PACKAGE__->new( pattern => $fill )->multiply( $cols, $add )
+              ->append_rows( $fill, $quads[0] );
+            $quads[0] = $pad;
+        } elsif ( $cols < $rows ) {    # tall
+            my $add = $rows - $cols;
+            my $pad = __PACKAGE__->new( pattern => $fill )->multiply( $add, $rows );
+            $quads[0]->append_cols( $fill, $pad );
+        }
+    }
+    for my $r ( 1 .. 3 ) {
+        push @quads, $quads[0]->clone->rotate($r);
+    }
+    $quads[1]->append_cols( $fill, $quads[0] );
+    $quads[2]->append_cols( $fill, $quads[3] );
+    $quads[1]->append_rows( $fill, $quads[2] );
+    return $quads[1];
+}
+
+sub from_array {
+    my ( $self, $array ) = @_;
+    my @pat;
+    for my $row (@$array) {
+        push @pat, join( '', @$row );
+    }
+    $self->pattern( \@pat );
+    return $self;
+}
+
+sub mask {
+    my ( $self, $mask, $pattern ) = @_;
+    my $pat = $self->pattern;
+    my ( $cols, $rows ) = ( length $pat->[0], scalar @$pat );
+    my $rep = $pattern->pattern;
+    for my $r ( 0 .. $rows - 1 ) {
+        $pat->[$r] =~ s{([$mask]+)}{substr($rep->[$r], $-[0], $+[0] - $-[0]) || $1}eg;
+    }
     return $self;
 }
 
@@ -138,13 +330,91 @@ sub multiply {
     return $self;
 }
 
-# TODO rotate -- 90, 180, 270 -- is 180 same as flip_both?
-# make direction the same as motion on unit circle so 90 is to the left?
+sub overlay {
+    my ( $self, $p, $overlay, $mask ) = @_;
+    my ( $cols, $rows ) = $self->dimensions;
+    $p->[0] += $cols - 1 if $p->[0] < 0;
+    $p->[1] += $rows - 1 if $p->[1] < 0;
+    if ( $p->[0] < 0 or $p->[0] >= $cols or $p->[1] < 0 or $p->[1] >= $rows ) {
+        local $" = ',';
+        croak "point @$p out of bounds";
+    }
+    my ( $colnum, $rownum ) = map { $_ - 1 } $overlay->dimensions;
+    my $subpat =
+      $self->clone->crop( $p,
+        [ min( $p->[0] + $colnum, $cols - 1 ), min( $p->[1] + $rownum, $rows - 1 ) ] );
+    my $to_draw = $overlay->clone->mask( $mask, $subpat );
+    $self->draw_in( $p, $to_draw );
+    return $self;
+}
+
+sub rotate {
+    my ( $self, $rotate_by ) = @_;
+    $rotate_by %= 4;
+    if ( $rotate_by == 0 ) {    # zero degrees
+        return $self;
+    } elsif ( $rotate_by == 2 ) {    # 180 degrees
+        return $self->flip_both;
+    }
+    my $pat = $self->pattern;
+    my ( $cols, $rows ) = ( length $pat->[0], scalar @$pat );
+    my @new;
+    if ( $rotate_by == 1 ) {         # 90 degrees
+        for my $char ( split //, $pat->[0] ) {
+            unshift @new, $char;
+        }
+        if ( $rows > 1 ) {
+            for my $rnum ( 1 .. $rows - 1 ) {
+                for my $cnum ( 0 .. $cols - 1 ) {
+                    $new[ $cols - $cnum - 1 ] .= substr $pat->[$rnum], $cnum, 1;
+                }
+            }
+        }
+    } elsif ( $rotate_by == 3 ) {    # 270 degrees
+        for my $char ( split //, $pat->[-1] ) {
+            push @new, $char;
+        }
+        if ( $rows > 1 ) {
+            for my $rnum ( reverse 0 .. $rows - 2 ) {
+                for my $cnum ( 0 .. $cols - 1 ) {
+                    $new[$cnum] .= substr $pat->[$rnum], $cnum, 1;
+                }
+            }
+        }
+    }
+    $self->pattern( \@new );
+    return $self;
+}
 
 sub string {
     my ( $self, $sep ) = @_;
     $sep //= $/;
     return join( $sep, @{ $self->pattern } ) . $sep;
+}
+
+sub trim {
+    my ( $self, $amount ) = @_;
+    return $self->crop( [ $amount, $amount ], [ -$amount, -$amount ] );
+}
+
+sub white_noise {
+    my ( $self, $char, $percent ) = @_;
+    my $pat = $self->pattern;
+    my ( $cols, $rows ) = ( length $pat->[0], scalar @$pat );
+    my $total   = $cols * $rows;
+    my $to_fill = int( $total * $percent );
+    if ( $to_fill > 0 ) {
+        for my $row (@$pat) {
+            for my $i ( 0 .. $cols - 1 ) {
+                if ( rand() < $to_fill / $total ) {
+                    substr( $row, $i, 1 ) = $char;
+                    $to_fill--;
+                }
+                $total--;
+            }
+        }
+    }
+    return $self;
 }
 
 1;
@@ -160,13 +430,12 @@ Game::TextPatterns - generate patterns of text
 
   my $v = Game::TextPatterns->new( pattern => ".#\n#." );
 
-  $v->multiply(7,3)
-    ->border(1,'#')->border(1,'.')->border(1,'#');
+  $v->multiply(7,3)->border->border(1, '.')->border;
 
   print $v->string;
 
 Ta-da! You should now have an Angband checker type vault. (Doors not
-included. Monsters and items may cost extra.)
+included. Items and monsters may cost extra.)
 
   ####################
   #..................#
@@ -180,6 +449,63 @@ included. Monsters and items may cost extra.)
   #.################.#
   #..................#
   ####################
+
+Items might be added by applying an appropriate B<mask>:
+
+  my $i = Game::TextPatterns->new( pattern => "." );
+  $i->multiply( 19, 11 );
+  $i->white_noise( '?', .1 );
+  $v->mask( '.', $i );
+  print $v->string;
+
+Which could result in
+
+  ####################
+  #.?..............?.#
+  #.################.#
+  #.#.#.#.#.#.#.#.##.#
+  #?##.#.#.#.#.#.#.#.#
+  #.#.#.#.#.#.#?#.##?#
+  #.##.#?#.#.#.#.#.#.#
+  #.#.#?#.#.#.#.#.##.#                  #######
+  #.##.#.#.#.#.#.#.#.#                  .@...<#
+  #.################.#                  #######
+  #.?....?.?.........#
+  ####################
+
+And this pattern adjusted with B<four_up>, twice
+
+  my $pat = Game::TextPatterns->new( pattern => <<"EOF" );
+  ..##.
+  ...##
+  #....
+  ##..#
+  .#.##
+  EOF
+  print $pat->four_up->four_up->string;
+
+creates
+
+  .#.##..##..#.##..##.
+  ##..#...####..#...##
+  #....#....#....#....
+  ...####..#...####..#
+  ..##..#.##..##..#.##
+  ##.#..##..##.#..##..
+  #..####...#..####...
+  ....#....#....#....#
+  ##...#..####...#..##
+  .##..##.#..##..##.#.
+  .#.##..##..#.##..##.
+  ##..#...####..#...##
+  #....#....#....#....
+  ...####..#...####..#
+  ..##..#.##..##..#.##
+  ##.#..##..##.#..##..
+  #..####...#..####...
+  ....#....#....#....#
+  ##...#..####...#..##
+  .##..##.#..##..##.#.
 
 =head1 DESCRIPTION
 
@@ -204,7 +530,9 @@ The B<pattern> text can be most any string value.
 
 =head1 CONSTRUCTORS
 
-These return new objects. Some require an existing object.
+These return new objects. Some require an existing object that probably
+should not be the same as the object being operated on. If something
+goes wrong they will throw an exception.
 
 =over 4
 
@@ -247,17 +575,30 @@ reference directly.
 =head1 METHODS
 
 Call these on something returned by a constructor. Those that modify the
-pattern in-place can be chained with other methods.
+pattern in-place can be chained with other methods. If something goes
+wrong these will throw an exception.
 
 =over 4
 
-=item B<append_cols>
+=item B<append_cols> I<fill> I<pattern>
 
-TODO
+Appends the given I<pattern> to the right of the existing object. If the
+patterns are of unequal size the I<fill> character (or array reference)
+will be used to fill in the gaps. If I<fill> is an array reference the
+first character of that reference will be used to fill gaps should the
+object be smaller, or otherwise the second character of the array will
+be used as fill if the object is larger than the given I<pattern>.
 
-=item B<append_rows>
+=item B<append_rows> I<fill> I<pattern>
 
-TODO
+Appends the given I<pattern> below the existing object. Same rules for
+I<fill> as for B<append_cols>.
+
+=item B<as_array>
+
+Returns the pattern of the object as a reference to a 2D array.
+Presumably useful for some other interface that expects a 2D grid. See
+also B<from_array>.
 
 =item B<border> I<width> I<character>
 
@@ -269,9 +610,28 @@ Creates a border of the given I<width> (1 by default) and I<character>
 Returns the width (x, or number of columns) in the B<pattern>. This is
 based on the length of the first line of the B<pattern>.
 
+=item B<crop> I<point1> I<point2>
+
+Crops the pattern to the given column and row pairs, which are counted
+from zero for the first row or column, or backwards from the end for
+negative numbers. Will throw an error if the crop values lie outside the
+size of the pattern.
+
+See also B<trim>.
+
 =item B<dimensions>
 
 Returns the B<cols> and B<rows> of the current B<pattern>.
+
+=item B<draw_in> I<point1> [ I<point2> ] I<pattern>
+
+Draws the I<pattern> within the given bounds, though will not extend the
+dimensions of the object if the I<pattern> exceeds that (hence the lower
+right bound being optional). Should the I<pattern> be smaller than the
+given bounds nothing will be changed at those subsequent points (this
+differs from other methods that accept a I<fill> argument).
+
+See also the more complicated B<overlay>.
 
 =item B<flip_both>
 
@@ -281,9 +641,40 @@ Flips the B<pattern> by columns and by rows.
 
 Flips the columns (vertical mirror) in the B<pattern>.
 
+=item B<flip_four>
+
+Treats the object as a pattern in quadrant I of the unit circle and
+returns a new object with that pattern flipped as appropriate into the
+other three quadrants. See also B<four_up>.
+
+Note that this does not modify the object in-place.
+
 =item B<flip_rows>
 
 Flips the rows (horizontal mirror).
+
+=item B<four_up> [ I<fill> ] [ I<crop?> ]
+
+Treats the object as a pattern in quadrant I of the unit circle and
+returns a new object with that pattern rotated into the other three
+quadrants by an appropriate number of degrees. See also B<flip_four>.
+
+I<fill> will be used if the input is not a square during various calls
+to B<append_cols> and B<append_rows>, unless I<crop> is a true value, in
+which case the object used will be cropped to be a square before the
+rotations.
+
+Note that this does not modify the object in-place.
+
+=item B<from_array> I<array>
+
+Replaces the pattern of the object with the contents of the given 2D
+array. See also B<as_array>.
+
+=item B<mask> I<char> I<pattern>
+
+B<mask> replaces instances of the I<char> in the object with the
+corresponding character(s) of the given I<pattern>.
 
 =item B<multiply> I<cols> [ I<rows> ]
 
@@ -291,14 +682,38 @@ Multiplies the existing data in the columns or rows, unless I<cols> or
 I<rows> is C<1>. With no I<rows> set multiplies both the columns and
 rows by the given value.
 
+=item B<overlay> I<point> I<pattern> I<mask>
+
+Draws the I<pattern> into the object at the given I<point> though
+preserving anything from the original object that match the I<mask>
+character in the I<pattern>.
+
+See also the simpler B<draw_in>.
+
 =item B<rows>
 
 Returns the height (y, or number of rows) in the B<pattern>.
 
+=item B<rotate> I<amount>
+
+Rotates the pattern by 0, 90, 180, or 270 degrees specified by the
+integers C<0>, C<1>, C<2>, and C<3> (or modulus of those).
+
 =item B<string> I<sep>
 
 Returns the B<pattern> as a string with rows joined by the I<sep> value
-(a newline by default).
+(C<$/> by default which typically is but may not be a newline).
+
+=item B<trim> I<amount>
+
+Convenience method for C<crop( [amount,amount], [-amount,-amount] )>.
+
+=item B<white_noise> I<char> I<percent>
+
+Fills the object with the given percentage of the I<char> randomly.
+
+    # 50% fill with 'x'
+    $v->white_noise( 'x', .5 );
 
 =back
 
@@ -316,8 +731,15 @@ L<https://github.com/thrig/Game-TextPatterns>
 
 =head2 Known Issues
 
-The newly being written thing (look for TODO or otherwise absent
-methods).
+Probably should have used a 2D array instead of an array of strings,
+internally.
+
+Probably needs more tests for various edge conditions.
+
+B<flip_four> and B<four_up> probably need better names.
+
+Some of the calling arguments to various methods likely need
+improvements which will probably break backwards compatibility.
 
 =head1 SEE ALSO
 
@@ -325,6 +747,11 @@ L<https://github.com/thrig/ministry-of-silly-vaults/>
 
 Consult the C<t/> directory under this module's distribution for
 example code.
+
+Another option might be to use a standard image library and then devise
+a conversion such that particular colors become particular ASCII symbols
+(or combinations of symbols, with Unicode or control sequences to set
+colors or such).
 
 =head1 AUTHOR
 

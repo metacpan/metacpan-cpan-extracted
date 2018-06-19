@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-MakeMaker-Fallback
 
+0.027     2018-06-17 23:55:09Z
+          - fix test failures with Dist::Zilla::Plugin::MakeMaker::Awesome
+            0.43 (and later) due to a change in its Makefile.PL template
+
 0.026     2017-12-11 03:01:32Z
           - warning messages shown to the user are text-wrapped to 78 chars
           - fix printing the Makefile.PL warning during 'dzil run' (and other

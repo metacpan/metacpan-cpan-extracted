@@ -15,8 +15,7 @@ my $builder = Module::Build->new(
     requires => {
         'Carp' => '1.3.8',
         'POSIX' => '1.7.6',
-        'Scalar::Util' => '1.5.0',
-        'aliased' => '0.3.4'
+        'Scalar::Util' => '1.5.0'
     },
     build_requires => {
         'Test::Simple' => '1.302136'

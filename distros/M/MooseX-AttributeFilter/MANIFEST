@@ -9,6 +9,7 @@ lib/MooseX/AttributeFilter/Trait/Attribute.pm
 lib/MooseX/AttributeFilter/Trait/Attribute/Role.pm
 minil.toml
 t/010-filter.t
+t/011-isa-and-coerce.t
 t/020-errors.t
 t/901-roles.t
 t/951-metajunk.t

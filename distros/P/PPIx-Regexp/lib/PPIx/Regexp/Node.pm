@@ -49,20 +49,19 @@ use PPIx::Regexp::Constant qw{
 use PPIx::Regexp::Util qw{ __instance };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.059';
+our $VERSION = '0.060';
 
 use constant ELEMENT_UNKNOWN	=> NODE_UNKNOWN;
 
 sub __new {
     my ( $class, @children ) = @_;
-    ref $class and $class = ref $class;
     foreach my $elem ( @children ) {
 	__instance( $elem, 'PPIx::Regexp::Element' ) or return;
     }
     my $self = {
 	children => \@children,
     };
-    bless $self, $class;
+    bless $self, ref $class || $class;
     foreach my $elem ( @children ) {
 	$elem->_parent( $self );
     }
@@ -349,6 +348,12 @@ sub perl_version_removed {
 	}
     }
     return $max;
+}
+
+sub remove_insignificant {
+    my ( $self ) = @_;
+    return $self->__new( map { $_->remove_insignificant() }
+	$self->children() );
 }
 
 =head2 schild

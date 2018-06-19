@@ -1,7 +1,7 @@
 package Finance::Currency::Convert::GMC;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-06-17'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -46,8 +46,10 @@ _
 };
 sub get_currencies {
     require Mojo::DOM;
+    require Parse::Date::Month::ID;
     #require Parse::Number::ID;
     require Parse::Number::EN;
+    require Time::Local;
 
     my %args = @_;
 
@@ -90,8 +92,34 @@ sub get_currencies {
         return [543, "Check: no/too few currencies found"];
     }
 
+    my $mtime;
+  GET_MTIME: {
+        unless ($page =~ m!</table>\s*<br>\s*<a>((\d+)-(\w+) (\d+):(\d+))</a>!s) {
+            log_warn "Cannot extract last update time";
+            last;
+        }
+        my $mon = Parse::Date::Month::ID::parse_date_month_id(text=>$3) or do {
+            log_warn "Cannot recognize month name '$3' in last update time '$1'";
+            last;
+        };
+        my $now = time();
+        my $year = (localtime $now)[5];
+        # the web page doesn't show year, pick year that will result in nearest
+        # time to current time
+        my $time1 = Time::Local::timegm(0, $5, $4, $2, $mon-1, $year  ) - 7*3600;
+        my $time2 = Time::Local::timegm(0, $5, $4, $2, $mon-1, $year-1) - 7*3600;
+        if (abs($time1 - $now) < abs($time2 - $now)) {
+            $mtime = $time1;
+        } else {
+            $mtime = $time2;
+        }
+    }
+
     # XXX parse update dates (mtime_er, mtime_ttc, mtime_bn)
-    [200, "OK", {currencies=>\%currencies}];
+    [200, "OK", {
+        mtime => $mtime,
+        currencies => \%currencies,
+    }];
 }
 
 # used for testing only
@@ -186,7 +214,7 @@ Finance::Currency::Convert::GMC - Convert currency using GMC (Golden Money Chang
 
 =head1 VERSION
 
-This document describes version 0.003 of Finance::Currency::Convert::GMC (from Perl distribution Finance-Currency-Convert-GMC), released on 2017-07-10.
+This document describes version 0.004 of Finance::Currency::Convert::GMC (from Perl distribution Finance-Currency-Convert-GMC), released on 2018-06-17.
 
 =head1 SYNOPSIS
 
@@ -300,7 +328,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

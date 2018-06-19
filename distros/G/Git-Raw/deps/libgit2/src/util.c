@@ -10,7 +10,12 @@
 #include "common.h"
 
 #ifdef GIT_WIN32
+# include "win32/utf-conv.h"
 # include "win32/w32_buffer.h"
+
+# ifdef HAVE_QSORT_S
+#  include <search.h>
+# endif
 #endif
 
 #ifdef _MSC_VER
@@ -799,6 +804,22 @@ int git__utf8_iterate(const uint8_t *str, int str_len, int32_t *dst)
 double git_time_monotonic(void)
 {
 	return git__timer();
+}
+
+size_t git__utf8_valid_buf_length(const uint8_t *str, size_t str_len)
+{
+	size_t offset = 0;
+
+	while (offset < str_len) {
+		int length = git__utf8_charlen(str + offset, str_len - offset);
+
+		if (length < 0)
+			break;
+
+		offset += length;
+	}
+
+	return offset;
 }
 
 #ifdef GIT_WIN32

@@ -1,0 +1,74 @@
+{
+   "abstract" : "MuForm class with DBIC model already applied",
+   "author" : [
+      "Gerda Shank"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-MuForm-Model-DBIC",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Load" : "0.06",
+            "Class::XSAccessor" : "0",
+            "DBIx::Class" : "0.08250",
+            "DBIx::Class::ResultSet::RecursiveUpdate" : "0.25",
+            "Data::MuForm" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "File::ShareDir" : "0",
+            "File::Spec" : "0",
+            "HTML::TreeBuilder" : "3.23",
+            "Moo" : "2.000",
+            "MooX::Aliases" : "0",
+            "Scalar::Util" : "0",
+            "Try::Tiny" : "0",
+            "Type::Tiny" : "0",
+            "aliased" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DateTime::Format::SQLite" : "0",
+            "Test::Differences" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.94",
+            "Test::Warn" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/gshank/data-muform-model-dbic/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gshank/data-muform-model-dbic.git",
+         "web" : "http://github.com/gshank/data-muform-model-dbic"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+}
+

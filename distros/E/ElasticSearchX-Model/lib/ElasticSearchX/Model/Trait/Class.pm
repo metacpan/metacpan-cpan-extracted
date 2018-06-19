@@ -8,7 +8,7 @@
 #   The (three-clause) BSD License
 #
 package ElasticSearchX::Model::Trait::Class;
-$ElasticSearchX::Model::Trait::Class::VERSION = '1.0.3';
+$ElasticSearchX::Model::Trait::Class::VERSION = '2.0.0';
 use Moose::Role;
 use List::Util ();
 use Carp;
@@ -66,7 +66,7 @@ ElasticSearchX::Model::Trait::Class
 
 =head1 VERSION
 
-version 1.0.3
+version 2.0.0
 
 =head1 AUTHOR
 

@@ -1,0 +1,16 @@
+If you are looking for ways to help:
+
+* Add tests!
+  * Do we do the right thing with unexpected encodings?  We create type
+    1, 2, and 3 messages today - what happens with a type 4? Type x?
+    Type chr(0)?
+  * Check error messages when bad keys are provided
+  * Check that system throws exceptions when methods are called with the
+    wrong number/type of parameters (extend tests in 05-calling.t)
+  * Does the module properly handle UTF-8 wide characters and such?
+  * If you write a test that should pass, but there is a bug, make it a
+    TODO test so it doesn't break the build - but I would love those
+    kinds of tests!
+* File encryption routines - for all routines have a variant that works
+  with files as input or output or both.
+

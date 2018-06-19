@@ -1,12 +1,7 @@
 do { my $x = {
-       'build' => {
-                    'requires' => {
-                                    'Module::Build' => '0.3601'
-                                  }
-                  },
        'configure' => {
                         'requires' => {
-                                        'Module::Build' => '0.28'
+                                        'ExtUtils::MakeMaker' => '0'
                                       }
                       },
        'develop' => {
@@ -46,8 +41,6 @@ do { my $x = {
                                       'MooseX::Types::Structured' => '0',
                                       'Scalar::Util' => '0',
                                       'Search::Elasticsearch' => '2.02',
-                                      'Search::Elasticsearch::Bulk' => '0',
-                                      'Search::Elasticsearch::Scroll' => '0',
                                       'Sub::Exporter' => '0',
                                       'strict' => '0',
                                       'version' => '0',

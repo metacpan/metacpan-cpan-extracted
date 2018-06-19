@@ -1,15 +1,74 @@
-This is CPAN distribution of the Lingua::RU::Money::XS module. Please note that
-this module works only on Perl 5.16.0 and newer.
+NAME
+    Lingua::RU::Money::XS - Perl extension for digit conversion to
+    corresponding money sum in Russian.
 
-Run `perldoc Lingua::RU::Money::XS` (while in this source directory before
-installation) for more documentation.
+SYNOPSIS
+      use Lingua::RU::Money::XS qw(rur2words);
+      print rur2words(123456789012345.00)
+      # outputs "сто двадцать три триллиона четыреста пятьдесят шесть миллиардов семьсот восемьдесят девять миллионов двенадцать тысяч триста сорок пять рублей 00 копеек"
 
-See https://github.com/igormunkin/Lingua-RU-Money-XS/issues for full list of
-open problems and feel free to report your bugs and feature requests there or
-by mailing imun@cpan.org
+DESCRIPTION
+  SUBROUTINES
+    Lingua::RU::Money::XS::rur2words
+        "rur2words" returns a given as number money sum in words, i.e.
+        *5.10* converts to *пять рублей 10 копеек*. The target charset is
+        UTF-8.
 
-Copyright (C) 2017 by Igor Munkin
+    Lingua::RU::Money::XS::all2words
+        "all2words" returns a given as number money sum in words, i.e.
+        *5.10* converts to *пять рублей десять копеек*. The target charset
+        is UTF-8.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16.0 or,
-at your option, any later version of Perl 5 you may have available.
+    Caution: Current implementation of "rur2words" and "all2words" follows
+    the Perl philosophy - anyway the given argument will be casted to
+    "double".
+
+    Caution: Due to previous caution there are several constraints, making
+    conversion impossible. These constraints divide input values into 4
+    groups listed below
+
+    *amount less than 0*
+            Conversion for specified values make no sense. Thus, conversion
+            croaks for all these values.
+
+    *amount between 0 and 1e12*
+            Any value in this range converts correctly with the specified
+            accuracy.
+
+    *amount between 1e12 and 1e15*
+            Due to the lack for significant digits after the radix point for
+            some values in this range, kopeck value is calculated
+            inaccurate. It simply is replaced with the 0 with the
+            corresponding warning.
+
+    *amount greater or equal than 1e15*
+            Conversion for these values is impossible due to the type
+            overflow. Conversion also croaks for all these values.
+
+  EXPORT
+    Nothing is exported by default.
+
+  SUPPORTED VERSIONS OF PERL
+    Please note that this module works only on Perl 5.10.0 and newer.
+
+    Caution: Though the version 0.06 of current module works with Perl
+    5.10.0, *it cannot be used in Perl older 5.16.0* due to typo within this
+    package. Please use version 0.07 instead.
+
+AUTHOR
+    Igor Munkin, <imun@cpan.org>
+
+ACKNOWLEDGEMENTS
+    Mons Anderson - The original idea, rationale and motivation
+
+BUGS
+    Feel free to report your bugs by mailing to <imun@cpan.org> or via
+    <https://rt.cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2017-2018 by Igor Munkin
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.10.0 or, at
+    your option, any later version of Perl 5 you may have available.
+

@@ -16,7 +16,7 @@ configure_requires:
   File::ShareDir::Install: '0.06'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,10 +28,10 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Author::MINTLAB:
     file: lib/Dist/Zilla/MintingProfile/Author/MINTLAB.pm
-    version: '0.01'
+    version: '0.02'
   Dist::Zilla::PluginBundle::Author::MINTLAB:
     file: lib/Dist/Zilla/PluginBundle/Author/MINTLAB.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Data::Dumper: '0'
   Dist::Zilla::App::Command::xtest: '0'
@@ -61,8 +61,9 @@ requires:
   namespace::clean: '0'
   perl: '5.010'
 resources:
-  repository: git://gitlab.com/mintlab/dist-zilla-pluginbundle-author-mintlab
-version: '0.01'
+  repository: git://gitlab.com/waterkip/dist-zilla-pluginbundle-author-mintlab.git
+version: '0.02'
 x_contributors:
   - 'Wesley Schwengle <wesley@schwengle.net>'
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.24.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

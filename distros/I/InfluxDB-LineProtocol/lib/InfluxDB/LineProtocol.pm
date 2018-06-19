@@ -2,7 +2,7 @@ package InfluxDB::LineProtocol;
 use strict;
 use warnings;
 
-our $VERSION = '1.009';
+our $VERSION = '1.010';
 
 # ABSTRACT: Write and read InfluxDB LineProtocol
 
@@ -77,7 +77,7 @@ sub _format_value {
     }
     else {
         # string actually, but this should be quoted differently?
-        $v =~ s/"/\\"/g;
+        $v =~ s/(["\\])/\\$1/g;
         $v = '"' . $v . '"';
     }
 
@@ -172,6 +172,7 @@ sub line2data {
     $line =~ s/\\ /ESCAPEDSPACE/g;
     $line =~ s/\\,/ESCAPEDCOMMA/g;
     $line =~ s/\\"/ESCAPEDDBLQUOTE/g;
+    $line =~ s/\\\\/ESCAPEDBACKSLASH/g;
 
     $line=~/^(.*?) (.*) (.*)$/;
     my ($key, $fields, $timestamp) = ( $1, $2, $3);
@@ -200,7 +201,9 @@ sub line2data {
         my ( $k, $v ) = split( /=/, $valset );
         $v =~ s/ESCAPEDSTRING_(\d+)/$strings[$1]/ge;
         $v =~ s/ESCAPEDDBLQUOTE/"/g;
+        $v =~ s/ESCAPEDBACKSLASH/\\/g;
         $v =~ s/^(-?\d+)i$/$1/;
+        $k =~ s/ESCAPEDBACKSLASH/\\\\/g;
         $values->{$k} = $v;
     }
 
@@ -334,7 +337,7 @@ InfluxDB::LineProtocol - Write and read InfluxDB LineProtocol
 
 =head1 VERSION
 
-version 1.009
+version 1.010
 
 =head1 SYNOPSIS
 

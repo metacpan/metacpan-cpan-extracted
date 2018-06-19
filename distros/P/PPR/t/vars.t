@@ -11,6 +11,8 @@ BEGIN{
 
 use PPR;
 
+ok '$#;' =~ m/\A (?&PerlVariable) ; \Z $PPR::GRAMMAR/x => '$# special case';
+
 my $neg = 0;
 while (my $str = <DATA>) {
            if ($str =~ /\A# TH[EI]SE? SHOULD MATCH/) { $neg = 0;       next; }

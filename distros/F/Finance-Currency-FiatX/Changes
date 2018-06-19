@@ -1,3 +1,64 @@
+0.005   2018-06-19 (PERLANCAR)
+
+	- No functional changes.
+
+	- Tweak Abstract & Description.
+
+
+0.004   2018-06-19 (PERLANCAR)
+
+	[BUG FIXES]
+
+        - Fix :average for get_all_spot_rates().
+
+	- Forgot to return mtime in cached information.
+
+	- Fix logging statement (perl undef warning).
+
+        [REMOVED]
+
+	- get_spot_rate(): Remove 'amount' argument.
+
+        [INTERNAL]
+
+	- get_spot_rate(): Do not call source's get_all_spot_rates(), so the
+	  source can reject unknown pairs properly.
+
+	- Bump database schema version to 4: add _key field so we can cache
+	  result of get_all_spot_rates() separately from get_spot_rate().
+
+        [ENHANCEMENTS]
+
+	- Return 'cached' and 'cache_time' in hash result.
+
+        - [ux] [cli] Add format for result fields.
+
+
+0.003   2018-06-19 (PERLANCAR)
+
+	[INCOMPATIBLE CHANGES]
+
+        - Change function name from convert_fiat_currency to get_spot_rate().
+
+        [NEW FEATURES]
+
+        - Add function get_all_spot_rates() to return all rates from a source.
+
+        - Add source 'bi' (Bank of Indonesia).
+
+        [INTERNAL]
+
+        - Modularize each source into a separate Perl module.
+
+        - Record 'mtime' (last update time) from source.
+
+        - Add option to return highest/lowest rate (of all sources), rate from
+	  newest/oldest source, average of all sources.
+
+        - Bump database schema version: add 'id' and 'mtime' columns to the rate
+          table, change 'time' column to 'query_time'.
+
+
 0.002   2018-05-10 (PERLANCAR)
 
 	- [Bugfix] Fix SQL that caused us to always query from remote

@@ -1,5 +1,8 @@
 Revision history for Perl module Log::Log4perl::Appender::ScreenColoredLevels::UsingMyColors
 
+0.112 2018-06-18T14:15:37Z
+	* Change to Artistic License 2.0
+
 0.111 2016-01-25T01:48:40Z
 	* Tidy up: remove Sourceforge reference, replace with GitHub reference
 	* Make this a stable version

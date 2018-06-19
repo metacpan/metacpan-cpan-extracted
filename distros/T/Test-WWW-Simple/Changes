@@ -1,4 +1,6 @@
 Revision history for Perl extension Test::WWW::Simple.
+0.39   Sun Jun 18 22:20:35 PDT 2018
+    - Change t/15ss_cache.t test to fix a hang on Windows.
 0.38   Fri Jun 15 21:46:34 PDT 2018
     - ONE MORE backticked string invoking a Perl script.
 0.37   Fri Jun 15 00:14:35 PST 2018

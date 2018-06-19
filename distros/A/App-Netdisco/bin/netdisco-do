@@ -101,7 +101,6 @@ unless ($action) {
   use Moo;
   with 'App::Netdisco::Worker::Runner';
 }
-my $worker = MyWorker->new();
 
 my $net = NetAddr::IP->new($device);
 if ($device and (!$net or $net->num == 0 or $net->addr eq '0.0.0.0')) {
@@ -112,6 +111,11 @@ if ($device and (!$net or $net->num == 0 or $net->addr eq '0.0.0.0')) {
 my @hostlist = defined $device ? ($net->hostenum) : (undef);
 my @job_specs = ();
 my $exitstatus =  0;
+
+if (scalar @hostlist > 512) {
+    info sprintf '%s: aborted - unwise to attempt %s jobs at once', $action, (scalar @hostlist);
+    exit 1;
+}
 
 foreach my $host (@hostlist) {
   my $dev = $host ? get_device($host->addr) : undef;
@@ -137,6 +141,7 @@ if ($queue_only) {
 }
 else {
   foreach my $spec (@job_specs) {
+    my $worker = MyWorker->new();
     my $job = App::Netdisco::Backend::Job->new({ job => 0, %$spec });
 
     my $actiontext = (

@@ -241,19 +241,67 @@ to use the development copy without needing to install them first.
 
 # SUPPORT
 
-Bugs should always be submitted via the CPAN bug tracker
+Bugs should always be submitted via the CPAN request tracker, see below.
 
-[http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-ShareDir](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-ShareDir)
+You can find documentation for this module with the perldoc command.
 
-For other issues, contact the maintainer.
+    perldoc File::ShareDir
+
+You can also look for information at:
+
+- RT: CPAN's request tracker
+
+    [http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-ShareDir](http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-ShareDir)
+
+- AnnoCPAN: Annotated CPAN documentation
+
+    [http://annocpan.org/dist/File-ShareDir](http://annocpan.org/dist/File-ShareDir)
+
+- CPAN Ratings
+
+    [http://cpanratings.perl.org/s/File-ShareDir](http://cpanratings.perl.org/s/File-ShareDir)
+
+- CPAN Search
+
+    [http://search.cpan.org/dist/File-ShareDir/](http://search.cpan.org/dist/File-ShareDir/)
+
+## Where can I go for other help?
+
+If you have a bug report, a patch or a suggestion, please open a new
+report ticket at CPAN (but please check previous reports first in case
+your issue has already been addressed).
+
+Report tickets should contain a detailed description of the bug or
+enhancement request and at least an easily verifiable way of
+reproducing the issue or fix. Patches are always welcome, too.
+
+## Where can I go for help with a concrete version?
+
+Bugs and feature requests are accepted against the latest version
+only. To get patches for earlier versions, you need to get an
+agreement with a developer of your choice - who may or not report the
+issue and a suggested fix upstream (depends on the license you have
+chosen).
+
+## Business support and maintenance
+
+For business support you can contact the maintainer via his CPAN
+email address. Please keep in mind that business support is neither
+available for free nor are you eligible to receive any support
+based on the license distributed with this package.
 
 # AUTHOR
 
 Adam Kennedy <adamk@cpan.org>
 
+## MAINTAINER
+
+Jens Rehsack <rehsack@cpan.org>
+
 # SEE ALSO
 
-[File::ShareDir::Install](https://metacpan.org/pod/File::ShareDir::Install), [File::HomeDir](https://metacpan.org/pod/File::HomeDir),
+[File::ShareDir::Install](https://metacpan.org/pod/File::ShareDir::Install),
+[File::ConfigDir](https://metacpan.org/pod/File::ConfigDir), [File::HomeDir](https://metacpan.org/pod/File::HomeDir),
 [Module::Install](https://metacpan.org/pod/Module::Install), [Module::Install::Share](https://metacpan.org/pod/Module::Install::Share),
 [File::ShareDir::PAR](https://metacpan.org/pod/File::ShareDir::PAR), [Dist::Zilla::Plugin::ShareDir](https://metacpan.org/pod/Dist::Zilla::Plugin::ShareDir)
 

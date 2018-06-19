@@ -1,5 +1,5 @@
 package Git::Raw::Graph;
-$Git::Raw::Graph::VERSION = '0.79';
+$Git::Raw::Graph::VERSION = '0.80';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Graph - Git graph class
 
 =head1 VERSION
 
-version 0.79
+version 0.80
 
 =head1 SYNOPSIS
 

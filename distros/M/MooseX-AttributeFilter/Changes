@@ -1,5 +1,10 @@
 Revision history for Perl extension MooseX-AttributeFilter
 
+0.09
+
+    - better docs
+    - test cases for isa/coerce
+
 0.08
 
     - bypass_filter_method_check

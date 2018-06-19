@@ -63,8 +63,6 @@ SYNOPSIS
      # TODO: more examples in SYNOPSIS
      # But you can explore API documentation.
      # My lib have simple API, which is intuitively familiar to anyone who used the DOM.
-     # Sorry, if my english is very bad, in future, i may be fix this. 
-     # Or you can help me with this, by sending pull request.
 
 DESCRIPTION
     HTML5::DOM <https://metacpan.org/pod/HTML5::DOM> is a fast HTML5 parser
@@ -1197,19 +1195,32 @@ HTML5::DOM::Element
      my $tree = HTML5::DOM->new->parse('
         <div id="test" data-test="test value" data-href="#"></div>
      ');
-     my $div = $tree->at('ul');
+     my $div = $tree->at('#test');
      $div->attr("data-new", "test");
      print $div->attr("data-test");     # test value
      print $div->{"data-test"};         # test value
      print $div->attr->{"data-test"};   # test value
  
      # {id => "test", "data-test" => "test value", "data-href" => "#", "data-new" => "test"}
-     print $div->attr;
+     print Dumper($div->attr);
  
      $div->removeAttr("data-test");
  
      # {id => "test", "data-href" => "#", "data-new" => "test"}
-     print $div->attr;
+     print Dumper($div->attr);
+
+   attrArray
+     my $arr = $node->attrArray;
+
+    Get all attributes in array (in tree order).
+
+     my $tree = HTML5::DOM->new->parse('
+        <div id="test" data-test="test value" data-href="#"></div>
+     ');
+     my $div = $tree->at('#test');
+ 
+     # [{key => 'id', value => 'test'}, {key => 'data-test', value => 'test'}, {key => 'data-href', value => '#'}]
+     print Dumper($div->attrArray);
 
    getAttribute
      my $value = $node->getAttribute($key);
@@ -1451,6 +1462,57 @@ HTML5::DOM::Comment
 HTML5::DOM::DocType
     DOM node object for document type. Inherit all methods from
     HTML5::DOM::Node.
+
+   name
+     my $name = $node->name;
+     my $node = $node->name($new_name);
+
+    Return or change root element name from doctype.
+
+     my $tree = HTML5::DOM->new->parse('
+            <!DOCTYPE svg>
+     ');
+ 
+     # get
+     print $tree->document->firstChild->name; # svg
+ 
+     # set
+     $tree->document->firstChild->name('html');
+     print $tree->document->firstChild->html; # <!DOCTYPE html>
+
+   publicId
+     my $public_id = $node->publicId;
+     my $node = $node->publicId($new_public_id);
+
+    Return or change public id from doctype.
+
+     my $tree = HTML5::DOM->new->parse('
+            <!DOCTYPE svg:svg PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN" "http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd">
+     ');
+ 
+     # get
+     print $tree->document->firstChild->publicId; # -//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN
+ 
+     # set
+     print $tree->document->firstChild->publicId('-//W3C//DTD SVG 1.1//EN');
+     print $tree->document->firstChild->html; # <!DOCTYPE svg:svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd">
+
+   systemId
+     my $system_id = $node->systemId;
+     my $node = $node->systemId($new_system_id);
+
+    Return or change public id from doctype.
+
+     my $tree = HTML5::DOM->new->parse('
+            <!DOCTYPE svg:svg PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN" "http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd">
+     ');
+ 
+     # get
+     print $tree->document->firstChild->systemId; # http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd
+ 
+     # set
+     print $tree->document->firstChild->systemId('http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd');
+     print $tree->document->firstChild->html; # <!DOCTYPE svg:svg PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 
 HTML5::DOM::Collection
     CSS Parser object

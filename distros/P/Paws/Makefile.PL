@@ -60,7 +60,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => 0,
     "YAML" => 0
   },
-  "VERSION" => "0.37",
+  "VERSION" => "0.38",
   "test" => {
     "TESTS" => "t/*.t"
   }

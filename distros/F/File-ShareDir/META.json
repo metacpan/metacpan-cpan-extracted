@@ -82,6 +82,6 @@
          "web" : "https://github.com/perl5-utils/File-ShareDir"
       }
    },
-   "version" : "1.110",
+   "version" : "1.112",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

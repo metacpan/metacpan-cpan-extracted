@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 7;
+plan tests => 1;
 
 @ARGV = (
   '--mode', 'uptime',

@@ -15,7 +15,7 @@ BEGIN {
     }
 }
 use warnings;
-our $VERSION = '0.000015';
+our $VERSION = '0.000016';
 use utf8;
 
 # Class for $PPR::X::ERROR objects...
@@ -130,13 +130,21 @@ our $GRAMMAR = qr{
            DESTROY                               (?&PerlOWS)
        )
        (?:
-           (?>
-               (?&PerlParenthesesList)                   # Parameter list
-           |
-               \( [^)]*+ \)                         # Prototype (
-           )                          (?&PerlOWS)
-       )?+
-       (?: (?>(?&PerlAttributes))     (?&PerlOWS)  )?+
+           # Perl pre 5.028
+           (?:
+               (?>
+                   (?&PerlParenthesesList)    # Parameter list
+               |
+                   \( [^)]*+ \)               # Prototype (
+               )
+               (?&PerlOWS)
+           )?+
+           (?: (?>(?&PerlAttributes))  (?&PerlOWS) )?+
+       |
+           # Perl post 5.028
+           (?: (?>(?&PerlAttributes))       (?&PerlOWS) )?+
+           (?: (?>(?&PerlParenthesesList))  (?&PerlOWS) )?+    # Parameter list
+       )
        (?> ; | (?&PerlBlock) )
     )) # End of rule
 
@@ -219,36 +227,7 @@ our $GRAMMAR = qr{
         (?: (?>(?&PerlPrefixUnaryOperator))  (?&PerlOWS) )*+
         (?>(?&PerlTerm))
         (?:
-            (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
-            (?>
-                (?> (?&PerlQualifiedIdentifier) | (?&PerlVariableScalar) )
-                (?: (?>(?&PerlOWS)) (?&PerlParenthesesList) )?+
-
-            |   (?&PerlParenthesesList)
-            |   (?&PerlArrayIndexer)
-            |   (?&PerlHashIndexer)
-            |   \$\*
-            )
-
-            (?:
-                (?>(?&PerlOWS))
-                (?>
-                    ->  (?>(?&PerlOWS))
-                    (?> (?&PerlQualifiedIdentifier) | (?&PerlVariableScalar) )
-                    (?: (?>(?&PerlOWS)) (?&PerlParenthesesList) )?+
-                |
-                    (?: -> (?&PerlOWS) )?+
-                    (?> (?&PerlParenthesesList)
-                    |   (?&PerlArrayIndexer)
-                    |   (?&PerlHashIndexer)
-                    |   \$\*
-                    )
-                )
-            )*+
-            (?:
-                (?>(?&PerlOWS)) -> (?>(?&PerlOWS)) [\@%]
-                (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
-            )?+
+            (?&PerlTermPostfixDereference)
         )?+
         (?: (?>(?&PerlOWS)) (?&PerlPostfixUnaryOperator) )?+
     )) # End of rule
@@ -314,6 +293,39 @@ our $GRAMMAR = qr{
         )
     )) # End of rule
 
+    (?<PerlTermPostfixDereference>   (?<PerlStdTermPostfixDereference>
+       (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
+       (?>
+           (?> (?&PerlQualifiedIdentifier) | (?&PerlVariableScalar) )
+           (?: (?>(?&PerlOWS)) (?&PerlParenthesesList) )?+
+
+       |   (?&PerlParenthesesList)
+       |   (?&PerlArrayIndexer)
+       |   (?&PerlHashIndexer)
+       |   \$\*
+       )
+
+       (?:
+           (?>(?&PerlOWS))
+           (?>
+               ->  (?>(?&PerlOWS))
+               (?> (?&PerlQualifiedIdentifier) | (?&PerlVariableScalar) )
+               (?: (?>(?&PerlOWS)) (?&PerlParenthesesList) )?+
+           |
+               (?: -> (?&PerlOWS) )?+
+               (?> (?&PerlParenthesesList)
+               |   (?&PerlArrayIndexer)
+               |   (?&PerlHashIndexer)
+               |   \$\*
+               )
+           )
+       )*+
+       (?:
+           (?>(?&PerlOWS)) -> (?>(?&PerlOWS)) [\@%]
+           (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+       )?+
+    )) # End of rule
+
     (?<PerlControlBlock>   (?<PerlStdControlBlock>
         (?> # Conditionals...
             (?> if | unless ) \b            (?>(?&PerlOWS))
@@ -340,11 +352,19 @@ our $GRAMMAR = qr{
                 for(?:each)?+ \b
                 (?>(?&PerlOWS))
                 (?:
-                    (?:
-                        (?: \\ (?>(?&PerlOWS))      (?> my | our | state )?+
-                        |   (?> my | our | state )  (?: (?>(?&PerlOWS)) \\ )?+
-                        )?+
-                        (?>(?&PerlOWS)) (?&PerlVariableScalar)
+                    (?> # Explicitly aliased iterator variable...
+                        (?> \\ (?>(?&PerlOWS))  (?> my | our | state )
+                        |                       (?> my | our | state )  (?>(?&PerlOWS)) \\
+                        )
+                        (?>(?&PerlOWS))
+                        (?> (?&PerlVariableScalar)
+                        |   (?&PerlVariableArray)
+                        |   (?&PerlVariableHash)
+                        )
+                    |
+                        # Implicitly aliased iterator variable...
+                        (?> (?: my | our | state ) (?>(?&PerlOWS)) )?+
+                        (?&PerlVariableScalar)
                     )?+
                     (?>(?&PerlOWS))
                     (?> (?&PerlParenthesesList) | (?&PerlQuotelikeQW) )
@@ -381,7 +401,7 @@ our $GRAMMAR = qr{
     (?<PerlFormat>   (?<PerlStdFormat>
         format
         (?: (?>(?&PerlNWS))  (?&PerlQualifiedIdentifier)  )?+
-            (?>(?&PerlOWS))  = [^\n]*+ 
+            (?>(?&PerlOWS))  = [^\n]*+
             (?&PPR_X_newline_and_heredoc)
         (?:
             (?! \. \n )
@@ -617,14 +637,21 @@ our $GRAMMAR = qr{
         sub \b
         (?>(?&PerlOWS))
         (?:
-            (?>
-                (?&PerlParenthesesList)    # Parameter list
-            |
-                \( [^)]*+ \)          # Prototype (
-            )
-            (?&PerlOWS)
-        )?+
-        (?: (?>(?&PerlAttributes))  (?&PerlOWS) )?+
+            # Perl pre 5.028
+            (?:
+                (?>
+                    (?&PerlParenthesesList)    # Parameter list
+                |
+                    \( [^)]*+ \)               # Prototype (
+                )
+                (?&PerlOWS)
+            )?+
+            (?: (?>(?&PerlAttributes))  (?&PerlOWS) )?+
+        |
+            # Perl post 5.028
+            (?: (?>(?&PerlAttributes))       (?&PerlOWS) )?+
+            (?: (?>(?&PerlParenthesesList))  (?&PerlOWS) )?+    # Parameter list
+        )
         (?&PerlBlock)
     )) # End of rule
 
@@ -1055,9 +1082,9 @@ our $GRAMMAR = qr{
         (?>
             `  [^`]*+  (?: \\. [^`]*+ )*+  `
         |
-            qx 
+            qx
                 (?:
-                    (?&PerlOWS) ' (?&PPR_X_quotelike_body) 
+                    (?&PerlOWS) ' (?&PPR_X_quotelike_body)
                 |
                     \b (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
                     (?&PPR_X_quotelike_body_interpolated)
@@ -1700,6 +1727,86 @@ our $GRAMMAR = qr{
 )
 }xms;
 
+sub decomment {
+    if ($] >= 5.014 && $] < 5.016) { _croak( "PPR::X::decomment() does not work under Perl 5.14" )}
+
+    my ($str) = @_;
+
+    local %PPR::X::comment_len;
+
+    # Locate comments...
+    $str =~ m{ \A (?&PerlDocument) \Z
+
+                (?(DEFINE)
+                    (?<decomment>
+                       ( (?<! [\$@%] ) [#] [^\n]*+ )
+                       (?{
+                            my $len = length($^N);
+                            my $pos = pos() - $len;
+                            $PPR::X::comment_len{$pos} = $len;
+                       })
+                    )
+
+                    (?<PerlOWS>
+                        (?:
+                            \h++
+                        |
+                            (?&PPR_X_newline_and_heredoc)
+                        |
+                            (?&decomment)
+                        |
+                            __ (?> END | DATA ) __ \b .*+ \z
+                        )*+
+                    ) # End of rule
+
+                    (?<PerlNWS>
+                        (?:
+                            \h++
+                        |
+                            (?&PPR_X_newline_and_heredoc)
+                        |
+                            (?&decomment)
+                        |
+                            __ (?> END | DATA ) __ \b .*+ \z
+                        )++
+
+                    ) # End of rule
+
+                    (?<PerlPod>
+                        (
+                            ^ = [^\W\d]\w*+
+                            .*?
+                            ^ = cut \b [^\n]*+ $
+                        )
+                        (?{
+                            my $len = length($^N);
+                            my $pos = pos() - $len;
+                            $PPR::X::comment_len{$pos} = $len;
+                        })
+                    ) # End of rule
+
+                    $PPR::X::GRAMMAR
+                )
+            }xms or return;
+
+    # Delete the comments found...
+    for my $from_pos (_uniq(sort { $b <=> $a } keys %PPR::X::comment_len)) {
+        substr($str, $from_pos, $PPR::X::comment_len{$from_pos}) = q{};
+    }
+
+    return $str;
+}
+
+sub _uniq {
+    my %seen;
+    return grep {!$seen{$_}} @_;
+}
+
+sub _croak {
+    require Carp;
+    Carp::croak(@_);
+}
+
 1; # Magic true value required at end of module
 
 __END__
@@ -1711,7 +1818,7 @@ PPR::X - Pattern-based Perl Recognizer
 
 =head1 VERSION
 
-This document describes PPR::X version 0.000015
+This document describes PPR::X version 0.000016
 
 
 =head1 SYNOPSIS
@@ -1908,6 +2015,26 @@ A typical use might therefore be:
             $PPR::X::ERROR->origin($linenum, $filename)->diagnostic . "\n";
     }
 
+=head2 Decommenting code with C<PPR_X::decomment()>
+
+The module provides (but does not export) a C<decomment()>
+subroutine that can remove any comments and/or POD from source code.
+
+It takes a single argument: a string containing the course code.
+It returns a single value: a string containing the decommented source code.
+
+For example:
+
+    $decommented_code = PPR::X::decomment( $commented_code );
+
+The subroutine will fail if the argument wasn't valid Perl code,
+in which case it returns C<undef> and sets C<$PPR::X::ERROR> to indicate
+where the invalid source code was encountered.
+
+Note that, due to separate bugs in the regex engine in Perl 5.14 and
+5.20, the C<decomment()> subroutine is not available when running under
+these releases.
+
 
 =head2 Examples
 
@@ -2056,6 +2183,13 @@ a variable or typeglob lookup; an anonymous array, hash, or subroutine
 constructor; a quotelike or numeric literal; a regex match; a
 substitution; a transliteration; a C<do> or C<eval> block; or any other
 expression in surrounding parentheses.
+
+
+=head3 C<< (?&PerlTermPostfixDereference) >>
+
+Matches a sequence of array- or hash-lookup brackets, or subroutine call
+parentheses, or a postfix dereferencer (e.g. C<< ->$* >>), with
+explicit or implicit intervening C<< -> >>, such as might appear after a term.
 
 
 =head3 C<< (?&PerlLvalue) >>
@@ -2874,6 +3008,16 @@ For all the gory details, see:
 L<https://rt.perl.org/Public/Bug/Display.html?id=122283>
 L<https://rt.perl.org/Public/Bug/Display.html?id=122890>
 
+
+=item C<< PPR::X::decomment() does not work under Perl 5.14 >>
+
+There is a separate bug in the Perl 5.14 regex engine that prevents
+the C<decomment()> subroutine from correctly detecting the location
+of comments.
+
+The subroutine throws an exception if you attempt to call it
+when running under Perl 5.14 specifically.
+
 =back
 
 The module has no other diagnostics, apart from those Perl
@@ -2924,9 +3068,13 @@ greater than 5.20 (presumably because I<most> regexes are measurably
 slower in more modern versions of Perl; such is the price of full
 re-entrancy and safe lexical scoping).
 
+The C<decomment()> subroutine trips a separate regex engine bug in Perl
+5.14 only and will not run under that version.
+
 There are also constructs in Perl 5 which cannot be parsed without
 actually executing some code...which the regex does not attempt to
 do, for obvious reasons.
+
 
 =head1 BUGS
 

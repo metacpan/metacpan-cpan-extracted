@@ -1,5 +1,8 @@
 Revision history for Perl extension HTML::Defang.
 
+1.05  Tue Jun 19 15:30:00 2018
+  - Many bug fixes, improvements, speed ups and better nested HTML handling
+
 1.04  Mon Jan 03 12:00:00 2011
 	- Change defang_and_add_to_output to delay the defanging until after the current tag is actually emmitted to the output
 	- If url callback has marked the attribute as to be defanged, skip result of attribute callback

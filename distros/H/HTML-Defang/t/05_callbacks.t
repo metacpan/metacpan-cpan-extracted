@@ -1,13 +1,15 @@
 #!/usr/bin/perl -w
 
-BEGIN { do '/home/mod_perl/hm/ME/FindLibs.pm'; }
+BEGIN { # CPAN users don't have ME::*, so use eval
+  eval 'use ME::FindLibs'
+}
 
 use Test::More tests => 94;
 use HTML::Defang;
 use strict;
 
 my ($Res, $H);
-my ($DefangString, $CommentStartText, $CommentEndText) = ('defang_', '', '');
+my ($DefangString, $CommentStartText, $CommentEndText) = ('defang_', ' ', ' ');
 
 #################################
 #  Basic tag callback tests
@@ -559,11 +561,7 @@ like($Res, qr{^1:<a style="a:b">
 
 29:<a style="{color: #900} :link {background: #ff0} :visited {background: #fff} :hover {outline: thin red solid} :active {background: #00f}">
 30:<a style="{color: #090; line-height: 1.2} ::first-letter {color: #900}">
-31:<a href="abccomscript" title="a" id="a1" style="{color: #900}
-          :link {background: #ff0}
-          :visited {background: #fff}
-          :hover {outline: thin red solid}
-          :active {background: #00f}">
+31:<a href="abccomscript" title="a" id="a1" style="{color: #900}&#x0a;          :link {background: #ff0}&#x0a;          :visited {background: #fff}&#x0a;          :hover {outline: thin red solid}&#x0a;          :active {background: #00f}">
 <style><!--${CommentStartText}   
 
 selector1{ab:cd}
@@ -686,11 +684,7 @@ like($Res, qr{^1:<a style="a:b">
 
 29:<a style="{color: #900} :link {background: #ff0} :visited {background: #fff} :hover {outline: thin red solid} :active {background: #00f}">
 30:<a style="{color: #090; line-height: 1.2} ::first-letter {color: #900}">
-31:<a href="abccomscript" title="a" id="a1" style="{color: #900}
-          :link {background: #ff0}
-          :visited {background: #fff}
-          :hover {outline: thin red solid}
-          :active {background: #00f}">
+31:<a href="abccomscript" title="a" id="a1" style="{color: #900}&#x0a;          :link {background: #ff0}&#x0a;          :visited {background: #fff}&#x0a;          :hover {outline: thin red solid}&#x0a;          :active {background: #00f}">
 <style><!--${CommentStartText}   
 
 selector1{ab:cd}
@@ -813,11 +807,7 @@ like($Res, qr{^1:<a style="/\*a:b\*/">
 
 29:<a style="{/\*color: #900\*/} :link {/\*background: #ff0\*/} :visited {/\*background: #fff\*/} :hover {/\*outline: thin red solid\*/} :active {/\*background: #00f\*/}">
 30:<a style="{/\*color: #090;\*/ /\*line-height: 1.2\*/} ::first-letter {/\*color: #900\*/}">
-31:<a href="abccomscript" title="a" id="a1" style="{/\*color: #900\*/}
-          :link {/\*background: #ff0\*/}
-          :visited {/\*background: #fff\*/}
-          :hover {/\*outline: thin red solid\*/}
-          :active {/\*background: #00f\*/}">
+31:<a href="abccomscript" title="a" id="a1" style="{/\*color: #900\*/}&#x0a;          :link {/\*background: #ff0\*/}&#x0a;          :visited {/\*background: #fff\*/}&#x0a;          :hover {/\*outline: thin red solid\*/}&#x0a;          :active {/\*background: #00f\*/}">
 <style><!--${CommentStartText}   
 
 selector1{/\*ab:cd\*/}
@@ -837,6 +827,7 @@ $Defang = HTML::Defang->new(
     my $StyleRules = $_[3];
     foreach my $StyleRule (@$StyleRules) {
       foreach my $KeyValueRules (@$StyleRule) {
+        unshift @$KeyValueRules, ["apricot", "nectar", 0];
         push @$KeyValueRules, ["orange", "juice", 0];
       }
     }
@@ -901,60 +892,56 @@ selector5{ab:cd;x:y;p:q;r:url(http://a.com);e:url("http://b.com") ;}
     </style>
 EOF
 $Res = $Defang->defang($H);
-like($Res, qr{^1:<a style="a:b;orange:juice">
-2:<a style=" c  :   d    ;orange:juice">
-3:<a style="e:f;orange:juice">
-4:<a style=" g  :   h    ;     orange:juice">
+like($Res, qr{^1:<a style="apricot:nectar;a:b;orange:juice">
+2:<a style=" apricot:nectar;c  :   d    ;orange:juice">
+3:<a style="apricot:nectar;e:f;orange:juice">
+4:<a style=" apricot:nectar;g  :   h    ;     orange:juice">
 
-5:<a style="i:j;k:l;orange:juice">
-6:<a style=" i2  :   j2    ;     k2      :       l2        ;orange:juice">
-7:<a style="i3:j3;k3:l3;orange:juice">
-8:<a style=" i4  :   j4    ;     k4      :       l4        ;         orange:juice">
+5:<a style="apricot:nectar;i:j;k:l;orange:juice">
+6:<a style=" apricot:nectar;i2  :   j2    ;     k2      :       l2        ;orange:juice">
+7:<a style="apricot:nectar;i3:j3;k3:l3;orange:juice">
+8:<a style=" apricot:nectar;i4  :   j4    ;     k4      :       l4        ;         orange:juice">
 
-9:<a style="{q:r;orange:juice}">
-10:<a style=" {  s   :    t     ;orange:juice}      ">
-11:<a style="{u:v;orange:juice}">
-12:<a style=" {  w   :    x     ;      orange:juice}       ">
+9:<a style="{apricot:nectar;q:r;orange:juice}">
+10:<a style=" {apricot:nectar;  s   :    t     ;orange:juice}      ">
+11:<a style="{apricot:nectar;u:v;orange:juice}">
+12:<a style=" {apricot:nectar;  w   :    x     ;      orange:juice}       ">
 
-13:<a style="{i5:j5;k5:l5;orange:juice}">
-14:<a style=" {  i6   :    j6     ;      k6       :        l6         ;orange:juice}          ">
-15:<a style="{i7:j7;k7:l7;orange:juice}">
-16:<a style=" {  i8   :    j8     ;      k8       :        l8         ;          orange:juice}          ">
+13:<a style="{apricot:nectar;i5:j5;k5:l5;orange:juice}">
+14:<a style=" {apricot:nectar;  i6   :    j6     ;      k6       :        l6         ;orange:juice}          ">
+15:<a style="{apricot:nectar;i7:j7;k7:l7;orange:juice}">
+16:<a style=" {apricot:nectar;  i8   :    j8     ;      k8       :        l8         ;          orange:juice}          ">
 
-17:<a style="s1{y:z;orange:juice}">
-18:<a style=" s1  {   y2    :     z2      ;orange:juice}       ">
-19:<a style="s1{y3:z3;orange:juice}">
-20:<a style=" s1  {   y4    :     z4      ;       orange:juice}        ">
+17:<a style="s1{apricot:nectar;y:z;orange:juice}">
+18:<a style=" s1  {apricot:nectar;   y2    :     z2      ;orange:juice}       ">
+19:<a style="s1{apricot:nectar;y3:z3;orange:juice}">
+20:<a style=" s1  {apricot:nectar;   y4    :     z4      ;       orange:juice}        ">
 
-21:<a style="s1{y5:z5;y6:z6;orange:juice}">
-22:<a style=" s2  {   y7    :     z7      ;       y8        :         z8          ;orange:juice}           ">
-23:<a style="s3{y9:z9;y10:z11;orange:juice}">
-24:<a style=" s4  {   y12    :     z12      ;       y13        :         z13          ;           orange:juice}            ">
+21:<a style="s1{apricot:nectar;y5:z5;y6:z6;orange:juice}">
+22:<a style=" s2  {apricot:nectar;   y7    :     z7      ;       y8        :         z8          ;orange:juice}           ">
+23:<a style="s3{apricot:nectar;y9:z9;y10:z11;orange:juice}">
+24:<a style=" s4  {apricot:nectar;   y12    :     z12      ;       y13        :         z13          ;           orange:juice}            ">
 
-25:<a style="s5{aa:ab;orange:juice}s6{ac:ad;orange:juice}">
-26:<a style=" s7  {   ae    :     af      ;orange:juice}       s8        {         ag          :           ah            ;orange:juice}             ">
-27:<a style="s5{ai:aj;orange:juice}s6{ak:al;orange:juice}">
-28:<a style=" s7  {   am    :     an      ;orange:juice}       s8        {         ao          :           ap            ;             orange:juice}              ">
+25:<a style="s5{apricot:nectar;aa:ab;orange:juice}s6{apricot:nectar;ac:ad;orange:juice}">
+26:<a style=" s7  {apricot:nectar;   ae    :     af      ;orange:juice}       s8        {apricot:nectar;         ag          :           ah            ;orange:juice}             ">
+27:<a style="s5{apricot:nectar;ai:aj;orange:juice}s6{apricot:nectar;ak:al;orange:juice}">
+28:<a style=" s7  {apricot:nectar;   am    :     an      ;orange:juice}       s8        {apricot:nectar;         ao          :           ap            ;             orange:juice}              ">
 
-29:<a style="{color: #900;orange:juice} :link {background: #ff0;orange:juice} :visited {background: #fff;orange:juice} :hover {outline: thin red solid;orange:juice} :active {background: #00f;orange:juice}">
-30:<a style="{color: #090; line-height: 1.2;orange:juice} ::first-letter {color: #900;orange:juice}">
-31:<a href="abccomscript" title="a" id="a1" style="{color: #900;orange:juice}
-          :link {background: #ff0;orange:juice}
-          :visited {background: #fff;orange:juice}
-          :hover {outline: thin red solid;orange:juice}
-          :active {background: #00f;orange:juice}">
+29:<a style="{apricot:nectar;color: #900;orange:juice} :link {apricot:nectar;background: #ff0;orange:juice} :visited {apricot:nectar;background: #fff;orange:juice} :hover {apricot:nectar;outline: thin red solid;orange:juice} :active {apricot:nectar;background: #00f;orange:juice}">
+30:<a style="{apricot:nectar;color: #090; line-height: 1.2;orange:juice} ::first-letter {apricot:nectar;color: #900;orange:juice}">
+31:<a href="abccomscript" title="a" id="a1" style="{apricot:nectar;color: #900;orange:juice}&#x0a;          :link {apricot:nectar;background: #ff0;orange:juice}&#x0a;          :visited {apricot:nectar;background: #fff;orange:juice}&#x0a;          :hover {apricot:nectar;outline: thin red solid;orange:juice}&#x0a;          :active {apricot:nectar;background: #00f;orange:juice}">
 <style><!--${CommentStartText}   
 
-selector1{ab:cd;orange:juice}
-selector2{ab:cccd;orange:juice}
-selector3{ab:cd;ef:gh;orange:juice}
-selector4{ab:cd;ef:gh;orange:juice}
-selector5{ab:cd;x:y;p:q;/\*r:url\(http://a.com\);\*//\*e:url\("http://b.com"\) ;\*/orange:juice}
- selector6  {   ab    :     cd      ;orange:juice}       
- selector7  {   ab    :     cd      ;       orange:juice}        
- selector8  {   ab    :     cd      ;       ef        :         gh          ;orange:juice}           
- selector9  {   ab    :     cd      ;       ef        :         gh          ;           orange:juice}            
- selector10  {   ab    :     cd      ;       x         :         y           ;           /\*r            :             url\(http://a.com\)              ;\*/orange:juice}               
+selector1{apricot:nectar;ab:cd;orange:juice}
+selector2{apricot:nectar;ab:cccd;orange:juice}
+selector3{apricot:nectar;ab:cd;ef:gh;orange:juice}
+selector4{apricot:nectar;ab:cd;ef:gh;orange:juice}
+selector5{apricot:nectar;ab:cd;x:y;p:q;/\*r:url\(http://a.com\);\*//\*e:url\("http://b.com"\) ;\*/orange:juice}
+ selector6  {apricot:nectar;   ab    :     cd      ;orange:juice}       
+ selector7  {apricot:nectar;   ab    :     cd      ;       orange:juice}        
+ selector8  {apricot:nectar;   ab    :     cd      ;       ef        :         gh          ;orange:juice}           
+ selector9  {apricot:nectar;   ab    :     cd      ;       ef        :         gh          ;           orange:juice}            
+ selector10  {apricot:nectar;   ab    :     cd      ;       x         :         y           ;           /\*r            :             url\(http://a.com\)              ;\*/orange:juice}               
     ${CommentEndText}--></style>$}, "CSS callback - insert attribute");
 
 
@@ -1064,11 +1051,7 @@ like($Res, qr{^1:<a style="">
 
 29:<a style="{} :link {} :visited {} :hover {} :active {}">
 30:<a style="{color: #090; } ::first-letter {}">
-31:<a href="abccomscript" title="a" id="a1" style="{}
-          :link {}
-          :visited {}
-          :hover {}
-          :active {}">
+31:<a href="abccomscript" title="a" id="a1" style="{}&#x0a;          :link {}&#x0a;          :visited {}&#x0a;          :hover {}&#x0a;          :active {}">
 <style><!--${CommentStartText}   
 
 selector1{}

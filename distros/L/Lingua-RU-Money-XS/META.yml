@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,10 +22,10 @@ no_index:
     - t
     - inc
 requires:
-  perl: '5.016000'
+  perl: '5.010000'
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-RU-Money-XS
   license: http://dev.perl.org/licenses/
-  repository: git://github.com/igormunkin/Lingua-RU-Money-XS.git
-version: '0.05'
+  repository: https://git.imun.cloud/p5-Lingua-RU-Money-XS.git
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

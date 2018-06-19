@@ -2,6 +2,12 @@ Revision history for CHI-Driver-BerkeleyDB
 
 ** denotes an incompatible change
 
+0.05  2018-06-16
+    - Replace Moose with Moo, which CHI already requires.
+    - POD doc updates.
+    - Fix noisy die with error "BDB0062 Successful return: 0" when calling
+      remove() on a non-existing key [RT #103290]
+
 0.04  2018-06-13
     - New Maintainer: Michael Schout <mschout@cpan.org>
     - Fix hidden dependency on Moose

@@ -449,13 +449,13 @@ choose(  child => 2 );
 class(   'PPIx::Regexp::Token::Modifier' );
 xplain(  'a: restrict non-Unicode classes to ASCII; m: ^ and $ match within string; n: parentheses do not capture; s: . can match newline; x: ignore whitespace and comments' );
 
-note	 'PPIx::Regexp::Token::NoOp';
+note	 'PPIx::Regexp::Token::Unknown since 5.28; previously ::NoOp';
 
 parse   ( '/\\N{}/' );
-value   ( failures => [], 0 );
-choose  ( child => 1, start => 1 );
-class   ( 'PPIx::Regexp::Token::NoOp' );
-xplain  ( 'Not significant' );
+value   ( failures => [], 1 );
+choose  ( child => 1, child => 0 );
+class   ( 'PPIx::Regexp::Token::Unknown' );
+xplain  ( 'Empty Unicode character name' );
 
 note     'PPIx::Regexp::Token::Operator';
 

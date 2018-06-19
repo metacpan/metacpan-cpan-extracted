@@ -1,0 +1,60 @@
+{
+   "abstract" : "Perl source code head-less editor written in Perl.",
+   "author" : [
+      "philiprbrenan@gmail.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Editor-Perl",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4224"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dump" : "0",
+            "Data::Table::Text" : "20180611",
+            "Test2::API" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Editor::Perl" : {
+         "file" : "lib/Text/Editor/Perl.pm",
+         "version" : "20180616"
+      },
+      "Text::Editor::Perl::Box" : {
+         "file" : "lib/Text/Editor/Perl.pm"
+      },
+      "Text::Editor::Perl::Line" : {
+         "file" : "lib/Text/Editor/Perl.pm"
+      },
+      "Text::Editor::Perl::Selection" : {
+         "file" : "lib/Text/Editor/Perl.pm"
+      },
+      "Text::Editor::Perl::Snippet" : {
+         "file" : "lib/Text/Editor/Perl.pm"
+      },
+      "Text::Editor::Perl::View" : {
+         "file" : "lib/Text/Editor/Perl.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "20180616"
+}

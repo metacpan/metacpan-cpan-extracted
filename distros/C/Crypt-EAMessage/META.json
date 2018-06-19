@@ -52,7 +52,7 @@
       },
       "test" : {
          "requires" : {
-            "Test2::Bundle::Extended" : "0.000058",
+            "Test2::V0" : "0.000111",
             "Test::UseAllModules" : "0.17"
          }
       }
@@ -60,7 +60,7 @@
    "provides" : {
       "Crypt::EAMessage" : {
          "file" : "lib/Crypt/EAMessage.pm",
-         "version" : "1.005"
+         "version" : "1.007"
       }
    },
    "release_status" : "stable",
@@ -74,7 +74,7 @@
          "web" : "https://github.com/jmaslak/Crypt-EAMessage"
       }
    },
-   "version" : "1.005",
+   "version" : "1.007",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

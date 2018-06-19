@@ -36,7 +36,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Dist::Zilla" : "4.102340"
+            "Dist::Zilla" : "4.102340",
+            "Moose" : "0"
          }
       },
       "test" : {
@@ -54,7 +55,7 @@
          "web" : "https://github.com/fayland/dist-zilla-plugin-repository"
       }
    },
-   "version" : "0.21",
+   "version" : "0.23",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
 }
 

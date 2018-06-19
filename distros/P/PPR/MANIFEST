@@ -66,5 +66,6 @@ t/merijn_is_evil.t
 t/quotelike_s_e.t
 t/subdecl.t
 t/postfix_deref.t
+t/decomment.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -23,8 +23,8 @@ Crypt::Perl::PKCS10 - Certificate Signing Request (CSR) creation
         attributes => [
             [ 'extensionRequest',
                 [ 'subjectAltName',
-                    dNSName => 'foo.com',
-                    dNSName => 'bar.com',
+                    [ dNSName => 'foo.com' ],
+                    [ dNSName => 'bar.com' ],
                 ],
             ],
         ],
@@ -72,16 +72,16 @@ Create an instance of this class. Parameters are:
 
 =over 4
 
-=item C<key>: An instance of either
+=item * C<key> - An instance of either
 C<Crypt::Perl::RSA::PrivateKey> or C<Crypt::Perl::ECDSA::PrivateKey>.
 If you’ve got a DER- or PEM-encoded key string, use L<Crypt::Perl::PK>
 (included in this distribution) to create an appropriate object.
 
-=item C<subject>: An array reference of arguments into
+=item * C<subject> - An array reference of arguments into
 L<Crypt::Perl::X509::Name>’s constructor.
 
-=item C<attributes>: An array reference of arguments into
-L<Crypt::Perl::PKCS10::Attrbutes>’s constructor.
+=item * C<attributes> - An array reference of arguments into
+L<Crypt::Perl::PKCS10::Attributes>’s constructor.
 
 =back
 
@@ -108,8 +108,8 @@ use Crypt::Format ();
 use Digest::SHA ();
 
 use Crypt::Perl::ASN1 ();
+use Crypt::Perl::ASN1::Signatures ();
 use Crypt::Perl::PKCS10::Attributes ();
-use Crypt::Perl::PKCS10::ASN1 ();
 use Crypt::Perl::PKCS10::Attributes ();
 use Crypt::Perl::X509::Name ();
 use Crypt::Perl::X ();
@@ -212,7 +212,7 @@ sub _encode_params {
         die Crypt::Perl::X::create('Generic', "Key ($key) is not a recognized private key class instance!");
     }
 
-    $sig_alg = $Crypt::Perl::PKCS10::ASN1::OID{$sig_alg} || do {
+    $sig_alg = $Crypt::Perl::ASN1::Signatures::OID{$sig_alg} || do {
         die Crypt::Perl::X::create('Generic', "Unrecognized signature algorithm OID: “$sig_alg”");
     };
 

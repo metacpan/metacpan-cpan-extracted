@@ -118,6 +118,13 @@ our $url     = "http://www.sigmund.nl/";
 # For the GoComics Fetcher:
 #
 # No extra variables are needed.
+#
+# Notes on patterns:
+#
+# URLs ususally start with http:// or https://, so always use
+# https?:// .
+# Images are usually jpg, gif or png, so for the image use
+# (?<image> ... (?:jpg|gif|png) ) .
 
 our $pattern =
   qr{ <img \s+

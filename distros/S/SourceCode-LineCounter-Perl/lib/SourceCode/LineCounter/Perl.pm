@@ -9,7 +9,9 @@ use vars qw($VERSION);
 
 use Carp qw(carp);
 
-$VERSION = '1.02';
+$VERSION = '1.021';
+
+=encoding utf8
 
 =head1 NAME
 
@@ -22,18 +24,18 @@ SourceCode::LineCounter::Perl - Count lines in Perl source code
 	my $counter    = SourceCode::LineCounter::Perl->new;
 
 	$counter->count( $file );
-	
+
 	my $total_lines   = $counter->total;
-	
+
 	my $pod_lines     = $counter->documentation;
-	
+
 	my $code_lines    = $counter->code;
-	
+
 	my $comment_lines = $counter->comment;
 
 	my $comment_lines = $counter->blank;
-	
-	
+
+
 =head1 DESCRIPTION
 
 This module counts the lines in Perl source code and tries to classify
@@ -49,7 +51,7 @@ it as a pod line and move on
 If we are in pod and the line is blank, record it as a blank line
 and a pod line, and move on.
 
-If we are ending pod (with C<=cut>, record it as a pod line and 
+If we are ending pod (with C<=cut>, record it as a pod line and
 move on.
 
 If we are in pod and it is not blank, record it as a pod line and
@@ -73,13 +75,13 @@ Move on to the next line.
 
 sub new {
 	my( $class, %hash ) = @_;
-	
+
 	my $self = bless {}, $class;
 	$self->_init;
-	
+
 	$self;
 	}
-	
+
 =item reset
 
 Reset everything the object counted so you can use the same object
@@ -88,7 +90,7 @@ with another file.
 =cut
 
 sub reset {
-	$_[0]->_init;	
+	$_[0]->_init;
 	}
 
 =item accumulate( [ BOOLEAN ] )
@@ -103,7 +105,7 @@ If false, C<counter> starts fresh each time.
 
 sub accumulate {
 	my( $self ) = @_;
-	
+
 	$self->{accumulate} = !! $_[1] if @_ > 1;
 
 	return $self->{accumulate};
@@ -125,27 +127,27 @@ sub count {
 		carp "Could not open file [$file]: $!";
 		return;
 		}
-		
+
 	$self->_clear_line_info unless $self->accumulate;
 
 	LINE: while( <$fh> ) {
 		chomp;
 		$self->_set_current_line( \$_ );
-		
+
 		$self->_total( \$_ );
 		$self->add_to_blank if $self->_is_blank( \$_ );
-		
+
 		foreach my $type ( qw( _start_pod _end_pod _pod_line ) ) {
 			$self->$type( \$_ ) && $self->add_to_documentation && next LINE;
 			}
-			
+
 		$self->add_to_comment if $self->_is_comment( \$_ );
 		$self->add_to_code if $self->_is_code( \$_ );
 		}
-		
+
 	$self;
 	}
-	
+
 sub _clear_line_info {
 	$_[0]->{line_info} = {};
 	}
@@ -153,13 +155,13 @@ sub _clear_line_info {
 sub _set_current_line {
 	$_[0]->{line_info}{current_line} = \ $_[1];
 	}
-	
+
 sub _init {
 	my @attrs = qw(total blank documentation code comment accumulate);
 	foreach ( @attrs ) { $_[0]->{$_} = 0 unless defined $_[0]->{$_} }
 	$_[0]->_clear_line_info;
 	};
-	
+
 =item total
 
 Returns the total number of lines in the file
@@ -185,26 +187,26 @@ Add to the documentation line counter if the line is documentation.
 
 =cut
 
-sub add_to_documentation {	
+sub add_to_documentation {
 	$_[0]->{line_info}{documentation}++;
 	$_[0]->{documentation}++;
-	
-	1;	
+
+	1;
 	}
 
 sub _start_pod {
 	return if $_[0]->_in_pod;
 	return unless ${$_[1]} =~ /^=\w+/;
-	
+
 	$_[0]->_mark_in_pod;
-	
+
 	1;
 	}
 
 sub _end_pod {
 	return unless $_[0]->_in_pod;
 	return unless ${$_[1]} =~ /^=cut$/;
-	
+
 	$_[0]->_clear_in_pod;
 
 	1;
@@ -213,7 +215,7 @@ sub _end_pod {
 sub _pod_line {
 	return unless $_[0]->_in_pod;
 	}
-	
+
 sub  _mark_in_pod { $_[0]->{line_info}{in_pod}++   }
 sub       _in_pod { $_[0]->{line_info}{in_pod}     }
 sub _clear_in_pod { $_[0]->{line_info}{in_pod} = 0 }
@@ -242,10 +244,10 @@ sub add_to_code {
 sub _is_code {
 	my( $self, $line_ref ) = @_;
 	return if grep { $self->$_() } qw(_is_blank _in_pod);
-		
+
 	# this will be false for things in strings!
 	( my $copy = $$line_ref ) =~ s/\s*#.*//;
-	
+
 	return unless length $copy;
 
 	1;
@@ -283,7 +285,7 @@ sub _is_comment {
 
 The number of blank lines. By default, these are lines that
 match the regex qr/^\s*$/. You can change this in C<new()>
-by specifying the C<line_ending> parameter. 
+by specifying the C<line_ending> parameter.
 
 =cut
 
@@ -295,7 +297,7 @@ Add to the blank line counter if the line is blank.
 
 =cut
 
-sub add_to_blank {	
+sub add_to_blank {
 	$_[0]->{line_info}{blank}++;
 	++$_[0]->{blank};
 	}
@@ -332,9 +334,9 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2008-2013, brian d foy, All Rights Reserved.
+Copyright © 2008-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+You may redistribute this under the terms of the Artistic License 2.0.
 
 =cut
 

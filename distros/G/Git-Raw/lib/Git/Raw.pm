@@ -1,5 +1,5 @@
 package Git::Raw;
-$Git::Raw::VERSION = '0.79';
+$Git::Raw::VERSION = '0.80';
 use strict;
 use warnings;
 
@@ -34,8 +34,11 @@ use Git::Raw::Worktree;
 <a href="https://ci.appveyor.com/project/jacquesg/p5-git-raw">
 	<img src="https://ci.appveyor.com/api/projects/status/il9rm9fsf9dj1dcu/branch/master?svg=true" alt="Build Status: AppVeyor" align="right" />
 </a>
+<a href="https://codecov.io/gh/jacquesg/p5-Git-Raw">
+	<img src="https://codecov.io/gh/jacquesg/p5-Git-Raw/branch/master/graph/badge.svg" alt="codecov" align="right"/>
+</a>
 <a href="https://coveralls.io/r/jacquesg/p5-Git-Raw">
-	<img src="https://coveralls.io/repos/jacquesg/p5-Git-Raw/badge.png?branch=master" alt="Coverage Status" align="right" />
+	<img src="https://coveralls.io/repos/jacquesg/p5-Git-Raw/badge.png?branch=master" alt="coveralls" align="right" />
 </a>
 =cut
 
@@ -45,7 +48,7 @@ Git::Raw - Perl bindings to the Git linkable library (libgit2)
 
 =head1 VERSION
 
-version 0.79
+version 0.80
 
 =head1 DESCRIPTION
 

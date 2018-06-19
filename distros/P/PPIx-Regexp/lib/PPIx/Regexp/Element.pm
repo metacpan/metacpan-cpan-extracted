@@ -50,7 +50,7 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.059';
+our $VERSION = '0.060';
 
 =head2 accepts_perl
 
@@ -471,6 +471,30 @@ sub previous_sibling {
 	or return;
     $inx or return;
     return $self->_parent()->$method( $inx - 1 );
+}
+
+=head2 remove_insignificant
+
+This method returns a new object manufactured from the invocant, but
+containing only elements for which C<< $elem->significant() >> returns a
+true value.
+
+If you call this method on a L<PPIx::Regexp::Node|PPIx::Regexp::Node>
+you will get back a deep clone, but without the insignificant elements.
+
+If you call this method on any other L<PPIx::Regexp|PPIx::Regexp> class
+you will get back either the invocant or nothing. This may change to a
+clone of the invocant or nothing if unforseen problems arise with
+returning the invocant, or if objects become mutable (unlikely, but not
+impossible.)
+
+=cut
+
+sub remove_insignificant {
+    my ( $self ) = @_;
+    $self->significant()
+	and return $self;
+    return;
 }
 
 =head2 requirements_for_perl

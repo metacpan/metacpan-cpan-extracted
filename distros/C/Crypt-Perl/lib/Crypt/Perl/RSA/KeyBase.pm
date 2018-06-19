@@ -85,6 +85,15 @@ sub to_der {
     return $self->_to_der($self->_ASN1_MACRO());
 }
 
+sub algorithm_identifier {
+    my ($self) = @_;
+
+    return {
+        algorithm => OID_rsaEncryption(),
+        parameters => Crypt::Perl::ASN1::NULL(),
+    };
+}
+
 use constant OID_rsaEncryption => '1.2.840.113549.1.1.1';
 
 sub _to_subject_public_der {
@@ -93,10 +102,7 @@ sub _to_subject_public_der {
     my $asn1 = $self->_asn1_find('SubjectPublicKeyInfo');
 
     return $asn1->encode( {
-        algorithm => {
-            algorithm => OID_rsaEncryption(),
-            parameters => Crypt::Perl::ASN1::NULL(),
-        },
+        algorithm => $self->algorithm_identifier(),
         subjectPublicKey => $self->_to_der('RSAPublicKey'),
     } );
 }

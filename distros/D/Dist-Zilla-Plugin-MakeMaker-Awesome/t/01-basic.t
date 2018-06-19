@@ -15,7 +15,7 @@ my $tzil = Builder->from_config(
         add_files => {
             path(qw(source dist.ini)) => simple_ini(
                 'GatherDir',
-                [ 'MakeMaker::Awesome' => { eumm_version => '6.00' } ],
+                [ 'MakeMaker::Awesome' => { eumm_version => '6.01' } ],
                 [ Prereqs => { 'Foo::Bar' => '1.20',      perl => '5.006' } ],
                 [ Prereqs => BuildRequires => { 'Builder::Bob' => '9.901' } ],
                 [ Prereqs => TestRequires  => { 'Test::Deet'   => '7',
@@ -52,7 +52,7 @@ my %want = (
         'Test::Deet'   => '7',
     },
     CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker' => '6.00'
+        'ExtUtils::MakeMaker' => '6.01'
     },
     # EXE_FILES omitted
     test => { TESTS => 't/*.t' },
@@ -78,7 +78,7 @@ use strict;
 use warnings;
 
 use 5\.008;
-use ExtUtils::MakeMaker 6\.00;
+use ExtUtils::MakeMaker 6\.01;
 
 my \%WriteMakefileArgs = \(/,
     'Makefile.PL header looks correct',
@@ -97,7 +97,7 @@ cmp_deeply(
         prereqs => {
             configure => {
                 requires => {
-                    'ExtUtils::MakeMaker' => '6.00',
+                    'ExtUtils::MakeMaker' => '6.01',
                 },
             },
             build => { requires => { 'Builder::Bob' => '9.901' } },

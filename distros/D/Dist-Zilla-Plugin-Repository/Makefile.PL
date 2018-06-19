@@ -16,13 +16,14 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Dist::Zilla::Plugin::Repository",
   "PREREQ_PM" => {
-    "Dist::Zilla" => "4.102340"
+    "Dist::Zilla" => "4.102340",
+    "Moose" => 0
   },
   "TEST_REQUIRES" => {
     "Dist::Zilla::Tester" => "4.102340",
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.21",
+  "VERSION" => "0.23",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,6 +33,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Dist::Zilla" => "4.102340",
   "Dist::Zilla::Tester" => "4.102340",
+  "Moose" => 0,
   "Test::More" => "0.88"
 );
 

@@ -26,7 +26,7 @@ use constant BLACKLIST_CURVES => (
 
 sub openssl_version {
     my $bin = openssl_bin();
-    return scalar qx<$bin version -v -o -f>;
+    return $bin && scalar qx<$bin version -v -o -f>;
 }
 
 sub can_load_private_pem {
@@ -154,6 +154,10 @@ sub __ecparam {
 my $ossl_bin;
 sub openssl_bin {
     return $ossl_bin ||= File::Which::which('openssl');
+}
+
+BEGIN {
+    diag( openssl_version() );
 }
 
 1;

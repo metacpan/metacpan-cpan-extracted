@@ -12,8 +12,15 @@ use File::Basename;
 use Digest::MD5 qw(md5_hex);
 use Errno;
 use Data::Dumper;
+$Data::Dumper::Indent = 1;
+eval {
+  # avoid "used only once" because older Data::Dumper don't have this
+  # use OMD please because OMD has everything!
+  no warnings 'all';
+  $Data::Dumper::Sparseseen = 1;
+};
 our $AUTOLOAD;
-*VERSION = \'2.4.14.6';
+*VERSION = \'3.0.2.6';
 
 use constant { OK => 0, WARNING => 1, CRITICAL => 2, UNKNOWN => 3 };
 
@@ -41,6 +48,14 @@ sub new {
       if ! grep /BEGIN/, keys %Monitoring::GLPlugin::TableItem::;
   $Monitoring::GLPlugin::plugin = Monitoring::GLPlugin::Commandline->new(%params);
   return $self;
+}
+
+sub rebless {
+  my ($self, $class) = @_;
+  bless $self, $class;
+  $self->debug('using '.$class);
+  # gilt nur fuer "echte" Fabrikate mit "Classes::" vorndran
+  $self->{classified_as} = ref($self) if $class !~ /^Monitoring::GLPlugin/;
 }
 
 sub init {
@@ -118,18 +133,21 @@ sub add_default_args {
       help => "--name
    The name of a specific component to check",
       required => 0,
+      decode => "rfc3986",
   );
   $self->add_arg(
       spec => 'name2=s',
       help => "--name2
    The secondary name of a component",
       required => 0,
+      decode => "rfc3986",
   );
   $self->add_arg(
       spec => 'name3=s',
       help => "--name3
    The tertiary name of a component",
       required => 0,
+      decode => "rfc3986",
   );
   $self->add_arg(
       spec => 'extra-opts=s',
@@ -147,7 +165,9 @@ sub add_default_args {
   $self->add_arg(
       spec => 'mitigation=s',
       help => "--mitigation
-   The parameter allows you to change a critical error to a warning.",
+   The parameter allows you to change a critical error to a warning.
+   It works only for specific checks. Which ones? Try it out or look in the code.
+   --mitigation warning ranks an error as warning which by default would be critical.",
       required => 0,
   );
   $self->add_arg(
@@ -177,6 +197,7 @@ sub add_default_args {
       help => '--morphmessage
    Modify the final output message',
       required => 0,
+      decode => "rfc3986",
   );
   $self->add_arg(
       spec => 'morphperfdata=s%',
@@ -185,6 +206,7 @@ sub add_default_args {
    It's a perl regexp and a substitution.
    Example: --morphperfdata '(.*)ISATAP(.*)'='\$1patasi\$2'",
       required => 0,
+      decode => "rfc3986",
   );
   $self->add_arg(
       spec => 'selectedperfdata=s',
@@ -260,6 +282,24 @@ sub add_default_args {
       help => "--tracefile
    Write debugging-info to this file (if it exists)",
       required => 0,
+      hidden => 1,
+  );
+}
+
+sub add_default_modes {
+  my ($self) = @_;
+  $self->add_mode(
+      internal => 'encode',
+      spec => 'encode',
+      alias => undef,
+      help => 'encode stdin',
+      hidden => 1,
+  );
+  $self->add_mode(
+      internal => 'decode',
+      spec => 'decode',
+      alias => undef,
+      help => 'decode stdin or --name',
       hidden => 1,
   );
 }
@@ -437,20 +477,16 @@ sub get_variable {
 
 sub debug {
   my ($self, $format, @message) = @_;
-  my $tracefile = $self->opts->tracefile ?
-      $self->opts->tracefile :
-      "/tmp/".$Monitoring::GLPlugin::pluginname.".trace";
-  $self->{trace} = -f $tracefile ? 1 : 0;
   if ($self->get_variable("verbose") &&
       $self->get_variable("verbose") > $self->get_variable("verbosity", 10)) {
     printf("%s: ", scalar localtime);
     printf($format, @message);
     printf "\n";
   }
-  if ($self->{trace}) {
+  if ($Monitoring::GLPlugin::tracefile) {
     my $logfh = IO::File->new();
     $logfh->autoflush(1);
-    if ($logfh->open($tracefile, "a")) {
+    if ($logfh->open($Monitoring::GLPlugin::tracefile, "a")) {
       $logfh->printf("%s: ", scalar localtime);
       $logfh->printf($format, @message);
       $logfh->printf("\n");
@@ -539,6 +575,18 @@ sub accentfree {
     'ef' => 'i', 'f0' => 'o', 'f1' => 'n', 'f2' => 'o', 'f3' => 'o', 'f4' => 'o',
     'f5' => 'o', 'f6' => 'o', 'f8' => 'o', 'f9' => 'u', 'fa' => 'u', 'fb' => 'u',
     'fc' => 'u', 'fd' => 'y', 'ff' => 'y',
+    '8a' => 'S', '8c' => 'CE', '9a' => 's', '9c' => 'oe', '9f' => 'Y', 'a2' => 'o', 'aa' => 'a',
+    'b2' => '2', 'b3' => '3', 'b9' => '1', 'bc' => '1/4', 'bd' => '1/2', 'be' => '3/4',
+    'c0' => 'A', 'c1' => 'A', 'c2' => 'A', 'c3' => 'A', 'c4' => 'A', 'c5' => 'A', 'c6' => 'AE',
+    'c7' => 'C', 'c8' => 'E', 'c9' => 'E', 'ca' => 'E', 'cb' => 'E',
+    'cc' => 'I', 'cd' => 'I', 'ce' => 'I', 'cf' => 'I', 'd0' => 'D', 'd1' => 'N',
+    'd2' => 'O', 'd3' => 'O', 'd4' => 'O', 'd5' => 'O', 'd6' => 'O',
+    'd8' => 'O', 'd9' => 'U', 'da' => 'U', 'db' => 'U', 'dc' => 'U', 'dd' => 'Y',
+    'df' => 'ss', 'e0' => 'a', 'e1' => 'a', 'e2' => 'a', 'e3' => 'a', 'e4' => 'a', 'e5' => 'a',
+    'e6' => 'ae', 'e7' => 'c', 'e8' => 'e', 'e9' => 'e', 'ea' => 'e', 'eb' => 'e',
+    'ec' => 'i', 'ed' => 'i', 'ee' => 'i', 'ef' => 'i', 'f1' => 'n',
+    'f2' => 'o', 'f3' => 'o', 'f4' => 'o', 'f5' => 'o', 'f6' => 'o', 'f8' => 'o',
+    'f9' => 'u', 'fa' => 'u', 'fb' => 'u', 'fc' => 'u', 'fd' => 'y', 'ff' => 'yy',
   );
   my @letters = split //, $text;;
   for (my $i = 0; $i <= $#letters; $i++) {
@@ -546,7 +594,9 @@ sub accentfree {
     $letters[$i] = $replace{$hex} if (exists $replace{$hex});
   }
   push @transformed, @letters;
-  return join '', @transformed;
+  $text = join '', @transformed;
+  $text =~ s/[[:^ascii:]]//g;
+  return $text;
 }
 
 sub dump {
@@ -714,15 +764,6 @@ sub load_my_extension {
   }
 }
 
-sub decode_password {
-  my ($self, $password) = @_;
-  if ($password && $password =~ /^rfc3986:\/\/(.*)/) {
-    $password = $1;
-    $password =~ s/%([A-Za-z0-9]{2})/chr(hex($1))/seg;
-  }
-  return $password;
-}
-
 sub number_of_bits {
   my ($self, $unit) = @_;
   # https://en.wikipedia.org/wiki/Data_rate_units
@@ -793,6 +834,12 @@ sub getopts {
   # (insb. fuer dbi disconnect) steht dann $self->opts->verbose
   # nicht mehr zur verfuegung bzw. $Monitoring::GLPlugin::plugin->opts ist undef.
   $self->set_variable("verbose", $self->opts->verbose);
+  $Monitoring::GLPlugin::tracefile = $self->opts->tracefile ?
+      $self->opts->tracefile :
+      $self->system_tmpdir()."/".$Monitoring::GLPlugin::pluginname.".trace";
+  if (! -f $Monitoring::GLPlugin::tracefile) {
+    $Monitoring::GLPlugin::tracefile = undef;
+  }
   #
   # die gueltigkeit von modes wird bereits hier geprueft und nicht danach
   # in validate_args. (zwischen getopts und validate_args wird
@@ -846,7 +893,7 @@ sub getopts {
       # der fliegt raus, sonst gehts gleich wieder in needs_restart rein
       next if $option eq "runas";
       foreach my $spec (map { $_->{spec} } @{$Monitoring::GLPlugin::plugin->opts->{_args}}) {
-        if ($spec =~ /^(\w+)=(.*)/) {
+        if ($spec =~ /^(\w+)[\|\w+]*=(.*)/) {
           if ($1 eq $option && $2 =~ /s%/) {
             foreach (keys %{$self->opts->$option()}) {
               push(@restart_opts, sprintf "--%s", $option);
@@ -1046,7 +1093,7 @@ sub is_blacklisted {
     }
   } else {
     foreach my $bl_items (split(/\//, $self->opts->blacklist)) {
-      if ($bl_items =~ /^(\w+):([\:\d\-,]+)$/) {
+      if ($bl_items =~ /^(\w+):([\:\d\-\.,]+)$/) {
         my $bl_type = $1;
         my $bl_names = $2;
         foreach my $bl_name (split(/,/, $bl_names)) {
@@ -1229,7 +1276,9 @@ sub valdiff {
     }
     if ($mode eq "normal" || $mode eq "lookback" || $mode eq "lookback_freeze_chill") {
       if (exists $self->{$_} && defined $self->{$_} && $self->{$_} =~ /^\d+\.*\d*$/) {
-        $last_values->{$_} = 0 if ! (exists $last_values->{$_} && defined $last_values->{$_});
+        # $VAR1 = { 'sysStatTmSleepCycles' => '',
+        # no idea why this happens, but we can repair it.
+        $last_values->{$_} = $self->{$_} if ! (exists $last_values->{$_} && defined $last_values->{$_} && $last_values->{$_} ne "");
         if ($self->{$_} >= $last_values->{$_}) {
           $self->{'delta_'.$_} = $self->{$_} - $last_values->{$_};
         } elsif ($self->{$_} eq $last_values->{$_}) {
@@ -1280,8 +1329,8 @@ sub valdiff {
         # nicht ganz sauber, aber das artet aus, wenn man jedem uninitialized hinterherstochert.
         # wem das nicht passt, der kann gerne ein paar tage debugging beauftragen.
         # das kostet aber mehr als drei kugeln eis.
-        $last_values->{$_} = 0 if ! (exists $last_values->{$_} && defined $last_values->{$_});
-        $self->{$_} = 0 if ! (exists $self->{$_} && defined $self->{$_});
+        $last_values->{$_} = 0 if ! (exists $last_values->{$_} && defined $last_values->{$_} && $last_values->{$_} ne "");
+        $self->{$_} = 0 if ! (exists $self->{$_} && defined $self->{$_} && $self->{$_} ne "");
         $self->{'delta_'.$_} = 0;
       }
     }
@@ -1449,7 +1498,7 @@ sub load_state {
       require $statefile;
     };
     if($@) {
-      printf "rumms\n";
+      printf "FATAL: Could not load state!\n";
     }
     $self->debug(sprintf "load %s from %s", Data::Dumper::Dumper($VAR1), $statefile);
     return $VAR1;

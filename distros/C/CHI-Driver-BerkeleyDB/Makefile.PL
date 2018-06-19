@@ -20,7 +20,8 @@ my %WriteMakefileArgs = (
     "BerkeleyDB" => "0.30",
     "CHI::Driver" => 0,
     "File::Path" => 0,
-    "Moose" => 0,
+    "Moo" => 0,
+    "namespace::clean" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -35,7 +36,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,11 +51,12 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Moose" => 0,
+  "Moo" => 0,
   "Test::Class" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,
   "lib" => 0,
+  "namespace::clean" => 0,
   "parent" => 0,
   "strict" => 0,
   "warnings" => 0

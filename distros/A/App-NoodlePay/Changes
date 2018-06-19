@@ -1,5 +1,8 @@
 Revision history for App-NoodlePay
 
+1.006   Tue Jun 19 01:28:57 2018 -0700
+        Optimize UI for use on Noodle Pi / Noodle Air
+
 1.005   Fri Mar 23 18:47:36 2018 -0700
     	Fix typos in documentation
 

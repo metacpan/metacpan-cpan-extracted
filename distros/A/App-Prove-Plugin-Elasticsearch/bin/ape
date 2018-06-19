@@ -1,0 +1,70 @@
+#!/usr/bin/env perl
+
+# ABSTRACT: ape - An elasticsearch based command-line test management system
+# PODNAME: ape
+
+package Bin::ape;
+$Bin::ape::VERSION = '0.001';
+use strict;
+use warnings;
+
+#Really was tempted to go with Grape::Ape here
+use App::ape;
+
+exit main(@ARGV) unless caller;
+
+sub main {
+    my @args = @_;
+    my $app  = App::ape->new(@args);
+    return $app unless ref($app) =~ m/^App::ape::/;
+    return $app->run();
+
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ape - ape - An elasticsearch based command-line test management system
+
+=head1 VERSION
+
+version 0.001
+
+=head1 USAGE
+
+=over 4
+
+=item B<ape test> - Add test results manually
+
+=item B<ape update> - Update test results (associate defects, et cetera)
+
+=item B<ape plan> - Make and queue test plans for execution by testd
+
+=back
+
+See the individual documentation for each tool by passing --help to each subcommand mentioned above.
+
+=head1 AUTHOR
+
+George S. Baugh <teodesian@cpan.org>
+
+=head1 SOURCE
+
+The development version is on github at L<http://https://github.com/teodesian/App-Prove-Elasticsearch>
+and may be cloned from L<git://https://github.com/teodesian/App-Prove-Elasticsearch.git>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by George S. Baugh.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

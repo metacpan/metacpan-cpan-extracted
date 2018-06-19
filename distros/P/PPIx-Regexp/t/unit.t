@@ -1904,7 +1904,7 @@ count   ( 5 );
 choose  ( 2 );
 class   ( 'PPIx::Regexp::Token::Unknown' );
 content ( '\\N{}' );
-error   ( 'Empty Unicode character name prohibited by "use re \'strict\'"' );
+error   ( 'Empty Unicode character name' );
 value   ( perl_version_introduced => [], '5.023008' );
 value   ( perl_version_removed => [], '5.027001' );
 

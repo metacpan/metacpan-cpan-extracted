@@ -1,12 +1,13 @@
 Changes
 corpus/hello.pl
 examples/loc
+INSTALL.SKIP
 lib/SourceCode/LineCounter/Perl.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-README
+README.pod
 t/blank.t
 t/code.t
 t/comment.t
@@ -17,5 +18,6 @@ t/pod_coverage.t
 t/pod_line.t
 t/test_manifest
 t/total.t
+xt/changes.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

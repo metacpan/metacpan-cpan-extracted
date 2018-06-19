@@ -1,0 +1,220 @@
+{
+   "abstract" : "Prove Plugin to upload test results to elastic search as they are executed",
+   "author" : [
+      "George S. Baugh <teodesian@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-Prove-Plugin-Elasticsearch",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Code::TidyAll" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Synopsis" : "0",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Prove" : "0",
+            "App::Prove::State" : "0",
+            "App::perlbrew" : "0",
+            "Capture::Tiny" : "0",
+            "Clone" : "0",
+            "Config::Simple" : "0",
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::HomeDir" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "0",
+            "Git" : "0",
+            "IO::Prompter" : "0",
+            "JSON::MaybeXS" : "0",
+            "List::Util" : "1.45",
+            "MCE::Loop" : "0",
+            "MCE::Shared" : "0",
+            "MCE::Signal" : "0",
+            "Net::RabbitMQ" : "0",
+            "POSIX" : "0",
+            "Perl::Version" : "0",
+            "Pod::Usage" : "0",
+            "Search::Elasticsearch" : "0",
+            "System::Info" : "0",
+            "TAP::Harness" : "0",
+            "TAP::Parser" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::Class" : "0",
+            "Test::Deep" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "App::Prove::Elasticsearch::Blamer::Default" : {
+         "file" : "lib/App/Prove/Elasticsearch/Blamer/Default.pm",
+         "version" : "0.001"
+      },
+      "App::Prove::Elasticsearch::Blamer::Env" : {
+         "file" : "lib/App/Prove/Elasticsearch/Blamer/Env.pm",
+         "version" : "0.001"
+      },
+      "App::Prove::Elasticsearch::Blamer::Git" : {
+         "file" : "lib/App/Prove/Elasticsearch/Blamer/Git.pm",
+         "version" : "0.001"
+      },
+      "App::Prove::Elasticsearch::Blamer::System" : {
+         "file" : "lib/App/Prove/Elasticsearch/Blamer/System.pm",
+         "version" : "0.001"
+      },
+      "App::Prove::Elasticsearch::Harness" : {
+         "file" : "lib/App/Prove/Elasticsearch/Harness.pm",
+         "version" : "0.001"
+      },
+      "App::Prove::Elasticsearch::Indexer" : {
+         "file" : "lib/App/Prove/Elasticsearch/Indexer.pm",
+         "version" : "0.001"
+      },
+      "App::Prove::Elasticsearch::Indexer::DzilDist" : {
+         "file" : "lib/App/Prove/Elasticsearch/Indexer/DzilDist.pm",
+         "version" : "0.001"
+      },
+      "App::Prove::Elasticsearch::Indexer::MMDist" : {
+         "file" : "lib/App/Prove/Elasticsearch/Indexer/MMDist.pm",
+         "version" : "0.001"
+      },
+      "App::Prove::Elasticsearch::Parser" : {
+         "file" : "lib/App/Prove/Elasticsearch/Parser.pm",
+         "version" : "0.001"
+      },
+      "App::Prove::Elasticsearch::Planner::Default" : {
+         "file" : "lib/App/Prove/Elasticsearch/Planner/Default.pm",
+         "version" : "0.001"
+      },
+      "App::Prove::Elasticsearch::Platformer::Default" : {
+         "file" : "lib/App/Prove/Elasticsearch/Platformer/Default.pm",
+         "version" : "0.001"
+      },
+      "App::Prove::Elasticsearch::Platformer::Env" : {
+         "file" : "lib/App/Prove/Elasticsearch/Platformer/Env.pm",
+         "version" : "0.001"
+      },
+      "App::Prove::Elasticsearch::Provisioner::Git" : {
+         "file" : "lib/App/Prove/Elasticsearch/Provisioner/Git.pm",
+         "version" : "0.001"
+      },
+      "App::Prove::Elasticsearch::Provisioner::Perl" : {
+         "file" : "lib/App/Prove/Elasticsearch/Provisioner/Perl.pm",
+         "version" : "0.001"
+      },
+      "App::Prove::Elasticsearch::Queue::Default" : {
+         "file" : "lib/App/Prove/Elasticsearch/Queue/Default.pm",
+         "version" : "0.001"
+      },
+      "App::Prove::Elasticsearch::Queue::Rabbit" : {
+         "file" : "lib/App/Prove/Elasticsearch/Queue/Rabbit.pm",
+         "version" : "0.001"
+      },
+      "App::Prove::Elasticsearch::Runner::Default" : {
+         "file" : "lib/App/Prove/Elasticsearch/Runner/Default.pm",
+         "version" : "0.001"
+      },
+      "App::Prove::Elasticsearch::Searcher::ByName" : {
+         "file" : "lib/App/Prove/Elasticsearch/Searcher/ByName.pm",
+         "version" : "0.001"
+      },
+      "App::Prove::Elasticsearch::Utils" : {
+         "file" : "lib/App/Prove/Elasticsearch/Utils.pm",
+         "version" : "0.001"
+      },
+      "App::Prove::Elasticsearch::Versioner::Default" : {
+         "file" : "lib/App/Prove/Elasticsearch/Versioner/Default.pm",
+         "version" : "0.001"
+      },
+      "App::Prove::Elasticsearch::Versioner::Env" : {
+         "file" : "lib/App/Prove/Elasticsearch/Versioner/Env.pm",
+         "version" : "0.001"
+      },
+      "App::Prove::Elasticsearch::Versioner::Git" : {
+         "file" : "lib/App/Prove/Elasticsearch/Versioner/Git.pm",
+         "version" : "0.001"
+      },
+      "App::Prove::Plugin::Elasticsearch" : {
+         "file" : "lib/App/Prove/Plugin/Elasticsearch.pm",
+         "version" : "0.001"
+      },
+      "App::ape" : {
+         "file" : "lib/App/ape.pm",
+         "version" : "0.001"
+      },
+      "App::ape::plan" : {
+         "file" : "lib/App/ape/plan.pm",
+         "version" : "0.001"
+      },
+      "App::ape::test" : {
+         "file" : "lib/App/ape/test.pm",
+         "version" : "0.001"
+      },
+      "App::ape::update" : {
+         "file" : "lib/App/ape/update.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/teodesian/App-Prove-Elasticsearch/issues"
+      },
+      "homepage" : "https://github.com/teodesian/App-Prove-Elasticsearch",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/teodesian/App-Prove-Elasticsearch.git",
+         "web" : "https://github.com/teodesian/App-Prove-Elasticsearch"
+      }
+   },
+   "version" : "0.001",
+   "x_contributors" : [
+      "George S. Baugh <george@troglodyne.net>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

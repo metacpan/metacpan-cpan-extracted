@@ -58,7 +58,7 @@ use PPIx::Regexp::Constant qw{
 use PPIx::Regexp::Util qw{ __instance };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.059';
+our $VERSION = '0.060';
 
 use constant ELEMENT_UNKNOWN => STRUCTURE_UNKNOWN;
 
@@ -220,6 +220,12 @@ sub last_element {
     $self->{start}[-1] and return $self->{start}[-1];
 
     return;
+}
+
+sub remove_insignificant {
+    my ( $self ) = @_;
+    return $self->__new(
+	map { $_->remove_insignificant() } $self->elements() );
 }
 
 =head2 start

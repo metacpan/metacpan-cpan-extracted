@@ -160,6 +160,19 @@ argument:
   # $result_ca contains A, a, B, b, C, c
 ```
 
+Also, make sure your list does not contain "wide characters", otherwise "Wide character in subroutine entry" exception
+will be thrown. Be vigilant if `use utf8` is in effect or your source code contains multibyte characters. It's a
+developer's responsibility to explicitly encode characters in a target encoding:
+
+```perl
+  use utf8;
+  use Encode;
+  use Sort::Naturally::XS qw/sorted/;
+
+  my $fruits = [qw/яблоко банан манго киви груша/];
+  my $result = sorted([map {Encode::encode('utf8', $_)} @{$fruits}], locale => 'ru_RU.utf8');
+``` 
+
 Note: due to the complexity of a cross-platform support, a locale aware sorting is guaranteed on Unix-like operating
 systems only.
 
@@ -228,7 +241,7 @@ Sergey Yurzin, [jurzin.s@gmail.com](mailto:jurzin.s@gmail.com)
 
 ## COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by Sergey Yurzin
+Copyright (C) 2018 by Sergey Yurzin
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.18.2 or,

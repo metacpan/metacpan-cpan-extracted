@@ -8,7 +8,7 @@
 #   The (three-clause) BSD License
 #
 package ElasticSearchX::Model;
-$ElasticSearchX::Model::VERSION = '1.0.3';
+$ElasticSearchX::Model::VERSION = '2.0.0';
 # ABSTRACT: Extensible and flexible model for Elasticsearch based on Moose
 use Moose 2.02 ();
 use Moose::Exporter ();
@@ -71,7 +71,7 @@ ElasticSearchX::Model - Extensible and flexible model for Elasticsearch based on
 
 =head1 VERSION
 
-version 1.0.3
+version 2.0.0
 
 =head1 SYNOPSIS
 

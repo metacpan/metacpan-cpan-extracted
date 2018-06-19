@@ -1,5 +1,10 @@
 Revision history for Perl extension Digest::HighwayHash.
 
+0.001001 2018-08-17T00:14+03:00
+ - Do not use "false" keyword, use 0 instead in XS
+   This fixes test failures on some C implementations
+ - Add a few tests for an error condition (invalid key)
+
 0.001 2018-06-09T18:55+01:00
  - Fix test failures
  - Write some documentation

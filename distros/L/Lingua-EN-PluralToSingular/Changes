@@ -1,5 +1,10 @@
 Revision history for perl module Lingua::EN::PluralToSingular
 
+0.20 2018-06-18
+
+* Document script
+* Better synopsis
+
 0.19 2017-02-11
 
 * More "es" to "e" words (causes)

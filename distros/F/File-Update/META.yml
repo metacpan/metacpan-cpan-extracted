@@ -7,6 +7,7 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Module::Build: '0.28'
+  Path::Tiny: '0'
   Test::More: '0.88'
   perl: '5.006'
 configure_requires:
@@ -21,7 +22,7 @@ name: File-Update
 provides:
   File::Update:
     file: lib/File/Update.pm
-    version: v0.0.1
+    version: v0.0.2
 requires:
   Exporter: '0'
   parent: '0'
@@ -31,7 +32,7 @@ resources:
   bugtracker: https://github.com/shlomif/file-update/issues
   homepage: http://metacpan.org/release/File-Update
   repository: https://github.com/shlomif/perl-File-Update.git
-version: 0.0.1
+version: 0.0.2
 x_Dist_Zilla:
   perl:
     version: '5.026002'

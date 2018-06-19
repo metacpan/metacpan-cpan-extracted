@@ -8,7 +8,7 @@
 #   The (three-clause) BSD License
 #
 package ElasticSearchX::Model::Document::Trait::Field::ID;
-$ElasticSearchX::Model::Document::Trait::Field::ID::VERSION = '1.0.3';
+$ElasticSearchX::Model::Document::Trait::Field::ID::VERSION = '2.0.0';
 use Moose::Role;
 use ElasticSearchX::Model::Document::Types qw(:all);
 
@@ -29,7 +29,7 @@ after install_accessors => sub {
 };
 
 package ElasticSearchX::Model::Document::Trait::Class::ID;
-$ElasticSearchX::Model::Document::Trait::Class::ID::VERSION = '1.0.3';
+$ElasticSearchX::Model::Document::Trait::Class::ID::VERSION = '2.0.0';
 use Moose::Role;
 
 1;
@@ -46,7 +46,7 @@ ElasticSearchX::Model::Document::Trait::Field::ID
 
 =head1 VERSION
 
-version 1.0.3
+version 2.0.0
 
 =head1 AUTHOR
 

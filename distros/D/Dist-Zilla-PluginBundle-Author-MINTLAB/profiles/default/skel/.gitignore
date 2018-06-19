@@ -1,0 +1,4 @@
+/{{$dist->name}}-*/
+/{{$dist->name}}-*.tar.gz
+Makefile
+Makefile.old

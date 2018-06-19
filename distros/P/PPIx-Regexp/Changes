@@ -1,3 +1,16 @@
+0.060		2018-06-16	T. R. Wyant
+    \N{} now parses as the unknown token, not NoOp, regardless of the
+    setting of 'use re qw< strict >;'. \N{} became unconditionally fatal
+    in 5.28.0 (5.27.1, actually). The policy when the parse changes is
+    to use the most-modern parse. Hence this change.
+
+    As a side effect of this, the unknown token's explain() method now
+    returns something -- normally the associated error.
+
+    Add method remove_insignificant(). If the invocant isa Node, this
+    returns a clone of the invocant with non-significant elements
+    removed. Otherwise it returns either the invocant or nothing.
+
 0.059		2018-05-08	T. R. Wyant
     Install @CARP_NOT everywhere so that warnings and exceptions
     generated in the bowels of the system appear to come from the point

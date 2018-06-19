@@ -1,3 +1,15 @@
+0.060   2018-06-17 (PERLANCAR)
+
+	- No functional changes.
+
+        - Bump version number to use x.yyy instead of x.yy scheme.
+
+
+0.05    2018-06-17 (PERLANCAR)
+
+	- Add function: get_currencies().
+
+
 0.04    2017-07-10 (PERLANCAR)
 
 	- No functional changes.

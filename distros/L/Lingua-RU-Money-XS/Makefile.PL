@@ -1,4 +1,4 @@
-use 5.016000;
+use 5.010000;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
@@ -14,7 +14,7 @@ WriteMakefile(
 	},
 	AUTHOR           => 'Igor Munkin <imun@cpan.org>',
 	LICENSE          => 'perl',
-	MIN_PERL_VERSION => '5.016000',
+	MIN_PERL_VERSION => '5.010000',
 	META_MERGE       => {
 		'meta-spec' => {
 			version => 2,
@@ -27,15 +27,23 @@ WriteMakefile(
 			},
 			repository => {
 				type => 'git',
-				url => 'git://github.com/igormunkin/Lingua-RU-Money-XS.git',
-				web => 'https://github.com/igormunkin/Lingua-RU-Money-XS',
+				url => 'https://git.imun.cloud/p5-Lingua-RU-Money-XS.git',
+				web => 'https://git.imun.cloud/p5-Lingua-RU-Money-XS.git',
 			},
 		},
 	},
 	LIBS             => ['-lm'],
-	DEFINE           => '',
+	DEFINE           => '-g -ggdb -O2 -Wall -Wextra',
 	INC              => '-I.',
 	H                => [ 'words.h' ],
 	PL_FILES         => { 'words.h.PL' => 'words.h' },
+	dist             => {
+		COMPRESS => 'gzip -9f',
+		SUFFIX => 'gz',
+		PREOP => q(perldoc -uT $(VERSION_FROM) \
+			| tee $(DISTVNAME)/README.pod > README.pod; \
+			pod2text README.pod | tee $(DISTVNAME)/README > README
+		),
+	},
 	clean            => { FILES => 'words.h' },
 );

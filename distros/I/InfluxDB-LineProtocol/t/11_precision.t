@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use 5.012;
+use lib 'lib';
 
 BEGIN {
     *CORE::GLOBAL::time = sub() {1437072205};

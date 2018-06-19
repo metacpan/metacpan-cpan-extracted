@@ -58,7 +58,7 @@ sub private {
             my $pk8_struct = $asn1_pkcs8->decode($pem_or_der);
 
             #It still might succeed, even if this is wrong, so don’t die().
-            if ( $pk8_struct->{'privateKeyAlgorithm'}{'algorithm'} ne Crypt::Perl::ECDSA::PrivateKey->OID_ecPublicKey() ) {
+            if ( $pk8_struct->{'privateKeyAlgorithm'}{'algorithm'} ne Crypt::Perl::ECDSA::ECParameters::OID_ecPublicKey() ) {
                 warn "Unknown private key algorithm OID: “$pk8_struct->{'privateKeyAlgorithm'}{'algorithm'}”";
             }
 
@@ -105,7 +105,7 @@ sub public {
             my $spk_struct = $asn1_pkcs8->decode($pem_or_der);
 
             #It still might succeed, even if this is wrong, so don’t die().
-            if ( $spk_struct->{'algorithm'}{'algorithm'} ne Crypt::Perl::ECDSA::PublicKey->OID_ecPublicKey() ) {
+            if ( $spk_struct->{'algorithm'}{'algorithm'} ne Crypt::Perl::ECDSA::ECParameters::OID_ecPublicKey() ) {
                 warn "Unknown private key algorithm OID: “$spk_struct->{'algorithm'}{'algorithm'}”";
             }
 

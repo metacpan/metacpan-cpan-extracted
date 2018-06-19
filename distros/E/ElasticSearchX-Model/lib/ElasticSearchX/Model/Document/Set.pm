@@ -8,7 +8,7 @@
 #   The (three-clause) BSD License
 #
 package ElasticSearchX::Model::Document::Set;
-$ElasticSearchX::Model::Document::Set::VERSION = '1.0.3';
+$ElasticSearchX::Model::Document::Set::VERSION = '2.0.0';
 # ABSTRACT: Represents a query used for fetching a set of results
 use Moose;
 use MooseX::Attribute::Chained;
@@ -255,7 +255,7 @@ ElasticSearchX::Model::Document::Set - Represents a query used for fetching a se
 
 =head1 VERSION
 
-version 1.0.3
+version 2.0.0
 
 =head1 SYNOPSIS
 

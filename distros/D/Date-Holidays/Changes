@@ -1,5 +1,14 @@
 Changes file for Date-Holidays
 
+1.16 2018-06-17 Feature release, update recommended
+
+- Added adapter for:
+    Date::Holidays::CZ the distribution had some issue with building 
+    these issue seems to have been fixed
+
+    Ref: https://github.com/jonasbn/Date-Holidays/issues/30
+
+
 1.15 2018-06-16 Feature release, update recommended
 
 - Added implementation of is_holiday method for Date::Holidays::DE

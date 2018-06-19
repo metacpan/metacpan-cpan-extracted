@@ -12,6 +12,9 @@ WriteMakefile(
 	PREREQ_PM         => {
 		qw/Math::Int64 0/,
 	},
+	TEST_REQUIRES     => {
+		qw/Test::Exception 0/,
+	},
 	INC               => '-I. -Ihighwayhash/c',
 	OBJECT            => '$(O_FILES)',
 	META_ADD         => {

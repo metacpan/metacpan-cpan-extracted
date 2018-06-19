@@ -7,21 +7,17 @@ package Comics::Plugin::CyanideAndHappiness;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "0.02";
+our $VERSION = "1.00";
 
-sub register {
-    shift->SUPER::register
-      ( { name    => "Cyanide & Happiness (Explosm.net)",
-	  url     => "http://explosm.net/",
-	  pat	  =>
+our $name    = "Cyanide & Happiness (Explosm.net)";
+our $url     = "http://explosm.net/";
+our $pattern =
 	    qr{ <img \s+
-		id="featured-comic" \s+
+		id="main-comic" \s+
 		src="(?<url>//files.explosm.net/comics/
 		(?:.+?/)?
 		(?<image>[^./]+\.\w+))
-	      }x,
-	} );
-}
+	      }x;
 
 # Important: Return the package name!
 __PACKAGE__;

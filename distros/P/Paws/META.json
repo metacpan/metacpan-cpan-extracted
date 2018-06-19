@@ -112,7 +112,7 @@
          "web" : "https://github.com/pplu/aws-sdk-perl"
       }
    },
-   "version" : "0.37",
+   "version" : "0.38",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0222"
 }
 

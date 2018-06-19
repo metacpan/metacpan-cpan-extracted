@@ -3,21 +3,22 @@ package PGObject::Type::ByteString;
 use strict;
 use warnings;
 
-use 5.008;
+use 5.010;
 use Carp;
 use DBD::Pg qw(:pg_types);
+use Ref::Util qw(is_ref is_scalarref);
 
 =head1 NAME
 
-PGObject::Type::ByteString - Wrapper for raw strings mapping to BYTEA columns
+PGObject::Type::ByteString - Wrapper for raw strings mapping to BYTEA columns.
 
 =head1 VERSION
 
-Version 1.1.2
+Version 1.2.3
 
 =cut
 
-our $VERSION = '1.2.0';
+our $VERSION = '1.2.3';
 
 =head1 SYNOPSIS
 
@@ -28,12 +29,16 @@ Now all BYTEA columns will be returned as ByteString objects.
 =head1 DESCRIPTION
 
 This module provides a basic wrapper around Perl strings, mapping them to
+BYTEA database columns.
+
+PGObject::Type::ByteString objects have no traditional properties, however
+dereferencing them will yield the raw string they contain.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 register
+=head2 register([registry => 'default',] [types => $types_arrayref])
 
-By default registers PG_BYTEA
+By default registers type PG_BYTEA.
 
 =cut
 
@@ -64,15 +69,19 @@ sub register {
 
 =head2 new
 
+Instantiates and returns a new object, based on the supplied scalar string,
+or scalar string reference.
+
+Dereferencing the returned object will yield the original raw string.
 
 =cut
 
 sub new {
     my ($class, $value) = @_;
     my $self;
-    croak 'Must pass scalar or scalar ref' 
-        if defined ref $value and ref $value !~ /SCALAR/;
-    if (ref $value ) {
+    croak 'Must pass scalar or scalar ref'
+        if is_ref($value) && ! is_scalarref($value);
+    if (is_ref($value)) {
        $self = $value;
     } else {
        $self = \$value;
@@ -83,7 +92,8 @@ sub new {
 
 =head2 from_db
 
-Parses a date from YYYY-MM-DD format and generates the new object based on it.
+Returns a new PGObject::Type::ByteString object based on the supplied
+scalar string, or scalar string reference.
 
 =cut
 
@@ -94,7 +104,8 @@ sub from_db {
 
 =head2 to_db
 
-Returns the date in YYYY-MM-DD format.
+Returns the object's binary string value packaged as PG_BYTEA type/value
+hashref suitable for passing to DBD::Pg.
 
 =cut
 
@@ -114,8 +125,6 @@ Please report any bugs or feature requests to
 C<bug-pgobject-type-bytestring at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=PGObject-Type-ByteString>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-
 
 
 =head1 SUPPORT
@@ -153,7 +162,7 @@ L<http://search.cpan.org/dist/PGObject-Type-ByteString/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Erik Huelsmann
+Copyright 2016-2018 Erik Huelsmann
 
 This program is released under the following license: BSD
 

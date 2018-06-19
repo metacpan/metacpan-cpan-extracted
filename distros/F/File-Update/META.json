@@ -50,6 +50,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Path::Tiny" : "0",
             "Test::More" : "0.88",
             "perl" : "5.006"
          }
@@ -58,7 +59,7 @@
    "provides" : {
       "File::Update" : {
          "file" : "lib/File/Update.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.2"
       }
    },
    "release_status" : "stable",
@@ -73,7 +74,7 @@
          "web" : "https://github.com/shlomif/perl-File-Update"
       }
    },
-   "version" : "0.0.1",
+   "version" : "0.0.2",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026002"

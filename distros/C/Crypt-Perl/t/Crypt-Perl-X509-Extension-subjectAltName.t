@@ -34,6 +34,25 @@ sub test_encode : Tests(1) {
     my $vector_str = '30.12.82.07.66.6f.6f.2e.63.6f.6d.82.07.62.61.72.2e.63.6f.6d';
 
     my $san_obj = Crypt::Perl::X509::Extension::subjectAltName->new(
+        [ dNSName => 'foo.com' ],
+        [ dNSName => 'bar.com' ],
+    );
+
+    my $san_enc = $san_obj->encode();
+
+    is(
+        sprintf( '%v.02x', $san_enc ),
+        $vector_str,
+        'encode() as expected - two dNSName entries',
+    );
+
+    return;
+}
+
+sub test_encode_legacy_format : Tests(1) {
+    my $vector_str = '30.12.82.07.66.6f.6f.2e.63.6f.6d.82.07.62.61.72.2e.63.6f.6d';
+
+    my $san_obj = Crypt::Perl::X509::Extension::subjectAltName->new(
         dNSName => 'foo.com',
         dNSName => 'bar.com',
     );

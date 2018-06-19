@@ -1,4 +1,4 @@
-use 5.026002;
+use 5.6.1;
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -13,7 +13,7 @@ WriteMakefile(
         'Carp'             => 0,
         'Furl'             => 0,
         'HTTP::Status'     => 0,
-        'List::Util'       => 0,
+        'List::Util'       => 1.29,
         'Mojo::IOLoop'     => 0,
         'Mojo::UserAgent'  => 0,
         'MooX::HandlesVia' => 0.

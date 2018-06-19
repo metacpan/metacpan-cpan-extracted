@@ -1,5 +1,15 @@
 Revision history for Dist-Zilla-Plugin-MakeMaker-Awesome
 
+0.44      2018-06-18 00:50:40Z
+  - also use quotes when testing ExtUtils::MakeMaker for the existence of
+    various features
+  - underscores are removed from eumm_version before injecting into
+    configure-requires prereqs and WriteMakefile arguments
+
+0.43      2018-06-17 20:04:47Z
+  - quotes are used around eumm_version when necessary to ensure the proper
+    version check is done
+
 0.42      2018-05-03 02:47:37Z
   - fix for Dist::Zilla 7: ensure that the proper directory is used
     for reading header and footer files

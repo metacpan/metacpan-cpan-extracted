@@ -7,10 +7,15 @@ third_party/modest/utils/
 third_party/modest/test/
 third_party/modest/examples/
 third_party/modest/devel/
+third_party/modest/third_party/font/
 Makefile$
+Makefile\.mk$
+Makefile\.bin\.cfg$
+Makefile\.cfg$
 MYMETA
 MANIFEST.bak
 .gz
 .tar
 .md
-
+blib/
+pm_to_lib

@@ -3,7 +3,7 @@ package Crypt::Perl;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.19';
 
 =encoding utf-8
 
@@ -35,7 +35,10 @@ See submodules for usage examples of:
 
 =item * L<JWK thumbprints|https://tools.ietf.org/html/rfc7638>
 
-=item * Certificate Signing Request (CSR) generation (PKCS #10), using RSA or ECDSA (L<Crypt::Perl::PKCS10>)
+=item * Certificate Signing Request (PKCS #10) generation (L<Crypt::Perl::PKCS10>)
+
+=item * SSL/TLS certificate (X.509) generation (L<Crypt::Perl::X509v3), including
+a broad variety of extensions
 
 =back
 
@@ -98,7 +101,7 @@ Most of the tests depend on the near-ubiquitous L<OpenSSL|http://openssl.org>,
 without which the Internet would be a very, very different reality from
 what we know!
 
-Other parts are parted from L<LibTomCrypt|http://www.libtom.net>.
+Other parts are ported from L<LibTomCrypt|http://www.libtom.net>.
 
 =head1 LICENSE
 

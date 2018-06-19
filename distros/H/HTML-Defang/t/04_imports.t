@@ -1,6 +1,8 @@
 #!/usr/bin/perl -w
 
-BEGIN { do '/home/mod_perl/hm/ME/FindLibs.pm'; }
+BEGIN { # CPAN users don't have ME::*, so use eval
+  eval 'use ME::FindLibs'
+}
 
 use Test::More tests => 33;
 use HTML::Defang;
@@ -9,7 +11,7 @@ use strict;
 # Tests taken from http://imfo.ru/csstest/css_hacks/import.php
 
 my ($Res, $H);
-my ($DefangString, ${CommentStartText}, ${CommentEndText}) = ('defang_', '', '');
+my ($DefangString, $CommentStartText, $CommentEndText) = ('defang_', ' ', ' ');
 
 my $Defang = HTML::Defang->new();
 

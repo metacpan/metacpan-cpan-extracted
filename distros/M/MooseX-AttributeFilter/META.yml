@@ -27,19 +27,19 @@ no_index:
 provides:
   MooseX::AttributeFilter:
     file: lib/MooseX/AttributeFilter.pm
-    version: '0.08'
+    version: '0.09'
   MooseX::AttributeFilter::Trait::Attribute:
     file: lib/MooseX/AttributeFilter/Trait/Attribute.pm
-    version: '0.08'
+    version: '0.09'
   MooseX::AttributeFilter::Trait::Attribute::Role:
     file: lib/MooseX/AttributeFilter/Trait/Attribute/Role.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Moose: '2.1210'
   perl: '5.008009'
 resources:
   homepage: https://github.com/icklekitten/MooseX-AttributeFilter
   repository: git://github.com/icklekitten/MooseX-AttributeFilter.git
-version: '0.08'
+version: '0.09'
 x_authority: cpan:KITTEN
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

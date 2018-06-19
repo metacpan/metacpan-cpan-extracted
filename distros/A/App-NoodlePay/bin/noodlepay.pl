@@ -4,7 +4,7 @@
 # noodlepay.pl - Convenient way to securely send Bitcoin from cold storage
 # Copyright (c) Ashish Gulhati <noodlepay at hash.neo.tc>
 #
-# $Id: bin/noodlepay.pl v1.005 Fri Mar 23 18:47:36 PDT 2018 $
+# $Id: bin/noodlepay.pl v1.006 Tue Jun 19 01:28:58 PDT 2018 $
 
 use warnings;
 
@@ -30,7 +30,7 @@ my %action;
 
 $action{SendSign} = sub {   # Send bitcoin / Sign transaction
   if ($ARGV[0] and $ARGV[0] eq '--offline') {
-    system ('v4l2-ctl --overlay=1');
+    system ('v4l2-ctl --set-fmt-overlay=width=400,top=0,left=0 --overlay=1');
     open (ZBAR, "zbarcam --nodisplay --prescale=640x480 /dev/video0 |");
     my $x = <ZBAR>; chomp $x; $x =~ s/^QR-Code://;
     system ('killall -9 zbarcam');
@@ -60,24 +60,29 @@ $action{SendSign} = sub {   # Send bitcoin / Sign transaction
     }
   }
   else {
-    my $dialog = Wx::TextEntryDialog->new( $frame, "Enter amount (in Satoshi)", "Send Bitcoin");
-    system ('xvkbd -geometry 300x200 -keypad&');
+    my $dialog = Wx::TextEntryDialog->new( $frame, "Enter amount (in Satoshi)", "Send Bitcoin", "", wxOK|wxCANCEL, [70,280] );
+    system ('xvkbd -geometry 480x250+0+520 -keypad&');
     my $ret = $dialog->ShowModal;
     system ('killall -9 xvkbd');
     return if $ret == wxID_CANCEL;
     my $amount = $dialog->GetValue(); return unless $amount =~ /^\d+$/; $amount = sprintf("%f",$amount / 100000000);
-    system ('v4l2-ctl --overlay=1');
+    system ('v4l2-ctl --set-fmt-overlay=width=400,top=0,left=0 --overlay=1');
     open (ZBAR, "zbarcam --nodisplay --prescale=640x480 /dev/video0 |");
     my $sendto = <ZBAR>;
     system ('killall -9 zbarcam');
     close ZBAR;
     system ('v4l2-ctl --overlay=0');
     chomp $sendto; $sendto =~ s/^QR-Code://; $sendto =~ s/^bitcoin://;
+    my $ProgressDialog = Wx::ProgressDialog->new("Send Money", "Creating transaction", 3, $frame,
+						 wxPD_AUTO_HIDE | wxPD_APP_MODAL );
+    $ProgressDialog->Update(0,"Checking balance...");
     my $balance = `$electrum getbalance`;
     if (defined $balance and $balance) {
       $balance =~ /"confirmed": "(\S+)"/s; $balance = $1 * 100000000;
       # TODO: Return error if wallet balance lower than send amount
+      $ProgressDialog->Update(1,"Creating transaction...");
       my $tx = `$electrum payto $sendto $amount -f 0 -u`;
+      $ProgressDialog->Update(2,"Looking up fees...");
       $tx =~ /"hex": "(\S+)"/s; my $txsize = length($1)/2 + 65;
       my $ua = new LWP::UserAgent; $ua->agent('Mozilla/5.0');
       my $req = HTTP::Request->new(GET => 'https://bitcoinfees.earn.com/api/v1/fees/recommended');
@@ -87,24 +92,30 @@ $action{SendSign} = sub {   # Send bitcoin / Sign transaction
       my $fastest_fee = $fees{fastestFee} * $txsize;
       my $halfhour_fee = $fees{halfHourFee} * $txsize;
       my $hour_fee = $fees{hourFee} * $txsize;
+      $ProgressDialog->Update(3);
       $dialog = Wx::TextEntryDialog->new( $frame, "Enter fee amount (in Satoshi). Recommended fees:\n\n" .
 					  "- Fastest (10-20 mins): $fastest_fee\n- Within half an hour: $halfhour_fee\n" .
-					  "- Within an hour: $hour_fee\n", "Send Bitcoin");
-      system ('xvkbd -geometry 300x200 -keypad&');
+					  "- Within an hour: $hour_fee\n", "Send Bitcoin", $fastest_fee, wxOK|wxCANCEL, [50, 180]);
+      system ('xvkbd -geometry 480x250+0+520 -keypad&');
       $ret = $dialog->ShowModal;
       system ('killall -9 xvkbd');
       return if $ret == wxID_CANCEL;
       my $feeamt = $dialog->GetValue(); return unless $feeamt =~ /^\d+$/; $feeamt = sprintf("%f",$feeamt / 100000000);
       my $signedtx;
       if ($ARGV[0] and $ARGV[0] eq '--online') {
+	$ProgressDialog = Wx::ProgressDialog->new("Send Money", "Signing transaction", 1, $frame,
+						  wxPD_AUTO_HIDE | wxPD_APP_MODAL );
+	$ProgressDialog->Update(0,"Signing transaction...");
 	$signedtx = `$electrum payto $sendto $amount -f $feeamt`;
+        $signedtx =~ s/\"final\": false/\"final\": true/;
+	$ProgressDialog->Update(1);
       }
       else {
 	$tx = `$electrum payto $sendto $amount -f $feeamt -u`;
 	$tx =~ /"hex": "(\S+)"/s;
 	my $dialog = qrdialog(fromdigits($1,16), 'Scan the QR code on Noodle Air', 'Sign Transaction');
 	$dialog->ShowModal;
-	system ('v4l2-ctl --overlay=1');
+	system ('v4l2-ctl --set-fmt-overlay=width=400,top=0,left=0 --overlay=1');
 	open (ZBAR, "zbarcam --nodisplay --prescale=640x480 /dev/video0 |");
 	my $signed = <ZBAR>; chomp $signed; $signed =~ s/^QR-Code://; $signed = todigitstring($signed,16);
 	system ('killall -9 zbarcam');
@@ -116,6 +127,7 @@ $action{SendSign} = sub {   # Send bitcoin / Sign transaction
       return if $dialog->ShowModal == wxID_CANCEL;
       my $id = `$electrum broadcast '$signedtx'`;
       $dialog = Wx::MessageDialog->new( $frame, "Transaction ID is $id", "Payment Sent", wxOK);
+      $dialog->ShowModal;
     }
   }
   show();
@@ -183,12 +195,12 @@ sub show {                  # Update the main frame
 sub initui {                # Initialize the UI
   Wx::InitAllImageHandlers();
   my $app = Wx::SimpleApp->new;
-  my $frame = Wx::Frame->new( undef, -1, _('Noodle Pay') , wxDefaultPosition, [500, 700] );
+  my $frame = Wx::Frame->new( undef, -1, _('Noodle Pay'), wxDefaultPosition, wxDefaultSize );
 
   my $topSizer = Wx::BoxSizer->new(wxVERTICAL);
   $frame->SetSizer($topSizer);
   my $boxSizer = Wx::BoxSizer->new(wxVERTICAL);
-  $topSizer->Add($boxSizer, 0, wxALIGN_CENTER_HORIZONTAL | wxALL | wxEXPAND, 5);
+  $topSizer->Add($boxSizer, 0, wxALL | wxEXPAND, 5);
 
   # Buttons
 
@@ -284,8 +296,8 @@ noodlepay.pl - Convenient way to securely send Bitcoin from cold storage
 
 =head1 VERSION
 
- $Revision: 1.005 $
- $Date: Fri Mar 23 18:47:36 PDT 2018 $
+ $Revision: 1.006 $
+ $Date: Tue Jun 19 01:28:58 PDT 2018 $
 
 =head1 SYNOPSIS
 

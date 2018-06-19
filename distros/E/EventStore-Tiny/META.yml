@@ -4,10 +4,12 @@ author:
   - 'Mirko Westermeier <mirko@westermeier.de>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::Pod: '1.52'
+  Test::Pod::Coverage: '1.10'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,5 +29,5 @@ requires:
 resources:
   bugtracker: http://github.com/memowe/EventStore-Tiny/issues
   repository: http://github.com/memowe/EventStore-Tiny
-version: '0.2'
+version: '0.21'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

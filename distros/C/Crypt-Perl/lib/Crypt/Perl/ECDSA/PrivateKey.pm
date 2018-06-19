@@ -224,7 +224,7 @@ sub _sign {
 #printf "Q.y: %s\n", $Q->{'y'}->to_bigint()->as_hex();
 #printf "Q.z: %s\n", $Q->{'z'}->as_hex();
         $r = $Q->get_x()->to_bigint()->copy()->bmod($n);
-    } while $r->ble(0);
+    } while !$r->is_positive();
 
 #printf "k: %s\n", $k->as_hex();
 #printf "n: %s\n", $n->as_hex();

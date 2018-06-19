@@ -7,6 +7,24 @@ for (@ARGV) {
 }
 print "\n";
 
+exit;
+
+__END__
+
+=head1 NAME
+
+singular - convert English plurals to singular
+
+=head1 SYNOPSIS
+
+    singular cats dogs sheep octopuses
+
+=head1 DESCRIPTION
+
+See L<Lingua::EN::PluralToSingular> for full details of the conversion.
+
+=cut
+
 # Local variables:
 # mode: perl
 # End:

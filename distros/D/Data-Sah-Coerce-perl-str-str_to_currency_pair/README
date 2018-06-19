@@ -1,0 +1,53 @@
+NAME
+    Data::Sah::Coerce::perl::str::str_to_currency_pair - Coerce string into
+    currency pair, e.g. USD/IDR
+
+VERSION
+    This document describes version 0.001 of
+    Data::Sah::Coerce::perl::str::str_to_currency_pair (from Perl
+    distribution Data-Sah-Coerce-perl-str-str_to_currency_pair), released on
+    2018-06-18.
+
+DESCRIPTION
+    This coercion rules checks that:
+
+    *   string is in the form of "*currency1*/*currency2*"
+
+    *   *currency1* is not the same as *currency2*
+
+    *   *currency1* is a known currency code
+
+    *   *currency2* is a known currency code
+
+    The rule is not enabled by default. You can enable it in a schema using
+    e.g.:
+
+     ["str", "x.perl.coerce_rules"=>["str_to_currency_pair"]]
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Sah-Coerce-perl-str-str_to_currency_p
+    air>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Sah-Coerce-perl-str-str_to_curre
+    ncy_pair>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-Coerce-perl-
+    str-str_to_currency_pair>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

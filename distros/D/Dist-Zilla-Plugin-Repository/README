@@ -51,6 +51,5 @@ DESCRIPTION
       * web
 
       This is a URL pointing to a human-usable web front-end for the
-      repository. Currently, only Github repositories get this set
-      automatically.
+      repository.
 

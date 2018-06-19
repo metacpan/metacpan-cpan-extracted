@@ -8,7 +8,7 @@
 #   The (three-clause) BSD License
 #
 package ElasticSearchX::Model::Document;
-$ElasticSearchX::Model::Document::VERSION = '1.0.3';
+$ElasticSearchX::Model::Document::VERSION = '2.0.0';
 use strict;
 use warnings;
 
@@ -49,7 +49,7 @@ ElasticSearchX::Model::Document
 
 =head1 VERSION
 
-version 1.0.3
+version 2.0.0
 
 =head1 SYNOPSIS
 

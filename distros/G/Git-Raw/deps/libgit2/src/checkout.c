@@ -1276,14 +1276,14 @@ static int checkout_verify_paths(
 	unsigned int flags = GIT_PATH_REJECT_WORKDIR_DEFAULTS;
 
 	if (action & CHECKOUT_ACTION__REMOVE) {
-		if (!git_path_isvalid(repo, delta->old_file.path, flags)) {
+		if (!git_path_isvalid(repo, delta->old_file.path, delta->old_file.mode, flags)) {
 			giterr_set(GITERR_CHECKOUT, "cannot remove invalid path '%s'", delta->old_file.path);
 			return -1;
 		}
 	}
 
 	if (action & ~CHECKOUT_ACTION__REMOVE) {
-		if (!git_path_isvalid(repo, delta->new_file.path, flags)) {
+		if (!git_path_isvalid(repo, delta->new_file.path, delta->new_file.mode, flags)) {
 			giterr_set(GITERR_CHECKOUT, "cannot checkout to invalid path '%s'", delta->new_file.path);
 			return -1;
 		}
@@ -1604,7 +1604,7 @@ static int blob_content_to_link(
 		st->st_mode = GIT_FILEMODE_LINK;
 	}
 
-	git_buf_free(&linktarget);
+	git_buf_dispose(&linktarget);
 
 	return error;
 }
@@ -2161,13 +2161,13 @@ static int checkout_write_merge(
 done:
 	git_filter_list_free(fl);
 
-	git_buf_free(&out_data);
-	git_buf_free(&our_label);
-	git_buf_free(&their_label);
+	git_buf_dispose(&out_data);
+	git_buf_dispose(&our_label);
+	git_buf_dispose(&their_label);
 
 	git_merge_file_result_free(&result);
-	git_buf_free(&path_workdir);
-	git_buf_free(&path_suffixed);
+	git_buf_dispose(&path_workdir);
+	git_buf_dispose(&path_suffixed);
 
 	return error;
 }
@@ -2347,8 +2347,8 @@ static void checkout_data_clear(checkout_data *data)
 	git__free(data->pfx);
 	data->pfx = NULL;
 
-	git_buf_free(&data->target_path);
-	git_buf_free(&data->tmp);
+	git_buf_dispose(&data->target_path);
+	git_buf_dispose(&data->tmp);
 
 	git_index_free(data->index);
 	data->index = NULL;

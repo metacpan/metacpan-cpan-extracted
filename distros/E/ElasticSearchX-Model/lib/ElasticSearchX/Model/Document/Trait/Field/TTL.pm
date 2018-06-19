@@ -8,7 +8,7 @@
 #   The (three-clause) BSD License
 #
 package ElasticSearchX::Model::Document::Trait::Field::TTL;
-$ElasticSearchX::Model::Document::Trait::Field::TTL::VERSION = '1.0.3';
+$ElasticSearchX::Model::Document::Trait::Field::TTL::VERSION = '2.0.0';
 use Moose::Role;
 use ElasticSearchX::Model::Document::Types qw(:all);
 
@@ -45,7 +45,7 @@ ElasticSearchX::Model::Document::Trait::Field::TTL
 
 =head1 VERSION
 
-version 1.0.3
+version 2.0.0
 
 =head1 AUTHOR
 

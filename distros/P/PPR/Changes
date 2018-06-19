@@ -92,10 +92,10 @@ Revision history for PPR
     * Handled /.../n flag
       (thanks, David)
 
-    * Handled leading BOM correctly 
+    * Handled leading BOM correctly
       (thanks, David)
 
-    * Handled ${!}-style punctuation variables 
+    * Handled ${!}-style punctuation variables
       (thanks, David)
 
     * "fline" is not a word (thanks, Hugo ;-)
@@ -119,7 +119,7 @@ Revision history for PPR
 
 0.000014  Thu Sep 28 21:43:51 2017
 
-    * Added BAIL_OUTs to test suite to accelerate 
+    * Added BAIL_OUTs to test suite to accelerate
       and clarify testing under Perl 5.20
 
     * Added missing optional whitespace to DESTROY and AUTOLOAD declarations
@@ -144,3 +144,17 @@ Revision history for PPR
     * Added (?&PerlReturnExpression) to distinguish
       in-term usages from statement-level usages
       requiring (?&PerlReturnStatement)
+
+
+0.000017  Tue Jun 19 07:57:57 2018
+
+    * Added PPR::decomment()
+      (mostly as an example of technique)
+
+    * Updated for loop parsing to support explicitly aliased iterator variables
+      (including arrays and hashes)
+
+    * Added (?&PerlTermPostfixDereference) to simply PPR::X overloading of terms
+
+    * Added Perl 5.28 ":attributes(before) ($ignature)" syntax for subroutines
+      (thanks, Matt)

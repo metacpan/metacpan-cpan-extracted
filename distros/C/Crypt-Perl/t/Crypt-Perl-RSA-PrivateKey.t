@@ -20,7 +20,6 @@ use Test::Exception;
 use lib "$FindBin::Bin/lib";
 use parent qw( TestClass );
 
-use Data::Dumper ();
 use MIME::Base64 ();
 
 use Crypt::Perl::BigInt ();

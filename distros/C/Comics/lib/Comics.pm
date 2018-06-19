@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Oct 21 09:18:23 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Nov 23 11:41:12 2017
-# Update Count    : 386
+# Last Modified On: Tue May 22 09:28:15 2018
+# Update Count    : 387
 # Status          : Unknown, Use with caution!
 
 use 5.012;
@@ -691,7 +691,7 @@ sub new {
     my $self = $pkg->SUPER::new();
     bless $self, $pkg;
 
-    $self->agent('Mozilla/5.0 (X11; Linux x86_64; rv:21.0) Gecko/20100101 Firefox/21.0');
+    $self->agent('Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0');
     $self->timeout(10);
     $cookie_jar ||= HTTP::Cookies->new
       (

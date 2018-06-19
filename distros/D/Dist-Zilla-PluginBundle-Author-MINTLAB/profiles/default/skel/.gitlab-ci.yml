@@ -1,0 +1,33 @@
+image: docker:stable
+services:
+  - docker:dind
+
+variables:
+  CONTAINER_IMAGE: registry.gitlab.com/$CI_PROJECT_PATH
+  DOCKER_DRIVER: overlay2
+
+before_script:
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+
+stages:
+  - build
+  - release
+
+build:
+  stage: build
+  except:
+    - master
+  script:
+    - docker pull $CONTAINER_IMAGE:$CI_BUILD_REF_NAME || true
+    - docker pull $CONTAINER_IMAGE:latest || true
+    - docker build --cache-from $CONTAINER_IMAGE:latest --cache-from $CONTAINER_IMAGE:$CI_BUILD_REF_NAME --tag $CONTAINER_IMAGE:$CI_BUILD_REF_NAME .
+    - docker push $CONTAINER_IMAGE:$CI_BUILD_REF_NAME
+
+build-latest:
+  stage: build
+  only:
+    - master
+  script:
+    - docker pull $CONTAINER_IMAGE:latest || true
+    - docker build --cache-from $CONTAINER_IMAGE:latest --tag $CONTAINER_IMAGE:latest .
+    - docker push $CONTAINER_IMAGE:latest

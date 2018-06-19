@@ -15,7 +15,7 @@ name: Net-Frame-Dump
 provides:
   Net::Frame::Dump:
     file: lib/Net/Frame/Dump.pm
-    version: '1.16'
+    version: '1.17'
   Net::Frame::Dump::Offline:
     file: lib/Net/Frame/Dump/Offline.pm
   Net::Frame::Dump::Online:
@@ -33,5 +33,5 @@ requires:
   perl: v5.6.1
 resources:
   license: http://www.perlfoundation.org/artistic_license_1_0
-version: '1.16'
+version: '1.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

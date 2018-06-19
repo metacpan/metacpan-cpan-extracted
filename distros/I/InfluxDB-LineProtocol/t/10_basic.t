@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use 5.012;
+use lib 'lib';
 use Test::Most;
 use InfluxDB::LineProtocol qw(data2line line2data);
 
@@ -191,6 +192,11 @@ my @tests = (
         'metric value="some \"value\""',
         ['metric', { value=>'some "value"' } , undef],
     ],
+    [   0,
+        [ 'metric', 'some \"value\"' ],
+        'metric value="some \\\\\"value\\\\\""',
+        [ 'metric', { value => 'some \"value\"' }, undef ],
+    ],
 
     # tag types
     # escape tags
@@ -223,7 +229,7 @@ my @tests = (
     [
         0,
         ['disk_free',{ value=> 442221834240, 'working directories'=>'C:\My Documents\Stuff for examples,C:\My Documents'}],
-        'disk_free value=442221834240i,working\ directories="C:\My Documents\Stuff for examples,C:\My Documents"',
+        'disk_free value=442221834240i,working\ directories="C:\\\\My Documents\\\\Stuff for examples,C:\\\\My Documents"',
         ['disk_free',{ value=> 442221834240, 'working directories'=>'C:\My Documents\Stuff for examples,C:\My Documents'}, undef],
     ],
     [

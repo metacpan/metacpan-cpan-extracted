@@ -1,23 +1,29 @@
 ---
-abstract: 'Classify and count lines in a Perl file'
+abstract: 'Count lines in Perl source code'
 author:
   - 'brian d foy <bdfoy@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  Test::More: '0.95'
+  Test::Output: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: SourceCode-LineCounter-Perl
 no_index:
   directory:
     - t
     - inc
 requires:
-  Test::More: 0.94
-  Test::Output: 0
-version: 1.02
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/briandfoy/sourcecode-linecounter-perl/issues
+  homepage: https://github.com/briandfoy/sourcecode-linecounter-perl
+  repository: https://github.com/briandfoy/sourcecode-linecounter-perl.git
+version: '1.021'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

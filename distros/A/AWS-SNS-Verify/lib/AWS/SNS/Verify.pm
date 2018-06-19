@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package AWS::SNS::Verify;
-$AWS::SNS::Verify::VERSION = '0.0102';
+$AWS::SNS::Verify::VERSION = '0.0103';
 use JSON;
 use HTTP::Tiny;
 use MIME::Base64;
@@ -130,7 +130,7 @@ AWS::SNS::Verify - Verifies authenticity of SNS messages.
 
 =head1 VERSION
 
-version 0.0102
+version 0.0103
 
 =head1 SYNOPSIS
 

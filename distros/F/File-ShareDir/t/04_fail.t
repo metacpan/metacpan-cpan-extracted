@@ -10,6 +10,8 @@ use File::Spec     ();
 use POSIX;
 use Test::More;
 
+use constant NO_PERMISSION_CHECK => ($^O eq 'MSWin32' or $< == 0);
+
 sub dies
 {
     my $code    = shift;
@@ -63,21 +65,29 @@ dies(sub { my $module_dir = module_dir('ShareDir::TestClass'); }, qr/No such dir
 make_path(dirname($testsharedirold), {mode => 0700});
 make_path($testsharedirold,          {mode => 0100});
 
-dies(
-    sub { my $module_dir = module_dir('ShareDir::TestClass'); },
-    qr/No read permission/,
-    "New module directory without read permission"
-);
+SKIP:
+{
+    skip("Root always has read permissions", 1) if NO_PERMISSION_CHECK;
+    dies(
+        sub { my $module_dir = module_dir('ShareDir::TestClass'); },
+        qr/No read permission/,
+        "New module directory without read permission"
+    );
+}
 
 my $testsharedirnew = File::Spec->catdir($testautolib, qw(share dist ShareDir-TestClass));
 make_path(dirname($testsharedirnew), {mode => 0700});
 make_path($testsharedirnew,          {mode => 0100});
 
-dies(
-    sub { my $dist_dir = dist_dir('ShareDir-TestClass'); },
-    qr/but no read permissions/,
-    "Old module directory without read permission"
-);
+SKIP:
+{
+    skip("Root always has read permissions", 1) if NO_PERMISSION_CHECK;
+    dies(
+        sub { my $dist_dir = dist_dir('ShareDir-TestClass'); },
+        qr/but no read permissions/,
+        "New module directory without read permission"
+    );
+}
 
 remove_tree($testautolib);
 open(my $fh, ">", $testsharedirold);
@@ -99,22 +109,26 @@ sysopen($fh, File::Spec->catfile($testsharedirold, qw(noread.txt)), O_RDWR | O_C
 print $fh "Moep\n";
 close($fh);
 
-dies(sub { my $dist_file = dist_file('ShareDir-TestClass', 'noread.txt'); }, qr/No read permission/, "Unreadable dist_file");
-dies(
-    sub { my $module_file = module_file('ShareDir::TestClass', 'noread.txt'); },
-    qr/No read permission/,
-    "Unreadable module_file"
-);
+SKIP:
+{
+    skip("Root always has read permissions", 3) if NO_PERMISSION_CHECK;
+    dies(sub { my $dist_file = dist_file('ShareDir-TestClass', 'noread.txt'); }, qr/No read permission/, "Unreadable dist_file");
+    dies(
+        sub { my $module_file = module_file('ShareDir::TestClass', 'noread.txt'); },
+        qr/No read permission/,
+        "Unreadable module_file"
+    );
+    dies(
+        sub { my $class_file = class_file('ShareDir::TestClass', 'noread.txt'); },
+        qr/cannot be read, no read permissions/,
+        "Unreadable class_file"
+    );
+}
+
 dies(
     sub { my $module_file = module_file('ShareDir::TestClass', 'noehere.txt'); },
     qr/does not exist in module dir/,
     "Unavailable module_file"
-);
-
-dies(
-    sub { my $class_file = class_file('ShareDir::TestClass', 'noread.txt'); },
-    qr/cannot be read, no read permissions/,
-    "Unreadable class_file"
 );
 
 dies(

@@ -1,7 +1,17 @@
 Revision history for PGObject-Type-ByteString
 
-1.2.0	2017-05-16
-	Adds support for PGObject 2.x
+1.2.3   2018-06-16
+        Correct inversed condition after fixes
+
+1.2.2   2018-06-16
+        Restore support for undefined values
+
+1.2.1   2018-06-16
+        Address warning thrown by LedgerSMB tests
+
+1.2.0   2017-05-16
+        Adds support for PGObject 2.x
+
 1.1.2   2016-12-04
         Fix copyright attribution in LICENSE (consistency)
 

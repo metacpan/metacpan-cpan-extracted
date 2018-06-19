@@ -1,5 +1,5 @@
 package Git::Raw::Odb;
-$Git::Raw::Odb::VERSION = '0.79';
+$Git::Raw::Odb::VERSION = '0.80';
 use strict;
 use warnings;
 
@@ -12,7 +12,7 @@ Git::Raw::Odb - Git object database class
 
 =head1 VERSION
 
-version 0.79
+version 0.80
 
 =head1 DESCRIPTION
 

@@ -16,12 +16,8 @@ constants-packbuilder.h
 constants-rebase-operation.h
 constants-stash-progress.h
 deps/libgit2/AUTHORS
-deps/libgit2/CHANGELOG.md
-deps/libgit2/CODE_OF_CONDUCT.md
 deps/libgit2/COPYING
 deps/libgit2/README.md
-deps/libgit2/THREADING.md
-deps/libgit2/TROUBLESHOOTING.md
 deps/libgit2/appveyor.yml
 deps/libgit2/deps/http-parser/CMakeLists.txt
 deps/libgit2/deps/http-parser/LICENSE-MIT
@@ -116,6 +112,7 @@ deps/libgit2/include/git2/status.h
 deps/libgit2/include/git2/stdint.h
 deps/libgit2/include/git2/strarray.h
 deps/libgit2/include/git2/submodule.h
+deps/libgit2/include/git2/sys/alloc.h
 deps/libgit2/include/git2/sys/commit.h
 deps/libgit2/include/git2/sys/config.h
 deps/libgit2/include/git2/sys/diff.h
@@ -141,7 +138,10 @@ deps/libgit2/include/git2/tree.h
 deps/libgit2/include/git2/types.h
 deps/libgit2/include/git2/version.h
 deps/libgit2/include/git2/worktree.h
+deps/libgit2/package.json
 deps/libgit2/src/CMakeLists.txt
+deps/libgit2/src/alloc.c
+deps/libgit2/src/alloc.h
 deps/libgit2/src/annotated_commit.c
 deps/libgit2/src/annotated_commit.h
 deps/libgit2/src/apply.c
@@ -230,6 +230,8 @@ deps/libgit2/src/hash/hash_collisiondetect.h
 deps/libgit2/src/hash/hash_common_crypto.h
 deps/libgit2/src/hash/hash_generic.c
 deps/libgit2/src/hash/hash_generic.h
+deps/libgit2/src/hash/hash_mbedtls.c
+deps/libgit2/src/hash/hash_mbedtls.h
 deps/libgit2/src/hash/hash_openssl.h
 deps/libgit2/src/hash/hash_win32.c
 deps/libgit2/src/hash/hash_win32.h
@@ -338,9 +340,13 @@ deps/libgit2/src/sortedcache.h
 deps/libgit2/src/stash.c
 deps/libgit2/src/status.c
 deps/libgit2/src/status.h
+deps/libgit2/src/stdalloc.c
+deps/libgit2/src/stdalloc.h
 deps/libgit2/src/stream.h
 deps/libgit2/src/streams/curl.c
 deps/libgit2/src/streams/curl.h
+deps/libgit2/src/streams/mbedtls.c
+deps/libgit2/src/streams/mbedtls.h
 deps/libgit2/src/streams/openssl.c
 deps/libgit2/src/streams/openssl.h
 deps/libgit2/src/streams/socket.c

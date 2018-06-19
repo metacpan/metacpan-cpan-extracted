@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+use strict;
+
 #
 # I've been told at times that this or that sort function is
 # faster for sorting IP addresses.  I've decied that I won't

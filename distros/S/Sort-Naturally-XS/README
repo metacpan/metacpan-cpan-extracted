@@ -1,4 +1,4 @@
-Sort-Naturally-XS version 0.7.8
+Sort-Naturally-XS version 0.7.9
 ===============================
 
 DESCRIPTION
@@ -22,7 +22,7 @@ Sergey Yurzin, [jurzin.s@gmail.com](mailto:jurzin.s@gmail.com)
 
 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by Sergey Yurzin
+Copyright (C) 2018 by Sergey Yurzin
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.18.2 or,

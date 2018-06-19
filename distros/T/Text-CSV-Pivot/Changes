@@ -1,5 +1,12 @@
 Revision history for Text::CSV::Pivot
 
+0.08  2018-06-17
+      - Added strict/warnings pragrma.
+
+0.07  2018-06-16
+      - Added key 'provides' to the Makefile.PL script.
+      - Documented tool 'csv-pivot'.
+
 0.06  2018-06-15
       - Added handy tool csv-pivot to play with it.
 

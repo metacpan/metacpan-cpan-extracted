@@ -14,7 +14,7 @@ my $tzil = Builder->from_config(
             path(qw(source dist.ini)) => simple_ini(
                 'GatherDir',
                 [ 'PruneFiles' => { filename => 'Makefile.PL' } ],
-                [ 'MakeMaker::Awesome' => { eumm_version => '6.00' } ],
+                [ 'MakeMaker::Awesome' => { eumm_version => '6.01' } ],
             ),
             path(qw(source lib DZT Sample.pm)) => 'package DZT::Sample; 1',
         },

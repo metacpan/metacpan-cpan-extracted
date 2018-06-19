@@ -1,7 +1,10 @@
 #!/usr/bin/perl -I. -w
 
+use strict;
+
+use Test2::V0;
+
 use Net::Netmask;
-use Test::More tests => 7;
 
 #feel free to add a build requires of Test::Exception if that is okay with you.
 sub throws_ok(&$$) {
@@ -45,3 +48,5 @@ is $cidr24->split(2),
 is $cidr24->split(256),
   map( { make_nm "10.0.0.$_" } ( 0 .. 255 ) ),
   'Can split into 32s (i.e $parts = $self->size)';
+
+done_testing();

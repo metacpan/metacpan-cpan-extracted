@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::Frame::Dump.
 
+1.17 Sun 17 Jun 13:10:12 CEST 2018
+   - bugfix: Dump::Online*: fixed a memleak due to the lack of freeing the pcap filter
+             in stop() method in N:F:Dump::Online and N:F:Dump::Online2.
+
 1.16 Thu 17 May 13:57:30 CEST 2018
    - bugfix: RT#125315, typos in pod and code.
 

@@ -4,7 +4,7 @@
       "Moritz Onken"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
@@ -14,14 +14,9 @@
    },
    "name" : "ElasticSearchX-Model",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.3601"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.28"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
@@ -61,8 +56,6 @@
             "MooseX::Types::Structured" : "0",
             "Scalar::Util" : "0",
             "Search::Elasticsearch" : "2.02",
-            "Search::Elasticsearch::Bulk" : "0",
-            "Search::Elasticsearch::Scroll" : "0",
             "Sub::Exporter" : "0",
             "strict" : "0",
             "version" : "0",
@@ -92,95 +85,95 @@
    "provides" : {
       "ElasticSearchX::Model" : {
          "file" : "lib/ElasticSearchX/Model.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       },
       "ElasticSearchX::Model::Bulk" : {
          "file" : "lib/ElasticSearchX/Model/Bulk.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       },
       "ElasticSearchX::Model::Document" : {
          "file" : "lib/ElasticSearchX/Model/Document.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       },
       "ElasticSearchX::Model::Document::EmbeddedRole" : {
          "file" : "lib/ElasticSearchX/Model/Document/EmbeddedRole.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       },
       "ElasticSearchX::Model::Document::Mapping" : {
          "file" : "lib/ElasticSearchX/Model/Document/Mapping.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       },
       "ElasticSearchX::Model::Document::Role" : {
          "file" : "lib/ElasticSearchX/Model/Document/Role.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       },
       "ElasticSearchX::Model::Document::Set" : {
          "file" : "lib/ElasticSearchX/Model/Document/Set.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       },
       "ElasticSearchX::Model::Document::Trait::Attribute" : {
          "file" : "lib/ElasticSearchX/Model/Document/Trait/Attribute.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       },
       "ElasticSearchX::Model::Document::Trait::Class" : {
          "file" : "lib/ElasticSearchX/Model/Document/Trait/Class.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       },
       "ElasticSearchX::Model::Document::Trait::Class::ID" : {
          "file" : "lib/ElasticSearchX/Model/Document/Trait/Field/ID.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       },
       "ElasticSearchX::Model::Document::Trait::Class::Timestamp" : {
          "file" : "lib/ElasticSearchX/Model/Document/Trait/Field/Timestamp.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       },
       "ElasticSearchX::Model::Document::Trait::Class::Version" : {
          "file" : "lib/ElasticSearchX/Model/Document/Trait/Field/Version.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       },
       "ElasticSearchX::Model::Document::Trait::Field::ID" : {
          "file" : "lib/ElasticSearchX/Model/Document/Trait/Field/ID.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       },
       "ElasticSearchX::Model::Document::Trait::Field::TTL" : {
          "file" : "lib/ElasticSearchX/Model/Document/Trait/Field/TTL.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       },
       "ElasticSearchX::Model::Document::Trait::Field::Timestamp" : {
          "file" : "lib/ElasticSearchX/Model/Document/Trait/Field/Timestamp.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       },
       "ElasticSearchX::Model::Document::Trait::Field::Version" : {
          "file" : "lib/ElasticSearchX/Model/Document/Trait/Field/Version.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       },
       "ElasticSearchX::Model::Document::Types" : {
          "file" : "lib/ElasticSearchX/Model/Document/Types.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       },
       "ElasticSearchX::Model::Index" : {
          "file" : "lib/ElasticSearchX/Model/Index.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       },
       "ElasticSearchX::Model::Role" : {
          "file" : "lib/ElasticSearchX/Model/Role.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       },
       "ElasticSearchX::Model::Scroll" : {
          "file" : "lib/ElasticSearchX/Model/Scroll.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       },
       "ElasticSearchX::Model::Trait::Class" : {
          "file" : "lib/ElasticSearchX/Model/Trait/Class.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       },
       "ElasticSearchX::Model::Tutorial" : {
          "file" : "lib/ElasticSearchX/Model/Tutorial.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       },
       "ElasticSearchX::Model::Util" : {
          "file" : "lib/ElasticSearchX/Model/Util.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       }
    },
    "release_status" : "stable",
@@ -194,7 +187,7 @@
          "web" : "https://github.com/metacpan/p5-elasticsearch-model"
       }
    },
-   "version" : "1.0.3",
+   "version" : "2.0.0",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -214,7 +207,7 @@
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "AutoPrereqs",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -225,7 +218,7 @@
                }
             },
             "name" : "TestRequires",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -236,7 +229,7 @@
                }
             },
             "name" : "RuntimeRequires",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
@@ -254,7 +247,7 @@
                }
             },
             "name" : "GatherDir",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
@@ -303,12 +296,12 @@
          {
             "class" : "Dist::Zilla::Plugin::PodCoverageTests",
             "name" : "PodCoverageTests",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "PodSyntaxTests",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
@@ -318,7 +311,7 @@
          {
             "class" : "Dist::Zilla::Plugin::CPANFile",
             "name" : "CPANFile",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyFilesFromBuild",
@@ -328,32 +321,32 @@
          {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
             "name" : "PruneCruft",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneFiles",
             "name" : "PruneFiles",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "ManifestSkip",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",
             "name" : "ExtraTests",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
             "name" : "NextRelease",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PkgVersion",
             "name" : "PkgVersion",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodWeaver",
@@ -458,12 +451,12 @@
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "ExecDir",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "ShareDir",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Bugtracker",
@@ -483,7 +476,7 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.011"
+                        "version" : "6.012"
                      }
                   ],
                   "include_underscores" : 0
@@ -505,48 +498,48 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "MetaConfig",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "License",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::ModuleBuild",
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
             "config" : {
                "Dist::Zilla::Role::TestRunner" : {
                   "default_jobs" : 1
                }
             },
-            "name" : "ModuleBuild",
-            "version" : "6.011"
+            "name" : "MakeMaker",
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "MetaYAML",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "MetaJSON",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Readme",
             "name" : "Readme",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "Manifest",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.17.0",
+                  "git_version" : "2.17.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -554,7 +547,7 @@
                }
             },
             "name" : "Git::Contributors",
-            "version" : "0.032"
+            "version" : "0.034"
          },
          {
             "class" : "Dist::Zilla::Plugin::ContributorsFile",
@@ -569,7 +562,7 @@
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "UploadToCPAN",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Check",
@@ -586,7 +579,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.17.0",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                }
             },
@@ -609,7 +602,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.17.0",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -626,12 +619,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.0.3",
+                  "tag" : "v2.0.0",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.17.0",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -651,7 +644,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.17.0",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                }
             },
@@ -661,57 +654,57 @@
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.011"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.011"
+            "version" : "6.012"
          }
       ],
       "zilla" : {
@@ -719,18 +712,20 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.011"
+         "version" : "6.012"
       }
    },
    "x_contributors" : [
       "Clinton Gormley <clint@traveljury.com>",
-      "mickey <mickey75@gmail.com>",
+      "Graham Knop <haarg@haarg.org>",
+      "Mickey <mickey75@gmail.com>",
       "Mickey Nasriachi <mickey@cpan.org>",
       "Moritz Onken <onken@netcubed.de>",
       "Olaf Alders <olaf@wundersolutions.com>",
       "Randy Stauner <randy@magnificent-tears.com>"
    ],
    "x_deprecated" : 1,
+   "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

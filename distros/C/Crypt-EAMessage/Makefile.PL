@@ -34,10 +34,10 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Test2::Bundle::Extended" => "0.000058",
+    "Test2::V0" => "0.000111",
     "Test::UseAllModules" => "0.17"
   },
-  "VERSION" => "1.005",
+  "VERSION" => "1.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,7 +52,7 @@ my %FallbackPrereqs = (
   "Moose" => 0,
   "Moose::Util::TypeConstraints" => 0,
   "Storable" => 0,
-  "Test2::Bundle::Extended" => "0.000058",
+  "Test2::V0" => "0.000111",
   "Test::UseAllModules" => "0.17",
   "autodie" => 0,
   "feature" => 0,

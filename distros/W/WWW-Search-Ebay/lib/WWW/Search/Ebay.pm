@@ -4,7 +4,7 @@ package WWW::Search::Ebay;
 use strict;
 use warnings;
 
-our $VERSION = 2.274;
+our $VERSION = 2.275;
 
 =head1 NAME
 
@@ -394,7 +394,7 @@ sub _parse_price
     {
     print STDERR " DDD   try TDprice ===$s===\n";
     } # if
-  if ($oTDprice->attr('class') =~ m'\bebcBid\b')
+  if ($oTDprice->attr('class') =~ m/\bebcBid\b/)
     {
     # If we see this, we must have been searching for Stores items
     # but we ran off the bottom of the Stores item list and ran
@@ -404,7 +404,7 @@ sub _parse_price
     # maybe just maybe we hit this because of a parsing glitch which
     # might correct itself on the next TD.
     } # if
-  if ($oTDprice->attr('class') !~ m'\b(ebcPr|prices|prc)\b')
+  if ($oTDprice->attr('class') !~ m/(ebcPr|prices?|prc)/)
     {
     # If we see this, we probably were searching for Store items
     # but we ran off the bottom of the Store item list and ran
@@ -446,6 +446,7 @@ sub _parse_price
     {
     $hit->shipping('free');
     } # if
+  print STDERR " DDD   good final iPrice ===$iPrice===\n" if  (DEBUG_COLUMNS || (1 < $self->{_debug}));
   $hit->bid_amount($iPrice);
   return 1;
   } # _parse_price
@@ -578,10 +579,34 @@ sub _parse_enddate
     $hit->change_date($sDate);
     return 1;
     }
+  print STDERR " DDD   raw     sDateTemp ===$sDateTemp===\n" if (DEBUG_DATES || (1 < $self->{_debug}));
+  # I don't know why there are sometimes weird characters in there:
+  $sDateTemp =~ s!&Acirc;!!g;
+  $sDateTemp =~ s!Â!!g;
+  $sDateTemp =~ s!<!!;
+  $sDateTemp =~ tr!()!!d;
+  # Convert nbsp to regular space:
+  $sDateTemp =~ s!\240!\040!g;
+  $sDateTemp =~ s!Time\s+left:?\s*!!g;
+  $sDateTemp =~ s!\s+left!!g;
+  print STDERR " DDD   poached sDateTemp ===$sDateTemp===\n" if (DEBUG_DATES || (1 < $self->{_debug}));
+  my $date;
   if (ref($oTDdate))
     {
     my $sClass = $oTDdate->attr('class') || q{};
-    if ($sClass !~ m/\b(col3|ebcTim|ti?me)\b/)
+    if ($sClass =~ m/time-end/)
+      {
+      $date = Date_Parse($sDateTemp);
+      # Fall through and continue
+      }
+    elsif ($sClass =~ m/time(-(left|-soon))?/)
+      {
+      $sDateTemp = $self->_process_date_abbrevs($sDateTemp);
+      # print STDERR " DDD   official time =====$self->{_ebay_official_time}=====\n" if (DEBUG_DATES || (1 < $self->{_debug}));
+      $date = DateCalc($self->{_ebay_official_time}, " + $sDateTemp");
+      # Fall through and continue
+      }
+    elsif ($sClass !~ m/(col3|ebcTim|ti?me)/)
       {
       # If we see this, we probably were searching for Buy-It-Now items
       # but we ran off the bottom of the item list and ran into the list
@@ -589,8 +614,12 @@ sub _parse_enddate
       return 0;
       # There is a separate backend for searching Store items!
       } # if
+    else
+      {
+      warn " EEE did not match time/date class '$sClass'";
+      return 1;
+      }
     } # if
-  print STDERR " DDD   raw    sDateTemp ===$sDateTemp===\n" if (DEBUG_DATES || (1 < $self->{_debug}));
   if ($sDateTemp =~ m/---/)
     {
     # If we see this, we probably were searching for Buy-It-Now items
@@ -599,17 +628,7 @@ sub _parse_enddate
     return 0;
     # There is a separate backend for searching Store items!
     } # if
-  # I don't know why there are sometimes weird characters in there:
-  $sDateTemp =~ s!&Acirc;!!g;
-  $sDateTemp =~ s!Â!!g;
-  $sDateTemp =~ s!<!!;
-  # Convert nbsp to regular space:
-  $sDateTemp =~ s!\240!\040!g;
-  $sDateTemp =~ s!Time\s+left:!!g;
-  $sDateTemp = $self->_process_date_abbrevs($sDateTemp);
-  print STDERR " DDD   cooked sDateTemp ===$sDateTemp===\n" if (DEBUG_DATES || (1 < $self->{_debug}));
-  print STDERR " DDD   official time =====$self->{_ebay_official_time}=====\n" if (DEBUG_DATES || (1 < $self->{_debug}));
-  my $date = DateCalc($self->{_ebay_official_time}, " + $sDateTemp");
+  print STDERR " DDD   cooked  sDateTemp ===$sDateTemp===\n" if (DEBUG_DATES || (1 < $self->{_debug}));
   print STDERR " DDD   date ===$date===\n" if (DEBUG_DATES || (1 < $self->{_debug}));
   $sDate = $self->_format_date($date);
   print STDERR " DDD   sDate ===$sDate===\n" if (DEBUG_DATES || (1 < $self->{_debug}));
@@ -720,17 +739,21 @@ sub _get_result_count_elements
                             class => 'count'
                            );
   push @ao, $tree->look_down(
-                            '_tag' => 'div',
-                            class => 'pageCaptionDiv'
-                           );
+                             '_tag' => 'div',
+                             class => 'pageCaptionDiv'
+                            );
   push @ao, $tree->look_down( # for BySellerID as of 2010-07
-                            '_tag' => 'div',
-                            id => 'rsc'
-                           );
+                             '_tag' => 'div',
+                             id => 'rsc'
+                            );
   push @ao, $tree->look_down( # for Category, as of 2018-02:
-                            _tag => 'h2',
-                            class => 'srp-controls__count-heading'
-                           );
+                             _tag => 'h2',
+                             class => 'srp-controls__count-heading'
+                            );
+  push @ao, $tree->look_down( # new as of 2018-02:
+                             _tag => 'h1',
+                             class => 'srp-controls__count-heading'
+                            );
   return @ao;
   } # _get_result_count_elements
 
@@ -773,16 +796,9 @@ sub _get_itemtitle_tds
                                class => 'lvtitle',
                               );
     } # if
-  # This is for Category search as of 2018-02:
-  $oDiv = $tree->look_down(_tag => 'ul',
-                           class => 'b-list__items_nofooter',
-                          );
-  if (ref $oDiv)
-    {
-    push @ao, $oDiv->look_down(_tag => 'div',
-                               class => 's-item__info clearfix',
-                              );
-    } # if
+  push @ao, $tree->look_down(_tag => 'div',
+                             class => 's-item__info clearfix',
+                            );
   return @ao;
   } # _get_itemtitle_tds
 
@@ -959,7 +975,8 @@ sub _parse_tree
     $hit->bid_count(0);
     # The rest of the info about this item is in sister <LI> elements
     # to the right:
-    my @aoSibs = $oTDtitle->parent->look_down(_tag => q{li});
+    my @aoSibs = $oTDtitle->look_down(_tag => q/span/);
+    push @aoSibs, $oTDtitle->parent->look_down(_tag => q/li/);
     # The parent itself is an <LI> tag:
     shift @aoSibs;
     warn " DDD before loop, there are ", scalar(@aoSibs), " sibling TDs\n" if (1 < $self->{_debug});
@@ -973,7 +990,7 @@ sub _parse_tree
         {
         warn " WWW auction info sibling has no class ==$s==" if (DEBUG_COLUMNS || (1 < $self->{_debug}));
         } # if
-      print STDERR " DDD   looking at TD'$sColumn' ===$s===\n" if (DEBUG_COLUMNS || (1 < $self->{_debug}));
+      print STDERR " DDD   looking at sibling TD whose class is '$sColumn' ===$s===\n" if (DEBUG_COLUMNS || (1 < $self->{_debug}));
       if ($sColumn =~ m'price')
         {
         next TD unless $self->_parse_price($oTDsib, $hit);

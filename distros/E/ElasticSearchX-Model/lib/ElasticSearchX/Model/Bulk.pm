@@ -8,13 +8,14 @@
 #   The (three-clause) BSD License
 #
 package ElasticSearchX::Model::Bulk;
-$ElasticSearchX::Model::Bulk::VERSION = '1.0.3';
-use Search::Elasticsearch::Bulk;
+$ElasticSearchX::Model::Bulk::VERSION = '2.0.0';
 use Moose;
+
+use ElasticSearchX::Model::Document::Types qw(ESBulk);
 
 has stash => (
     is         => 'ro',
-    isa        => "Search::Elasticsearch::Bulk",
+    isa        => ESBulk,
     handles    => { stash_size => '_buffer_count', commit => "flush" },
     lazy_build => 1,
 );
@@ -105,7 +106,7 @@ ElasticSearchX::Model::Bulk
 
 =head1 VERSION
 
-version 1.0.3
+version 2.0.0
 
 =head1 SYNOPSIS
 
@@ -119,7 +120,7 @@ version 1.0.3
 
 =head1 DESCRIPTION
 
-This class is a wrapper around L<Search::Elasticsearch::Bulk> which adds
+This class is a wrapper around L<Search::Elasticsearch>'s bulk helper which adds
 some convenience. By specifiying a L</size> you set the maximum
 number of documents that are processed in one request. You can either
 L</put> or L</delete> documents. Once the C<$bulk> object is out

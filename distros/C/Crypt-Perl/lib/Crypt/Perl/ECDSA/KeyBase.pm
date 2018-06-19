@@ -24,8 +24,6 @@ use Crypt::Perl::ECDSA::EncodedPoint ();
 use Crypt::Perl::ECDSA::Utils ();
 use Crypt::Perl::X ();
 
-use constant OID_ecPublicKey => '1.2.840.10045.2.1';
-
 use constant ASN1_SIGNATURE => q<
     SEQUENCE {
         r   INTEGER,

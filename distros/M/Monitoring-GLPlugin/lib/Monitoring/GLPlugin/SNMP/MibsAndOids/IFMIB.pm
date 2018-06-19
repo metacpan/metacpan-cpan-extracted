@@ -15,6 +15,7 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'IFMIB'} = {
   ifIndex => '1.3.6.1.2.1.2.2.1.1',
   ifDescr => '1.3.6.1.2.1.2.2.1.2',
   ifType => '1.3.6.1.2.1.2.2.1.3',
+  ifTypeDefinition => 'IANAIFTYPE-MIB::IANAifType',
   ifMtu => '1.3.6.1.2.1.2.2.1.4',
   ifSpeed => '1.3.6.1.2.1.2.2.1.5',
   ifPhysAddress => '1.3.6.1.2.1.2.2.1.6',

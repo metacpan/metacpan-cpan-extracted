@@ -17,7 +17,7 @@ use Path::Tiny;
 use POSIX ":sys_wait_h";
 use App::MultiSsh qw/hosts_from_map is_host multi_run shell_quote/;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
@@ -54,6 +54,7 @@ sub main {
         'tmux_cmd|tmux-cmd|T=s',
         'tmux|m',
         'tmux_nested|tmux-nested|n',
+        'only|o!',
         'test|t!',
         'verbose|v+',
         'man',
@@ -92,7 +93,7 @@ sub main {
         pod2usage( -verbose => 1 );
     }
 
-
+    # --fork implies --parallel 4 and defaults --interleve on
     if ($option{fork}) {
         $option{parallel}   ||= 4;
         $option{interleave} //= 1;
@@ -114,10 +115,10 @@ sub main {
         exec $option{cssh_cmd}, hosts_from_map($option{host});
     }
 
-    # do stuff here
-    my $remote_cmd = pop @ARGV || '';
-    #my $remote_cmd = join ' ', map {s{'}{'\\''}gxms; $_} @ARGV;
+    # get the remote command to run
+    my $remote_cmd = !$option{only} && @ARGV ? pop @ARGV : '';
 
+    # any parameters left over are assumed to be host specifications
     if (@ARGV) {
         push @{$option{host}}, @ARGV;
     }
@@ -156,14 +157,14 @@ mssh - Multi host ssh executer
 
 =head1 VERSION
 
-This documentation refers to mssh version 0.20.
+This documentation refers to mssh version 0.21.
 
 =head1 SYNOPSIS
 
    mssh [ --VERSION | --help | --man ]
-   mssh [ -t | --test ] [ -v | --verbose ] -h host [-h host2 ..] 'remote command'
-   mssh [ -t | --test ] [ -v | --verbose ] host [host2 ...] 'remote command'
-   mssh [ -t | --test ] [ -v | --verbose ] [-c|--cssh|-m|--tmux] -h host [-h host2 ..]
+   mssh [-t|--test] [-v|--verbose] -h host [-h host2 ..] 'remote command'
+   mssh [-t|--test] [-v|--verbose] host [host2 ...] 'remote command'
+   mssh [-t|--test] [-v|--verbose] [-c|--cssh|-m|--tmux|-n|--tmux-nested] -h host [-h host2 ..]
 
  OPTIONS:
   'remote command'
@@ -203,6 +204,8 @@ This documentation refers to mssh version 0.20.
                 run anything
   -f --fork     Fork the ssh processes so they run in parallel, output may
                 not be legible. (Equivalent of --parallel=4 --interleave)
+  -s --script[=]str
+                Hmmm what's this
   -c --cssh     Use cssh to run the ssh commands
      --cssh-cmd[=]str
                 Use str as the C<cssh> program (defaults to cssh found in $PATH)
@@ -213,6 +216,7 @@ This documentation refers to mssh version 0.20.
                 Use this fag when running in an existing tmux session to split up
                 the current tmux window in the same fashion as running a sepperate
                 tmux session.
+  -o --only     No command passed (all arguments are hosts)
 
   -v --verbose  Show more detailed option
      --VERSION  Prints the version information

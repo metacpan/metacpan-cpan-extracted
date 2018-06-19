@@ -4,7 +4,7 @@
       "Igor Munkin <imun@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -36,7 +36,7 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.016000"
+            "perl" : "5.010000"
          }
       }
    },
@@ -51,10 +51,10 @@
       ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/igormunkin/Lingua-RU-Money-XS.git",
-         "web" : "https://github.com/igormunkin/Lingua-RU-Money-XS"
+         "url" : "https://git.imun.cloud/p5-Lingua-RU-Money-XS.git",
+         "web" : "https://git.imun.cloud/p5-Lingua-RU-Money-XS.git"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

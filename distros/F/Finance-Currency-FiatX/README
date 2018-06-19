@@ -1,31 +1,76 @@
 NAME
-    Finance::Currency::FiatX - Convert fiat currency using current rate
+    Finance::Currency::FiatX - Fiat currency exchange rate library
 
 VERSION
-    This document describes version 0.002 of Finance::Currency::FiatX (from
-    Perl distribution Finance-Currency-FiatX), released on 2018-05-10.
+    This document describes version 0.005 of Finance::Currency::FiatX (from
+    Perl distribution Finance-Currency-FiatX), released on 2018-06-19.
 
 SYNOPSIS
     See fiatx from App::fiatx for an example on how to use this module.
 
 DESCRIPTION
     FiatX is a library/application to convert one fiat currency to another
-    using several backend modules ("Finance::Currency::Convert::*") and
-    store the rates in DBI database.
+    using several backend modules ("sources",
+    "Finance::Currency::FiatX::Source::*", which in turns usually utilize
+    "Finance::Currency::Convert::*") and store the rates in DBI database for
+    caching.
 
 FUNCTIONS
-  convert_fiat_currency
+  get_all_spot_rates
     Usage:
 
-     convert_fiat_currency(%args) -> [status, msg, result, meta]
+     get_all_spot_rates(%args) -> [status, msg, result, meta]
 
-    Convert fiat currency using current rate.
+    Get all spot rates from a source.
 
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
 
-    *   amount => *num* (default: 1)
+    *   dbh => *obj*
+
+    *   max_age_cache => *posint* (default: 14400)
+
+        Above this age (in seconds), we retrieve rate from remote source
+        again.
+
+    *   source* => *str* (default: ":any")
+
+        Ask for a specific remote source.
+
+        If you want a specific remote source, you can specify it here. The
+        default is ':any' which is to pick the first source that returns a
+        recent enough current rate.
+
+        Other special values: ":highest" to return highest rate of all
+        sources, ":lowest" to return lowest rate of all sources, ':newest'
+        to return rate from source with the newest last update time,
+        ':oldest' to return rate from source with the oldest last update
+        time, ':average' to return arithmetic average of all sources.
+
+    *   table_prefix => *str* (default: "fiatx_")
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  get_spot_rate
+    Usage:
+
+     get_spot_rate(%args) -> [status, msg, result, meta]
+
+    Get spot (latest) rate.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
 
     *   dbh => *obj*
 
@@ -36,10 +81,19 @@ FUNCTIONS
         Above this age (in seconds), we retrieve rate from remote source
         again.
 
-    *   max_age_current => *posint* (default: 86400)
+    *   source => *str* (default: ":any")
 
-        Above this age (in seconds), we no longer consider the rate to be
-        "current" but "historical".
+        Ask for a specific remote source.
+
+        If you want a specific remote source, you can specify it here. The
+        default is ':any' which is to pick the first source that returns a
+        recent enough current rate.
+
+        Other special values: ":highest" to return highest rate of all
+        sources, ":lowest" to return lowest rate of all sources, ':newest'
+        to return rate from source with the newest last update time,
+        ':oldest' to return rate from source with the oldest last update
+        time, ':average' to return arithmetic average of all sources.
 
     *   table_prefix => *str* (default: "fiatx_")
 

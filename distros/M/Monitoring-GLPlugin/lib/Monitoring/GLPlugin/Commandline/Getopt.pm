@@ -82,6 +82,15 @@ sub new {
   $self->_init(@params);
 }
 
+sub decode_rfc3986 {
+  my ($self, $password) = @_;
+  if ($password && $password =~ /^rfc3986:\/\/(.*)/) {
+    $password = $1;
+    $password =~ s/%([A-Za-z0-9]{2})/chr(hex($1))/seg;
+  }
+  return $password;
+}
+
 sub add_arg {
   my ($self, %arg) = @_;
   push (@{$self->{_args}}, \%arg);
@@ -164,6 +173,17 @@ sub getopts {
       *{"$field"} = sub {
         return $self->{opts}->{$aliasfield};
       };
+    }
+    foreach (grep { exists $_->{decode} } @{$self->{_args}}) {
+      my $decoding = $_->{decode};
+      $_->{spec} =~ /^([\w\-]+)/;
+      my $spec = $1;
+      if (exists $self->{opts}->{$spec}) {
+        if ($decoding eq "rfc3986") {
+	  $self->{opts}->{$spec} =
+	      $self->decode_rfc3986($self->{opts}->{$spec});
+	}
+      }
     }
   }
 }

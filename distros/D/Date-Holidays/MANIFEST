@@ -20,6 +20,7 @@ lib/Date/Holidays/Adapter/BR.pm
 lib/Date/Holidays/Adapter/BY.pm
 lib/Date/Holidays/Adapter/CA_ES.pm
 lib/Date/Holidays/Adapter/CN.pm
+lib/Date/Holidays/Adapter/CZ.pm
 lib/Date/Holidays/Adapter/DE.pm
 lib/Date/Holidays/Adapter/DK.pm
 lib/Date/Holidays/Adapter/ES.pm

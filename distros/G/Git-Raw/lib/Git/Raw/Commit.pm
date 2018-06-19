@@ -1,5 +1,5 @@
 package Git::Raw::Commit;
-$Git::Raw::Commit::VERSION = '0.79';
+$Git::Raw::Commit::VERSION = '0.80';
 use strict;
 use warnings;
 use overload
@@ -14,7 +14,7 @@ Git::Raw::Commit - Git commit class
 
 =head1 VERSION
 
-version 0.79
+version 0.80
 
 =head1 SYNOPSIS
 
@@ -104,6 +104,10 @@ Retrieve the id of the commit, as a string.
 =head2 message( )
 
 Retrieve the message of the commit.
+
+=head2 message_trailers( )
+
+Retrieve the message trailers of the commit. Returns a hash.
 
 =head2 summary( )
 

@@ -8,7 +8,7 @@
 #   The (three-clause) BSD License
 #
 package ElasticSearchX::Model::Document::Role;
-$ElasticSearchX::Model::Document::Role::VERSION = '1.0.3';
+$ElasticSearchX::Model::Document::Role::VERSION = '2.0.0';
 use Moose::Role;
 
 use Carp;
@@ -154,7 +154,7 @@ ElasticSearchX::Model::Document::Role
 
 =head1 VERSION
 
-version 1.0.3
+version 2.0.0
 
 =head1 AUTHOR
 

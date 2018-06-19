@@ -7,7 +7,7 @@ use base qw(Date::Holidays::Adapter::GB);
 
 use vars qw($VERSION);
 
-$VERSION = '1.15';
+$VERSION = '1.16';
 
 1;
 
@@ -21,7 +21,7 @@ Date::Holidays::Adapter::UK - adapter dummy class for Date::Holidays::UK
 
 =head1 VERSION
 
-This POD describes version 1.15 of Date::Holidays::Adapter::UK
+This POD describes version 1.16 of Date::Holidays::Adapter::UK
 
 =head1 DESCRIPTION
 

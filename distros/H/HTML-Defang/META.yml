@@ -1,13 +1,21 @@
---- #YAML:1.0
-name:                HTML-Defang
-version:             1.04
-abstract:            Cleans HTML as well as CSS of scripting and other executable contents, and neutralises XSS attacks.
-license:             ~
-author:              
-    - Kurian Jose Aerthail <cpan@kurianja.fastmail.fm>
-generated_by:        ExtUtils::MakeMaker version 6.42
-distribution_type:   module
-requires:     
+---
+abstract: 'Cleans HTML as well as CSS of scripting and other executable contents, and neutralises XSS attacks.'
+author:
+  - 'Rob Mueller <cpan@robm.fastmail.fm>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: unknown
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-Defang
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+version: 1.05

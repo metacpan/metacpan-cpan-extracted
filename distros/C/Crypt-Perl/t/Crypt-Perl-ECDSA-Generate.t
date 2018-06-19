@@ -94,6 +94,8 @@ sub test_legacy_alias : Tests(1) {
 sub test_generate : Tests() {
     my ($self) = @_;
 
+    diag "XXX NOTE: This test can take a while and/or spew a lot of text.";
+
     my $msg = rand;
 
     my $ossl_bin = OpenSSL_Control::openssl_bin();

@@ -8,7 +8,7 @@
 #   The (three-clause) BSD License
 #
 package ElasticSearchX::Model::Document::Types;
-$ElasticSearchX::Model::Document::Types::VERSION = '1.0.3';
+$ElasticSearchX::Model::Document::Types::VERSION = '2.0.0';
 use List::MoreUtils ();
 use DateTime::Format::Epoch::Unix;
 use DateTime::Format::ISO8601;
@@ -18,6 +18,7 @@ use DateTime;
 use JSON::MaybeXS qw( decode_json encode_json );
 use Scalar::Util qw(blessed);
 use MooseX::Types::ElasticSearch qw(:all);
+use Moose::Util::TypeConstraints qw(duck_type);
 
 use MooseX::Types -declare => [
     qw(
@@ -25,6 +26,8 @@ use MooseX::Types -declare => [
         Types
         TimestampField
         TTLField
+        ESBulk
+        ESScroll
         )
 ];
 
@@ -34,6 +37,8 @@ use Sub::Exporter -setup => {
             Location
             QueryType
             ES
+            ESBulk
+            ESScroll
             Type
             Types
             TimestampField
@@ -61,6 +66,19 @@ coerce TimestampField, from Str, via {
 coerce TimestampField, from HashRef, via {
     { enabled => 1, %$_ };
 };
+
+subtype ESScroll,
+    as duck_type([qw(
+        next
+        total
+        max_score
+    )]);
+
+subtype ESBulk,
+    as duck_type([qw(
+        _buffer_count
+        flush
+    )]);
 
 subtype TTLField,
     as Dict [
@@ -191,7 +209,7 @@ ElasticSearchX::Model::Document::Types
 
 =head1 VERSION
 
-version 1.0.3
+version 2.0.0
 
 =head1 AUTHOR
 

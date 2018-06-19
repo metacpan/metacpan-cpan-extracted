@@ -8,7 +8,7 @@
 #   The (three-clause) BSD License
 #
 package ElasticSearchX::Model::Document::EmbeddedRole;
-$ElasticSearchX::Model::Document::EmbeddedRole::VERSION = '1.0.3';
+$ElasticSearchX::Model::Document::EmbeddedRole::VERSION = '2.0.0';
 # Mark a Document class for use as an embedded object only
 # Classes which do this role will not create their own mapping
 # in Elasticsearch
@@ -29,7 +29,7 @@ ElasticSearchX::Model::Document::EmbeddedRole
 
 =head1 VERSION
 
-version 1.0.3
+version 2.0.0
 
 =head1 AUTHOR
 

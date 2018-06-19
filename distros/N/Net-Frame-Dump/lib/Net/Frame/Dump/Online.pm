@@ -1,5 +1,5 @@
 #
-# $Id: Online.pm,v c07e2f6c705b 2018/05/17 11:57:52 gomor $
+# $Id: Online.pm,v 89981a6995b9 2018/06/17 11:10:11 gomor $
 #
 package Net::Frame::Dump::Online;
 use strict;
@@ -21,6 +21,7 @@ our @AS = qw(
    _sDataAwaiting
    _firstTime
    _son
+   _fcode
 );
 __PACKAGE__->cgBuildIndices;
 __PACKAGE__->cgBuildAccessorsScalar(\@AS);
@@ -159,6 +160,7 @@ sub _startOnRecv {
       print("[-] ".__PACKAGE__.": compile: ". Net::Pcap::geterr($pd). "\n");
       return;
    }
+   $self->_fcode($fcode);  # Used to free it later on, usually on stop call.
 
    if (Net::Pcap::setfilter($pd, $fcode) < 0) {
       print("[-] ".__PACKAGE__.": setfilter: ". Net::Pcap::geterr($pd). "\n");
@@ -229,10 +231,6 @@ sub _clean {
 sub stop {
    my $self = shift;
 
-   if (!$self->isRunning || $self->isSon) {
-      return;
-   }
-
    if ($self->onRecv && $self->_pcapd) {
       Net::Pcap::breakloop($self->_pcapd);
       Net::Pcap::close($self->_pcapd);
@@ -241,6 +239,12 @@ sub stop {
       $self->_killTcpdump;
       Net::Pcap::breakloop($self->_pcapd);
       Net::Pcap::close($self->_pcapd);
+   }
+
+   # Free the pcap filter
+   if (defined($self->_fcode)) {
+      Net::Pcap::pcap_freecode($self->_fcode);
+      $self->_fcode(undef);
    }
 
    $self->isRunning(0);
@@ -306,6 +310,7 @@ sub _startTcpdump {
       print("[-] ".__PACKAGE__.": compile: ". Net::Pcap::geterr($pd). "\n");
       return;
    }
+   $self->_fcode($fcode);  # Used to free it later on, usually on stop call.
 
    if (Net::Pcap::setfilter($pd, $fcode) < 0) {
       print("[-] ".__PACKAGE__.": setfilter: ". Net::Pcap::geterr($pd). "\n");

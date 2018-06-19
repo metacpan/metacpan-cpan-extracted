@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-my $VERSION = 1.15;
+my $VERSION = 1.16;
 
 use blib;
 use Data::Dumper;
@@ -25,7 +25,6 @@ tm_new_engine('Ebay::ByEndDate');
 pass('no-op');
 TEST_NOW:
 pass('no-op');
-diag("Sending end-date query...");
 $iDebug = 0;
 $iDump = 0;
 # We need a query that returns "Featured Items" _and_ items that end
@@ -34,6 +33,8 @@ $iDump = 0;
 TODO:
   {
   $TODO = 'We only need one page of results in order to test the end-date sort';
+  diag("Sending end-date query...");
+  $WWW::Search::Test::sSaveOnError = q{byenddate-failed.html};
   tm_run_test('normal', 'zeppelin', 45, 49, $iDebug, $iDump);
   }
 $TODO = '';

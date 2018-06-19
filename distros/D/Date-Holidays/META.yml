@@ -29,79 +29,82 @@ name: Date-Holidays
 provides:
   Date::Holidays:
     file: lib/Date/Holidays.pm
-    version: '1.15'
+    version: '1.16'
   Date::Holidays::Adapter:
     file: lib/Date/Holidays/Adapter.pm
-    version: '1.15'
+    version: '1.16'
   Date::Holidays::Adapter::AU:
     file: lib/Date/Holidays/Adapter/AU.pm
-    version: '1.15'
+    version: '1.16'
   Date::Holidays::Adapter::BR:
     file: lib/Date/Holidays/Adapter/BR.pm
-    version: '1.15'
+    version: '1.16'
   Date::Holidays::Adapter::BY:
     file: lib/Date/Holidays/Adapter/BY.pm
-    version: '1.15'
+    version: '1.16'
   Date::Holidays::Adapter::CA_ES:
     file: lib/Date/Holidays/Adapter/CA_ES.pm
-    version: '1.15'
+    version: '1.16'
   Date::Holidays::Adapter::CN:
     file: lib/Date/Holidays/Adapter/CN.pm
-    version: '1.15'
+    version: '1.16'
+  Date::Holidays::Adapter::CZ:
+    file: lib/Date/Holidays/Adapter/CZ.pm
+    version: '1.16'
   Date::Holidays::Adapter::DE:
     file: lib/Date/Holidays/Adapter/DE.pm
-    version: '1.15'
+    version: '1.16'
   Date::Holidays::Adapter::DK:
     file: lib/Date/Holidays/Adapter/DK.pm
-    version: '1.15'
+    version: '1.16'
   Date::Holidays::Adapter::ES:
     file: lib/Date/Holidays/Adapter/ES.pm
-    version: '1.15'
+    version: '1.16'
   Date::Holidays::Adapter::FR:
     file: lib/Date/Holidays/Adapter/FR.pm
-    version: '1.15'
+    version: '1.16'
   Date::Holidays::Adapter::GB:
     file: lib/Date/Holidays/Adapter/GB.pm
-    version: '1.15'
+    version: '1.16'
   Date::Holidays::Adapter::JP:
     file: lib/Date/Holidays/Adapter/JP.pm
-    version: '1.15'
+    version: '1.16'
   Date::Holidays::Adapter::KR:
     file: lib/Date/Holidays/Adapter/KR.pm
-    version: '1.15'
+    version: '1.16'
   Date::Holidays::Adapter::KZ:
     file: lib/Date/Holidays/Adapter/KZ.pm
-    version: '1.15'
+    version: '1.16'
   Date::Holidays::Adapter::Local:
     file: lib/Date/Holidays/Adapter/Local.pm
-    version: '1.15'
+    version: '1.16'
   Date::Holidays::Adapter::NO:
     file: lib/Date/Holidays/Adapter/NO.pm
-    version: '1.15'
+    version: '1.16'
   Date::Holidays::Adapter::NZ:
     file: lib/Date/Holidays/Adapter/NZ.pm
-    version: '1.15'
+    version: '1.16'
   Date::Holidays::Adapter::PL:
     file: lib/Date/Holidays/Adapter/PL.pm
-    version: '1.15'
+    version: '1.16'
   Date::Holidays::Adapter::PT:
     file: lib/Date/Holidays/Adapter/PT.pm
-    version: '1.15'
+    version: '1.16'
   Date::Holidays::Adapter::RU:
     file: lib/Date/Holidays/Adapter/RU.pm
-    version: '1.15'
+    version: '1.16'
   Date::Holidays::Adapter::SK:
     file: lib/Date/Holidays/Adapter/SK.pm
-    version: '1.15'
+    version: '1.16'
   Date::Holidays::Adapter::UK:
     file: lib/Date/Holidays/Adapter/UK.pm
-    version: '1.15'
+    version: '1.16'
   Date::Holidays::Adapter::US:
     file: lib/Date/Holidays/Adapter/US.pm
-    version: '1.15'
+    version: '1.16'
   Date::Holidays::Adapter::USFederal:
     file: lib/Date/Holidays/Adapter/USFederal.pm
-    version: '1.15'
+    version: '1.16'
 requires:
   Carp: '0'
   DateTime: '0'
@@ -118,5 +121,5 @@ resources:
   bugtracker: https://github.com/jonasbn/perl-date-holidays/issues
   homepage: https://jonasbn.github.io/perl-date-holidays/
   repository: https://github.com/jonasbn/perl-date-holidays.git
-version: '1.15'
+version: '1.16'
 x_serialization_backend: 'YAML::Tiny version 1.70'

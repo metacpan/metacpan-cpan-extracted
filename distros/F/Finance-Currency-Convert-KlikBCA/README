@@ -2,9 +2,9 @@ NAME
     Finance::Currency::Convert::KlikBCA - Convert currency using KlikBCA
 
 VERSION
-    This document describes version 0.14 of
+    This document describes version 0.150 of
     Finance::Currency::Convert::KlikBCA (from Perl distribution
-    Finance-Currency-Convert-KlikBCA), released on 2017-07-11.
+    Finance-Currency-Convert-KlikBCA), released on 2018-06-16.
 
 SYNOPSIS
      use Finance::Currency::Convert::KlikBCA qw(convert_currency);
@@ -111,7 +111,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014, 2012 by
+    This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2012 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

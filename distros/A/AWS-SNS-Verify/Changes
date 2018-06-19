@@ -1,5 +1,8 @@
 Revision history for Perl module AWS::SNS::Verify
 
+0.0103 2018-06-18
+ - Fix broken test due to certificates becoming invalid. 
+
 0.0102 2017-01-05
  - Add validation of the SigningCertURL thanks to Johan Lindstrom.
 

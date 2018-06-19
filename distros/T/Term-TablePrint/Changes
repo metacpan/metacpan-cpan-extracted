@@ -1,6 +1,12 @@
 Revision history for Term::TablePrint
 
 
+0.066   2018-06-17
+        - Changed 'no_spacebar' to 'meta_items'.
+        - Removed deprecated option 'add_header'
+        - Removed 'choose_columns' value-2-warning.
+        - Backup self.
+
 0.065   2018-04-20
         - Bugfix: wrong sprintf format in row limit.
 

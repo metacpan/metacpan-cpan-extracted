@@ -145,7 +145,7 @@ our @EXPORT_OK = qw{
 our %EXPORT_TAGS = (
     ALL => [@EXPORT_OK],
 );
-our $VERSION = '1.110';
+our $VERSION = '1.112';
 
 #####################################################################
 # Interface Functions
@@ -578,19 +578,71 @@ to use the development copy without needing to install them first.
 
 =head1 SUPPORT
 
-Bugs should always be submitted via the CPAN bug tracker
+Bugs should always be submitted via the CPAN request tracker, see below.
 
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-ShareDir>
+You can find documentation for this module with the perldoc command.
 
-For other issues, contact the maintainer.
+    perldoc File::ShareDir
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-ShareDir>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/File-ShareDir>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/s/File-ShareDir>
+
+=item * CPAN Search
+
+L<http://search.cpan.org/dist/File-ShareDir/>
+
+=back
+
+=head2 Where can I go for other help?
+
+If you have a bug report, a patch or a suggestion, please open a new
+report ticket at CPAN (but please check previous reports first in case
+your issue has already been addressed).
+
+Report tickets should contain a detailed description of the bug or
+enhancement request and at least an easily verifiable way of
+reproducing the issue or fix. Patches are always welcome, too.
+
+=head2 Where can I go for help with a concrete version?
+
+Bugs and feature requests are accepted against the latest version
+only. To get patches for earlier versions, you need to get an
+agreement with a developer of your choice - who may or not report the
+issue and a suggested fix upstream (depends on the license you have
+chosen).
+
+=head2 Business support and maintenance
+
+For business support you can contact the maintainer via his CPAN
+email address. Please keep in mind that business support is neither
+available for free nor are you eligible to receive any support
+based on the license distributed with this package.
 
 =head1 AUTHOR
 
 Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
+=head2 MAINTAINER
+
+Jens Rehsack E<lt>rehsack@cpan.orgE<gt>
+
 =head1 SEE ALSO
 
-L<File::ShareDir::Install>, L<File::HomeDir>,
+L<File::ShareDir::Install>,
+L<File::ConfigDir>, L<File::HomeDir>,
 L<Module::Install>, L<Module::Install::Share>,
 L<File::ShareDir::PAR>, L<Dist::Zilla::Plugin::ShareDir>
 

@@ -21,8 +21,15 @@ if ($^O =~ /openbsd/i) {
 }
 
 my $sources = [
-	"modest.o", 
-	"DOM.o"
+	"DOM.o", 
+	"modest_modest.o", 
+	"modest_mycore.o", 
+	"modest_mycss.o", 
+	"modest_myencoding.o", 
+	"modest_myfont.o", 
+	"modest_myhtml.o", 
+	"modest_myport.o", 
+	"modest_myurl.o"
 ];
 
 WriteMakefile(

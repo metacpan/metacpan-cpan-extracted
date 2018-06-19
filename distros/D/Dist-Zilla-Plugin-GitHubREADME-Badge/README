@@ -11,6 +11,7 @@ SYNOPSIS
         # configure it yourself
         [GitHubREADME::Badge]
         badges = travis
+        badges = travis-ci.com
         badges = appveyor
         badges = coveralls
         badges = gitter

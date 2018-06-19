@@ -23,4 +23,13 @@ sub new_cache_options {
     );
 }
 
+# Fix for RT #103290
+sub noisy_remove :Tests {
+    my $self = shift;
+
+    my $cache = $self->new_cleared_cache;
+
+    $cache->remove('foo');
+}
+
 1;

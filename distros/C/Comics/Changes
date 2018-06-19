@@ -1,5 +1,14 @@
 Revision history for Comics
 
+1.09	2018-06-18
+
+	Add DoodleForFood.
+	Fix patterns for LeastICouldDo, CyanideAndHappiness, DoodleForFood,
+	MyExtraLife, SlackWyrm, QuestionableContent, SMBC,
+	WhatTheDuck, CheerUpEmoKid, UserFriendly, MyJetPack.
+	Rename MyExtraLife to Frogpants and update patterns.
+	Disable PretendsToBeDrawing. We cannot do multi-pane comics yet.
+
 1.08	2018-04-06
 
 	Add RudyPark, Speedbump.

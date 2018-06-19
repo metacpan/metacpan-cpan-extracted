@@ -4,7 +4,7 @@
       "Mirko Westermeier <mirko@westermeier.de>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -39,6 +39,12 @@
             "UUID::Tiny" : "1.04",
             "perl" : "5.014000"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Pod" : "1.52",
+            "Test::Pod::Coverage" : "1.10"
+         }
       }
    },
    "release_status" : "stable",
@@ -50,6 +56,6 @@
          "url" : "http://github.com/memowe/EventStore-Tiny"
       }
    },
-   "version" : "0.2",
+   "version" : "0.21",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,5 +1,9 @@
-See moreso the git repository.
+See also the git repository.
+
+0.42    2018-06-18
+        More methods (append_cols, append_rows, as_array, crop, draw_in,
+        flip_four, four_up, from_array, mask, overlay, rotate, trim,
+        white_noise). More error checking, tests, and docs.
 
 0.01    2018-04-10
-        First version, released on an (mostly) unsuspecting world.
-
+        First version, released on an (some would say) unsuspecting world.

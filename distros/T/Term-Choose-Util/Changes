@@ -1,6 +1,10 @@
 Revision history for Term::Choose::Util
 
 
+0.064   2018-06-17
+        - Changed 'no_spacebar' to 'meta_items'.
+        - "choose_a_subset": bugfix sort.
+
 0.063   2018-04-20
         - Update 'prompt'.
 

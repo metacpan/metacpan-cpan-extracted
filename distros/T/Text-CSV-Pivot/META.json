@@ -40,6 +40,12 @@
          }
       }
    },
+   "provides" : {
+      "Text::CSV::Pivot" : {
+         "file" : "lib/Text/CSV/Pivot.pm",
+         "version" : "0.08"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
@@ -48,6 +54,6 @@
          "web" : "https://github.com/manwar/Text-CSV-Pivot"
       }
    },
-   "version" : "0.06",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

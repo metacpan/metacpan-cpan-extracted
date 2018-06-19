@@ -1,4 +1,4 @@
-Net-Mattermost-Bot version 0.01
+Net-Mattermost-Bot version 0.03
 ===============================
 
 A base class for Mattermost bots. Provides a websocket connection and basic API
@@ -6,10 +6,11 @@ controls for creating a simple Mattermost bot.
 
 Several methods are provided which may be overridden in your own bot:
 
-    - event_emit_connection() - The bot connected to the chat server ($self).
-    - event_emit_typing() - Someone started typing ($self, $args).
-    - event_emit_channel_viewed() - A channel was viewed ($self, $args).
-    - event_emit_posted() - A message was posted to a channel ($self, $args).
+    - event_connected() - The bot connected to the chat server ($self).
+    - event_typing() - Someone started typing ($self, $args).
+    - event_channel_viewed() - A channel was viewed ($self, $args).
+    - event_posted() - A message was posted to a channel ($self, $args).
+    - event_generic() - Catch-all for other events ($self, $args).
 
     Extend Net::Mattermost::Bot in a C<Moo> or C<Moose> package.
 
@@ -29,7 +30,7 @@ Several methods are provided which may be overridden in your own bot:
     extends 'Net::Mattermost::Bot';
 
     # A message was posted to the channel
-    sub event_emit_posted {
+    sub event_posted {
         my $self = shift;
         my $args = shift;
 
@@ -46,7 +47,7 @@ Several methods are provided which may be overridden in your own bot:
 API calls can also be made directly to Mattermost using their v4 API (using
 Furl):
 
-    sub event_emit_posted {
+    sub event_posted {
         my $self = shift;
 
         # Get a list of your team's custom emoticons

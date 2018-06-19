@@ -1,6 +1,6 @@
 package Resque::Worker;
 # ABSTRACT: Does the hard work of babysitting Resque::Job's
-$Resque::Worker::VERSION = '0.35';
+$Resque::Worker::VERSION = '0.36';
 use Moose;
 with 'Resque::Encoder';
 
@@ -53,7 +53,9 @@ has paused   => ( is => 'rw', default => sub{0} );
 
 has interval => ( is => 'rw', default => sub{5} );
 
-sub pause           { $_[0]->paused(1) }
+has autoconfig => ( is => 'rw', predicate => 'has_autoconfig' );
+
+sub pause { $_[0]->paused(1) }
 
 sub unpause         { $_[0]->paused(0) }
 
@@ -70,6 +72,7 @@ sub work {
 
     $self->startup;
     while ( ! $self->shutdown ) {
+        $self->autoconfig->($self) if $self->has_autoconfig;
         if ( !$self->paused && ( my $job = $self->reserve ) ) {
             $waiting=0;
             $self->log("Got job $job");
@@ -412,7 +415,7 @@ Resque::Worker - Does the hard work of babysitting Resque::Job's
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 ATTRIBUTES
 
@@ -463,6 +466,15 @@ When true, this worker won't proccess more jobs till false.
 =head2 interval
 
 Float representing the polling frequency. The default is 5 seconds, but for a semi-active app you may want to use a smaller value.
+
+=head2 autoconfig
+
+An optional callback to be called periodically while work()'ing. It's main purpose is to
+allow running auto-config code as this function will receive this worker as it's only argument
+and will be called before reserving the first job.
+
+When this callback is provided, it will be called on every wheel iteration, so it's recommended
+to keep track of time to prevent running slow re-configuration code every time.
 
 =head1 METHODS
 

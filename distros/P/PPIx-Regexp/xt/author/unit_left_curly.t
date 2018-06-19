@@ -12,6 +12,14 @@ use Test::More 0.88;	# Because of done_testing();
 
 use PPIx::Regexp::Constant();
 
+# Local constants describing the current removal plans for various
+# constructs involving un-escaped left curlys. Everything should be done
+# in terms of these because we seem to be shooting at a moving target on
+# this issue.
+use constant REMOVE_NEVER	=> undef;
+use constant REMOVE_PHASE_2	=> '5.030';
+use constant REMOVE_PHASE_3	=> '5.032';
+
 {
 
     no warnings qw{ redefine };
@@ -24,10 +32,10 @@ use PPIx::Regexp::Constant();
     # possible.
 
     sub PPIx::Regexp::Constant::LITERAL_LEFT_CURLY_REMOVED_PHASE_2 () {
-	'5.030' }	# As of 2018-02-26 this is the plan
+	REMOVE_PHASE_2 }	# As of 2018-06-08 this is the plan
 
     sub PPIx::Regexp::Constant::LITERAL_LEFT_CURLY_REMOVED_PHASE_3 () {
-	'5.032' }	# As of 2018-02-26 this is the plan
+	REMOVE_PHASE_3 }	# As of 2018-06-08 this is the plan
 
 }
 
@@ -40,21 +48,21 @@ value	( failures => [], 0 );
 choose	( child => 1, child => 1 );
 class	( 'PPIx::Regexp::Token::Literal' );
 content	( '{' );	# }
-value	( perl_version_removed => [], '5.030' );	# THIS IS THE POINT
+value	( perl_version_removed => [], REMOVE_PHASE_2 );	# THIS IS THE POINT
 
 parse	( '/ { /x' );	# }
 value	( failures => [], 0 );
 choose	( child => 1, child => 0 );
 class	( 'PPIx::Regexp::Token::Literal' );
 content	( '{' );	# }
-value	( perl_version_removed => [], undef );		# THIS IS THE POINT
+value	( perl_version_removed => [], REMOVE_NEVER );	# THIS IS THE POINT
 
 parse	( '/ ( { ) /x' );	# }
 value	( failures => [], 0 );
 choose	( child => 1, child => 0, child => 0 );
 class	( 'PPIx::Regexp::Token::Literal' );
 content	( '{' );	# }
-value	( perl_version_removed => [], '5.032' );	# THIS IS THE POINT
+value	( perl_version_removed => [], REMOVE_PHASE_3 );	# THIS IS THE POINT
 
 done_testing;
 

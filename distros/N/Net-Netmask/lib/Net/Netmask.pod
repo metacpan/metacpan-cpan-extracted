@@ -4,14 +4,14 @@
 
 =head1 SYNOPSIS
 
-use Net::Netmask;
+ use Net::Netmask;
 
  $block = Net::Netmask->new(network block)
  $block = Net::Netmask->new(network block, netmask)
  $block = Net::Netmask->new2(network block)
  $block = Net::Netmask->new2(network block, netmask)
 
- print $block;			# a.b.c.d/bits
+ print $block;                      # a.b.c.d/bits
  print $block->base()
  print $block->mask()
  print $block->hostmask()
@@ -22,6 +22,7 @@ use Net::Netmask;
  print $block->next()
  print $block->match($ip);
  print $block->nth(1, [$bitstep]);
+ print $block->protocol();
 
  if ($block->sameblock("network block")) ...
  if ($block->cmpblocks("network block")) ...
@@ -56,15 +57,17 @@ use Net::Netmask;
 
 =head1 DESCRIPTION
 
-Net::Netmask parses and understands IPv4 CIDR blocks.  It's built
-with an object-oriented interface.  Nearly all functions are
-methods that operate on a Net::Netmask object.
+Net::Netmask parses and understands IPv4 CIDR blocks (see
+L<https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing>
+for more information on CIDR blocks).  It's built with an
+object-oriented interface, with functions being methods that
+operate on a Net::Netmask object.
 
-There are methods that provide the nearly all bits of information
-about a network block that you might want.
+These methods provide nearly all types of information about a
+network block that you might want.
 
-There are also functions to put a network block into a table and
-then later lookup network blocks by IP address in that table.
+There are also functions to insert a network block into a table
+and then later lookup network blocks by IP address using that table.
 There are functions to turn a IP address range into a list of
 CIDR blocks.  There are functions to turn a list of CIDR blocks
 into a list of IP addresses.
@@ -118,14 +121,15 @@ Always a /8 block.
 
 =item '216.240.32.0#0.0.31.255'
 
-A hostmask (as used by Cisco access-lists).
+A hostmask (as used by Cisco access-lists - that is, the hostmask
+is the bitwise inverse of a netmask).
 
 =back
 
-There are two constructor methods: C<new> and C<new2>.  The difference
-is that C<new2> will return undef for invalid netmasks and C<new> will
-return a netmask object even if the constructor could not figure out
-what the network block should be.
+There are two constructor methods: C<new> and C<new2>.  C<new2>
+differs from C<new> in that it will return undef for invalid netmasks,
+while C<new> will return a netmask object even if the constructor
+could not figure out what the network block should be.
 
 With C<new>, the error string can be found as $block->{'ERROR'}.  With
 C<new2> the error can be found as Net::Netmask::errstr or $Net::Netmask::error.
@@ -136,22 +140,22 @@ C<new2> the error can be found as Net::Netmask::errstr or $Net::Netmask::error.
 
 =item ->B<desc>()
 
-Returns a description of the network block.  Eg: 216.240.32.0/19.
+Returns a description of the network block.  Eg: "216.240.32.0/19".
 This is also available as overloaded stringification.
 
 =item ->B<base>()
 
-Returns base address of the network block as a string.  Eg: 216.240.32.0.
+Returns base address of the network block as a string.  Eg: "216.240.32.0".
 B<Base> does not give an indication of the size of the network block.
 
 =item ->B<mask>()
 
-Returns the netmask as a string. Eg: 255.255.255.0.
+Returns the netmask as a string. Eg: "255.255.255.0".
 
 =item ->B<hostmask>()
 
 Returns the host mask which is the opposite of the netmask.
-Eg: 0.0.0.255.
+Eg: "0.0.0.255".
 
 =item ->B<bits>()
 
@@ -175,6 +179,13 @@ the broadcast address.) Eg: 192.168.1.0/24 => 192.168.2.0
 =item ->B<first>() & ->B<last>()
 
 Synonyms for ->B<base>() and ->B<broadcast>()
+
+=item ->B<protocol>()
+
+Added in version 1.9102.
+
+Returns the address family/protocol represented by the block.  Today,
+this will always be "IPv4".
 
 =item ->B<match>($ip)
 
@@ -408,10 +419,10 @@ span that range.
 For example, range2cidrlist('216.240.32.128', '216.240.36.127'),
 will return a list of Net::Netmask objects that correspond to:
 
-	216.240.32.128/25
-	216.240.33.0/24
-	216.240.34.0/23
-	216.240.36.0/25
+    216.240.32.128/25
+    216.240.33.0/24
+    216.240.34.0/23
+    216.240.36.0/25
 
 =item B<cidrs2contiglists>(@listOfBlocks)
 
@@ -422,15 +433,15 @@ discontiguous with the next.
 For example, given a list of Net::Netmask objects corresponding to
 the following blocks:
 
-	216.240.32.128/25
-	216.240.33.0/24
-	216.240.36.0/25
+    216.240.32.128/25
+    216.240.33.0/24
+    216.240.36.0/25
 
 C<cidrs2contiglists> will return a list with two sublists:
 
-	216.240.32.128/25 216.240.33.0/24
+    216.240.32.128/25 216.240.33.0/24
 
-	216.240.36.0/25
+    216.240.36.0/25
 
 Overlapping blocks will be placed in the same sublist.
 
@@ -457,7 +468,7 @@ Copyright (C) 2011-2013 Google, Inc.
 
 Copyright (C) 2018 Joelle Maslak
 
-This module may be used, modified and redistributed on the same
+This module may be used, modified and redistributed under the same
 terms as Perl itself.
 
 =cut

@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "File-Update",
-  "dist_version" => "0.0.1",
+  "dist_version" => "0.0.2",
   "license" => "mit",
   "module_name" => "File::Update",
   "recursive_test_files" => 1,
@@ -32,6 +32,7 @@ my %module_build_args = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Path::Tiny" => 0,
     "Test::More" => "0.88",
     "perl" => "5.006"
   }
@@ -43,6 +44,7 @@ my %fallback_build_requires = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Module::Build" => "0.28",
+  "Path::Tiny" => 0,
   "Test::More" => "0.88",
   "perl" => "5.006"
 );

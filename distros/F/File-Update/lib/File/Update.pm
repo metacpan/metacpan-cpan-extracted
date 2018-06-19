@@ -1,5 +1,5 @@
 package File::Update;
-$File::Update::VERSION = '0.0.1';
+$File::Update::VERSION = '0.0.2';
 use strict;
 use warnings;
 
@@ -57,7 +57,7 @@ File::Update - update/modify/mutate a file only on change in contents.
 
 =head1 VERSION
 
-version 0.0.1
+version 0.0.2
 
 =head1 SYNOPSIS
 
@@ -70,7 +70,7 @@ version 0.0.1
 
 =head1 VERSION
 
-version 0.0.1
+version 0.0.2
 
 =head1 FUNCTIONS
 

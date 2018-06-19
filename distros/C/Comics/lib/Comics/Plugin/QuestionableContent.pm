@@ -7,20 +7,16 @@ package Comics::Plugin::QuestionableContent;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "0.02";
+our $VERSION = "1.00";
 
-sub register {
-    shift->SUPER::register
-      ( { name    => "Questionable Content",
-	  url     => "http://www.questionablecontent.net/",
-	  pat	  =>
+our $name    = "Questionable Content";
+our $url     = "http://www.questionablecontent.net/";
+our $pattern =
 	    qr{ <img \s+
-		src="(?<url>http://www.questionablecontent.net/comics/
+		src="(?<url>https?://www.questionablecontent.net/comics/
 		      (?<image>\d+\.\w+))" \s*
 		>
-	      }x,
-	} );
-}
+	      }x;
 
 # Important: Return the package name!
 __PACKAGE__;

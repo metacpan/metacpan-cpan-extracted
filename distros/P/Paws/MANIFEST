@@ -6867,6 +6867,8 @@ lib/Paws/IoTAnalytics/ListDatastores.pm
 lib/Paws/IoTAnalytics/ListDatastoresResponse.pm
 lib/Paws/IoTAnalytics/ListPipelines.pm
 lib/Paws/IoTAnalytics/ListPipelinesResponse.pm
+lib/Paws/IoTAnalytics/ListTagsForResource.pm
+lib/Paws/IoTAnalytics/ListTagsForResourceResponse.pm
 lib/Paws/IoTAnalytics/LoggingOptions.pm
 lib/Paws/IoTAnalytics/MathActivity.pm
 lib/Paws/IoTAnalytics/Message.pm
@@ -6886,6 +6888,11 @@ lib/Paws/IoTAnalytics/SelectAttributesActivity.pm
 lib/Paws/IoTAnalytics/SqlQueryDatasetAction.pm
 lib/Paws/IoTAnalytics/StartPipelineReprocessing.pm
 lib/Paws/IoTAnalytics/StartPipelineReprocessingResponse.pm
+lib/Paws/IoTAnalytics/Tag.pm
+lib/Paws/IoTAnalytics/TagResource.pm
+lib/Paws/IoTAnalytics/TagResourceResponse.pm
+lib/Paws/IoTAnalytics/UntagResource.pm
+lib/Paws/IoTAnalytics/UntagResourceResponse.pm
 lib/Paws/IoTAnalytics/UpdateChannel.pm
 lib/Paws/IoTAnalytics/UpdateDataset.pm
 lib/Paws/IoTAnalytics/UpdateDatastore.pm
@@ -10272,6 +10279,7 @@ lib/Paws/SSM/AutomationExecutionMetadata.pm
 lib/Paws/SSM/AutomationParameterMap.pm
 lib/Paws/SSM/CancelCommand.pm
 lib/Paws/SSM/CancelCommandResult.pm
+lib/Paws/SSM/CloudWatchOutputConfig.pm
 lib/Paws/SSM/Command.pm
 lib/Paws/SSM/CommandFilter.pm
 lib/Paws/SSM/CommandInvocation.pm

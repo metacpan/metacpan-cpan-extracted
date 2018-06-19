@@ -1,5 +1,3 @@
-#!/usr/bin/perl -w
-
 package HTML::Defang;
 
 =head1 NAME
@@ -18,7 +16,8 @@ HTML::Defang - Cleans HTML as well as CSS of scripting and other executable cont
     url_callback => \&DefangUrlCallback,
     css_callback => \&DefangCssCallback,
     attribs_to_callback => [ qw(border src) ],
-    attribs_callback => \&DefangAttribsCallback
+    attribs_callback => \&DefangAttribsCallback,
+    content_callback => \&ContentCallback,
   );
 
   my $SanitizedHtml = $Defang->defang($InputHtml);
@@ -82,6 +81,13 @@ HTML::Defang - Cleans HTML as well as CSS of scripting and other executable cont
     return DEFANG_NONE;
   }
 
+  # Callback for all content between tags (except <style>, <script>, etc)
+  sub DefangContentCallback {
+    my ($Self, $Defang, $ContentR) = @_;
+
+    $$ContentR =~ s/remove this content//;
+  }
+
 =head1 DESCRIPTION
 
 This module accepts an input HTML and/or CSS string and removes any executable code including scripting, embedded objects, applets, etc., and neutralises any XSS attacks. A whitelist based approach is used which means only HTML known to be safe is allowed through.
@@ -124,7 +130,7 @@ Exporter::export_ok_tags('all');
 use strict;
 use warnings;
 
-our $VERSION=1.04;
+our $VERSION=1.05;
 
 use constant DEFANG_NONE => 0;
 use constant DEFANG_ALWAYS => 1;
@@ -138,19 +144,23 @@ BEGIN { eval "use Scalar::Readonly qw(readonly_on);" && ($HasScalarReadonly = 1)
 our @FormTags = qw(form input textarea select option button fieldset label legend multicol nextid optgroup);
 
 # Some regexps for matching HTML tags + key=value attributes
-my $AttrKeyStartLineRE = qr/(?:[^=<>\s\/\\]{1,}|[\/]\s*(?==))/;
+my $AttrKeyStartLineRE = qr/(?:[^=<>\s\/\\]{1,}|[\/](?!\s*>))/;
 my $AttrKeyRE = qr/(?<=[\s'"\/])$AttrKeyStartLineRE/;
-my $AttrValRE = qr/[^>\s'"`][^>\s]*|'[^']{0,16384}?'|"[^"]{0,16384}?"|`[^`]{0,16384}?`/;
+my $AttrValRE = qr/[^>\s'"`][^>\s]*|'[^']*?'|"[^"]*?"|`[^`]*?`/;
 my $AttributesRE = qr/(?:(?:$AttrKeyRE\s*)?(?:=\s*$AttrValRE\s*)?)*/;
 my $TagNameRE = qr/[A-Za-z][A-Za-z0-9\#\&\;\:\!_-]*/;
 
-my $StyleSelectors = qr/[^{}\s][^{}]*?/;
+my $StyleSelectors = qr/[^{}\s][^{}]{0,1024}?/;
 my $StyleName = qr/[^:}\s][^:{}]*?/;
 my $StyleValue = qr/[^;}\s][^;}]*|.*$/; 
 my $StyleRule = qr/$StyleName\s*:\s*$StyleValue\s*/;
-my $StyleRules = qr/\s*(?:$StyleRule)?(?:;\s*$StyleRule)*(?:;\s*)?/;
+my $StyleRules = qr/\s*(?:$StyleRule)?(?:;\s*$StyleRule)*(?:;\s*)*/;
+my $StyleMediaSelector = qr/\@media\b[^{]*/;
+my $RECStyleMediaSelector = qr{\G(\s*)($StyleMediaSelector)(\{)(\s*)}so;
+my $RECStyleNaked = qr/\G(\s*)()()()($StyleRules)()(\s*)/o;
+my $RECStyleSelected = qr/\G(\s*)((?:$StyleSelectors)?)(\s*)(\{)($StyleRules)(\})(\s*)/o;
 
-my $Fonts            = qr/"?([A-Za-z0-9\s-]+)"?/;
+my $Fonts            = qr/["']?([A-Za-z0-9\s-]+)["']?/;
 my $Alignments       = qr/(absbottom|absmiddle|all|autocentre|baseline|bottom|center|justify|left|middle|none|right|texttop|top)/;
 
 my $Executables = '([^@]\.com|'.
@@ -172,13 +182,14 @@ my %Rules =
   "coords"       => qr/^(\d+,)+\d+$/i,
   "datetime"     => qr/^\d\d\d\d-\d\d-\d\d.{0,5}\d\d:\d\d:\d\d.{0,5}$/,
   "dir"          => qr/^(ltr|rtl)$/i,
+  "empty"        => qr/^$/i,
   "eudora"       => qr/^(autourl)$/i,
   "font-face"    => qr/^((${Fonts})[,\s]*)+$/i,
   "form-enctype" => qr/^(application\/x-www-form-urlencoded|multipart\/form-data)$/i,
   "form-method"  => qr/^(get|post)$/i,
   "frame"        => qr/^(void|above|below|hsides|vsides|lhs|rhs|box|border)$/i,
   # href: Not javascript, vbs or vbscript
-  "href"         => [ qr/(?i:^([a-z]*script\s*:|.*\&{|mocha|hcp|opera\s*:|about\s*:|smb|\/dev\/|<))|[^\x00-\x7f]/ ],
+  "href"         => [ qr/^((?:[a-z]*script|mocha|opera|about|data|tcl)\s*:|.*\&{|hcp|smb|\/dev\/|<)/i ],
   "usemap-href"  => qr/^#[A-Za-z0-9_.-]+$/,  # this is not really a href at all!
   "input-size"   => qr/^(\d{1,4})$/, # some browsers freak out with very large widgets
   "input-type"   => qr/^(button|checkbox|file|hidden|image|password|radio|readonly|reset|submit|text)$/i,
@@ -207,7 +218,7 @@ my %Rules =
   "stylesheet"   => [ qr/expression|eval|script:|mocha:|\&{|\@import/i ], # stylesheets are forbidden if Embedded => 1.  css positioning can be allowed in an iframe.
   # NB see also `process_stylesheet' below
   "style-type"   => [ qr/script|mocha/i ],
-  "size"         => qr/^[\d.]+(px|%)?$/i,
+  "size"         => qr/^[\+\-]?[\d.]+(px|%)?$/i,
   "target"       => qr/^[A-Za-z0-9_][A-Za-z0-9_.-]*$/,
   "base-href"    => qr/^https?:\/\/[\w.\/]+$/,
   "anything"     => qr/^.*$/, #[ 0, 0 ],
@@ -244,8 +255,10 @@ my %CommonAttributes =
   "scroll"       => "boolean",
   "scrolling"    => "boolean",
   "topmargin"    => "size",
+  "type"         => "mime-type",
   "valign"      => "align",
   "width"      => "size",
+  "/"          => "empty",
 );
 
 my %ListAttributes =
@@ -293,8 +306,8 @@ my %UrlRules = (
 );
 
 my %Tags = (
-  script => \&defang_script,
-  style => \&defang_style,
+  script => \&defang_script_tag,
+  style => \&defang_style_tag,
   "html" => 100,
   #
   # Safe elements commonly found in the <head> block follow.
@@ -361,6 +374,7 @@ my %Tags = (
     "shape"  => "shape", 
     "target" => "target",
   },
+  "article" => 1,
   "applet" => 0,
   "basefont" =>
   {
@@ -417,6 +431,7 @@ my %Tags = (
     "size"   => "number",
     "ptsize" => "number",
   },
+  "footer" => 1,
   "form" => # FORM
   {
     "method"  => "form-method",
@@ -425,6 +440,7 @@ my %Tags = (
     "accept"   => "anything",
     "accept-charset"   => "anything",
   },
+  "header" => 1,
   "hr" =>
   {
     "size"    => "number",
@@ -504,7 +520,9 @@ my %Tags = (
   "nobr"     => 0,
   "noembed"  => 1,
   "nolayer"  => 1,
-  "noscript" => 1,
+  # Pretend our defang result is going into a non-scripting environment,
+  #  even though javascript is likely enabled, so just defang all noscript tags
+  "noscript" => 0,
   "noembed"  => 1,
   "object"   => 0,
   "ol"       => \%ListAttributes,
@@ -527,6 +545,7 @@ my %Tags = (
   "pre"      => 1,
   "rt"       => 0,
   "ruby"     => 0,
+  "section"  => 1,
   "select"   => # FORM
   {
     "disabled" => "anything",
@@ -632,12 +651,10 @@ my %MathMLTags = (
 );
 
 # Some entity conversions for attributes
+my $CtrlChars = qr/[\x00-\x08\x0b-\x1f]/;
 my %EntityToChar = (quot => '"', apos => "'", amp => '&', 'lt' => '<', 'gt' => '>');
-my %CharToEntity = reverse %EntityToChar;
-my %QuoteRe = ('"' => qr/(["&<>])/, "'" => qr/(['&<>])/, "" => qr/(["&<>])/);
-
-# Default list of mismatched tags to track
-my %MismatchedTags = map { $_ => 1 } qw(table tbody thead tr td th font div span pre center blockquote dl ul ol h1 h2 h3 h4 h5 h6 fieldset tt p noscript a);
+my %CharToEntity = ((reverse %EntityToChar), ' ' => '#x20', '/' => '#x2f', "\x09" => '#x09', "\x0a" => '#x0a');
+my %QuoteRe = ('"' => qr/(["&<>\x09\x0a])/, "'" => qr/(['&<>\x09\x0a])/, "" => qr/(['"&<> \/\x09\x0a])/);
 
 # When fixing mismatched tags, sometimes a close tag
 #  shouldn't close all the way out
@@ -674,9 +691,13 @@ my %ImplicitOpenTags = (
 # Convert to hash of hashes
 $_ = { default => $_->[0], map { $_ => 1 } @$_ } for values %ImplicitOpenTags;
 
-my %BlockTags = map { $_ => 1 } qw(h1 h2 h3 h4 h5 h6 p div pre plaintext address blockquote center form table tbody thead tfoot tr td caption colgroup col);
-my %InlineTags = map { $_ => 1 } qw(span abbr acronym q sub sup cite code em kbd samp strong var dfn strike b i u s tt small big nobr a);
+my %TableTags = map { $_ => 1 } qw(table tbody thead tfoot tr td th caption colgroup col);
+my %BlockTags = map { $_ => 1 } qw(h1 h2 h3 h4 h5 h6 p div pre plaintext address blockquote center form table tbody thead tfoot tr td th caption colgroup col dl ul ol li fieldset);
+my %InlineTags = map { $_ => 1 } qw(span abbr acronym q sub sup cite code em kbd samp strong var dfn strike b i u s tt small big nobr a font);
 my %NestInlineTags = map { $_ => 1 } qw(span abbr acronym q sub sup cite code em kbd samp strong var dfn strike b i u s tt small big nobr);
+
+# Default list of mismatched tags to track
+my %MismatchedTags = (%BlockTags, %InlineTags);
 
 =head1 CONSTRUCTOR
 
@@ -718,6 +739,10 @@ Subroutine reference to be invoked when a URL is detected in an HTML tag attribu
 
 Subroutine reference to be invoked when CSS data is found either as the contents of a 'style' attribute in an HTML tag, or as the contents of a <style> HTML tag.
 
+=item B<content_callback>
+
+Subroutine reference to be invoked when standard content between HTML tags in found.
+
 =item B<fix_mismatched_tags>
 
 This property, if set, fixes mismatched tags in the HTML input. By default, tags present in the default %mismatched_tags_to_fix hash are fixed. This set of tags can be overridden by passing in an array reference $mismatched_tags_to_fix to the constructor. Any opened tags in the set are automatically closed if no corresponding closing tag is found. If an unbalanced closing tag is found, that is commented out.
@@ -744,11 +769,15 @@ modification, even if they are flagged to be defanged by the
 return value of a callback.  Any tag or attribute modifications made
 directly by a callback are still performed.
 
+=item B<delete_defang_content>
+
+Normally defanged tags are turned into comments and prefixed by defang_,
+and defanged styles are surrounded by /* ... */. If this is set to
+true, then defanged content is deleted instead
+
 =item B<Debug>
 
 If set, prints debugging output.
-
-=back
 
 =back
 
@@ -762,16 +791,21 @@ sub new {
 
   my %Opts = @_;
 
-#  my $Context = shift;
-
-  my ($tags_to_callback, $attribs_to_callback) = ($Opts{"tags_to_callback"}, $Opts{"attribs_to_callback"});
-  my %tags_to_callback = map { $_ => 1 } @$tags_to_callback if $tags_to_callback;
-  my %attribs_to_callback = map { $_ => 1 } @$attribs_to_callback if $attribs_to_callback;
+  my ($tags_to_callback, $attribs_to_callback, $empty_tags_to_collapse, $mismatched_tags_to_fix)
+    = @Opts{qw(tags_to_callback attribs_to_callback empty_tags_to_collapse mismatched_tags_to_fix)};
+  my %tags_to_callback;
+  %tags_to_callback = map { $_ => 1 } @$tags_to_callback if $tags_to_callback;
+  my %attribs_to_callback;
+  %attribs_to_callback = map { $_ => 1 } @$attribs_to_callback if $attribs_to_callback;
+  my %empty_tags_to_collapse;
+  %empty_tags_to_collapse = map { $_ => 1 } @$empty_tags_to_collapse if $empty_tags_to_collapse;
   my %mismatched_tags_to_fix = %MismatchedTags;
-  %mismatched_tags_to_fix = map { $_ => 1 } @{$Opts{'mismatched_tags_to_fix'}} if $Opts{'mismatched_tags_to_fix'};
+  %mismatched_tags_to_fix = map { $_ => 1 } @$mismatched_tags_to_fix if $mismatched_tags_to_fix;
 
   my $Self = {
     defang_string => 'defang_',
+    defang_re => qr/^defang_/,
+    defang_default => ($Opts{defang_default} // DEFANG_DEFAULT),
     allow_double_defang => $Opts{allow_double_defang},
     tags_to_callback => \%tags_to_callback,
     tags_callback => $Opts{tags_callback},
@@ -779,18 +813,65 @@ sub new {
     attribs_callback => $Opts{attribs_callback},
     url_callback => $Opts{url_callback},
     css_callback => $Opts{css_callback},
+    content_callback => $Opts{content_callback},
     mismatched_tags_to_fix => \%mismatched_tags_to_fix,
     fix_mismatched_tags => $Opts{fix_mismatched_tags},
     context => $Opts{context},
     opened_tags => [],
     opened_tags_count => {},
-    opened_nested_tags => [],
+    closed_into_block_tags => [],
+    empty_tags_to_collapse => \%empty_tags_to_collapse,
+    quiet => $Opts{quiet},
+    delete_defang_content => $Opts{delete_defang_content},
     Debug => $Opts{Debug},
   };
 
   bless ($Self, $Class);
   return $Self;
 }
+
+=item I<HTML::Defang-E<gt>new_bodyonly(%Options)>
+
+Constructs a new HTML::Defang object that has the following
+implicit options
+
+=over 4
+
+=item B<fix_mismatched_tags = 1>
+
+=item B<delete_defang_content = 1>
+
+=item B<tags_to_callback = [ qw(html head link body meta title bgsound) ]>
+
+=item B<tags_callback = { ... remove all above tags and related content ... }>
+
+=item B<url_callback = { ... explicity DEFANG_NONE to leave everything alone ... }>
+
+=back
+
+Basically this is a easy way to remove all html boiler plate
+content and return only the html body content.
+
+=cut
+
+sub new_bodyonly {
+  return shift->new(
+    fix_mismatched_tags => 1,
+    delete_defang_content => 1,
+    tags_to_callback => [ qw(html head link body meta title bgsound) ],
+    tags_callback => sub {
+      my (undef, $Defang, $Angle, $lcTag, $IsEndTag, $AttributeHash, $AttributesEnd, $HtmlR, $OutR) = @_;
+      $$HtmlR =~ m{\G.*?(?=</title|</head)}gcis if $lcTag eq 'title' && !$IsEndTag;
+      return DEFANG_ALWAYS;
+    },
+    url_callback => sub { return DEFANG_NONE; },
+    @_
+  );
+}
+
+=back
+
+=cut
 
 =head1 CALLBACK METHODS
 
@@ -1048,11 +1129,13 @@ True if the currently processed item is a style attribute. False if the currentl
 
 =over 4
 
-=item I<defang($InputHtml)>
+=cut
+
+=item I<defang($InputHtml, \%Opts)>
 
 Cleans up $InputHtml of any executable code including scripting, embedded objects, applets, etc., and defang any XSS attacks.
 
-=over 4 
+=over 4
 
 =item B<Method parameters>
 
@@ -1069,20 +1152,24 @@ The input HTML string that needs to be sanitized.
 Returns the cleaned HTML. If fix_mismatched_tags is set, any tags that appear in @$mismatched_tags_to_fix that are unbalanced are automatically commented or closed.
 
 =cut
-
 sub defang {
   my $Self = shift;
 
   my $I = shift;
+  my $Opts = shift;
 
   my $Debug = $Self->{Debug};
 
-  my $HeaderCharset = shift;
+  my $HeaderCharset = $Opts->{header_charset};
   warn("defang HeaderCharset=$HeaderCharset") if $Debug;
-  my $FallbackCharset = shift;
+  my $FallbackCharset = $Opts->{fallback_charset};
   warn("defang FallbackCharset=$FallbackCharset") if $Debug;
 
   $Self->{Reentrant}++;
+
+  # Output buffer
+  local $Self->{OutR} = $Opts->{add_to_existing} ? $Self->{OutR} : \(my $O = "");
+  my $OutR = $Self->{OutR};
 
 # Get encoded characters
 #  $Self->{Charset} = $Self->get_applicable_charset($_, $HeaderCharset, $FallbackCharset);
@@ -1111,11 +1198,10 @@ sub defang {
   # Force byte matching everywhere (see above)
   use bytes;
 
+  Carp::cluck() if !defined $I;
+
   # Strip all NUL chars
   $I =~ s/\0//g;
-
-  # Output buffer
-  my $O = '';
 
   # This parser uses standard /\G.../gc matching, so have to be careful
   #  to not reset pos() on the string
@@ -1130,8 +1216,14 @@ sub defang {
     # walk to next < (testing in 5.8.8 shows .*? is faster than [^<]* or [^<]*?)
     if ($I =~ m{\G(.*?)<}gcso) {
 
+      my $Content = $1;
+
+      # Call content callback if present
+      $Self->{content_callback}->($Self->{context}, $Self, \$Content)
+        if $Self->{content_callback};
+
       # Everything before tag goes into the output
-      $O .= $1;
+      $$OutR .= $Content;
 
       # All tags default to open/close with </>
       my ($OpenAngle, $CloseAngle) = ('<', '>');
@@ -1178,18 +1270,19 @@ sub defang {
         NoParseAttributes:
         my $Defang = DEFANG_ALWAYS;
 
-        my $TagOps = $Tags{lc $Tag};
+        my $lcTag = lc $Tag;
+        my $TagOps = $Tags{$lcTag};
 
         # Process this tag
-        if (ref $TagOps eq "CODE") {
+        if (!exists $Self->{tags_to_callback}->{$lcTag} && ref $TagOps eq "CODE") {
 
           warn "process_tag Found CODE reference" if $Debug;
-          $Defang = $Self->${TagOps}(\$O, \$I, $TagOps, \$OpenAngle, $IsEndTag, $Tag, $TagTrail, \@Attributes, \$CloseAngle);
+          $Defang = $Self->${TagOps}($OutR, \$I, $TagOps, \$OpenAngle, $IsEndTag, $lcTag, $TagTrail, \@Attributes, \$CloseAngle);
 
         } else {
 
           warn "process_tag Found regular tag" if $Debug;
-          $Defang = $Self->defang_attributes(\$O, \$I, $TagOps, \$OpenAngle, $IsEndTag, $Tag, $TagTrail, \@Attributes, \$CloseAngle);
+          $Defang = $Self->defang_attributes($OutR, \$I, $TagOps, \$OpenAngle, $IsEndTag, $lcTag, $TagTrail, \@Attributes, \$CloseAngle);
 
         }
         die "Callback reset pos on Tag=$Tag IsEndTag=$IsEndTag" if !defined pos($I);
@@ -1200,81 +1293,72 @@ sub defang {
         # @Attributes can have unicode values, but we're within "use bytes", so it's flattened ok
         my $TagContent = $TagTrail . join("", grep { defined } map { @$_ } @Attributes);
 
-        $Defang ||= $Self->track_tags(\$O, \$I, $TagOps, \$OpenAngle, $IsEndTag, $Tag, \$TagContent)
-          if $Self->{fix_mismatched_tags} && ($Defang != DEFANG_ALWAYS);
+        if ($Self->{fix_mismatched_tags} && ($Defang == DEFANG_NONE)) {
+          if (!$IsEndTag) {
+            $Defang = $Self->open_tag(0, $OutR, \$I, $lcTag, \$TagContent);
+          } else {
+            $Defang = $Self->close_tag(0, $OutR, \$I, $lcTag);
+            goto SkipOutput if $Defang == DEFANG_ALWAYS;
+          }
+        }
 
         # defang unknown tags
         if ($Defang != DEFANG_NONE) {
           warn "defang Defanging $Tag" if $Debug;
-          $Tag = $Self->{defang_string} . $Tag
-            if $Self->{allow_double_defang}
-              || (
-                substr( $Tag, 0, length( $Self->{defang_string} ) ) ne
-                $Self->{defang_string} );
-          $TagContent =~ s/--//g;
-          $Tag =~ s/--//g;
-          $OpenAngle =~ s/^</<!--/;
-          $CloseAngle =~ s/>$/-->/;
+          if ($Self->{delete_defang_content}) {
+            $OpenAngle = $IsEndTag = $Tag = $TagContent = $CloseAngle = '';
+          } else {
+            $Tag = $Self->{defang_string} . $Tag
+              if $Self->{allow_double_defang} || $Tag !~ $Self->{defang_re};
+            $TagContent =~ s/--//g;
+            $Tag =~ s/--//g;
+            $OpenAngle =~ s/^</<!--/;
+            $CloseAngle =~ s/>$/-->/;
+          }
         }
 
         # And put it all back together into the output string
-        $O .= $OpenAngle . $IsEndTag . $Tag . $TagContent . $CloseAngle;
+        $$OutR .= $OpenAngle . $IsEndTag . $Tag . $TagContent . $CloseAngle;
+        SkipOutput:
 
-      # It's a comment of some sort. We are looking for regular HTML comment, XML CDATA section and 
-      # IE conditional comments
-      # Refer http://msdn.microsoft.com/en-us/library/ms537512.aspx for IE conditional comment information
-      } elsif ($I =~ m{\G(!)((?:\[CDATA\[|(?:--)?\[if|--)?)}gcis) {
+      # It's a comment of some sort. We are looking for regular HTML comment, XML CDATA section
+      } elsif ($I =~ m{\G(!)((?:\[CDATA\[|--)?)}gcis) {
 
         my ($Comment, $CommentDelim) = ($1, $2);
         warn "defang Comment=$Comment CommentDelim=$CommentDelim" if $Debug;
-      
+
         # Find the appropriate closing delimiter
         my $IsCDATA = $CommentDelim eq "[CDATA[";
         my $ClosingCommentDelim = $IsCDATA ? "]]" : $CommentDelim;
-        
-        my $EndRestartCommentsText = '';
-        # Handle IE conditionals specially. We can have <![if ...]>, <!--[if ...]> and <!--[if ...]-->
-        #  for the third case, we just want to immediately match the -->
-        if ($CommentDelim =~ /((?:--)?)\[if/) {
-          my $ConditionalDelim = $1;
-          $EndRestartCommentsText = '--' if $ConditionalDelim eq '';
-          $ClosingCommentDelim = $CommentDelim;
-          if ($I !~ m{\G[^\]]*\]-->}gcis) {
-            $ClosingCommentDelim = "<![endif]$ConditionalDelim";
-          }
-        }
 
         warn "defang ClosingCommentDelim=$ClosingCommentDelim" if $Debug;
-      
+
         my ($CommentStartText, $CommentEndText) = ("--/*SC*/", "/*EC*/--");
-      
+
         # Convert to regular HTML comment
-        $O .= $OpenAngle . $Comment . $CommentStartText;
+        if (!$Self->{delete_defang_content}) {
+          $$OutR .= $OpenAngle . $Comment . $CommentStartText;
+        }
 
         # Find closing comment
-        if ($I =~ m{\G(.*?)(\Q${ClosingCommentDelim}\E!?\s*)(>)}gcis || $I =~ m{\G(.*?)(--)(>)}gcis) {
+        if ($I =~ m{\G(.*?)(\Q$ClosingCommentDelim\E!?\s*)(>)}gcis || $I =~ m{\G(.*?)(--)(>)}gcis) {
 
           my ( $StartTag, $CommentData, $ClosingTag, $CloseAngle ) =
             ( $CommentDelim, $1, $2, $3 );
-
-          if ($EndRestartCommentsText && $CommentData =~ s/^(.*?)(>.*)$/$2/s) {
-            $StartTag .= $1;
-          }
 
           # Strip all HTML comment markers
           $StartTag =~ s/--//g;
           $CommentData =~ s/--//g;
           $ClosingTag =~ s/--//g;
 
-          $StartTag .= $EndRestartCommentsText if $CommentData;
-          $ClosingTag =~ s{^(<!)}{$1$EndRestartCommentsText} if $CommentData;
-
-          # Put it all into the output
-          $O .= $StartTag
-            . ($EndRestartCommentsText ? $Self->defang($CommentData) : $CommentData)
-            . $ClosingTag
-            . $CommentEndText
-            . $CloseAngle;
+          if (!$Self->{delete_defang_content}) {
+            # Put it all into the output
+            $$OutR .= $StartTag
+              . $CommentData
+              . $ClosingTag
+              . $CommentEndText
+              . $CloseAngle;
+          }
 
         # No closing comment, so we add that
         } else {
@@ -1285,7 +1369,9 @@ sub defang {
           $Data =~ s/--//g;
         
           # Output
-          $O .= $Data . $CommentEndText . ">";
+          if (!$Self->{delete_defang_content}) {
+            $$OutR .= $Data . $CommentEndText . ">";
+          }
 
         }
 
@@ -1304,16 +1390,23 @@ sub defang {
       
         $Data =~ s{--}{}g;
 
-        $O .= $OpenAngle . '!--' . $Processing . $Data . '-->';
+        if (!$Self->{delete_defang_content}) {
+          $$OutR .= $OpenAngle . '!--' . $Processing . $Data . '-->';
+        }
 
       }
       # Some other thing starting with <, keep looking
 
+      if (exists $Self->{TrackedAppendOutput}) {
+        for (@{delete $Self->{TrackedAppendOutput}}) {
+          $Self->open_tag(1, $OutR, \$I, $_->[0], \$_->[1], 1);
+        }
+      }
       if (exists $Self->{AppendOutput}) {
-        $O .= delete $Self->{AppendOutput};
+        $$OutR .= delete $Self->{AppendOutput};
       }
       if (exists $Self->{DelayedAppendOutput}) {
-        $O .= $Self->defang(delete $Self->{DelayedAppendOutput});
+        $Self->defang(delete $Self->{DelayedAppendOutput}, { add_to_existing => 1 });
       }
       next;
     }
@@ -1322,7 +1415,7 @@ sub defang {
     warn "defang OutputRemainder" if $Debug;
     $I =~ m/\G(.*)$/gcs;
 
-    $O .= $1 if $1;
+    $$OutR .= $1 if $1;
 
     # Exit if we got here
     last;
@@ -1330,13 +1423,13 @@ sub defang {
 
   # If not a recursive call, close mismatched tags
   if ($Self->{Reentrant}-- <= 1) {
-    $Self->close_tags(\$O);
+    $Self->close_all_tags($OutR, \$I);
   }
 
   # Turn on utf-8 flag again
-  Encode::_utf8_on($O) if $UTF8Input;
+  Encode::_utf8_on($$OutR) if $UTF8Input;
 
-  return $O;
+  return $$OutR;
 }
 
 =item I<add_to_output($String)>
@@ -1360,9 +1453,8 @@ The string that is added after the current parsed tag ends.
 =back
 
 =cut
-
-# Callbacks call this method
 sub add_to_output {
+  # Callbacks call this method
   my $Self = shift;
   $Self->{AppendOutput} = '' if !defined $Self->{AppendOutput};
   $Self->{AppendOutput} .= shift;
@@ -1374,6 +1466,11 @@ sub defang_and_add_to_output {
   $Self->{DelayedAppendOutput} .= shift;
 }
 
+sub track_and_add_tag_to_output {
+  my $Self = shift;
+  push @{$Self->{TrackedAppendOutput}}, shift;
+}
+
 =item B<INTERNAL METHODS>
 
 Generally these methods never need to be called by users of the class, because they'll be called internally as the appropriate tags are 
@@ -1381,7 +1478,9 @@ encountered, but they may be useful for some users in some cases.
 
 =over 4
 
-=item I<defang_script($OutR, $HtmlR, $TagOps, $OpenAngle, $IsEndTag, $Tag, $TagTrail, $Attributes, $CloseAngle)>
+=cut
+
+=item I<defang_script_tag($OutR, $HtmlR, $TagOps, $OpenAngle, $IsEndTag, $Tag, $TagTrail, $Attributes, $CloseAngle)>
 
 This method is invoked when a <script> tag is parsed. Defangs the <script> opening tag, and any closing tag. Any scripting content is also commented out, so browsers don't display them.
 
@@ -1436,22 +1535,27 @@ Anything after the end of last attribute including the closing HTML angle(>)
 =back
 
 =cut
-
-sub defang_script {
+sub defang_script_tag {
   my $Self = shift;
-  my ($OutR, $HtmlR, $TagOps, $OpenAngle, $IsEndTag, $Tag, $TagTrail, $Attributes, $CloseAngle) = @_;
+  my ($OutR, $HtmlR, $TagOps, $OpenAngle, $IsEndTag, $lcTag, $TagTrail, $Attributes, $CloseAngle) = @_;
   warn "defang_script Processing <script> tag" if $Self->{Debug};
 
   if (!$IsEndTag) {
 
-    # If we just parsed a starting <script> tag, code better be commented. If
-    #  not, we attach comments around the code.
+    # If we just parsed a starting <script> tag, find up to end tag
+    #  There's all sort of possible mess around this:
+    #   </script<foo> - not really an end tag
+    #   </script foo="bar > yes, still in a attribute"> - a valid end tag
+    #  For weird cases, we end script tag early and end up defanging script
+    #  content as HTML content, which is still safe
     if ($$HtmlR =~ m{\G(.*?)(?=</script\b)}gcsi) {
       my $ScriptTagContents = $1;
       warn "defang_script ScriptTagContents $ScriptTagContents" if $Self->{Debug};
-      $ScriptTagContents =~ s/^(\s*)(<!--)?(.*?)(-->)?(\s*)$/$1<!-- $3 -->$5/s;
-      $Self->add_to_output($ScriptTagContents);
-      
+      if (!$Self->{delete_defang_content}) {
+        $ScriptTagContents =~ s/<!--|-->|--//g;
+        $ScriptTagContents = "<!-- " . $ScriptTagContents . " -->";
+        $Self->add_to_output($ScriptTagContents);
+      }
     }
   }
 
@@ -1459,39 +1563,16 @@ sub defang_script {
   return DEFANG_ALWAYS;
 }
 
-=item I<defang_style($OutR, $HtmlR, $TagOps, $OpenAngle, $IsEndTag, $Tag, $TagTrail, $Attributes, $CloseAngle, $IsAttr)>
+sub defang_style_tag {
+  my ($Self, $OutR, $HtmlR, $TagOps, $OpenAngle, $IsEndTag, $lcTag, $TagTrail, $Attributes, $CloseAngle) = @_;
 
-Builds a list of selectors and declarations from HTML style tags as well as style attributes in HTML tags and calls defang_stylerule() to do the actual defanging.
+  warn "defang_style_tag Tag=$lcTag IsEndTag=$IsEndTag" if $Self->{Debug};
 
-Returns 0 to indicate that style tags must not be defanged.
-
-=over 4
-
-=item B<Method parameters>
-
-=over 4
-
-=item I<$IsAttr>
-
-Whether we are currently parsing a style attribute or style tag. $IsAttr will be true if we are currently parsing a style attribute.
-
-=back
-
-For a description of other parameters, see documentation of defang_script() method
-
-=back
-
-=cut
-
-sub defang_style {
-
-  my ($Self, $OutR, $HtmlR, $TagOps, $OpenAngle, $IsEndTag, $Tag, $TagTrail, $Attributes, $CloseAngle, $IsAttr) = @_;
-  my $lcTag = lc $Tag;
-
-  warn "defang_style Tag=$Tag IsEndTag=$IsEndTag IsAttr=$IsAttr" if $Self->{Debug};
+  # Defang attributes
+  my $Defang = $Self->defang_attributes($OutR, $HtmlR, $TagOps, $OpenAngle, $IsEndTag, $lcTag, $TagTrail, $Attributes, $CloseAngle);
 
   # Nothing to do if end tag
-  return DEFANG_NONE if !$IsAttr && $IsEndTag;
+  return $Defang if $IsEndTag;
 
   # Do all style work in byte mode
   use bytes;
@@ -1500,29 +1581,63 @@ sub defang_style {
   my $ClosingStyleTagPresent = 1;
 
   for ($$HtmlR) {
+    if (m{\G(.*?)(?=</style\b)}gcis) {
+      $Content = $1;
 
-    if (!$IsAttr) {
-      if (m{\G(.*?)(?=</style\b)}gcis) {
-        $Content = $1;
-
-      # No ending style tag
-      } elsif (m{\G([^<]*)}gcis) {
-        $Content = $1;
-        $ClosingStyleTagPresent = 0;
-      }
-    # Its a style attribute
-    } else {
-      # Avoid undef warning for style attr with no value. eg <tag style>
-      $Content = defined($_) ? $_ : '';
+    # No ending style tag
+    } elsif (m{\G([^<]*)}gcis) {
+      $Content = $1;
+      $ClosingStyleTagPresent = 0;
     }
   }
-    
+
   # Handle any wrapping HTML comments. If no comments, we add
   my ($OpeningHtmlComment, $ClosingHtmlComment) = ('', '');
-  if (!$IsAttr) {
-    $OpeningHtmlComment = $Content =~ s{^(\s*<!--)}{} ? $1 : "<!--";
-    $ClosingHtmlComment = $Content =~ s{(-->\s*)$}{} ? $1 : "-->";
+  $OpeningHtmlComment = $Content =~ s{^(\s*<!--)}{} ? $1 . " " : "<!-- ";
+  $ClosingHtmlComment = $Content =~ s{(-->\s*)$}{} ? " " . $1 : " -->";
+
+  # Check for large bogus style data with mostly HTML tags and blat it
+  if (length $Content > 16384) {
+    my $TagCount = 0;
+    $TagCount++ while $Content =~ m{</?\w+\b[^>]*>}g;
+    if ($TagCount > length($Content)/256) {
+      $Content = '';
+    }
   }
+
+  my $StyleOut = $Self->defang_style_text($Content, $lcTag, 0, undef, $HtmlR, $OutR);
+
+  $Self->add_to_output($OpeningHtmlComment . $StyleOut . $ClosingHtmlComment);
+  $Self->add_to_output("</style>") if !$ClosingStyleTagPresent;
+
+  return $Defang;
+}
+
+=item I<defang_style_text($Content, $lcTag, $IsAttr, $AttributeHash, $HtmlR, $OutR)>
+
+Defang some raw css data and return the defanged content
+
+=over 4
+
+=item B<Method parameters>
+
+=over 4
+
+=item I<$Content>
+
+The input style string that is defanged.
+
+=item I<$IsAttr>
+
+True if $Content is from an attribute, otherwise from a <style> block
+
+=back
+
+=back
+
+=cut
+sub defang_style_text {
+  my ($Self, $Content, $lcTag, $IsAttr, $AttributeHash, $HtmlR, $OutR) = @_;
 
   # Clean up all comments, expand character escapes and such
   $Self->cleanup_style($Content, $IsAttr);
@@ -1533,24 +1648,48 @@ sub defang_style {
   warn "defang_style Naked=$Naked" if $Self->{Debug};
 
   # And suitably change the regex to match the data
-  my $SelectorRuleRE = $Naked ? qr/(\s*)()()()($StyleRules)()(\s*)/o : 
-                       qr/(\s*)((?:$StyleSelectors)?)(\s*)(\{)($StyleRules)(\})(\s*)/o;
+  my $SelectorRuleRE = $Naked ? $RECStyleNaked : $RECStyleSelected;
 
-  my (@Selectors, @SelectorRules, %ExtraData );
+  my (@Selectors, @SelectorRules, @ExtraData, @InMedia);
 
   # Now we parse the selectors and declarations
-  while ($Content =~ m{\G.*?$SelectorRuleRE}sgc) {
-    my ($Selector, $SelectorRule) = ($2, $5);
-    last if $Selector eq '' && $SelectorRule eq '';
-    push @Selectors, $Selector;
-    push @SelectorRules, $SelectorRule;
-    warn "defang_style Selector=$Selector" if $Self->{Debug};
-    warn "defang_style SelectorRule=$SelectorRule" if $Self->{Debug};
-    $ExtraData{$Selector} = [ $1, $3, $4, $6, $7];
+  while (1) {
+    if ($Content =~ m{$RECStyleMediaSelector}sgco) {
+      push @InMedia, $2;
+      push @Selectors, $2;
+      push @SelectorRules, "";
+      push @ExtraData, [ $1, "", $3, "", $4 ];
+    } elsif (@InMedia && $Content =~ m{\G(\s*)(\})(\s*)}sgc) {
+      pop @InMedia;
+      push @Selectors, "";
+      push @SelectorRules, "";
+      push @ExtraData, [ $1, "", "", $2, $3 ];
+    } elsif ($Content =~ m{$SelectorRuleRE}sgc) {
+      my ($Selector, $SelectorRule) = ($2, $5);
+      last if $Selector eq '' && $SelectorRule =~ /^[;\s]*$/;
+      $Selector = join("\000", @InMedia, $Selector) if @InMedia;
+      push @Selectors, $Selector;
+      push @SelectorRules, $SelectorRule;
+      push @ExtraData, [ $1, $3, $4, $6, $7];
+      warn "defang_style Selector=$Selector" if $Self->{Debug};
+      warn "defang_style SelectorRule=$SelectorRule" if $Self->{Debug};
+
+    # Just a large bunch of selectors and no rules, suck up and discard
+    } elsif (!$Naked && $Content =~ m{\G\s*$StyleSelectors\s*$}sgc) {
+    # Looks like an html tag, suck up and discard
+    } elsif (!$Naked && $Content =~ m{\G(?:</?$TagNameRE(?:\s[^>\{\}]*)?>\s*)+}sgc) {
+
+    # If content didn't match a rule, suck up whitespace
+    } elsif ($Content =~ m{\G\s+}sgc) {
+    # Or any non-whitespace, but try and sync to <...> tags
+    } elsif ($Content =~ m{\G[^\s<]+}sgc || $Content =~ m{\G<+}sgc) {
+
+    # Nothing matched, must be at end
+    } else { last; }
   }
 
   # Check declaration elements for defanging
-  $Self->defang_stylerule(\@Selectors, \@SelectorRules, $lcTag, $IsAttr, $HtmlR, $OutR);
+  $Self->defang_stylerule(\@Selectors, \@SelectorRules, $lcTag, $IsAttr, $AttributeHash, $HtmlR, $OutR);
 
   my $StyleOut = "";
 
@@ -1558,15 +1697,15 @@ sub defang_style {
   foreach my $Selector (@Selectors) {
 
     my $SelectorRule = shift @SelectorRules;
-    my $Spaces = $ExtraData{$Selector};
+    my $Spaces = shift @ExtraData;
     my ($BeforeSelector, $AfterSelector, $OpenBrace, $CloseBrace, $AfterRule) = @$Spaces if $Spaces;
-    ($BeforeSelector, $AfterSelector, $AfterRule) = ("", " ", "\n") unless $ExtraData{$Selector};
+    ($BeforeSelector, $AfterSelector, $AfterRule) = ("", " ", "\n") unless $Spaces;
     ($OpenBrace, $CloseBrace) = ("{", "}") if !$Spaces && !$IsAttr;
   
     # Put back the rule together
     if (defined($Selector)) {
       $StyleOut .= $BeforeSelector if defined($BeforeSelector);
-      $StyleOut .= $Selector;
+      $StyleOut .= $Selector =~ /\000/ ? (reverse split /\000/, $Selector)[0] : $Selector;
       $StyleOut .= $AfterSelector if defined($AfterSelector);
       $StyleOut .= $OpenBrace if defined($OpenBrace);
       $StyleOut .= $SelectorRule if defined($SelectorRule);
@@ -1578,16 +1717,7 @@ sub defang_style {
 
   warn "defang_style StyleOut=$StyleOut" if $Self->{Debug};
 
-  if ($IsAttr) {
-    $$HtmlR = $StyleOut;
-
-  } else {
-    $Self->add_to_output($OpeningHtmlComment . $StyleOut . $ClosingHtmlComment);
-    $Self->add_to_output("</style>") if !$ClosingStyleTagPresent;
-  }
-   
-  # We don't want <style> tags to be defanged
-  return DEFANG_NONE;
+  return $StyleOut;
 }
 
 =item I<cleanup_style($StyleString)>
@@ -1609,7 +1739,6 @@ The input style string that is cleaned.
 =back
 
 =cut
-
 sub cleanup_style {
   my $Self = shift;
   
@@ -1650,7 +1779,7 @@ sub cleanup_style {
 
 }
 
-=item I<defang_stylerule($SelectorsIn, $StyleRules, $lcTag, $IsAttr, $HtmlR, $OutR)>
+=item I<defang_stylerule($SelectorsIn, $StyleRules, $lcTag, $IsAttr, $AttributeHash, $HtmlR, $OutR)>
 
 Defangs style data.
 
@@ -1689,10 +1818,8 @@ A scalar reference to the processed output so far.
 =back
 
 =cut
-
 sub defang_stylerule {
-
-  my ($Self, $SelectorsIn, $StyleRules, $lcTag, $IsAttr, $HtmlR, $OutR) = @_;
+  my ($Self, $SelectorsIn, $StyleRules, $lcTag, $IsAttr, $AttributeHash, $HtmlR, $OutR) = @_;
 
   my (@SelectorStyleKeyValues, %SelectorStyleKeyExtraData);
 
@@ -1711,17 +1838,24 @@ sub defang_stylerule {
       warn "defang_stylerule Key=$Key Value=$Value Separator=$Separator ValueEnd=$ValueEnd" if $Self->{Debug};
       # Store everything except style property and value in a hash
       $StyleKeyExtraData{lc $Key} = [$KeyPilot, $Separator, $QuoteStart, $QuoteEnd, $ValueEnd, $ValueTrail];
-      my $DefangStyleRule = DEFANG_DEFAULT;
+      my $DefangStyleRule = $Self->{defang_default};
 
       # If the style value has a URL in it and URL callback has been supplied, make a url_callback
-      if ($Self->{url_callback} && $Value =~ m/\s*url\(\s*((?:['"])?)(.*?)\1\s*\)/i) {
-        my ($UrlOrig, $Url) = ($2, $2) if $2;
-        warn "defang_stylerule Url found in style property value. Url=$Url" if $Self->{Debug};
-        my $lcAttrKey = $IsAttr ? "style" : undef;
-        $DefangStyleRule = $Self->{url_callback}->($Self->{context}, $Self, $lcTag, $lcAttrKey, \$Url, undef, $HtmlR, $OutR) if $Url;
-        # Save back any changes
-        warn "defang_stylerule After URL callback, Value=$Value DefangStyleRule=$DefangStyleRule" if $Self->{Debug};
-        $Value =~ s{\Q$UrlOrig\E}{$Url} if $UrlOrig;
+      if ($Self->{url_callback}) {
+        our $StartPos = 0;
+        while ($Value =~ m/\G\s*url\(\s*((?:['"])?)(?{ $StartPos = pos; })(.*?)\1\s*\)/gci) {
+          my ($UrlOrig, $Url) = $2 ? ($2, $2) : ('', '');
+          my $EndPos = pos($Value);
+          warn "defang_stylerule Url found in style property value. Url=$Url" if $Self->{Debug};
+          my $lcAttrKey = $IsAttr ? "style" : undef;
+          $DefangStyleRule = $Self->{url_callback}->($Self->{context}, $Self, $lcTag, $lcAttrKey, \$Url, $AttributeHash, $HtmlR, $OutR, lc $Key) if $Url;
+          # Save back any changes
+          warn "defang_stylerule After URL callback, Value=$Value DefangStyleRule=$DefangStyleRule" if $Self->{Debug};
+          if ($UrlOrig) {
+            substr($Value, $StartPos, length($UrlOrig), $Url);
+            pos($Value) = $EndPos - length($UrlOrig) + length($Url);
+          }
+        }
       }
 
       # Save the style property, value and defang flag      
@@ -1756,16 +1890,14 @@ sub defang_stylerule {
       for (my $k = 0; $k < @$KeyValueRules; $k++) {
         my ($Key, $Value, $Defang) = @{$KeyValueRules->[$k]};
 
-        my $v = $ExtraData->{lc $Key};
-        my ($KeyPilot, $Separator, $QuoteStart, $QuoteEnd, $ValueEnd, $ValueTrail) = @{$v || []};
+        my $v = ($ExtraData->{lc $Key} ||= []);
+        my ($KeyPilot, $Separator, $QuoteStart, $QuoteEnd, $ValueEnd, $ValueTrail) = @$v;
 
+        # Always need a separator
+        $v->[1] //= ':';
         # If an intermediate style property-value pair doesn't have a terminating semi-colon, add it
-        if ($k > 0 && !$v) {
-          my $PreviousRule = $KeyValueRules->[$k - 1];
-          my $PreviousKey = $PreviousRule->[0];
-          my $PrevExtra = $ExtraData->{lc $PreviousKey};
-          $ExtraData->{lc $PreviousKey}->[4] .= ";" if defined($PrevExtra->[4]) && $PrevExtra->[4] !~ m/;/;
-          $ExtraData->{lc $Key}->[1] = ":";
+        if ($k < @$KeyValueRules - 1) {
+          $v->[4] .= ";" if !defined $v->[4] || $v->[4] !~ m/;/;
         }
 
       }
@@ -1790,13 +1922,12 @@ sub defang_stylerule {
         my ($Key, $Value, $Defang) = @$KeyValueRule;
         my $v = $ExtraData->{lc $Key};
         my ($KeyPilot, $Separator, $QuoteStart, $QuoteEnd, $ValueEnd, $ValueTrail) = @{$v || []};
-        ($Separator, $ValueEnd, $ValueTrail) = (":", ";", " ") unless $v;
-        
+
         # Flag to defang if a url, expression or unallowed character found
         if ($Defang == DEFANG_DEFAULT) {
           $Defang = $Value =~ m{^\s*[a-z0-9%!"'`:()#\s.,\/+-]+\s*;?\s*$}i ? DEFANG_NONE : DEFANG_ALWAYS;
-          $Defang = $Value =~ m{^\s*url\s*\(}i ? DEFANG_ALWAYS : $Defang;
-          $Defang = $Value =~ m{^\s*expression\s*\(}i ? DEFANG_ALWAYS : $Defang;
+          $Defang = $Value =~ m{\burl\s*\(}i ? DEFANG_ALWAYS : $Defang;
+          $Defang = $Value =~ m{\bexpression\s*\(}i ? DEFANG_ALWAYS : $Defang;
         }
 
         ($KeyPilot, $Key, $Separator, $QuoteStart, $Value, $QuoteEnd, $ValueEnd, $ValueTrail) =
@@ -1804,12 +1935,25 @@ sub defang_stylerule {
             ($KeyPilot, $Key, $Separator, $QuoteStart, $Value, $QuoteEnd, $ValueEnd, $ValueTrail);
         
         # Comment out the style property-value pair if $Defang
-        $Key = $Defang != DEFANG_NONE ? "/*" . $Key : $Key;
-        $ValueEnd = $Defang != DEFANG_NONE ? $ValueEnd . "*/" : $ValueEnd;
+        my $CommentDefang = 0;
+        if ($Defang != DEFANG_NONE) {
+          if ($Self->{delete_defang_content}) {
+            $KeyPilot = $Key = $Separator = $QuoteStart = $Value = $QuoteEnd = $ValueEnd = $ValueTrail = '';
+          } else {
+            $CommentDefang = 1;
+          }
+        }
 
         # Put the rule together back
         if (defined($Key)) {
-          $Rule .= join "", $KeyPilot, $Key, $Separator, $QuoteStart, $Value, $QuoteEnd, $ValueEnd, $ValueTrail;
+          my $RuleContent = join "", $Key, $Separator, $QuoteStart, $Value, $QuoteEnd, $ValueEnd;
+          if ($CommentDefang) {
+            # Strip any mismatched comment markers, then add our own
+            $RuleContent =~ s{/\*}{}g;
+            $RuleContent =~ s{\*/}{}g;
+            $RuleContent = "/*" . $RuleContent . "*/";
+          }
+          $Rule .= join "", $KeyPilot, $RuleContent, $ValueTrail;
         }
           
         warn "defang_stylerule Rule=$Rule" if $Self->{Debug};
@@ -1833,129 +1977,117 @@ Defangs attributes, defangs tags, does tag, attrib, css and url callbacks.
 
 =item B<Method parameters>
 
-For a description of the method parameters, see documentation of defang_script() method
+For a description of the method parameters, see documentation of defang_script_tag() method
 
 =back
 
 =cut
-
 sub defang_attributes {
-  my ($Self, $OutR, $HtmlR, $TagOps, $OpenAngle, $IsEndTag, $Tag, $TagTrail, $Attributes, $CloseAngle) = @_;
-  my $lcTag = lc $Tag;
+  my ($Self, $OutR, $HtmlR, $TagOps, $OpenAngle, $IsEndTag, $lcTag, $TagTrail, $Attributes, $CloseAngle) = @_;
 
   my $Debug = $Self->{Debug};
 
+  my $DefangTag = $Self->{defang_default};
+  my ($DefangTagUrlOverride, $DefangTagAttrOverride);
+
   # Create a key -> \value mapping of all attributes up front
   #  so we have a complete hash for each callback
-  my %AttributeHash = map { lc($_->[0]) => \$_->[4] } @$Attributes;
+  my %AttributeHash;
+  for my $Attr (@$Attributes) {
+    my ($AttrKey, $AttrValR) = ($Attr->[0], \$Attr->[4]);
+
+    my $lcAttrKey = $Attr->[7] = lc($AttrKey // "");
+
+    # Get the attribute value cleaned up
+    $$AttrValR = $Self->cleanup_attribute($$AttrValR);
+    warn "defang_attributes cleaned AttrVal=$$AttrValR" if $Debug;
+
+    $AttributeHash{$lcAttrKey} = $AttrValR;
+  }
+
+  # Callback if the tag is in @$tags_to_callback
+  if (exists($Self->{tags_to_callback}->{$lcTag})) {
+    warn "defang_attributes Calling tags_callback for $lcTag" if $Debug;
+    $DefangTag = $Self->{tags_callback}->($Self->{context}, $Self, $OpenAngle, $lcTag, $IsEndTag, \%AttributeHash, $CloseAngle, $HtmlR, $OutR);
+  }
 
   # Now process each attribute
   foreach my $Attr (@$Attributes) {
+    my ($lcAttrKey, $AttrKey, $AttrValR) = ($Attr->[7], $Attr->[0], \$Attr->[4]);
 
-    # We get the key and value of the attribute
-    my ($AttrKey, $AttrValR) = ($Attr->[0], \$Attr->[4]);
-    my $lcAttrKey = lc $AttrKey;
-    warn "defang_attributes Tag=$Tag AttrKey=$AttrKey AttrVal=$$AttrValR" if $Debug;
-
-    # Get the attribute value cleaned up
-    ($$AttrValR, my $AttrValStripped) = $Self->cleanup_attribute($Attr, $AttrKey, $$AttrValR);
-    warn "defang_attributes AttrValStripped=$AttrValStripped" if $Debug;
+    warn "defang_attributes Tag=$lcTag lcAttrKey=$lcAttrKey AttrVal=$$AttrValR" if $Debug;
 
     my $AttribRule = "";
-    if (ref($Tags{$lcTag})) {
+    if (ref($Tags{$lcTag}) eq 'HASH') {
       $AttribRule = $Tags{$lcTag}{$lcAttrKey};
     }
 
-    my $DefangAttrib = DEFANG_DEFAULT;
+    my $DefangAttrib = $Self->{defang_default};
 
-    $AttribRule = $CommonAttributes{$lcAttrKey} unless $AttribRule;
+    $AttribRule ||= $CommonAttributes{$lcAttrKey};
     warn "defang_attributes AttribRule=$AttribRule" if $Debug;
     
     # If this is a URL type $AttrKey and URL callback method is supplied, make a url_callback
     if ($Self->{url_callback} && $AttribRule && exists($UrlRules{$AttribRule})) {
         warn "defang_attributes Making URL callback" if $Debug;
-        $DefangAttrib = $Self->{url_callback}->($Self->{context}, $Self, $lcTag, $lcAttrKey, $AttrValR, \%AttributeHash, $HtmlR, $OutR);
+        ($DefangAttrib, $DefangTagUrlOverride) = $Self->{url_callback}->($Self->{context}, $Self, $lcTag, $lcAttrKey, $AttrValR, \%AttributeHash, $HtmlR, $OutR, { defang_attrib => $DefangAttrib, attrib_rule => $AttribRule });
         die "url_callback reset" if !defined pos($$HtmlR);
     }
 
     # We have a style attribute, so we call defang_style
     if ($lcAttrKey eq "style") {
       warn "defang_attributes Found style attribute, calling defang_style" if $Debug;
-      $Self->defang_style($OutR, $AttrValR, $TagOps, $OpenAngle, $IsEndTag, $lcTag, $TagTrail, $Attributes, $CloseAngle, 1);
+      $$AttrValR = $Self->defang_style_text($$AttrValR, $lcTag, 1, \%AttributeHash, $HtmlR, $OutR);
     }
 
     # If a attribute callback is supplied and its interested in this attribute, we make a attribs_callback
     if ($Self->{attribs_callback} && exists($Self->{attribs_to_callback}->{$lcAttrKey})) {
-      warn "defang_attributes Making attribute callback for Tag=$Tag AttrKey=$AttrKey" if $Debug;
-      my $DefangResult = $Self->{attribs_callback}->($Self->{context}, $Self, $lcTag, $lcAttrKey, $AttrValR, $HtmlR, $OutR);
+      warn "defang_attributes Making attribute callback for Tag=$lcTag AttrKey=$AttrKey" if $Debug;
+      (my $DefangResult, $DefangTagAttrOverride) = $Self->{attribs_callback}->($Self->{context}, $Self, $lcTag, $lcAttrKey, $AttrValR, $HtmlR, $OutR);
       # Only use new result if not already DEFANG_ALWAYS from url_callback
       $DefangAttrib = $DefangResult if $DefangAttrib != DEFANG_ALWAYS;
     }
 
-    if (($DefangAttrib == DEFANG_DEFAULT) && $AttribRule) {
-      my $Rule = $Rules{$AttribRule};
-      warn "defang_attributes AttribRule=$AttribRule Rule=$Rule" if $Debug;
-
-      # We whitelist the attribute if the value matches the rule
-      if (ref($Rule) eq "Regexp") {
-        $DefangAttrib = ($AttrValStripped =~ $Rule) ? DEFANG_NONE : DEFANG_ALWAYS;
-      }
-
-      # Hack. Ref to array is a blacklist regexp
-      if (ref($Rule) eq "ARRAY") {
-        $DefangAttrib = ($AttrValStripped =~ $Rule->[0]) ? DEFANG_ALWAYS : DEFANG_NONE;
-      }
-      
-    } elsif (!$AttribRule)  {
-      $DefangAttrib = DEFANG_ALWAYS;
-    }
-
-    warn "defang_attributes DefangAttrib=$DefangAttrib" if $Debug;
+    # Check if the final attribute value needs defanging
+    $DefangAttrib = $Self->defang_attribute_value($AttrValR, $AttribRule, $DefangAttrib);
 
     # Store the attribute defang flag
-    push @$Attr, $DefangAttrib if $DefangAttrib != DEFANG_NONE;
+    $Attr->[8] = $DefangAttrib;
 
-  }
-
-  my $DefangTag = DEFANG_DEFAULT;
-
-  # Callback if the tag is in @$tags_to_callback
-  if (exists($Self->{tags_to_callback}->{$lcTag})) {
-    warn "defang_attributes Calling tags_callback for $Tag" if $Debug;
-    $DefangTag = $Self->{tags_callback}->($Self->{context}, $Self, $OpenAngle, $lcTag, $IsEndTag, \%AttributeHash, $CloseAngle, $HtmlR, $OutR);
   }
 
   my @OutputAttributes;
 
   foreach my $Attr (@$Attributes) {
  
-    my $lcAttr = lc $Attr->[0];
+    my $lcAttr = $Attr->[7];
 
     # If the attribute is deleted don't output it
     unless ($AttributeHash{$lcAttr}) {
-      warn "defang_attributes Marking attribute $Attr->[0] for deletion" if $Debug;
+      warn "defang_attributes Marking attribute $lcAttr for deletion" if $Debug;
       next;
     }
 
     # And we attach the defang string here, if the attribute should be defanged
     # (attribute could be undef for buggy html, eg <ahref=blah>)
-    $Attr->[0] = $Self->{defang_string}
-      . ( $Attr->[0] || '' )
-      if defined($Attr->[7]) && $Attr->[7] != DEFANG_NONE
-        && (
-          $Self->{allow_double_defang}
-          || (
-            substr( ( $Attr->[0] || '' ),
-              0, length( $Self->{defang_string} ) ) ne $Self->{defang_string}
-          )
-        );
-    # Set defang value to undef, or this value will appear in the output
-    $Attr->[7] = undef;
+    if ($Attr->[8] != DEFANG_NONE) {
+      if ($Self->{delete_defang_content}) {
+        @$Attr = ('') x 7;
+      } else {
+        $Attr->[0] = $Self->{defang_string} . ($Attr->[0] || '')
+          if $Self->{allow_double_defang} || ($Attr->[0] || '') !~ $Self->{defang_re};
+      }
+    }
+
+    # Remove non-attribute values so they're not in the output
+    splice(@$Attr, 7);
 
     # Requote specials in attribute value
-    my $QuoteRe = $QuoteRe{$Attr->[3]} || $QuoteRe{""};
-    $Attr->[4] =~ s/$QuoteRe/'&'.$CharToEntity{$1}.';'/eg
-      if defined($Attr->[4]);
+    if (defined $Attr->[4]) {
+      my $QuoteRe = $QuoteRe{$Attr->[3]} || $QuoteRe{""};
+      $Attr->[4] =~ s/$CtrlChars//go; # strip ctrls
+      $Attr->[4] =~ s/$QuoteRe/'&'.$CharToEntity{$1}.';'/eg;
+    }
 
     # Add to attributes to output
     push @OutputAttributes, $Attr;
@@ -1966,10 +2098,12 @@ sub defang_attributes {
 
   # Append all remaining attribute keys (which must have been newly added attributes by 
   # the callback)and values in no particular order
+  my $QuoteRe = $QuoteRe{'"'};
   while (my ($Key,$Value) = each %AttributeHash ) {
     my $Attr = [" " . $Key, "", "=", '"', $$Value, '"', ""];
     if (defined $Attr->[4]) {
-      $Attr->[4] =~ s/(['"<>&])/'&'.$CharToEntity{$1}.';'/eg
+      $Attr->[4] =~ s/$CtrlChars//g; # strip ctrls
+      $Attr->[4] =~ s/$QuoteRe/'&'.$CharToEntity{$1}.';'/eg
     } else {
       @$Attr[2..6] = (undef) x 5;
     }
@@ -1983,56 +2117,157 @@ sub defang_attributes {
   if ($DefangTag == DEFANG_DEFAULT && (my $TagOps = $Tags{$lcTag})) {
     $DefangTag = DEFANG_NONE;
   }
-  
+  # Unless we have overrides
+  $DefangTag = DEFANG_ALWAYS
+    if defined($DefangTagUrlOverride) && $DefangTagUrlOverride == DEFANG_ALWAYS;
+  $DefangTag = DEFANG_ALWAYS
+    if defined($DefangTagAttrOverride) && $DefangTagAttrOverride == DEFANG_ALWAYS;
+
   return $DefangTag;
 }
 
-sub track_tags {
-  my ($Self, $OutR, $HtmlR, $TagOps, $OpenAngle, $IsEndTag, $Tag, $TagContentR) = @_;
-  my $lcTag = lc $Tag;
+sub defang_attribute_value {
+  my ($Self, $AttrValR, $AttribRule, $DefangAttrib) = @_;
 
-  my ($OpenedTags, $OpenedTagsCount, $OpenedNestedTags)
-    = @$Self{qw(opened_tags opened_tags_count opened_nested_tags)};
-  my $IsTagToFix = $Self->{mismatched_tags_to_fix}->{$lcTag};
+  my $Debug = $Self->{Debug};
+
+  my $AttrValStripped = $Self->strip_attribute($$AttrValR);
+
+  warn "defang_attribute_value AttrVal=$$AttrValR AttrValStripped=$AttrValStripped" if $Debug;
+
+  if (($DefangAttrib == DEFANG_DEFAULT) && $AttribRule) {
+    my $Rule = $Rules{$AttribRule};
+    warn "defang_attributes AttribRule=$AttribRule Rule=$Rule" if $Debug;
+
+    # We whitelist the attribute if the value matches the rule
+    if (ref($Rule) eq "Regexp") {
+      $DefangAttrib = ($AttrValStripped =~ $Rule) ? DEFANG_NONE : DEFANG_ALWAYS;
+    }
+
+    # Hack. Ref to array is a blacklist regexp
+    if (ref($Rule) eq "ARRAY") {
+      $DefangAttrib = ($AttrValStripped =~ $Rule->[0]) ? DEFANG_ALWAYS : DEFANG_NONE;
+    }
+    
+  } elsif (!$AttribRule && $DefangAttrib != DEFANG_NONE)  {
+    $DefangAttrib = DEFANG_ALWAYS;
+  }
+
+  warn "defang_attribute_value DefangAttrib=$DefangAttrib" if $Debug;
+
+  return $DefangAttrib;
+}
+
+sub track_implicit_tags {
+  my ($Self, $OutR, $HtmlR, $lcTag, $IsEndTag) = @_;
+
+  my $OpenedTags = $Self->{opened_tags};
+  return if !@$OpenedTags;
+
+  # If just closing the last tag, nothing to do
+  my $LastTag = $OpenedTags->[-1]->[0];
+
+  # Are we expecting a particular tag based on last open tag?
+  if (my $ImplicitTags = $ImplicitOpenTags{$LastTag}) {
+
+    # We didn't get a tag we were expecting (eg <table><div> rather
+    #  than <table><tbody><tr><td><div>), so insert opening tags recursively
+    $LastTag = $lcTag;
+    while ($ImplicitTags && (!$ImplicitTags->{$LastTag} || $IsEndTag)) {
+      my $Tag = $ImplicitTags->{default};
+      # Don't insert implicit tag if it's actually the one we actually just parsed
+      last if !$IsEndTag && $Tag eq $lcTag;
+      $Self->open_tag(1, $OutR, $HtmlR, $Tag, \"");
+      $$OutR .= "<!-- $Tag implicit open due to $LastTag -->" unless $Self->{quiet};
+      $LastTag = $Tag;
+      $ImplicitTags = $ImplicitOpenTags{$LastTag};
+    }
+  }
+}
+
+sub track_in_to_block_tags {
+  my ($Self, $OutR, $HtmlR, $lcTag) = @_;
 
   # If we've got a block tag, then close any inline tags
   #  before the block tag. We'll re-opened them again below
-  if ($BlockTags{$lcTag}) {
+  if ($BlockTags{$lcTag} && !$TableTags{$lcTag}) {
+    my ($OpenedTags, $ClosedIntoBlockTags, $Quiet)
+      = @$Self{qw(opened_tags closed_into_block_tags quiet)};
+
     while (@$OpenedTags && $InlineTags{$OpenedTags->[-1]->[0]}) {
-      push @$OpenedNestedTags, my $POTD = $OpenedTags->[-1];
-      $Self->track_tag(1, $POTD->[0]);
-      $$OutR .= "<!-- close inline tag into block --></$POTD->[0]>";
+      push @$ClosedIntoBlockTags, my $POTD = $OpenedTags->[-1];
+      $$OutR .= "<!-- close inline tag into block -->" unless $Quiet;
+      $Self->close_tag(1, $OutR, $HtmlR, $POTD->[0], 1);
     }
   }
+}
 
-  # Track browser implicitly opened tags
-  if (@$OpenedTags) {
+sub track_out_of_block_tags {
+  my ($Self, $OutR, $HtmlR, $lcTag) = @_;
 
-    # If just closing the last tag, nothing to do
-    my $LastTag = $OpenedTags->[-1]->[0];
-    if (!$IsEndTag || $lcTag ne $LastTag) {
+  my $ClosedIntoBlockTags = $Self->{closed_into_block_tags};
+  return if !@$ClosedIntoBlockTags;
 
-      # Are we expecting a particular tag based on last open tag?
-      if (my $ImplicitTags = $ImplicitOpenTags{$LastTag}) {
+  # Re-open inline tags into this block
 
-        # We didn't get a tag we were expecting (eg <table><div> rather
-        #  than <table><tbody><tr><td><div>), so insert opening tags recursively
-        $LastTag = $lcTag;
-        while ($ImplicitTags && (!$ImplicitTags->{$LastTag} || $IsEndTag)) {
-          my $Tag = $ImplicitTags->{default};
-          # Don't insert implicit tag if it's actually the one we actually just parsed
-          last if !$IsEndTag && $Tag eq $lcTag;
-          $Self->track_tag(0, $Tag, '');
-          $$OutR .= "<!-- $Tag implicit open due to $LastTag --><$Tag>";
-          $LastTag = $Tag;
-          $ImplicitTags = $ImplicitOpenTags{$LastTag};
-        }
-      }
+  # Peek ahead. If another block tag, don't do this
+  return if $$HtmlR =~ m{\G(?=\s*</?($TagNameRE))}gc
+    && $BlockTags{lc "$1"} && !$TableTags{lc "$1"};
+
+  my ($SpanCount, $SpanAttrs) = (0, '');
+  while (my $POTD = pop @$ClosedIntoBlockTags) {
+
+    # Don't add more than 3 span tags with same attrs in a row
+    if ($SpanCount < 3) {
+      # Add after the current tag is output
+      $Self->track_and_add_tag_to_output($POTD);
+      $Self->add_to_output("<!-- reopen inline tag after block -->") unless $Self->{quiet};
     }
+    $SpanCount = $POTD->[0] eq 'span' && $POTD->[1] eq $SpanAttrs ? $SpanCount+1 : 0;
+    $SpanAttrs = $POTD->[1];
+  }
+}
+
+sub open_tag {
+  my ($Self, $AddOutput, $OutR, $HtmlR, $lcTag, $TagContentR, $NoBlockCheck) = @_;
+
+  $Self->track_implicit_tags($OutR, $HtmlR, $lcTag, 0);
+  $Self->track_in_to_block_tags($OutR, $HtmlR, $lcTag)
+    unless $NoBlockCheck;
+
+  # Track this tag that was opened (and all attributes, so we can re-open with the same if needed)
+  if ($Self->{mismatched_tags_to_fix}->{$lcTag}) {
+    push @{$Self->{opened_tags}}, [ $lcTag, $$TagContentR ];
+    $Self->{opened_tags_count}->{$lcTag}++;
+  }
+  if ($AddOutput) {
+    $$OutR .= "<${lcTag}${$TagContentR}>";
   }
 
-  # Check for correctly nest closing tags
-  if ($IsEndTag && $IsTagToFix) {
+  $Self->track_out_of_block_tags($OutR, $HtmlR, $lcTag)
+    unless $NoBlockCheck;
+
+  return DEFANG_NONE;
+}
+
+my %RECache;
+sub close_tag {
+  my ($Self, $AddOutput, $OutR, $HtmlR, $lcTag, $NoBlockCheck) = @_;
+
+  my ($OpenedTags, $OpenedTagsCount, $Quiet)
+    = @$Self{qw(opened_tags opened_tags_count quiet)};
+
+  # If just closing the last tag, nothing to do
+  if (@$OpenedTags && $OpenedTags->[-1]->[0] ne $lcTag) {
+    $Self->track_implicit_tags($OutR, $HtmlR, $lcTag, 1);
+  }
+
+  $Self->track_in_to_block_tags($OutR, $HtmlR, $lcTag)
+    unless $NoBlockCheck;
+
+  # Check for correctly nested closing tags
+  my $IsTagToFix = $Self->{mismatched_tags_to_fix}->{$lcTag};
+  if ($IsTagToFix) {
     my ($Found, $ClosingTags) = (0, '');
 
     # Tag not even open, just defang it
@@ -2053,79 +2288,67 @@ sub track_tags {
       }
 
       # Close this mismatched tag
-      $Self->track_tag(1, $PreviousOpenedTag);
-      $$OutR .= "<!-- close mismatched tag --></$PreviousOpenedTag>";
+      $$OutR .= "<!-- close mismatched tag -->" unless $Quiet;
+      $Self->close_tag(1, $OutR, $HtmlR, $PreviousOpenedTag);
     }
-    
-    # Should have popped stack correctly if found
-    if ($Found) {
-      pop @$OpenedTags;
-      $OpenedTagsCount->{$lcTag}--;
 
     # Otherwise hit tag that stops breaking out, defang it
-    } else {
+    if (!$Found) {
       return DEFANG_ALWAYS;
     }
-
   }
 
+  my $Result = DEFANG_NONE;
 
-  # Track this tag that was opened (and all attributes, so we can re-open with the same if needed)
-  if (!$IsEndTag && $IsTagToFix) {
-    push @$OpenedTags, [ $lcTag, $$TagContentR ];
-    $OpenedTagsCount->{$lcTag}++;
-  }
+  if ($IsTagToFix && $Self->{empty_tags_to_collapse}->{$lcTag}) {
 
-  # Re-open inline tags into this block
-  if ($BlockTags{$lcTag}) {
-    # Peek ahead. If another block tag, don't do this
-    if ($$HtmlR !~ m{\G(?=\s*</?($TagNameRE))}gc || !$BlockTags{lc "$1"}) {
-      my ($SpanCount, $SpanAttrs) = (0, '');
-      while (my $POTD = pop @$OpenedNestedTags) {
-
-        # Don't add more than 3 span tags with same attrs in a row
-        if ($SpanCount < 3) {
-          # Add after the current tag is output
-          $Self->track_tag(0, @$POTD);
-          $Self->add_to_output("<!-- reopen inline tag after block --><$POTD->[0]$POTD->[1]>");
-        }
-        $SpanCount = $POTD->[0] eq 'span' && $POTD->[1] eq $SpanAttrs ? $SpanCount+1 : 0;
-        $SpanAttrs = $POTD->[1];
+    # Check if previous output is open tag, or just comments
+    my $LastTagPos = rindex($$OutR, '<');
+    while ($LastTagPos >= 0) {
+      pos($$OutR) = $LastTagPos;
+      my $RE = ($RECache{$lcTag} //= qr/\G<${lcTag}\b[^<>]*>\s*(?:<|$)/);
+      if ($$OutR =~ /$RE/gc) {
+        substr($$OutR, $LastTagPos) = '';
+        ($AddOutput, $Result) = (0, DEFANG_ALWAYS);
+        last;
+      } elsif ($$OutR =~ /\G<!--(?!KEEP)[^<>]*-->\s*(?:<|$)/gc && $LastTagPos > 0) {
+        $LastTagPos = rindex($$OutR, '<', $LastTagPos-1);
+      } else {
+        last;
       }
     }
   }
 
-  return DEFANG_NONE;
-}
-
-sub track_tag {
-  my ($Self, $IsEndTag, $Tag, $Attr) = @_;
-  my $lcTag = lc $Tag;
-
-  if ($IsEndTag) {
+  if ($IsTagToFix) {
     if ($lcTag eq $Self->{opened_tags}->[-1]->[0]) {
       pop @{$Self->{opened_tags}};
       $Self->{opened_tags_count}->{$lcTag}--;
     } else {
       warn "Unexpected tag stack. Expected $lcTag, found " . $Self->{opened_tags}->[-1]->[0];
     }
-  } else {
-    push @{$Self->{opened_tags}}, [ $lcTag, $Attr ];
-    $Self->{opened_tags_count}->{$lcTag}++;
   }
+  if ($AddOutput) {
+    $$OutR .= "</$lcTag>";
+  }
+
+  $Self->track_out_of_block_tags($OutR, $HtmlR, $lcTag)
+    unless $NoBlockCheck;
+
+  return $Result;
 }
 
-sub close_tags {
-  my ($Self, $OutR) = @_;
+sub close_all_tags {
+  my ($Self, $OutR, $HtmlR) = @_;
 
   my $RemainingClosingTags = '';
 
-  my ($OpenedTags, $OpenedTagsCount) = @$Self{qw(opened_tags opened_tags_count)};
-  while (my $PreviousOpenedTag = pop @$OpenedTags) {
-    $RemainingClosingTags .= "<!-- close unclosed tag --></$PreviousOpenedTag->[0]>";
-    $OpenedTagsCount->{$PreviousOpenedTag}--;
+  my ($OpenedTags, $OpenedTagsCount, $Quiet)
+    = @$Self{qw(opened_tags opened_tags_count quiet)};
+
+  for (reverse @$OpenedTags) {
+    $$OutR .= "<!-- close unclosed tag -->" unless $Quiet;
+    $Self->close_tag(1, $OutR, $HtmlR, $_->[0]);
   }
-  $$OutR .= $RemainingClosingTags;
 
   # Also clear implicit tags
   $Self->{opened_nested_tags} = [];
@@ -2159,9 +2382,8 @@ The value of the attribute.
 =back
 
 =cut
-
 sub cleanup_attribute {
-  my ($Self, $Attr, $AttrKey, $AttrVal) = @_;
+  my ($Self, $AttrVal) = @_;
 
   return (undef, '') unless defined($AttrVal);
 
@@ -2181,25 +2403,29 @@ sub cleanup_attribute {
   # These get requoted when we output the attribute
   $AttrVal =~ s/&(quot|apos|amp|lt|gt);?/$EntityToChar{lc($1)} || warn "no entity for: $1"/egi;
 
-  my $AttrValStripped = $AttrVal;
-
-  # In JS, \u000a is unicode char (note &#x5c;&#x75;&#x30;&#x30;&#x37;&#x32; -> \u0072 -> r, so do HTML entities first)
-  #  This can't be undone, so only do on stripped value
-  $AttrValStripped =~ s/\\u(0?[\da-f]{1,6});?/defined($1) && hex($1) < 1_114_111 && hex($1) != 65535 && !(hex($1) > 55295 && hex($1) < 57344) ? chr(hex($1)) : ""/egi;
-
-  # Also undo URL decoding for "stripped" value
-  # (can't do this above, because it's non-reversible, eg "http://...?a=%25" => "http://...?a=?",
-  #  how would we know which ? to requote when outputting?)
-  $AttrValStripped =~ s/%([\da-f]{2})/chr(hex($1))/egi;
-  $AttrValStripped =~ s/[\x00-\x19]*//g;
-  $AttrValStripped =~ s/^\x20*//g; # http://ha.ckers.org/xss.html#XSS_Spaces_meta_chars
-
   # Have to upgrade string to unicode string if entity expansion
   #  resulted in non-ascii char
   utf8::upgrade($AttrVal) if $UnicodeEntity;
 
-  warn "cleanup_attribute AttrValStripped=$AttrVal" if $Self->{Debug};
-  return ($AttrVal, $AttrValStripped);
+  warn "cleanup_attribute AttrVal=$AttrVal" if $Self->{Debug};
+  return $AttrVal;
+}
+
+sub strip_attribute {
+  my ($Self, $AttrVal) = @_;
+
+  # In JS, \u000a is unicode char (note &#x5c;&#x75;&#x30;&#x30;&#x37;&#x32; -> \u0072 -> r, so do HTML entities first)
+  #  This can't be undone, so only do on stripped value
+  $AttrVal =~ s/\\u(0?[\da-f]{1,6});?/defined($1) && hex($1) < 1_114_111 && hex($1) != 65535 && !(hex($1) > 55295 && hex($1) < 57344) ? chr(hex($1)) : ""/egi;
+
+  # Also undo URL decoding for "stripped" value
+  # (can't do this above, because it's non-reversible, eg "http://...?a=%25" => "http://...?a=?",
+  #  how would we know which ? to requote when outputting?)
+  $AttrVal =~ s/%([\da-f]{2})/chr(hex($1))/egi;
+  $AttrVal =~ s/[\x00-\x19]+//g;
+  $AttrVal =~ s/^[\x20]+//g; # http://ha.ckers.org/xss.html#XSS_Spaces_meta_chars
+
+  return $AttrVal;
 }
 
 sub get_applicable_charset {
@@ -2246,7 +2472,7 @@ Kurian Jose Aerthail E<lt>cpan@kurianja.fastmail.fmE<gt>. Thanks to Rob Mueller 
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2003-2010 by Opera Software Australia Pty Ltd
+Copyright (C) 2003-2013 by FastMail Pty Ltd
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

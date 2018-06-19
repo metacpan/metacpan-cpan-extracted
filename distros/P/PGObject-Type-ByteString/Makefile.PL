@@ -1,4 +1,4 @@
-use 5.006;
+use 5.010;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -13,8 +13,9 @@ WriteMakefile(
       : ()),
     PL_FILES            => {},
     PREREQ_PM => {
-        'PGObject' => '1.403.2',
-        'DBD::Pg'  => '1.20',
+        'PGObject'  => '1.403.2',
+        'DBD::Pg'   => '1.20',
+        'Ref::Util' => 0,
     },
     BUILD_REQUIRES => {
         'Test::More' => 0,

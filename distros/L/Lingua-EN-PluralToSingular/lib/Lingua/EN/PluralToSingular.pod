@@ -1,5 +1,6 @@
 
 
+
 =encoding UTF-8
 
 =head1 NAME
@@ -9,27 +10,35 @@ Lingua::EN::PluralToSingular - change an English plural to a singular
 =head1 SYNOPSIS
 
     
-    use Lingua::EN::PluralToSingular 'to_singular';
-    
-    print to_singular ('knives');
-    # "knife"
-    
-    use Lingua::EN::PluralToSingular 'is_plural';
-    
-    # Returns 1
-    is_plural ('sheep');
-    # Returns 0
-    is_plural ('dog');
-    # Returns 1
-    is_plural ('dogs');
-    # Returns 0
-    is_plural ('cannabis');
+    use Lingua::EN::PluralToSingular qw/to_singular is_plural/;
+    my @words = qw/knives sheep dog dogs cannabis/;
+    for my $word (@words) {
+        if (is_plural ($word)) {
+            my $sing = to_singular ($word);
+            print "The singular of '$word' is '$sing'.\n";
+        }
+        else {
+            print "'", ucfirst ($word), "' is not plural.\n";
+        }
+    }
+
+
+produces output
+
+    The singular of 'knives' is 'knife'.
+    The singular of 'sheep' is 'sheep'.
+    'Dog' is not plural.
+    The singular of 'dogs' is 'dog'.
+    'Cannabis' is not plural.
+
+
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.20/examples/synopsis.pl> in the distribution.)
 
     
 =head1 VERSION
 
-This documents Lingua::EN::PluralToSingular version 0.19
-corresponding to git commit L<c5ae4a8f7f039ef7387de8d50ea096fd0379fe9c|https://github.com/benkasminbullock/Lingua-EN-PluralToSingular/commit/c5ae4a8f7f039ef7387de8d50ea096fd0379fe9c> released on Sat Feb 11 15:19:45 2017 +0900.
+This documents Lingua::EN::PluralToSingular version 0.20
+corresponding to git commit L<9cbdc3f9f198f5de3b027c1f88f32a581ec821df|https://github.com/benkasminbullock/Lingua-EN-PluralToSingular/commit/9cbdc3f9f198f5de3b027c1f88f32a581ec821df> released on Mon Jun 18 09:10:12 2018 +0900.
 
 =head1 DESCRIPTION
 
@@ -147,6 +156,7 @@ Lisa Hare contributed support for plurals ending in i as part of the
 2016 Pull Request Challenge.
 
 
+
 =head1 AUTHOR
 
 Ben Bullock, <bkb@cpan.org>
@@ -154,7 +164,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2011-2017
+2011-2018
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

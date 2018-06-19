@@ -30,7 +30,7 @@ my $tzil = Builder->from_config(
             ) . <<END_INI,
 
 [MakeMaker::Awesome]
-eumm_version = 6.00
+eumm_version = 6.01
 WriteMakefile_arg = CCFLAGS => '-Wall'
 test_file = xt/*.t
 exe_file = bin/hello-world
@@ -59,7 +59,7 @@ is(
 use strict;
 use warnings;
 
-use ExtUtils::MakeMaker 6.00;
+use ExtUtils::MakeMaker 6.01;
 
 my \$string = 'oh hai';
 

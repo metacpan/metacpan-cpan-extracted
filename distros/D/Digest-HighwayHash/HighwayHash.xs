@@ -24,14 +24,14 @@ void process_key(pTHX_ AV *key_av, uint64_t *key) {
 	}
 }
 
-uint64_t highway_hash64(AV *key_av, char *bytes, uint64_t size) {
+uint64_t highway_hash64(AV *key_av, unsigned char *bytes, uint64_t size) {
 	dTHX;
 	uint64_t key[4];
 	process_key(aTHX_ key_av, key);
 	return HighwayHash64(bytes, size, key);
 }
 
-AV* highway_hash128(AV *key_av, char *bytes, uint64_t size) {
+AV* highway_hash128(AV *key_av, unsigned char *bytes, uint64_t size) {
 	dTHX;
 	AV* result;
 	uint64_t key[4];
@@ -44,7 +44,7 @@ AV* highway_hash128(AV *key_av, char *bytes, uint64_t size) {
 	return result;
 }
 
-AV* highway_hash256(AV *key_av, char *bytes, uint64_t size) {
+AV* highway_hash256(AV *key_av, unsigned char *bytes, uint64_t size) {
 	dTHX;
 	AV* result;
 	uint64_t key[4];
@@ -60,11 +60,12 @@ AV* highway_hash256(AV *key_av, char *bytes, uint64_t size) {
 }
 
 MODULE = Digest::HighwayHash		PACKAGE = Digest::HighwayHash
+PROTOTYPES: DISABLE
 BOOT:
      PERL_MATH_INT64_LOAD_OR_CROAK;
 
-uint64_t highway_hash64(AV *key_av, char *bytes, uint64_t length(bytes))
+uint64_t highway_hash64(AV *key_av, unsigned char *bytes, uint64_t length(bytes))
 
-AV* highway_hash128(AV *key_av, char *bytes, uint64_t length(bytes))
+AV* highway_hash128(AV *key_av, unsigned char *bytes, uint64_t length(bytes))
 
-AV* highway_hash256(AV *key_av, char *bytes, uint64_t length(bytes))
+AV* highway_hash256(AV *key_av, unsigned char *bytes, uint64_t length(bytes))

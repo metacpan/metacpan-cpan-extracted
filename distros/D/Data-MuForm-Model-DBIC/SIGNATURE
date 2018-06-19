@@ -1,0 +1,78 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 268e60873948f25093a13d68f7bf0234def7606f Changes
+SHA1 f5956d2184ba101fb17fc3292fd7bb733571c589 INSTALL
+SHA1 260e79e34ae1c1c5bcc0732a491513f2fc2e646a LICENSE
+SHA1 86bd68e0719955139106712331fa9e81396f6bd4 MANIFEST
+SHA1 44447d674121546e09c6237fed9b9a5ad0531f72 META.json
+SHA1 c6a7ae4a89095ef711a3eeda577c69c662f4575f META.yml
+SHA1 7f79147c1ad865eef5609536e8d5dcf25f0fef75 Makefile.PL
+SHA1 84472e8bc56ae0843b069251ebfe9ed0d5f326fb README
+SHA1 94d7bea4a7c03aa5721bbc22a10df9a04314c4e2 README.md
+SHA1 f463da4fbcc5dd22122867bdc41090c06b500d0f dist.ini
+SHA1 0e159cf940f4490f33f1a2393ff39d9af19b5f8b lib/Data/MuForm/Model/DBIC.pm
+SHA1 8082833cdfd2f81345197074743124e5a705b8a3 lib/Data/MuForm/Role/Model/DBIC.pm
+SHA1 08c5386a5f3ba5d82614e526a881c69d9ef13e9c t/00create_db.t
+SHA1 742f2034c980e2444fea18dd685b7ef6607d0387 t/01-app.t
+SHA1 847af2dd21c3f6f15e01682b1446bad486b62421 t/02-book.t
+SHA1 2ef4b145867b73dc09b1cfa74ff3ca50fd01a704 t/03-author.t
+SHA1 0c438f821e06d012e728e25d37ff9d31c4132436 t/author-eol.t
+SHA1 6ce2f4116add64a8991f99807c82d0f1e413eb5b t/author-no-tabs.t
+SHA1 60fa39c69183b89e25083eef3315543d957ceb6b t/db/bookdb.sql
+SHA1 73b0a1b4c79120094016c57f92c068daa8df2128 t/db_has_many.t
+SHA1 54c686eedd7117c83a45938b928adc06bb727551 t/db_init_obj.t
+SHA1 3966740ba6b829281fd79a2bbd1082a627b9a5fa t/db_options.t
+SHA1 14989b01195d51bfe165bda524799c5ad84919de t/lib/BookDB.pm
+SHA1 fcd14f25d549cb5f78aa8a906aa69e4c5c33c534 t/lib/BookDB/Form/Author.pm
+SHA1 bdb00912f9dcd5bd758bd6c953257373bd36d769 t/lib/BookDB/Form/AuthorOld.pm
+SHA1 a1e4af3dd262de2e6a9e2d6ae9fc2b5918b28d6e t/lib/BookDB/Form/Book.pm
+SHA1 056d2b3c038712df5fb7ad7283f64612f33873fb t/lib/BookDB/Form/Book2PK.pm
+SHA1 45df9d93c50b47b8e0f4f324792fa1be192dee8a t/lib/BookDB/Form/BookHTML.pm
+SHA1 dc7feacb8b8130f358d9f25635586b470b3fe1f7 t/lib/BookDB/Form/BookM2M.pm
+SHA1 92cef41eb19974c4af14a7419969ac045e755114 t/lib/BookDB/Form/BookView.pm
+SHA1 182b034459be2b22b03acb7b1aa0b06a63e1e38f t/lib/BookDB/Form/BookWithOwner.pm
+SHA1 ff6b31385b93ac66dbed22c7d3347066629232bd t/lib/BookDB/Form/BookWithOwnerAlt.pm
+SHA1 30eda7fc8d40bfa6599e422fa07d98ef165f3c64 t/lib/BookDB/Form/Borrower.pm
+SHA1 7b40d5e4a746f1bd33b0d060e830307c8465d684 t/lib/BookDB/Form/BorrowerX.pm
+SHA1 f66d51e1c459966ec4c639ed516e3dca4a9c6293 t/lib/BookDB/Form/Field/AltText.pm
+SHA1 d9aebee396a0e075759da19cc57190384ab0331c t/lib/BookDB/Form/Field/Book.pm
+SHA1 4a789d53d928ba8edd7a8d6363dae54f7617311c t/lib/BookDB/Form/Role/BookOwner.pm
+SHA1 8c2801cb27932e800f01a20b0fcd5ef6267c56e4 t/lib/BookDB/Form/User.pm
+SHA1 a6ee6f269e6024d675d22c40b0a5bb4aa859ca40 t/lib/BookDB/Schema.pm
+SHA1 4856e496246686ef913209a49a4dc57904dce5a7 t/lib/BookDB/Schema/Result/Address.pm
+SHA1 742e87180a2599893a806f2d03cc57f5f705088e t/lib/BookDB/Schema/Result/Author.pm
+SHA1 66660fb22bcb833e82609ac33ba4183261be2f66 t/lib/BookDB/Schema/Result/AuthorBooks.pm
+SHA1 47bc39eb211a3e8be2ec2c7b5281dddc001ca13f t/lib/BookDB/Schema/Result/AuthorOld.pm
+SHA1 f7e3a768098f9ee0b197e0b2276b90cabfef6c83 t/lib/BookDB/Schema/Result/Book.pm
+SHA1 e17c92e2a4cf1c5e7988f75f1161644daf0b263e t/lib/BookDB/Schema/Result/Book2PK.pm
+SHA1 0b13f30efa9317c7def84e10a007ed8a2e900d0e t/lib/BookDB/Schema/Result/BooksGenres.pm
+SHA1 8fdeb42fdfc15f2692fdc141ca4853ea3997b276 t/lib/BookDB/Schema/Result/Borrower.pm
+SHA1 025fa1a06df3677d577311cdf88190fca9c2ec9a t/lib/BookDB/Schema/Result/Country.pm
+SHA1 85dd3c2065ad98adb46ba52f1d02e1f5305d7dd1 t/lib/BookDB/Schema/Result/Employer.pm
+SHA1 42f9533e65597837b19389aef03b87096b3060b4 t/lib/BookDB/Schema/Result/Format.pm
+SHA1 30f613369f25dcb5c7799acedb2efbc1d5713422 t/lib/BookDB/Schema/Result/Genre.pm
+SHA1 4efc958e6acf9822a75d27bf24d8cd1b08dc9e2a t/lib/BookDB/Schema/Result/License.pm
+SHA1 7b72cbd79220d74553e66d662b17e1136e1c85b1 t/lib/BookDB/Schema/Result/Options.pm
+SHA1 caea8cb79f441d37d54e192d1bcc16763819a7ed t/lib/BookDB/Schema/Result/User.pm
+SHA1 c2b07809d8b836565eb70105704867668dfb7011 t/lib/BookDB/Schema/Result/UserEmployer.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.22 (Darwin)
+
+iF4EAREIAAYFAlsmuNsACgkQlX0ZOkgCucj6/QD9EQok/2LoPHUbT+2ygPea7AoE
+CSct5462KmHzAFNqaGQA/jBW6xlTn9mM5SJE/cb13xMjFlUr+IRte42cMKM+TMkl
+=EyLG
+-----END PGP SIGNATURE-----

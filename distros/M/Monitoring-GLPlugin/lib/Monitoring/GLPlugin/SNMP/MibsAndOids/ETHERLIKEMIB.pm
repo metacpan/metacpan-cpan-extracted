@@ -1,13 +1,14 @@
 package Monitoring::GLPlugin::SNMP::MibsAndOids::ETHERLIKEMIB;
 
-$Monitoring::GLPlugin::SNMP::MibsAndOids::origin->{'ETHERLIKE-MIB'} = {
+$Monitoring::GLPlugin::SNMP::MibsAndOids::origin->{'EtherLike-MIB'} = {
   url => '',
-  name => 'ETHERLIKE-MIB',
+  name => 'EtherLike-MIB',
 };
 
-#$Monitoring::GLPlugin::SNMP::MibsAndOids::mib_ids->{'ETHERLIKE-MIB'} = 
+$Monitoring::GLPlugin::SNMP::MibsAndOids::mib_ids->{'EtherLike-MIB'} =
+    '1.3.6.1.2.1.10.7.2';
 
-$Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'ETHERLIKE-MIB'} = {
+$Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'EtherLike-MIB'} = {
   dot3 => '1.3.6.1.2.1.10.7',
   dot3StatsTable => '1.3.6.1.2.1.10.7.2',
   dot3StatsEntry => '1.3.6.1.2.1.10.7.2.1',
@@ -71,7 +72,7 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'ETHERLIKE-MIB'} = {
   etherCompliances => '1.3.6.1.2.1.35.2.2',
 };
 
-$Monitoring::GLPlugin::SNMP::MibsAndOids::definitions->{'ETHERLIKE-MIB'} = {
+$Monitoring::GLPlugin::SNMP::MibsAndOids::definitions->{'EtherLike-MIB'} = {
   dot3PauseOperMode => {
     '1' => 'disabled',
     '2' => 'enabledXmit',

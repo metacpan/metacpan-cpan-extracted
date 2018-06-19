@@ -1,5 +1,8 @@
 Revision history for Open-This
 
+0.000008  2018-06-18 18:37:05Z
+    - Don't use /usr/bin/env in shebang
+
 0.000007  2018-03-20 20:14:09Z
     - Extract line numbers from contextual git-grep matches
 

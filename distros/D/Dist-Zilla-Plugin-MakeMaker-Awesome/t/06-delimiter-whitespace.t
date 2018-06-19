@@ -17,7 +17,7 @@ my $tzil = Builder->from_config(
             ) . <<'END_INI',
 
 [MakeMaker::Awesome]
-eumm_version = 6.00
+eumm_version = 6.01
 WriteMakefile_arg = CCFLAGS => '-Wall'
 header = my $string = 'oh hai';
 delimiter = |

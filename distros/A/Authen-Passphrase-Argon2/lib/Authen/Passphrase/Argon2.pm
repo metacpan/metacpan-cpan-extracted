@@ -3,17 +3,25 @@ package Authen::Passphrase::Argon2;
 use 5.006;
 use strict;
 use warnings;
-use Crypt::Argon2 qw/argon2i_pass argon2i_verify/;
+use Crypt::Argon2 qw/argon2id_pass argon2id_verify/;
 use MIME::Base64 qw(decode_base64 encode_base64);
 use Data::GUID;
 use Carp qw/croak/;
+use Syntax::Construct qw( ?<> /a );
 
 use parent 'Authen::Passphrase';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
-our (%salts, %hashes);
+our (%salts, %hashes, @argons);
 BEGIN {
+	@argons = (
+		['salt'], 
+		[qw/cost 3/], 
+		[qw/factor 32M/],
+		[qw/parallelism 1/],
+		[qw/size 16/]
+	);
 	%salts = (
 		salt => sub {
 			$_[0] =~ m#\A[\x00-\xff]*\z#
@@ -51,111 +59,150 @@ BEGIN {
 
 sub new {
 	my ($class, %args) = (shift, (scalar @_ > 1 ? @_ : %{$_[0]}));
+	
 	my $self = bless({ algorithm => 'Argon2' }, $class);
-	my $passphrase = $args{passphrase};
-	for (keys %salts) {
-		if (exists $args{$_}) {
-			croak sprintf "salt specified redundantly - %s", $_ if ($self->{salt});
-			$self->{salt} = $salts{$_}->($args{$_});
-		}
-	}
-	for (qw/stored_hash stored_base64 stored_hex/) {
-		if ($args{$_}) {
-			my @change = split "_", $_;
-			$args{'hash_' . $change[1]} = $passphrase;
-			$passphrase = undef;
-			last;
-		}
-	}
-	for (keys %hashes) {
-		if (exists $args{$_}) {
-			croak "hash specified redundantly"
-				if exists($self->{hash}) || defined($passphrase);
-			$self->{crypt} = $hashes{$_}->($args{$_});
-		}
-	}
-	croak "salt not specified" unless exists $self->{salt};
-	$self->{cost} = $args{cost} || 3;
-	$self->{factor} = $args{factor} || '32M';
-	$self->{parallelism} = $args{parallelism} || 1;
-	$self->{size} = $args{size} || 16;
-	$self->{crypt} = $self->_hash_of($passphrase) if defined $passphrase;
-	croak "crypt not specified" unless exists $self->{crypt};
+	
+	$args{crypt} = delete $args{passphrase} || $args{crypt};
+
+	exists $args{$_} and ! $self->{salt}
+		&& do { $self->{salt} = $salts{$_}->($args{$_}) }
+		|| croak sprintf "salt specified redundantly - %s", $_
+	foreach (keys %salts);
+
+	exists $args{"stored_$_"} and do { $args{"hash_$_"} = delete $args{crypt} } 
+		&& last
+	foreach(qw/hash base64 hex/);
+	
+	unless ($args{crypt}) { exists $args{$_} and ! $self->{crypt} 
+		&& do { $self->{crypt} = $hashes{$_}->($args{$_}) } 
+		|| croak sprintf "hash specified redundantly - %s", $_
+	foreach (keys %hashes); }	
+	
+	$self->{$_->[0]} = $self->{$_->[0]} 
+		|| $args{$_->[0]} 
+		|| $_->[1] 
+	foreach @argons;
+	
+	$self->{crypt} 
+		or $args{crypt} 
+		&& do { $self->{crypt} = $self->_hash_of($args{crypt}) }
+		|| croak "crypt not specified";
+	
 	return $self;
 }
 
-sub _hash_of {
-	my ($self, $pass) = @_;
-
-	if ($pass =~ m/\$argon2/) {
-		return $pass;
-	}
-
-	return argon2i_pass($pass, $self->{salt}, $self->{cost}, $self->{factor}, $self->{parallelism}, $self->{size});
+sub match {
+	my ($self, $passphrase) = @_;
+	
+	return argon2id_verify($self->{crypt}, $passphrase);
 }
 
-sub algorithm {
-	my($self) = @_;
-	return $self->{algorithm};
+sub from_crypt {
+	my ($self, $crypt, $info) = (@_, {});
+
+	croak "invalid Argon2 crypt format"
+		unless $crypt =~ m/^
+			\$argon2id
+			\$v=\d+
+			\$m=(?<factor>\d+),
+			t=(?<cost>\d+),
+			p=(?<parallelism>\d+)
+			\$
+		/ax;
+
+	return $self->new(%{ $info }, %+,  passphrase => $crypt);
 }
 
-sub salt {
-	my($self, $val) = @_;
-	$self->{salt} = $salts{salt}->($val) if $val;
-	return $self->{salt};
-}
-
-sub salt_hex {
-	my($self, $val) = @_;
-	$self->{salt} = $salts{salt_hex}->($val) if $val;
-	return unpack("H*", $self->{salt});
-}
-
-sub salt_base64 {
-	my($self, $val) = @_;
-	$self->{salt} = $salts{salt_base64}->($val) if $val;
-	return encode_base64($self->{salt});
+sub from_rfc2307 {
+	my ( $class, $rfc2307, $info) = (@_, {});
+	
+	croak "invalid Argon2 RFC2307 format" unless $rfc2307 =~ m/^{ARGON2}(.*)$/;
+	
+	return $class->from_crypt($1, $info);
 }
 
 sub as_crypt {
 	my ($self, $val) = @_;
+	
 	$self->{crypt} = $self->_hash_of($val) if $val;
+	
 	return $self->{crypt};
 }
 
 sub as_hex {
 	my ($self, $val) = @_;
+	
 	return $self->hash_hex($val);
 }
 
 sub as_base64 {
 	my ($self, $val) = @_;
+	
 	return $self->hash_base64($val);
+}
+
+sub as_rfc2307 {
+	my ($self, $val) = @_;
+	
+	return '{ARGON2}' . $self->as_crypt($val);
+}
+
+sub algorithm {
+	my($self) = @_;
+
+	return $self->{algorithm};
+}
+
+sub salt {
+	my($self, $val) = @_;
+	
+	$self->{salt} = $salts{salt}->($val) if $val;
+	
+	return $self->{salt};
+}
+
+sub salt_hex {
+	my($self, $val) = @_;
+	
+	$self->{salt} = $salts{salt_hex}->($val) if $val;
+	
+	return unpack("H*", $self->{salt});
+}
+
+sub salt_base64 {
+	my($self, $val) = @_;
+	
+	$self->{salt} = $salts{salt_base64}->($val) if $val;
+	
+	return encode_base64($self->{salt});
 }
 
 sub hash {
 	my($self, $val) = @_;
+	
 	return $self->as_crypt($val);
 }
 
 sub hash_hex {
 	my($self, $val) = @_;
+	
 	return unpack("H*", $self->as_crypt($val));
 }
 
 sub hash_base64 {
 	my($self, $val) = @_;
+	
 	return encode_base64($self->as_crypt($val));
 }
 
-sub match {
-	my ($self, $passphrase) = @_;
-	return argon2i_verify($self->{crypt}, $passphrase);
-}
+sub _hash_of {
+	my ($self, $pass, @params) = @_;
 
-sub from_crypt {
-	my ($self, $passphrase, $info) = @_;
-	return $self->new({ %{ $info },  passphrase => $passphrase });
+	return $pass if ($pass =~ m/\$argon2/);
+
+	!$self->{$_->[0]} && croak "$_ not set" or push @params, $self->{$_->[0]} for @argons; 
+
+	return argon2id_pass($pass, @params);
 }
 
 1;
@@ -168,7 +215,7 @@ Authen::Passphrase::Argon2 - Store and check password using Argon2
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -318,7 +365,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Authen::Passphrase::Argon2
+	perldoc Authen::Passphrase::Argon2
 
 
 You can also look for information at:

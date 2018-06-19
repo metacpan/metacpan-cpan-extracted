@@ -8,7 +8,7 @@
 #   The (three-clause) BSD License
 #
 package ElasticSearchX::Model::Document::Mapping;
-$ElasticSearchX::Model::Document::Mapping::VERSION = '1.0.3';
+$ElasticSearchX::Model::Document::Mapping::VERSION = '2.0.0';
 use strict;
 use warnings;
 use Moose::Util::TypeConstraints;
@@ -223,7 +223,7 @@ ElasticSearchX::Model::Document::Mapping
 
 =head1 VERSION
 
-version 1.0.3
+version 2.0.0
 
 =head1 AUTHOR
 

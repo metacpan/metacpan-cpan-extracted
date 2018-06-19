@@ -1,8 +1,8 @@
-package Dist::Zilla::Plugin::MakeMaker::Awesome; # git description: v0.41-6-g1baeebe
+package Dist::Zilla::Plugin::MakeMaker::Awesome; # git description: v0.43-3-ge8b4a71
 # ABSTRACT: A more awesome MakeMaker plugin for L<Dist::Zilla>
 # KEYWORDS: plugin installer MakeMaker Makefile.PL toolchain customize override
 
-our $VERSION = '0.42';
+our $VERSION = '0.44';
 
 use Moose;
 use MooseX::Types::Moose qw< Str ArrayRef HashRef >;
@@ -54,7 +54,10 @@ use strict;
 use warnings;
 
 {{ $perl_prereq ? qq[use $perl_prereq;] : ''; }}
-use ExtUtils::MakeMaker{{ 0+$eumm_version ? ' ' . $eumm_version : '' }};
+use ExtUtils::MakeMaker{{
+    0+$eumm_version
+        ? ' ' . (0+$eumm_version eq $eumm_version ? $eumm_version : "'" . $eumm_version . "'")
+        : '' }};
 
 {{ $header }}
 
@@ -69,7 +72,7 @@ my {{ $WriteMakefileArgs }}
 }}
 my {{ $fallback_prereqs }}
 
-unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
+unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {
   delete $WriteMakefileArgs{TEST_REQUIRES};
   delete $WriteMakefileArgs{BUILD_REQUIRES};
   $WriteMakefileArgs{PREREQ_PM} = \%FallbackPrereqs;
@@ -409,9 +412,10 @@ sub _build_footer {
 sub register_prereqs {
     my ($self) = @_;
 
+    (my $eumm_version = $self->eumm_version) =~ tr/_//d;
     $self->zilla->register_prereqs(
         { phase => 'configure' },
-        'ExtUtils::MakeMaker' => $self->eumm_version || 0,
+        'ExtUtils::MakeMaker' => $eumm_version,
     );
 
     return unless keys %{ $self->zilla->_share_dir_map };
@@ -493,7 +497,7 @@ Dist::Zilla::Plugin::MakeMaker::Awesome - A more awesome MakeMaker plugin for L<
 
 =head1 VERSION
 
-version 0.42
+version 0.44
 
 =head1 SYNOPSIS
 

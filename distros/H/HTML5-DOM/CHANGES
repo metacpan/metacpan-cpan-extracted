@@ -6,3 +6,4 @@
 2018-05-27	1.05	- fix specificity calculation
 2018-05-27	1.06	- fix tests passing on 32-bit machines
 2018-05-27	1.07	- fix crash on OpenBSD (use semaphore instead of mutex)
+2018-06-16	1.08	- fix char-ref parsing (myhtml bug), fix doctype serialization (myhtml bug), new api for DOCTYPE nodes, attrArray method. 

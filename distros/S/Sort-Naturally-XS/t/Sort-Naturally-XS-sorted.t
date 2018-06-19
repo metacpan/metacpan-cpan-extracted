@@ -109,7 +109,6 @@ SKIP: {
         my $ar_ca_local__actual = sorted($ar_en_local, locale => $locale);
         ok(eq_array($ar_ca_local__expected, $ar_ca_local__actual), 'Locale CA test');
     }
-
 }
 
 done_testing();

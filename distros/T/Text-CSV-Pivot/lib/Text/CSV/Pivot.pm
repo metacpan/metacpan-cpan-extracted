@@ -1,6 +1,6 @@
 package Text::CSV::Pivot;
 
-$Text::CSV::Pivot::VERSION   = '0.06';
+$Text::CSV::Pivot::VERSION   = '0.08';
 $Text::CSV::Pivot::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,10 +9,11 @@ Text::CSV::Pivot - Transform CSV file into Pivot Table format.
 
 =head1 VERSION
 
-Version 0.06
+Version 0.08
 
 =cut
 
+use strict; use warnings;
 use 5.008;
 use Text::CSV;
 use File::Basename;
@@ -162,7 +163,7 @@ In case, we would want to skip "Year" column then the following code:
                             col_value_idx => 2,
                             col_skip_idx  => [3] })->transform;
 
-You should get the result as below:
+You should get the result in C<sample.pivot.csv> as below:
 
     +----------------+-----------+---------+----------+-------+-------+
     | Student        | Geography | History | Language | Maths | Music |
@@ -170,6 +171,37 @@ You should get the result as below:
     | Gabriel, Peter | 10.0      | 7.0     |          | 10.0  | 2.0   |
     | Smith, John    |           | 9.0     | 7.0      | 4.0   | 7.0   |
     +----------------+-----------+---------+----------+-------+-------+
+
+=head1 CLI
+
+With the C<Text::CSV::Pivot v0.06> or above, there is a tool distributed with the
+distribution called C<csv-pivot>.
+
+  Usage: csv-pivot [OPTIONS]...
+
+      OPTIONS:
+         -i, --i, -input-file,    --input-file=s     input file (required)
+         -o, --o, -output-file,   --output-file=s    output file (optional)
+         -k, --k, -col-key-idx,   --col-key-idx=i    key column index (required)
+         -n, --n, -col-name-idx,  --col-name-idx=i   name column index (required)
+         -v, --v, -col-value-idx, --col-value-idx=i  value column index (required)
+         -s, --s, -col-skip-idx,  --col-skip-idx=s   comma separated skip column index (optional)
+         -h, --help                                  print this message
+
+If you want to do something like below:
+
+    use strict; use warnings;
+    use Text::CSV::Pivot;
+
+    Text::CSV::Pivot->new({ input_file    => 'sample.csv',
+                            col_key_idx   => 0,
+                            col_name_idx  => 1,
+                            col_value_idx => 2,
+                            col_skip_idx  => [3] })->transform;
+
+Then this can be achieved using CLI C<csv-pivot> like below:
+
+    $ cvs-pivot -i sample.csv -k 0 -n 1 -v 2 -s 3
 
 =head1 CONSTRUCTOR
 

@@ -1,5 +1,15 @@
 Revision history for Perl extension Lingua::RU::Money::XS.
 
+0.08  Jun 17 2018
+      Added CONTRIBUTING, fixed Kwalitee issue, updated git repository URL
+
+0.07  Jun 17 2018
+      Fixed a typo that that prevents the module from being used in perl older
+      5.16.0. Some updates for distribution
+
+0.06  Jun 16 2018
+      Updated MIN_PERL_VERRSION to 5.10.0
+
 0.05  Apr 24 2017
       Updated distro files
 

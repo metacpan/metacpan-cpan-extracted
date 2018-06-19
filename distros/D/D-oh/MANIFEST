@@ -1,5 +1,11 @@
+.releaserc
+Changes
+CONTRIBUTORS
 lib/D/oh.pm
 Makefile.PL
 MANIFEST
-README
-test.pl
+MANIFEST.SKIP
+README.md
+t/d-oh.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

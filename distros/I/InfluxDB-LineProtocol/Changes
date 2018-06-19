@@ -1,8 +1,15 @@
 Changes for InfluxDB::LineProtocol
 
-1.009   2017-01-16T17:07:19
+1.010   2018-06-19T13:07:50
+    - it seems 1.009 was already published on CPAN, so another VERSION bump
+
+
+1.009   2018-06-19T12:30:45
+    - do not escape backlash in very old legacy protocol 0.9.2 (Thomas Klausner)
+    - fixed wrong escape sequence (APA-IT, Mario Paumann)
+      https://github.com/domm/InfluxDB-LineProtocol/pull/12
     - Fix spelling mistakes (Guillem Jover)
-    - Add minimum perl version using dzil plugin (Mohammad S Anwar)
+    - Add minimum perl version using dzil plugin [MinimumPerl] (Mohammad S Anwar)
 
 
 1.008	2016-09-06T15:05:31

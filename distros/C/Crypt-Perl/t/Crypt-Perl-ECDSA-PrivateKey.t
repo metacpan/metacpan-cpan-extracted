@@ -140,7 +140,9 @@ sub test_seed : Tests(2) {
 sub test_sign : Tests() {
     my ($self) = @_;
 
-    my $msg = 'Hello';
+    diag "XXX NOTE: This test can take a while and/or spew a lot of text.";
+
+    my $msg = 'Hello' . rand;
 
     #Use SHA1 since it’s the smallest digest that the latest OpenSSL accepts.
     my $dgst = Digest::SHA::sha1($msg);

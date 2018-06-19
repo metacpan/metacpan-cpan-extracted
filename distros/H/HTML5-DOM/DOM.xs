@@ -964,6 +964,8 @@ myencoding_t html5_dom_auto_encoding(html5_dom_options_t *opts, const char **htm
 	return encoding;
 }
 
+void html5_dom_apply_tree_options(myhtml_tree_t *tree, html5_dom_options_t *opts);
+
 static myhtml_tree_node_t *html5_dom_parse_fragment(html5_dom_options_t *opts, myhtml_tree_t *tree, myhtml_tag_id_t tag_id, myhtml_namespace_t ns, 
 	const char *text, size_t length, html5_fragment_parts_t *parts, mystatus_t *status_out)
 {
@@ -979,6 +981,8 @@ static myhtml_tree_node_t *html5_dom_parse_fragment(html5_dom_options_t *opts, m
 		myhtml_tree_destroy(tree);
 		return NULL;
 	}
+	
+	html5_dom_apply_tree_options(fragment_tree, opts);
 	
 	myencoding_t encoding = html5_dom_auto_encoding(opts, &text, &length);
 	
@@ -2734,6 +2738,38 @@ CODE:
 OUTPUT:
 	RETVAL
 
+# return all attributes in a array
+SV *
+attrArray(HTML5::DOM::Element self)
+CODE:
+	AV *array = newAV();
+	
+	myhtml_tree_attr_t *attr = myhtml_node_attribute_first(self);
+	while (attr) {
+		HV *hash = newHV();
+		
+		size_t attr_key_len = 0;
+		const char *attr_key = myhtml_attribute_key(attr, &attr_key_len);
+		
+		size_t attr_val_len = 0;
+		const char *attr_val = myhtml_attribute_value(attr, &attr_val_len);
+		
+		size_t ns_len = 0;
+		const char *ns_name = myhtml_namespace_name_by_id(myhtml_attribute_namespace(attr), &ns_len);
+		
+		hv_store_ent(hash, sv_2mortal(newSVpv("name", 4)), newSVpv(attr_key ? attr_key : "", attr_key_len), 0);
+		hv_store_ent(hash, sv_2mortal(newSVpv("value", 5)), newSVpv(attr_val ? attr_val : "", attr_val_len), 0);
+		hv_store_ent(hash, sv_2mortal(newSVpv("namespace", 9)), newSVpv(ns_name ? ns_name : "", ns_len), 0);
+		
+		av_push(array, newRV_noinc((SV *) hash));
+		
+		attr = myhtml_attribute_next(attr);
+	}
+	
+	RETVAL = newRV_noinc((SV *) array);
+OUTPUT:
+	RETVAL
+
 # attr()					- return all attributes in a hash
 # attr("key")				- return value of attribute "key" (undef is not exists)
 # attr("key", "value")		- set value for attribute "key" (return this)
@@ -2959,6 +2995,107 @@ CODE:
 	}
 	
 	RETVAL = ret ? newSVpv(ret, strlen(ret)) : &PL_sv_undef;
+OUTPUT:
+	RETVAL
+
+#################################################################
+# HTML5::DOM::DocType (extends Node)
+#################################################################
+MODULE = HTML5::DOM  PACKAGE = HTML5::DOM::DocType
+SV *name(HTML5::DOM::DocType self, SV *value = NULL)
+ALIAS:
+	publicId		= 1
+	systemId		= 2
+CODE:
+	static const char *TYPE_SYSTEM = "SYSTEM";
+	static const char *TYPE_PUBLIC = "PUBLIC";
+	
+	myhtml_tree_attr_t *root_name = self->token ? self->token->attr_first : NULL;
+	myhtml_tree_attr_t *restrict_type = root_name ? root_name->next : NULL;
+	myhtml_tree_attr_t *public_id = restrict_type ? restrict_type->next : NULL;
+	myhtml_tree_attr_t *system_id = public_id ? public_id->next : NULL;
+	
+	if (restrict_type && restrict_type->value.length == 6) {
+		if (mycore_strcasecmp(restrict_type->value.data, "SYSTEM") == 0) {
+			system_id = public_id;
+			public_id = NULL;
+		}
+	}
+	
+	if (value) {
+		value = sv_stringify(value);
+		
+		myhtml_tree_attr_t *attr_first = self->token ? self->token->attr_first : NULL;
+		myhtml_tree_attr_t *attr_last = self->token ? self->token->attr_last : NULL;
+		
+		STRLEN val_len = 0;
+		const char *val_str = SvPV_const(value, val_len);
+		
+		// root element name
+		if (ix == 0) {
+			myhtml_attribute_add(self, val_str, val_len, "", 0, MyENCODING_DEFAULT);
+		} else {
+			myhtml_attribute_add(self, root_name && root_name->key.data ? root_name->key.data : "", root_name ? root_name->key.length : 0, "", 0, MyENCODING_DEFAULT);
+		}
+		
+		const char *restrict_type_str = NULL;
+		
+		if ((ix == 2 && val_len) || (system_id && system_id->value.length))
+			restrict_type_str = TYPE_SYSTEM;
+		
+		if ((ix == 1 && val_len) || (public_id && public_id->value.length))
+			restrict_type_str = TYPE_PUBLIC;
+		
+		if (restrict_type_str) {
+			// SYSTEM or PUBLIC
+			myhtml_attribute_add(self, "", 0, restrict_type_str, 6, MyENCODING_DEFAULT);
+			
+			if (restrict_type_str == TYPE_PUBLIC) {
+				// publicId
+				if (ix == 1) {
+					myhtml_attribute_add(self, "", 0, val_str, val_len, MyENCODING_DEFAULT);
+				} else {
+					myhtml_attribute_add(self, "", 0, public_id && public_id->value.data ? public_id->value.data : "", public_id ? public_id->value.length : 0, MyENCODING_DEFAULT);
+				}
+			}
+			
+			// systemId
+			if (ix == 2) {
+				myhtml_attribute_add(self, "", 0, val_str, val_len, MyENCODING_DEFAULT);
+			} else {
+				myhtml_attribute_add(self, "", 0, system_id && system_id->value.data ? system_id->value.data : "", system_id ? system_id->value.length : 0, MyENCODING_DEFAULT);
+			}
+		}
+		
+		// remove old
+		while (attr_last && attr_first) {
+			myhtml_tree_attr_t *next = attr_first->next;
+			myhtml_attribute_delete(self->tree, self, attr_first);
+			
+			if (attr_first == attr_last)
+				break;
+			
+			attr_first = next;
+		}
+		
+		RETVAL = SvREFCNT_inc(ST(0));
+	} else {
+		RETVAL = &PL_sv_undef;
+		
+		switch (ix) {
+			case 0: /* name */
+				RETVAL = newSVpv(root_name && root_name->key.data ? root_name->key.data : "", root_name ? root_name->key.length : 0);
+			break;
+			
+			case 1: /* publicId */
+				RETVAL = newSVpv(public_id && public_id->value.data ? public_id->value.data : "", public_id ? public_id->value.length : 0);
+			break;
+			
+			case 2: /* systemId */
+				RETVAL = newSVpv(system_id && system_id->value.data ? system_id->value.data : "", system_id ? system_id->value.length : 0);
+			break;
+		}
+	}
 OUTPUT:
 	RETVAL
 

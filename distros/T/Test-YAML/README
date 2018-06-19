@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes Test::YAML version 1.06.
+    This document describes Test::YAML version 1.07.
 
 SYNOPSIS
 
@@ -22,7 +22,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    Copyright 2001-2015. Ingy döt Net.
+    Copyright 2001-2018. Ingy döt Net.
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

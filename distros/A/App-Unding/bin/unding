@@ -49,7 +49,7 @@ if (      # decrypt (no arg given) but nothing stored
 
 # read password, without any prompt
 ReadMode('noecho');
-chomp(my $password = <STDIN>);
+my $password = ReadLine(0);
 ReadMode('restore');
 
 my $obj = Data::Serializer->new(
@@ -101,7 +101,7 @@ unding - dark magic, encrypted wallet
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -139,13 +139,21 @@ No separation of ciphertext and cryptologic.
 
 =over
 
-=item This is an early release. Use it at your own risk.
+=item *
 
-=item While encryption, the script does not check if it overwrites existing encrypted data.
+This is an early release. Use it at your own risk.
 
-=item While encryption, the script does not check if the password is the same as before. Decrypt once to be sure you made no typos.
+=item *
 
-=item After encryption, the script does not delete the original file. You have to do this yourself. This may be considered a feature, since it might prevent loss of data.
+While encryption, the script does not check if it overwrites existing encrypted data.
+
+=item *
+
+While encryption, the script does not check if the password is the same as before. Decrypt once to be sure you made no typos.
+
+=item *
+
+After encryption, the script does not delete the original file. You have to do this yourself. This may be considered a feature, since it might prevent loss of data.
 
 =back
 

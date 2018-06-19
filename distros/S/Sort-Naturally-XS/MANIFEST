@@ -6,6 +6,7 @@ t/Sort-Naturally-XS.t
 t/Sort-Naturally-XS-ncmp.t
 t/Sort-Naturally-XS-nsort.t
 t/Sort-Naturally-XS-sorted.t
+t/Sort-Naturally-XS-wchar.t
 Changes
 const-c.inc
 const-xs.inc

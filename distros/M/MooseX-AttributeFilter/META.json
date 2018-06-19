@@ -47,6 +47,9 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "Types::Standard" : "0"
+         },
          "requires" : {
             "Test2::V0" : "0",
             "Test::Moose" : "0"
@@ -56,15 +59,15 @@
    "provides" : {
       "MooseX::AttributeFilter" : {
          "file" : "lib/MooseX/AttributeFilter.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "MooseX::AttributeFilter::Trait::Attribute" : {
          "file" : "lib/MooseX/AttributeFilter/Trait/Attribute.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "MooseX::AttributeFilter::Trait::Attribute::Role" : {
          "file" : "lib/MooseX/AttributeFilter/Trait/Attribute/Role.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -75,7 +78,7 @@
          "web" : "https://github.com/icklekitten/MooseX-AttributeFilter"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_authority" : "cpan:KITTEN",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,11 +1,14 @@
 package Finance::Currency::Convert::KlikBCA;
 
-our $DATE = '2017-07-11'; # DATE
-our $VERSION = '0.14'; # VERSION
+our $DATE = '2018-06-16'; # DATE
+our $VERSION = '0.150'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
+
+use List::Util qw(min);
 
 use Exporter 'import';
 our @EXPORT_OK = qw(get_currencies convert_currency);
@@ -48,7 +51,9 @@ _
 };
 sub get_currencies {
     require Mojo::DOM;
+    require Parse::Date::Month::ID;
     require Parse::Number::ID;
+    require Time::Local;
 
     my %args = @_;
 
@@ -95,8 +100,54 @@ sub get_currencies {
         return [543, "Check: no/too few currencies found"];
     }
 
+    my ($mtime, $mtime_er, $mtime_ttc, $mtime_bn);
+  GET_MTIME_ER:
+    {
+        unless ($page =~ m!<th[^>]*>e-Rate\*?<br />((\d+) (\w+) (\d{4}) / (\d+):(\d+) WIB)</th>!) {
+            log_warn "Cannot extract last update time for e-Rate";
+            last;
+        }
+        my $mon = Parse::Date::Month::ID::parse_date_month_id(text=>$3) or do {
+            log_warn "Cannot recognize month name '$3' in last update time '$1'";
+            last;
+        };
+        $mtime_er = Time::Local::timegm(0, $6, $5, $2, $mon-1, $4) - 7*3600;
+    }
+  GET_MTIME_TTC:
+    {
+        unless ($page =~ m!<th[^>]*>TT Counter\*?<br />((\d+) (\w+) (\d{4}) / (\d+):(\d+) WIB)</th>!) {
+            log_warn "Cannot extract last update time for TT Counter";
+            last;
+        }
+        my $mon = Parse::Date::Month::ID::parse_date_month_id(text=>$3) or do {
+            log_warn "Cannot recognize month name '$3' in last update time '$1'";
+            last;
+        };
+        $mtime_ttc = Time::Local::timegm(0, $6, $5, $2, $mon-1, $4) - 7*3600;
+    }
+  GET_MTIME_BN:
+    {
+        unless ($page =~ m!<th[^>]*>Bank Notes\*?<br />((\d+) (\w+) (\d{4}) / (\d+):(\d+) WIB)</th>!) {
+            log_warn "Cannot extract last update time for Bank Note";
+            last;
+        }
+        my $mon = Parse::Date::Month::ID::parse_date_month_id(text=>$3) or do {
+            log_warn "Cannot recognize month name '$3' in last update time '$1'";
+            last;
+        };
+        $mtime_bn = Time::Local::timegm(0, $6, $5, $2, $mon-1, $4) - 7*3600;
+    }
+
+    $mtime = min(grep {defined} ($mtime_er, $mtime_ttc, $mtime_bn));
+
     # XXX parse update dates (mtime_er, mtime_ttc, mtime_bn)
-    [200, "OK", {currencies=>\%currencies}];
+    [200, "OK", {
+        mtime => $mtime,
+        mtime_er => $mtime_er,
+        mtime_ttc => $mtime_ttc,
+        mtime_bn => $mtime_bn,
+        currencies => \%currencies,
+    }];
 }
 
 # used for testing only
@@ -196,7 +247,7 @@ Finance::Currency::Convert::KlikBCA - Convert currency using KlikBCA
 
 =head1 VERSION
 
-This document describes version 0.14 of Finance::Currency::Convert::KlikBCA (from Perl distribution Finance-Currency-Convert-KlikBCA), released on 2017-07-11.
+This document describes version 0.150 of Finance::Currency::Convert::KlikBCA (from Perl distribution Finance-Currency-Convert-KlikBCA), released on 2018-06-16.
 
 =head1 SYNOPSIS
 
@@ -315,7 +366,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

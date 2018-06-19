@@ -203,7 +203,11 @@ paths:
         name: enumArg
         type: array
         items:
-          $ref: "#/definitions/BigEnum"
+          type: string
+          enum:
+            - dot.space
+            - dot space
+            - ""
       responses:
         200:
           description: query response

@@ -7,17 +7,17 @@ package Comics::Plugin::SMBC;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "1.00";
+our $VERSION = "1.01";
 
 our $name    = "Saturday Morning Breakfast Cereal";
-our $url     = "http://www.smbc-comics.com/";
+our $url     = "https://www.smbc-comics.com/";
 our $pattern =
-	    qr{ <img \s+
+	    qr{ <div \s+ id="cc-comicbody"> \s*
+		<img \s+
 	        title="(?<title>.*?)" \s+
-		src="(?<url>/comics/
+		src="(?:https?://www.smbc-comics.com)?(?<url>/comics/
 		  (?<image>[^./]+\.\w+))" \s+
 	        id="cc-comic" \s+
-		border="\d+" \s+
 		/>
 	      }x;
 

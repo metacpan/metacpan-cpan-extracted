@@ -1,6 +1,26 @@
+0.005   2018-06-19 (PERLANCAR)
+
+	- No functional changes.
+
+	- Tweak Abstract.
+
+
+0.004   2018-06-19 (PERLANCAR)
+
+	- Forgot to bump dep version: Finance::Currency::FiatX 0 -> 0.004.
+
+
+0.003   2018-06-19 (PERLANCAR)
+
+	- Adjust to Finance::Currency::FiatX 0.004: replace 'convert' subcommand
+          with 'spot-rate'. Add subcommands: 'source', 'all-spot-rates'.
+
+
 0.002   2018-05-10 (PERLANCAR)
 
-	- Enable logging in CLI.
+	- No functional changes.
+
+        - Enable logging in CLI.
 
 
 0.001   2018-05-09 (PERLANCAR)

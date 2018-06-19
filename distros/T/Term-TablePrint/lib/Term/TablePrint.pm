@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '0.065';
+our $VERSION = '0.066';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -30,6 +30,8 @@ sub new {
         croak "new: The (optional) argument is not a HASH reference." if ref $opt ne 'HASH';
         $self->__validate_options( $opt );
     }
+    my $backup_self = { map{ $_ => $self->{$_} } keys %$self };
+    $self->{backup_self} = $backup_self;
     return $self;
 }
 
@@ -41,11 +43,10 @@ sub __validate_options {
         min_col_width   => '[ 0-9 ]+',
         progress_bar    => '[ 0-9 ]+',
         tab_width       => '[ 0-9 ]+',
-        add_header      => '[ 0 1 ]', # DEPRECATED
+        choose_columns  => '[ 0 1 ]',
         binary_filter   => '[ 0 1 ]',
         grid            => '[ 0 1 ]',
         keep_header     => '[ 0 1 ]',
-        choose_columns  => '[ 0 1 2 ]', # '[ 0 1 ]',
         table_expand    => '[ 0 1 2 ]',
         mouse           => '[ 0 1 2 3 4 ]',
         binary_string   => '',
@@ -93,7 +94,8 @@ sub __set_defaults {
 
 sub print_table {
     if ( ref $_[0] ne 'Term::TablePrint' ) {
-        return Term::TablePrint->new( $_[1] )->print_table( $_[0] );
+        #return Term::TablePrint->new( $_[1] )->print_table( $_[0] );
+        return print_table( bless( {}, 'Term::TablePrint' ), @_ );
     }
     my $self = shift;
     my ( $table_ref, $opt ) = @_;
@@ -101,7 +103,6 @@ sub print_table {
     croak "print_table: requires an ARRAY reference as its first argument."            if ref $table_ref  ne 'ARRAY';
     if ( defined $opt ) {
         croak "print_table: the (optional) second argument is not a HASH reference."   if ref $opt ne 'HASH';
-        $self->{backup_opt} = { map{ $_ => $self->{$_} } keys %$opt };
         $self->__validate_options( $opt );
     }
     if ( ! @$table_ref ) {
@@ -109,21 +110,6 @@ sub print_table {
         return;
     }
     $self->__set_defaults();
-
-    # ### remove and choose_columns data type from [ 0 1 2 ] to [ 0 1 ],
-    if ( $self->{choose_columns} == 2 ) {
-        choose( [ 'Close with ENTER' ], { prompt => "'print_table' option \"choose-columns\": 2 is no longer a valid value!" } );
-    }
-    # ###
-
-    # ### remove and the pod
-    if ( defined $self->{add_header} ) {
-        choose( [ 'Close with ENTER' ], { prompt => "The 'print_table' option \"add_header\" is deprecated and will be removed!" } );
-        if ( $self->{add_header} ) {
-            unshift @$table_ref, [ map { $_ . 'col' } 1 .. @{$table_ref->[0]} ];
-        }
-    }
-    # ###
     my $table_rows = @$table_ref - 1;
     if ( $self->{max_rows} && $table_rows >= $self->{max_rows} ) {
         $self->{info_row} = sprintf( 'Reached the row LIMIT %s', insert_sep( $self->{max_rows}, $self->{thsd_sep} ) );
@@ -154,10 +140,15 @@ sub print_table {
     }
     $self->__calc_col_width( $a_ref );
     $self->__win_size_dependet_code( $a_ref );
-    if ( $self->{backup_opt} ) {
-        my $backup_opt = delete $self->{backup_opt};
-        for my $key ( keys %$backup_opt ) {
-            $self->{$key} = $backup_opt->{$key};
+    if ( defined $self->{backup_self} ) {
+        my $backup_self = delete $self->{backup_self};
+        for my $key ( keys %$self ) {
+            if ( defined $backup_self->{$key} ) {
+                $self->{$key} = $backup_self->{$key};
+            }
+            else {
+                delete $self->{$key};
+            }
         }
     }
 
@@ -488,12 +479,12 @@ sub __choose_columns {
 
     while ( 1 ) {
         my @chosen_cols = @$col_idxs ?  @cols[@$col_idxs] : '*';
-        my $prompt = $init_prompt . join( ', ', @chosen_cols );
+        my $prompt = $init_prompt . join( ', ', @chosen_cols ) . '  (Spacebar)';
         my $choices = [ @pre, @cols ];
         my @idx = choose(
             $choices,
             { prompt => $prompt, lf => [ 0, $s_tab ], clear_screen => 1, undef => '<<',
-              no_spacebar => [ 0 .. $#pre ], index => 1, mouse => $self->{mouse} }
+              meta_items => [ 0 .. $#pre ], index => 1, mouse => $self->{mouse}, include_highlighted => 2 }
         );
         if ( ! @idx || $idx[0] == 0 ) {
             if ( @$col_idxs ) {
@@ -608,7 +599,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.065
+Version 0.066
 
 =cut
 
@@ -762,16 +753,6 @@ Defaults may change in a future release.
 =head3 prompt
 
 String displayed above the table.
-
-=head3 add_header DEPRECATED
-
-This option is deprecated and will be removed.
-
-Enabling I<add_header> alters the passed list.
-
-If I<add_header> is set to 1, C<print_table> adds a header row - the columns are numbered starting with 1.
-
-Default: 0
 
 =head3 binary_filter
 

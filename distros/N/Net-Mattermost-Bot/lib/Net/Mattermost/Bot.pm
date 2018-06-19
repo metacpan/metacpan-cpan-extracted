@@ -1,6 +1,6 @@
 package Net::Mattermost::Bot;
 
-use 5.026002;
+use 5.6.1;
 
 use Carp qw(carp croak);
 use Furl;
@@ -13,7 +13,7 @@ use Moo;
 use MooX::HandlesVia;
 use Types::Standard qw(ArrayRef HashRef Int Object Str);
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 ################################################################################
 
@@ -66,7 +66,7 @@ sub connect {
         croak 'Unauthorized';
     }
 
-    $self->event_emit_connected();
+    $self->event_connected();
     $self->_start();
 
     return 1;
@@ -96,21 +96,24 @@ sub handle_message {
             data   => { token => $self->token },
         };
     } elsif ($content->{event} eq 'typing') {
-        $output = $self->event_emit_typing($content);
+        $output = $self->event_typing($content);
     } elsif ($content->{event} eq 'channel_viewed') {
-        $output = $self->event_emit_channel_viewed($content);
+        $output = $self->event_channel_viewed($content);
     } elsif ($content->{event} eq 'posted') {
-        $output = $self->event_emit_posted($content);
+        $output = $self->event_posted($content);
+    } else {
+        $output = $self->event_generic($content);
     }
 
     return $output;
 }
 
 # Override these
-sub event_emit_connected      {}
-sub event_emit_typing         {}
-sub event_emit_channel_viewed {}
-sub event_emit_posted         {}
+sub event_connected      {}
+sub event_typing         {}
+sub event_channel_viewed {}
+sub event_posted         {}
+sub event_generic        {}
 
 ################################################################################
 
@@ -234,6 +237,10 @@ __END__
 
 Net::Mattermost::Bot - A base class for Mattermost bots.
 
+=head1 VERSION
+
+0.03
+
 =head1 SYNOPSIS
 
 Extend C<Net::Mattermost::Bot> in a C<Moo> or C<Moose> package.
@@ -254,7 +261,7 @@ Extend C<Net::Mattermost::Bot> in a C<Moo> or C<Moose> package.
     extends 'Net::Mattermost::Bot';
 
     # A message was posted to the channel
-    sub event_emit_posted {
+    sub event_posted {
         my $self = shift;
         my $args = shift;
 
@@ -271,7 +278,7 @@ Extend C<Net::Mattermost::Bot> in a C<Moo> or C<Moose> package.
 API calls can also be made directly to Mattermost using their v4 API (using
 Furl):
 
-    sub event_emit_posted {
+    sub event_posted {
         my $self = shift;
 
         # Get a list of your team's custom emoticons
@@ -290,25 +297,29 @@ Mattermost bot.
 This package provides several methods which may be overridden in your own bot.
 
 Each method takes two arguments (C<$self> and C<$event>), except
-C<event_emit_connected> which only passes C<$self>.
+C<event_connected> which only passes C<$self>.
 
 =over 4
 
-=item C<event_emit_connected()>
+=item C<event_connected()>
 
 The bot connected to the server.
 
-=item C<event_emit_typing()>
+=item C<event_typing()>
 
 Someone started typing.
 
-=item C<event_emit_channel_viewed()>
+=item C<event_channel_viewed()>
 
 Someone viewed the channel.
 
-=item C<event_emit_posted()>
+=item C<event_posted()>
 
 Someone posted to the channel.
+
+=item C<event_generic()>
+
+Generic catch-all for extra events.
 
 =back
 

@@ -28,7 +28,7 @@ use Dist::Zilla::Role::PluginBundle                   ();
 use Dist::Zilla::Role::PluginBundle::Easy             ();
 use Dist::Zilla::Util                                 ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 with
     'Dist::Zilla::Role::PluginBundle::Easy',
@@ -72,7 +72,8 @@ has exclude_files => (
 around exclude_files => sub {
     my $orig = shift;
     my $self = shift;
-    sort(uniq(
+
+    return sort(uniq(
             $self->$orig(@_),
             qw(Dockerfile .gitlab-ci.yml docker-compose.yml docker-compose.override.yml .dockerignore dev-bin/cpanm)
     ));
@@ -180,10 +181,14 @@ sub _warn_me {
 }
 
 sub commit_files_after_release {
-    grep { -e } sort(uniq(
+    my $self = shift;
+    grep { -e }
+        sort(uniq(
             'README.pod',
-            'Changes',   shift->copy_files_from_release
-    ));
+            'Changes',
+            $self->copy_files_from_release,
+            $self->copy_files_from_build,
+        ));
 }
 
 my %removed;
@@ -244,11 +249,25 @@ sub configure {
             },
         ],
 
+        [
+            'PromptIfStale' => 'stale modules, build' =>
+                { phase => 'build', module => [$self->meta->name] }
+        ],
+        [
+            'PromptIfStale' => 'stale modules, release' => {
+                phase             => 'release',
+                check_all_plugins => 1,
+                check_all_prereqs => 1
+            }
+        ],
+
         qw(PruneCruft ManifestSkip MetaYAML MetaJSON),
 
         ['License' => { filename => $self->license }],
 
-        qw(Readme ExecDir ShareDir MakeMaker Manifest
+        ['ReadmeFromPod' => { type => 'markdown', readme => 'README.md' }],
+
+        qw(ExecDir ShareDir MakeMaker Manifest
             TestRelease PodWeaver),
 
         ['Git::Contributors'    => { order_by => 'commits' }],
@@ -269,6 +288,16 @@ sub configure {
         [ 'CopyFilesFromBuild::Filtered' => {
             copy => [ $self->copy_files_from_build ]
         }],
+
+        [ 'Git::Check' => 'initial check' => { allow_dirty => [ $self->airplane ? 'dist.ini' : '' ] } ],
+
+        qw(Git::CheckFor::MergeConflicts),
+        ['Git::Remote::Check' => { branch => 'master', remote_branch => 'master' } ],
+        ['Git::CheckFor::CorrectBranch' =>
+                { release_branch => 'master' }
+        ],
+
+        qw(CheckPrereqsIndexed),
 
         ['Repository'],
         ['ConfirmRelease'],
@@ -358,7 +387,7 @@ Dist::Zilla::PluginBundle::Author::MINTLAB - An plugin bundle for all distributi
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -384,7 +413,7 @@ C<cpan> or C<stratopan>. When fake release is used, this overrides these two opt
 
 =head1 SEE ALSO
 
-I took inspiration from L<Dist::Zilla::PluginBundle::Author::ETHER>
+L<Dist::Zilla::PluginBundle::Author::WATERKIP>
 
 =head1 AUTHOR
 
@@ -392,7 +421,7 @@ Wesley Schwengle <waterkip@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Mintlab BV.
+This software is copyright (c) 2018 by Mintlab B.V / Zaaksysteem.nl.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

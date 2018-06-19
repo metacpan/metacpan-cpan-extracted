@@ -3,7 +3,7 @@ package Dist::Zilla::Plugin::GitHubREADME::Badge;
 use strict;
 use warnings;
 use 5.008_005;
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use Moose;
 use Moose::Util::TypeConstraints qw(enum);
@@ -52,11 +52,11 @@ has readme_file => (
             # for the other phases we look on disk
             my $root = path($self->zilla->root);
 
-            return Dist::Zilla::File::OnDisk->new( 
+            return Dist::Zilla::File::OnDisk->new(
                 name    => "$_",
                 content => $_->slurp_raw,
                 encoding => 'bytes',
-            ) for grep { -f $_ } map { $root->child($_) } @candidates 
+            ) for grep { -f $_ } map { $root->child($_) } @candidates
         }
 
         $self->log_fatal('README file not found');
@@ -92,8 +92,10 @@ sub add_badges {
 
     my @badges;
     foreach my $badge (@{$self->badges}) {
-        if ($badge eq 'travis') {
+        if ($badge eq 'travis' or $badge eq 'travis-ci.org') {
             push @badges, "[![Build Status](https://travis-ci.org/$user_name/$repository_name.svg?branch=master)](https://travis-ci.org/$user_name/$repository_name)";
+        } elsif ($badge eq 'travis-ci.com') {
+            push @badges, "[![Build Status](https://travis-ci.com/$user_name/$repository_name.svg?branch=master)](https://travis-ci.com/$user_name/$repository_name)";
         } elsif ($badge eq 'appveyor') {
             push @badges, "[![AppVeyor Status](https://ci.appveyor.com/api/projects/status/github/$user_name/$repository_name?branch=master&svg=true)](https://ci.appveyor.com/project/$user_name/$repository_name)";
         } elsif ($badge eq 'coveralls') {
@@ -158,6 +160,7 @@ Dist::Zilla::Plugin::GitHubREADME::Badge - Dist::Zilla - add badges to github RE
     # configure it yourself
     [GitHubREADME::Badge]
     badges = travis
+    badges = travis-ci.com
     badges = appveyor
     badges = coveralls
     badges = gitter

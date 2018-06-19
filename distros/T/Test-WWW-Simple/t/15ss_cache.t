@@ -21,7 +21,7 @@ if ($pid == 0) {
   get "/stop" => sub { 
     shift->render(text=>"ok!"); 
     diag 'stopping Mojolicious server';
-    kill 9,$$ 
+    exit; 
   };
   
   my $daemon = Mojo::Server::Daemon->new(

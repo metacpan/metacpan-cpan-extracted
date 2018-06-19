@@ -5,7 +5,7 @@
 # All Rights Reserved - See License
 #
 
-use Test2::Bundle::Extended 0.000058;
+use Test2::V0 0.000111;
 
 use Crypt::EAMessage;
 
@@ -43,6 +43,7 @@ foreach my $msg (@MSG) {
     my $ascii      = $eamsg->encrypt_auth_ascii($txt);
     my $ascii_crlf = $eamsg->encrypt_auth_ascii($txt, "\r\n");
     my $ascii_nolf = $eamsg->encrypt_auth_ascii($txt, "");
+    my $urlsafe    = $eamsg->encrypt_auth_urlsafe($txt);
 
     ok(length($encrypted) < length($ascii), "ASCII encrypted message is longer for msg $cnt");
     ok(length($encrypted) < length($ascii_crlf), "ASCII CRLF encrypted message is longer for msg $cnt");
@@ -50,8 +51,9 @@ foreach my $msg (@MSG) {
     ok(length($ascii) <= length($ascii_crlf), "ASCII CRLF encrypted message is longer than or same length as LF encrypted for msg $cnt");
     ok(length($ascii_nolf) <= length($ascii), "ASCII no-LF encrypted message is longer than or same length as ascii encrypted for msg $cnt");
     ok(length($ascii_nolf) < length($ascii_crlf), "ASCII CRLF encrypted message is longer than CRLF encrypted for msg $cnt");
+    ok(length($urlsafe) == length($ascii_nolf), "URL-Safe encrypted message is same length as ASCII no-LF encrypted message for msg $cnt");
 
-    my ($plain, $plain2, $plain3, $plain4);
+    my ($plain, $plain2, $plain3, $plain4, $plain5);
 
     ok(lives( sub { $plain = $eamsg->decrypt_auth($encrypted) } ), "Decrypted raw msg $cnt");
     is( $plain, $txt, "Decrypted raw msg $cnt correctly" );
@@ -64,6 +66,9 @@ foreach my $msg (@MSG) {
 
     ok(lives( sub { $plain4 = $eamsg->decrypt_auth($ascii_nolf) } ), "Decrypted B64 NOLF msg $cnt");
     is( $plain4, $txt, "Decrypted B64 msg $cnt correctly" );
+
+    ok(lives( sub { $plain5 = $eamsg->decrypt_auth($urlsafe) } ), "Decrypted URL Safe msg $cnt");
+    is( $plain5, $txt, "Decrypted B64 msg $cnt correctly" );
 
     my $badkey = '11112222333344445555666677778888';
     $eamsg = Crypt::EAMessage->new( hex_key => $badkey );

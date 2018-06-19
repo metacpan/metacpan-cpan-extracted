@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::Repository;
-$Dist::Zilla::Plugin::Repository::VERSION = '0.21';
+$Dist::Zilla::Plugin::Repository::VERSION = '0.23';
 # ABSTRACT: Automatically sets repository URL from svn/svk/Git checkout for Dist::Zilla
 
 use Moose;
@@ -18,9 +18,10 @@ has github_http => (
 );
 
 has _found_repo => (
-    is         => 'ro',
-    isa        => 'HashRef',
-    lazy_build => 1,
+    is      => 'ro',
+    isa     => 'HashRef',
+    lazy    => 1,
+    builder => '_build__found_repo',
 );
 
 sub _build__found_repo {
@@ -36,15 +37,18 @@ sub _build__found_repo {
     return \%repo;
 }
 
-has 'repository' => (
-    is         => 'ro',
-    isa        => 'Str',
-    lazy_build => 1,
+has uri => (
+    is      => 'ro',
+    isa     => 'Str',
+    lazy    => 1,
+    default => sub { shift->_found_repo->{url} },
 );
 
-sub _build_repository {
-    shift->_found_repo->{url};
-}
+has repository => (
+    is        => 'ro',
+    isa       => 'Str',
+    predicate => 'has_repository',
+);
 
 has type => (
     is      => 'ro',
@@ -64,9 +68,9 @@ sub metadata {
     my ($self, $arg) = @_;
 
     my %repo;
-    $repo{url}  = $self->repository if $self->repository;
-    $repo{type} = $self->type       if $self->type;
-    $repo{web}  = $self->web        if $self->web;
+    $repo{url}  = $self->uri  if $self->uri;
+    $repo{type} = $self->type if $self->type;
+    $repo{web}  = $self->web  if $self->web;
 
     return unless $repo{url} or $repo{web};
 
@@ -79,6 +83,32 @@ sub _execute {
     `$command`;
 }
 
+sub _git_to_repo {
+    my ($self, $uri) = @_;
+
+    $uri =~ s![\w\-]+\@([^:]+):!git://$1/!;
+
+    my %repo = (type => 'git');
+
+    $repo{url} = $uri unless $uri eq 'origin';    # RT 55136
+
+    if ($uri =~ /^(?:git|https?):\/\/((?:git(?:lab|hub)\.com|bitbucket.org).*?)(?:\.git)?$/) {
+        $repo{web} = "https://$1";
+
+        if ($self->github_http) {
+
+            # I prefer https://github.com/user/repository
+            # to git://github.com/user/repository.git
+            delete $repo{url};
+            $self->log("github_http is deprecated.  "
+                    . "Consider using META.json instead,\n"
+                    . "which can store URLs for both git clone "
+                    . "and the web front-end.");
+        }
+    }
+    return %repo;
+}
+
 # Copy-Paste of Module-Install-Repository, thank MIYAGAWA
 sub _find_repo {
     my ($self, $execute) = @_;
@@ -86,32 +116,14 @@ sub _find_repo {
     my %repo;
 
     if (-e ".git") {
-        $repo{type} = 'git';
-        if ($execute->('git remote show -n ' . $self->git_remote) =~ /URL: (.*)$/m) {
-            # XXX Make it public clone URL, but this only works with github
-            my $git_url = $1;
-
-            $git_url =~ s![\w\-]+\@([^:]+):!git://$1/!;
-
-            $repo{url} = $git_url unless $git_url eq 'origin';    # RT 55136
-
-            if ($git_url =~ /^(?:git|https?):\/\/((?:git(?:lab|hub)\.com|bitbucket.org).*?)(?:\.git)?$/) {
-                $repo{web} = "https://$1";
-
-                if ($self->github_http) {
-                    # I prefer https://github.com/user/repository
-                    # to git://github.com/user/repository.git
-                    delete $repo{url};
-                    $self->log("github_http is deprecated.  "
-                            . "Consider using META.json instead,\n"
-                            . "which can store URLs for both git clone "
-                            . "and the web front-end.");
-                }    # end if github_http
-            }    # end if Github repository
-
+        if ($self->has_repository) {
+            %repo = $self->_git_to_repo($self->repository);
+        } elsif ($execute->('git remote show -n ' . $self->git_remote) =~ /URL: (.*)$/m) {
+            %repo = $self->_git_to_repo($1);
         } elsif ($execute->('git svn info') =~ /URL: (.*)$/m) {
             %repo = (qw(type svn  url), $1);
         }
+
         # invalid github remote might come back with just the remote name
         if ($repo{url} && $repo{url} =~ /\A\w+\z/) {
             delete $repo{$_} for qw/url type web/;
@@ -162,6 +174,10 @@ sub _find_repo {
         }
     }
 
+    if (!exists $repo{url} && $self->has_repository) {
+        $repo{url} = $self->repository;
+    }
+
     return %repo;
 }
 
@@ -182,7 +198,7 @@ Dist::Zilla::Plugin::Repository - Automatically sets repository URL from svn/svk
 
 =head1 VERSION
 
-version 0.21
+version 0.23
 
 =head1 SYNOPSIS
 
@@ -237,7 +253,7 @@ It's normally determined automatically, but you can override it.
 =item * web
 
 This is a URL pointing to a human-usable web front-end for the
-repository.  Currently, only Github repositories get this set automatically.
+repository.
 
 =back
 
@@ -267,7 +283,7 @@ Christopher J. Madsen <perl@cjmweb.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Fayland Lam, Ricardo SIGNES, Moritz Onken, Christopher J. Madsen.
+This software is copyright (c) 2018 by Fayland Lam, Ricardo SIGNES, Moritz Onken, Christopher J. Madsen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

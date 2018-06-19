@@ -1,5 +1,11 @@
 Revision history for Dist::Zilla::PluginBundle::Author::MINTLAB
 
+0.02      2018-06-16 20:07:23Z
+
+    * Add PromptIfStale
+    * Add Git::* modules for better checking
+    * Replace Readme with ReadmeFromPOD
+
 0.01      2018-06-11 14:28:12Z
 
     * Initial release to CPAN

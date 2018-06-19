@@ -1,0 +1,7 @@
+MANIFEST
+MYMETA.json
+MYMETA.yml
+Makefile
+Manta-Client-*.tar.gz
+blib/
+pm_to_blib

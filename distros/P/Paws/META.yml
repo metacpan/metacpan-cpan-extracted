@@ -53,5 +53,5 @@ requires:
 resources:
   bugtracker: https://github.com/pplu/aws-sdk-perl/issues
   repository: https://github.com/pplu/aws-sdk-perl.git
-version: '0.37'
+version: '0.38'
 x_serialization_backend: 'YAML::Tiny version 1.69'

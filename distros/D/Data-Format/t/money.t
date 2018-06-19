@@ -1,16 +1,19 @@
 #!/usr/bin/perl
+use 5.008;
+use strict;
+use warnings;
 
 use Test::Simple tests => 32;
 use Data::Format::Sanitize::Number q/:money/;
 use Data::Format::Validate::Number q/:money/;
 
-ok(money(385) eq '385,00');
-ok(money(385.00) eq '385,00');
-ok(money(385000) eq '385.000,00');
-ok(money(3850000) eq '3.850.000,00');
-ok(money(3850000.5) eq '3.850.000,5');
-ok(money(3850000.56) eq '3.850.000,56');
-ok(money(3850000.56665) eq '3.850.000,56665');
+ok(to_money(385) eq '385,00');
+ok(to_money(385.00) eq '385,00');
+ok(to_money(385000) eq '385.000,00');
+ok(to_money(3850000) eq '3.850.000,00');
+ok(to_money(3850000.5) eq '3.850.000,5');
+ok(to_money(3850000.56) eq '3.850.000,56');
+ok(to_money(3850000.56665) eq '3.850.000,56665');
 
 ok(money_integer(385) eq '385');
 ok(money_integer(385000) eq '385.000');

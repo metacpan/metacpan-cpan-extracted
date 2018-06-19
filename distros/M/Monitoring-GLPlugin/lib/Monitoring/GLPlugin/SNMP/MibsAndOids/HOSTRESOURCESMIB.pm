@@ -13,6 +13,7 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'HOST-RESOURCES-MIB'} 
   hrSystem => '1.3.6.1.2.1.25.1',
   hrSystemUptime => '1.3.6.1.2.1.25.1.1',
   hrSystemDate => '1.3.6.1.2.1.25.1.2',
+  hrSystemDateDefinition => 'MIB-2-MIB::DateAndTime',
   hrSystemInitialLoadDevice => '1.3.6.1.2.1.25.1.3',
   hrSystemInitialLoadParameters => '1.3.6.1.2.1.25.1.4',
   hrSystemNumUsers => '1.3.6.1.2.1.25.1.5',

@@ -3,19 +3,46 @@ NAME
     Indonesian Central Bank (BI)
 
 VERSION
-    This document describes version 0.04 of Finance::Currency::Convert::BI
+    This document describes version 0.060 of Finance::Currency::Convert::BI
     (from Perl distribution Finance-Currency-Convert-BI), released on
-    2017-07-10.
+    2018-06-17.
 
 SYNOPSIS
-     use Finance::Currency::Convert::BI qw(get_jisdor_rates);
+     use Finance::Currency::Convert::BI qw(get_currencies get_jisdor_rates);
 
      my $res = get_jisdor_rates();
 
 DESCRIPTION
-    EARLY RELEASE.
-
 FUNCTIONS
+  get_currencies
+    Usage:
+
+     get_currencies() -> [status, msg, result, meta]
+
+    Extract currency data from Bank Indonesia's page.
+
+    This function is not exported by default, but exportable.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+    Will return a hash containing key "currencies".
+
+    The currencies is a hash with currency symbols as keys and prices as
+    values.
+
+    Tha values is a hash with these keys: "buy" and "sell".
+
   get_jisdor_rates
     Usage:
 
@@ -65,7 +92,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017, 2016, 2015 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -20,9 +20,9 @@ WebService::S3::Tiny - Perl module for using S3 or compatible APIs
 
 =head1 SYNOPSIS
 
- use WebDriver::S3::Tiny;
+ use WebService::S3::Tiny;
 
- my $s3 = WebDriver::S3::Tiny->new(
+ my $s3 = WebService::S3::Tiny->new(
      access_key => 'foo',
      host       => 'http://localhost:1337',
      secret_key => 'bar',
@@ -30,9 +30,19 @@ WebService::S3::Tiny - Perl module for using S3 or compatible APIs
 
 =head1 METHODS
 
+All the request methods of the form {get,put,delete,head}_{bucket,object} can
+also be called with the C<_url> suffix to generate a pre-signed URL for the
+corresponding call.
+
+These URL methods take almost the same arguments as their request counterparts,
+with the difference that they take an optional argument to indicate the lifetime
+of the URL in seconds. This argument always comes after the bucket and object, and
+before the header and parameter references. This value cannot be greater than
+604800 (= one week).
+
 =head2 new
 
- WebDriver::S3::Tiny->new(
+ WebService::S3::Tiny->new(
      access_key => ..., # required
      host       => ..., # required
      region     => ..., # optional, defaults to "us-east-1"
@@ -92,6 +102,52 @@ WebService::S3::Tiny - Perl module for using S3 or compatible APIs
 =head2 request
 
  $s3->request($method, $bucket, $object, $content, \%headers, \%parameters);
+
+=head2 delete_bucket_url
+
+ $s3->delete_bucket_url($bucket, $expires);
+ $s3->delete_bucket_url($bucket, $expires, \%headers);
+
+=head2 get_bucket_url
+
+ $s3->get_bucket_url($bucket, $expires);
+ $s3->get_bucket_url($bucket, $expires, \%headers);
+ $s3->get_bucket_url($bucket, $expires, \%headers, \%parameters);
+
+=head2 head_bucket_url
+
+ $s3->head_bucket_url($bucket, $expires);
+ $s3->head_bucket_url($bucket, $expires, \%headers);
+
+=head2 put_bucket_url
+
+ $s3->put_bucket_url($bucket, $expires);
+ $s3->put_bucket_url($bucket, $expires, \%headers);
+
+=head2 delete_object_url
+
+ $s3->delete_object_url($bucket, $object, $expires);
+ $s3->delete_object_url($bucket, $object, $expires, \%headers);
+
+=head2 get_object_url
+
+ $s3->get_object_url($bucket, $object, $expires);
+ $s3->get_object_url($bucket, $object, $expires, \%headers);
+ $s3->get_object_url($bucket, $object, $expires, \%headers, \%parameters);
+
+=head2 head_object_url
+
+ $s3->head_object_url($bucket, $object, $expires);
+ $s3->head_object_url($bucket, $object, $expires, \%headers);
+
+=head2 put_object_url
+
+ $s3->put_object_url($bucket, $object, $expires);
+ $s3->put_object_url($bucket, $object, $expires, \%headers);
+
+=head2 signed_url
+
+ $s3->signed_url($method, $bucket, $object, $expires, \%headers, \%parameters );
 
 =head1 COPYRIGHT AND LICENSE
 

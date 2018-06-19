@@ -23,6 +23,7 @@ t/07-authors.t
 t/08-version-ranges.t
 t/09-missing-file.t
 t/10-content-from-file.t
+t/11-eumm_version-numification.t
 t/zzz-check-breaks.t
 xt/author/00-compile.t
 xt/author/changes_has_content.t

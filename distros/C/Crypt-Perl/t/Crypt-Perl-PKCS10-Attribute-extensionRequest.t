@@ -39,8 +39,8 @@ sub test_encode : Tests(2) {
     my $vector_str = '30.1d.30.1b.06.03.55.1d.11.04.14.30.12.82.07.66.6f.6f.2e.63.6f.6d.82.07.62.61.72.2e.63.6f.6d';
 
     my $san_obj = Crypt::Perl::X509::Extension::subjectAltName->new(
-        dNSName => 'foo.com',
-        dNSName => 'bar.com',
+        [ dNSName => 'foo.com' ],
+        [ dNSName => 'bar.com' ],
     );
 
     my $ext_r_obj = Crypt::Perl::PKCS10::Attribute::extensionRequest->new($san_obj);

@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use 5.012;
+use lib 'lib';
 use Test::Most;
 use InfluxDB::LineProtocol qw(v0.9.2 data2line line2data);
 

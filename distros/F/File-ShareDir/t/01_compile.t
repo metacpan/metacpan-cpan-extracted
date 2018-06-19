@@ -10,8 +10,12 @@ BEGIN
     $^W = 1;
 }
 
-use Test::More tests => 2;
+use Test::More;
 
 ok($] > 5.005, 'Perl version is 5.005 or newer');
 
 use_ok('File::ShareDir');
+
+diag("Testing File::ShareDir $File::ShareDir::VERSION, Perl $], $^X, UID: $<");
+
+done_testing();

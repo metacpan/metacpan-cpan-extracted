@@ -10,7 +10,6 @@ README
 SIGNATURE
 lib/CHI/Driver/BerkeleyDB.pm
 t/00-compile.t
-t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/author-signature.t
 t/driver-tests.t

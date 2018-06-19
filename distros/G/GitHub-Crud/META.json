@@ -23,7 +23,7 @@
          "requires" : {
             "Carp" : "0",
             "Data::Dump" : "0",
-            "Data::Table::Text" : "20171124",
+            "Data::Table::Text" : "20180616",
             "Digest::SHA1" : "0",
             "Storable" : "0",
             "Test2::API" : "0",
@@ -35,7 +35,7 @@
    "provides" : {
       "GitHub::Crud" : {
          "file" : "lib/GitHub/Crud.pm",
-         "version" : "20180316"
+         "version" : "20180616"
       },
       "GitHub::Crud::Response" : {
          "file" : "lib/GitHub/Crud.pm"
@@ -50,5 +50,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20180316"
+   "version" : "20180616"
 }

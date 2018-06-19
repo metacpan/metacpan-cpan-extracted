@@ -1,4 +1,4 @@
-use 5.016000;
+use 5.010000;
 use utf8;
 use Encode qw(encode);
 use List::MoreUtils qw(zip);
@@ -37,6 +37,7 @@ my $words = {
 
 printf "#define MONEY_MIN 0\n";
 printf "#define MONEY_MAX %17.2f\n", 1e3 ** @decade;
+printf "const char *zero = \"%s\";\n", utf2hex "ноль ";
 
 # Generate enum with ending types
 printf "enum {\n\t%s\n};\n", join ",\n\t", @enum;

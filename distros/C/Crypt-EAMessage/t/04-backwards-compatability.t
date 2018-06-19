@@ -5,7 +5,7 @@
 # All Rights Reserved - See License
 #
 
-use Test2::Bundle::Extended 0.000058;
+use Test2::V0 0.000111;
 
 use Crypt::EAMessage;
 
@@ -48,6 +48,14 @@ my (@MSG) = (
         key  => 'abcd1234abcd1234abcd1234abcd1234',
         text => 'Plain Text Message no-LF encoded',
     },
+    {
+        ct => '33454c6343575141385046746f6954774451366a51564c7a66'
+          . '6a504f524456424558536f555f6c762d4f4d6577696c776f544e'
+          . '3037745a3553584b716256506137587a5047634f51716a35737a'
+          . '4469436d57304b676f6b7535',
+        key  => 'abcd1234abcd1234abcd1234abcd1234',
+        text => 'Plain Text Message URL encoded',
+    }
 );
 
 my $cnt = 0;

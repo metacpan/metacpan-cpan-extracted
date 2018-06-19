@@ -60,17 +60,15 @@ sub DESTROY {
 
 sub debug {
   my ($self, $format, @message) = @_;
-  my $tracefile = "/tmp/".$Monitoring::GLPlugin::pluginname.".trace";
-  $self->{trace} = -f $tracefile ? 1 : 0;
   if ($self->opts->verbose && $self->opts->verbose > 10) {
     printf("%s: ", scalar localtime);
     printf($format, @message);
     printf "\n";
   }
-  if ($self->{trace}) {
+  if ($Monitoring::GLPlugin::tracefile) {
     my $logfh = IO::File->new();
     $logfh->autoflush(1);
-    if ($logfh->open($tracefile, "a")) {
+    if ($logfh->open($Monitoring::GLPlugin::tracefile, "a")) {
       $logfh->printf("%s: ", scalar localtime);
       $logfh->printf($format, @message);
       $logfh->printf("\n");

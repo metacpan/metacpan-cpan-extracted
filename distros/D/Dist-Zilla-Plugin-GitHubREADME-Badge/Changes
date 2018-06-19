@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-GitHubREADME-Badge
 
+0.27  2018-06-17 11:16:23 CST
+        - add travis-ci.com badge
+
 0.26  2018-04-04 20:37:17 CST
         - Fix github url for docker badge (powerman)
 

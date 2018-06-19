@@ -8,7 +8,7 @@
 
 package Data::Table::Text;
 use v5.8.0;
-our $VERSION = '20180611';
+our $VERSION = '20180616';
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -425,7 +425,7 @@ sub searchDirectoryTreesForMatchingFiles(@)                                     
   for my $dir(@folder)                                                          # Directory
    {for(split /\0/, qx(find $dir -print0))
      {next if -d $_;                                                            # Do not include folder names
-      push @f, $_ if m(($e)\Z)s;
+      push @f, $_ if m(($e)\Z)is;
      }
    }
   sort @f
@@ -1135,6 +1135,16 @@ sub genLValueHashMethods(@)                                                     
    }
  }
 
+sub assertRef(@)                                                                # Confirm that the specified references are to the package into which this routine has been exported.
+ {my (@refs) = @_;                                                              # References
+  my ($package) = caller;                                                       # Package
+  for(@_)                                                                       # Check each reference
+   {my $r = ref($_);
+    $r && $r eq $package or confess "Wanted reference to $package, but got $r";
+   }
+  1
+ }
+
 #1 Strings                                                                      # Actions on strings
 
 sub indentString($$)                                                            # Indent lines contained in a string or formatted table by the specified string.
@@ -1198,6 +1208,31 @@ sub printQw(@)                                                                  
  }
 
 #1 Cloud Cover                                                                  # Useful for operating across the cloud
+
+sub saveSourceToS3($;$)                                                         # Save source code
+ {my ($aws, $saveIntervalInSeconds) = @_;                                       # Aws target file and keywords, save internal
+  $saveIntervalInSeconds //= 1200;                                              # Default save time
+  unless(fork())
+   {my $saveTime = "/tmp/saveTime/$0";                                          # Get last save time if any
+    makePath($saveTime);
+
+    if (my $lastSaveTime = fileModTime($saveTime))                              # Get last save time
+     {return if $lastSaveTime > time - $saveIntervalInSeconds;                  # Already saved
+     }
+
+    say STDERR &timeStamp." Saving latest version of code to S3";
+    unlink my $z = qq(/tmp/DataTableText/save/$0.zip);                          # Zip file
+    makePath($z);                                                               # Zip file folder
+    my $c = qq(zip -r $z $0);                                                   # Zip command
+    print STDERR $_ for qx($c);                                                 # Zip file to be saved
+    my $a = qq(aws s3 cp $z $aws);                                              # Aws command
+    my $r = qx($a);                                                             # Copy zip to S3
+    #!$r or confess $r;
+    writeFile($saveTime, time);                                                 # Save last save time
+    say STDERR &timeStamp." Saved latest version of code to S3";
+    exit;
+   }
+ }
 
 sub addCertificate($)                                                           # Add a certificate to the current ssh session.
  {my ($file) = @_;                                                              # File containing certificate
@@ -1680,7 +1715,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 @ISA          = qw(Exporter);
 @EXPORT       = qw(formatTable);
 @EXPORT_OK    = qw(
-absFromAbsPlusRel addCertificate appendFile
+absFromAbsPlusRel addCertificate appendFile assertRef
 binModeAllUtf8
 checkFile checkFilePath checkFilePathExt checkFilePathDir
 checkKeys clearFolder contains containingPowerOfTwo
@@ -1706,7 +1741,7 @@ nws
 pad parseFileName parseCommandLineArguments powerOfTwo printFullFileName printQw
 quoteFile
 readBinaryFile readFile relFromAbsAgainstAbs removeFilePrefix
-saveToS3 searchDirectoryTreesForMatchingFiles
+saveSourceToS3 searchDirectoryTreesForMatchingFiles
 setIntersectionOfTwoArraysOfWords setUnionOfTwoArraysOfWords
 temporaryDirectory temporaryFile temporaryFolder timeStamp trackFiles trim
 updateDocumentation updatePerlModuleDocumentation userId
@@ -2536,6 +2571,14 @@ Print an array of words in qw() format
 
 Useful for operating across the cloud
 
+=head2 saveSourceToS3($$)
+
+Save source code
+
+     Parameter               Description
+  1  $aws                    Aws target file and keywords
+  2  $saveIntervalInSeconds  Save internal
+
 =head2 addCertificate($)
 
 Add a certificate to the current ssh session.
@@ -2876,43 +2919,45 @@ Extract a line of a test.
 
 85 L<renormalizeFolderName|/renormalizeFolderName>
 
-86 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles>
+86 L<saveSourceToS3|/saveSourceToS3>
 
-87 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords>
+87 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles>
 
-88 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords>
+88 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords>
 
-89 L<temporaryDirectory|/temporaryDirectory>
+89 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords>
 
-90 L<temporaryFile|/temporaryFile>
+90 L<temporaryDirectory|/temporaryDirectory>
 
-91 L<temporaryFolder|/temporaryFolder>
+91 L<temporaryFile|/temporaryFile>
 
-92 L<timeStamp|/timeStamp>
+92 L<temporaryFolder|/temporaryFolder>
 
-93 L<trackFiles|/trackFiles>
+93 L<timeStamp|/timeStamp>
 
-94 L<trim|/trim>
+94 L<trackFiles|/trackFiles>
 
-95 L<updateDocumentation|/updateDocumentation>
+95 L<trim|/trim>
 
-96 L<userId|/userId>
+96 L<updateDocumentation|/updateDocumentation>
 
-97 L<versionCode|/versionCode>
+97 L<userId|/userId>
 
-98 L<versionCodeDashed|/versionCodeDashed>
+98 L<versionCode|/versionCode>
 
-99 L<writeBinaryFile|/writeBinaryFile>
+99 L<versionCodeDashed|/versionCodeDashed>
 
-100 L<writeFile|/writeFile>
+100 L<writeBinaryFile|/writeBinaryFile>
 
-101 L<writeFiles|/writeFiles>
+101 L<writeFile|/writeFile>
 
-102 L<xxx|/xxx>
+102 L<writeFiles|/writeFiles>
 
-103 L<yyy|/yyy>
+103 L<xxx|/xxx>
 
-104 L<zzz|/zzz>
+104 L<yyy|/yyy>
+
+105 L<zzz|/zzz>
 
 =head1 Installation
 
@@ -2974,10 +3019,10 @@ test unless caller;
 1;
 # podDocumentation
 __DATA__
-use Test::More tests => 234;
-
 #Test::More->builder->output("/dev/null");
+use Test::More tests => 236;
 my $windows = $^O =~ m(MSWin32)is;
+my $mac     = $^O =~ m(darwin)is;
 
 if (1)                                                                          # Unicode to local file
  {use utf8;
@@ -3053,7 +3098,7 @@ if (1)                                                                          
   ok $s eq $z;
   ok length($s) == length($z);
 
-  if ($windows) {ok 1}
+  if ($windows or $mac) {ok 1}
   else
    {my @f = findFiles($T);
     ok $f[0] eq $f, "Find unicode file name";
@@ -3458,6 +3503,14 @@ if (1)
  {my $d = temporaryFolder;
   ok $d eq firstFileThatExists($d);
   ok $d eq firstFileThatExists("$d/$d", $d);
+ }
+
+if (1)
+ {my $r = bless {};
+  ok assertRef($r);
+          bless $r, "aaa";
+  eval {assertRef($r)};
+  ok $@ =~ m(\AWanted reference to Data::Table::Text, but got aaa);
  }
 
 # Relative and absolute files

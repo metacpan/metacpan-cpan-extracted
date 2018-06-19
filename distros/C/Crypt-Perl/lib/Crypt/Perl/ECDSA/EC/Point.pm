@@ -124,6 +124,7 @@ sub twice {
     # y3 = 4 * y1^2 * z1 * (3 * w * x1 - 2 * y1^2 * z1) - w^3
     #var y3 = w.multiply(THREE).multiply(x1).subtract(y1sqz1.shiftLeft(1)).shiftLeft(2).multiply(y1sqz1).subtract(w.square().multiply(w)).mod(this.curve.q);
     #my $y3 = 4 * $y1sqz1 * (3 * $w * $x1 - 2 * $y1sqz1) - ($w ** 3);
+
     my $y3 = $y1sqz1->copy()->blsft($bi2);
 
     $y3->bmuladd(

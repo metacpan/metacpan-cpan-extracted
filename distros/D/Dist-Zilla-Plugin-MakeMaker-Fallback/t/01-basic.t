@@ -39,7 +39,7 @@ use Path::Tiny 0.062;
         if not Test::Builder->new->is_passing;
 }
 
-foreach my $eumm_version ('6.00', '0')
+foreach my $eumm_version ('6.00', '6.01', '0', '6.55_02')
 {
     my $tzil = Builder->from_config(
         { dist_root => 'does-not-exist' },
@@ -137,6 +137,10 @@ foreach my $eumm_version ('6.00', '0')
     {
         ok($Makefile_PL_content =~ /^my %configure_requires = \($/mg, 'found start of %configure_requires declaration')
             or skip 'failed to test %configure_requires section', 2;
+
+        skip 'versions of Dist::Zilla::Plugin::MakeMaker::Awesome before 0.44 did not strip underscores from prereq versions', 2
+            if $Makefile_PL_content =~ /(['"])ExtUtils::MakeMaker\1\s+=>\s+\1[\d.]+_/m;
+
         my $start = pos($Makefile_PL_content);
 
         ok($Makefile_PL_content =~ /\);$/mg, 'found end of %configure_requires declaration')

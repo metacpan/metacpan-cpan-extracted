@@ -880,6 +880,188 @@ for my $test (@$test_manipulations) {
 }
 
 #####################################
+# HTML5::DOM::DocType
+#####################################
+my $doctype_lists = [
+	{
+		'in'		=> '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">',
+		'out'		=> '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">', 
+		'name'		=> 'html', 
+		'systemId'	=> 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd',
+		'publicId'	=> '-//W3C//DTD XHTML 1.0 Strict//EN',
+	}, {
+		'in'		=> '<!DOCTYPE html>',
+		'out'		=> '<!DOCTYPE html>', 
+		'name'		=> 'html',
+		'systemId'	=> '',
+		'publicId'	=> '',
+	}, {
+		'in'		=> '<!DOCTYPE html PUBLIC>',
+		'out'		=> '<!DOCTYPE html>',
+		'name'		=> 'html',
+		'publicId'	=> '',
+		'systemId'	=> '',
+	}, {
+		'in'		=> '<!DOCTYPE html SYSTEM>',
+		'out'		=> '<!DOCTYPE html>', 
+		'name'		=> 'html',
+		'publicId'	=> '',
+		'systemId'	=> ''
+	}, {
+		'in'		=> '<!DOCTYPE html allala>',
+		'out'		=> '<!DOCTYPE html>',
+		'name'		=> 'html',
+		'publicId'	=> '',
+		'systemId'	=> ''
+	}, {
+		'out'		=> '<!DOCTYPE html>',
+		'in'		=> '<!DOCTYPE html "allala">',
+		'name'		=> 'html',
+		'publicId'	=> '',
+		'systemId'	=> ''
+	}, {
+		'in'		=> '<!doctype HTML system "about:legacy-compat">',
+		'out'		=> '<!DOCTYPE html SYSTEM "about:legacy-compat">',
+		'name'		=> 'html', 
+		'publicId'	=> '',
+		'systemId'	=> 'about:legacy-compat'
+	}, {
+		'in'		=> '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0//EN">',
+		'out'		=> '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0//EN">',
+		'name'		=> 'html',
+		'publicId'	=> '-//W3C//DTD HTML 4.0//EN',
+		'systemId'	=> ''
+	}, {
+		'in'		=> '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">',
+		'out'		=> '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">',
+		'name'		=> 'html',
+		'publicId'	=> '-//W3C//DTD HTML 4.0//EN',
+		'systemId'	=> 'http://www.w3.org/TR/REC-html40/strict.dtd'
+	}, {
+		'in'		=> '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">',
+		'out'		=> '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">',
+		'name'		=> 'html',
+		'publicId'	=> '-//W3C//DTD HTML 4.01//EN',
+		'systemId'	=> ''
+	}, {
+		'in'		=> '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">',
+		'out'		=> '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">',
+		'name'		=> 'html',
+		'publicId'	=> '-//W3C//DTD HTML 4.01//EN',
+		'systemId'	=> 'http://www.w3.org/TR/html4/strict.dtd'
+	}, {
+		'in'		=> '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">',
+		'out'		=> '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">',
+		'name'		=> 'html',
+		'publicId'	=> '-//W3C//DTD XHTML 1.0 Strict//EN',
+		'systemId'	=> 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'
+	}, {
+		'in'		=> '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">',
+		'out'		=> '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">',
+		'name'		=> 'html',
+		'publicId'	=> '-//W3C//DTD XHTML 1.1//EN',
+		'systemId'	=> 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'
+	}, {
+		'in'		=> '<!DOCTYPE html SYSTEM "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">',
+		'out'		=> '<!DOCTYPE html SYSTEM "-//W3C//DTD XHTML 1.1//EN">',
+		'name'		=> 'html',
+		'publicId'	=> '',
+		'systemId'	=> '-//W3C//DTD XHTML 1.1//EN',
+	}, {
+		'in'		=> '<!DOCTYPE OlOlLo>',
+		'out'		=> '<!DOCTYPE olollo>',
+		'name'		=> 'olollo',
+		'publicId'	=> '',
+		'systemId'	=> '',
+	}, {
+		'in'		=> '<!DOCTYPE html PUBLIC "" "xxx">',
+		'out'		=> '<!DOCTYPE html SYSTEM "xxx">',
+		'name'		=> 'html',
+		'publicId'	=> '',
+		'systemId'	=> 'xxx',
+	}, {
+		'in'		=> '<!DOCTYPE svg:svg PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN" "http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd">',
+		'out'		=> '<!DOCTYPE svg:svg PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN" "http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd">',
+		'name'		=> 'svg:svg',
+		'publicId'	=> '-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN',
+		'systemId'	=> 'http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd'
+	}
+];
+
+# basic doctype tests
+for my $dt (@$doctype_lists) {
+	my $tree = HTML5::DOM->new->parse($dt->{in});
+	
+	if ($dt == $doctype_lists->[0]) {
+		isa_ok($tree->document->firstChild, 'HTML5::DOM::DocType', 'check doctype isa');
+		can_ok($tree->document->firstChild, @node_methods);
+		can_ok($tree->document->firstChild, qw|name publicId systemId|);
+	}
+	
+	# check serialization
+	# ok($tree->document->firstChild->html eq $dt->{out}, 'check doctype serialization');
+	
+	# check name
+	ok($tree->document->firstChild->name eq $dt->{name}, 'check doctype name');
+	
+	# check systemId
+	ok($tree->document->firstChild->publicId eq $dt->{publicId}, 'check doctype publicId');
+	
+	# check publicId
+	ok($tree->document->firstChild->systemId eq $dt->{systemId}, 'check doctype systemId');
+}
+
+# test change value
+my $doctype_test_change = [
+	{
+		method		=> 'name', 
+		value		=> 'svg'
+	}, 
+	{
+		method		=> 'publicId', 
+		value		=> '-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN'
+	}, 
+	{
+		method		=> 'systemId', 
+		value		=> 'http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd'
+	}
+];
+for my $test (@$doctype_test_change) {
+	my @doctypes = (
+		'<!DOCTYPE>', 
+		'<!DOCTYPE html>', 
+		'<!DOCTYPE html SYSTEM "blabla">', 
+		'<!DOCTYPE html PUBLIC "blabla">', 
+		'<!DOCTYPE html PUBLIC "blabla" "blabla222">'
+	);
+	
+	my $method = $test->{method};
+	for my $dt (@doctypes) {
+		my $tree = HTML5::DOM->new->parse($dt);
+		
+		my @check;
+		for my $method2 (qw|name publicId systemId|) {
+			if ($method2 ne $method) {
+				push @check, {
+					method	=> $method2, 
+					value	=> $tree->document->firstChild->$method2()
+				};
+			}
+		}
+		
+		isa_ok($tree->document->firstChild->$method($test->{value}), 'HTML5::DOM::DocType');
+		ok($tree->document->firstChild->$method() eq $test->{value}, "$method: test new val");
+		
+		for my $c (@check) {
+			my $method2 = $c->{method};
+			my $value = $tree->document->firstChild->$method2();
+			
+			ok($tree->document->firstChild->$method2() eq $c->{value}, "$method: test old val of $method2");
+		}
+	}
+}
+
+#####################################
 # HTML5::DOM::Element
 #####################################
 # classList
@@ -888,7 +1070,7 @@ $tree = HTML5::DOM->new->parse('
 	<div class="red blue">ololo</div>
 ');
 my $cl_test_node = $tree->at('.red');
-isa_ok(ref($cl_test_node->classList), 'HTML5::DOM::TokenList');
+isa_ok($cl_test_node->classList, 'HTML5::DOM::TokenList');
 
 isa_ok($cl_test_node->classList->add('blue', 'right', 'red', 'brown'), 'HTML5::DOM::TokenList');
 ok($cl_test_node->classList->text eq 'red blue right brown', 'class add '.$cl_test_node->classList->text);
@@ -1121,30 +1303,43 @@ $tree = $parser->parse('
 		
 	</div>
 ');
-for my $method (qw|attr getAttribute|) {
+for my $method (qw|attr getAttribute attrArray|) {
 	my $test = $tree->at('#test');
 	
-	ok(!defined $test->$method("iwefwefwefewfwe"), "$method (undef)");
+	my $method2 = $method eq 'attrArray' ? 'attr' : $method;
+	
+	ok(!defined $test->$method2("iwefwefwefewfwe"), "$method2 (undef)");
 	
 	my $attrs_test = [
-		['test', ''], 
 		['id', 'test'], 
-		['test-one', '1'], 
+		['test', ''], 
+		['data-test', "\n 123409 >^_^< \n"], 
 		['test-empty', ''], 
-		['data-test', "\n 123409 >^_^< \n"]
+		['test-one', '1'], 
 	];
 	
 	for my $attr (@$attrs_test) {
-		ok($test->$method($attr->[0]) eq $attr->[1], "$method(".$attr->[0].")");
+		ok($test->$method2($attr->[0]) eq $attr->[1], "$method2(".$attr->[0].")");
 	}
 	
-	# bulk test
+	# bulk test attr
 	if ($method eq 'attr') {
 		my $hash = $test->attr;
 		ok(scalar(keys(%$hash)) == scalar(@$attrs_test), 'attr bulk: result length');
 		
 		for my $attr (@$attrs_test) {
 			ok($hash->{$attr->[0]} eq $attr->[1], 'attr bulk: test '.$attr->[0]);
+		}
+	}
+	
+	# bulk test attrArray
+	if ($method eq 'attrArray') {
+		my $i = 0;
+		
+		for my $attr (@{$test->$method()}) {
+			ok($attrs_test->[$i]->[0] eq $attr->{name}, 'attrArray bulk: test key '.$attr->{name}." eq ".$attrs_test->[$i]->[0]);
+			ok($attrs_test->[$i]->[1] eq $attr->{value}, 'attrArray bulk: test val '.$attr->{name});
+			++$i;
 		}
 	}
 }

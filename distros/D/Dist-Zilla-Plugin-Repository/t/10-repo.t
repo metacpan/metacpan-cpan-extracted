@@ -471,4 +471,19 @@ END GITHUB REMOTE NOT FOUND
 }
 
 #---------------------------------------------------------------------
+{
+    my $tzil = build_tzil(['repository = git@gitlab.com:foo/bar.git'], '.git');
+
+    is_deeply(
+        $tzil->distmeta->{resources}{repository},
+        {
+            type => 'git',
+            url  => 'git://gitlab.com/foo/bar.git',
+            web  => 'https://gitlab.com/foo/bar'
+        },
+        "Auto gitlab"
+    );
+    ok(!github_deprecated($tzil), "Auto gitlab log message");
+}
+
 done_testing;

@@ -105,6 +105,7 @@ ISBN:
 CONTENTS:
 diag("Sending 1-page ebay query to check contents...");
 $iDebug = DEBUG_CONTENTS ? 2 : 0;
+# $iDebug = 2;
 $iDump = 0;
 $WWW::Search::Test::sSaveOnError = q{ebay-1-failed.html}; # }; # Emacs bug
 my $sQuery = 'trinidad tobago flag';

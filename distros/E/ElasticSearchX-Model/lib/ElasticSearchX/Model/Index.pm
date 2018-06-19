@@ -8,7 +8,7 @@
 #   The (three-clause) BSD License
 #
 package ElasticSearchX::Model::Index;
-$ElasticSearchX::Model::Index::VERSION = '1.0.3';
+$ElasticSearchX::Model::Index::VERSION = '2.0.0';
 use Moose;
 use Module::Find ();
 use Class::Load  ();
@@ -139,7 +139,7 @@ ElasticSearchX::Model::Index
 
 =head1 VERSION
 
-version 1.0.3
+version 2.0.0
 
 =head1 ATTRIBUTES
 

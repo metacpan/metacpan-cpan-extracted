@@ -1,10 +1,23 @@
 #!/usr/bin/perl -w
 
-use Net::Netmask;
-use Net::Netmask qw(sameblock cmpblocks);
-use Carp;
+use strict;
+
+use Test2::V0;
+
+use Net::Netmask qw(
+  cidrs2cidrs
+  cidrs2contiglists
+  cidrs2inverse
+  cmpblocks
+  dumpNetworkTable
+  findAllNetblock
+  findNetblock
+  findOuterNetblock
+  range2cidrlist
+  sameblock
+  sort_by_ip_address
+);
 use Carp qw(verbose);
-use Test::More tests => 304;
 
 MAIN: {
     #  addr                       mask          base            newmask       bits mb
@@ -69,6 +82,7 @@ MAIN: {
         is( $x->mask(),     $newmask, "mask of $addr" );
         is( $x->maxblock(), $max,     "maxblock of $addr" );
         is( $x->bits(),     $bits,    "bits of $addr" );
+        is( $x->protocol(), 'IPv4',   "protocol of $addr" );
     }
 
     my @y;
@@ -81,7 +95,7 @@ MAIN: {
     print "# REVERSE: @y\n";
     is( $y[0],        '64.157.209.in-addr.arpa' );
     is( $y[ 31 * 3 ], '95.157.209.in-addr.arpa' );
-    ok( !defined( $y[ 32 * 3 ] ) );
+    ok( !defined( $y[ 32 * 3 ] ), '!defined $y[32*3]' );
 
     $x = Net::Netmask->new('140.174.82.4/32');
     is( $x->size(), 1, "size of 140.174.82.4/32" );
@@ -94,23 +108,23 @@ MAIN: {
     is( ( $x->inaddr() )[2], 95 );
 
     $x = Net::Netmask->new('any');
-    ok( $x->size() == 4294967296 );
+    ok( $x->size() == 4294967296, 'size of any netblock' );
 
     $x = Net::Netmask->new('209.157.64.0/27');
     @y = $x->enumerate();
     is( $y[0],  '209.157.64.0' );
     is( $y[31], '209.157.64.31' );
-    ok( !defined( $y[32] ) );
+    ok( !defined( $y[32] ), '!defiend($y[32])' );
     @y = $x->enumerate(31);
     is( $y[0],  '209.157.64.0' );
     is( $y[15], '209.157.64.30' );
-    ok( !defined( $y[16] ) );
+    ok( !defined( $y[16] ), '!defined($y[16]' );
 
     $x = Net::Netmask->new('10.2.0.16/19');
     @y = $x->enumerate();
     is( $y[0],    '10.2.0.0' );
     is( $y[8191], '10.2.31.255' );
-    ok( !defined( $y[8192] ) );
+    ok( !defined( $y[8192] ), '!defined($y[8192])' );
 
     my $table  = {};
     my $table9 = {};
@@ -146,14 +160,14 @@ MAIN: {
     $newmask = Net::Netmask->new("192.168.1.0/24");
     is( $newmask->broadcast(), "192.168.1.255" );
     is( $newmask->next(),      "192.168.2.0" );
-    ok( $newmask->match("192.168.1.0") );
-    ok( $newmask->match("192.168.1.255") );
-    ok( $newmask->match("192.168.1.63") );
+    ok( $newmask->match("192.168.1.0"), 'match 192.168.1.0' );
+    ok( $newmask->match("192.168.1.255"), 'match 192.168.1.255' );
+    ok( $newmask->match("192.168.1.63"), 'match 192.168.1.63' );
 
-    ok( !$newmask->match("192.168.0.255") );
-    ok( !$newmask->match("192.168.2.0") );
-    ok( !$newmask->match("10.168.2.0") );
-    ok( !$newmask->match("209.168.2.0") );
+    ok( !$newmask->match("192.168.0.255"), 'match 192.168.0.255' );
+    ok( !$newmask->match("192.168.2.0"), 'match 192.168.2.0' );
+    ok( !$newmask->match("10.168.2.0"), 'match 10.168.2.0' );
+    ok( !$newmask->match("209.168.2.0"), 'match 209.168.2.0' );
 
     is( $newmask->nth(1),  '192.168.1.1' );
     is( $newmask->nth(-1), '192.168.1.255' );
@@ -163,19 +177,19 @@ MAIN: {
     is( $newmask->nth(256),  undef );
     is( $newmask->nth(-257), undef );
 
-    ok( $newmask->match('192.168.1.1') == 1 );
-    ok( $newmask->match('192.168.1.100') == 100 );
-    ok( $newmask->match('192.168.1.255') == 255 );
+    ok( $newmask->match('192.168.1.1') == 1, 'match 192.168.1.1' );
+    ok( $newmask->match('192.168.1.100') == 100, 'match 192.168.1.100' );
+    ok( $newmask->match('192.168.1.255') == 255, 'match 192.168.1.255' );
 
-    ok( ( $newmask->match('192.168.2.1') == 0 ) );
-    ok( !( $newmask->match('192.168.2.1') ) );
-    ok( ( ( 0 + $newmask->match('192.168.1.0') ) == 0 ) );
-    ok( ( $newmask->match('192.168.1.0') ) );
+    ok( ( $newmask->match('192.168.2.1') == 0 ), 'match 192.168.2.1' );
+    ok( !( $newmask->match('192.168.2.1') ), 'match 192.168.2.1' );
+    ok( ( ( 0 + $newmask->match('192.168.1.0') ) == 0 ), '0 + match 192.168.1.0' );
+    ok( ( $newmask->match('192.168.1.0') ), 'match 192.168.1.0' );
 
     my $bks;
-    $block = Net::Netmask->new('209.157.64.1/32');
+    my $block = Net::Netmask->new('209.157.64.1/32');
     $block->storeNetblock($bks);
-    ok( findNetblock( '209.157.64.1', $bks ) );
+    ok( findNetblock( '209.157.64.1', $bks ), 'findNetBlock 209.157.64.1 / 209.157.64.1/32' );
 
     my @store3 = qw(
       216.240.32.0/19
@@ -226,22 +240,22 @@ MAIN: {
 
     my (@c) = range2cidrlist( "66.33.85.239", "66.33.85.240" );
     my $dl = dlist(@c);
-    ok( $dl eq '66.33.85.239/32 66.33.85.240/32' );
+    is( $dl, '66.33.85.239/32 66.33.85.240/32', 'match cidrlist 1' );
 
     (@c) = range2cidrlist( "66.33.85.240", "66.33.85.239" );
     $dl = dlist(@c);
-    ok( $dl eq '66.33.85.239/32 66.33.85.240/32' );
+    is( $dl, '66.33.85.239/32 66.33.85.240/32', 'match cidrlist 2' );
 
     (@c) = range2cidrlist( '216.240.32.128', '216.240.36.127' );
     $dl = dlist(@c);
-    ok( $dl eq '216.240.32.128/25 216.240.33.0/24 216.240.34.0/23 216.240.36.0/25' );
+    is( $dl, '216.240.32.128/25 216.240.33.0/24 216.240.34.0/23 216.240.36.0/25', 'match cidrlist 3' );
 
     my @d;
     @d = ( @c[ 0, 1, 3 ] );
 
     my (@e) = cidrs2contiglists(@d);
 
-    ok( @e == 2 );
+    is( @e, 2 );
 
     is( dlist( @{ $e[0] } ), '216.240.32.128/25 216.240.33.0/24' );
     is( dlist( @{ $e[1] } ), '216.240.36.0/25' );
@@ -372,27 +386,27 @@ MAIN: {
       cidrs2cidrs(
         multinew(qw(216.240.32.0/25 216.240.32.128/25 216.240.33.0/25 216.240.34.0/24)) );
     $dl = dlist(@c);
-    ok( $dl eq '216.240.32.0/24 216.240.33.0/25 216.240.34.0/24' );
+    is( $dl, '216.240.32.0/24 216.240.33.0/25 216.240.34.0/24' );
 
     (@c) = cidrs2cidrs(
         multinew(
             qw(216.240.32.0/32 216.240.32.1/32 216.240.32.2/32 216.240.32.3/32 216.240.32.4/32))
     );
     $dl = dlist(@c);
-    ok( $dl eq '216.240.32.0/30 216.240.32.4/32' );
+    is( $dl, '216.240.32.0/30 216.240.32.4/32' );
 
     (@c) = cidrs2cidrs(
         multinew(
             qw(216.240.32.64/28 216.240.32.0/25 216.240.32.128/25 216.240.33.0/25 216.240.34.0/24))
     );
     $dl = dlist(@c);
-    ok( $dl eq '216.240.32.0/24 216.240.33.0/25 216.240.34.0/24' );
+    is( $dl, '216.240.32.0/24 216.240.33.0/25 216.240.34.0/24' );
 
-    my $block = Net::Netmask->new( '172.2.4.0', '255.255.255.0' );
+    $block = Net::Netmask->new( '172.2.4.0', '255.255.255.0' );
     $table = {};
     $block->storeNetblock($table);
-    @bl = findAllNetblock( '172.2.4.1', $table );
-    ok( $#bl == 0 );
+    my @bl = findAllNetblock( '172.2.4.1', $table );
+    is( $#bl, 0 );
 
     $block->tag( 'a', 'b' );
     $block->tag( 'b', 'c' );
@@ -401,11 +415,11 @@ MAIN: {
     $block->tag( 'd', 'x' );
     $block->tag('d');
 
-    ok( $block->tag('a') eq 'b' );
-    ok( $block->tag('b') eq 'c' );
-    ok( !defined( $block->tag('c') ) );
-    ok( $block->tag('d') eq 'x' );
-    ok( $block->tag('a') eq 'b' );
+    is( $block->tag('a'), 'b' );
+    is( $block->tag('b'), 'c' );
+    is( $block->tag('c'), undef );
+    is( $block->tag('d'), 'x' );
+    is( $block->tag('a'), 'b' );
 
     (@c) = cidrs2inverse(
         '216.240.32.0/22',
@@ -416,7 +430,7 @@ MAIN: {
         )
     );
     $dl = dlist(@c);
-    ok( $dl eq '216.240.33.128/25 216.240.35.0/24' );
+    is( $dl, '216.240.33.128/25 216.240.35.0/24' );
 
     (@c) = cidrs2inverse(
         '216.240.32.0/22',
@@ -427,7 +441,7 @@ MAIN: {
         )
     );
     $dl = dlist(@c);
-    ok( $dl eq '216.240.33.128/25 216.240.35.0/24' );
+    is( $dl, '216.240.33.128/25 216.240.35.0/24' );
 
     (@c) = cidrs2inverse(
         '216.240.32.0/22',
@@ -438,12 +452,12 @@ MAIN: {
         )
     );
     $dl = dlist(@c);
-    ok( $dl eq '' );
+    is( $dl, '' );
 
     my $table77 = {};
     my $block77 = new2 Net::Netmask( "10.1.2.0/24", $table77 );
     $block77->storeNetblock();
-    ok( !defined( findNetblock( "10.2.1.0", $table77 ) ) );
+    is( findNetblock( "10.2.1.0", $table77 ), undef );
 
     {
         my $bl = Net::Netmask->new("192.168.0.0/23");
@@ -465,46 +479,46 @@ MAIN: {
         my $obj2     = new2 Net::Netmask('1.0.0.4/32');
         my @leftover = cidrs2inverse( $obj1, $obj2 );
         # print "leftover = @leftover\n";
-        ok( @leftover == 1 );
-        ok( "$leftover[0]" eq "1.0.0.5/32" );
+        is( @leftover, 1 );
+        is( "$leftover[0]", "1.0.0.5/32" );
     }
 
     {
         my $obj1     = new2 Net::Netmask('1.0.0.4/32');
         my $obj2     = new2 Net::Netmask('1.0.0.0/8');
         my @leftover = cidrs2inverse( $obj1, $obj2 );
-        ok( !@leftover, "@leftover" );
+        is( @leftover, 0, "@leftover" );
     }
 
     {
         my $obj1     = new2 Net::Netmask('1.0.0.4/32');
         my $obj2     = new2 Net::Netmask('1.0.0.4/32');
         my @leftover = cidrs2inverse( $obj1, $obj2 );
-        ok( !@leftover, "@leftover" );
+        is( @leftover, 0, "@leftover" );
     }
 
     {
         my $obj1     = new2 Net::Netmask('1.0.0.4/32');
         my $obj2     = new2 Net::Netmask('1.0.0.6/32');
         my @leftover = cidrs2inverse( $obj1, $obj2 );
-        ok( @leftover == 1 );
-        ok( "$leftover[0]" eq '1.0.0.4/32' );
+        is( @leftover, 1 );
+        is( "$leftover[0]", '1.0.0.4/32' );
     }
 
     {
         my $obj1     = new2 Net::Netmask('1.0.0.4/31');
         my $obj2     = new2 Net::Netmask('1.0.0.5/32');
         my @leftover = cidrs2inverse( $obj1, $obj2 );
-        ok( @leftover == 1 );
-        ok( "$leftover[0]" eq '1.0.0.4/32' );
+        is( @leftover, 1 );
+        is( "$leftover[0]", '1.0.0.4/32' );
     }
 
     {
         my $obj1     = new2 Net::Netmask('1.0.0.4/31');
         my $obj2     = new2 Net::Netmask('1.0.0.4/32');
         my @leftover = cidrs2inverse( $obj1, $obj2 );
-        ok( @leftover == 1 );
-        ok( "$leftover[0]" eq '1.0.0.5/32' );
+        is( @leftover, 1 );
+        is( "$leftover[0]", '1.0.0.5/32' );
     }
 
     {
@@ -512,8 +526,8 @@ MAIN: {
         my $obj2 = new2 Net::Netmask('217.173.200.0/21');
         is( "$obj1", '217.173.192.0/21' );
         is( "$obj2", '217.173.200.0/21' );
-        ok( !$obj1->contains($obj2) );
-        ok( !$obj2->contains($obj1) );
+        is( $obj1->contains($obj2), 0);
+        is( $obj2->contains($obj1), 0);
     }
 
     {
@@ -528,6 +542,8 @@ MAIN: {
         my $blk = findNetblock( "127.0.0.", { 1 => [] } );
         is( $warnings, '' );
     }
+
+    done_testing();
 }
 
 sub lookeq {

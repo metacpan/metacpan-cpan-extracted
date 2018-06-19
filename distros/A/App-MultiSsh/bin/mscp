@@ -15,7 +15,7 @@ use English qw/ -no_match_vars /;
 use FindBin qw/$Bin/;
 use App::MultiSsh qw/hosts_from_map is_host multi_run shell_quote/;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
@@ -86,7 +86,7 @@ mscp - Multi host scp (send files to multiple hosts only)
 
 =head1 VERSION
 
-This documentation refers to mscp version 0.20.
+This documentation refers to mscp version 0.21.
 
 =head1 SYNOPSIS
 

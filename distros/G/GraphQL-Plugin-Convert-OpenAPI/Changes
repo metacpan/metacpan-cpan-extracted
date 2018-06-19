@@ -1,5 +1,8 @@
 Revision history for Perl extension GraphQL-Plugin-Convert-OpenAPI
 
+0.12	Sun 17 Jun 19:04:57 BST 2018
+ - fix t/local.t which had invalid OpenAPI 2 spec, caught by JV 2.08
+
 0.11	Fri Feb 23 04:18:47 GMT 2018
  - test, implement handling input of properties-less "object" using pairs
 

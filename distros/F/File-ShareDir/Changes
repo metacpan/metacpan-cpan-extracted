@@ -1,5 +1,13 @@
 Revision history for Perl extension File-ShareDir
 
+1.112	2018-06-18
+    - Fix tests that fail when running as root (RT#125602,
+      thanks Wesley Schwengle <wesley@schwengle.net>)
+    - Fix tests fail on MSWin32 for similar reason as the
+      root failures from RT#125602
+    - clarify support rules
+    - improve POD
+
 1.110	2018-06-16
     - remove unused/incomplete _dist_packfile
     - increase test coverage

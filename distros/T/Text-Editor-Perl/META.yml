@@ -1,0 +1,37 @@
+---
+abstract: 'Perl source code head-less editor written in Perl.'
+author:
+  - philiprbrenan@gmail.com
+build_requires: {}
+configure_requires:
+  Module::Build: '0.4224'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Editor-Perl
+provides:
+  Text::Editor::Perl:
+    file: lib/Text/Editor/Perl.pm
+    version: '20180616'
+  Text::Editor::Perl::Box:
+    file: lib/Text/Editor/Perl.pm
+  Text::Editor::Perl::Line:
+    file: lib/Text/Editor/Perl.pm
+  Text::Editor::Perl::Selection:
+    file: lib/Text/Editor/Perl.pm
+  Text::Editor::Perl::Snippet:
+    file: lib/Text/Editor/Perl.pm
+  Text::Editor::Perl::View:
+    file: lib/Text/Editor/Perl.pm
+requires:
+  Carp: '0'
+  Data::Dump: '0'
+  Data::Table::Text: '20180611'
+  Test2::API: '0'
+  Test::More: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '20180616'

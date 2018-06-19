@@ -1,5 +1,5 @@
 #
-# $Id: Online2.pm,v c07e2f6c705b 2018/05/17 11:57:52 gomor $
+# $Id: Online2.pm,v 89981a6995b9 2018/06/17 11:10:11 gomor $
 #
 package Net::Frame::Dump::Online2;
 use strict;
@@ -20,6 +20,7 @@ our @AS = qw(
    _sel
    _frames
    _timeWithoutReceiving
+   _fcode
 );
 __PACKAGE__->cgBuildIndices;
 __PACKAGE__->cgBuildAccessorsScalar(\@AS);
@@ -113,6 +114,7 @@ sub start {
       print("[-] ".__PACKAGE__.": compile: ". Net::Pcap::geterr($pd). "\n");
       return;
    }
+   $self->_fcode($fcode);  # Used to free it later on, usually on stop call.
 
    if (Net::Pcap::setfilter($pd, $fcode) < 0) {
       print("[-] ".__PACKAGE__.": setfilter: ". Net::Pcap::geterr($pd). "\n");
@@ -202,18 +204,22 @@ sub _killTcpdump {
 sub stop {
    my $self = shift;
 
-   if (! $self->isRunning || $self->_isSon) {
-      return;
-   }
-
    # We are in capture mode
-   if (length($self->file) && $self->_isFather) {
+   if (defined($self->file) && length($self->file) && $self->_isFather) {
       $self->_killTcpdump;
    }
 
-   Net::Pcap::close($self->_pcapd);
-   $self->_pcapd(undef);
-   $self->isRunning(0);
+   # Free the pcap filter
+   if (defined($self->_fcode)) {
+      Net::Pcap::pcap_freecode($self->_fcode);
+      $self->_fcode(undef);
+   }
+
+   if (defined($self->_pcapd)) {
+      Net::Pcap::close($self->_pcapd);
+      $self->_pcapd(undef);
+      $self->isRunning(0);
+   }
 
    return 1;
 }

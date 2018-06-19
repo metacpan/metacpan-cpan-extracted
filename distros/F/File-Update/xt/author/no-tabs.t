@@ -8,7 +8,8 @@ use Test::NoTabs;
 
 my @files = (
     'lib/File/Update.pm',
-    't/00-compile.t'
+    't/00-compile.t',
+    't/test1.t'
 );
 
 notabs_ok($_) foreach @files;

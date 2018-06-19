@@ -22,7 +22,8 @@ no_index:
     - t
 requires:
   Dist::Zilla: '4.102340'
+  Moose: '0'
 resources:
   repository: git://github.com/fayland/dist-zilla-plugin-repository.git
-version: '0.21'
+version: '0.23'
 x_serialization_backend: 'YAML::Tiny version 1.70'

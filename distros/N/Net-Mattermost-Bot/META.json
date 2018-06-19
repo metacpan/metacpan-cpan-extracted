@@ -37,7 +37,7 @@
             "Furl" : "0",
             "HTTP::Status" : "0",
             "JSON::MaybeXS" : "0",
-            "List::Util" : "0",
+            "List::Util" : "1.29",
             "Mojo::IOLoop" : "0",
             "Mojo::UserAgent" : "0",
             "Moo" : "0",
@@ -47,6 +47,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

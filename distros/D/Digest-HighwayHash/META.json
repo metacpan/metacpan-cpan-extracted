@@ -22,7 +22,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "Test::Exception" : "0"
          }
       },
       "configure" : {
@@ -43,6 +44,6 @@
          "url" : "https://git.ieval.ro/?p=digest-highwayhash.git"
       }
    },
-   "version" : "0.001",
+   "version" : "0.001001",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

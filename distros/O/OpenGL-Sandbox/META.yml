@@ -1,0 +1,41 @@
+---
+abstract: 'Easy access to a variety of OpenGL prototyping tools'
+author:
+  - 'Michael Conrad <mike@nrdvana.net>'
+build_requires:
+  FindBin: '0'
+  Log::Any::Adapter: '0'
+  Log::Any::Adapter::TAP: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  Devel::CheckLib: '1.03'
+  ExtUtils::MakeMaker: '0'
+  Inline::MakeMaker: '0.45'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OpenGL-Sandbox
+requires:
+  Carp: '0'
+  Exporter: '0'
+  File::Find: '0'
+  File::Map: '0'
+  File::Spec::Functions: '0'
+  Image::PNG::Libpng: '0'
+  Inline: '0'
+  Log::Any: '0'
+  Moo: '0'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  constant: '0'
+  perl: v5.14.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/nrdvana/perl-OpenGL-Sandbox
+  repository: https://github.com/nrdvana/perl-OpenGL-Sandbox.git
+version: '0.02'

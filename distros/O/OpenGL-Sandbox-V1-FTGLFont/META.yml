@@ -1,0 +1,35 @@
+---
+abstract: 'Wrapper around FTGL Font library which renders TrueType in OpenGL 1.x'
+author:
+  - 'Michael Conrad <mike@nrdvana.net>'
+build_requires:
+  File::Spec::Functions: '0'
+  FindBin: '0'
+  Log::Any::Adapter: '0'
+  Log::Any::Adapter::TAP: '0'
+  OpenGL::Sandbox: '0'
+  Test::More: '0'
+  Time::HiRes: '0'
+  Try::Tiny: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Devel::CheckLib: '1.03'
+  ExtUtils::MakeMaker: '0'
+  Inline::MakeMaker: '0.45'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OpenGL-Sandbox-V1-FTGLFont
+requires:
+  Cwd: '0'
+  Inline: '0'
+  Moo: '0'
+  OpenGL::Sandbox::MMap: '0'
+resources:
+  bugtracker: https://github.com/nrdvana/perl-OpenGL-Sandbox
+  repository: https://github.com/nrdvana/perl-OpenGL-Sandbox.git
+version: '0.02'

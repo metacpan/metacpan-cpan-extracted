@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.063';
+our $VERSION = '0.064';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_dir choose_a_file choose_dirs choose_a_number choose_a_subset settings_menu insert_sep
                      length_longest print_hash term_size term_width unicode_sprintf unicode_trim );
@@ -459,8 +459,8 @@ sub choose_a_subset {
         my @idx = choose(
             [ @pre, map { $prefix . ( defined $_ ? $_ : '' ) } @$curr_avail ],
             { prompt => $lines, layout => $layout, mouse => $mouse, clear_screen => $clear, justify => $justify,
-              index => 1, lf => [ 0, 2 ], order => $order, no_spacebar => [ 0 .. $#pre ], undef => $back,
-              mark => $mark }
+              index => 1, lf => [ 0, 2 ], order => $order, meta_items => [ 0 .. $#pre ], undef => $back,
+              mark => $mark, include_highlighted => 2 }
         );
         $mark = undef;
         if ( ! defined $idx[0] || $idx[0] == 0 ) {
@@ -477,8 +477,8 @@ sub choose_a_subset {
             $i -= @pre;
             if ( $remove_chosen ) {
                 splice( @$curr_avail, $i, 1 );
-                for my $u ( sort @$new_idx ) {
-                    last if $u > $i;
+                for my $used_i ( sort { $a <=> $b } @$new_idx ) {
+                    last if $used_i > $i;
                     ++$i;
                 }
             }
@@ -702,7 +702,7 @@ Term::Choose::Util - CLI related functions.
 
 =head1 VERSION
 
-Version 0.063
+Version 0.064
 
 =cut
 

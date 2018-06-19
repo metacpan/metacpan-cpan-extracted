@@ -7,24 +7,20 @@ package Comics::Plugin::WhatTheDuck;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "0.02";
+our $VERSION = "1.00";
 
-sub register {
-    shift->SUPER::register
-      ( { name    => "What the Duck",
-	  url     => "http://www.whattheduck.net/",
-	  pat	  =>
+our $name    = "What the Duck";
+our $url     = "http://www.whattheduck.net/";
+our $pattern =
 	    qr{ <img \s+
-		src="(?<url>http://\d+\.media\.tumblr\.com/
+		src="(?<url>https?://\d+\.media\.tumblr\.com/
 		[0-9a-f]{32}/
-		(?<image>tumblr_.*?_1280\.\w+))" \s+
+		(?<image>tumblr_.*?_(?:1280|640)\.\w+))" \s+
 	        alt="(?<alt>WTD.*?)" \s+
 		width="\d+" \s+
 		height="\d+" \s*
 		>
-	      }x,
-	} );
-}
+	      }x;
 
 # Important: Return the package name!
 __PACKAGE__;

@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 
 #
-# Copyright (C) 2016 Joelle Maslak
+# Copyright (C) 2016-2018 Joelle Maslak
 # All Rights Reserved - See License
 #
 
-use Test2::Bundle::Extended 0.000058;
+use Test2::V0 0.000111;
 
 use Crypt::EAMessage;
 

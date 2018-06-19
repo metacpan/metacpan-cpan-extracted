@@ -253,6 +253,36 @@ sub test_cn : Test(3) {
     }
 }
 
+
+sub test_cz : Test(4) {
+    SKIP: {
+        eval { require Date::Holidays::CZ };
+        skip "Date::Holidays::CZ not installed", 4 if $@;
+
+        ok( my $dh = Date::Holidays->new( countrycode => 'cz' ),
+            'Testing Date::Holidays::cz' );
+
+        ok( $dh->holidays( year => 2004 ),
+            'Testing holidays for Date::Holidays::cz' );
+
+        ok($dh->is_holiday(
+            year   => 2017,
+            month  => 1,
+            day    => 1,
+        ), 'Testing czech national holiday');
+
+        my $holidays_hashref = Date::Holidays->is_holiday(
+            year  => 2017,
+            month => 1,
+            day   => 1,
+            countries => [ 'cz' ],
+        );
+
+        ok( $holidays_hashref->{'cz'},
+            'Checking for Czech first day of year' );
+    }
+}
+
 sub test_de : Test(6) {
     SKIP: {
         eval { require Date::Holidays::DE };

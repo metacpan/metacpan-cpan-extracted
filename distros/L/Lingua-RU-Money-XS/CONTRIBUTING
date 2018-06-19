@@ -1,0 +1,68 @@
+This is a short set of guidelines for those contributing Lingua::RU::Money::XS.
+It's not an iron-clad set of rules, but just things which make life easier when
+reading and integrating a patch.
+
+
+Reporting bugs
+
+- Often the only information we have for fixing a bug is contained in your
+  report. So...
+
+- Please report your bugs via http://rt.cpan.org or by mailing <imun@cpan.org>
+
+- Please report your bug immediately upon encountering it. Do not wait until you
+  have a patch to fix the bug. Patches are good, but not at the expense of
+  timely bug reports.
+
+- Please be as verbose as possible. Include the complete output of your
+  'make test' or even 'make test TEST_VERBOSE=1', output of 'uname -a' for your
+  machine and example for reproducing. The more data we have to work with, the
+  faster we can diagnose the problem.
+
+- If you find an undocumented feature, or if a feature has changed/been added
+  which causes a problem, report it. Do not assume it was done deliberately.
+  Even if it was done deliberately, we still want to hear if it caused problems.
+
+- If you're testing Lingua::RU::Money::XS against a development version of Perl,
+  please also check it against the latest stable version. This makes it easier
+  to figure out if it's MakeMaker or Perl at fault.
+
+
+Pull Request
+
+- If you wrote a patch already, please send it by mailing <imun@cpan.org> so we
+  can check it together.
+
+- Patches against master branch of
+  https://git.imun.cloud/p5-Lingua-RU-Money-XS.git are prefered.
+
+- Patches against the latest CPAN version are ok, too.
+
+
+Code formatting
+
+- No spaces for indentation, please use tabs. This allows everyone to configure
+  convinient indentaion width.
+
+- snake_case is preferred instead of camelCase though it is module for Perl, not
+  for Python.
+
+
+Backwards Compatibility
+
+- Lingua::RU::Money::XS must be backwards compatible to 5.10.0.
+
+
+Cross-Platform Compatibility
+
+- Lingua::RU::Money::XS must work on all UNIX architectures Perl works on.
+
+
+Documentation
+
+- If you're patching an existing method, please document this in accordance with
+  the changes and write about reason within BUGS section.
+
+- If you're adding new method, please document this in maximum detail.
+
+- Additional and more verbose documentation would be a present for me.

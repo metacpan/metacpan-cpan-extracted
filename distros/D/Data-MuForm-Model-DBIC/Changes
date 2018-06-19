@@ -1,0 +1,9 @@
+Revision history for Perl module Data::MuForm::Model::DBIC
+
+0.01 2017-01-29
+
+ - Initial release
+
+0.02 2018-06-17
+
+ - Add Data::MuForm prereq

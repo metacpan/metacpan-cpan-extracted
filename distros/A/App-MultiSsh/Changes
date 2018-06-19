@@ -1,5 +1,13 @@
 Revision history for App-MultiSsh
 
+0.21   2018-06-18
+        Updating for release of version 0.21
+        Adding in latest perl version for travis (Ivan Wills)
+        Updated dates (Ivan Wills)
+        Adding auto build (Ivan Wills)
+        Fixing up docs and making example version work (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+
 0.20   2017-08-06
         Updating for release of version 0.20
         Updated date (Ivan Wills)

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Open::This;
 
-our $VERSION = '0.000007';
+our $VERSION = '0.000008';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(parse_text to_editor_args);
@@ -43,7 +43,7 @@ sub parse_text {
     }
 
     if ( $file_name && $sub_name && $^O ne 'MSWin32' ) {
-        my $grep = `grep --line-number "sub $sub_name" $file_name`;
+        my $grep = `grep -n "sub $sub_name" $file_name`;
         my @results = split m{:}, $grep;
         $line_number = shift @results;
     }
@@ -147,7 +147,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 =head1 VERSION
 
-version 0.000007
+version 0.000008
 
 =head1 DESCRIPTION
 

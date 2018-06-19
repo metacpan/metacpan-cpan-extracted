@@ -1,6 +1,7 @@
 .travis.yml
 CHANGES
 DOM.xs
+examples/html5lib_tests.pl
 examples/simple.pl
 gen/modest_errors.c
 gen/tags_ua_style.c
@@ -25,7 +26,15 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-modest.c
+modest_config.h
+modest_modest.c
+modest_mycore.c
+modest_mycss.c
+modest_myencoding.c
+modest_myfont.c
+modest_myhtml.c
+modest_myport.c
+modest_myurl.c
 port/openbsd/mcsync.c
 ppport.h
 README
@@ -220,8 +229,6 @@ third_party/modest/include/myurl/serialization.h
 third_party/modest/include/myurl/url.h
 third_party/modest/include/myurl/utils.h
 third_party/modest/LICENSE
-third_party/modest/Makefile.bin.cfg
-third_party/modest/Makefile.cfg
 third_party/modest/modest.pc.in
 third_party/modest/source/modest/declaration.c
 third_party/modest/source/modest/declaration.h
@@ -241,7 +248,6 @@ third_party/modest/source/modest/glue.c
 third_party/modest/source/modest/glue.h
 third_party/modest/source/modest/layer/layer.c
 third_party/modest/source/modest/layer/layer.h
-third_party/modest/source/modest/Makefile.mk
 third_party/modest/source/modest/modest.c
 third_party/modest/source/modest/modest.h
 third_party/modest/source/modest/myosi.h
@@ -276,7 +282,6 @@ third_party/modest/source/modest/style/type.c
 third_party/modest/source/modest/style/type.h
 third_party/modest/source/mycore/incoming.c
 third_party/modest/source/mycore/incoming.h
-third_party/modest/source/mycore/Makefile.mk
 third_party/modest/source/mycore/myosi.c
 third_party/modest/source/mycore/myosi.h
 third_party/modest/source/mycore/mystring.c
@@ -333,7 +338,6 @@ third_party/modest/source/mycss/declaration/state.c
 third_party/modest/source/mycss/declaration/state.h
 third_party/modest/source/mycss/entry.c
 third_party/modest/source/mycss/entry.h
-third_party/modest/source/mycss/Makefile.mk
 third_party/modest/source/mycss/media/init.c
 third_party/modest/source/mycss/media/init.h
 third_party/modest/source/mycss/media/myosi.h
@@ -433,7 +437,6 @@ third_party/modest/source/myencoding/detect.c
 third_party/modest/source/myencoding/detect_resource.h
 third_party/modest/source/myencoding/encoding.c
 third_party/modest/source/myencoding/encoding.h
-third_party/modest/source/myencoding/Makefile.mk
 third_party/modest/source/myencoding/myosi.h
 third_party/modest/source/myencoding/mystring.c
 third_party/modest/source/myencoding/mystring.h
@@ -450,7 +453,6 @@ third_party/modest/source/myfont/hmtx.c
 third_party/modest/source/myfont/hmtx.h
 third_party/modest/source/myfont/loca.c
 third_party/modest/source/myfont/loca.h
-third_party/modest/source/myfont/Makefile.mk
 third_party/modest/source/myfont/maxp.c
 third_party/modest/source/myfont/maxp.h
 third_party/modest/source/myfont/myfont.c
@@ -476,7 +478,6 @@ third_party/modest/source/myhtml/charef_resource.h
 third_party/modest/source/myhtml/data_process.c
 third_party/modest/source/myhtml/data_process.h
 third_party/modest/source/myhtml/def.h
-third_party/modest/source/myhtml/Makefile.mk
 third_party/modest/source/myhtml/myhtml.c
 third_party/modest/source/myhtml/myhtml.h
 third_party/modest/source/myhtml/mynamespace.c
@@ -509,26 +510,22 @@ third_party/modest/source/myhtml/tokenizer_script.c
 third_party/modest/source/myhtml/tokenizer_script.h
 third_party/modest/source/myhtml/tree.c
 third_party/modest/source/myhtml/tree.h
-third_party/modest/source/myport/posix/Makefile.mk
 third_party/modest/source/myport/posix/mycore/io.c
 third_party/modest/source/myport/posix/mycore/memory.c
 third_party/modest/source/myport/posix/mycore/perf.c
 third_party/modest/source/myport/posix/mycore/thread.c
 third_party/modest/source/myport/posix/mycore/utils/mcsync.c
 third_party/modest/source/myport/posix/Rules.mk
-third_party/modest/source/myport/windows_nt/Makefile.mk
 third_party/modest/source/myport/windows_nt/mycore/io.c
 third_party/modest/source/myport/windows_nt/mycore/memory.c
 third_party/modest/source/myport/windows_nt/mycore/perf.c
 third_party/modest/source/myport/windows_nt/mycore/thread.c
 third_party/modest/source/myport/windows_nt/mycore/utils/mcsync.c
 third_party/modest/source/myport/windows_nt/Rules.mk
-third_party/modest/source/myunicode/Makefile.mk
 third_party/modest/source/myunicode/myosi.c
 third_party/modest/source/myunicode/myosi.h
 third_party/modest/source/myurl/host.c
 third_party/modest/source/myurl/host.h
-third_party/modest/source/myurl/Makefile.mk
 third_party/modest/source/myurl/myosi.c
 third_party/modest/source/myurl/myosi.h
 third_party/modest/source/myurl/parser.c
@@ -549,9 +546,6 @@ third_party/modest/source/myurl/url.c
 third_party/modest/source/myurl/url.h
 third_party/modest/source/myurl/utils.c
 third_party/modest/source/myurl/utils.h
-third_party/modest/third_party/font/Arkhip.otf
-third_party/modest/third_party/font/Arkhip.ttf
-third_party/modest/third_party/font/readme.txt
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,10 @@
 Revision history for App-Unding
  
+0.005     2018-06-16 16:58:54+02:00 Europe/Zurich
+ - use ReadLine form Term::ReadKey instead of <>
+ - move source repository to gitlab
+ - documentation, use bullets in item list
+
 0.004     2018-06-08 11:11:05+02:00 Europe/Zurich
  - clarifiy that script should be copied to local directoy in pod
 

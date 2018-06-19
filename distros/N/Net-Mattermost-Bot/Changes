@@ -4,3 +4,9 @@ Revision history for Perl extension Net::Mattermost::Bot.
 	- original version; created by h2xs 1.23 with options
 		-AX Net::Mattermost::Bot
 
+0.02  Sat Jun 16 14:07:15 2018
+	- lowered minimum required Perl version
+
+0.03  Mon Jun 18 11:10:45 2018
+	- specified List::Util version with "pairs"
+	- renamed events, added a generic catch-all for unknowns

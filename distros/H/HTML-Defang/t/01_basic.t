@@ -1,7 +1,10 @@
 #!/usr/bin/perl -w
-BEGIN { do '/home/mod_perl/hm/ME/FindLibs.pm'; }
 
-use Test::More tests => 89;
+BEGIN { # CPAN users don't have ME::*, so use eval
+  eval 'use ME::FindLibs'
+}
+
+use Test::More tests => 93;
 use HTML::Defang;
 use strict;
 
@@ -73,6 +76,7 @@ $H = <<EOF;
 25:<![if gte IE 4]>
 26:<SCRIPT>alert('XSS');</SCRIPT>
 27:<![endif]>
+27a:<!--[if gte IE 4]--><foo>
 28:<XML ID=I><X><C>
 29:<![CDATA[<IMG SRC="javas]]>
 30:<![CDATA[cript:alert('XSS');">
@@ -122,9 +126,10 @@ like($Res, qr{21: comment ${CommentEndText}-->}, "Multi-line comment end");
 like($Res, qr{22:<!--${CommentStartText}\[if gte IE 4\]>}, "IE conditional downlevel-hidden comment start");
 like($Res, qr{23:<SCRIPT>alert\('XSS'\);</SCRIPT>}, "IE conditional downlevel-hidden comment body");
 like($Res, qr{24:<!\[endif\]${CommentEndText}-->}, "IE conditional downlevel-hidden comment end");
-like($Res, qr{25:<!--${CommentStartText}\[if gte IE 4\]-->}, "IE conditional downlevel-revealed comment start");
+like($Res, qr{25:<!--${CommentStartText}\[if gte IE 4\]${CommentEndText}-->}, "IE conditional downlevel-revealed comment start");
 like($Res, qr{26:<!--defang_SCRIPT--><!-- alert\('XSS'\); --><!--/defang_SCRIPT-->}, "IE conditional downlevel-revealed comment body");
-like($Res, qr{27:<!--\[endif\]${CommentEndText}-->}, "IE conditional downlevel-revealed comment end");
+like($Res, qr{27:<!--${CommentStartText}\[endif\]${CommentEndText}-->}, "IE conditional downlevel-revealed comment end");
+like($Res, qr{27a:<!--${CommentStartText}\[if gte IE 4\]${CommentEndText}--><!--${DefangString}foo-->}, "IE conditional defang content");
 
 # Some XML tests
 # Refer http://www.w3schools.com/XML/xml_cdata.asp for information on CDATA
@@ -177,6 +182,13 @@ EOF
 $Res = $Defang->defang($H);
 
 like($Res, qr{<img width="1" defang_/  = "/">}, "Use '/' as an attribute key");
+
+$H = <<'EOF';
+1:<img width="1" / style="color: red">
+EOF
+$Res = $Defang->defang($H);
+
+like($Res, qr{^1:<img width="1" / style="color: red">$}, "Stray / in tag");
 
 $H = <<EOF;
 1:<html><!--
@@ -243,11 +255,11 @@ alert("XSS");
 EOF
 $Res = $Defang->defang($H);
 
-like($Res, qr{<!--defang_script-->
-<!-- /\*multi line script start\*/
+like($Res, qr{<!--defang_script--><!-- 
+/\*multi line script start\*/
 alert\("XSS"\);
-/\*multi line script end\*/ -->
-<!--/defang_script-->}, "Multi-line <script> tag with opening HTML comments alone");
+/\*multi line script end\*/
+ --><!--/defang_script-->}, "Multi-line <script> tag with opening HTML comments alone");
 
 $H = <<'EOF';
 <script>
@@ -257,10 +269,10 @@ alert("XSS");
 EOF
 $Res = $Defang->defang($H);
 
-like($Res, qr{<!--defang_script-->
-<!-- 
-alert\("XSS"\); -->
-<!--/defang_script-->}, "Multi-line <script> tag with closing HTML comments alone");
+like($Res, qr{<!--defang_script--><!-- 
+
+alert\("XSS"\);
+ --><!--/defang_script-->}, "Multi-line <script> tag with closing HTML comments alone");
 
 $Defang = HTML::Defang->new(
     fix_mismatched_tags => 1,
@@ -312,7 +324,7 @@ like($Res, qr{^<table>
 $H = <<EOF;
 <table>
 <tr>
-<td><i>
+<td><i>non-blank
 <pre>
 </tr>
 EOF
@@ -321,9 +333,9 @@ $Res =~ s/<!--.*?-->//g;
 
 like($Res, qr{^<table>
 <tr>
-<td><i>
-<pre>
-</pre></td></tr>
+<td><i>non-blank
+</i><pre><i>
+</i></pre></td></tr>
 </table>$}, "Add multiple missing closing tags when one closing tag and one non-callback tag is present");
 
 $H = <<EOF;
@@ -362,6 +374,20 @@ like($Res, qr{^<pre>
 </pre>$}, "Add missing closing tag to end of HTML");
 
 $H = <<EOF;
+<PRE>
+<div></a></A>
+</DIV>
+</pre>
+EOF
+$Res = $Defang->defang($H);
+$Res =~ s/<!--.*?-->//g;
+
+like($Res, qr{^<PRE>
+<div>
+</DIV>
+</pre>$}, "Check uppercase/lowercase tags");
+
+$H = <<EOF;
 <table><tr><td>before-font</font>after-font
 EOF
 $Res = $Defang->defang($H);
@@ -385,7 +411,8 @@ EOF
 $Res = $Defang->defang($H);
 $Res =~ s/<!--.*?-->//g;
 
-like($Res, qr{^<table><tr><td></td></tr></table>$}, "Check implicit opening tags 2");
+like($Res, qr{^<table><tr><td>
+</td></tr></table>$}, "Check implicit opening tags 2");
 
 $H = <<EOF;
 <table><tr><td><table></table><div>
@@ -502,7 +529,10 @@ like($Res, qr{^1:<br>
 
 $H = <<EOF;
 1:<unknownTag title="something with -- in it">
+2:<b><noscript><!-- </noscript><img src=xx: onerror=alert(document.domain) --></noscript>
 EOF
 $Res = $Defang->defang($H);
 
 like($Res, qr{^1:<!--${DefangString}unknownTag title="something with  in it"-->}, "Defang unknown tag with --'s in it");
+like($Res, qr{^2:<b><!--${DefangString}noscript--><!--$CommentStartText </noscript><img src=xx: onerror=alert\(document\.domain\) $CommentEndText--><!--/${DefangString}noscript-->}m, "Defang noscript tag");
+

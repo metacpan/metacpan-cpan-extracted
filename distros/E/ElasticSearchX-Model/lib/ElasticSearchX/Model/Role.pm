@@ -8,7 +8,7 @@
 #   The (three-clause) BSD License
 #
 package ElasticSearchX::Model::Role;
-$ElasticSearchX::Model::Role::VERSION = '1.0.3';
+$ElasticSearchX::Model::Role::VERSION = '2.0.0';
 use Moose::Role;
 use Search::Elasticsearch;
 use ElasticSearchX::Model::Index;
@@ -59,7 +59,7 @@ sub deploy {
         }
         if ( my $alias = $index->alias_for ) {
             my @aliases = keys %{
-                $self->es->indices->get_aliases(
+                $self->es->indices->get_alias(
                     index  => $index->name,
                     ignore => [404]
                     )
@@ -106,7 +106,7 @@ ElasticSearchX::Model::Role
 
 =head1 VERSION
 
-version 1.0.3
+version 2.0.0
 
 =head1 AUTHOR
 

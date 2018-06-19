@@ -3,7 +3,7 @@ abstract: 'Simple-to-use Abstraction of Encrypted Authenticated Messages'
 author:
   - 'Joelle Maslak <jmaslak@antelope.net>'
 build_requires:
-  Test2::Bundle::Extended: '0.000058'
+  Test2::V0: '0.000111'
   Test::UseAllModules: '0.17'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -17,7 +17,7 @@ name: Crypt-EAMessage
 provides:
   Crypt::EAMessage:
     file: lib/Crypt/EAMessage.pm
-    version: '1.005'
+    version: '1.007'
 requires:
   Bytes::Random::Secure: '0'
   Carp: '0'
@@ -35,5 +35,5 @@ requires:
 resources:
   bugtracker: https://github.com/jmaslak/Crypt-EAMessage/issues
   repository: git://github.com/jmaslak/Crypt-EAMessage.git
-version: '1.005'
+version: '1.007'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -149,7 +149,7 @@ static int commit_index(
 
 cleanup:
 	git_tree_free(i_tree);
-	git_buf_free(&msg);
+	git_buf_dispose(&msg);
 	return error;
 }
 
@@ -291,7 +291,7 @@ static int commit_untracked(
 
 cleanup:
 	git_tree_free(u_tree);
-	git_buf_free(&msg);
+	git_buf_dispose(&msg);
 	return error;
 }
 
@@ -423,7 +423,7 @@ static int prepare_worktree_commit_message(
 	error = (git_buf_oom(msg) || git_buf_oom(&buf)) ? -1 : 0;
 
 cleanup:
-	git_buf_free(&buf);
+	git_buf_dispose(&buf);
 
 	return error;
 }
@@ -565,7 +565,7 @@ int git_stash_save(
 
 cleanup:
 
-	git_buf_free(&msg);
+	git_buf_dispose(&msg);
 	git_commit_free(i_commit);
 	git_commit_free(b_commit);
 	git_commit_free(u_commit);
@@ -737,9 +737,6 @@ static void normalize_apply_options(
 		git_stash_apply_options default_apply_opts = GIT_STASH_APPLY_OPTIONS_INIT;
 		memcpy(opts, &default_apply_opts, sizeof(git_stash_apply_options));
 	}
-
-	if ((opts->checkout_options.checkout_strategy & (GIT_CHECKOUT_SAFE | GIT_CHECKOUT_FORCE)) == 0)
-		opts->checkout_options.checkout_strategy = GIT_CHECKOUT_SAFE;
 
 	if (!opts->checkout_options.our_label)
 		opts->checkout_options.our_label = "Updated upstream";

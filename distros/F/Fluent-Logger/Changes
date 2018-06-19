@@ -1,5 +1,8 @@
 Revision history for Fluent::Logger
 
+0.27 2018-06-19T07:52:56Z
+  * Add retry_immediately option (#28)
+
 0.25 2017-06-02T01:41:24Z
   * Fix tests failure on Perl 5.26 (#27)
 

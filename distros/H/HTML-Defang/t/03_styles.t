@@ -1,13 +1,15 @@
 #!/usr/bin/perl -w
 
-BEGIN { do '/home/mod_perl/hm/ME/FindLibs.pm'; }
+BEGIN { # CPAN users don't have ME::*, so use eval
+  eval 'use ME::FindLibs'
+}
 
-use Test::More tests => 89;
+use Test::More tests => 93;
 use HTML::Defang;
 use strict;
 
 my ($Res, $H);
-my ($DefangString, $CommentStartText, $CommentEndText) = ('defang_', '', '');
+my ($DefangString, $CommentStartText, $CommentEndText) = ('defang_', ' ', ' ');
 
 my $Defang = HTML::Defang->new();
 
@@ -599,12 +601,7 @@ like($Res, qr{27:<a style="s5\{ai:aj;\}s6\{ak:al;\}">}s, "Test style attribute -
 like($Res, qr{28:<a style=" s7  \{   am    :     an      \}       s8        \{         ao          :           ap            ;             \}              ">}s, "Test style attribute - multiple property pairs with selectors, braces spaces and semi-colon");
 like($Res, qr{29:<a style="{color: #900} :link {background: #ff0} :visited {background: #fff} :hover {outline: thin red solid} :active {background: #00f}">}s, "Test style attribute - style rule with and without selectors");
 like($Res, qr{30:<a style="{color: #090; line-height: 1.2} ::first-letter {color: #900}">}, "Test style attribute - style rule with and without selectors in single line");
-like($Res, qr{31:<a href="abccomscript" title="a" id="a1" style="{color: #900}
-          :link {background: #ff0}
-          :visited {background: #fff}
-          :hover {outline: thin red solid}
-          :active {background: #00f}">
-$}, "Test style attribute - style rule with and without selectors over multiple lines");
+like($Res, qr{31:<a href="abccomscript" title="a" id="a1" style="{color: #900}&#x0a;          :link {background: #ff0}&#x0a;          :visited {background: #fff}&#x0a;          :hover {outline: thin red solid}&#x0a;          :active {background: #00f}">$}, "Test style attribute - style rule with and without selectors over multiple lines");
 
 $H = <<EOF;
 <style>   
@@ -668,4 +665,68 @@ $Res = $Defang->defang($H);
 like($Res, qr{^<style><!--${CommentStartText}
 body {color: black}
 $CommentEndText--></style>$}s, "Style tag without HTML comments");
+
+$H = <<EOF;
+<style><!--
+body { background: #fff url("javascript:alert('XSS')"); }
+--></style>
+EOF
+$Res = $Defang->defang($H);
+
+like($Res, qr{^<style><!--${CommentStartText}
+body { /\*background: #fff url\("javascript:alert\('XSS'\)"\);\*/ }
+${CommentEndText}--></style>$}s, "Background with separate url");
+
+$H = <<EOF;
+<style><!-- body { */background*/-image: url("javascript:alert('XSS')")/* } --></style>
+EOF
+$Res = $Defang->defang($H);
+
+like($Res, qr{^<style><!--${CommentStartText} body { /\*background-image: url\("javascript:alert\('XSS'\)"\) \*/} ${CommentEndText}--></style>$}s, "Lone end-comment/start-comment in style");
+
+
+$H = <<EOF;
+<style>
+\@media all and (max-width: 699px) {
+  body {
+    border: 10px;
+    color: black;
+    padding: 20px
+  }
+}
+\@media all and (min-width: 700px) {
+  body {
+    padding:1px;
+    border:  2px;
+    color: white
+  }
+}
+</style>
+EOF
+$Res = $Defang->defang($H);
+
+like($Res, qr{^<style><!--${CommentStartText}
+\@media all and \(max-width: 699px\) {
+  body {
+    border: 10px;
+    color: black;
+    padding: 20px
+  }
+}
+\@media all and \(min-width: 700px\) {
+  body {
+    padding:1px;
+    border:  2px;
+    color: white
+  }
+}
+$CommentEndText--></style>$}s, "Media selectors");
+
+$H = <<EOF;
+<p style="font-size: 30px;; font-weight: lighter ;; line-height: 38px; ; color: #ffffff; font-family: 'Segoe UI Light', 'Segoe WP Light', 'Segoe UI', Helvetica, Arial;; ; ;; ">
+EOF
+
+$Res = $Defang->defang($H);
+
+like($Res, qr{^<p style="font-size: 30px;; font-weight: lighter ;; line-height: 38px; ; color: #ffffff; font-family: 'Segoe UI Light', 'Segoe WP Light', 'Segoe UI', Helvetica, Arial;">}, "Rule with multiple semi-colons");
 

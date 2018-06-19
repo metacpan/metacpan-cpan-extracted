@@ -24,16 +24,10 @@ requires "MooseX::Types::Moose" => "0";
 requires "MooseX::Types::Structured" => "0";
 requires "Scalar::Util" => "0";
 requires "Search::Elasticsearch" => "2.02";
-requires "Search::Elasticsearch::Bulk" => "0";
-requires "Search::Elasticsearch::Scroll" => "0";
 requires "Sub::Exporter" => "0";
 requires "strict" => "0";
 requires "version" => "0";
 requires "warnings" => "0";
-
-on 'build' => sub {
-  requires "Module::Build" => "0.3601";
-};
 
 on 'test' => sub {
   requires "ExtUtils::MakeMaker" => "0";
@@ -55,7 +49,7 @@ on 'test' => sub {
 };
 
 on 'configure' => sub {
-  requires "Module::Build" => "0.28";
+  requires "ExtUtils::MakeMaker" => "0";
 };
 
 on 'develop' => sub {

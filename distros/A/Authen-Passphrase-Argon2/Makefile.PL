@@ -23,6 +23,7 @@ WriteMakefile(
 		'Mime::Base64' => 0,
 		'Data::GUID' => '0.049',
 		'Carp' => 0,
+		'Syntax::Construct' => '1.004',
 	},
 	META_MERGE => {
 		'meta-spec' => { version => 2 },
@@ -33,6 +34,10 @@ WriteMakefile(
 				web  => 'https://github.com/ThisUsedToBeAnEmail/Authen-Passphrase-Argon2',
 			},
 		},
+		x_contributors => [
+			'Alexander Hartmaier <abraxxa@cpan.org>',
+			'Lars Dɪᴇᴄᴋᴏᴡ 迪拉斯 <daxim@cpan.org>'
+		],
 	},
 	dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean => { FILES => 'Authen-Passphrase-Argon2-*' },

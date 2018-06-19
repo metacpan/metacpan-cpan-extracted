@@ -8,7 +8,7 @@
 #   The (three-clause) BSD License
 #
 package ElasticSearchX::Model::Document::Trait::Field::Timestamp;
-$ElasticSearchX::Model::Document::Trait::Field::Timestamp::VERSION = '1.0.3';
+$ElasticSearchX::Model::Document::Trait::Field::Timestamp::VERSION = '2.0.0';
 use Moose::Role;
 use ElasticSearchX::Model::Document::Types qw(:all);
 
@@ -33,7 +33,7 @@ around query_property => sub {1};
 around property => sub {0};
 
 package ElasticSearchX::Model::Document::Trait::Class::Timestamp;
-$ElasticSearchX::Model::Document::Trait::Class::Timestamp::VERSION = '1.0.3';
+$ElasticSearchX::Model::Document::Trait::Class::Timestamp::VERSION = '2.0.0';
 use Moose::Role;
 
 1;
@@ -50,7 +50,7 @@ ElasticSearchX::Model::Document::Trait::Field::Timestamp
 
 =head1 VERSION
 
-version 1.0.3
+version 2.0.0
 
 =head1 AUTHOR
 

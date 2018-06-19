@@ -19,6 +19,7 @@ my @files = (
     't/08-version-ranges.t',
     't/09-missing-file.t',
     't/10-content-from-file.t',
+    't/11-eumm_version-numification.t',
     't/zzz-check-breaks.t'
 );
 

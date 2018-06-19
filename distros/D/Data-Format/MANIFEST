@@ -1,8 +1,5 @@
 Build.PL
 lib/Data/Format.pm
-lib/Data/Format/Error.pm
-lib/Data/Format/Error/ValueNumericException.pm
-lib/Data/Format/Error/ValueProvideException.pm
 lib/Data/Format/Sanitize.pm
 lib/Data/Format/Sanitize/Number.pm
 lib/Data/Format/Validate.pm
